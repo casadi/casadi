@@ -322,6 +322,12 @@ namespace CasADi{
     */
     void getNZInplace(std::vector<int>& indices) const;
 
+    /// Get nonzeros in lower triangular part
+    std::vector<int> getLowerNZ() const;
+
+    /// Get nonzeros in upper triangular part
+    std::vector<int> getUpperNZ() const;
+
     /// Get the sparsity in compressed column storage (CCS) format
 #ifndef SWIG
     void getCCS(std::vector<int>& colind, std::vector<int>& row) const;
@@ -466,12 +472,6 @@ namespace CasADi{
     /// Get lower triangular part
     Sparsity upper(bool includeDiagonal=true) const;
 
-    /// Get nonzeros in lower triangular part
-    std::vector<int> lowerNZ() const;
-
-    /// Get nonzeros in upper triangular part
-    std::vector<int> upperNZ() const;
-
     /// Do the rows appear sequentially on each column (if strictly==true, then do not allow multiple entries)
     bool rowsSequential(bool strictly=true) const;
 
@@ -604,6 +604,8 @@ namespace CasADi{
     Sparsity(int nrow, int ncol, bool dense=false);
     static Sparsity createDiagonal(int nrow){ return diag(nrow);}
     static Sparsity createDiagonal(int nrow, int ncol){ return diag(nrow,ncol);}
+    std::vector<int> lowerNZ() const{ return getLowerNZ();}
+    std::vector<int> upperNZ() const{ return getUpperNZ();}
 #ifndef SWIG
     void getSparsityCCS(std::vector<int>& colind, std::vector<int>& row) const;
     void getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const;

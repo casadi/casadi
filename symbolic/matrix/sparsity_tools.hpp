@@ -48,8 +48,8 @@ namespace CasADi{
   inline Sparsity trans(const Sparsity& a){ return a.transpose();}
   inline Sparsity upperSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.upper(includeDiagonal); }
   inline Sparsity lowerSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.lower(includeDiagonal); }
-  inline std::vector<int> upperNZ(const Sparsity& a) { return a.upperNZ(); }
-  inline std::vector<int> lowerNZ(const Sparsity& a) { return a.lowerNZ(); }
+  inline std::vector<int> upperNZ(const Sparsity& a) { return a.getUpperNZ(); }
+  inline std::vector<int> lowerNZ(const Sparsity& a) { return a.getLowerNZ(); }
   inline bool isSingular(const Sparsity& a){ return a.isSingular();}
   inline std::vector<int> sp_compress(const Sparsity& a){ return a.compress();}
   inline Sparsity sp_compress(const std::vector<int>& v){ return Sparsity::compressed(v);}

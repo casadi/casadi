@@ -191,10 +191,10 @@ namespace CasADi{
     Sparsity upper(bool includeDiagonal) const;
 
     /// Get nonzeros in lower triangular part
-    std::vector<int> lowerNZ() const;
+    std::vector<int> getLowerNZ() const;
 
     /// Get nonzeros in upper triangular part
-    std::vector<int> upperNZ() const;
+    std::vector<int> getUpperNZ() const;
 
     /// Get the dimension as a string
     std::string dimString() const;

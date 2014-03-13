@@ -723,12 +723,12 @@ namespace CasADi{
     return (*this)->upper(includeDiagonal);
   }
 
-  std::vector<int> Sparsity::lowerNZ() const{
-    return (*this)->lowerNZ();
+  std::vector<int> Sparsity::getLowerNZ() const{
+    return (*this)->getLowerNZ();
   }
 
-  std::vector<int> Sparsity::upperNZ() const{
-    return (*this)->upperNZ();
+  std::vector<int> Sparsity::getUpperNZ() const{
+    return (*this)->getUpperNZ();
   }
 
   std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row){

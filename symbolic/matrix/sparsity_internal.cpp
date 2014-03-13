@@ -3561,7 +3561,7 @@ namespace CasADi{
     return Sparsity(nrow_,ncol_,colind,row);
   }
 
-  std::vector<int> SparsityInternal::lowerNZ() const{
+  std::vector<int> SparsityInternal::getLowerNZ() const{
     vector<int> ret;
     for(int cc=0; cc<ncol_; ++cc){
       for(int el = colind_[cc]; el<colind_[cc+1]; ++el){
@@ -3573,7 +3573,7 @@ namespace CasADi{
     return ret;
   }
 
-  std::vector<int> SparsityInternal::upperNZ() const{
+  std::vector<int> SparsityInternal::getUpperNZ() const{
     vector<int> ret;
     for(int cc=0; cc<ncol_; ++cc){
       for(int el = colind_[cc]; el<colind_[cc+1] && row_[el]<=cc; ++el){
