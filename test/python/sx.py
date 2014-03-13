@@ -544,7 +544,7 @@ class SXtests(casadiTestCase):
     r=w-y
     self.assertFalse(isSymbolic(r))     
     self.assertTrue(isZero(r))
-    self.assertEqual(r.getIntValue(),0)
+    self.assertEqual(r.getValue(),0)
     self.assertEqual(getValue(r),0)
     y = SX.sym("y",2)
     y = substitute(y+6,y,0)
