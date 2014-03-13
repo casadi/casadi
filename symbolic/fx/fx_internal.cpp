@@ -1314,7 +1314,7 @@ namespace CasADi{
                           const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){                
     MXFunction f = wrapMXFunction();
     f.init();
-    f.evalMX(arg,res,fseed,fsens,aseed,asens);
+    f.callDerivative(arg,res,fseed,fsens,aseed,asens,true);
   }
 
   void FXInternal::spEvaluate(bool fwd){

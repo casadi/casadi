@@ -203,7 +203,7 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
-            res,fwdsens,adjsens = f.evalMX([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
+            res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds),True)
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             

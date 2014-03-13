@@ -282,17 +282,6 @@ namespace CasADi{
     void evalSX(const SXVector& arg, SXVector& SWIG_OUTPUT(res), 
                 const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens), 
                 const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens));
-
-    /** \brief Evaluate symbolically with with directional derivatives, MX type
-     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-     * the length of the vector being the number of forward directions.
-     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-     * the length of the vector being the number of adjoint directions.
-     */
-    void evalMX(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
-                const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
-                const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens));
               
     /** \brief Evaluate symbolically with with directional derivatives, SXElement type, overloaded
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -423,6 +412,11 @@ namespace CasADi{
               const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
               const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens)){
       callDerivative(arg,res,fseed,fsens,aseed,asens);
+    }
+    void evalMX(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
+                const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
+                const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens)){
+      callDerivative(arg,res,fseed,fsens,aseed,asens,true);
     }
     //@}
 #endif
