@@ -281,12 +281,14 @@ namespace CasADi{
     /** \brief  Get a reference to the colindex of col i (see class description) */
     int colind(int i) const;
 
+#ifndef SWIG
     /** \brief Get a reference to the rows of all non-zero element (copy if not unique!) */
     std::vector<int>& rowRef();
     
     /** \brief Get a reference to the colindex of all column element (copy if not unique!) */
     std::vector<int>& colindRef();
-    
+#endif
+
     /** \brief Get the column for each non-zero entry
         Together with the row-vector, this vector gives the sparsity of the matrix in
         sparse triplet format, i.e. the column and row for each non-zero elements  */

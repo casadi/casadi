@@ -204,10 +204,10 @@ if (!ret) {
 
 #ifdef SWIGPYTHON
 %outputRefOwn(CasADi::Sparsity)
-%outputRefOwn(std::vector< CasADi::SXElement >)
 
-%outputRefOwn(std::vector< int >)
-%outputRefOwn(std::vector< double >)
+%outputRefNew(std::vector< CasADi::SXElement >)
+%outputRefNew(std::vector< int >)
+%outputRefNew(std::vector< double >)
 
 %outputRefOwn(CasADi::Matrix< double >)
 %outputRefOwn(CasADi::Matrix< CasADi::SXElement >)

@@ -295,42 +295,34 @@ int meta< int >::as(PyObject * p, int &m) {
     m = PyLong_AsLong(r);
     Py_DECREF(r);
     return true;
-  } else if (PyObject_HasAttrString(p,"__int__")) {
+  } else if (PyObject_HasAttrString(p,"dtype")) {
+    PyObject *r = PyObject_GetAttrString(p,"dtype");
+    if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
+    PyObject *k = PyObject_GetAttrString(r,"kind");
+    if (!PyObject_HasAttrString(p,"__int__")) { Py_DECREF(k);Py_DECREF(r); return false;}
     char name[] = "__int__";
-    PyObject *r = PyObject_CallMethod(p, name,0);
-    if (!r) { Py_DECREF(r); return false;}
-    m = PyLong_AsLong(r);
-    Py_DECREF(r);
-    return true;
+    PyObject *mm = PyObject_CallMethod(p, name,0);
+    if (!mm) { PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
+    char *kk = PyString_AsString(k);
+    bool result =  kk[0]=='i';
+    Py_DECREF(k); Py_DECREF(r);
+    if (result) {
+      m = PyLong_AsLong(mm);
+    }
+    Py_DECREF(mm);
+    return result;
+  } else if (meta< CasADi::Matrix<int> >::isa(p)) {
+    CasADi::Matrix<int> *temp;
+    meta< CasADi::Matrix<int> >::get_ptr(p,temp);
+    if (temp->numel()==1 && temp->size()==1) {
+      m = temp->data()[0];
+      return true;
+    }
+    return false;
   } else {
     return false;
   }
 }
-
-
-template <> bool meta< int >::couldbe(PyObject * p) {
- if (PyObject_HasAttrString(p,"dtype")) {
-   PyObject *r = PyObject_GetAttrString(p,"dtype");
-   if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
-   PyObject *k = PyObject_GetAttrString(r,"kind");
-   if (!PyObject_HasAttrString(p,"__int__")) { Py_DECREF(k);Py_DECREF(r); return false;}
-   char name[] = "__int__";
-   PyObject *m = PyObject_CallMethod(p, name,0);
-   if (!m) { PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
-   char *kk = PyString_AsString(k);
-   bool result =  kk[0]=='i';
-   Py_DECREF(k); Py_DECREF(r); Py_DECREF(m);
-   return result;
-   
- }
- if (meta< CasADi::Matrix<int> >::isa(p)) {
-   CasADi::Matrix<int> *temp;
-   meta< CasADi::Matrix<int> >::get_ptr(p,temp);
-   if (temp->numel()==1 && temp->size()==1) return true;
- }
- return PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p);
-}
-
 
 /// std::vector<double>
 template<> char meta< std::vector< double > >::expected_message[] = "Expecting sequence(double)"; 
@@ -338,15 +330,22 @@ template <>
 int meta< std::vector< double > >::as(PyObject * p,std::vector<double > &m) {
   NATIVERETURN(std::vector< double >,m)
   if (is_array(p)) {
-    if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT))
-      SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
+    if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT)) {
+      return false;
+      //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
+    }
     int size = array_size(p,0);
-    if (!array_is_native(p))
-      SWIG_Error_return(SWIG_TypeError, "std::vector<double>: array byte order should be native.");
+    if (!array_is_native(p)) {
+      return false;
+      //SWIG_Error_return(SWIG_TypeError, "std::vector<double>: array byte order should be native.");
+    }
     // Make sure we have a contigous array with double datatype
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-    if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
+    if (!array) { 
+      //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
+      return false;
+    }
     double* d=(double*) array_data(array);
     
     m.assign( d, d+size );
@@ -360,29 +359,31 @@ int meta< std::vector< double > >::as(PyObject * p,std::vector<double > &m) {
   return meta< double >::as_vector(p,m);
 }
 
-template <> 
-bool meta< std::vector< double > >::couldbe(PyObject * p) {
-  return meta< std::vector< double > >::isa(p) || (is_array(p) && array_numdims(p)==1 && array_type(p)!=NPY_OBJECT) || (meta< double >::couldbe_sequence(p) && !is_array(p) && !(meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)) );
-}
-
 /// std::vector<int>
 template<> char meta< std::vector< int > >::expected_message[] = "Expecting sequence(integer) or 1D numpy.array of ints"; 
 template <>
 int meta< std::vector< int > >::as(PyObject * p,std::vector< int > &m) {
   NATIVERETURN(std::vector< int >,m)
   if (is_array(p)) {
-    if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT))
-      SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
+    if (!(array_numdims(p)==1 && array_type(p)!=NPY_OBJECT)) {
+      //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array must be 1D and of a numeric type");
+      return false;
+    }
     int size = array_size(p,0);
-    if (!array_is_native(p))
-      SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array byte order should be native.");
+    if (!array_is_native(p)) {
+      //SWIG_Error_return(SWIG_TypeError, "std::vector<int>: array byte order should be native.");
+      return false;
+    }
       
     // Make sure we have a contigous array with int datatype
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_INT,&array_is_new_object);
     if (!array) { // Trying LONG
       array = obj_to_array_contiguous_allow_conversion(p,NPY_LONG,&array_is_new_object);
-      if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "std::vector<int>: no luck converting numpy array to int. Better don't use unsigned datatypes."); }
+      if (!array) { 
+        //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "std::vector<int>: no luck converting numpy array to int. Better don't use unsigned datatypes.");
+        return false;
+      }
       long* temp=(long*) array_data(array);
       m.resize(size);
       for (int k=0;k<size;k++) m[k]=temp[k];
@@ -401,12 +402,6 @@ int meta< std::vector< int > >::as(PyObject * p,std::vector< int > &m) {
   return meta< int >::as_vector(p,m);
 }
 
-template <> 
-bool meta< std::vector< int > >::couldbe(PyObject * p) {
-  return meta< std::vector< int > >::isa(p) || (is_array(p) && array_numdims(p)==1) || (meta< int >::couldbe_sequence(p) && !is_array(p) && !(meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) || meta< CasADi::Matrix<double> >::isa(p)));
-}
-
-
 /// double
 template<> char meta< double >::expected_message[] = "Expecting double";
 
@@ -419,41 +414,41 @@ int meta< double >::as(PyObject * p, double &m) {
     m = PyFloat_AsDouble(r);
     Py_DECREF(r);
     return true;
-  } else if (PyObject_HasAttrString(p,"__float__")) {
+  } else if (PyObject_HasAttrString(p,"dtype")) {
+    PyObject *r = PyObject_GetAttrString(p,"dtype");
+    if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
+    PyObject *k = PyObject_GetAttrString(r,"kind");
+    if (!PyObject_HasAttrString(p,"__float__")) { Py_DECREF(k);Py_DECREF(r); return false;}
     char name[] = "__float__";
-    PyObject *r = PyObject_CallMethod(p, name,0);
-    if (!r) { PyErr_Clear();return false;}
-    m = PyFloat_AsDouble(r);
-    Py_DECREF(r);
-    return true;
+    PyObject *mm = PyObject_CallMethod(p, name,NULL);
+    if (!mm) {   PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
+    char *kk = PyString_AsString(k);
+    bool result = kk[0]=='f' || kk[0]=='i';
+    Py_DECREF(k); Py_DECREF(r); 
+    if (result) {
+      m = PyFloat_AsDouble(mm);
+    }
+    Py_DECREF(mm);
+    return result;
+  } else if (meta< CasADi::Matrix<double> >::isa(p)) {
+    CasADi::Matrix<double> *temp;
+    meta< CasADi::Matrix<double> >::get_ptr(p,temp);
+    if (temp->numel()==1 && temp->size()==1) {
+      m = temp->data()[0];
+      return true;
+    }
+    return false;
+  } else if (meta< CasADi::Matrix<int> >::isa(p)) {
+    CasADi::Matrix<int> *temp;
+    meta< CasADi::Matrix<int> >::get_ptr(p,temp);
+    if (temp->numel()==1 && temp->size()==1) {
+      m = temp->data()[0];
+      return true;
+    }
+    return false;
   } else {
     return false;
   }
-}
-   
-template <> bool meta< double >::couldbe(PyObject * p) {
- if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) return true;
- 
- if (PyObject_HasAttrString(p,"dtype")) {
-   PyObject *r = PyObject_GetAttrString(p,"dtype");
-   if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
-   PyObject *k = PyObject_GetAttrString(r,"kind");
-   if (!PyObject_HasAttrString(p,"__float__")) { Py_DECREF(k);Py_DECREF(r); return false;}
-   char name[] = "__float__";
-   PyObject *m = PyObject_CallMethod(p, name,NULL);
-   if (!m) {   PyErr_Clear(); Py_DECREF(k); Py_DECREF(r); return false; }
-   char *kk = PyString_AsString(k);
-   bool result = kk[0]=='f' || kk[0]=='i';
-   Py_DECREF(k); Py_DECREF(r); Py_DECREF(m);
-   return result;
- } 
- if (meta< CasADi::Matrix<double> >::isa(p)) {
-   CasADi::Matrix<double> *temp;
-   meta< CasADi::Matrix<double> >::get_ptr(p,temp);
-   if (temp->numel()==1 && temp->size()==1) return true;
- }
-
-  return false;
 }
 
 /// std::string
@@ -461,21 +456,17 @@ template<> char meta< std::string >::expected_message[] = "Expecting string";
 
 template <>
 int meta< std::string >::as(PyObject * p, std::string &m) {
-  m.clear();
+  NATIVERETURN(std::string,m)
   if (!PyString_Check(p)) return false;
+  m.clear();
   m.append(PyString_AsString(p));
   return true;
-}
-   
-template <> bool meta< std::string >::couldbe(PyObject * p) {
-    return PyString_Check(p);
 }
 
 meta_vector(std::string);
 
 // Forward declarations
 template<> int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType::Dictionary &s);
-template<> bool meta< CasADi::GenericType::Dictionary >::couldbe(PyObject * p);
 template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType::Dictionary &a, PyObject *&p);
 
 /// CasADi::DerivativeGenerator
@@ -484,20 +475,18 @@ template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::
  template <>
    int meta< CasADi::DerivativeGenerator >::as(PyObject * p, CasADi::DerivativeGenerator &s) {
    NATIVERETURN(CasADi::DerivativeGenerator, s)
-     s = CasADi::DerivativeGeneratorPython(p);
-   return true;
- }
-
- template<> bool meta< CasADi::DerivativeGenerator >::couldbe(PyObject * p) {
    PyObject* return_type = getReturnType(p);
    if (!return_type) return false;
    PyObject* fx = getCasadiObject("FX");
    if (!fx) { Py_DECREF(return_type); return false; }
    bool res = PyClass_IsSubclass(return_type,fx);
    Py_DECREF(return_type);Py_DECREF(fx);
-   return res;
+   if (res) {
+     s = CasADi::DerivativeGeneratorPython(p);
+     return true;
+   }
+   return false;
  }
-
 
 /// CasADi::CustomEvaluate
 template<> char meta< CasADi::CustomEvaluate >::expected_message[] = "Expecting CustomFunction wrapper generator";
@@ -505,15 +494,12 @@ template<> char meta< CasADi::CustomEvaluate >::expected_message[] = "Expecting 
 template <>
 int meta< CasADi::CustomEvaluate >::as(PyObject * p, CasADi::CustomEvaluate &s) {
   NATIVERETURN(CasADi::CustomEvaluate, s)
-  s = CasADi::CustomEvaluatePython(p);
-  return true;
-}
-
-template<> bool meta< CasADi::CustomEvaluate >::couldbe(PyObject * p) {
   PyObject* return_type = getReturnType(p);
-  if (!return_type) return true;
-  bool res = return_type==Py_None;
-  Py_DECREF(return_type);
+  bool res = (return_type==Py_None) || !return_type;
+  if (return_type) Py_DECREF(return_type);
+  if (res) {
+    s = CasADi::CustomEvaluatePython(p);
+  }
   return res;
 }
 
@@ -523,18 +509,16 @@ template<> char meta< CasADi::Callback >::expected_message[] = "Expecting Callba
 template <>
 int meta< CasADi::Callback >::as(PyObject * p, CasADi::Callback &s) {
   NATIVERETURN(CasADi::Callback, s)
-  s = CasADi::CallbackPython(p);
-  return true;
-}
-
-template<> bool meta< CasADi::Callback >::couldbe(PyObject * p) {
   PyObject* return_type = getReturnType(p);
   if (!return_type) return false;
   bool res = PyType_IsSubtype((PyTypeObject *)return_type,&PyInt_Type) || PyType_IsSubtype((PyTypeObject *)return_type,&PyLong_Type);
   Py_DECREF(return_type);
-  return res;
+  if (res) {
+    s = CasADi::CallbackPython(p);
+    return true;
+  }
+  return false;
 }
-
 
 /// CasADi::GenericType
 template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting any type (None might be an exception)";
@@ -572,15 +556,31 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     s = CasADi::GenericType(temp);
   } else if (PyType_Check(p) && PyObject_HasAttrString(p,"creator")) {
     PyObject *c = PyObject_GetAttrString(p,"creator");
-    int result = meta< CasADi::GenericType >::as(c,s);
-    Py_DECREF(c);
-    return result;
+    if (!c) return false;
+    PyObject* gt = getCasadiObject("GenericType");
+    if (!gt) return false;
+
+    PyObject* args = PyTuple_New(1);
+    PyTuple_SetItem(args,0,c);
+    
+    PyObject* g = PyObject_CallObject(gt,args);
+    
+    Py_DECREF(args);
+    Py_DECREF(gt);
+    
+    if (g) {
+      int result = meta< CasADi::GenericType >::as(g,s);
+      Py_DECREF(g);
+      return result;
+    }
+    if (!g) { PyErr_Clear();  return false;}
+    
   } else if (meta< CasADi::FX >::couldbe(p)) {
     CasADi::FX temp;
     int ret = meta< CasADi::FX >::as(p,temp); 
     if (!ret) return false;
     s = CasADi::GenericType(temp);
-  } else {
+  } else if (meta< CasADi::GenericType::Dictionary >::couldbe(p) || meta< CasADi::DerivativeGenerator >::couldbe(p) || meta< CasADi::Callback >::couldbe(p)) {
     PyObject* gt = getCasadiObject("GenericType");
     if (!gt) return false;
 
@@ -601,16 +601,11 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     if (!g) { PyErr_Clear();  return false;}
 
     
+  } else {
+    return false;
   }
   return true;
 }
-
-template <>
-bool meta< CasADi::GenericType >::couldbe(PyObject * p) {
-  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< CasADi::FX >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p) || meta< CasADi::DerivativeGenerator >::couldbe(p) || meta< CasADi::Callback >::couldbe(p);
-
-  
-  }
 
 template <>
 bool meta< CasADi::GenericType >::toPython(const CasADi::GenericType &a, PyObject *&p) {
@@ -662,11 +657,6 @@ int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType
 }
 
 template <>
-bool meta< CasADi::GenericType::Dictionary >::couldbe(PyObject * p) {
-  return PyDict_Check(p);
-}
-
-template <>
 bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType::Dictionary &a, PyObject *&p) {
   p = PyDict_New();
   //CasADi::Dictionary::const_iterator end = a.end(); 
@@ -688,7 +678,7 @@ bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType
 
 // Explicit intialization of these two member functions, so we can use them in meta< CasADi::SXElement >
 template<> int meta< CasADi::Matrix<CasADi::SXElement> >::as(GUESTOBJECT,CasADi::Matrix<CasADi::SXElement> &);
-template<> bool meta< CasADi::Matrix<CasADi::SXElement> >::couldbe(GUESTOBJECT);
+//template<> bool meta< CasADi::Matrix<CasADi::SXElement> >::couldbe(GUESTOBJECT);
 
 /// CasADi::SX
 template<> char meta< CasADi::SXElement >::expected_message[] = "Expecting SXElement or number";
@@ -707,12 +697,6 @@ int meta< CasADi::SXElement >::as(PyObject * p,CasADi::SXElement &s) {
   }
   return true;
 }
-
-template <>
-bool meta< CasADi::SXElement >::couldbe(PyObject * p) {
-  return (meta< CasADi::SXElement >::isa(p) || meta< double >::couldbe(p));
-}
-
 
 /// CasADi::Matrix<int>
 template<> char meta< CasADi::Matrix<int> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csc_matrix, IMatrix";
@@ -738,16 +722,10 @@ int meta< CasADi::Matrix<int> >::as(PyObject * p,CasADi::Matrix<int> &m) {
     Py_DECREF(cr);
     return result;
   } else {
-    SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
+    //SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
   }
   return true;
-}
-
-// Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
-template <>
-bool meta< CasADi::Matrix<int> >::couldbe(PyObject * p) {
-  return meta< int >::couldbe(p) || meta< int >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::isa(p) || PyObject_HasAttrString(p,"__IMatrix__");
 }
 
 meta_vector(CasADi::Matrix<int>)
@@ -776,25 +754,31 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
       return result;
     }
     if (array_numdims(p)>2 || array_numdims(p)<1) {
-      std::stringstream s;
-      s << "SWIG::typemapDMatrixHelper:";
-      s << "Number of dimensions must be 1 or 2.";
-      s << "Got " << array_numdims(p) << " instead.";
-      const std::string tmp(s.str());
-      const char* cstr = tmp.c_str();
-      SWIG_Error_return(SWIG_TypeError,  cstr);
+      return false;
+      //std::stringstream s;
+      //s << "SWIG::typemapDMatrixHelper:";
+      //s << "Number of dimensions must be 1 or 2.";
+      //s << "Got " << array_numdims(p) << " instead.";
+      //const std::string tmp(s.str());
+      //const char* cstr = tmp.c_str();
+      //SWIG_Error_return(SWIG_TypeError,  cstr);
     }
     int nrows = array_size(p,0); // 1D array is cast into column vector
     int ncols  = 1;
     if (array_numdims(p)==2)
       ncols=array_size(p,1); 
     int size=nrows*ncols; // number of elements in the dense matrix
-    if (!array_is_native(p))
-      SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: array byte order should be native.");
+    if (!array_is_native(p)) {
+      return false;
+      //SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: array byte order should be native.");
+    }
     // Make sure we have a contigous array with double datatype
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);
-    if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
+    if (!array) { 
+      return false;
+      //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
+    }
     
     double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
@@ -807,11 +791,16 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
       Py_DECREF(array); 
   } else if(PyObjectHasClassName(p,"csc_matrix")) { // scipy's csc_matrix will be cast to sparse Matrix<double>
     PyObject * narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
-    if (!(is_array(narray) && array_numdims(narray)==1))
-      SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
+    if (!(is_array(narray) && array_numdims(narray)==1)) {
+      return false;
+      //SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
+    }
     int array_is_new_object;
     PyArrayObject* array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
-    if (!array) { PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double"); }
+    if (!array) { 
+      return false;
+      //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
+    }
     int size=array_size(array,0); // number on non-zeros
     double* d=(double*) array_data(array);
     std::vector<double> v(d,d+size);
@@ -823,14 +812,20 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
 		
     // Construct the 'row' vector needed for initialising the correct sparsity
     PyObject * row = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
-    if (!(is_array(row) && array_numdims(row)==1 && array_type(row)==NPY_INT)) { PyErr_Print(); SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");}
+    if (!(is_array(row) && array_numdims(row)==1 && array_type(row)==NPY_INT)) {
+      return false;
+      //PyErr_Print(); SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");
+    }
     
     int* rowd=(int*) array_data(row);
     std::vector<int> rowv(rowd,rowd+size);
     
     // Construct the 'colind' vector needed for initialising the correct sparsity
     PyObject * colind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
-    if (!(is_array(colind) && array_numdims(colind)==1 && array_type(colind)==NPY_INT)) { PyErr_Print();   SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");}
+    if (!(is_array(colind) && array_numdims(colind)==1 && array_type(colind)==NPY_INT)) {
+      //PyErr_Print();   SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");
+      return false;
+    }
     int* colindd=(int*) array_data(colind);
     std::vector<int> colindv(colindd,colindd+(ncols+1));
     
@@ -862,16 +857,10 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     }
     return res;
   } else {
-    SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
+    //SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
   }
   return true;
-}
-
-// Disallow 1D numpy arrays. Allowing them may introduce conflicts with other typemaps or overloaded methods
-template <>
-bool meta< CasADi::Matrix<double> >::couldbe(PyObject * p) {
-  return meta< double >::couldbe(p) || (((is_array(p) && array_numdims(p)==2) && array_type(p)!=NPY_OBJECT) || PyObjectHasClassName(p,"csc_matrix") || PyObject_HasAttrString(p,"tocsc") || PyObjectHasClassName(p,"DMatrix")) || meta< double >::couldbe_sequence(p) || meta< CasADi::Matrix<int> >::couldbe(p) || PyObject_HasAttrString(p,"__DMatrix__");
 }
 
 meta_vector(CasADi::Matrix<double>)
@@ -884,19 +873,16 @@ template <>
 int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<CasADi::SXElement> &m) {
   NATIVERETURN(CasADi::Matrix<CasADi::SXElement>, m)
   NATIVERETURN(CasADi::SXElement, m)
-  if(meta< CasADi::Matrix<double> >::couldbe(p)) {
-    CasADi::DMatrix mt;
-    bool result=meta< CasADi::Matrix<double> >::as(p,mt);
-    if (!result)
-      return false;
+  CasADi::DMatrix mt;
+  if(meta< CasADi::Matrix<double> >::as(p,mt)) {
     m = CasADi::SX(mt);
   } else if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SXElement>
 		if (array_type(p)!=NPY_OBJECT) {
-			SWIG_Error(SWIG_TypeError, "asSX: numpy.ndarray must be of dtype object");
+			//SWIG_Error(SWIG_TypeError, "asSX: numpy.ndarray must be of dtype object");
 			return false;
 		}
 		if (array_numdims(p)>2 || array_numdims(p)<1) {
-			SWIG_Error(SWIG_TypeError, "asSX: Number of dimensions must be 1 or 2.");
+			//SWIG_Error(SWIG_TypeError, "asSX: Number of dimensions must be 1 or 2.");
 			return false;
 		}
 		int nrows = array_size(p,0); // 1D array is cast into column vector
@@ -925,23 +911,12 @@ int meta< CasADi::Matrix<CasADi::SXElement> >::as(PyObject * p,CasADi::Matrix<Ca
     Py_DECREF(cr);
     return result;
 	} else {
-    SWIG_Error(SWIG_TypeError, "asSX: unrecognised type. Should have been caught by typemap(typecheck)");
+    //SWIG_Error(SWIG_TypeError, "asSX: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
   }
 	return true;
 }
 
-template <>
-bool meta< CasADi::Matrix<CasADi::SXElement> >::couldbe(PyObject * p) {
-  if (is_array(p)) { // Numpy arrays will be cast to dense Matrix<SXElement>
-    if (array_type(p)==NPY_OBJECT)
-      return true;
-  } else if (meta< CasADi::Matrix<double> >::couldbe(p)) {
-    return true;
-  }
-  
-  return meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) || meta< CasADi::SXElement >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || PyObject_HasAttrString(p,"__SX__");
-}
 
 meta_vector(std::vector<CasADi::SXElement>);
 meta_vector(CasADi::SXElement);
@@ -952,18 +927,10 @@ meta_vector(std::vector< CasADi::Matrix< CasADi::SXElement > >);
 template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numberarray)";
 
 template <>
-bool meta< CasADi::MX >::couldbe(PyObject * p) {
-  return meta< CasADi::MX >::isa(p) || meta< CasADi::Matrix<double> >::couldbe(p) || PyObject_HasAttrString(p,"__MX__");
-}
-
-template <>
 int meta< CasADi::MX >::as(PyObject * p,CasADi::MX &m) {
   NATIVERETURN(CasADi::MX,m)
-  if(meta< CasADi::Matrix<double> >::couldbe(p)) {
-    CasADi::DMatrix mt;
-    bool result=meta< CasADi::Matrix<double> >::as(p,mt);
-    if (!result)
-      return false;
+  CasADi::DMatrix mt;
+  if(meta< CasADi::Matrix<double> >::as(p,mt)) {
     m = CasADi::MX(mt);
     return true;
   } else if (PyObject_HasAttrString(p,"__MX__")) {

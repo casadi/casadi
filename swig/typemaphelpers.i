@@ -74,10 +74,10 @@ bool istype(GUESTOBJECT, swig_type_info *type) {
 }
 #endif // SWIGPYTHON
 
-template<typename DataType>
+template<class T>
 class meta {
   public:
-    /// Check if Python object is of type DataType
+    /// Check if Python object is of type T
     static bool isa(GUESTOBJECT) {
       #ifdef SWIGPYTHON
       if (p == Py_None) return false;
@@ -85,33 +85,35 @@ class meta {
       #ifdef SWIGOCTAVE
       if (p.is_null_value()) return false;
       #endif // SWIGOCTAVE
-      return istype(p,*meta<DataType>::name);
+      return istype(p,*meta<T>::name);
     };
-    /// Convert Python object to pointer of type DataType
-    static bool get_ptr(GUESTOBJECT,DataType*& m) {
+    /// Convert Python object to pointer of type T
+    static bool get_ptr(GUESTOBJECT,T*& m) {
       void *pd = 0 ;
-      int res = SWIG_ConvertPtr(p, &pd,*meta<DataType>::name, 0 );
+      int res = SWIG_ConvertPtr(p, &pd,*meta<T>::name, 0 );
       if (!SWIG_IsOK(res)) {
         return false;
       }
-      m = reinterpret_cast< DataType*  >(pd);
+      m = reinterpret_cast< T*  >(pd);
       return true;
     };
-    /// Convert Guest object to type DataType
+    /// Convert Guest object to type T
     /// This function must work when isa(GUESTOBJECT) too
-    static int as(GUESTOBJECT,DataType& m) {
-        DataType *t = (DataType *)(0);
+    static int as(GUESTOBJECT,T& m) {
+        T *t = (T *)(0);
         int res = swig::asptr(p, &t);
         bool succes = SWIG_CheckState(res) && t;
         if (succes) m=*t;
         if (succes && SWIG_IsNewObj(res)) delete t;
         return succes;
     }
-    /// Check if Guest object could ultimately be converted to type DataType
+    /// Check if Guest object could ultimately be converted to type T
     /// may return true when isa(GUESTOBJECT), but this is not required.
     static bool couldbe(GUESTOBJECT) { 
-        int res = swig::asptr(p, (DataType**)(0));
-        return SWIG_CheckState(res);
+        //int res = swig::asptr(p, (T**)(0));
+        //if SWIG_CheckState(res) return true;
+        T m;
+        return as(p,m);
     }
     static swig_type_info** name;
     static char expected_message[];
@@ -125,7 +127,7 @@ class meta {
         if (!it) return false;
         PyObject *pe;
         while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-          if (!meta<DataType>::couldbe(pe)) {
+          if (!meta< T >::couldbe(pe)) {
             Py_DECREF(pe);Py_DECREF(it);return false;
           }
           Py_DECREF(pe);
@@ -146,7 +148,7 @@ class meta {
       int ncol = p.columns();
       if (nrow!=1 && ncol!=1) return false;
       for(int i=0; i<p.length(); ++i){
-        if (!meta<DataType>::couldbe(p.cell_value()(i))) return false;
+        if (!meta< T >::couldbe(p.cell_value()(i))) return false;
       }
       return true;
     }
@@ -154,27 +156,33 @@ class meta {
     
     // Assumes that p is a PYTHON sequence
     #ifdef SWIGPYTHON
-    static int as_vector(PyObject * p, std::vector<DataType> &m) {
-      PyObject *it = PyObject_GetIter(p);
-      PyObject *pe;
-      m.resize(PySequence_Size(p));
-      int i=0;
-      while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-        bool result=meta<DataType>::as(pe,m[i++]);
-        if (!result) {
-          Py_DECREF(pe);Py_DECREF(it);
-          return false;
+    static int as_vector(PyObject * p, std::vector<T> &m) {
+      if(PySequence_Check(p) && !PyString_Check(p) && !meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+        PyObject *it = PyObject_GetIter(p);
+        if (!it) { PyErr_Clear();  return false;}
+        PyObject *pe;
+        int size = PySequence_Size(p);
+        if (size==-1) { PyErr_Clear();  return false;}
+        m.resize(size);
+        int i=0;
+        while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
+          bool result=meta< T >::as(pe,m[i++]);
+          if (!result) {
+            Py_DECREF(pe);Py_DECREF(it);
+            return false;
+          }
+          Py_DECREF(pe);
         }
-        Py_DECREF(pe);
+        Py_DECREF(it);
+        return true;
       }
-      Py_DECREF(it);
-      return true;
+      return false;
     }
     #endif // SWIGPYTHON
     
     // Assumes that p is an octave cell
     #ifdef SWIGOCTAVE
-    static int as_vector(const octave_value& p , std::vector<DataType> &m) {
+    static int as_vector(const octave_value& p , std::vector<T> &m) {
       if (!p.is_cell()) return false;
       int nrow = p.rows();
       int ncol = p.columns();
@@ -187,7 +195,7 @@ class meta {
         const octave_value& obj_i = c(i);
         
         if (!(obj_i.is_real_matrix() && obj_i.is_empty())) {
-          bool ret = meta<DataType>::as(obj_i,m[i]);
+          bool ret = meta< T >::as(obj_i,m[i]);
           if(!ret) return false;
         }
       }
@@ -198,7 +206,7 @@ class meta {
     
     #ifdef SWIGPYTHON
     // Would love to make this const T&, but looks like not allowed
-    static bool toPython(const DataType &, PyObject *&p);
+    static bool toPython(const T &, PyObject *&p);
     #endif //SWIGPYTHON
 };
 
@@ -211,14 +219,8 @@ class meta {
 
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
-  if (meta< Type >::isa($input)) { // Type object get passed on as-is, and fast.
-    int result = meta< Type >::get_ptr($input,$1);
-    if (!result)
-      SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
-  } else {
-    bool result=meta< Type >::as($input,m);
-    if (!result)
-      SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
+  if (!meta< Type >::get_ptr($input,$1)) {
+    if (!meta< Type >::as($input,m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
     $1 = &m;
   }
 }
@@ -325,6 +327,25 @@ void PyDECREFParent(PyObject* self) {
 }
 %enddef
 
+// Convert reference output to a new data structure
+%define %outputRefNew(Type)
+%typemap(out) Type & {
+   $result = swig::from(static_cast< Type >(*$1));
+}
+%typemap(out) const Type & {
+   $result = swig::from(static_cast< Type >(*$1));
+}
+%extend Type {
+%pythoncode%{
+    def __del__(self):
+      if not(_casadi_main_module is None):
+         _casadi_main_module.PyDECREFParent(self)
+
+%}
+
+}
+%enddef
+
 %inline %{
 /// std::vector< Type >
 #define meta_vector(Type) \
@@ -335,11 +356,7 @@ int meta< std::vector< Type > >::as(GUESTOBJECT,std::vector< Type > &m) { \
   NATIVERETURN(std::vector< Type >,m) \
   return meta< Type >::as_vector(p,m); \
 } \
- \
-template <> \
-bool meta< std::vector< Type > >::couldbe(GUESTOBJECT) { \
-  return meta< std::vector< Type > >::isa(p) ||  meta< Type >::couldbe_sequence(p); \
-}
+
 %}
 
 
@@ -349,6 +366,12 @@ bool meta< std::vector< Type > >::couldbe(GUESTOBJECT) { \
 %inline %{
 template <>
 int meta< std::pair< TypeA, TypeB > >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
+  std::pair< TypeA, TypeB > * tm;
+  int res1 = meta< std::pair< TypeA, TypeB > >::get_ptr(p,tm); 
+  if (res1) {
+    m = *tm;
+    return true;
+  }
   if(!PySequence_Check(p)) return false;
   if(PySequence_Size(p)!=2) return false;
   PyObject * first =  PySequence_GetItem(p,0);
@@ -357,20 +380,6 @@ int meta< std::pair< TypeA, TypeB > >::as(PyObject * p,std::pair< TypeA, TypeB >
   
   Py_DECREF(first);Py_DECREF(second);
   return result;   
-}
-
-template <>
-bool meta< std::pair< TypeA, TypeB > >::couldbe(PyObject * p) {
-  if (meta< std::pair< TypeA, TypeB > >::isa(p)) return true; 
-  if(!PySequence_Check(p)) return false;
-  if(PySequence_Size(p)!=2) return false;
-  PyObject * first =  PySequence_GetItem(p,0);
-  PyObject * second = PySequence_GetItem(p,1);
-  
-  bool success = (meta< TypeA >::isa(first) || meta< TypeA >::couldbe(first)) &&
-                 (meta< TypeB >::isa(second) || meta< TypeB >::couldbe(second));
-  Py_DECREF(first);Py_DECREF(second);              
-  return success;
 }
 
 template <>

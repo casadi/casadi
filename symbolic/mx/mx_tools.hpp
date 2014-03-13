@@ -227,12 +227,12 @@ namespace CasADi{
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
-  std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps);
+  MX createParent(const std::vector<MX> &deps, std::vector<MX>& SWIG_OUTPUT(children));
 
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
-  std::pair<MX, std::vector<MX> > createParent(const std::vector<Sparsity> &deps);
+  MX createParent(const std::vector<Sparsity> &deps, std::vector<MX>& SWIG_OUTPUT(children));
 
   /** Count number of nodes */
   int countNodes(const MX& A);

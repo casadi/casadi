@@ -517,10 +517,7 @@ class typemaptests(casadiTestCase):
   def testGenericType3(self):
     self.message("Generic type 3")
     
-    is_differential_ivec = IVector(2)
-    is_differential_ivec[0] = 4
-
-    is_differential_gentype = GenericType(is_differential_ivec)
+    is_differential_gentype = GenericType([2,3])
     
     self.assertTrue(is_differential_gentype.isIntVector())
 
@@ -758,13 +755,13 @@ class typemaptests(casadiTestCase):
       def __DMatrix__(self):
         return SX([4])
         
-    self.assertRaises(TypeError,lambda :f.setInput(Foo()))
+    self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
     
     class Foo:
       def __DMatrix__(self):
         raise Exception("15")
         
-    self.assertRaises(TypeError,lambda :f.setInput(Foo()))
+    self.assertRaises(NotImplementedError,lambda :f.setInput(Foo()))
 
     class Foo:
       pass
@@ -784,13 +781,13 @@ class typemaptests(casadiTestCase):
       def __IMatrix__(self):
         return SX([[4,6],[2,4]])
         
-    self.assertRaises(TypeError,lambda :det(Foo()))
+    self.assertRaises(NotImplementedError,lambda :det(Foo()))
     
     class Foo:
       def __IMatrix__(self):
         raise Exception("15")
         
-    self.assertRaises(TypeError,lambda :det(Foo()))
+    self.assertRaises(NotImplementedError,lambda :det(Foo()))
 
     class Foo:
       pass
@@ -813,13 +810,13 @@ class typemaptests(casadiTestCase):
       def __SX__(self):
         return MX.sym("x")
         
-    self.assertRaises(TypeError,lambda : SXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : SXFunction([x],[Foo()]))
     
     class Foo:
       def __SX__(self):
         raise Exception("15")
         
-    self.assertRaises(TypeError,lambda : SXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : SXFunction([x],[Foo()]))
 
     class Foo:
       pass
@@ -843,13 +840,13 @@ class typemaptests(casadiTestCase):
       def __MX__(self):
         return SX.sym("x")
         
-    self.assertRaises(TypeError,lambda : MXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : MXFunction([x],[Foo()]))
     
     class Foo:
       def __MX__(self):
         raise Exception("15")
         
-    self.assertRaises(TypeError,lambda : MXFunction([x],[Foo()]))
+    self.assertRaises(NotImplementedError,lambda : MXFunction([x],[Foo()]))
 
     class Foo:
       pass

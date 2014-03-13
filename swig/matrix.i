@@ -455,16 +455,11 @@ int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
 
 }
 
-template <>
-bool meta<  CasADi::Slice >::couldbe(PyObject * p) {
-  return meta< CasADi::Slice >::isa(p) || PyInt_Check(p) || PySlice_Check(p);
-}
-
 /// CasADi::IndexList
 template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
 template <>
 int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
-  
+  NATIVERETURN(CasADi::IndexList,m)
   if (meta< int >::couldbe(p)) {
     m.type = CasADi::IndexList::INT;
     meta< int >::as(p,m.i);
@@ -480,11 +475,6 @@ int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
   return true;
 }
 
-
-template <>
-bool meta<  CasADi::IndexList >::couldbe(PyObject * p) {
-  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || meta< int >::couldbe(p);
-}
 #endif //SWIGPYTHON
 
 #ifdef SWIGOCTAVE

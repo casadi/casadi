@@ -64,10 +64,11 @@
 %inline %{
 template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;
 template<> swig_type_info** meta< int >::name = &SWIGTYPE_p_int;
+template<> swig_type_info** meta< std::string >::name = &SWIGTYPE_p_std__string;
 template<> swig_type_info** meta< std::vector<double> >::name = &SWIGTYPE_p_std__vectorT_double_std__allocatorT_double_t_t;
 template<> swig_type_info** meta< std::vector<int> >::name = &SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t;
 template<> swig_type_info** meta< CasADi::GenericType >::name = &SWIGTYPE_p_CasADi__GenericType;
-template<> swig_type_info** meta< CasADi::GenericType::Dictionary >::name = &SWIGTYPE_p_std__mapT_std__string_CasADi__GenericType_t;
+template<> swig_type_info** meta< CasADi::GenericType::Dictionary >::name = &SWIGTYPE_p_Dictionary;
 template<> swig_type_info** meta< CasADi::SXElement >::name = &SWIGTYPE_p_CasADi__SXElement;
 template<> swig_type_info** meta< CasADi::Matrix<CasADi::SXElement> >::name = &SWIGTYPE_p_CasADi__MatrixT_CasADi__SXElement_t;
 template<> swig_type_info** meta< std::vector< CasADi::Matrix<CasADi::SXElement> > >::name = &SWIGTYPE_p_std__vectorT_CasADi__MatrixT_CasADi__SXElement_t_std__allocatorT_CasADi__MatrixT_CasADi__SXElement_t_t_t;
