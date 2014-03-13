@@ -228,12 +228,7 @@ namespace CasADi{
 
     // Solve
     int solv_ind_N = gen.getDependency(solv_fcn_N_);
-    int solv_ind_T = gen.getDependency(solv_fcn_T_);
-    stream << "  if(*x2==0){" << endl;
-    stream << "    f" << solv_ind_N << "(Q,R,x1,r0);" << endl;    
-    stream << "  } else {" << endl;
-    stream << "    f" << solv_ind_T << "(Q,R,x1,r0);" << endl;    
-    stream << "  }" << endl;
+    stream << "  f" << solv_ind_N << "(Q,R,x1,r0);" << endl;    
   }
 
 } // namespace CasADi
