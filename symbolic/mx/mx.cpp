@@ -1024,5 +1024,12 @@ namespace CasADi{
     }
   }
 
+  void MX::addToSum(const MX& x){
+    if(isNullE()){
+      *this = x;
+    } else {
+      *this += x;
+    }
+  }
           
 } // namespace CasADi
