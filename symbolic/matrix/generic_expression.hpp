@@ -53,20 +53,12 @@ class GenericExpression{
 
     /// In-place addition
     inline ExType& operator+=(const ExType &y){
-      if(static_cast<ExType&>(*this).isNull()){
-        return static_cast<ExType&>(*this) = y;
-      } else {
-        return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);
-      }
+      return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);
     }
 
     /// In-place subtraction
     inline ExType& operator-=(const ExType &y){
-      if(static_cast<ExType&>(*this).isNull()){
-        return static_cast<ExType&>(*this) = -y;
-      } else {
-        return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__sub__(y);
-      }
+      return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__sub__(y);
     }
 
     /// In-place elementwise multiplication
