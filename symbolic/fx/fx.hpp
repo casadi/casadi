@@ -218,7 +218,7 @@ namespace CasADi{
     void setFullJacobian(const FX& jac);
 
     //@{
-    /** \brief Call the function, no derivatives */
+    /** \brief Evaluate the function symbolically or numerically  */
     std::vector<DMatrix> call(const std::vector<DMatrix> &arg, bool always_inline=false, bool never_inline=false);
     std::vector<SX> call(const std::vector<SX> &arg, bool always_inline=false, bool never_inline=false);
     std::vector<MX> call(const std::vector<MX> &arg, bool always_inline=false, bool never_inline=false);
@@ -226,21 +226,21 @@ namespace CasADi{
 
 #ifndef SWIG
     //@{
-    /// Functor shorthands for evaluation
+    /// Functor shorthand for evaluation
     std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg){ return call(arg);}
     std::vector<SX> operator()(const std::vector<SX>& arg){ return call(arg);}
     std::vector<MX> operator()(const std::vector<MX>& arg){ return call(arg);}
     //@}
 
     //@{
-    /// Functor shorthands for evaluation, single argument
+    /// Functor shorthand for evaluation, single argument
     std::vector<DMatrix> operator()(const DMatrix& arg0){ return call(toVector(arg0));}
     std::vector<SX> operator()(const SX& arg0){ return call(toVector(arg0));}
     std::vector<MX> operator()(const MX& arg0){ return call(toVector(arg0));}
     //@}
 
     //@{
-    /// Functor shorthands for evaluation, two arguments
+    /// Functor shorthand for evaluation, two arguments
     std::vector<DMatrix> operator()(const DMatrix& arg0, const DMatrix& arg1){ return call(toVector(arg0,arg1));}
     std::vector<SX> operator()(const SX& arg0, const SX& arg1){ return call(toVector(arg0,arg1));}
     std::vector<MX> operator()(const MX& arg0, const MX& arg1){ return call(toVector(arg0,arg1));}
@@ -248,10 +248,8 @@ namespace CasADi{
 
 #endif // SWIG
   
-    /// evaluate symbolically, MX type (overloaded)
-    std::vector<MX> eval(const std::vector<MX>& arg);
-                  
-   /** \brief Evaluate symbolically with with directional derivatives, DMatrix type
+    //@{
+   /** \brief Evaluate the function symbolically or numerically with directional derivatives
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
      * the length of the vector being the number of forward directions.
@@ -263,29 +261,16 @@ namespace CasADi{
                         const DMatrixVectorVector& aseed, DMatrixVectorVector& SWIG_OUTPUT(asens),
                         bool always_inline=false, bool never_inline=false);
 
-    /** \brief Evaluate symbolically with with directional derivatives, SX type
-     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-     * the length of the vector being the number of forward directions.
-     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-     * the length of the vector being the number of adjoint directions.
-     */
     void callDerivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res), 
                         const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens), 
                         const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
                         bool always_inline=false, bool never_inline=false);
 
-    /** \brief Evaluate symbolically with with directional derivatives, MX type
-     * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-     * the length of the vector being the number of forward directions.
-     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-     * the length of the vector being the number of adjoint directions.
-     */
     void callDerivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
                         const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
                         const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
                         bool always_inline=false, bool never_inline=false);
+    //@}
       
     /** \brief  Evaluate symbolically in parallel (matrix graph)
         paropt: Set of options to be passed to the Parallelizer
@@ -417,6 +402,9 @@ namespace CasADi{
     }
     std::vector<SX> eval(const std::vector<SX>& arg){
       return call(arg);
+    }
+    std::vector<MX> eval(const std::vector<MX>& arg){
+      return call(arg,true);
     }
 #ifndef SWIG
     std::vector<MX> call(const MX &arg){ return call(std::vector<MX>(1,arg));}

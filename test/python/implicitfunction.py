@@ -235,7 +235,7 @@ class NLPtests(casadiTestCase):
     #ifcn = MXFunction([X0],[vertcat([X0])])
     #ifcn.setOption("name","I")
     #ifcn.init()
-    [V] = ifcn.eval([0,X0])
+    [V] = ifcn.call([0,X0],True)
 
     f = 1  # fails
 

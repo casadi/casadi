@@ -280,7 +280,7 @@ namespace CasADi{
     std::vector<MX> ifcn_call_in(5);
     ifcn_call_in[0] = MX::zeros(V.sparsity()); 
     std::copy(vfcn_inputs.begin()+1,vfcn_inputs.end(),ifcn_call_in.begin()+1);
-    std::vector<MX> ifcn_call_out = ifcn.eval(ifcn_call_in);
+    std::vector<MX> ifcn_call_out = ifcn.call(ifcn_call_in,true);
     Vs = vertsplit(ifcn_call_out[0],splitPositions);
     
     MX XF = 0;
