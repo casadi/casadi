@@ -924,6 +924,9 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>_iprint</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>_isumm</td><td>OT_INTEGER</td><td>6</td><td></td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>_start</td><td>OT_STRING</td><td>"Cold"</td><td>(Cold|Warm)</td><td>CasADi::SnoptInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>CasADi::FXInternal</td></tr>
 <tr><td>detect_linear</td><td>OT_BOOLEAN</td><td>true</td><td>Make an effort to treat linear constraints and linear variables specially.</td><td>CasADi::SnoptInternal</td></tr>
@@ -960,6 +963,9 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>_iprint</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>_isumm</td><td>OT_INTEGER</td><td>6</td><td></td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>_start</td><td>OT_STRING</td><td>"Cold"</td><td>(Cold|Warm)</td><td>CasADi::SnoptInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>CasADi::FXInternal</td></tr>
 <tr><td>detect_linear</td><td>OT_BOOLEAN</td><td>true</td><td>Make an effort to treat linear constraints and linear variables specially.</td><td>CasADi::SnoptInternal</td></tr>
@@ -2774,7 +2780,7 @@
 <tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>(42, 41, 42, 45, 43, 46, 44)</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>[42, 41, 42, 45, 43, 46, 44]</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
@@ -2970,7 +2976,7 @@
 <tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>(42, 41, 42, 45, 43, 46, 44)</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>[42, 41, 42, 45, 43, 46, 44]</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>

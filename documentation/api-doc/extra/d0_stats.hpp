@@ -114,6 +114,24 @@
 <tr><td>iter_count</td><td>CasADi::SCPgenInternal</td></tr>
 </table>
 */
+/** \class CasADi::SnoptInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>return_status</td><td>CasADi::SnoptInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SnoptSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>return_status</td><td>CasADi::SnoptInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IpoptInternal
 \n
 \par
