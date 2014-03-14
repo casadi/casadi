@@ -218,17 +218,9 @@ namespace CasADi{
     void setFullJacobian(const FX& jac);
 
     //@{
-    /** \brief Call the function (numerically) */
+    /** \brief Call the function, no derivatives */
     std::vector<DMatrix> call(const std::vector<DMatrix> &arg, bool always_inline=false, bool never_inline=false);
-    //@}
-
-    //@{
-    /** \brief Call the function (SX graph) */
     std::vector<SX> call(const std::vector<SX> &arg, bool always_inline=false, bool never_inline=false);
-    //@}
-
-    //@{
-    /** \brief Call the function (MX graph) */
     std::vector<MX> call(const std::vector<MX> &arg, bool always_inline=false, bool never_inline=false);
     //@}
 
@@ -262,11 +254,6 @@ namespace CasADi{
     /// evaluate symbolically, MX type (overloaded)
     std::vector<MX> eval(const std::vector<MX>& arg);
                   
-#ifndef SWIG
-    /// evaluate symbolically, single input, single output 
-    SX eval(const SX& arg){ return eval(std::vector<SX>(1,arg)).at(0);}
-#endif // SWIG
-
    /** \brief Evaluate symbolically with with directional derivatives, DMatrix type
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
      * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
@@ -433,6 +420,7 @@ namespace CasADi{
     }
 #ifndef SWIG
     std::vector<MX> call(const MX &arg){ return call(std::vector<MX>(1,arg));}
+    SX eval(const SX& arg){ return eval(std::vector<SX>(1,arg)).at(0);}
 #endif // SWIG
     //@}
 #endif
