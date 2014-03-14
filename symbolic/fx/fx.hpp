@@ -224,7 +224,6 @@ namespace CasADi{
     std::vector<MX> call(const std::vector<MX> &arg, bool always_inline=false, bool never_inline=false);
     //@}
 
-#ifndef SWIG
     //@{
     /// Functor shorthand for evaluation
     std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg){ return call(arg);}
@@ -232,20 +231,20 @@ namespace CasADi{
     std::vector<MX> operator()(const std::vector<MX>& arg){ return call(arg);}
     //@}
 
+#ifndef SWIG
     //@{
-    /// Functor shorthand for evaluation, single argument
+    /// Functor shorthand for evaluation, single argument (only C++)
     std::vector<DMatrix> operator()(const DMatrix& arg0){ return call(toVector(arg0));}
     std::vector<SX> operator()(const SX& arg0){ return call(toVector(arg0));}
     std::vector<MX> operator()(const MX& arg0){ return call(toVector(arg0));}
     //@}
 
     //@{
-    /// Functor shorthand for evaluation, two arguments
+    /// Functor shorthand for evaluation, two arguments (only C++)
     std::vector<DMatrix> operator()(const DMatrix& arg0, const DMatrix& arg1){ return call(toVector(arg0,arg1));}
     std::vector<SX> operator()(const SX& arg0, const SX& arg1){ return call(toVector(arg0,arg1));}
     std::vector<MX> operator()(const MX& arg0, const MX& arg1){ return call(toVector(arg0,arg1));}
     //@}
-
 #endif // SWIG
   
     //@{
