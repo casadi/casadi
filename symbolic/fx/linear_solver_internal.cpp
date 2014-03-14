@@ -195,16 +195,16 @@ namespace CasADi{
 
         // Propagate to A
         if(!tr){
-          *adjSens[d][1] -= mul(rhs[i],X.T(),A.sparsity());
+          adjSens[d][1]->addToSum(-mul(rhs[i],X.T(),A.sparsity()));
         } else {
-          *adjSens[d][1] -= mul(X,rhs[i].T(),A.sparsity());
+          adjSens[d][1]->addToSum(-mul(X,rhs[i].T(),A.sparsity()));
         }
 
         // Propagate to B
         if(adjSeed[d][0]==adjSens[d][0]){
           *adjSens[d][0] = rhs[i];
         } else {
-          *adjSens[d][0] += rhs[i];
+          adjSens[d][0]->addToSum(rhs[i]);
         }
       }
     }

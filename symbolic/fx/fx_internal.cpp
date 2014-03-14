@@ -2409,7 +2409,7 @@ namespace CasADi{
     for(int d=0; d<adjSens.size(); ++d){
       for(int i=0; i<adjSens[d].size(); ++i){
         if(adjSens[d][i]!=0 && !asens[d][i].isNull() && !(*adjSens[d][i]).isEmpty(true)){
-          *adjSens[d][i] += asens[d][i];
+          adjSens[d][i]->addToSum(asens[d][i]);
         }
       }
     }

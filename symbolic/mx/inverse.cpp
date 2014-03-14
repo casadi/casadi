@@ -61,7 +61,7 @@ namespace CasADi{
     if(nadj>0){
       MX trans_inv_X = inv_X.T();
       for(int d=0; d<nadj; ++d){
-        *adjSens[d][0] -= mul(trans_inv_X,mul(*adjSeed[d][0],trans_inv_X));
+        adjSens[d][0]->addToSum(-mul(trans_inv_X,mul(*adjSeed[d][0],trans_inv_X)));
         *adjSeed[d][0] = MX();
       }
     }
