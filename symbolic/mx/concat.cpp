@@ -178,7 +178,7 @@ namespace CasADi{
       vector<MX> s = horzsplit(aseed,col_offset);
       aseed = MX();
       for(int i=0; i<ndep(); ++i){
-        *adjSens[d][i] += s[i];
+        adjSens[d][i]->addToSum(s[i]);
       }
     }
   }
@@ -234,7 +234,7 @@ namespace CasADi{
       vector<MX> s = vertsplit(aseed,row_offset);
       aseed = MX();
       for(int i=0; i<ndep(); ++i){
-        *adjSens[d][i] += s[i];
+        adjSens[d][i]->addToSum(s[i]);
       }
     }
   }

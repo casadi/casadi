@@ -104,7 +104,7 @@ namespace CasADi{
     for(int d=0; d<nadj; ++d){
       MX& aseed = *adjSeed[d][0];
       MX& asens = *adjSens[d][0];
-      asens += reshape(aseed,dep().shape());
+      asens.addToSum(reshape(aseed,dep().shape()));
       aseed = MX();
     }
   }

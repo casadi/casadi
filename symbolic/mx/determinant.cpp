@@ -66,7 +66,7 @@ namespace CasADi{
 
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] +=  (*adjSeed[d][0]*det_X) * trans_inv_X;
+      adjSens[d][0]->addToSum((*adjSeed[d][0]*det_X) * trans_inv_X);
       *adjSeed[d][0] = MX();
     }
   }

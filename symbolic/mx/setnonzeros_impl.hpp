@@ -249,14 +249,14 @@ namespace CasADi{
       if(!r_nz.empty()){
         // Create a sparsity pattern from vectors
         Sparsity f_sp(isp.size1(),isp.size2(),r_colind,r_row);
-        asens += aseed->getGetNonzeros(f_sp,r_nz);
+        asens.addToSum(aseed->getGetNonzeros(f_sp,r_nz));
         if(!Add){
           aseed = MX::zeros(f_sp)->getSetNonzeros(aseed,r_nz);
         }
       }
 
       if(&aseed != &asens0){
-        asens0 += aseed;
+        asens0.addToSum(aseed);
         aseed = MX();
       }
     }

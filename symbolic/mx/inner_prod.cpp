@@ -60,8 +60,8 @@ namespace CasADi{
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] += *adjSeed[d][0] * *input[1];
-      *adjSens[d][1] += *adjSeed[d][0] * *input[0];
+      adjSens[d][0]->addToSum(*adjSeed[d][0] * *input[1]);
+      adjSens[d][1]->addToSum(*adjSeed[d][0] * *input[0]);
       *adjSeed[d][0] = MX();
     }
   }
