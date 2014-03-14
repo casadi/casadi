@@ -88,6 +88,7 @@ namespace CasADi{
     virtual bool __nonzero__() const;
   };
 
+  /// A constant given as a DMatrix
   class ConstantDMatrix : public ConstantMX{
   public:
 
@@ -153,6 +154,70 @@ namespace CasADi{
     static const int value = v;
   };
 
+  /// A zero-by-zero matrix
+  class ZeroByZero : public ConstantMX{
+  private:
+    /** \brief Private constructor (singleton design pattern) */
+    explicit ZeroByZero() : ConstantMX(Sparsity::sparse(0,0)){
+      initSingleton();
+    }
+
+  public:
+    /** \brief Get a pointer to the singleton */
+    static ZeroByZero* getInstance(){
+      static ZeroByZero instance;
+      return &instance;
+    }
+
+    /// Destructor
+    virtual ~ZeroByZero(){
+      destroySingleton();
+    }
+
+    /** \brief  Clone function */
+    virtual ZeroByZero* clone() const{ return getInstance();}
+
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
+    
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){}
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){}
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{}
+
+    /// Get the value (only for scalar constant nodes)
+    virtual double getValue() const{ return 0;}
+
+    /// Get the value (only for constant nodes)
+    virtual DMatrix getMatrixValue() const{ return DMatrix(); }
+
+    /// Get densification
+    virtual MX getSetSparse(const Sparsity& sp) const;
+
+    /// Get the nonzeros of matrix
+    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
+    
+    /// Assign the nonzeros of a matrix to another matrix
+    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
+
+    /// Transpose
+    virtual MX getTranspose() const;
+
+    /// Get a unary operation
+    virtual MX getUnary(int op) const;
+
+    /// Get a binary operation operation
+    virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
+    
+    /// Reshape
+    virtual MX getReshape(const Sparsity& sp) const;
+  };
+
+  /// A constant with all entries identical
   template<typename Value>
   class Constant : public ConstantMX{
   public:

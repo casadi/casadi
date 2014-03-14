@@ -182,5 +182,39 @@ namespace CasADi{
     return true;
   }
 
+  void ZeroByZero::printPart(std::ostream &stream, int part) const{
+    stream << "0x0";
+  }
+
+  MX ZeroByZero::getSetSparse(const Sparsity& sp) const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const{
+    casadi_assert(nz.empty());
+    return MX::zeros(sp);
+  }
+    
+  MX ZeroByZero::getSetNonzeros(const MX& y, const std::vector<int>& nz) const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getTranspose() const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getUnary(int op) const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getReshape(const Sparsity& sp) const{
+    casadi_assert(sp.isEmpty());
+    return MX::zeros(sp);
+  }
+
 } // namespace CasADi
 
