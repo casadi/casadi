@@ -40,8 +40,7 @@ namespace CasADi{
   }
 
   MX::MX(){
-    // Not yet enabled, #380
-    //assignNode(ZeroByZero::getInstance());
+    assignNode(ZeroByZero::getInstance());
   }
 
   MX::MX(MXNode* node, bool dummy1, bool dummy2, bool dummy3, bool dummy4){
