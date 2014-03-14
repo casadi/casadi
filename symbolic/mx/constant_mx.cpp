@@ -92,20 +92,28 @@ namespace CasADi{
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, int val){
-    switch(val){
-    case 0: return new Constant<CompiletimeConst<0> >(sp);
-    case 1: return new Constant<CompiletimeConst<1> >(sp);
-    case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
-    default: return new Constant<RuntimeConst<int> >(sp,val);        
+    if(sp.isEmpty(true)){
+      return ZeroByZero::getInstance();
+    } else {
+      switch(val){
+      case 0: return new Constant<CompiletimeConst<0> >(sp);
+      case 1: return new Constant<CompiletimeConst<1> >(sp);
+      case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
+      default: return new Constant<RuntimeConst<int> >(sp,val);        
+      }
     }
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, double val){
-    int intval(val);
-    if(intval-val==0){
-      return create(sp,intval);
+    if(sp.isEmpty(true)){
+      return ZeroByZero::getInstance();
     } else {
-      return new Constant<RuntimeConst<double> >(sp,val);
+      int intval(val);
+      if(intval-val==0){
+        return create(sp,intval);
+      } else {
+        return new Constant<RuntimeConst<double> >(sp,val);
+      }
     }
   }
 
