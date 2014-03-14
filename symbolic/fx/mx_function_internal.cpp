@@ -662,7 +662,7 @@ namespace CasADi{
     bool skip_fwd = true;
     for(vector<vector<MX> >::const_iterator i=fseed.begin(); i!=fseed.end() && skip_fwd; ++i){
       for(vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_fwd; ++j){
-        if(!j->isNull() && j->size()>0){
+        if(!j->isNullE() && j->size()>0){
           skip_fwd = false;
         }
       }
@@ -672,7 +672,7 @@ namespace CasADi{
     bool skip_adj = true;
     for(vector<vector<MX> >::const_iterator i=aseed.begin(); i!=aseed.end() && skip_adj; ++i){
       for(vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_adj; ++j){
-        if(!j->isNull() && j->size()>0){
+        if(!j->isNullE() && j->size()>0){
           skip_adj = false;
         }
       }
@@ -817,7 +817,7 @@ namespace CasADi{
             fseed_p[d][iind] = el<0 ? 0 : &dwork[el][d];
           
             // Give zero seed if null
-            if(el>=0 && dwork[el][d].isNull()){
+            if(el>=0 && dwork[el][d].isNullE()){
               if(d==0){
                 dwork[el][d] = MX::sparse(input_p[iind]->shape());
               } else {
@@ -830,7 +830,7 @@ namespace CasADi{
           for(int oind=0; oind<it->res.size(); ++oind){
             int el = it->res[oind];
             fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
-            if (el>=0 && dwork[el][d].isNull() && !output_p[oind]->isNull()) {
+            if (el>=0 && dwork[el][d].isNullE() && !output_p[oind]->isNull()) {
               dwork[el][d] = MX::sparse(output_p[oind]->shape());
             }
           }
@@ -882,7 +882,7 @@ namespace CasADi{
         if(it->op == OP_INPUT){
           // Collect the symbolic adjoint sensitivities
           for(int d=0; d<nadir; ++d){
-            if(dwork[it->res.front()][d].isNull()){
+            if(dwork[it->res.front()][d].isNullE()){
               asens[d][it->arg.front()] = MX::sparse(input(it->arg.front()).shape());
             } else {
               asens[d][it->arg.front()] = dwork[it->res.front()][d];
@@ -927,7 +927,7 @@ namespace CasADi{
               aseed_p[d][oind] = el<0 ? 0 : &dwork[el][d];
             
               // Provide a zero seed if no seed exists
-              if(el>=0 && dwork[el][d].isNull()){
+              if(el>=0 && dwork[el][d].isNullE()){
                 dwork[el][d] = MX::sparse(swork[el].shape());
               }
             }
@@ -938,7 +938,7 @@ namespace CasADi{
               asens_p[d][iind] = el<0 ? 0 : &dwork[el][d];
             
               // Set sensitivities to zero if not yet used
-              if(el>=0 && dwork[el][d].isNull()){
+              if(el>=0 && dwork[el][d].isNullE()){
                 dwork[el][d] = MX::sparse(swork[el].shape());
               }
             }
