@@ -1816,7 +1816,7 @@ namespace CasADi{
 
       // Assumes initialised
       for(int i=0; i<arg.size(); ++i){
-        if(arg[i].isNull() || arg[i].isEmpty() || input(i).isNull() || input(i).isEmpty()) continue;
+        if(arg[i].isNull() || arg[i].isEmpty() || input(i).isEmpty()) continue;
         casadi_assert_message(arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
                               "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
                               std::endl << input_.scheme.describeInput(i) <<  " has shape (" << input(i).size2() << 

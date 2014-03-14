@@ -596,7 +596,7 @@ namespace CasADi{
 
     for(vector<MXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
 
-      if (!(it->data).isEmpty(true)) {
+      if (!(it->data).isNull()) {
         // Check if it->data points to a supplied expr
         it_lookup = expr_lookup.find((it->data).operator->());
         

@@ -690,9 +690,6 @@ namespace CasADi{
 
     /** \brief  create an n-by-n identity matrix */
     static Matrix<DataType> eye(int ncol);
-
-    /** \brief  The following function is used to ensure similarity to MX, which is reference counted */
-    bool isNull() const{ return false;}
     
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;
