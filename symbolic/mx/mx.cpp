@@ -40,6 +40,8 @@ namespace CasADi{
   }
 
   MX::MX(){
+    // Not yet enabled, #380
+    //assignNode(ZeroByZero::getInstance());
   }
 
   MX::MX(MXNode* node, bool dummy1, bool dummy2, bool dummy3, bool dummy4){
@@ -62,6 +64,14 @@ namespace CasADi{
     assignNode(ConstantMX::create(DMatrix(x)));
   }
 
+  MX::MX(int nrow, int ncol){
+    if(nrow==0 && ncol==0){
+      assignNode(ZeroByZero::getInstance());
+    } else {
+      assignNode(new Constant<CompiletimeConst<0> >(Sparsity::sparse(nrow,ncol)));
+    }
+  }
+
 #ifndef WITHOUT_PRE_1_9_X
   MX::MX(const string& name, int nrow, int ncol){
     assignNode(new SymbolicMX(name,nrow,ncol));
@@ -73,10 +83,6 @@ namespace CasADi{
 
   MX::MX(const string& name, const Sparsity& sp){
     assignNode(new SymbolicMX(name,sp));
-  }
-
-  MX::MX(int nrow, int ncol){
-    assignNode(new Constant<CompiletimeConst<0> >(Sparsity::sparse(nrow,ncol)));
   }
 
   MX::MX(int nrow, int ncol, const MX& val){
