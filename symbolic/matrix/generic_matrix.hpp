@@ -94,11 +94,8 @@ namespace CasADi{
     std::pair<int,int> shape() const;
 #endif
 
-    /** \brief  Check if the matrix expression is empty, i.e. one of its dimensions is 0 */
-    bool isEmpty() const{ return sparsity().isEmpty();}
-    
-    /** \brief  Check if the matrix expression is null, i.e. its dimensios are 0-by-0 */
-    bool null() const;
+    /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero (or optionally both dimensions) */
+    bool isEmpty(bool both=false) const{ return sparsity().isEmpty(both);}
     
     /** \brief  Check if the matrix expression is dense */
     bool isDense() const{ return sparsity().isDense();}
@@ -268,11 +265,6 @@ namespace CasADi{
   template<typename MatType>
   std::string GenericMatrix<MatType>::dimString() const {
     return sparsity().dimString();
-  }
-
-  template<typename MatType>
-  bool GenericMatrix<MatType>::null() const{
-    return sparsity().null();
   }
 
   template<typename MatType>

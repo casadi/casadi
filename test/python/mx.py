@@ -1337,10 +1337,10 @@ class MXtests(casadiTestCase):
     f.evaluate()
     
     r = f.call([x,MX()])
-    self.assertTrue(r[1].null())
+    self.assertTrue(r[1].isEmpty(True))
 
     r = f.call([MX(),MX()])
-    self.assertTrue(r[1].null())
+    self.assertTrue(r[1].isEmpty(True))
     
     #self.assertRaises(Exception,lambda : f.call([x,x],True))
     #self.assertRaises(Exception,lambda : f.call([[],[]],True))

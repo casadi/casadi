@@ -1989,14 +1989,10 @@ namespace CasADi{
     return size() == numel();
   }
   
-  bool SparsityInternal::isEmpty() const{
-    return numel()==0;
+  bool SparsityInternal::isEmpty(bool both) const{
+    return both ? ncol_==0 && nrow_==0 : ncol_==0 || nrow_==0;
   }
   
-  bool SparsityInternal::null() const{
-    return ncol_==0 && nrow_==0;
-  }
-
   bool SparsityInternal::isDiagonal() const{
     // Check if matrix is square
     if(ncol_ != nrow_) return false;

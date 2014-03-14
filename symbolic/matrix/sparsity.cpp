@@ -127,14 +127,10 @@ namespace CasADi{
     return (*this)->numel();
   }
 
-  bool Sparsity::isEmpty() const{
-    return (*this)->isEmpty();
+  bool Sparsity::isEmpty(bool both) const{
+    return (*this)->isEmpty(both);
   }
-  
-  bool Sparsity::null() const{
-    return (*this)->null();
-  }
-    
+      
   int Sparsity::size() const{
     return (*this)->size();
   }

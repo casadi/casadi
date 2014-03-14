@@ -247,12 +247,9 @@ namespace CasADi{
         \see size()  */
     int numel() const;
     
-    /// Check if the sparsity is empty, i.e. one of its dimensions is 0 
-    bool isEmpty() const;
-    
-    /// Check if the sparsity is null, i.e. dimension is 0-by-0
-    bool null() const;
-    
+    /// Check if the sparsity is empty, i.e. if one of the dimensions is zero (or optionally both dimensions)
+    bool isEmpty(bool both=false) const;
+        
     /** \brief Get the number of (structural) non-zeros
         \see numel() */
     int size() const;
