@@ -21,7 +21,7 @@
  */
 
 #include <iostream>
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "interfaces/ipopt/ipopt_solver.hpp"
 #include "interfaces/ipopt/ipopt_internal.hpp"
 #include "symbolic/sx/sx_tools.hpp"

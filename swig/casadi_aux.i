@@ -22,7 +22,7 @@
 
 %{
 #include <sstream>
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "symbolic/printable_object.hpp"
 #include "symbolic/shared_object.hpp"
 #include "symbolic/weak_ref.hpp"
@@ -42,7 +42,7 @@ def _swig_repr(self):
 %}
 #endif // SWIGPYTHON
 
-%include "symbolic/stl_vector_tools.hpp"
+%include "symbolic/std_vector_tools.hpp"
 VECTOR_TOOLS_TEMPLATES(int)
 VECTOR_TOOLS_TEMPLATES(double)
 

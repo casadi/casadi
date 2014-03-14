@@ -22,7 +22,7 @@
 
 #include "sparsity_tools.hpp"
 #include "../casadi_exception.hpp"
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include "../matrix/matrix.hpp"
 #include "../matrix/matrix_tools.hpp"
 

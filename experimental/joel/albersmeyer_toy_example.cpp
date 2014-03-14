@@ -28,7 +28,7 @@
 #include <nonlinear_programming/sqp_method.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 #include <nonlinear_programming/lifted_sqp.hpp>
 
 using namespace CasADi;

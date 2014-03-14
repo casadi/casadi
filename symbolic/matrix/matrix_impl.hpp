@@ -27,7 +27,7 @@
 #include "matrix.hpp"
 #include "matrix_tools.hpp"
 #include "sparsity_tools.hpp"
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 
 namespace CasADi{
   // Implementations

@@ -25,7 +25,7 @@
 #include <ctime>
 #include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 
 using namespace CasADi;
 using namespace std;

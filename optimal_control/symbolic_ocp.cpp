@@ -29,11 +29,11 @@
 #include <sstream>
 #include <ctime>
 
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "external_packages/tinyxml/tinyxml.h"
 
 #include "../symbolic/casadi_exception.hpp"
-#include "../symbolic/stl_vector_tools.hpp"
+#include "../symbolic/std_vector_tools.hpp"
 #include "variable_tools.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/sx/sx_tools.hpp"

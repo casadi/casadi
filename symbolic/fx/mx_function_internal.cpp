@@ -25,7 +25,7 @@
 #include "../mx/mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
 
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include "../casadi_types.hpp"
 
 #include <stack>

@@ -26,7 +26,7 @@
 #include "multiplication.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include "../fx/fx_internal.hpp"
 
 using namespace std;

@@ -22,7 +22,7 @@
 
 #include "gsl_internal.hpp"
 #include "symbolic/fx/sx_function_internal.hpp"
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/fx/linear_solver_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"

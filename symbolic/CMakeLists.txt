@@ -19,7 +19,7 @@ SET(CASADI_SRCS
   generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
   generic_type_internal.hpp                             # Internal class for the same
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class
-  stl_vector_tools.hpp        stl_vector_tools.cpp      # Set of useful functions for the vector template class in STL
+  std_vector_tools.hpp        std_vector_tools.cpp      # Set of useful functions for the vector template class in STL
   profiling.hpp               profiling.cpp
   functor.hpp                 functor.cpp              # Classes for callbacks
   functor_internal.hpp        functor_internal.cpp     

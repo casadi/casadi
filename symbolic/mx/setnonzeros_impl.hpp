@@ -24,7 +24,7 @@
 #define SETNONZEROS_IMPL_HPP
 
 #include "setnonzeros.hpp"
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"

@@ -25,7 +25,7 @@
 #include "../casadi_math.hpp"
 #include "../casadi_exception.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 using namespace std;
 
 namespace CasADi{

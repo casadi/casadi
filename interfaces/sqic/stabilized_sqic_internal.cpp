@@ -28,7 +28,7 @@
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/fx/mx_function.hpp"
 
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 
 #include "wsqic.hpp"
 #include "interfaces/sqic/resource_sqic.hpp"

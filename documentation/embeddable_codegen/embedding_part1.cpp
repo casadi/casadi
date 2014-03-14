@@ -21,7 +21,7 @@
  */
 
 #include <symbolic/casadi.hpp>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 #include <symbolic/fx/nlp_solver.hpp>
 #include <fstream>
 

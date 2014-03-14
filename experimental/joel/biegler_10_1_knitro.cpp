@@ -22,7 +22,7 @@
 
 #include <iostream>
 #include <ctime>
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "interfaces/knitro/knitro_solver.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/fx/sx_function.hpp"

@@ -23,7 +23,7 @@
 #include "sparsity_internal.hpp"
 #include "sparsity_tools.hpp"
 #include "../matrix/matrix.hpp"
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include <climits>
 
 using namespace std;

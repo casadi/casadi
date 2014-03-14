@@ -22,7 +22,7 @@
 
 %{
 #include <sstream>
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "symbolic/printable_object.hpp"
 #include "symbolic/shared_object.hpp"
 #include "symbolic/generic_type.hpp"

@@ -24,7 +24,7 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include "../casadi_options.hpp"
 
 using namespace std;

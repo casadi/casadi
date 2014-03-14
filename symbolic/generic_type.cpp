@@ -21,7 +21,7 @@
  */
 
 #include "generic_type_internal.hpp"
-#include "stl_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 #include "casadi_exception.hpp"
 #include <cmath>
 

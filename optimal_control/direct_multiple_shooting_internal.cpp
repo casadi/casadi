@@ -24,7 +24,7 @@
 #include "../symbolic/fx/integrator.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
-#include "../symbolic/stl_vector_tools.hpp"
+#include "../symbolic/std_vector_tools.hpp"
 
 using namespace std;
 namespace CasADi{
