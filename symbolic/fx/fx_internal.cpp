@@ -2408,7 +2408,7 @@ namespace CasADi{
     // Store the adjoint sensitivities
     for(int d=0; d<adjSens.size(); ++d){
       for(int i=0; i<adjSens[d].size(); ++i){
-        if(adjSens[d][i]!=0 && !asens[d][i].isNullE() && !(*adjSens[d][i]).isEmpty(true)){
+        if(adjSens[d][i]!=0 && !asens[d][i].isEmpty(true) && !(*adjSens[d][i]).isEmpty(true)){
           adjSens[d][i]->addToSum(asens[d][i]);
         }
       }

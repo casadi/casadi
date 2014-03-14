@@ -1001,7 +1001,7 @@ namespace CasADi{
       // Determine if this direction is empty
       bool empty = true;
       for (int i=0;i<seed[d].size();++i) {
-        if (!(seed[d][i]==0 || seed[d][i]->isNullE() || (*seed[d][i])->isZero())) {
+        if (!(seed[d][i]==0 || seed[d][i]->isEmpty(true) || (*seed[d][i])->isZero())) {
           empty = false; break;
         }
       }
@@ -1010,7 +1010,7 @@ namespace CasADi{
         // Empty directions are discarded, with forward sensitivities put to zero
         if (forward) {
           for (int i=0;i<sens[d].size();++i) {
-            if (sens[d][i]!=0 && !sens[d][i]->isNullE()) {
+            if (sens[d][i]!=0 && !sens[d][i]->isEmpty(true)) {
               *sens[d][i]=MatType(sens[d][i]->sparsity(),0);
             }
           }

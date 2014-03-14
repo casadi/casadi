@@ -63,6 +63,8 @@ namespace CasADi{
     assignNode(ConstantMX::create(DMatrix(x)));
   }
 
+#ifndef WITHOUT_PRE_1_9_X
+
   MX::MX(int nrow, int ncol){
     if(nrow==0 && ncol==0){
       assignNode(ZeroByZero::getInstance());
@@ -71,7 +73,6 @@ namespace CasADi{
     }
   }
 
-#ifndef WITHOUT_PRE_1_9_X
   MX::MX(const string& name, int nrow, int ncol){
     assignNode(new SymbolicMX(name,nrow,ncol));
   }
@@ -1024,7 +1025,7 @@ namespace CasADi{
   }
 
   void MX::addToSum(const MX& x){
-    if(isNullE()){
+    if(isEmpty(true)){
       *this = x;
     } else {
       *this += x;

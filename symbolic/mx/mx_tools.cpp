@@ -62,7 +62,7 @@ namespace CasADi{
     bool is_vector = true;
     for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it){
       // Rewrite with horzcat and transpose if not a vector
-      if(!it->isNullE() && !(it->size1()==0 && it->size2()==0) && !it->isVector()){
+      if(!it->isEmpty(true) && !(it->size1()==0 && it->size2()==0) && !it->isVector()){
         vector<MX> v(comp.size());
         for(int i=0; i<v.size(); ++i)
           v[i] = comp[i].T();
@@ -181,7 +181,7 @@ namespace CasADi{
   }
 
   void simplify(MX& ex){
-    if(!ex.isNullE()){
+    if(!ex.isEmpty(true)){
       ex->simplifyMe(ex);
     }
   }
@@ -596,7 +596,7 @@ namespace CasADi{
 
     for(vector<MXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
 
-      if (!(it->data).isNullE()) {
+      if (!(it->data).isEmpty(true)) {
         // Check if it->data points to a supplied expr
         it_lookup = expr_lookup.find((it->data).operator->());
         
