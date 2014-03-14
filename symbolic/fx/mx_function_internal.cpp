@@ -892,7 +892,7 @@ namespace CasADi{
         } else if(it->op==OP_OUTPUT){
           // Pass the adjoint seeds
           for(int d=0; d<nadir; ++d){
-            dwork[it->arg.front()][d] += aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(),true);
+            dwork[it->arg.front()][d].addToSum(aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(),true));
           }
         } else if(it->op==OP_PARAMETER){
           // Clear adjoint seeds
