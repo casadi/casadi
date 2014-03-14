@@ -69,7 +69,6 @@ except:
 #except:
 #  pass
 
-@run_only(["IPOPTrhb"])
 class NLPtests(casadiTestCase):
 
   def testboundsviol(self):
