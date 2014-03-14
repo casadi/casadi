@@ -155,7 +155,7 @@ void DirectMultipleShootingInternal::init(){
   // Objective function
   MX f;
   if (mfcn_.getNumInputs()==1) {
-    f = mfcn_.call(X.back()).front();
+    f = mfcn_(X.back()).front();
   } else {
     vector<MX> mfcn_argin(MAYER_NUM_IN); 
     mfcn_argin[MAYER_X] = X.back();

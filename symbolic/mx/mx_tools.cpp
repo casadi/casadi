@@ -929,7 +929,7 @@ namespace CasADi{
     SX n = SX::sym("A",A.sparsity());
     SXFunction f(n,nullspace(n));
     f.init();
-    return f.call(A)[0];
+    return f(A).at(0);
   }
   
 } // namespace CasADi

@@ -268,6 +268,34 @@ namespace CasADi{
 %}
   #endif // SWIGPYTHON
   #endif // SWIG
+
+#ifndef SWIG
+  // Create a vector of length 1
+  template<typename T>
+  std::vector<T> toVector(const T& v0){ 
+    return std::vector<T>(1,v0);
+  }
+
+  // Create a vector of length 2
+  template<typename T>
+  std::vector<T> toVector(const T& v0, const T& v1){ 
+    std::vector<T> ret(2);
+    ret[0] = v0;
+    ret[1] = v1;
+    return ret;
+  }
+
+  // Create a vector of length 3
+  template<typename T>
+  std::vector<T> toVector(const T& v0, const T& v1, const T& v2){ 
+    std::vector<T> ret(3);
+    ret[0] = v0;
+    ret[1] = v1;
+    ret[2] = v2;
+    return ret;
+  }
+#endif // SWIG
+
   
   /// Checks if vector does not contain NaN or Inf
   template<typename T>

@@ -1974,7 +1974,7 @@ namespace CasADi{
       MX J_simo_arg = horzcat(tmp);
 
       // Evaluate symbolically
-      jac_resv = J_simo.call(J_simo_arg);
+      jac_resv = J_simo(J_simo_arg);
     }
 
     // We are now ready to form the full Jacobian
