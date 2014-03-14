@@ -42,7 +42,7 @@ namespace CasADi{
   
     setOption("name", "unnamed_mx_function");
   
-    // Check for inputs that are not are symbolic primitives
+    // Check for inputs that are not symbolic primitives
     int ind=0;
     for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it, ++ind){
       if(!it->isSymbolic()){
@@ -158,7 +158,7 @@ namespace CasADi{
         } else {
           ae.arg.resize(n->ndep());
           for(int i=0; i<n->ndep(); ++i){
-            ae.arg[i] = n->dep(i).isNull() ? -1 : n->dep(i)->temp;
+            ae.arg[i] = n->dep(i)->temp;
           }
           ae.res.resize(n->getNumOutputs());
           if(n->isMultipleOutput()){
@@ -662,7 +662,7 @@ namespace CasADi{
     bool skip_fwd = true;
     for(vector<vector<MX> >::const_iterator i=fseed.begin(); i!=fseed.end() && skip_fwd; ++i){
       for(vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_fwd; ++j){
-        if(!j->isEmpty(true) && j->size()>0){
+        if(j->size()>0){
           skip_fwd = false;
         }
       }
@@ -672,7 +672,7 @@ namespace CasADi{
     bool skip_adj = true;
     for(vector<vector<MX> >::const_iterator i=aseed.begin(); i!=aseed.end() && skip_adj; ++i){
       for(vector<MX>::const_iterator j=i->begin(); j!=i->end() && skip_adj; ++j){
-        if(!j->isEmpty(true) && j->size()>0){
+        if(j->size()>0){
           skip_adj = false;
         }
       }
@@ -830,7 +830,7 @@ namespace CasADi{
           for(int oind=0; oind<it->res.size(); ++oind){
             int el = it->res[oind];
             fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
-            if (el>=0 && dwork[el][d].isEmpty(true) && !output_p[oind]->isNull()) {
+            if(el>=0 && dwork[el][d].isEmpty(true)){
               dwork[el][d] = MX::sparse(output_p[oind]->shape());
             }
           }
