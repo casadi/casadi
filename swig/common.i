@@ -590,6 +590,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 %}
 
+#ifndef SWIGXML
 %traits_swigtype(CasADi::DerivativeGenerator);
 %fragment(SWIG_Traits_frag(CasADi::DerivativeGenerator));
 %traits_swigtype(CasADi::Callback);
@@ -600,7 +601,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 %fragment(SWIG_Traits_frag(CasADi::IndexList));
 
 %template(Dictionary) std::map<std::string,CasADi::GenericType>;
-
+#endif
 
 
 // These dummy things would go away when we properly use fragments
