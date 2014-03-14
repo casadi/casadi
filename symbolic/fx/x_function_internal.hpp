@@ -138,7 +138,7 @@ namespace CasADi{
   
     // Make sure that inputs are symbolic
     for(int i=0; i<inputv.size(); ++i){
-      if (inputv[i].isNull()) {
+      if (inputv[i].isNull() || inputv[i].isEmpty(true)) {
         inputv_[i] = MatType::sym("empty",0,0);
       } else if (inputv[i].isEmpty()) {
         // That's okay
@@ -154,7 +154,7 @@ namespace CasADi{
   
     // Null output arguments become empty
     for(int i=0; i<outputv_.size(); ++i) {
-      if (outputv_[i].isNull()) {
+      if (outputv_[i].isNull() || outputv_[i].isEmpty(true)) {
         outputv_[i] = MatType::sparse(0,0);
       }
     }
@@ -1001,7 +1001,7 @@ namespace CasADi{
       // Determine if this direction is empty
       bool empty = true;
       for (int i=0;i<seed[d].size();++i) {
-        if (!(seed[d][i]==0 || seed[d][i]->isNull() || (*seed[d][i])->isZero())) {
+        if (!(seed[d][i]==0 || seed[d][i]->isNullE() || (*seed[d][i])->isZero())) {
           empty = false; break;
         }
       }
@@ -1010,7 +1010,7 @@ namespace CasADi{
         // Empty directions are discarded, with forward sensitivities put to zero
         if (forward) {
           for (int i=0;i<sens[d].size();++i) {
-            if (sens[d][i]!=0 && !sens[d][i]->isNull()) {
+            if (sens[d][i]!=0 && !sens[d][i]->isNullE()) {
               *sens[d][i]=MatType(sens[d][i]->sparsity(),0);
             }
           }
