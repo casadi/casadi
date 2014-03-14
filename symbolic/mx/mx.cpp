@@ -42,6 +42,14 @@ namespace CasADi{
   MX::MX(){
   }
 
+  MX::MX(MXNode* node, bool dummy1, bool dummy2, bool dummy3, bool dummy4){
+    assignNode(node);
+  }
+
+  MX MX::create(MXNode* node){
+    return MX(node,false,false,false,false);
+  }
+
   MX::MX(double x){
     assignNode(ConstantMX::create(Sparsity::dense(1,1),x));
   }
@@ -106,12 +114,6 @@ namespace CasADi{
 
   MX::MX(const Sparsity& sp, double val){
     assignNode(ConstantMX::create(sp,val));
-  }
-
-  MX MX::create(MXNode* node){
-    MX ret;
-    ret.assignNode(node);
-    return ret;
   }
 
   std::vector<MX> MX::createMultipleOutput(MXNode* node){
