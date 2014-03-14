@@ -480,7 +480,7 @@ class FXtests(casadiTestCase):
     with self.assertRaises(Exception):
       f.output("baz")
       
-    ret = f.eval([12])
+    ret = f.call([SX(12)])
     self.checkarray(myOut(ret,"foo")[0],DMatrix([144]))
     self.checkarray(myOut(ret,"bar")[0],DMatrix([12]))
     with self.assertRaises(Exception):

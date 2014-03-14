@@ -41,7 +41,7 @@ class Misctests(casadiTestCase):
     x = SXElement.sym("x")
     f = SXFunction([x], [2 * x])
     f.init()
-    y = f.eval([x])[0].data()
+    y = f.call([x])[0].data()
     print y
     
   def test_issue179B(self):

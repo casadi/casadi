@@ -178,7 +178,7 @@ namespace CasADi{
     // Otherwise, evaluate symbolically     
     SXFunction F(v,ex);
     F.init();
-    return F.eval(vdef);
+    return F(vdef);
   }
 
   SX substitute(const SX &ex, const SX &v, const SX &vdef){

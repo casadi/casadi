@@ -248,9 +248,6 @@ namespace CasADi{
 
 #endif // SWIG
   
-    /// evaluate symbolically, SX type (overloaded)
-    std::vector<SX> eval(const std::vector<SX>& arg);
-
     /// evaluate symbolically, MX type (overloaded)
     std::vector<MX> eval(const std::vector<MX>& arg);
                   
@@ -418,9 +415,12 @@ namespace CasADi{
               const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens)){
       callDerivative(arg,res,fseed,fsens,aseed,asens,true);
     }
+    std::vector<SX> eval(const std::vector<SX>& arg){
+      return call(arg);
+    }
 #ifndef SWIG
     std::vector<MX> call(const MX &arg){ return call(std::vector<MX>(1,arg));}
-    SX eval(const SX& arg){ return eval(std::vector<SX>(1,arg)).at(0);}
+    SX eval(const SX& arg){ return call(std::vector<SX>(1,arg)).at(0);}
 #endif // SWIG
     //@}
 #endif
