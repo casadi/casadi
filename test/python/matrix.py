@@ -1046,6 +1046,22 @@ class Matrixtests(casadiTestCase):
     a = DMatrix([[1,2],[3,4],[5,6]])
     self.checkarray(repmat(a,2,3),kron(DMatrix.ones(2,3),a))
         
+  def test_triu(self):
+    a = DMatrix([[1,2],[3,4]])
+    b = triu(a)
+    self.checkarray(b, DMatrix([[1,2],[0,4]]) )
+
+    with self.assertRaises(Exception):
+      c.triu(DMatrix.ones(3,4))
+
+  def test_tril(self):
+    a = DMatrix([[1,2],[3,4]])
+    b = tril(a)
+    self.checkarray(b, DMatrix([[1,0],[3,4]]) )
+
+    with self.assertRaises(Exception):
+      c.tril(DMatrix.ones(3,4))
+
 if __name__ == '__main__':
     unittest.main()
 
