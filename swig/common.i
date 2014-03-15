@@ -216,6 +216,10 @@ namespace swig {
 
 #ifdef SWIGPYTHON
 
+%{
+#include <vector>
+%}
+
 %include <std/std_common.i>
 %include <std_container.i>
 
