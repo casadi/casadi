@@ -91,10 +91,10 @@ namespace CasADi{
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][1] += tr<TrX>(mul(*adjSeed[d][0],tr<!TrY>(*input[2]),tr<TrX>(*input[1]).sparsity()));
-      *adjSens[d][2] += tr<TrY>(mul(tr<!TrX>(*input[1]),*adjSeed[d][0],tr<TrY>(*input[2]).sparsity()));
+      adjSens[d][1]->addToSum(tr<TrX>(mul(*adjSeed[d][0],tr<!TrY>(*input[2]),tr<TrX>(*input[1]).sparsity())));
+      adjSens[d][2]->addToSum(tr<TrY>(mul(tr<!TrX>(*input[1]),*adjSeed[d][0],tr<TrY>(*input[2]).sparsity())));
       if(adjSeed[d][0]!=adjSens[d][0]){
-        *adjSens[d][0] += *adjSeed[d][0];
+        adjSens[d][0]->addToSum(*adjSeed[d][0]);
         *adjSeed[d][0] = MX();
       }
     }

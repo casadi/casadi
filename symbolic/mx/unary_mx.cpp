@@ -99,7 +99,7 @@ namespace CasADi{
       for(int d=0; d<nadj; ++d){
         MX s = *adjSeed[d][0];
         *adjSeed[d][0] = MX();
-        *adjSens[d][0] += pd[0]*s;
+        adjSens[d][0]->addToSum(pd[0]*s);
       }
     }
  

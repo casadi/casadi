@@ -160,7 +160,7 @@ namespace CasADi{
             v.push_back(MX::sparse(output_sparsity_[i].shape()));
           }
         }
-        *adjSens[d][0] += horzcat(v);
+        adjSens[d][0]->addToSum(horzcat(v));
       }
     }
   }
@@ -230,7 +230,7 @@ namespace CasADi{
             v.push_back(MX::sparse(output_sparsity_[i].shape()));
           }
         }
-        *adjSens[d][0] += vertcat(v);
+        adjSens[d][0]->addToSum(vertcat(v));
       }
     }
   }

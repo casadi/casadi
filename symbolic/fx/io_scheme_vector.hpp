@@ -49,16 +49,17 @@ namespace CasADi{
     operator std::vector<T>&(){ return this->data;}
     operator const std::vector<T>&() const{ return this->data;}
     //@}
-    T operator[](int i) {
+    T operator[](int i) const {
       casadi_assert_message(i>=0 && i<this->data.size(),"Index error for " << this->scheme.name() << ": supplied integer must be >=0 and <= " << this->data.size() << " but got " << i << ".");
       return this->data.at(i);
     }
-    T operator[](const std::string& name) { return (*this)[this->scheme.index(name)]; }
+    T operator[](const std::string& name) const { return (*this)[this->scheme.index(name)]; }
 #endif // SWIG
-    T __getitem__(int i) { if (i<0) i+= this->data.size(); return (*this)[i]; }
-    T __getitem__(const std::string& name) { return (*this)[name]; }
-    int __len__() { return this->data.size(); }
-        
+    T __getitem__(int i) const { if (i<0) i+= this->data.size(); return (*this)[i]; }
+    T __getitem__(const std::string& name) const { return (*this)[name]; }
+    int __len__() const { return this->data.size(); }
+    std::vector<T> vector() const { return this->data; }
+
 #ifndef SWIG
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const { 

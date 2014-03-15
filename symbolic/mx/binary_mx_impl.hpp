@@ -101,7 +101,7 @@ namespace CasADi{
           }
           
           // Propagate the seeds
-          *adjSens[d][c] += t;
+          adjSens[d][c]->addToSum(t);
         }
       }
     }

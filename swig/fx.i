@@ -84,19 +84,19 @@
 %extend CasADi::IOSchemeVector< CasADi::MX > {
 %pythoncode %{
   def __iter__(self):
-    return self.data.__iter__()
+    return iter(self.data)
 %}
 }
 %extend CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SXElement> > {
 %pythoncode %{
   def __iter__(self):
-    return self.data.__iter__()
+    return iter(self.data)
 %}
 }
 %extend CasADi::IOSchemeVector< CasADi::Sparsity > {
 %pythoncode %{
   def __iter__(self):
-    return self.data.__iter__()
+    return iter(self.data)
 %}
 }
 

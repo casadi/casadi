@@ -75,7 +75,7 @@ namespace CasADi{
     // Propagate adjoint seeds
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] += adjSeed[d][0]->setSparse(dep().sparsity(),true);
+      adjSens[d][0]->addToSum(adjSeed[d][0]->setSparse(dep().sparsity(),true));
       *adjSeed[d][0] = MX();
     }
   }

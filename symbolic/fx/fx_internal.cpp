@@ -1816,7 +1816,7 @@ namespace CasADi{
 
       // Assumes initialised
       for(int i=0; i<arg.size(); ++i){
-        if(arg[i].isNull() || arg[i].isEmpty() || input(i).isNull() || input(i).isEmpty()) continue;
+        if(arg[i].isNull() || arg[i].isEmpty() || input(i).isEmpty()) continue;
         casadi_assert_message(arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
                               "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
                               std::endl << input_.scheme.describeInput(i) <<  " has shape (" << input(i).size2() << 
@@ -2408,8 +2408,8 @@ namespace CasADi{
     // Store the adjoint sensitivities
     for(int d=0; d<adjSens.size(); ++d){
       for(int i=0; i<adjSens[d].size(); ++i){
-        if(adjSens[d][i]!=0 && !asens[d][i].isNull() && !(*adjSens[d][i]).isEmpty(true)){
-          *adjSens[d][i] += asens[d][i];
+        if(adjSens[d][i]!=0 && !asens[d][i].isEmpty(true) && !(*adjSens[d][i]).isEmpty(true)){
+          adjSens[d][i]->addToSum(asens[d][i]);
         }
       }
     }

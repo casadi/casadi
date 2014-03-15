@@ -63,13 +63,13 @@ namespace CasADi{
 
     // Start destruction method if any of the dependencies has dependencies
     for(vector<MX>::iterator cc=dep_.begin(); cc!=dep_.end(); ++cc){
-      // Skip if null
-      if(cc->isNull()) continue;
+      // Skip if constant
+      if(cc->isConstant()) continue;
     
       // Check if there are other "owners" of the node
       if(cc->getCount()!= 1){
       
-        // Replace with a null pointer
+        // Replace with a 0-by-0 matrix
         *cc = MX();
       
       } else {
@@ -92,8 +92,8 @@ namespace CasADi{
           // Start destruction method if any of the dependencies has dependencies
           for(vector<MX>::iterator ii=t->dep_.begin(); ii!=t->dep_.end(); ++ii){
           
-            // Skip if null
-            if(ii->isNull()) continue;
+            // Skip if constant
+            if(ii->isConstant()) continue;
           
             // Check if this is the only reference to the element
             if(ii->getCount()==1){
@@ -199,11 +199,7 @@ namespace CasADi{
       remaining_calls--;
       printPart(stream,0);
       for(int i=0; i<ndep(); ++i){
-        if (dep(i).isNull()) {
-          stream << "MX()";
-        } else {
-          dep(i)->print(stream,remaining_calls);
-        }
+        dep(i)->print(stream,remaining_calls);
         printPart(stream,i+1);
       }
     } else {
@@ -670,7 +666,7 @@ namespace CasADi{
     vector<MX> c;
     c.reserve(x.size());
     for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it)
-      if(!it->isNull() && !it->isEmpty())
+      if(!it->isEmpty())
         c.push_back(*it);
   
     if(c.empty()){
@@ -705,7 +701,7 @@ namespace CasADi{
     vector<MX> c;
     c.reserve(x.size());
     for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it)
-      if(!it->isNull() && !it->isEmpty())
+      if(!it->isEmpty())
         c.push_back(*it);
   
     if(c.empty()){

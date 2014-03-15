@@ -40,6 +40,7 @@ namespace CasADi{
   }
 
   MX::MX(){
+    assignNode(ZeroByZero::getInstance());
   }
 
   MX::MX(MXNode* node, bool dummy1, bool dummy2, bool dummy3, bool dummy4){
@@ -63,6 +64,15 @@ namespace CasADi{
   }
 
 #ifndef WITHOUT_PRE_1_9_X
+
+  MX::MX(int nrow, int ncol){
+    if(nrow==0 && ncol==0){
+      assignNode(ZeroByZero::getInstance());
+    } else {
+      assignNode(new Constant<CompiletimeConst<0> >(Sparsity::sparse(nrow,ncol)));
+    }
+  }
+
   MX::MX(const string& name, int nrow, int ncol){
     assignNode(new SymbolicMX(name,nrow,ncol));
   }
@@ -73,10 +83,6 @@ namespace CasADi{
 
   MX::MX(const string& name, const Sparsity& sp){
     assignNode(new SymbolicMX(name,sp));
-  }
-
-  MX::MX(int nrow, int ncol){
-    assignNode(new Constant<CompiletimeConst<0> >(Sparsity::sparse(nrow,ncol)));
   }
 
   MX::MX(int nrow, int ncol, const MX& val){
@@ -132,8 +138,7 @@ namespace CasADi{
   }
 
   bool MX::__nonzero__() const {
-    if (isNull()) {casadi_error("Cannot determine truth value of null MX.");}
-    return (operator->())->__nonzero__();
+    return (*this)->__nonzero__();
   }
 
   const MX MX::sub(const std::vector<int>& j, int i) const{
@@ -833,24 +838,24 @@ namespace CasADi{
     return max_num_calls_in_print_;
   }
 
-  MX MX::getDep(int ch) const { return !isNull() ? (*this)->dep(ch) : MX(); }
+  MX MX::getDep(int ch) const { return (*this)->dep(ch); }
 
-  int MX::getNdeps() const { return !isNull() ? (*this)->ndep() : 0; }
+  int MX::getNdeps() const { return (*this)->ndep(); }
   
-  std::string MX::getName() const { return !isNull() ? (*this)->getName() : "null"; }
+  std::string MX::getName() const { return (*this)->getName(); }
 
-  bool         MX::isSymbolic () const { return !isNull() ? (*this)->getOp()==OP_PARAMETER : false; }
-  bool         MX::isConstant () const { return !isNull() ? (*this)->getOp()==OP_CONST : false; }
-  bool         MX::isEvaluation () const { return !isNull() ? (*this)->getOp()==OP_CALL : false; }
-  bool         MX::isEvaluationOutput () const { return !isNull() ? (*this)->isOutputNode() : false; }
+  bool         MX::isSymbolic () const { return (*this)->getOp()==OP_PARAMETER; }
+  bool         MX::isConstant () const { return (*this)->getOp()==OP_CONST; }
+  bool         MX::isEvaluation () const { return (*this)->getOp()==OP_CALL; }
+  bool         MX::isEvaluationOutput () const { return (*this)->isOutputNode(); }
 
-  int         MX::getEvaluationOutput () const { return !isNull() ? (*this)->getFunctionOutput() : -1; }
+  int         MX::getEvaluationOutput () const { return (*this)->getFunctionOutput(); }
 
     
-  bool         MX::isOperation (int op) const { return !isNull() ? (*this)->getOp()==op : false; }
-  bool         MX::isMultiplication () const { return !isNull() ? (*this)->getOp()==OP_MATMUL : false; }
+  bool         MX::isOperation (int op) const { return (*this)->getOp()==op; }
+  bool         MX::isMultiplication () const { return (*this)->getOp()==OP_MATMUL; }
 
-  bool         MX::isNorm () const { return !isNull() ? dynamic_cast<const Norm*>(get())!=0 : false; }
+  bool         MX::isNorm () const { return dynamic_cast<const Norm*>(get())!=0; }
 
   FX MX::getFunction () {  return (*this)->getFunction(); }
          
@@ -862,9 +867,9 @@ namespace CasADi{
     return (*this)->getMatrixValue();
   }
            
-  bool MX::isBinary() const { return isNull() ? false : (*this)->isBinaryOp();}
+  bool MX::isBinary() const { return (*this)->isBinaryOp();}
 
-  bool MX::isUnary() const { return isNull() ? false : (*this)->isUnaryOp();}
+  bool MX::isUnary() const { return (*this)->isUnaryOp();}
          
   int MX::getOp() const {
     return (*this)->getOp();
@@ -890,7 +895,6 @@ namespace CasADi{
   }
 
   long MX::__hash__() const {
-    if (isNull()) return 0;
     // FIXME: This is bad coding, the pointer might on certain architectures be larger than the long,
     // giving an error of type "error: cast from 'const SharedObjectInternal*' to 'int' loses precision"
     // The solution is to convert to intptr_t, but this is not yet C++ standard
@@ -918,7 +922,7 @@ namespace CasADi{
   }
 
   MX MX::setSparse(const Sparsity& sp, bool intersect) const{
-    if(isNull() || isEmpty() || (sp==sparsity())){
+    if(isEmpty() || (sp==sparsity())){
       return *this;
     } else {
       if(intersect){
@@ -958,9 +962,7 @@ namespace CasADi{
   }
 
   bool MX::isSymbolicSparse() const{
-    if(isNull()){
-      return false;
-    } else if(getOp()==OP_HORZCAT){
+    if(getOp()==OP_HORZCAT){
       // Check if the expression is a horzcat where all components are symbolic primitives
       for(int d=0; d<getNdeps(); ++d){
         if(!getDep(d).isSymbolic()){
@@ -974,7 +976,7 @@ namespace CasADi{
   }
 
   bool MX::isIdentity() const{
-    return !isNull() && (*this)->isIdentity();
+    return (*this)->isIdentity();
   }
 
   bool MX::isZero() const{
@@ -986,19 +988,15 @@ namespace CasADi{
   }
 
   bool MX::isOne() const{
-    return !isNull() && (*this)->isOne();
+    return (*this)->isOne();
   }
 
   bool MX::isMinusOne() const{
-    return !isNull() && (*this)->isValue(-1);
+    return (*this)->isValue(-1);
   }
 
   bool MX::isTranspose() const{
-    if(isNull()){
-      return false;
-    } else {
-      return getOp()==OP_TRANSPOSE;
-    }
+    return getOp()==OP_TRANSPOSE;
   }
 
   bool MX::isRegular() const{
@@ -1010,13 +1008,20 @@ namespace CasADi{
   }
 
   MX MX::trans() const{
-    // Quick return if null or scalar
-    if(isNull() || isScalar()){
+    // Quick return if scalar
+    if(isScalar()){
       return *this;
     } else {
       return (*this)->getTranspose();
     }
   }
 
+  void MX::addToSum(const MX& x){
+    if(isEmpty(true)){
+      *this = x;
+    } else {
+      *this += x;
+    }
+  }
           
 } // namespace CasADi

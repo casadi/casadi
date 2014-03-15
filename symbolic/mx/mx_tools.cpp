@@ -62,7 +62,7 @@ namespace CasADi{
     bool is_vector = true;
     for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it){
       // Rewrite with horzcat and transpose if not a vector
-      if(!it->isNull() && !(it->size1()==0 && it->size2()==0) && !it->isVector()){
+      if(!it->isEmpty(true) && !(it->size1()==0 && it->size2()==0) && !it->isVector()){
         vector<MX> v(comp.size());
         for(int i=0; i<v.size(); ++i)
           v[i] = comp[i].T();
@@ -181,7 +181,7 @@ namespace CasADi{
   }
 
   void simplify(MX& ex){
-    if(!ex.isNull()){
+    if(!ex.isEmpty(true)){
       ex->simplifyMe(ex);
     }
   }
@@ -329,17 +329,19 @@ namespace CasADi{
     }
   
     // Create the parent
-    MX P = MX::sym("P",1,index[deps.size()]);
-  
+    MX P = MX::sym("P",index[deps.size()],1);
+    
+    std::vector<MX> Ps = vertsplit(P,index);
+    
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      deps[k] = reshape(P(0,range(index[k],index[k+1])),deps[k].sparsity());
+      deps[k] = reshape(Ps[k],deps[k].sparsity());
     }
   
     return P;
   }
 
-  std::pair<MX, std::vector<MX> > createParent(const std::vector<Sparsity> &deps) {
+  MX createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children) {
     // Collect the sizes of the depenencies
     std::vector<int> index(deps.size()+1,0);
     for (int k=0;k<deps.size();k++) {
@@ -347,22 +349,23 @@ namespace CasADi{
     }
   
     // Create the parent
-    MX P = MX::sym("P",1,index[deps.size()]);
-  
-    std::vector<MX> ret(deps.size());
+    MX P = MX::sym("P",index[deps.size()],1);
+    std::vector<MX> Ps = vertsplit(P,index);
+    
+    children.resize(deps.size());
   
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      ret[k] =  reshape(P(0,range(index[k],index[k+1])),deps[k]);
+      children[k] =  reshape(Ps[k],deps[k]);
     }
   
-    return std::pair< MX, std::vector<MX> > (P,ret);
+    return P;
   }
 
-  std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps) {
-    std::vector<MX> ret(deps);
-    MX P = createParent(ret);
-    return std::pair< MX, std::vector<MX> > (P,ret);
+  MX createParent(const std::vector<MX> &deps, std::vector<MX>& children) {
+    children = deps;
+    MX P = createParent(children);
+    return P;
   }
 
   MX diag(const MX& x){

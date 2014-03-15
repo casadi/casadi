@@ -41,7 +41,7 @@ namespace CasADi {
 
     // Replace nulls with zeros of the right dimension
     for(int i=0; i<arg.size(); ++i){
-      if(arg[i].isNull()) arg[i] = MX::zeros(fcn_.input(i).sparsity());
+      if(arg[i].isEmpty(true)) arg[i] = MX::zeros(fcn_.input(i).sparsity());
     }
 
     setDependencies(arg);

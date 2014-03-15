@@ -275,7 +275,7 @@ class NLPtests(casadiTestCase):
         self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,6,str(Solver))
         self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,6,str(Solver))
       
-  def testIPOPTrhb2(self):
+  def test_IPOPTrhb2(self):
     self.message("rosenbrock, exact hessian, constrained")
     x=SX.sym("x")
     y=SX.sym("y")
@@ -533,7 +533,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],0,8,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
       
-  def testIPOPTrhb(self):
+  def test_IPOPTrhb(self):
     self.message("rosenbrock, exact hessian")
     x=SX.sym("x")
     y=SX.sym("y")

@@ -76,6 +76,9 @@ class vector {};
 template<class A,class B>
 class pair {};
 
+template<class A,class B>
+class map {};
+
 }
 #else
 
@@ -188,11 +191,77 @@ namespace swig {
   };
 }
 }
+%fragment("StdVectorTraits","header",fragment="StdSequenceTraits")
+%{
+  namespace swig {
+    template <class T>
+    struct traits_asptr<std::vector<T> >  {
+      static int asptr(PyObject *obj, std::vector<T> **vec) {
+	return traits_asptr_stdseq<std::vector<T> >::asptr(obj, vec);
+      }
+    };
+    
+    template <class T>
+    struct traits_from<std::vector<T> > {
+      static PyObject *from(const std::vector<T>& vec) {
+	return traits_from_stdseq<std::vector<T> >::from(vec);
+      }
+    };
+  }
+%}
 #endif
 
+
 %include "std_string.i"
+
+#ifdef SWIGPYTHON
+
+%{
+#include <vector>
+%}
+
+%include <std/std_common.i>
+%include <std_container.i>
+
+namespace std {
+
+  template<class _Tp, class _Alloc = allocator< _Tp > >
+  class vector {
+  public:
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+    typedef _Tp value_type;
+    typedef value_type* pointer;
+    typedef const value_type* const_pointer;
+    typedef _Tp& reference;
+    typedef const _Tp& const_reference;
+    typedef _Alloc allocator_type;
+
+    %traits_swigtype(_Tp);
+
+    %fragment(SWIG_Traits_frag(std::vector<_Tp, _Alloc >), "header",
+	      fragment=SWIG_Traits_frag(_Tp),
+	      fragment="StdVectorTraits") {
+      namespace swig {
+	template <>  struct traits<std::vector<_Tp, _Alloc > > {
+	  typedef pointer_category category;
+	  static const char* type_name() {
+	    return "std::vector<" #_Tp "," #_Alloc " >";
+	  }
+	};
+      }
+    }
+
+    %typemap_traits_ptr(SWIG_TYPECHECK_VECTOR, std::vector<_Tp, _Alloc >);
+  
+  };
+
+}
+#else
 %include "std_vector.i"
+#endif
 %include "std_pair.i"
+%include "std_map.i"
 #endif
 
 #ifdef SWIG_MAIN_MODULE
@@ -477,6 +546,13 @@ memberbinops(mpower,argtype,argCast,selfCast,returntype)
 #define binopsNoPriority(argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
+//%traits_swigtype(CasADi::GenericType);
+//%traits_swigtype(std::mapCasADi::Dictionary);
+
+//%fragment(SWIG_Traits_frag(std::map< std::string, CasADi::GenericType, std::less<std::string > , allocator<std::pair<const std::string, CasADi::GenericType > > >));
+
+//%fragment(SWIG_Traits_frag(CasADi::Dictionary));
+
 // typemaphelpers
 %include "typemaphelpers.i"
 
@@ -518,6 +594,23 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 %}
 
+#ifndef SWIGXML
+%traits_swigtype(CasADi::DerivativeGenerator);
+%fragment(SWIG_Traits_frag(CasADi::DerivativeGenerator));
+%traits_swigtype(CasADi::Callback);
+%fragment(SWIG_Traits_frag(CasADi::Callback));
+%traits_swigtype(CasADi::CustomEvaluate);
+%fragment(SWIG_Traits_frag(CasADi::CustomEvaluate));
+%traits_swigtype(CasADi::IndexList);
+%fragment(SWIG_Traits_frag(CasADi::IndexList));
+
+%template(Dictionary) std::map<std::string,CasADi::GenericType>;
+#endif
+
+
+// These dummy things would go away when we properly use fragments
+// %traits_swigtype
+
 %{
 namespace std {
 void dummy(CasADi::SXElement foo,
@@ -538,6 +631,7 @@ void dummy(CasADi::SXElement foo,
   std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
   std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
   std::vector < std::vector < CasADi::MX > > foo17,
+  CasADi::Dictionary foo18,
 	int &bar,
 	double &baz) {}
 };
@@ -575,6 +669,7 @@ void dummy(CasADi::SXElement foo,
   std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
   std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
   std::vector < std::vector < CasADi::MX > > foo17,
+  CasADi::Dictionary foo18,
 	int &bar,
 	double &baz);
 };

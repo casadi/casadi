@@ -138,9 +138,7 @@ namespace CasADi{
   
     // Make sure that inputs are symbolic
     for(int i=0; i<inputv.size(); ++i){
-      if (inputv[i].isNull()) {
-        inputv_[i] = MatType::sym("empty",0,0);
-      } else if (inputv[i].isEmpty()) {
+      if (inputv[i].isEmpty()) {
         // That's okay
       } else if(!inputv[i].isSymbolicSparse()){
         casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
@@ -152,13 +150,6 @@ namespace CasADi{
     for(int i=0; i<inputv_.size(); ++i)
       input(i) = DMatrix(inputv_[i].sparsity());
   
-    // Null output arguments become empty
-    for(int i=0; i<outputv_.size(); ++i) {
-      if (outputv_[i].isNull()) {
-        outputv_[i] = MatType::sparse(0,0);
-      }
-    }
-
     // Allocate space for outputs
     setNumOutputs(outputv_.size());
     for(int i=0; i<outputv_.size(); ++i)
@@ -1001,7 +992,7 @@ namespace CasADi{
       // Determine if this direction is empty
       bool empty = true;
       for (int i=0;i<seed[d].size();++i) {
-        if (!(seed[d][i]==0 || seed[d][i]->isNull() || (*seed[d][i])->isZero())) {
+        if (!(seed[d][i]==0 || seed[d][i]->isEmpty(true) || (*seed[d][i])->isZero())) {
           empty = false; break;
         }
       }
@@ -1010,7 +1001,7 @@ namespace CasADi{
         // Empty directions are discarded, with forward sensitivities put to zero
         if (forward) {
           for (int i=0;i<sens[d].size();++i) {
-            if (sens[d][i]!=0 && !sens[d][i]->isNull()) {
+            if (sens[d][i]!=0 && !sens[d][i]->isEmpty(true)) {
               *sens[d][i]=MatType(sens[d][i]->sparsity(),0);
             }
           }

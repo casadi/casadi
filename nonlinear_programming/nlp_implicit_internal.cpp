@@ -98,11 +98,10 @@ namespace CasADi {
     std::vector<Sparsity> sps;
     for(int i=0; i<getNumInputs(); ++i)
       if(i!=iin_) sps.push_back(input(i).sparsity());
-    std::pair<MX,std::vector<MX> > mypair = createParent(sps);
-
+      
     // u groups all parameters in an MX
-    MX p = mypair.first;
-    std::vector< MX > inputs(mypair.second);
+    std::vector< MX > inputs;
+    MX p = createParent(sps,inputs);
     
     // Dummy NLP objective
     MX nlp_f = 0;
@@ -111,7 +110,7 @@ namespace CasADi {
     std::vector< MX > args_call(getNumInputs());
     args_call[iin_] = u;
     for(int i=0, i2=0; i<getNumInputs(); ++i)
-      if(i!=iin_) args_call[i] = mypair.second[i2++];
+      if(i!=iin_) args_call[i] = inputs[i2++];
     MX nlp_g = f_.call(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
