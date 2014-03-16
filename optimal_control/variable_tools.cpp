@@ -25,75 +25,75 @@ using namespace std;
 
 namespace CasADi{
 
-vector<SXElement> var(const vector<Variable> v){
-  vector<SXElement> ret(v.size());
-  for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].var();
-  return ret;
-}
-    
-vector<SXElement> der(const vector<Variable> v){
-  vector<SXElement> ret(v.size());
-  for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].der();
-  return ret;
-}
-    
-vector<SXElement> highest(const vector<Variable> v){
-  vector<SXElement> ret(v.size());
-  for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].highest();
-  return ret;
-}
-
-vector<SXElement> binding(const vector<Variable> v){
-  vector<SXElement> ret(v.size());
-  for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].binding();
-  return ret;
-}
-
-vector<double> getNominal(const vector<Variable> v){
-  vector<double> ret(v.size());
-  for(int i=0; i<v.size(); ++i)
-    ret[i] = v[i].getNominal();
-  return ret;
-}
-
-std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal){
-  vector<double> ret(v.size());
-  for(int i=0; i<v.size(); ++i)
-    ret[i] = (v[i].*fcn)();
-
-  if(nominal){
-    vector<double> nominal = getNominal(v);
+  vector<SXElement> var(const vector<Variable> v){
+    vector<SXElement> ret(v.size());
     for(int i=0; i<v.size(); ++i)
-      ret[i] /= nominal[i];
+      ret[i] = v[i].var();
+    return ret;
+  }
+    
+  vector<SXElement> der(const vector<Variable> v){
+    vector<SXElement> ret(v.size());
+    for(int i=0; i<v.size(); ++i)
+      ret[i] = v[i].der();
+    return ret;
+  }
+    
+  vector<SXElement> highest(const vector<Variable> v){
+    vector<SXElement> ret(v.size());
+    for(int i=0; i<v.size(); ++i)
+      ret[i] = v[i].highest();
+    return ret;
   }
 
-  return ret;
-}
+  vector<SXElement> binding(const vector<Variable> v){
+    vector<SXElement> ret(v.size());
+    for(int i=0; i<v.size(); ++i)
+      ret[i] = v[i].binding();
+    return ret;
+  }
+
+  vector<double> getNominal(const vector<Variable> v){
+    vector<double> ret(v.size());
+    for(int i=0; i<v.size(); ++i)
+      ret[i] = v[i].getNominal();
+    return ret;
+  }
+
+  std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal){
+    vector<double> ret(v.size());
+    for(int i=0; i<v.size(); ++i)
+      ret[i] = (v[i].*fcn)();
+
+    if(nominal){
+      vector<double> nominal = getNominal(v);
+      for(int i=0; i<v.size(); ++i)
+        ret[i] /= nominal[i];
+    }
+
+    return ret;
+  }
 
 
-vector<double> getStart(const vector<Variable> v, bool nominal){
-  return getAll(&Variable::getStart, v, nominal);
-}
+  vector<double> getStart(const vector<Variable> v, bool nominal){
+    return getAll(&Variable::getStart, v, nominal);
+  }
 
-vector<double> getDerivativeStart(const vector<Variable> v, bool nominal){
-  return getAll(&Variable::getDerivativeStart, v, nominal);
-}
+  vector<double> getDerivativeStart(const vector<Variable> v, bool nominal){
+    return getAll(&Variable::getDerivativeStart, v, nominal);
+  }
 
-vector<double> getMin(const vector<Variable> v, bool nominal){
-  return getAll(&Variable::getMin, v, nominal);
-}
+  vector<double> getMin(const vector<Variable> v, bool nominal){
+    return getAll(&Variable::getMin, v, nominal);
+  }
 
-vector<double> getMax(const vector<Variable> v, bool nominal){
-  return getAll(&Variable::getMax, v, nominal);
-}
+  vector<double> getMax(const vector<Variable> v, bool nominal){
+    return getAll(&Variable::getMax, v, nominal);
+  }
 
-vector<double> getInitialGuess(const vector<Variable> v, bool nominal){
-  return getAll(&Variable::getInitialGuess, v, nominal);
-}
+  vector<double> getInitialGuess(const vector<Variable> v, bool nominal){
+    return getAll(&Variable::getInitialGuess, v, nominal);
+  }
 
     
 } // namespace CasADi
