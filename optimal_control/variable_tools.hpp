@@ -27,17 +27,17 @@
 
 namespace CasADi{
   
-  /// Get a vector of expressions from a vector of variables
-  std::vector<SXElement> var(const std::vector<Variable> v);
+  /// Get an expression from a vector of variables
+  SX var(const std::vector<Variable> v);
 
-  /// Get a vector of derivative expressions from a vector of variables
-  std::vector<SXElement> der(const std::vector<Variable> v);
+  /// Get a derivative expression from a vector of variables
+  SX der(const std::vector<Variable> v);
 
-  /// Get a vector of highest order undetermined expression from a vector of variables
-  std::vector<SXElement> highest(const std::vector<Variable> v);
+  /// Get am expression for the highest order undetermined derivative from a vector of variables
+  SX highest(const std::vector<Variable> v);
 
-  /// Get a vector of binding expressions from a vector of variables
-  std::vector<SXElement> binding(const std::vector<Variable> v);
+  /// Get an expression for the binding expressions from a vector of variables
+  SX binding(const std::vector<Variable> v);
 
 #ifndef SWIG
   /// Call a member function for all members of a vector (note: fcn pointer to member function)
