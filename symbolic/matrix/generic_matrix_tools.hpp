@@ -138,14 +138,12 @@ namespace CasADi{
   template<typename MatType>
   MatType triu(const GenericMatrix<MatType> &a_) {
     const MatType& a = static_cast<const MatType&>(a_);
-    casadi_assert_message(a.isSquare(),"Shape error in triu. Expecting square shape but got " << a.dimString());
     return a.setSparse(a.sparsity().getTriu());
   }
 
   template<typename MatType>
   MatType tril(const GenericMatrix<MatType> &a_) {
     const MatType& a = static_cast<const MatType&>(a_);
-    casadi_assert_message(a.isSquare(),"Shape error in tril. Expecting square shape but got " << a.dimString());
     return a.setSparse(a.sparsity().getTril());
   }
 #endif // SWIG
