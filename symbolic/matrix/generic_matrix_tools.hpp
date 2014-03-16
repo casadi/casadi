@@ -52,6 +52,16 @@ namespace CasADi{
   template<typename MatType>
   MatType triu2symm(const GenericMatrix<MatType> &a);
 
+  /** \brief Get the upper triangular part of a matrix
+   */
+  template<typename MatType>
+  MatType triu(const GenericMatrix<MatType> &a);
+
+  /** \brief Get the lower triangular part of a matrix
+   */
+  template<typename MatType>
+  MatType tril(const GenericMatrix<MatType> &a);
+
   /** \brief Check if two expressions are equal, assuming that they are comparible */
   template<typename MatType>
   bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y){ 
@@ -124,6 +134,20 @@ namespace CasADi{
     casadi_assert_message(a.sizeL()-a.sizeD()==0,"Sparsity error in triu2symm. Found below-diagonal entries in argument: " << a.dimString());
     return a + a.T() - diag(diag(a));
   }
+
+  template<typename MatType>
+  MatType triu(const GenericMatrix<MatType> &a_) {
+    const MatType& a = static_cast<const MatType&>(a_);
+    casadi_assert_message(a.isSquare(),"Shape error in triu. Expecting square shape but got " << a.dimString());
+    return a(a.sparsity()*Sparsity::triu(a.size1()));
+  }
+
+  template<typename MatType>
+  MatType tril(const GenericMatrix<MatType> &a_) {
+    const MatType& a = static_cast<const MatType&>(a_);
+    casadi_assert_message(a.isSquare(),"Shape error in tril. Expecting square shape but got " << a.dimString());
+    return a(a.sparsity()*Sparsity::tril(a.size1()));
+  }
 #endif // SWIG
 
 
@@ -140,6 +164,8 @@ namespace CasADi{
 GMTT_INST(MatType,cross) \
 GMTT_INST(MatType,tril2symm) \
 GMTT_INST(MatType,triu2symm) \
+GMTT_INST(MatType,triu) \
+GMTT_INST(MatType,tril) \
 GMTT_INST(MatType,isEqual)
 
 // Define template instanciations
