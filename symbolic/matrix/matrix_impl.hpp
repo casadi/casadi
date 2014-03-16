@@ -2053,6 +2053,17 @@ namespace CasADi{
     throw CasadiException("\"getName\" not defined for instantiation");
   }
 
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::setSparse(const Sparsity& sp, bool intersect) const{
+    if(intersect){
+      return setSparse(sp.patternIntersection(sparsity()),false);
+    } else {
+      Matrix<DataType> ret(sp);
+      ret.set(*this);
+      return ret;
+    }
+  }
+
 } // namespace CasADi
 
 #endif // MATRIX_IMPL_HPP

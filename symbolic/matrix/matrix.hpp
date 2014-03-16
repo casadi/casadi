@@ -421,6 +421,9 @@ namespace CasADi{
     /// Set all elements to a value
     void setAll(const DataType& val);
 
+    /** \brief Set sparse */
+    Matrix<DataType> setSparse(const Sparsity& sp, bool intersect=false) const;
+
     /// Make the matrix dense
     void densify(const DataType& val = 0);
 
