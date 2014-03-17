@@ -130,7 +130,7 @@ int usage_c_unknown_signature(){
 
   /* Initialize and get the number of inputs and outputs */
   int n_in=-1, n_out=-1;
-  int flag = init(&n_in, &n_out);
+  init(&n_in, &n_out);
   printf("n_in = %d, n_out = %d\n", n_in, n_out);
 
   /* Get sparsities */

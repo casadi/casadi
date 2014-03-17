@@ -76,9 +76,6 @@ int main(){
   // Constraints
   MX g = x[0]+x[1]-10;
     
-  // Infinity
-  double inf = numeric_limits<double>::infinity();
-
   // Convert MXFunction to SXFunction before code generation (may or may not improve efficiency)
   bool expand = true;
 
