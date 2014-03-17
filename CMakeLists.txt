@@ -80,11 +80,11 @@ option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SQIC "Enable SQIC interface" OFF)
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
-option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
-option(WITH_WORHP "Compile the WORHP interface" OFF) 
-option(WITH_SNOPT "Compile the SNOPT interface" OFF) 
-option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
-option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
+option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF)
+option(WITH_WORHP "Compile the WORHP interface" OFF)
+option(WITH_SNOPT "Compile the SNOPT interface" OFF)
+option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF)
+option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
@@ -131,11 +131,11 @@ foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
-      ${CMAKE_BINARY_DIR} 
+      ${CMAKE_BINARY_DIR}
       ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11.cpp
       CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
       OUTPUT_VARIABLE OUTPUT)
-    
+
     # Save flag, if successful
     if(USE_CXX11)
       set(CXX11FLAG ${CXX11FLAG_TEST} CACHE INTERNAL "C++11 compile flag")
@@ -157,7 +157,7 @@ add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficienc
 
 if(CXX11FLAG)
   try_compile(HAS_COPYSIGN
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_copysign.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -166,7 +166,7 @@ if(CXX11FLAG)
   endif()
 
   try_compile(HAS_ERF
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_erf.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -175,7 +175,7 @@ if(CXX11FLAG)
   endif()
 
   try_compile(HAS_ERFINV
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_erfinv.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -254,7 +254,7 @@ add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
-find_package(LibXml2) 
+find_package(LibXml2)
 if(WITH_LAPACK)
   find_package(LAPACK)
 endif()
@@ -384,4 +384,3 @@ CONFIGURE_FILE(
 if(EXTRA_CMAKE)
   include(${EXTRA_CMAKE})
 endif()
-
