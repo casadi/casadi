@@ -1019,7 +1019,7 @@ namespace CasADi{
 
     // Get references to data for quick access
     const std::vector<DataType> &data = this->data();
-    const int size1 = this->size1();
+    //const int size1 = this->size1();
     const int size2 = this->size2();
     const std::vector<int>& colind = this->colind();
     const std::vector<int>& row = this->row();
