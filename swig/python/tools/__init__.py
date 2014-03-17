@@ -22,8 +22,6 @@
 # -*- coding: utf-8 -*-
 
 from graph import *
-from variables import Variables, Numbers
-from collection import Collection 
 from bounds import *
 from structure import repeated, entry, struct_symSX, struct_symMX, struct_SX, struct_MX, struct_MX_mutable, nesteddict, index, indexf, struct, struct_load
 from io import nice_stdout, capture_stdout

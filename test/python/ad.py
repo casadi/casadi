@@ -80,33 +80,33 @@ class ADtests(casadiTestCase):
     
     def temp1(xyz):
       X=MX.sparse(6,1)
-      X[0,0]=xyz[0]
-      X[2,0]=xyz[0]+2*xyz[1]**2
-      X[4,0]=xyz[0]+2*xyz[1]**3+3*xyz[2]**4
-      X[5,0]=xyz[3]
+      X[0,0]=xyz.nz[0]
+      X[2,0]=xyz.nz[0]+2*xyz.nz[1]**2
+      X[4,0]=xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4
+      X[5,0]=xyz.nz[3]
       return [X]
     
     def temp2(xyz):
       X=MX.sparse(1,6)
-      X[0,0]=xyz[0]
-      X[0,2]=xyz[0]+2*xyz[1]**2
-      X[0,4]=xyz[0]+2*xyz[1]**3+3*xyz[2]**4
-      X[0,5]=xyz[3]
+      X[0,0]=xyz.nz[0]
+      X[0,2]=xyz.nz[0]+2*xyz.nz[1]**2
+      X[0,4]=xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4
+      X[0,5]=xyz.nz[3]
       return [X]
 
     def testje(xyz):
-      print vertcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]]).shape
+      print vertcat([xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]).shape
       
     self.mxoutputs = {
        "column": {
-        "dense":  lambda xyz: [vertcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]])],
+        "dense":  lambda xyz: [vertcat([xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
         "sparse": temp1
         }, "row": {
-        "dense": lambda xyz: [horzcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]])],
+        "dense": lambda xyz: [horzcat([xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]])],
         "sparse": temp2
        },
        "matrix": {
-          "dense": lambda xyz: [c.reshape(vertcat([xyz[0],xyz[0]+2*xyz[1]**2,xyz[0]+2*xyz[1]**3+3*xyz[2]**4,xyz[3]]),(2,2))],
+          "dense": lambda xyz: [c.reshape(vertcat([xyz.nz[0],xyz.nz[0]+2*xyz.nz[1]**2,xyz.nz[0]+2*xyz.nz[1]**3+3*xyz.nz[2]**4,xyz.nz[3]]),(2,2))],
           "sparse": lambda xyz: [c.reshape(temp1(xyz)[0],(3,2))]
        }
     }

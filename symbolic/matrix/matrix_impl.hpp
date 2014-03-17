@@ -171,7 +171,7 @@ namespace CasADi{
 
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const std::vector<int>& cc){
-    casadi_assert_message(m.numel()==1 || (cc.size() == m.size2() && rr.size() == m.size1()),"Dimension mismatch." << std::endl << "lhs is " << cc.size() << " x " << rr.size() << ", while rhs is " << m.dimString());
+    casadi_assert_message(m.numel()==1 || (cc.size() == m.size2() && rr.size() == m.size1()),"Dimension mismatch." << std::endl << "lhs is " << rr.size() << " x " << cc.size() << ", while rhs is " << m.dimString());
 
     if (!inBounds(rr,size1())) {
       casadi_error("setSub[.,rr,cc] out of bounds. Your rr contains " << *std::min_element(rr.begin(),rr.end()) << " up to " << *std::max_element(rr.begin(),rr.end()) << ", which is outside of the matrix shape " << dimString() << ".");

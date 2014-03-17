@@ -49,7 +49,7 @@ zz = x+y
 
 dotdraw(zz)
 
-f = MXFunction([z,y],[z+x[0],x-y])
+f = MXFunction([z,y],[z+x[0,0],x-y])
 f.setOption("name","magic")
 f.init()
 
