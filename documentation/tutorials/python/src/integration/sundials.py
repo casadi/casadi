@@ -124,7 +124,7 @@ sim.setInput([x0,y0],"x0")
 sim.setInput(0,"p")
 sim.evaluate()
 
-sol2 = sim.output().toArray()
+sol2 = sim.output().toArray().T
 #! sol and sol2 are exactly the same
 print linalg.norm(sol-sol2)
 
