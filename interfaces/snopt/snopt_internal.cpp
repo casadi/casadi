@@ -574,7 +574,7 @@ namespace CasADi {
       &info, &mincw, &miniw, &minrw, &nS, &nInf, &sInf, &Obj,
       // Working spaces for usrfun
       getPtr(snopt_cw_), &clen,
-      getPtr(iu), &ilen,
+      getPtr(iu), &iulen,
       getPtr(snopt_rw_), &rlen,
       // Working spaces for SNOPT
       getPtr(snopt_cw_), &clen,
