@@ -122,96 +122,23 @@ After reading this document, the reader should be able to formulate and manipula
 \section{What \CasADi is and what it is \emph{not}}
 \CasADi started out as a tool for algorithmic differentiation (AD) using a syntax borrowed from computer algebra systems (CAS), which explains its name. While this still forms one of the core functionalities of the tool, the scope of the tool has since been considerably broadened, with the addition of support for ODE/DAE integration and sensitivity analysis, nonlinear programming and interfaces to other numerical tools. In its current form, it is more of a general-purpose tool for gradient-based numerical optimization -- with a strong focus on optimal control -- and ``\CasADi'' is just a name without any particular meaning.
 
+CasADi is written in C++ but also has front-ends to Python and (experimentally) Octave.
+
 It is important to point out that \CasADi is \emph{not} a conventional AD tool, that can be used to calculate derivative information from existing user code with little to no modification. If you have an existing model written in say C++ or Python, you need to be prepared to reimplement the model using CasADi syntax.
 
 Secondly, \CasADi is \emph{not} a computer algebra system. While the symbolic core does include an increasing set of tools for manipulate symbolic expressions, these capabilities are very limited compared to a proper CAS tool.
 
-Finally, \CasADi is not an ``Optimal Control Problem solver'', that allows the user to enter an OCP and gives the solution back. Instead, it tries to provide the user with a set of ``building blocks'' that can be used to implement general-purpose or specific-purpose OCP solvers efficiently with a modest programming effort.
+Finally, \CasADi is not an ``optimal control problem solver'', that allows the user to enter an OCP and gives the solution back. Instead, it tries to provide the user with a set of ``building blocks'' that can be used to implement general-purpose or specific-purpose OCP solvers efficiently with a modest programming effort.
 
 \section{Reading this document}
 Our explaination is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of either Python or C++, theory of differential equations and optimization theory. 
 
-We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, and try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter \ref{sec:syntax_differences}. The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software.
+We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, and try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{sec:syntax_differences}. The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software.
 
-\chapter{Installation}
-In this section we introduce step by step the installation procedure of \CasADi. First we detail what software packages need to
-be installed in order to use CasADi.
-\section{Software requirements}
-CasADi consists of a symbolic core, which is strongly used by the interfaces that are shipped with it. Now we summarize
-what the dependencies of each are. As a general rule you will always need a C++ compiler (tested with gcc 4.4.3) and
-CMake (tested with version 2.8.2).
-\begin{center}
-\small
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Package/interface} & \textbf{Dependency}\\
-\hline
-CasADi core & None \\
-\hline
-CSparse interface & \htmladdnormallink{CSparse}{http://www.cise.ufl.edu/research/sparse/CSparse/} (comes with CasADi)\\
-\hline
-qpOASES interface & \htmladdnormallink{qpOASES}{http://www.kuleuven.be/optec/software/qpOASES} (comes with CasADi)\\
-\hline
-Ipopt interface & \htmladdnormallink{Ipopt}{http://www.coin-or.org/Ipopt/} (\htmladdnormallink{tutorial}{http://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf}) \\
-\hline
-KNITRO interface & \htmladdnormallink{KNITRO}{http://www.ziena.com/knitro.htm}\\
-\hline
-LAPACK interface & library with LAPACK api\\
-\hline
-WORHP interface & \htmladdnormallink{WORHP}{http://www.worhp.de/}\\
-\hline
-Sundials interface & \htmladdnormallink{SUNDIALS}{https://computation.llnl.gov/casc/sundials/main.html} \\
-\hline
-CasADi for python & SWIG \\
-\hline
-\end{tabular}
-\end{center}
-\section{Compilation}
-First, you have to get CasADi from \htmladdnormallink{here}{http://www.casadi.org/} or check out the git repository from GitHub.
-\par
-\codebegin
-\begin{verbatim}
-git clone https://github.com/casadi/casadi.git -b tested casadi
-\end{verbatim}
-\codeend
-Set the \texttt{CMAKE\_PREFIX\_PATH} to inform CMake where the dependecies are. 
-For example if Sundials headers and libraries are installed under \texttt{\$HOME/local/}, then type
-\par
-\codebegin{
-\begin{verbatim}
-export CMAKE_PREFIX_PATH=$HOME/local/
-\end{verbatim}
-\codeend
-\par
-Go to directory of the source tree, create a directory called \texttt{build} where all compilation-related files will be created.
-\par
-\codebegin
-\begin{verbatim}
-cd casadi; mkdir build; cd build
-\end{verbatim}
-\codeend
-Generate the \texttt{Makefile} by typing
-\par
-\codebegin
-\begin{verbatim}
-cmake ..
-\end{verbatim}
-\codeend
-Check the output of CMake if the dependencies are correctly located. The interfaces without underlying libraries and headers won't be compiled.
-Now compile the C++ libraries.
-\par
-\codebegin
-\begin{verbatim}
-make
-\end{verbatim}
-\codeend
-If you wish to use the python interface you can compile it with the \texttt{python} target and install it with the \texttt{install\_python} target.
-\par
-\codebegin
-\begin{verbatim}
-make python && sudo make install_python
-\end{verbatim}
-\codeend
+\chapter{Obtaining and installing \CasADi}
+\CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its alternative front-ends, to Python and Octave, are full-featured and auto-generated via the SWIG tool and can be used with little to no loss of efficiency. CasADi has been compiled and used successfully on Linux, OS X and Windows.
+
+For up-to-date installation instructions, we refer to the \CasADi's website, \htmladdnormallink{casadi.org}{http://casadi.org/}.
 
 \chapter{Structure of CasADi}
 In CasADi a powerful symbolic abstraction of mathematical functions is implemented.
