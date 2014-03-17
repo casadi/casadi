@@ -18,6 +18,7 @@
 
 \newcommand{\n}{\\n}
 \newcommand{\CasADi}{\texttt{CasADi}\xspace}
+\newcommand{\currentversion}{1.9.0\xspace}
 
 \begin{htmlonly}
 \newcounter{pytexcount}
@@ -101,7 +102,7 @@
 %end{latexonly}
 
 \author{Joel Andersson \and Joris Gillis \and Moritz Diehl}
-\title{User Documentation for \CasADi v1.9.0}
+\title{User Documentation for \CasADi v\currentversion}
 \begin{document}
 %\htmlinfo*
 %\sffamily
@@ -114,17 +115,26 @@
 \clearpage
 
 \chapter{Introduction}
-This document gives a brief tutorial on the CasADi software package and on the interfaces that comes with it. We aim at
-introducing the most important capabilities of what CasADi can do. Our fundamental motivation is to provide open-source
-software for people working with numerical optimization, dynamic system simulation and optimal control.
+This document aims to give an introduction to \CasADi, an open-source software framework for numerical optimization in general and optimal control (i.e. optimization involving differential equations) in particular. \CasADi was developed by Joel Andersson and Joris Gillis while PhD students at the Optimization in Engineering Center (OPTEC) of the K.U. Leuven under supervision of Moritz Diehl.
 
-Our explaination is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of either Python or C++, theory of differential equations and optimization theory. We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with CasADi, and try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter \ref{sec:syntax_differences}. The goal of this document is to make the reader familiar with the syntax of CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software.
+After reading this document, the reader should be able to formulate and manipulate expressions in \CasADi's symbolic framework, generate derivative information efficiently using \emph{algorithmic differentiation}, to set up, solve and perform forward and adjoint sensitivity analysis for systems of ordinary differential equations (ODE) or differential-algebraic equations (DAE) as well as to formulate and solve nonlinear programs (NLP) problems and optimal control problems (OCP).
 
-After reading this users' guide, the reader should be able to formulate and manipulate symbolic expressions in CasADi, generate derivatives using algorithmic differentiation, to set up, solve and perform forward and adjoint sensitivity analysis for systems of ordinary differential equations (ODE) or differential-algebraic equations (DAE) as well as to solve nonlinear programming (NLP) problems and optimal control (OCP) problems.
+\section{What \CasADi is and what it is \emph{not}}
+\CasADi started out as a tool for algorithmic differentiation (AD) using a syntax borrowed from computer algebra systems (CAS), which explains its name. While this still forms one of the core functionalities of the tool, the scope of the tool has since been considerably broadened, with the addition of support for ODE/DAE integration and sensitivity analysis, nonlinear programming and interfaces to other numerical tools. In its current form, it is more of a general-purpose tool for gradient-based numerical optimization -- with a strong focus on optimal control -- and ``\CasADi'' is just a name without any particular meaning.
+
+It is important to point out that \CasADi is \emph{not} a conventional AD tool, that can be used to calculate derivative information from existing user code with little to no modification. If you have an existing model written in say C++ or Python, you need to be prepared to reimplement the model using CasADi syntax.
+
+Secondly, \CasADi is \emph{not} a computer algebra system. While the symbolic core does include an increasing set of tools for manipulate symbolic expressions, these capabilities are very limited compared to a proper CAS tool.
+
+Finally, \CasADi is not an ``Optimal Control Problem solver'', that allows the user to enter an OCP and gives the solution back. Instead, it tries to provide the user with a set of ``building blocks'' that can be used to implement general-purpose or specific-purpose OCP solvers efficiently with a modest programming effort.
+
+\section{Reading this document}
+Our explaination is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of either Python or C++, theory of differential equations and optimization theory. 
+
+We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, and try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter \ref{sec:syntax_differences}. The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software.
 
 \chapter{Installation}
-{\color{red}Warning: This chapter is not up-to-date.}
-In this section we introduce step by step the installation procedure of CasADi. First we detail what software packages need to
+In this section we introduce step by step the installation procedure of \CasADi. First we detail what software packages need to
 be installed in order to use CasADi.
 \section{Software requirements}
 CasADi consists of a symbolic core, which is strongly used by the interfaces that are shipped with it. Now we summarize
