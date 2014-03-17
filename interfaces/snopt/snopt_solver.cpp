@@ -29,7 +29,7 @@ namespace CasADi{
 
   SnoptSolver::SnoptSolver(){
   }
-  
+
   SnoptSolver::SnoptSolver(const FX& F, const FX& G){
     assignNode(new SnoptInternal(joinFG(F,G)));
   }
@@ -45,11 +45,11 @@ namespace CasADi{
   const SnoptInternal* SnoptSolver::operator->() const{
     return static_cast<const SnoptInternal*>(NLPSolver::operator->());
   }
-    
+
   bool SnoptSolver::checkNode() const{
     return dynamic_cast<const SnoptInternal*>(get());
   }
-  
+
   void SnoptSolver::setOptionsFromFile(const std::string & file) {
     dynamic_cast<SnoptInternal*>(get())->setOptionsFromFile(file);
   }

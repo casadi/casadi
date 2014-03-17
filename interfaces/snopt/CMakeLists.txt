@@ -28,9 +28,8 @@ install(TARGETS snopt_fortran_c_bridge
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
-install(DIRECTORY ./ 
+install(DIRECTORY ./
    DESTINATION include/casadi/interfaces/snopt
    FILES_MATCHING PATTERN "*.hpp"
    PATTERN ".svn" EXCLUDE
 )
-

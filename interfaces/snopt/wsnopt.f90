@@ -28,13 +28,13 @@ contains
 subroutine snopt_init (iPrint, iSumm, cw, lencw, iw, leniw, rw, lenrw) bind (c)
 
     integer(c_int), intent(in) :: iPrint, iSumm, lencw, leniw, lenrw
-    
+
     integer(c_int), intent(inout) :: iw(leniw)
     character(c_char), intent(inout)  :: cw(lencw*8)
     real(c_double), intent(inout) :: rw(lenrw)
 
     call snInit ( iPrint, iSumm, cw, lencw, iw, leniw, rw, lenrw )
-    
+
 end  subroutine
 
 subroutine snopt_getc (buffer, lenbuffer, cvalue, Errors, cw, lencw, iw, leniw, rw, lenrw) bind (c)
@@ -45,10 +45,10 @@ subroutine snopt_getc (buffer, lenbuffer, cvalue, Errors, cw, lencw, iw, leniw, 
     real(c_double), intent(inout) :: rw(lenrw)
 
     character(lenbuffer), pointer :: str
-    type(C_PTR) p 
+    type(C_PTR) p
     p = transfer(LOC(buffer(1)),p)
     call C_F_POINTER(p,str)
-    
+
     call snGetc(buffer, cvalue, Errors, cw, lencw, iw, leniw, rw, lenrw)
 end subroutine
 
@@ -59,12 +59,12 @@ subroutine snopt_geti (buffer, lenbuffer, ivalue, Errors, cw, lencw, iw, leniw, 
     character(c_char), intent(inout)  :: cw(lencw*8)
     character(c_char), intent(in) :: buffer(lenbuffer)
     real(c_double), intent(inout) :: rw(lenrw)
-    
+
     character(lenbuffer), pointer :: str
-    type(C_PTR) p 
+    type(C_PTR) p
     p = transfer(LOC(buffer(1)),p)
     call C_F_POINTER(p,str)
-    
+
     call snGeti(str, ivalue, Errors, cw, lencw, iw, leniw, rw, lenrw)
 end subroutine
 
@@ -75,12 +75,12 @@ subroutine snopt_getr (buffer, lenbuffer, rvalue, Errors, cw, lencw, iw, leniw, 
     character(c_char), intent(inout)  :: cw(lencw*8)
     character(c_char), intent(in) :: buffer(lenbuffer)
     real(c_double), intent(inout) :: rw(lenrw)
-    
+
     character(lenbuffer), pointer :: str
-    type(C_PTR) p 
+    type(C_PTR) p
     p = transfer(LOC(buffer(1)),p)
     call C_F_POINTER(p,str)
-    
+
     call snGetr(str, rvalue, Errors, cw, lencw, iw, leniw, rw, lenrw)
 end subroutine
 
@@ -92,10 +92,10 @@ subroutine snopt_set (buffer, lenbuffer,iPrint, iSumm, Errors, cw, lencw, iw, le
     real(c_double), intent(inout) :: rw(lenrw)
 
     character(lenbuffer), pointer :: str
-    type(C_PTR) p 
+    type(C_PTR) p
     p = transfer(LOC(buffer(1)),p)
     call C_F_POINTER(p,str)
-    
+
     call snSet(str, iPrint, iSumm,Errors, cw, lencw, iw, leniw, rw, lenrw)
 end subroutine
 
@@ -106,12 +106,12 @@ subroutine snopt_seti (buffer, lenbuffer, ivalue, iPrint, iSumm,Errors, cw, lenc
     character(c_char), intent(inout)  :: cw(lencw*8)
     character(c_char), intent(in) :: buffer(lenbuffer)
     real(c_double), intent(inout) :: rw(lenrw)
-    
+
     character(lenbuffer), pointer :: str
-    type(C_PTR) p 
+    type(C_PTR) p
     p = transfer(LOC(buffer(1)),p)
     call C_F_POINTER(p,str)
-    
+
     call snSeti(str, ivalue, iPrint, iSumm,Errors, cw, lencw, iw, leniw, rw, lenrw)
 
 end subroutine
@@ -126,10 +126,10 @@ subroutine snopt_setr (buffer, lenbuffer, rvalue, iPrint, iSumm,Errors, cw, lenc
     real(c_double), intent(inout) :: rw(lenrw)
 
     character(lenbuffer), pointer :: str
-    type(C_PTR) p 
+    type(C_PTR) p
     p = transfer(LOC(buffer(1)),p)
     call C_F_POINTER(p,str)
-    
+
     call snSetr(str, rvalue, iPrint, iSumm,Errors, cw, lencw, iw, leniw, rw, lenrw)
 end subroutine
 
@@ -148,9 +148,9 @@ subroutine snopt_memb (INFO, m,n,neA, negCon, nnCon, nnJac, nnObj, mincw, miniw,
     integer(c_int), intent(inout) :: iw(leniw)
     character(c_char), intent(inout)  :: cw(lencw*8)
     real(c_double), intent(inout) :: rw(lenrw)
-    
+
     integer(c_int), intent(inout) :: mincw, miniw, minrw
-    
+
     call snMemB(INFO, m,n,neA, negCon, nnCon, nnJac, nnObj, mincw, miniw,minrw, cw, lencw, iw, leniw, rw, lenrw)
 end subroutine
 
@@ -179,5 +179,3 @@ end subroutine
 
 
 end module
-
-
