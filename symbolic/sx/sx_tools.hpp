@@ -277,7 +277,13 @@ namespace CasADi{
    *
    */
   SX mtaylor(const SX& ex,const SX& x, const SX& a,int order,const std::vector<int>&order_contributions);
+  
+  /** Construct a column vector from SXElements */
+  SX vertcat(const std::vector<SXElement > &v);
 
+  /** Construct a row vector from SXElements */
+  SX horzcat(const std::vector<SXElement > &v);
+  
   /** \brief Count number of nodes */
   int countNodes(const SX& A);
 

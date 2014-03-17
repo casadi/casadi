@@ -853,6 +853,14 @@ namespace CasADi{
     }
     return vertcat(dirder);
   }
+  
+  SX vertcat(const std::vector<SXElement > &v) {
+    return SX(v);
+  }
+
+  SX horzcat(const std::vector<SXElement > &v) {
+    return SX(v).T();
+  }
 
   void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v, std::vector<SXElement>& vdef, const std::string& v_prefix, const std::string& v_suffix){
   
