@@ -874,13 +874,19 @@ class msymStruct(CasadiStructured,MasterGettable):
 
     self.master = MX.sym("V",self.size,1)
     
+    self.buildMap()
  
-    ks = []
+
+  def buildMap(self,struct=None,parentIndex = (),parent=None):
+    if struct is None:  struct = self.struct
+    if parent is None:  parent = self.master
+    ks  = []
     its = []
     sps = []
+    es  = []
     k = 0 # Global index counter
-    for i in self.struct.traverseCanonicalIndex(limit=1):
-      e = self.struct.getStructEntryByCanonicalIndex(i)
+    for i in struct.traverseCanonicalIndex(limit=1):
+      e = struct.getStructEntryByCanonicalIndex(i)
       sp = None
       if e.isPrimitive():
         sp = Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
@@ -888,13 +894,15 @@ class msymStruct(CasadiStructured,MasterGettable):
         sp = Sparsity.dense(e.struct.size,1)
       ks.append(k)
       it = tuple(i)
+      es.append(e)
       its.append(it)
       sps.append(sp)
       k += sp.size()
       
-    for it, k, sp in zip(its,vertsplit(self.master,ks),sps):
-      self.priority_object_map[it] = k if k.sparsity()==sp else k[IMatrix(sp,range(sp.size()))] #.reshape(sp)
-      
+    for it, k, sp,e in zip(its,vertsplit(parent,ks),sps,es):
+      if not(e.isPrimitive()):
+        self.buildMap(struct=e.struct,parentIndex = parentIndex + it,parent=k)
+      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else k[IMatrix(sp,range(sp.size()))]      
 
   def __MX__(self):
     return self.cat
