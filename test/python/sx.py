@@ -738,12 +738,12 @@ class SXtests(casadiTestCase):
       x = sin(x)*x
       
       
-    self.assertTrue(len(str(x)) <  4*SXElement.getMaxNumCallsInPrint())
+    self.assertTrue(len(str(x)) <  4*SX.getMaxNumCallsInPrint())
     
-    SXElement.setMaxNumCallsInPrint(5)
+    SX.setMaxNumCallsInPrint(5)
     self.assertTrue(len(str(x)) <  100)
     
-    SXElement.getMaxNumCallsInPrint()
+    SX.getMaxNumCallsInPrint()
     
   def test_isEqual(self):
     self.message("equivalent")

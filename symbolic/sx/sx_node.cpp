@@ -113,7 +113,7 @@ namespace CasADi{
   }
 
   void SXNode::print(std::ostream &stream) const{
-    long remaining_calls = SXElement::getMaxNumCallsInPrint();
+    long remaining_calls = max_num_calls_in_print_;
     print(stream,remaining_calls);
   }
 
@@ -125,5 +125,7 @@ namespace CasADi{
     temp = -temp-1;
   }
 
+  long SXNode::max_num_calls_in_print_ = 10000;
+  int SXNode::eq_depth_ = 1;
 
 } // namespace CasADi

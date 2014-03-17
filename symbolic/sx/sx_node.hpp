@@ -39,6 +39,7 @@ namespace CasADi{
   */
   class SXNode{
     friend class SXElement;
+    friend class Matrix<SXElement>;
 
   public:
 
@@ -103,6 +104,12 @@ namespace CasADi{
     
     // Mark by flipping the sign of the temporary and decreasing by one
     void mark();
+
+    // Maximum number of calls
+    static long max_num_calls_in_print_;
+    
+    // Depth when checking equalities
+    static int eq_depth_;
 
     /** Temporary variables to be used in user algorithms like sorting, 
         the user is resposible of making sure that use is thread-safe

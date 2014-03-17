@@ -532,6 +532,18 @@ namespace CasADi{
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
     //@}
     
+    /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
+    static void setMaxNumCallsInPrint(long num=10000);
+
+    /** \brief Get the maximum number of calls to the printing function when printing an expression */
+    static long getMaxNumCallsInPrint();
+    
+    /** \brief Set or reset the depth to which equalities are being checked for simplifications */
+    static void setEqualityCheckingDepth(int eq_depth=1);
+
+    /** \brief Get the depth to which equalities are being checked for simplifications */
+    static int getEqualityCheckingDepth();
+
     //@{
     /// Printing
 #ifndef SWIG
