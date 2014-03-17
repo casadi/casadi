@@ -169,7 +169,7 @@ void SundialsInternal::init(){
   }
   
   // Create a Jacobian if requested
-  if (exact_jacobian_) jac_ = getJacobian();
+  if (exact_jacobian_) jac_ = getJac();
   // Initialize Jacobian if availabe
   if(!jac_.isNull() && !jac_.isInit()) jac_.init();
   
@@ -180,7 +180,7 @@ void SundialsInternal::init(){
   }
 
   // Create a backwards Jacobian if requested
-  if(exact_jacobianB_ && !g_.isNull()) jacB_ = getJacobianB();
+  if(exact_jacobianB_ && !g_.isNull()) jacB_ = getJacB();
   // Initialize backwards  Jacobian if availabe
   if(!jacB_.isNull() && !jacB_.isInit()) jacB_.init();
   

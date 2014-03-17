@@ -1703,7 +1703,7 @@ namespace CasADi{
     if(flag!=CV_SUCCESS) cvodes_error("CVDenseB",flag);
     if(exact_jacobianB_){
       // Generate jacobians if not already provided
-      if(jacB_.isNull()) jacB_ = getJacobian();
+      if(jacB_.isNull()) jacB_ = getJac();
       if(!jacB_.isInit()) jacB_.init();
     
       // Pass to CVodes
@@ -1786,7 +1786,7 @@ namespace CasADi{
   }
 
   template<typename FunctionType>
-  FunctionType CVodesInternal::getJacobianGen(){
+  FunctionType CVodesInternal::getJacGen(){
     FunctionType f = shared_cast<FunctionType>(f_);
     casadi_assert(!f.isNull());
   
@@ -1805,7 +1805,7 @@ namespace CasADi{
   }
 
   template<typename FunctionType>
-  FunctionType CVodesInternal::getJacobianGenB(){
+  FunctionType CVodesInternal::getJacGenB(){
     FunctionType g = shared_cast<FunctionType>(g_);
     casadi_assert(!g.isNull());
   
@@ -1823,24 +1823,24 @@ namespace CasADi{
     return FunctionType(jac_in,jac);
   }
 
-  FX CVodesInternal::getJacobianB(){
+  FX CVodesInternal::getJacB(){
     if(is_a<SXFunction>(g_)){
-      return getJacobianGenB<SXFunction>();
+      return getJacGenB<SXFunction>();
     } else if(is_a<MXFunction>(g_)){
-      return getJacobianGenB<MXFunction>();
+      return getJacGenB<MXFunction>();
     } else {
-      throw CasadiException("CVodesInternal::getJacobianB(): Not an SXFunction or MXFunction");
+      throw CasadiException("CVodesInternal::getJacB(): Not an SXFunction or MXFunction");
     }
   }
 
 
-  FX CVodesInternal::getJacobian(){
+  FX CVodesInternal::getJac(){
     if(is_a<SXFunction>(f_)){
-      return getJacobianGen<SXFunction>();
+      return getJacGen<SXFunction>();
     } else if(is_a<MXFunction>(f_)){
-      return getJacobianGen<MXFunction>();
+      return getJacGen<MXFunction>();
     } else {
-      throw CasadiException("CVodesInternal::getJacobian(): Not an SXFunction or MXFunction");
+      throw CasadiException("CVodesInternal::getJac(): Not an SXFunction or MXFunction");
     }
   }
 

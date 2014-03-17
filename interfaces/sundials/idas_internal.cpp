@@ -1914,7 +1914,7 @@ namespace CasADi{
     if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
     if(exact_jacobian_){
       // Generate jacobians if not already provided
-      if(jac_.isNull()) jac_ = getJacobian();
+      if(jac_.isNull()) jac_ = getJac();
       if(!jac_.isInit()) jac_.init();
     
       // Pass to IDA
@@ -2075,7 +2075,7 @@ namespace CasADi{
   }
 
   template<typename FunctionType>
-  FunctionType IdasInternal::getJacobianGen(){
+  FunctionType IdasInternal::getJacGen(){
     FunctionType f = shared_cast<FunctionType>(f_);
     casadi_assert(!f.isNull());
   
@@ -2095,7 +2095,7 @@ namespace CasADi{
   }
 
   template<typename FunctionType>
-  FunctionType IdasInternal::getJacobianGenB(){
+  FunctionType IdasInternal::getJacGenB(){
     FunctionType g = shared_cast<FunctionType>(g_);
     casadi_assert(!g.isNull());
   
@@ -2114,23 +2114,23 @@ namespace CasADi{
     return FunctionType(jac_in,jac);
   }
 
-  FX IdasInternal::getJacobianB(){
+  FX IdasInternal::getJacB(){
     if(is_a<SXFunction>(g_)){
-      return getJacobianGenB<SXFunction>();
+      return getJacGenB<SXFunction>();
     } else if(is_a<MXFunction>(g_)){
-      return getJacobianGenB<MXFunction>();
+      return getJacGenB<MXFunction>();
     } else {
-      throw CasadiException("IdasInternal::getJacobianB(): Not an SXFunction or MXFunction");
+      throw CasadiException("IdasInternal::getJacB(): Not an SXFunction or MXFunction");
     }
   }
 
-  FX IdasInternal::getJacobian(){
+  FX IdasInternal::getJac(){
     if(is_a<SXFunction>(f_)){
-      return getJacobianGen<SXFunction>();
+      return getJacGen<SXFunction>();
     } else if(is_a<MXFunction>(f_)){
-      return getJacobianGen<MXFunction>();
+      return getJacGen<MXFunction>();
     } else {
-      throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
+      throw CasadiException("IdasInternal::getJac(): Not an SXFunction or MXFunction");
     }
   }
 

@@ -95,7 +95,7 @@ class IdasInternal : public SundialsInternal{
   
   /** \brief  Get the integrator Jacobian for the forward problem (generic) */
   template<typename FunctionType>
-  FunctionType getJacobianGen();
+  FunctionType getJacGen();
   
   /** \brief  Get the integrator Jacobian for the backward problem (generic) 
   *   Structure:
@@ -105,13 +105,13 @@ class IdasInternal : public SundialsInternal{
   *   | diff(gz,rx)                        |   diff(gz,rz) |
   */
   template<typename FunctionType>
-  FunctionType getJacobianGenB();
+  FunctionType getJacGenB();
 
   /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual FX getJacobian();
+  virtual FX getJac();
   
   /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual FX getJacobianB();
+  virtual FX getJacB();
   
   /// Correct the initial conditions, i.e. calculate
   void correctInitialConditions();
