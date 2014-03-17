@@ -140,45 +140,11 @@ We will mainly use Python syntax in the discussion, which is the language we rec
 
 For up-to-date installation instructions, we refer to the \CasADi's website, \htmladdnormallink{casadi.org}{http://casadi.org/}.
 
-\chapter{Structure of CasADi}
-In CasADi a powerful symbolic abstraction of mathematical functions is implemented.
-In this chapter we will learn how to create general functions out of our model equations, 
-how to evaluate them and optionally their derivatives. We also give some instructional
-examples to make it more easily understandable.
+\chapter{Symbolic framework}
+At the core of CasADi, is a self-contained symbolic framework that allows the user to construct symbolic expressions using a MATLAB inspired everything-is-a-matrix data type, i.e. vectors are treated as n-by-1 matrices and scalars as 1-by-1 matrices. All matrices are \emph{sparse} and use a general sparse format -- \emph{compressed column storage} (CCS) -- to store matrices\footnote{Before v1.9.0, \emph{compressed row storage} (CRS) was used.}. In the following, we introduce the most fundamental classes of this framework.
 
-The backbone of CasADi is centered around some fundamental classes:
-\begin{itemize}
- \item \texttt{SX} -- \emph{scalar symbolic type}
- \item \texttt{SX} -- \emph{sparse matrix with elements of type \texttt{SX}}
- \item \texttt{DMatrix}  -- \emph{same as \texttt{SX} but with elements of floating point type}
- \item \texttt{FX} and derived classes -- \emph{functions}
- \item \texttt{MX} -- \emph{matrix symbolic type}
-\end{itemize}
-
-\begin{pytexTemplate}{main}
-from casadi import *
-\end{pytexTemplate}
-
-\begin{pytexTemplate}{maintools}
-from casadi import *
-from casadi.tools import *
-\end{pytexTemplate}
-
-\pytexStart{empty}
-
-The following is a listing of available subclasses of FX:
-\begin{pytex}
-import casadi
-import casadi.tools
-casadi.tools.print_subclasses(casadi.FX)
-\end{pytex}
-
-\section{\texttt{SX} and \texttt{SX}}
-The \texttt{SX} type is used to represent symbolic expressions made up by a sequence of unary and binary operations. It uses a syntax similar to a numeric type such as \texttt{float} in Python or a \texttt{double} in C/C++, but instead of calculating the expressions numerically, the \texttt{SX} will build up an expression. The type overloads most common operations and can also be used instead of container classes such as \texttt{numpy.array} in Python or \texttt{std::vector<>} in C++'s Standard Template Library (STL).
-
-Though it is possible and somtimes benificial, we shall not work with the \texttt{SX} type directly in this tutorial. Instead we shall work with a \emph{sparse matrix type} called \texttt{SX}, whose elements are \texttt{SX} instances. \texttt{SX} uses an everything-is-a-matrix type syntax that should be familiar to Matlab users, which means that scalars can be represented as 1-by-1 matrices and vectors as $n$-by-1 matrices. To store its element, it uses a general sparse matrix format comparible to that used for sparse matrices in Matlab\footnote{To be more precise, the storage format used is \emph{compressed row storage}}.
-
-To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "symbolic/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the CasADi module is imported by simply invoking \texttt{casadi}}
+\section{The \texttt{SX} symbolics}
+The \texttt{SX} data type is used to represent matrices whose elements consist of symbolic expressions made up by a sequence of unary and binary operations. To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "symbolic/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the CasADi module is imported by simply invoking \texttt{casadi}}
 
 \pytexStart{empty}
 
@@ -187,25 +153,24 @@ from casadi import *
 \end{pytex}
 
 Now create the variable \texttt{x} using the syntax (cf. the function \texttt{sym} in Matlab's Symbolic Toolbox)\footnote{In C++, since it is statically typed, you need to specify the return type, here \texttt{SX}. To find the return types for a CasADi function, use the C++ API docs on the website}:
-
 \begin{pytex}
 x = SX.sym("x")
 \end{pytex}
-
-Note that the string passed is only the display name, not the identifier. Multiple variables can have the same name, but still be different. You can also create vectors or matrices of variables using by supplying additional arguments to \texttt{SX.sym}:
+which creates a 1-by-1 matrix, i.e. a scalar containing a symbolic primitive called ``x''. This is just the display name, not the identifier. Multiple variables can have the same name, but still be different. You can also create vector- or matrix-valued symbolic variables using by supplying additional arguments to \texttt{SX.sym}:
 \begin{pytex}
-y = SX.sym("y",5)   # A 5-by-1 matrix, i.e. a vector, with symbolic variables
-Z = SX.sym("Z",4,2) # A 4-by-2 matrix with symbolic variables
+y = SX.sym("y",5)
+Z = SX.sym("Z",4,2)
 \end{pytex}
+which creates a 5-by-1 matrix, i.e. a vector, and a 4-by-2 matrix with symbolic primitives, respectively.
 
-Note that \texttt{SX.sym} is a function which returns an \texttt{SX} instance. When variables have been declared, expressions can now be formed in an intuitive way:
+\texttt{SX.sym} is a (static) function which returns an \texttt{SX} instance. When variables have been declared, expressions can now be formed in an intuitive way:
 \begin{pytex}
 f = x**2 + 10  # "x**y" corresponds to "pow(x,y)" in C++
 f = sqrt(f)
 print "f = ", f
 \end{pytex}
 
-You can also create \texttt{SX} instances \emph{without} any symbolic variables\footnote{In C++, class}:
+You can also create constant \texttt{SX} instances \emph{without} any symbolic primitives:
 \begin{pytex} 
 B1 = SX.zeros(4,5)  # a dense 4-by-5 empty matrix with all zeros
 B2 = SX.sparse(4,5) # a sparse 4-by-5 empty matrix with all zeros
@@ -213,21 +178,30 @@ B3 = SX.ones(4,5)   # a dense 4-by-5 matrix filled with ones
 B4 = SX.eye(4)      # a sparse 4-by-4 matrix with ones on the diagonal
 \end{pytex}
 
-Note the difference between a sparse matrix with \emph{structural} zeros and a dense matrix with \emph{actual} zeros. When printing an expression with structural zeros, these will be represented as $00$ to distinguish them from actual zeros $0$.
+Note the difference between a sparse matrix with \emph{structural} zeros and a dense matrix with \emph{actual} zeros. When printing an expression with structural zeros, these will be represented as $00$ to distinguish them from actual zeros $0$:
+\begin{pytex} 
+print "B4 = ", B4
+\end{pytex}
 
 Elements are accessed and set using a bracket syntax, which also updates the sparsity pattern. Note that in C++ and Python (and thus also in CasADi) indices start with zero:
 \begin{pytex} 
 print B1[0,0]   # print elements [0,0] (Python is zero-based!)
+\end{pytex}
+\begin{pytex} 
 print B2[-1,-1] # print the last element of the last row
+\end{pytex}
+\begin{pytex} 
 print B3[:,2]   # print all elements in the 3rd column
+\end{pytex}
+\begin{pytex} 
 B4[2:4,1]=[7,3] # set [2,1] to 7 and [3,1] to 3
 print B4
 \end{pytex}
 
-Remember to pass two arguments if you wish to access a matrix entry. If you call the same function using \emph{one} index, is interpreted as accesssing the (structural) nonzeros of the matrix:
+Remember to pass two arguments if you wish to access a matrix entry. You can also access the (structural) nonzeros of the matrix:
 \begin{verbatim}
- B4[:] = 5   # set all nonzeros to 5
- print B4[6] # error: there are only six nonzeros!
+ B4.nz[:] = 5   # set all nonzeros to 5
+ print B4.nz[6] # error: there are only six nonzeros!
 \end{verbatim}
 
 There is a growing set of operations that can be performed with the \texttt{SX}, including:
@@ -238,151 +212,45 @@ There is a growing set of operations that can be performed with the \texttt{SX},
 It is typically uncomplicated to add new such functions whenever they appear in applications.
 
 \section{\texttt{DMatrix}}
-\texttt{DMatrix} is very similar to \texttt{SX} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not \texttt{SX} expressions. The syntax is also the same, except for functions such as \texttt{SX.sym} or \texttt{jacobian} which has no equivalent.
+\texttt{DMatrix} is very similar to \texttt{SX} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not symbolic expressions. The syntax is also the same, except for functions such as \texttt{SX.sym} or \texttt{jacobian} which have no equivalents.
 
 \texttt{DMatrix} is mainly used for storing matrices in CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
-\begin{verbatim}
- C = 4*DMatrix.ones(2,3)
- C[:,2] = 5
+\begin{pytex}
+C = DMatrix.sparse(2,3)
+C[:,2] = 5
+print type(C),
+print C
+\end{pytex}
 
- import numpy as NP
- C_numpy = NP.array(C)
+\begin{pytex}
+from numpy import array
+C_numpy = array(C)
+print type(C_numpy)
+print C_numpy
+\end{pytex}
 
- import scipy as SP
- C_scipy = SP.sparse.csr_matrix(C)
-\end{verbatim}
+\begin{pytex}
+from scipy.sparse import csc_matrix
+C_scipy = csc_matrix(C)
+print type(C_scipy)
+print C_scipy
+\end{pytex}
 
 More usage examples for \texttt{SX} can be found in the tutorials at \texttt{casadi.org}. For documentation of particular functions of this class (and others), find the ``C++ API docs'' on the website and search for information about \texttt{CasADi::Matrix<\,T\,>}.
 
-\section{\texttt{FX} and derived classes} \label{sec:fx}
-CasADi contains a number of functions that all derive from the \texttt{FX} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
-
-The basic usage skeleton of all these functions are:
-\begin{verbatim}
-# Call the constructor
-f = ClassName(arguments)
-
-# Set options
-f.setOption("option_name",option_value)
-
-# Initialize the function
-f.init()
-
-# Set inputs, forward and adjoint derivative seeds
-f.setInput(value,input_index)
-
-# Evaluate
-f.evaluate()
-
-# Get outputs, forward and adjoint derivative sensitivities
-f.getOutput(output_index)
-\end{verbatim}
-
-In Section \ref{sec:ad_numeric}, we extend this skeleton to also includes derivatives.
-
-As an alternative to calling \texttt{getOutput} etc., you can also directly access the internal matrices (which are of type \texttt{DMatrix}). This can decrease overhead and shorten the code, but must be used with caution, since changing the \emph{structure} of these matrices can cause CasADi to crash.
-\begin{verbatim}
-print "output is ", f.output()
-\end{verbatim}
-
-Evaluating \texttt{f} again, will change the output matrix internal to f and hence the reference \texttt{f.output()}. If you wish to retain the old matrix, make a deep copy first. In fact, \texttt{f.getOutput()} behaves as \texttt{DMatrix(f.output())}.
-\begin{verbatim}
-a = f.output()
-b = DMatrix(a)  # make deepcopy
-f.evaluate()
-# a has changed
-# b has not changed
-\end{verbatim}
-
-Note that all functions are multiple (sparse, matrix-valued) input, multiple (sparse, matrix-valued) output.
-
-One of the \texttt{FX} derived classes is \texttt{SXFunction}, which defines a function given a symbolic expression. Its constructor is:
-\begin{verbatim}
- f = SXFunction(list_of_inputs,list_of_outputs)
-\end{verbatim}
-
-There is no mechanism to distinguish the nature of \texttt{FX} functions. For example, any \texttt{FX} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be considered to represent a dae function. The CasADi used to generate this documentation has:
-\begin{pytexoutput}
-print "DAE_NUM_IN = ", DAE_NUM_IN
-print "DAE_NUM_OUT = ", DAE_NUM_OUT
-\end{pytexoutput}
-There are a couple of global constants starting with \texttt{DAE\_} that together constitute the \emph{input/output scheme} of a dae. You can look these up in the API documentation or the python docstrings. You should use these constants and not replace them by the numerical values they happen to have in your version of CasADi, as they might change in the future.\\
-
-For example, here is an excerpt from the documentation for the constructor of a \texttt{CVodesIntegrator}:
-\begin{pytexoutput}
-docs = CVodesIntegrator.__init__.__doc__.split("\n")
-start = docs.index(filter(lambda x: "DAEOutput" in x,docs)[0])
-print "\n".join(docs[start:start+4+2*DAE_NUM_OUT])
-\end{pytexoutput}
-
-Helper functions are available to construct lists of objects that adhere to a particular scheme. For example, to create a list of a \texttt{DAEOutput} scheme, you use \texttt{daeOut}:
-
-\begin{pytex}
-print daeOut()
-print daeOut(ode=SX.sym("fx"))
-print daeOut(alg=SX.sym("fz"),ode=SX.sym("fx"))
-\end{pytex}
-
-Consult the python docstrings for more information of how to use these helper functions:
-\begin{pytexoutput}
-print daeOut.__doc__
-\end{pytexoutput}
-
-All derived classes of \texttt{FX} come with a range of options that can be set. The API documentation shows the list of available options, along with their default values and descriptions. For example, here is an excerpt from the documentation for \texttt{SXFunction}:
-
-\begin{pytexoutput}
-docs = SXFunction.__doc__.split("\n")
-start = docs.index(filter(lambda x: "List of available options" in x,docs)[0])
-print "\n".join(docs[start:start+50])
-print "..."
-\end{pytexoutput}
-
-You can also query such a list from any object:
-\begin{pytex}
-x = SX.sym("x")
-f = SXFunction([x],[x])
-f.init()
-f.printOptions()
-\end{pytex}
-
-\begin{pytexoutput}
-docs = SXFunction.__doc__.split("\n")
-start = docs.index(filter(lambda x: "List of available options" in x,docs)[0])
-print "\n".join(docs[start:start+15])
-print "..."
-\end{pytexoutput}
-
-Two options commonly used during debugging, are "verbose" (a boolean) and "monitor".
-The latter allows to specify a list of keywords that each trigger some numerical output to be dumped to the screen when the function is evaluated. A classic example to monitor the objective and constraint function values during NLP solution is as follows:
-\begin{verbatim}
-solver.setOption("monitor",["eval_f","eval_g"])
-\end{verbatim}
-
-Again check the API documentation for details. For example, here is an excerpt from the documentation for of \texttt{IpoptSolver}:
-\begin{pytexoutput}
-docs = IpoptSolver.__doc__.split("\n")
-start = docs.index(filter(lambda x: "List of available monitors" in x,docs)[0])
-print "\n".join(docs[start:start+15])
-print "..."
-\end{pytexoutput}
-
 \section{The \texttt{MX} symbolics}
-
-\pytexStart{main}
-
 Let us perform a simple operation using the \texttt{SX} above:
 \begin{pytex}
 x = SX.sym("x",2,2)
 y = SX.sym("y")
 f = 3*x + y
 print "f = ", f
+print "f.shape = ", f.shape
 \end{pytex}
 
-As you can see, the output of this operaton is a 2-by-2 matrix.
+As you can see, the output of this operaton is a 2-by-2 matrix. Note how the multiplication and the addition were performed elementwise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
 
-Note how the multiplication and the addition were performed elementwise and new expressions (of type $SX$) were created for each entry of the result matrix.
-
-We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$. In particular, we allow \emph{calls} to functions of type \texttt{FX} (including calls to ODE integrators and \texttt{SXFunction} instances).
+We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$. %In particular, we allow \emph{calls} to functions of type \texttt{FX} (including calls to ODE integrators and \texttt{SXFunction} instances).
 
 The syntax of \texttt{MX} is intended to mirror that of \texttt{SX}:
 \begin{pytex}
@@ -390,21 +258,20 @@ x = MX.sym("x",2,2)
 y = MX.sym("y")
 f = 3*x + y
 print "f = ", f
+print "f.shape = ", f.shape
 \end{pytex}
 
-where \texttt{MX.sym} has replaced \texttt{SX.sym}.
-
-Note that this operation required only 2 elementary operations (one multiplication and one addition) using \texttt{MX} symbolics, whereas the \texttt{SX} symbolics required 8 (2 for each element of the resulting matrix). \texttt{MX} is thus more economical when working with operations that are naturally vector or matrix valued. It is also much more general since we allow calls to arbitrary functions that cannot be expanded in terms of elementary operations (like a call to CVodes). %This extra generality, however, comes to the price of more overhead, and we shall 
+Note that this operation required only 2 elementary operations (one multiplication and one addition) using \texttt{MX} symbolics, whereas the \texttt{SX} symbolics required 8 (2 for each element of the resulting matrix). \texttt{MX} is thus more economical when working with operations that are naturally vector or matrix valued. As we shall see later, it is also much more general since we allow calls to arbitrary functions that cannot be expanded in terms of elementary operations.
 
 \texttt{MX} supports getting and setting elements, using the same syntax as \texttt{SX}, but the way it is implemented is very different. Test, for example, to print the first column of a 2-by-2 symbolic variable:
 \begin{pytex}
 x = MX.sym("x",2,2)
-print x[:,0] 
+print x[0,:]
 \end{pytex}
 
-The output should be understood as a (linear) mapping from nonzeros 0 and 2 of the expression \texttt{x} to a new expression of dimension 2-by-1.
+The output should be understood as a (linear) mapping from nonzeros 0 and 2 of the expression \texttt{x} to a new expression of dimension 1-by-2.
 
-Similar outputs can be expected when trying to set elements:
+Similar results can be expected when trying to set elements:
 \begin{pytex}
 x = MX.sym("x",2)
 A = MX.sparse(2,2)
@@ -419,34 +286,140 @@ Linear mappings, of the type you have seen here, is also the the result of sever
 
 This output tend to become quite hard to understand. An alternative (but not always better) way is to represent the function is as a graph:
 
-\begin{minipage}[t]{0.45\textwidth}
-\texttt{from casadi import tools} \\
-\texttt{tools.dotdraw(A)} \\
-\end{minipage}
-\begin{minipage}[t]{0.45\textwidth}
+\begin{verbatim}
+from casadi import tools
+tools.dotdraw(A)
+\end{verbatim}
+
 \begin{center}
-\includegraphics[width=\textwidth]{mxdraw}
+\includegraphics[width=0.8\textwidth]{mxdraw}
 \end{center}
-\end{minipage}
 
 Using this feature, which is still under development, requires that you have installed the Python package \emph{pydot}. We actively work on getting the expressions more easier to grasp.
 
-\texttt{MX} expressions may contain calls to CasADi functions. To embed a call to an \texttt{FX}-derived function (e.g. \texttt{SXFunction} or \texttt{CVodesIntegrator}, see Section \ref{chapter:integrators}), you use the syntax:
+
+
+%% \pytexStart{empty}
+
+%% In CasADi a powerful symbolic abstraction of mathematical functions is implemented.
+%% In this chapter we will learn how to create general functions out of our model equations, 
+%% how to evaluate them and optionally their derivatives. We also give some instructional
+%% examples to make it more easily understandable.
+
+%% The backbone of CasADi is centered around some fundamental classes:
+%% \begin{itemize}
+%%  \item \texttt{SX} -- \emph{scalar symbolic type}
+%%  \item \texttt{SX} -- \emph{sparse matrix with elements of type \texttt{SX}}
+%%  \item \texttt{DMatrix}  -- \emph{same as \texttt{SX} but with elements of floating point type}
+%%  \item \texttt{FX} and derived classes -- \emph{functions}
+%%  \item \texttt{MX} -- \emph{matrix symbolic type}
+%% \end{itemize}
+
+%% \begin{pytexTemplate}{main}
+%% from casadi import *
+%% \end{pytexTemplate}
+
+%% \begin{pytexTemplate}{maintools}
+%% from casadi import *
+%% from casadi.tools import *
+%% \end{pytexTemplate}
+
+%% \pytexStart{empty}
+
+%% The following is a listing of available subclasses of FX:
+%% \begin{pytex}
+%% import casadi
+%% import casadi.tools
+%% casadi.tools.print_subclasses(casadi.FX)
+%% \end{pytex}
+
+\section{\texttt{FX} and derived classes} \label{sec:fx}
+\CasADi allows the user to create function objects (functors) that all derive the \texttt{FX} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
+
+The basic usage skeleton of all these function objects are:
+\begin{verbatim}
+f = ClassName(arguments)                 # Call the constructor
+f.setOption("option_name",option_value)  # Set options
+f.init()                                 # Initialize the function
+f.setInput(value,input_index)            # Pass inputs
+f.evaluate()                             # Evaluate numerically
+f.getOutput(output_index)                # Get outputs
+\end{verbatim}
+
+Note that all functions are multiple (sparse, matrix-valued) input, multiple (sparse, matrix-valued) output.
+
+One important member of the \texttt{FX} derived classes is \texttt{SXFunction}, which is constructed with the syntax \verb|SXFunction(list_of_inputs,list_of_outputs)|:
+\begin{pytex}
+x = SX.sym("x",2,2)
+y = SX.sym("y")
+f = SXFunction([x,y],[x,sin(y)*x])
+\end{pytex}
+which defines a function $f : \mathbb{R}^{2 \times 2} \times \mathbb{R}, \quad (x,y) \mapsto (x,\sin(y) x)$.
+
+\texttt{MXFunction} works the same way, but for the \texttt{MX} expression graphs:
+\begin{pytex}
+x = MX.sym("x",2,2)
+y = MX.sym("y")
+f = MXFunction([x,y],[x,sin(y)*x])
+\end{pytex}
+
+We can get a list of other supported function objects deriving from \texttt{FX}:
+\begin{pytex}
+import casadi
+import casadi.tools
+casadi.tools.print_subclasses(casadi.FX)
+\end{pytex}
+
+
+%% There is no mechanism to distinguish the nature of \texttt{FX} functions. For example, any \texttt{FX} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be considered to represent a dae function. The CasADi used to generate this documentation has:
+%% \begin{pytexoutput}
+%% print "DAE_NUM_IN = ", DAE_NUM_IN
+%% print "DAE_NUM_OUT = ", DAE_NUM_OUT
+%% \end{pytexoutput}
+%% There are a couple of global constants starting with \texttt{DAE\_} that together constitute the \emph{input/output scheme} of a dae. You can look these up in the API documentation or the python docstrings. You should use these constants and not replace them by the numerical values they happen to have in your version of CasADi, as they might change in the future.\\
+
+%% For example, here is an excerpt from the documentation for the constructor of a \texttt{CVodesIntegrator}:
+%% \begin{pytexoutput}
+%% docs = CVodesIntegrator.__init__.__doc__.split("\n")
+%% start = docs.index(filter(lambda x: "DAEOutput" in x,docs)[0])
+%% print "\n".join(docs[start:start+4+2*DAE_NUM_OUT])
+%% \end{pytexoutput}
+
+%% Helper functions are available to construct lists of objects that adhere to a particular scheme. For example, to create a list of a \texttt{DAEOutput} scheme, you use \texttt{daeOut}:
+
+%% \begin{pytex}
+%% print daeOut()
+%% print daeOut(ode=SX.sym("fx"))
+%% print daeOut(alg=SX.sym("fz"),ode=SX.sym("fx"))
+%% \end{pytex}
+
+%% Consult the python docstrings for more information of how to use these helper functions:
+%% \begin{pytexoutput}
+%% print daeOut.__doc__
+%% \end{pytexoutput}
+
+All derived classes of \texttt{FX} come with a range of options that can be set. The API documentation shows the list of available options, along with their default values and descriptions. For example, here is an excerpt from the documentation for \texttt{IpoptSolver}:
+\begin{pytexoutput}
+docs = IpoptSolver.__doc__.split("\n")
+start = docs.index(filter(lambda x: "List of available monitors" in x,docs)[0])
+print "\n".join(docs[start:start+15])
+print "..."
+\end{pytexoutput}
+
+Two options commonly used during debugging, are "verbose" (a boolean) and "monitor". The latter allows to specify a list of keywords that each trigger some numerical output to be dumped to the screen when the function is evaluated. E.g. to monitor the objective and constraint function values during NLP solution, set:
+\begin{verbatim}
+solver.setOption("monitor",["eval_f","eval_g"])
+\end{verbatim}
+
+\texttt{MX} expressions may contain calls to \texttt{FX}-derived functions. To embed a call to function (e.g. \texttt{SXFunction} or \texttt{CVodesIntegrator}, see Section \ref{chapter:integrators}), you use the syntax:
 \begin{verbatim}
 [y1,y2,...,yn] = f.call([x1,x2,...,xn])
 \end{verbatim}
 
 Remember to put the brackets around the output even if the function only has a single output.
 
-Expressions formulated using \texttt{MX} expressions can be used to formulate functions of type \texttt{MXFunction}:
-\begin{verbatim}
- f = MXFunction(list_of_inputs,list_of_outputs)
-\end{verbatim}
-
 \section{Mixing \texttt{SX} and \texttt{MX}}
-You can \emph{not} multiply an \texttt{SX} with a \texttt{MX}, or perform any other operation to mix the two in the same expression graph. You can, however, as mentioned above, include calls to an \texttt{SXFunction} in an \texttt{MX} graph. This is often a good idea since \texttt{SXFunction} is several times faster than \texttt{MXFunction} when dealing with small to medium size expressions (up to some thousands of variables). It is also much more stable and contains fewer bugs. 
-
-The \texttt{SX} expressions is thus intended to be used for low level operations (for example the DAE right hand side), whereas the \texttt{MX} expressions act as a glue and enables the formulation of e.g. the constraint function of an NLP (which might contain calls to ODE/DAE integrators, or might simply be too large to expand as one big expression).
+You can \emph{not} multiply an \texttt{SX} with a \texttt{MX}, or perform any other operation to mix the two in the same expression graph. You can, however, include calls to an \texttt{SXFunction} in an \texttt{MX} graph. This is often a good idea since \texttt{SXFunction} has a much lower overhead per operation making it much faster for operations that are naturally written as a sequence of scalar operations. The \texttt{SX} expressions is thus intended to be used for low level operations (for example the DAE right hand side), whereas the \texttt{MX} expressions act as a glue and enables the formulation of e.g. the constraint function of an NLP (which might contain calls to ODE/DAE integrators, or might simply be too large to expand as one big expression).
 
 An \texttt{MXFunction} which only contains built-in operations (e.g. +, *, linear mappings, matrix multiplications and calls to \texttt{SXFunction} instances, can be converted into an \texttt{SXFunction} using the syntax:
 \begin{verbatim}
@@ -614,7 +587,7 @@ print M[i,:2]   # [[3,  4,  7,  5 ],[4,  3,  5,  7 ]]
 \paragraph{Sparsity access} involves slicing with a sparsity pattern o fthe same shape as the left hand side. For each non-zero in the slice item, the element of the left hand side with the same (row, col) pair is selected.
 \begin{pytex}
 M = DMatrix([[3,7,8],[4,5,6],[1,2,9]])
-print M[sp_diag(3)]   # diag([3,5,9])
+print M[Sparsity.diag(3)]   # diag([3,5,9])
 \end{pytex}
 
 \section{Sparsity tools}
@@ -622,7 +595,7 @@ print M[sp_diag(3)]   # diag([3,5,9])
 Sparsities are easily visualised with the \texttt{spy} command:
 
 \begin{pytex}
-sp_diag(3).spy()
+Sparsity.diag(3).spy()
 \end{pytex}
 
 \subsection{Sparsity constructors}
@@ -635,8 +608,8 @@ There are several options to build sparse CasADi matrix types:
 \end{itemize}
 
 \begin{pytex}
-print DMatrix(sp_tril(3),1)          # [[1,  00,  00 ], [1,  1,  00 ], [1,  1,  1 ]]
-print DMatrix(sp_tril(3),range(6))  # [[0,  00,  00 ], [1,  2,  00 ], [3,  4,  5 ]]
+print DMatrix(Sparsity.tril(3),1)
+print DMatrix(Sparsity.tril(3),range(6))
 \end{pytex}
 
 \paragraph{diagonal}
