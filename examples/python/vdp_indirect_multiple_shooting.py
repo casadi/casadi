@@ -154,9 +154,9 @@ simulator.setInput(solver.getOutput()[0:4],"x0")
 simulator.evaluate()
 
 # Get optimal control
-x_opt = simulator.getOutput(0)
-y_opt = simulator.getOutput(1)
-u_opt = simulator.getOutput(2)
+x_opt = simulator.getOutput(0).T
+y_opt = simulator.getOutput(1).T
+u_opt = simulator.getOutput(2).T
 
 # Plot the results
 plt.figure(1)
