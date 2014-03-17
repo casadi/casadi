@@ -124,7 +124,7 @@ After reading this document, the reader should be able to formulate and manipula
 
 CasADi is written in C++ but also has front-ends to Python and (experimentally) Octave.
 
-It is important to point out that \CasADi is \emph{not} a conventional AD tool, that can be used to calculate derivative information from existing user code with little to no modification. If you have an existing model written in say C++ or Python, you need to be prepared to reimplement the model using CasADi syntax.
+It is important to point out that \CasADi is \emph{not} a conventional AD tool, that can be used to calculate derivative information from existing user code with little to no modification. If you have an existing model written in say C++ or Python, you need to be prepared to reimplement the model using \CasADi syntax.
 
 Secondly, \CasADi is \emph{not} a computer algebra system. While the symbolic core does include an increasing set of tools for manipulate symbolic expressions, these capabilities are very limited compared to a proper CAS tool.
 
@@ -136,15 +136,15 @@ Our explaination is mostly program code driven and provides little mathematical 
 We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, and try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{sec:syntax_differences}. The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software.
 
 \chapter{Obtaining and installing \CasADi}
-\CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its alternative front-ends, to Python and Octave, are full-featured and auto-generated via the SWIG tool and can be used with little to no loss of efficiency. CasADi has been compiled and used successfully on Linux, OS X and Windows.
+\CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its alternative front-ends, to Python and Octave, are full-featured and auto-generated via the SWIG tool and can be used with little to no loss of efficiency. \CasADi has been compiled and used successfully on Linux, OS X and Windows.
 
 For up-to-date installation instructions, we refer to the \CasADi's website, \htmladdnormallink{casadi.org}{http://casadi.org/}.
 
 \chapter{Symbolic framework}
-At the core of CasADi, is a self-contained symbolic framework that allows the user to construct symbolic expressions using a MATLAB inspired everything-is-a-matrix data type, i.e. vectors are treated as n-by-1 matrices and scalars as 1-by-1 matrices. All matrices are \emph{sparse} and use a general sparse format -- \emph{compressed column storage} (CCS) -- to store matrices\footnote{Before v1.9.0, \emph{compressed row storage} (CRS) was used.}. In the following, we introduce the most fundamental classes of this framework.
+At the core of \CasADi, is a self-contained symbolic framework that allows the user to construct symbolic expressions using a MATLAB inspired everything-is-a-matrix data type, i.e. vectors are treated as n-by-1 matrices and scalars as 1-by-1 matrices. All matrices are \emph{sparse} and use a general sparse format -- \emph{compressed column storage} (CCS) -- to store matrices\footnote{Before v1.9.0, \emph{compressed row storage} (CRS) was used.}. In the following, we introduce the most fundamental classes of this framework.
 
 \section{The \texttt{SX} symbolics}
-The \texttt{SX} data type is used to represent matrices whose elements consist of symbolic expressions made up by a sequence of unary and binary operations. To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "symbolic/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the CasADi module is imported by simply invoking \texttt{casadi}}
+The \texttt{SX} data type is used to represent matrices whose elements consist of symbolic expressions made up by a sequence of unary and binary operations. To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import \CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "symbolic/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the \CasADi module is imported by simply invoking \texttt{casadi}}
 
 \pytexStart{empty}
 
@@ -152,7 +152,7 @@ The \texttt{SX} data type is used to represent matrices whose elements consist o
 from casadi import *
 \end{pytex}
 
-Now create the variable \texttt{x} using the syntax (cf. the function \texttt{sym} in Matlab's Symbolic Toolbox)\footnote{In C++, since it is statically typed, you need to specify the return type, here \texttt{SX}. To find the return types for a CasADi function, use the C++ API docs on the website}:
+Now create the variable \texttt{x} using the syntax (cf. the function \texttt{sym} in Matlab's Symbolic Toolbox)\footnote{In C++, since it is statically typed, you need to specify the return type, here \texttt{SX}. To find the return types for a \CasADi function, use the C++ API docs on the website}:
 \begin{pytex}
 x = SX.sym("x")
 \end{pytex}
@@ -183,7 +183,7 @@ Note the difference between a sparse matrix with \emph{structural} zeros and a d
 print "B4 = ", B4
 \end{pytex}
 
-Elements are accessed and set using a bracket syntax, which also updates the sparsity pattern. Note that in C++ and Python (and thus also in CasADi) indices start with zero:
+Elements are accessed and set using a bracket syntax, which also updates the sparsity pattern. Note that in C++ and Python (and thus also in \CasADi) indices start with zero:
 \begin{pytex} 
 print B1[0,0]   # print elements [0,0] (Python is zero-based!)
 \end{pytex}
@@ -214,7 +214,7 @@ It is typically uncomplicated to add new such functions whenever they appear in 
 \section{\texttt{DMatrix}}
 \texttt{DMatrix} is very similar to \texttt{SX} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not symbolic expressions. The syntax is also the same, except for functions such as \texttt{SX.sym} or \texttt{jacobian} which have no equivalents.
 
-\texttt{DMatrix} is mainly used for storing matrices in CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
+\texttt{DMatrix} is mainly used for storing matrices in \CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
 \begin{pytex}
 C = DMatrix.sparse(2,3)
 C[:,2] = 5
@@ -301,12 +301,12 @@ Using this feature, which is still under development, requires that you have ins
 
 %% \pytexStart{empty}
 
-%% In CasADi a powerful symbolic abstraction of mathematical functions is implemented.
+%% In \CasADi a powerful symbolic abstraction of mathematical functions is implemented.
 %% In this chapter we will learn how to create general functions out of our model equations, 
 %% how to evaluate them and optionally their derivatives. We also give some instructional
 %% examples to make it more easily understandable.
 
-%% The backbone of CasADi is centered around some fundamental classes:
+%% The backbone of \CasADi is centered around some fundamental classes:
 %% \begin{itemize}
 %%  \item \texttt{SX} -- \emph{scalar symbolic type}
 %%  \item \texttt{SX} -- \emph{sparse matrix with elements of type \texttt{SX}}
@@ -371,12 +371,12 @@ casadi.tools.print_subclasses(casadi.FX)
 \end{pytex}
 
 
-%% There is no mechanism to distinguish the nature of \texttt{FX} functions. For example, any \texttt{FX} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be considered to represent a dae function. The CasADi used to generate this documentation has:
+%% There is no mechanism to distinguish the nature of \texttt{FX} functions. For example, any \texttt{FX} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be considered to represent a dae function. The \CasADi used to generate this documentation has:
 %% \begin{pytexoutput}
 %% print "DAE_NUM_IN = ", DAE_NUM_IN
 %% print "DAE_NUM_OUT = ", DAE_NUM_OUT
 %% \end{pytexoutput}
-%% There are a couple of global constants starting with \texttt{DAE\_} that together constitute the \emph{input/output scheme} of a dae. You can look these up in the API documentation or the python docstrings. You should use these constants and not replace them by the numerical values they happen to have in your version of CasADi, as they might change in the future.\\
+%% There are a couple of global constants starting with \texttt{DAE\_} that together constitute the \emph{input/output scheme} of a dae. You can look these up in the API documentation or the python docstrings. You should use these constants and not replace them by the numerical values they happen to have in your version of \CasADi, as they might change in the future.\\
 
 %% For example, here is an excerpt from the documentation for the constructor of a \texttt{CVodesIntegrator}:
 %% \begin{pytexoutput}
@@ -428,9 +428,9 @@ An \texttt{MXFunction} which only contains built-in operations (e.g. +, *, linea
 
 This might speed up the calculations significantly, but might also cause extra memory overhead.
 
-\chapter{Working with CasADi's types}
+\chapter{Working with \CasADi's types}
 
-This chapter aims to give you an in-depth overview of available manipulations on the CasADi primitives, with a focus on the matrix types \texttt{MX} and \texttt{SX}.
+This chapter aims to give you an in-depth overview of available manipulations on the \CasADi primitives, with a focus on the matrix types \texttt{MX} and \texttt{SX}.
 
 \section{Indexing and slicing}
 CasADi offers a variety of different ways to get or set specific elements or blocks of elements in matrix types. Most slicing techniques fall into one of the following two categories:
@@ -443,21 +443,23 @@ CasADi offers a variety of different ways to get or set specific elements or blo
 This section gives an exhaustive overview of the possibilities of indexing and slicing. The methods can be used both for setting and getting and they apply to all matrix types: \texttt{MX}, \texttt{SMatrix}, \texttt{DMatrix}, \texttt{IMatrix}.
 
 In python and C++ indexing starts from zero, while in octave indexing starts from 1.
-In python, it is customary to use negative indices to specify an index counted from the end of a list. CasADi supports this, too.
+In python, it is customary to use negative indices to specify an index counted from the end of a list. \CasADi supports this, too.
 
 \subsection{Getting and setting}
 
-\pytexStart{main}
+%\pytexStart{main}
 
 Each type of slicing comes with a get or set variant.
 \begin{pytex}
 M = DMatrix([[3,7],[4,5]])
-print M[0,:]  # Get variant
-M[0,:] = 1    # Set variant
+print M[0,:]  # Get
+\end{pytex}
+\begin{pytex}
+M[0,:] = 1    # Set
 print M
 \end{pytex}
 
-Unlike numpy, CasADi slices are not views into the data of the left hand side; rather, a slice access copies the data. As a result, the matrix $M$ is not changed in the following examples: 
+Unlike numpy, \CasADi slices are not views into the data of the left hand side; rather, a slice access copies the data. As a result, the matrix $M$ is not changed in the following examples: 
 \begin{pytex}
 M = DMatrix([[3,7],[4,5]])
 A = M[0,:]
@@ -599,7 +601,7 @@ Sparsity.diag(3).spy()
 \end{pytex}
 
 \subsection{Sparsity constructors}
-There are several options to build sparse CasADi matrix types:
+There are several options to build sparse \CasADi matrix types:
 
 \begin{itemize}
  \item Start from an empty matrix and add elements by using indexing/slicing in a setting mode.
@@ -608,54 +610,52 @@ There are several options to build sparse CasADi matrix types:
 \end{itemize}
 
 \begin{pytex}
-print DMatrix(Sparsity.tril(3),1)
+print DMatrix.ones(Sparsity.tril(3))
 print DMatrix(Sparsity.tril(3),range(6))
 \end{pytex}
 
 \paragraph{diagonal}
 \begin{pytex}
-sp_diag(3).spy()
+Sparsity.diag(3).spy()
 \end{pytex}
 
 \paragraph{triangular}
 
 \begin{pytex}
-sp_tril(3).spy()
+Sparsity.tril(3).spy()
 \end{pytex}
 
 \paragraph{banded}
 \begin{pytex}
-sp_band(3,1).spy()
+Sparsity.band(3,1).spy()
 print ""
-sp_band(3,-1).spy()
+Sparsity.band(3,-1).spy()
 \end{pytex}
 
-\paragraph{row and columsn slices}
+\paragraph{row and column slices}
 \begin{pytex}
-sp_rowcol([0,3],[1,2],4,4).spy()
+Sparsity.rowcol([0,3],[1,2],4,4).spy()
 \end{pytex}
 
 \paragraph{(row,col) pairs}
 \begin{pytex}
-sp_triplet(2,4,[0,1,0,0],[0,1,2,3]).spy()
+Sparsity.triplet(2,4,[0,1,0,0],[0,1,2,3]).spy()
 \end{pytex}
 
 \subsection{Sparsity operators}
 
-The \texttt{+} operator is overloaded for sparsity patterns to perform an \emph{or} operation:
-
+The \texttt{+} operator is overloaded for sparsity patterns to perform an \emph{or} (pattern union) operation:
 \begin{pytex}
-(sp_diag(3)+sp_band(3,1)).spy()
+(Sparsity.diag(3) + Sparsity.band(3,1)).spy()
 \end{pytex}
 
-The \texttt{*} operator is overloaded for sparsity patterns to perform an \emph{and} operation:
-
+The \texttt{*} operator is overloaded for sparsity patterns to perform an \emph{and} (pattern intersection) operation:
 \begin{pytex}
-(sp_tril(4)*sp_rowcol([2,3],range(4),4,4)).spy()
+(Sparsity.tril(4)*Sparsity.rowcol([2,3],range(4),4,4)).spy()
 \end{pytex}
 
-\chapter{Automatic differentiation\label{chapter:ad}}
-The most central functionality of CasADi is \emph{algorithmic (or automatic) differentiation} (AD).
+\chapter{Algorithmic differentiation\label{chapter:ad}}
+The most central functionality of \CasADi is \emph{algorithmic (or automatic) differentiation} (AD).
 
 Assume a function $\mathbf{R}^N \rightarrow \mathbf{R}^M$:
 \begin{equation}
@@ -668,7 +668,7 @@ Assume a function $\mathbf{R}^N \rightarrow \mathbf{R}^M$:
 \end{equation}
 We will refer to the mulitplying vector as the \emph{seed} vector and the result as the \emph{sensitivity} vector.
 
-Similarily, \emph{adjoint mode} directional derivatives can be used to calculate Jacobian-transposed-times-vector products:
+Similarily, \emph{reverse mode} (or \emph{adjoint mode}) directional derivatives can be used to calculate Jacobian-transposed-times-vector products:
 \begin{equation}
  x_{\text{asens}} = \left(\frac{\partial f}{\partial x}\right)^{\text{T}} \, y_{\text{aseed}}
 \end{equation}
@@ -685,43 +685,6 @@ CasADi is also able to generate complete, \emph{sparse} Jacobians efficiently. I
 
 Hessians are calculated by first calcuating the gradient and then performing the same steps as above to calculate the Jacobian of the gradient in the same way as above, while exploiting symmetry.
 
-\section{Calculating directional derivatives numerically} \label{sec:ad_numeric}
-Forward and adjoint derivatives can be calculated when a function is numerically evaluated as described in Section \ref{sec:fx}. To achieve this, we extend the usage skeleton as follows:
-
-\begin{verbatim}
-# Call the constructor
-f = ClassName(arguments)
-
-# Set options
-f.setOption("option_name",option_value)
-
-# Initialize the function
-f.init()
-
-# Set inputs, forward and adjoint derivative seeds
-f.setInput(value,input_index)
-f.setFwdSeed(value,input_index)
-f.setAdjSeed(value,output_index)
-
-# Evaluate
-f.evaluate(num_fwd_sensitivities, num_adj_sensitivities)
-
-# Get outputs, forward and adjoint derivative sensitivities
-f.getOutput(output_index)
-f.getFwdSens(output_index)
-f.getAdjSens(input_index)
-\end{verbatim}
-
-Forward and adjoint seeds are set hence together with the function inputs and forward and adjoint sensitivities are collected together with the the function outputs. Multiple forward and/or adjoint derivative directions can be handled simultaneously, that is you can simultaneously multiply the Jacobian from the left or right with multiple vectors.
-
-The number of directional derivatives that be calculated simultaneously is controlled by setting the options \verb|number_of_fwd_dir| and \verb|number_of_adj_dir| (default is 1). If the function is passed as input to another CasADi function (e.g. an ODE integrator or an NLP solver), the number of directional derivatives is allowed to the value set by the options \verb|max_number_of_fwd_dir| and \verb|max_number_of_adj_dir| respectively (default is 64).
-
-As mentioned before, there are ways to access the internal matrices directly:
-\begin{verbatim}
-print f.output(output_index)
-print f.fwdSens(output_index)
-print f.adjSens(input_index)
-\end{verbatim}
 
 \section{Calculating complete Jacobians and Hessians numerically}
 You can generate a new function for calculating the Jacobian by calling the \texttt{FX::jacobian} member function:
@@ -755,39 +718,67 @@ We refer to the API documentation for details.
 
 \chapter{ODE/DAE integration and sensitivity analysis} \label{chapter:integrators}
 \section{ODE/DAE formulation}
-The integrators interfaced with CasADi assumes a DAE residual function of the fully implicit form:
-\begin{equation}
- f(t,x,p,\dot{x}) = 0
-\end{equation}
+The integrators interfaced with \CasADi assumes a DAE residual function of semi-implicit form with quadratures:
+\begin{subequations}
+\begin{align}
+ \dot{x} &= f_{\text{ode}}(t,x,z,p), \qquad x(0) = x_0 \\
+      0  &= f_{\text{alg}}(t,x,z,p) \\
+ \dot{q} &= f_{\text{quad}}(t,x,z,p), \qquad q(0) = 0
+\end{align}
+\end{subequations}
 
-Solvers for \emph{ordinary} differential equations will make the additional assumption that the structure of the function is:
-\begin{equation}
- f_{\text{ode}}(t,x,p) - \dot{x} = 0
-\end{equation}
-the explicit equation for $\dot{x}$ can thus be retrieved by simply evaluating the DAE function with $\dot{x} = 0$.
+For solvers of \emph{ordinary} differential equations, the second equation and the algbraic variables $z$ must be absent.
 
-An example dae construction is:
+%% \newcommand{\backward}[1]{#1^*}
+%% \begin{equation}
+%%   \begin{array}{l}
+%%     f:
+%%     \mathbb{R}^{n_x} \times \mathbb{R}^{n_u}
+%%     \times \mathbb{R}^{n_r} \times \mathbb{R}^{n_v}
+%%     \rightarrow  
+%%     \mathbb{R}^{n_x} \times \mathbb{R}^{n_q}
+%%     \times \mathbb{R}^{n_r} \times \mathbb{R}^{n_p}, \\
+%%     \quad (x_0, u, r_1, v) \mapsto (x_1, q_1, r_0, p_0) \\
+%%     \noalign{\smallskip}
+%%     \left\{
+%%     \begin{array}{rcl}
+%%      \dot{x}(t) &=& \phi(x(t),z(t),u), \\
+%%               0 &=& \theta(x(t),z(t),u), \\
+%%      \dot{q}(t) &=& \psi(x(t),z(t),u), \\
+%%     -\dot{r}(t) &=& \backward{\phi}(x(t),z(t),u,r(t),s(t),v), \\
+%%               0 &=& \backward{\theta}(x(t),z(t),u,r(t),s(t),v), \\
+%%     -\dot{p}(t) &=& \backward{\psi}(x(t),z(t),u,r(t),s(t),v),
+%%     \end{array}
+%%     \right. 
+%%      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~t \in [0,1], \\
+%%      \noalign{\smallskip}
+%%      x(0) = x_0, \quad r(1) = r_1, \quad q(0) = 0, \quad p(1) = 0, \\
+%%      \noalign{\smallskip}
+%%      x_1 = x(1), \quad q_1 = q(1), \quad r_0 = r(0), \quad p_0 = p(0),
+%%   \end{array}
+%% \end{equation}
+
+DAEs of form can be formed using the \verb|daeIn| and \verb|daeOut| helper functions:
 
 \begin{pytex}
-states = SX.sym("x")
+x = SX.sym("x")
 z = SX.sym("z")
-rhs = -z*states
-C = z*z-2
-
-dae = SXFunction(daeIn(x=states,z=z),daeOut(ode=rhs,alg=C))
+f = -z*x
+g = z*z-2
+dae = SXFunction(daeIn(x=x,z=z),daeOut(ode=f,alg=g))
 print dae
 \end{pytex}
 
 This particular problem is actually troublesome. During integration, the rootfinding problem $C(z) = 0$ will be solved, and the initial guess is $z=0$. Since $\frac{dC}{dz}(z=0)=0$, the rootfinding will fail. You cannot force a different inital guess directly, but you can transform the $z$ variable:
 $z \rightarrow z + 1$ -- $C=z^2+2z-1$, which will work fine.
 
-An integrator in CasADi is a function that take the state at the initial time, guesses for the algebraic states and state derivatives (only important for DAEs) and evaluates the state vector at the final time. The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
+An integrator in \CasADi is a function that take the state at the initial time, guesses for the algebraic states and state derivatives (only important for DAEs) and evaluates the state vector at the final time. The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
 \begin{verbatim}
  integrator.setOption("tf",integration_end_time)
 \end{verbatim}
 
 \section{Sundials integrators}
-The Sundials suite contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These two integrators supports forward and adjoint sensitivities and when used via CasADi's Sundials interface, CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivitiy equations. This means that the only information that the user needs to provide is the DAE residual function:
+The Sundials suite contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These two integrators supports forward and adjoint sensitivities and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivitiy equations. This means that the only information that the user needs to provide is the DAE residual function:
 \begin{verbatim}
  integrator = CVodesIntegrator(f)   or  integrator = IdasIntegrator(f)
 \end{verbatim}
@@ -803,7 +794,7 @@ or by consulting the online C++ API docs on the website.
 From evaluation point of view, an integrator behaves just like the \texttt{SXFunction} introduced in the previous session. You set inputs, forward/adjoint seeds, evaluate and obtain the outputs and forward/adjoint sensitivities.
 
 \section{The \texttt{Simulator} class}
-As already mentioned, integrators in CasADi are functions that calculates the state at the final time. Often, however, a user is interested in obtaining the solution at multiple time points. This can often be done more efficiently than by repeatedly calling \texttt{integrator.evaluate()}. The easiest way to use this functionality is to use the \texttt{Simulator} class.
+As already mentioned, integrators in \CasADi are functions that calculates the state at the final time. Often, however, a user is interested in obtaining the solution at multiple time points. This can often be done more efficiently than by repeatedly calling \texttt{integrator.evaluate()}. The easiest way to use this functionality is to use the \texttt{Simulator} class.
 
 A \texttt{Simulator} can be created using the syntax:
 \begin{verbatim}
@@ -823,9 +814,8 @@ A \texttt{Simulator} can be created using the syntax:
 
 A \texttt{Simulator} can be used just like an integrator, and its input scheme is the same. Its output is now matrix valued, with the the columns corresponding to different time points. The class can also be used to evaluate a particular function of the state at a set of time points. See the API documentation for more information.
 
-% \section{Integration of implicit ODEs}
 \chapter{Nonlinear Programming}
-The NLP solvers interfaced with CasADi solves parametric NLPs of the following form:
+The NLP solvers interfaced with \CasADi solves parametric NLPs of the following form:
 \begin{equation}
 \begin{array}{cc}
 \begin{array}{c}
@@ -833,7 +823,7 @@ The NLP solvers interfaced with CasADi solves parametric NLPs of the following f
 x \in \mathbb{R}^{nx}, p \in \mathbb{R}^{np}
 \end{array}
 &
-f(x)
+f(x,p)
 \\
 \begin{array}{c}
 \text{subject to:}
@@ -853,23 +843,23 @@ With a function \texttt{nlp}, which given $x$ and $p$, gives $f$ and $g$, an NLP
 
 The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver.
 
-NLP solvers, like ODE/DAE integrators are functions in CasADi (though taking derivatives of them is currently not supported). You will find the input and output schemes in the CasADi API documentation on the website or by using the question mark in Python.
+NLP solvers, like ODE/DAE integrators are functions in \CasADi (though taking derivatives of them is currently not supported). You will find the input and output schemes in the \CasADi API documentation on the website or by using the question mark in Python.
 
 \chapter{Optimal control}
 
-\section{Optimal control with CasADi}
+\section{Optimal control with \CasADi}
 CasADi can be used to solve optimal control problem using a variety of methods. As a user, there are two ways to attack the problem:
 \begin{itemize}
   \item Use an existing OCP solver
   \item Write your own OCP solver
 \end{itemize}
 
-Using an existing OCP solver is attractive for the user who has a relatively simple problem that he wants to test using different methods. In the next exercise, you will get some experience on using such solvers within the JModelica.org framework. Some of these solvers use CasADi.
+Using an existing OCP solver is attractive for the user who has a relatively simple problem that he wants to test using different methods. In the next exercise, you will get some experience on using such solvers within the JModelica.org framework. Some of these solvers use \CasADi.
 
-The option to using an existing solver is to write your own OCP solver. While definitely more involved than using JModelica.org's solver, it is a viable alternative especially when adressing a challenging problem, or a problem using a nonstandard problem formulation. Doing this,   CasADi will take care of things like Jacobian and Hessian generation, sparsity exploitation and all that is left to the user is to perform the reformulation from the infinite dimensional optimal control problem to a finite dimensional NLP.
+The option to using an existing solver is to write your own OCP solver. While definitely more involved than using JModelica.org's solver, it is a viable alternative especially when adressing a challenging problem, or a problem using a nonstandard problem formulation. Doing this,   \CasADi will take care of things like Jacobian and Hessian generation, sparsity exploitation and all that is left to the user is to perform the reformulation from the infinite dimensional optimal control problem to a finite dimensional NLP.
 
 \section{Optimization of a Van der Pol oscillator}
-In CasADi's examples collection, you find codes which all try to solve a simple optimal control problem, a problem borrowed from JModelica.org's examples collection, namely that of driving a \emph{Van der Pol} oscillator to the origin, while trying to minimize a quadratic cost:
+In \CasADi's examples collection, you find codes which all try to solve a simple optimal control problem, a problem borrowed from JModelica.org's examples collection, namely that of driving a \emph{Van der Pol} oscillator to the origin, while trying to minimize a quadratic cost:
 \begin{equation}
 \begin{array}{lc}
 \begin{array}{l}
@@ -896,7 +886,7 @@ x_1(0)=1, \quad x_1(10)=0
 \end{equation}
 
 \section{Direct single-shooting}
-The simplest OCP method to implement in CasADi is single-shooting. In fact, it can be implemented in just 30 lines of code, which the script {\texttt{vdp\_single\_shooting.py}} in CasADi's examples collection demonstrates. Please go through the code carefully and make sure that you understand the principle. The most important part of the code are the lines:
+The simplest OCP method to implement in \CasADi is single-shooting. In fact, it can be implemented in just 30 lines of code, which the script {\texttt{vdp\_single\_shooting.py}} in \CasADi's examples collection demonstrates. Please go through the code carefully and make sure that you understand the principle. The most important part of the code are the lines:
 \begin{verbatim}
 # Build a graph of integrator calls
 for k in range(nk):
@@ -906,7 +896,7 @@ for k in range(nk):
 Here, we recursively construct a symbolic expression for the state at the final time. This expression is then used in the formulation of the NLP objective and constraint functions.
 
 \section{Direct multiple-shooting}
-The second optimal control method we shall consider is multiple shooting. In multiple shooting, the states at each ''shooting node'' are degrees of freedom in the NLP. The script \\ \texttt{vdp\_multiple\_shooting.py} demonstrates how the VDP problem can be solved using direct multiple shooting in CasADi.
+The second optimal control method we shall consider is multiple shooting. In multiple shooting, the states at each ''shooting node'' are degrees of freedom in the NLP. The script \\ \texttt{vdp\_multiple\_shooting.py} demonstrates how the VDP problem can be solved using direct multiple shooting in \CasADi.
 
 Note how the symbolic variable in the NLP functions now contains both the control and states for each of the \texttt{nk} intervals:
 \begin{verbatim}
@@ -998,12 +988,12 @@ x_{k+1,0} - \sum_{r=0}^{d}{D_r \, x_{k,r}} = 0, \qquad k=0,\ldots,n_k-1,
 These two sets of equations take the place of the continuity equation (represented by the integrator call) in direct multiple shooting. The above equations have been implemented in the script \texttt{vdp\_collocation.py}.
 
 \chapter{Model import from Modelica}\label{sec:modelica}
-CasADi contains a facility to import dynamic system models formulated in the Modelica modelling language as well as in the Optimica extension of Modelica to optimal control. The import facility currently works with the open-source \htmladdnormallink{JModelica.org}{http://www.jmodelica.org/} compiler.
+\CasADi contains a facility to import dynamic system models formulated in the Modelica modelling language as well as in the Optimica extension of Modelica to optimal control. The import facility currently works with the open-source \htmladdnormallink{JModelica.org}{http://www.jmodelica.org/} compiler.
 
-For instructions on how to install and use JModelica.org, we refer to their \htmladdnormallink{website}{http://www.jmodelica.org/}. CasADi currently comes bundled with JModelica.org and the JModelica.org trunk is synchronized with CasADi's trunk, simplifying the installation procedure. Pre-built JModelica.org binaries that include CasADi are available for Windows users.
+For instructions on how to install and use JModelica.org, we refer to their \htmladdnormallink{website}{http://www.jmodelica.org/}. \CasADi currently comes bundled with JModelica.org and the JModelica.org trunk is synchronized with \CasADi's trunk, simplifying the installation procedure. Pre-built JModelica.org binaries that include \CasADi are available for Windows users.
 
 \section{Compiling the Modelica code} \label{sec:modelica_compilation}
-To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in CasADi's example collection. 
+To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in \CasADi's example collection. 
 
 Assuming that the Modelica/Optimica model \texttt{ModelicaClass.ModelicaModel} is defined in the files \texttt{file1.mo} and \texttt{file2.mop}, the compile command is:
 \begin{verbatim}
@@ -1021,7 +1011,7 @@ This will generate a \texttt{jmu}-file, which is essentially a zipfile containin
 \end{verbatim}
 
 \section{The SymbolicOCP class} \label{sec:modelica_import}
-The symbolic optimal control problem representation (or just model description) contained in \texttt{modelDescription.xml} can be imported into CasADi in the form of the SymbolicOCP class:
+The symbolic optimal control problem representation (or just model description) contained in \texttt{modelDescription.xml} can be imported into \CasADi in the form of the SymbolicOCP class:
 \begin{verbatim}
 ocp = SymbolicOCP()
 \end{verbatim}
@@ -1033,13 +1023,13 @@ ocp.parseFMI('modelDescription.xml',{'scale_variables':True})
 
 For a more detailed description of this class and its functionalities, we refer to the API documentation.
 
-\chapter{Syntax differences between CasADi in Python, C++ and Octave}\label{sec:syntax_differences}
+\chapter{Syntax differences between \CasADi in Python, C++ and Octave}\label{sec:syntax_differences}
 \scriptsize
 \begin{center}
   \begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.5cm} | }
     \hline
       & Python & C++ & Octave \\ \hline
-    Starting CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace CasADi;| & \verb|casadi| \\ \hline
+    Starting \CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace CasADi;| & \verb|casadi| \\ \hline
     Printing the \emph{representation} (string representation intended to be \emph{unambiguous}) & \verb|A <ENTER>| (interactive), \verb|print repr(A)| (in scripts) & \verb|std::cout << A;|& \verb|A <ENTER>| or \verb|disp A|\\ \hline
     Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
     Calling a class function & \verb|SX.zeros(3,4)| & \verb|SX::zeros(3,4)| & \verb|SX.zeros(3,4)|\\ \hline
