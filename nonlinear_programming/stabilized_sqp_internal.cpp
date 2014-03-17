@@ -332,7 +332,7 @@ namespace CasADi{
       char info = ' ';
       
       // 1-norm of lagrange gradient
-      double gLag_norm1 = norm_1(gLag_);
+      //double gLag_norm1 = norm_1(gLag_);
       
       // 1-norm of step
       double dx_norm1 = norm_1(dx_);
@@ -361,7 +361,7 @@ namespace CasADi{
       }
       normJ_ = norm1matrix(Jk_);
       // Default stepsize
-      double t = 0;
+      //double t = 0;
 
   
 

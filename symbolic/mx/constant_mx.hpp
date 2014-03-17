@@ -79,7 +79,7 @@ namespace CasADi{
     virtual Matrix<double> getMatrixValue() const = 0;
 
     /// Matrix multiplcation
-    virtual MX getMultiplication(const MX& y) const;
+    //    virtual MX getMultiplication(const MX& y) const;
 
     /// Inner product
     virtual MX getInnerProd(const MX& y) const;
