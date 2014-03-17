@@ -66,7 +66,7 @@ _object = _copyableObject
 #ifndef SWIGXML
 %feature("compactdefaultargs","1");
 %feature("compactdefaultargs","0") CasADi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
-#endif SWIGXML
+#endif //SWIGXML
 
 // STL
 #ifdef SWIGXML
