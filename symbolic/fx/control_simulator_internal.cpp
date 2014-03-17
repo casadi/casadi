@@ -344,7 +344,7 @@ namespace CasADi{
         if (k+1==U.size1()) {
           P_eval[4] = P_eval[3];
         } else {
-          P_eval[4] = U(k+1,range(nu_)).T();
+          P_eval[4] = U(k+1,Slice(0,nu_)).T();
         }
       }
       P_eval[5] = Xk;
@@ -354,15 +354,13 @@ namespace CasADi{
       simulator_out = simulator_.call(simulator_in);
     
       // Remember the end state and dstate for next iteration in this loop
-      Xk = simulator_out[0](simulator_out[0].size1()-1,ALL).T();
+      Xk = simulator_out[0](ALL,simulator_out[0].size2()-1);
     
       // Copy all the outputs (but not those 2 extra we introduced)
       for (int i=0;i<simulator_out.size()-2;++i) {
-        if(simulator_out[i+2].isNull()) continue; // NOTE: Joel: quick-fix
-      
-        simulator_outputs[i].push_back(simulator_out[i+2](range(nf_),ALL));
+        simulator_outputs[i].push_back(simulator_out[i+2](ALL,Slice(0,nf_)));
         if (k+1==ns_-1) {  // Output of the last minor step of the last major step
-          simulator_outputs[i].push_back(simulator_out[i+2](std::vector<int>(1,nf_),ALL));
+          simulator_outputs[i].push_back(simulator_out[i+2](ALL,nf_));
         }
       }
     
@@ -372,7 +370,7 @@ namespace CasADi{
     // Concatenate the results of all simulator calls
     vector<MX> all_output_out(simulator_outputs.size());
     for (int k=0;k<all_output_out.size();++k) {
-      all_output_out[k] = vertcat(simulator_outputs[k]);
+      all_output_out[k] = horzcat(simulator_outputs[k]).T(); // TODO: Remove T()?
     }
   
     // Finally, construct all_output_
