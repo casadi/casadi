@@ -54,6 +54,7 @@ namespace CasADi{
     optionsmap_["_minor_iteration_limit"] = std::pair<opt_type,std::string>(OT_INTEGER,"Minor iteration limit");
     optionsmap_["_feasibility_tolerance"] = std::pair<opt_type,std::string>(OT_REAL,   "Feasibility tolerance");
     optionsmap_["_optimality_tolerance"]  = std::pair<opt_type,std::string>(OT_REAL,   "Optimality tolerance");
+    optionsmap_["_scale_option"] = std::pair<opt_type,std::string>(OT_INTEGER,   "Scale option");
     
     // Add the Snopt Options
     for (OptionsMap::const_iterator it=optionsmap_.begin();it!=optionsmap_.end();it++) {
