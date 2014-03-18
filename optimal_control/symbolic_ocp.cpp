@@ -1568,7 +1568,7 @@ namespace CasADi{
     return const_cast<SymbolicOCP*>(this)->variableByType(type);
   }
 
-  SX SymbolicOCP::var(const std::string& name) const{
+  SX SymbolicOCP::operator()(const std::string& name) const{
     // For all variable types
     for(unsigned int i=0; i<NUM_VAR; ++i){
       const std::vector<Variable>& v = variableByType(SymbolicOCPVariables(i));

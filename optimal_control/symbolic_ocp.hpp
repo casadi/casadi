@@ -283,7 +283,7 @@ namespace CasADi{
     void scaleEquations();
 
     /// Find an expression by name
-    SX var(const std::string& name) const;
+    SX operator()(const std::string& name) const;
 
 #ifndef SWIG
     ///  Print representation
