@@ -58,7 +58,6 @@ namespace CasADi{
     bool scale_equations = false;
     bool eliminate_dependent = true;
     bool sort_equations = true;
-    bool make_explicit = false;
   
     // Read user options
     for(Dictionary::const_iterator it=options.begin(); it!=options.end(); ++it){
@@ -72,8 +71,6 @@ namespace CasADi{
         eliminate_dependent = it->second;
       } else if(it->first.compare("sort_equations")==0){
         sort_equations = it->second;
-      } else if(it->first.compare("make_explicit")==0){
-        make_explicit = it->second;
       } else {
         stringstream ss;
         ss << "Unknown option \"" << it->first << "\"" << endl;
@@ -459,22 +456,6 @@ namespace CasADi{
     // Scale the equations
     if(scale_equations)
       scaleEquations();
-    
-    // Transform to semi-explicit form
-    if(make_explicit){
-      casadi_assert(eliminate_dependent);
-    
-      // Save the old number of dependent states
-      int ny = y.size();
-    
-      // Make the ODE explicit
-      makeExplicit();
-    
-      // Eliminate dependents again if necessary
-      if(y.size()!=ny){
-        eliminateDependent();
-      }
-    }
   }
 
   Variable& SymbolicOCP::readVariable(const XMLNode& node){
