@@ -83,7 +83,7 @@ namespace CasADi{
       if(allocate){
         // Create a timed variable
         stringstream ss;
-        ss << var_ << ".atTime(" << t << ")";
+        ss << var_.getName() << ".atTime(" << t << ")";
         SX tvar = SX::sym(ss.str());
       
         // Save to map

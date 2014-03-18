@@ -598,7 +598,7 @@ namespace CasADi{
 
     // Print the variables
     stream << "{" << endl;
-    stream << "  t = " << t << endl;
+    stream << "  t = " << t.getDescription() << endl;
     stream << "  x = " << x << endl;
     stream << "  z =  " << z << endl;
     stream << "  q =  " << q << endl;
