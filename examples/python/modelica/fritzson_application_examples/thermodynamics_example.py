@@ -83,8 +83,8 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-m = ocp.variable("m").var()
-P = ocp.variable("P").var()
+m = ocp.var("m")
+P = ocp.var("P")
 output_fcn_out = ocp.substituteDependents([m,P])
 output_fcn_in = daeIn(
   t=ocp.t,
@@ -147,7 +147,7 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp.variable("T").var()
+T = ocp.var("T")
 output_fcn_out = ocp.substituteDependents([T])
 output_fcn_in = daeIn(
   t=ocp.t,
@@ -203,9 +203,9 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp.variable("T").var()
-U = ocp.variable("U").var()
-V = ocp.variable("V").var()
+T = ocp.var("T")
+U = ocp.var("U")
+V = ocp.var("V")
 output_fcn_out = ocp.substituteDependents([T,U,V])
 output_fcn_in = daeIn(
   t=ocp.t,

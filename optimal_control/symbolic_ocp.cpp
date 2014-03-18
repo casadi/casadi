@@ -673,14 +673,14 @@ namespace CasADi{
   }
 
   void SymbolicOCP::eliminateInterdependencies(){
-    substituteInPlace(var(y),dep,false);
+    substituteInPlace(CasADi::var(y),dep,false);
   
     // Make sure that the dependent variables have been properly eliminated from the dependent expressions
-    casadi_assert(!dependsOn(dep,var(y)));
+    casadi_assert(!dependsOn(dep,CasADi::var(y)));
   }
 
   vector<SX> SymbolicOCP::substituteDependents(const vector<SX>& x) const{
-    return substitute(x,vector<SX>(1,var(y)),vector<SX>(1,dep));
+    return substitute(x,vector<SX>(1,CasADi::var(y)),vector<SX>(1,dep));
   }
 
   void SymbolicOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
@@ -757,12 +757,12 @@ namespace CasADi{
     double time1 = clock();
   
     // Variables
-    SX _x = var(x);
+    SX _x = CasADi::var(x);
     SX _xdot = der(x);
-    SX _z = var(z);
-    SX _pi = var(pi);
-    SX _pf = var(pf);
-    SX _u = var(u);
+    SX _z = CasADi::var(z);
+    SX _pi = CasADi::var(pi);
+    SX _pf = CasADi::var(pf);
+    SX _u = CasADi::var(u);
   
     // Collect all the variables
     SX v;
@@ -819,12 +819,12 @@ namespace CasADi{
     enum Variables{T,X,XDOT,Z,PI,PF,U,NUM_VAR};
     vector<SX > v(NUM_VAR); // all variables
     v[T] = t;
-    v[X] = var(x);
+    v[X] = CasADi::var(x);
     v[XDOT] = der(x);
-    v[Z] = var(z);
-    v[PI] = var(pi);
-    v[PF] = var(pf);
-    v[U] = var(u);
+    v[Z] = CasADi::var(z);
+    v[PI] = CasADi::var(pi);
+    v[PF] = CasADi::var(pf);
+    v[U] = CasADi::var(u);
 
     // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
     SX xz;
@@ -910,7 +910,7 @@ namespace CasADi{
     if(z.empty()) return;
   
     // Find out which algebraic equation depends on which algebraic state
-    SXFunction f(var(z),alg);
+    SXFunction f(CasADi::var(z),alg);
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -934,7 +934,7 @@ namespace CasADi{
     if(pd.empty()) return;
   
     // Find out which dependent parameter depends on which binding equation
-    SX v = var(pd);
+    SX v = CasADi::var(pd);
     SXFunction f(v,v-binding(pd));
     f.init();
     Sparsity sp = f.jacSparsity();
@@ -1044,7 +1044,7 @@ namespace CasADi{
     if(z.empty()) return;
   
     // Write the algebraic equations as a function of the algebraic states
-    SXFunction f(var(z),alg);
+    SXFunction f(CasADi::var(z),alg);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
@@ -1066,7 +1066,7 @@ namespace CasADi{
     z_new.clear();
 
     // Rewrite the sorted algebraic equations as a function of the algebraic states
-    f = SXFunction(var(z),alg);
+    f = SXFunction(CasADi::var(z),alg);
     f.init();
 
     // Get the Jacobian
@@ -1100,7 +1100,7 @@ namespace CasADi{
       SX Jb = J(Slice(rowblock[b],rowblock[b+1]),Slice(colblock[b],colblock[b+1]));
 
       // If Jb depends on zb, then we cannot (currently) solve for it explicitly
-      if(dependsOn(Jb,var(zb))){
+      if(dependsOn(Jb,CasADi::var(zb))){
       
         // Add the equations to the new list of algebraic equations
         f_imp.append(fb);
@@ -1111,7 +1111,7 @@ namespace CasADi{
       } else { // The variables that we wish to determine enter linearly
       
         // Divide fb into a part which depends on vb and a part which doesn't according to "fb == mul(Jb,vb) + fb_res"
-        SX fb_res = substitute(fb,var(zb),SX::zeros(zb.size())).data();
+        SX fb_res = substitute(fb,CasADi::var(zb),SX::zeros(zb.size())).data();
       
         // Solve for vb
         SX fb_exp;
@@ -1130,7 +1130,7 @@ namespace CasADi{
     }
   
     // Eliminate inter-dependencies in fb_exp
-    substituteInPlace(var(z_exp),f_exp,false);
+    substituteInPlace(CasADi::var(z_exp),f_exp,false);
 
     // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
     y.insert(y.begin(),z_exp.begin(),z_exp.end());
@@ -1568,6 +1568,22 @@ namespace CasADi{
     return const_cast<SymbolicOCP*>(this)->variableByType(type);
   }
 
+  SX SymbolicOCP::var(const std::string& name) const{
+    // For all variable types
+    for(unsigned int i=0; i<NUM_VAR; ++i){
+      const std::vector<Variable>& v = variableByType(SymbolicOCPVariables(i));
+
+      // Linear search
+      for(std::vector<Variable>::const_iterator it=v.begin(); it!=v.end(); ++it){
+        // Check if name matches
+        if(it->getName()==name){
+          return it->var();
+        }
+      }
+    }
+    // Not found
+    casadi_error("SymbolicOCP::var: Error, variable \"" + name + "\" not found.");
+  }
 
 } // namespace CasADi
 
