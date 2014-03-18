@@ -60,6 +60,8 @@ _object = _copyableObject
 
 %feature("autodoc", "1");
 
+%naturalvar;
+
 // Make sure that a copy constructor is created
 %copyctor;
 
@@ -269,7 +271,7 @@ namespace std {
 %include "std_map.i"
 #endif
 
-#ifdef SWIG_MAIN_MODULE
+//#ifdef SWIG_MAIN_MODULE
 %template(StringVector) std::vector<std::string>;
 
 %template(BVector)             std::vector<bool> ;
@@ -288,9 +290,9 @@ namespace std {
 
 %template(Pair_Int_Int) std::pair<int,int>;
 %template(VectorPair_Int_Int) std::vector< std::pair<int,int> >;
-#endif //SWIG_MAIN_MODULE
-#ifndef SWIG_MAIN_MODULE
-%template() std::vector<std::string>;
+//#endif //SWIG_MAIN_MODULE
+//#ifndef SWIG_MAIN_MODULE
+/**%template() std::vector<std::string>;
 
 %template() std::vector<std::vector<bool> > ;
 %template() std::vector< std::vector<std::vector<bool> > > ;
@@ -306,8 +308,8 @@ namespace std {
 %template() std::vector< std::vector<std::vector<double> > > ;
 
 %template() std::pair<int,int>;
-%template() std::vector< std::pair<int,int> >;
-#endif //SWIG_MAIN_MODULE
+%template() std::vector< std::pair<int,int> >;*/
+//#endif //SWIG_MAIN_MODULE
 
 
 // The following is a work-around since it appears not possible to use the standard print functions from stl_vector tools,
@@ -610,6 +612,10 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 %fragment(SWIG_Traits_frag(CasADi::IndexList));
 
 %template(Dictionary) std::map<std::string,CasADi::GenericType>;
+
+%traits_swigtype(CasADi::FX);
+%fragment(SWIG_Traits_frag(CasADi::FX));
+
 #endif
 
 
@@ -636,9 +642,23 @@ void dummy(CasADi::SXElement foo,
   std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
   std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
   std::vector < std::vector < CasADi::MX > > foo17,
+  std::vector < std::vector < CasADi::MX* > > foo17b,
   CasADi::Dictionary foo18,
+  std::string& foo19,
+  CasADi::Matrix<int> foo20,
+  CasADi::CustomFunction foo24,
+  CasADi::FX foo25,
 	int &bar,
 	double &baz) {}
+
+
+#ifdef SWIGPYTHON
+void dummy2(
+  CasADi::DerivativeGenerator foo1,
+  CasADi::Callback foo2,
+  CasADi::CustomEvaluate foo3
+  ) {}
+#endif// SWIGPYTHON
 };
 %}
 
@@ -674,7 +694,22 @@ void dummy(CasADi::SXElement foo,
   std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
   std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
   std::vector < std::vector < CasADi::MX > > foo17,
+  std::vector < std::vector < CasADi::MX* > > foo17b,
   CasADi::Dictionary foo18,
+  std::string& foo19,
+  CasADi::Matrix<int> foo20,
+  CasADi::CustomFunction foo24,
+  CasADi::FX foo25,
 	int &bar,
 	double &baz);
+
+
+#ifdef SWIGPYTHON
+void dummy2(
+  CasADi::DerivativeGenerator foo1,
+  CasADi::Callback foo2,
+  CasADi::CustomEvaluate foo3
+  ) {}
+#endif
+
 };

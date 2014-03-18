@@ -339,10 +339,7 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
     USE_SOURCE_PERMISSIONS
     PATTERN .pyc EXCLUDE
     PATTERN .svn EXCLUDE
-  )
-  install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py 
-    DESTINATION ${PYTHON_PREFIX}/casadi
-    COMPONENT install_python
+    PATTERN .py EXCLUDE
   )
   
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
@@ -356,6 +353,23 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
     DESTINATION ${PYTHON_PREFIX}/casadi
     COMPONENT install_python
   )
+  if(WITH_SWIG_SPLIT)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py
+      DESTINATION ${PYTHON_PREFIX}/casadi
+      COMPONENT install_python
+    )
+    foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+      install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py 
+        DESTINATION ${PYTHON_PREFIX}/casadi
+        COMPONENT install_python
+      )
+    endforeach()
+  else()
+    install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py 
+      DESTINATION ${PYTHON_PREFIX}/casadi
+      COMPONENT install_python
+    )
+  endif()
   
   #creation of a custom installation command
   if(WITH_SWIG_SPLIT)
