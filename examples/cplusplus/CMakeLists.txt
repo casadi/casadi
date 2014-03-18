@@ -22,6 +22,15 @@ if(IPOPT_FOUND)
   )
 endif()
 
+# ipopt segfault
+if(IPOPT_FOUND)
+  add_executable(ipopt_bug ipopt_bug.cpp)
+  target_link_libraries(ipopt_bug
+    casadi_ipopt_interface casadi
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
+
 # basic snopt example
 if(SNOPT_FOUND)
   add_executable(snopt_nl snopt_nl.cpp)
