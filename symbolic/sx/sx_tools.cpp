@@ -385,6 +385,7 @@ namespace CasADi{
     // Construct a temporary algorithm
     SXFunction temp(arg,ex);
     temp.init();
+    temp.spInit(true);
     
     bvec_t* input_ =  get_bvec_t(temp.input().data());
     // Make a column with all variables active

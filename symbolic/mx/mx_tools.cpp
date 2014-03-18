@@ -873,6 +873,7 @@ namespace CasADi{
     // Construct a temporary algorithm
     MXFunction temp(arg,ex);
     temp.init();
+    temp.spInit(true);
     
     for (int i=0;i<temp.getNumInputs();++i) {
       bvec_t* input_ =  get_bvec_t(temp.input(i).data());

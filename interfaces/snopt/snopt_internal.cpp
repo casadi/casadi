@@ -101,6 +101,7 @@ namespace CasADi {
     g_type_.resize(ng_);
 
     if (detect_linear_) {
+      jacF_.spInit(true);
       // Detect dependencies w.r.t. gradF
       // Dependency seeds
       bvec_t* input_v_x =  get_bvec_t(jacF_->inputNoCheck(GRADF_X).data());
