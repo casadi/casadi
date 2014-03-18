@@ -883,10 +883,10 @@ namespace CasADi{
 
   void SymbolicOCP::sortODE(){
     // Quick return if no differential states
-    if(x.empty()) return;
+    if(this->x.empty()) return;
 
     // Find out which differential equation depends on which differential state
-    SXFunction f(der(x),ode);
+    SXFunction f(der(this->x),this->ode);
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -895,7 +895,7 @@ namespace CasADi{
     sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
     // Permute equations
-    ode = ode(rowperm);
+    this->ode = this->ode(rowperm);
   
     // Permute variables
     vector<Variable> x_new(this->x.size());
@@ -923,7 +923,7 @@ namespace CasADi{
   
     // Permute variables
     vector<Variable> z_new(this->z.size());
-    for(int i=0; i<z.size(); ++i){
+    for(int i=0; i<this->z.size(); ++i){
       z_new[i]= this->z[colperm[i]];
     }
     z_new.swap(this->z);
