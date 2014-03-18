@@ -55,7 +55,6 @@ namespace CasADi{
     // Default options
     bool verbose = false;
     bool scale_variables = false;
-    bool scale_equations = false;
     bool eliminate_dependent = true;
     bool sort_equations = true;
   
@@ -65,8 +64,6 @@ namespace CasADi{
         verbose = it->second;
       } else if(it->first.compare("scale_variables")==0){
         scale_variables = it->second;
-      } else if(it->first.compare("scale_equations")==0){
-        scale_equations = it->second;
       } else if(it->first.compare("eliminate_dependent")==0){
         eliminate_dependent = it->second;
       } else if(it->first.compare("sort_equations")==0){
@@ -452,10 +449,6 @@ namespace CasADi{
       sortODE();
       sortALG();
     }
-
-    // Scale the equations
-    if(scale_equations)
-      scaleEquations();
   }
 
   Variable& SymbolicOCP::readVariable(const XMLNode& node){
