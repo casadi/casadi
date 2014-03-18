@@ -2280,6 +2280,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f.output(3),A)
     self.checkarray(f.output(4),A)
       
+  @requires("CSparse")
   def test_bizarre_bug(self):
 
     A = [[-26.9091,00,00,1,00,00,00,00,00,00,00,00,00,00,00],

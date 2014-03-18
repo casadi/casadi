@@ -599,6 +599,57 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "optimal_control/direct_multiple_shooting.hpp"
 #include "optimal_control/symbolic_ocp.hpp"
 
+#include "symbolic/fx/io_interface.hpp"
+#include "symbolic/fx/fx.hpp"
+#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/fx/symbolic_qr.hpp"
+#include "symbolic/fx/implicit_function.hpp"
+#include "symbolic/fx/integrator.hpp"
+#include "symbolic/fx/simulator.hpp"
+#include "symbolic/fx/control_simulator.hpp"
+#include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/fx/qp_solver.hpp"
+#include "symbolic/fx/stabilized_qp_solver.hpp"
+#include "symbolic/fx/lp_solver.hpp"
+#include "symbolic/fx/ocp_solver.hpp"
+#include "symbolic/fx/sdp_solver.hpp"
+#include "symbolic/fx/socp_solver.hpp"
+#include "symbolic/fx/qcqp_solver.hpp"
+#include "symbolic/fx/sdqp_solver.hpp"
+#include "symbolic/fx/external_function.hpp"
+#include "symbolic/fx/parallelizer.hpp"
+#include "symbolic/fx/custom_function.hpp"
+#include "symbolic/fx/nullspace.hpp"
+
+#include "nonlinear_programming/symbolic_nlp.hpp"
+#include "nonlinear_programming/sqp_method.hpp"
+#include "nonlinear_programming/stabilized_sqp_method.hpp"
+#include "nonlinear_programming/scpgen.hpp"
+#include "nonlinear_programming/nlp_qp_solver.hpp"
+#include "nonlinear_programming/nlp_implicit_solver.hpp"
+#include "nonlinear_programming/newton_implicit_solver.hpp"
+
+#include "integration/fixed_step_integrator.hpp"
+#include "integration/implicit_fixed_step_integrator.hpp"
+#include "integration/rk_integrator.hpp"
+#include "integration/collocation_integrator.hpp"
+#include "integration/old_collocation_integrator.hpp"
+#include "integration/integration_tools.hpp"
+
+
+#include "optimal_control/variable.hpp"
+#include "optimal_control/symbolic_ocp.hpp"
+#include "optimal_control/variable_tools.hpp"
+#include "optimal_control/ocp_tools.hpp"
+#include "optimal_control/direct_single_shooting.hpp"
+#include "optimal_control/direct_multiple_shooting.hpp"
+#include "optimal_control/direct_collocation.hpp"
+
+#include "control/dple_solver.hpp"
+#include "control/simple_indef_dple_solver.hpp"
+
 %}
 
 #ifndef SWIGXML
