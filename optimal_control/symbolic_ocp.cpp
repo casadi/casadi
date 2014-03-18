@@ -216,7 +216,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 
       // Get the binding equation
       bool has_der = false;
-      SXElement bexpr = readExpr(beq[1][0],has_der,eliminate_dependent);
+      SX bexpr = readExpr(beq[1][0],has_der,eliminate_dependent);
       casadi_assert(!has_der);
       
       // Add binding equation
@@ -242,7 +242,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 
       // Add the differential equation
       bool has_der = false;
-      SXElement de_new = readExpr(dnode[0],has_der,eliminate_dependent);
+      SX de_new = readExpr(dnode[0],has_der,eliminate_dependent);
       if(has_der){
         ode.append(de_new);
       } else {
@@ -332,7 +332,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
             
             // Read expression
             bool has_der = false;
-            SXElement v = readExpr(var,has_der,eliminate_dependent);
+            SX v = readExpr(var,has_der,eliminate_dependent);
             casadi_assert(!has_der);
             mterm.append(v);
           }
@@ -352,7 +352,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
             
             // Read expression
             bool has_der = false;
-            SXElement v = readExpr(var,has_der,eliminate_dependent);
+            SX v = readExpr(var,has_der,eliminate_dependent);
             lterm.append(v);
           }
         } catch(exception& ex){
@@ -370,20 +370,20 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
         for(int i=0; i<onode.size(); ++i){
           const XMLNode& constr_i = onode[i];
           if(constr_i.checkName("opt:ConstraintLeq")){
-            SXElement ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-            SXElement ub = readExpr(constr_i[1],has_der,eliminate_dependent);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX ub = readExpr(constr_i[1],has_der,eliminate_dependent);
             point.append(ex-ub);
             point_min.append(-numeric_limits<double>::infinity());
             point_max.append(0.);
           } else if(constr_i.checkName("opt:ConstraintGeq")){
-            SXElement ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-            SXElement lb = readExpr(constr_i[1],has_der,eliminate_dependent);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX lb = readExpr(constr_i[1],has_der,eliminate_dependent);
             point.append(ex-lb);
             point_min.append(0.);
             point_max.append(numeric_limits<double>::infinity());
           } else if(constr_i.checkName("opt:ConstraintEq")){
-            SXElement ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-            SXElement eq = readExpr(constr_i[1],has_der,eliminate_dependent);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX eq = readExpr(constr_i[1],has_der,eliminate_dependent);
             point.append(ex-eq);
             point_min.append(0.);
             point_max.append(0.);
@@ -399,20 +399,20 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
         for(int i=0; i<onode.size(); ++i){
           const XMLNode& constr_i = onode[i];
           if(constr_i.checkName("opt:ConstraintLeq")){
-            SXElement ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-            SXElement ub = readExpr(constr_i[1],has_der,eliminate_dependent);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX ub = readExpr(constr_i[1],has_der,eliminate_dependent);
             path.append(ex-ub);
             path_min.append(-numeric_limits<double>::infinity());
             path_max.append(0.);
           } else if(constr_i.checkName("opt:ConstraintGeq")){
-            SXElement ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-            SXElement lb = readExpr(constr_i[1],has_der,eliminate_dependent);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX lb = readExpr(constr_i[1],has_der,eliminate_dependent);
             path.append(ex-lb);
             path_min.append(0.);
             path_max.append(numeric_limits<double>::infinity());
           } else if(constr_i.checkName("opt:ConstraintEq")){
-            SXElement ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-            SXElement eq = readExpr(constr_i[1],has_der,eliminate_dependent);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX eq = readExpr(constr_i[1],has_der,eliminate_dependent);
             path.append(ex-eq);
             path_min.append(0.);
             path_max.append(0.);
@@ -485,7 +485,7 @@ Variable& SymbolicOCP::readVariable(const XMLNode& node){
   return variable(qn);
 }
 
-SXElement SymbolicOCP::readExpr(const XMLNode& node, bool& has_der, bool elim_binding){
+SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der, bool elim_binding){
   const string& fullname = node.getName();
   if (fullname.find("exp:")== string::npos) {
     casadi_error("SymbolicOCP::readExpr: unknown - expression is supposed to start with 'exp:' , got " << fullname);
@@ -539,7 +539,7 @@ SXElement SymbolicOCP::readExpr(const XMLNode& node, bool& has_der, bool elim_bi
     int n = node.size();
     
     // Default-expression
-    SXElement ex = readExpr(node[n-1],has_der,elim_binding);
+    SX ex = readExpr(node[n-1],has_der,elim_binding);
     
     // Evaluate ifs
     for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i],has_der,elim_binding),readExpr(node[i+1],has_der,elim_binding),ex);
@@ -630,7 +630,7 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << endl;
 
   stream << "Initial equations" << endl;
-  for(vector<SXElement>::const_iterator it=initial.begin(); it!=initial.end(); it++){
+  for(SX::const_iterator it=initial.begin(); it!=initial.end(); it++){
     stream << "0 == " << *it << endl;
   }
   stream << endl;
@@ -711,7 +711,7 @@ void SymbolicOCP::eliminateLagrangeTerms(){
   // Index for the names
   int ind = 0;
   // For every integral term in the objective function
-  for(vector<SXElement>::iterator it=lterm.begin(); it!=lterm.end(); ++it){
+  for(SX::iterator it=lterm.begin(); it!=lterm.end(); ++it){
     
     // Give a name to the quadrature state
     stringstream q_name;
@@ -757,15 +757,15 @@ void SymbolicOCP::scaleVariables(){
   double time1 = clock();
   
   // Variables
-  Matrix<SXElement> _x = var(x);
-  Matrix<SXElement> _xdot = der(x);
-  Matrix<SXElement> _z = var(z);
-  Matrix<SXElement> _pi = var(pi);
-  Matrix<SXElement> _pf = var(pf);
-  Matrix<SXElement> _u = var(u);
+  SX _x = var(x);
+  SX _xdot = der(x);
+  SX _z = var(z);
+  SX _pi = var(pi);
+  SX _pf = var(pf);
+  SX _u = var(u);
   
   // Collect all the variables
-  Matrix<SXElement> v;
+  SX v;
   v.append(t);
   v.append(_x);
   v.append(_xdot);
@@ -773,17 +773,17 @@ void SymbolicOCP::scaleVariables(){
   v.append(_pi);
   v.append(_pf);
   v.append(_u);
-  
+    
   // Nominal values
-  Matrix<SXElement> t_n = 1.;
-  Matrix<SXElement> x_n = getNominal(x);
-  Matrix<SXElement> z_n = getNominal(z);
-  Matrix<SXElement> pi_n = getNominal(pi);
-  Matrix<SXElement> pf_n = getNominal(pf);
-  Matrix<SXElement> u_n = getNominal(u);
+  SX t_n = 1.;
+  SX x_n = getNominal(x);
+  SX z_n = getNominal(z);
+  SX pi_n = getNominal(pi);
+  SX pf_n = getNominal(pf);
+  SX u_n = getNominal(u);
   
   // Get all the old variables in expressed in the nominal ones
-  Matrix<SXElement> v_old;
+  SX v_old;
   v_old.append(t*t_n);
   v_old.append(_x*x_n);
   v_old.append(_xdot*x_n);
@@ -793,7 +793,7 @@ void SymbolicOCP::scaleVariables(){
   v_old.append(_u*u_n);
   
   // Temporary variable
-  Matrix<SXElement> temp;
+  SX temp;
 
   // Substitute equations
   ode = substitute(ode,v,v_old);
@@ -817,7 +817,7 @@ void SymbolicOCP::scaleEquations(){
 
   // Variables
   enum Variables{T,X,XDOT,Z,PI,PF,U,NUM_VAR};
-  vector<Matrix<SXElement> > v(NUM_VAR); // all variables
+  vector<SX > v(NUM_VAR); // all variables
   v[T] = t;
   v[X] = var(x);
   v[XDOT] = der(x);
@@ -827,7 +827,7 @@ void SymbolicOCP::scaleEquations(){
   v[U] = var(u);
 
   // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
-  Matrix<SXElement> xz;
+  SX xz;
   xz.append(v[X]);
   xz.append(v[Z]);
   xz.append(v[PI]);
@@ -895,11 +895,11 @@ void SymbolicOCP::sortODE(){
   sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
   // Permute equations
-  vector<SXElement> ode_new(ode.size());
+  SX ode_new = SX::zeros(ode.size());
   for(int i=0; i<ode.size(); ++i){
-    ode_new[i] = ode.at(rowperm[i]);
+    ode_new.at(i) = ode.at(rowperm[i]);
   }
-  ode_new.swap(ode.data());
+  ode = ode_new;
   
   // Permute variables
   vector<Variable> x_new(x.size());
@@ -923,11 +923,7 @@ void SymbolicOCP::sortALG(){
   sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
   // Permute equations
-  vector<SXElement> alg_new(alg.size());
-  for(int i=0; i<alg.size(); ++i){
-    alg_new[i] = alg.at(rowperm[i]);
-  }
-  alg_new.swap(alg.data());
+  alg = alg(rowperm);
   
   // Permute variables
   vector<Variable> z_new(z.size());
@@ -981,12 +977,7 @@ void SymbolicOCP::makeExplicit(){
   int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
   // Permute equations
-  vector<SXElement> ode_new(ode.size());
-  for(int i=0; i<ode.size(); ++i){
-    ode_new[i] = ode.at(rowperm[i]);
-  }
-  ode_new.swap(ode.data());
-  ode_new.clear();
+  ode = ode(rowperm);
   
   // Permute variables
   vector<Variable> x_new(x.size());
@@ -1073,12 +1064,7 @@ void SymbolicOCP::eliminateAlgebraic(){
   int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
   // Permute equations
-  vector<SXElement> alg_new(alg.size());
-  for(int i=0; i<alg.size(); ++i){
-    alg_new[i] = alg.at(rowperm[i]);
-  }
-  alg_new.swap(alg.data());
-  alg_new.clear();
+  alg = alg(rowperm);
   
   // Permute variables
   vector<Variable> z_new(z.size());

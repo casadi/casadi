@@ -47,6 +47,7 @@ int main(){
   parse_options["eliminate_dependent"] = true;
   parse_options["scale_equations"] = false;
   parse_options["make_explicit"] = true;
+  parse_options["verbose"] = true;
   ocp.parseFMI("../examples/xml_files/cstr.xml",parse_options);
   
   // Print the ocp to screen
