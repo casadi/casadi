@@ -1078,13 +1078,12 @@ namespace CasADi{
   
     // Block variables and equations
     vector<Variable> zb;
-    vector<SXElement> fb;
 
     // Variables where we have found an explicit expression and where we haven't
     vector<Variable> z_exp, z_imp;
   
     // Explicit and implicit equations
-    vector<SXElement> f_exp, f_imp;
+    SX f_exp, f_imp;
   
     // Loop over blocks
     for(int b=0; b<nb; ++b){
@@ -1099,18 +1098,16 @@ namespace CasADi{
       }
 
       // Get local equations
-      fb.clear();
-      for(int i=rowblock[b]; i<rowblock[b+1]; ++i)
-        fb.push_back(alg.at(i));
+      SX fb = alg(Slice(rowblock[b],rowblock[b+1]));
 
       // Get local Jacobian
-      SX Jb = J(range(rowblock[b],rowblock[b+1]),range(colblock[b],colblock[b+1]));
+      SX Jb = J(Slice(rowblock[b],rowblock[b+1]),Slice(colblock[b],colblock[b+1]));
 
       // If Jb depends on zb, then we cannot (currently) solve for it explicitly
       if(dependsOn(Jb,var(zb))){
       
         // Add the equations to the new list of algebraic equations
-        f_imp.insert(f_imp.end(),fb.begin(),fb.end());
+        f_imp.append(fb);
         
         // ... and the variables accordingly
         z_imp.insert(z_imp.end(),zb.begin(),zb.end());
@@ -1119,9 +1116,9 @@ namespace CasADi{
       
         // Divide fb into a part which depends on vb and a part which doesn't according to "fb == mul(Jb,vb) + fb_res"
         SX fb_res = substitute(fb,var(zb),SX::zeros(zb.size())).data();
-        SX fb_exp;
       
         // Solve for vb
+        SX fb_exp;
         if (bs <= 3){
           // Calculate inverse and multiply for very small matrices
           fb_exp = mul(inv(Jb),-fb_res);
@@ -1132,18 +1129,16 @@ namespace CasADi{
 
         // Add to explicitly determined equations and variables
         z_exp.insert(z_exp.end(),zb.begin(),zb.end());
-        f_exp.insert(f_exp.end(),fb_exp.data().begin(),fb_exp.data().end());
+        f_exp.append(fb_exp);
       }
     }
   
     // Eliminate inter-dependencies in fb_exp
-    SX f_expmat = f_exp;
-    substituteInPlace(var(z_exp),f_expmat,false);
-    f_exp = f_expmat.data();
+    substituteInPlace(var(z_exp),f_exp,false);
 
     // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
     y.insert(y.begin(),z_exp.begin(),z_exp.end());
-    dep = vertcat(SX(f_exp),dep);
+    dep = vertcat(f_exp,dep);
   
     // Save new algebraic equations
     z = z_imp;

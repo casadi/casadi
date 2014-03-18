@@ -66,7 +66,7 @@ namespace CasADi{
 
   /** \brief Smart pointer class to a Variable
    *  
-   *  In a sense, a Variable is an SX expression with meta-data attached.
+   *  A Variable is an SX expression with meta-data attached.
    */
   class Variable : public SharedObject{
   public:
