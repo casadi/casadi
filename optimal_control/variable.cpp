@@ -252,14 +252,6 @@ namespace CasADi{
     (*this)->is_differential_ = is_differential;
   }
 
-  SX Variable::highest() const{
-    if(isDifferential()){
-      return der();
-    } else {
-      return var();
-    }
-  }
-
   bool Variable::getFree() const{
     return (*this)->free_;
   }

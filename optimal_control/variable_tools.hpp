@@ -33,9 +33,6 @@ namespace CasADi{
   /// Get a derivative expression from a vector of variables
   SX der(const std::vector<Variable> v);
 
-  /// Get am expression for the highest order undetermined derivative from a vector of variables
-  SX highest(const std::vector<Variable> v);
-
   /// Get an expression for the binding expressions from a vector of variables
   SX binding(const std::vector<Variable> v);
 

@@ -89,9 +89,6 @@ namespace CasADi{
     /// Get the binding expression for the variable or its derivative
     SX binding(bool derivative=false) const;
     
-    /// Get the highest order derivative (i.e. der() or var())
-    SX highest() const;
-    
     /// Timed variable (never allocate)
     SX atTime(double t, bool allocate=false) const;
 
