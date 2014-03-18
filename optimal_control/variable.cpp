@@ -33,7 +33,6 @@ namespace CasADi{
     assignNode(new VariableInternal(name));
   }
 
-
   Variable::~Variable(){
   }
 
@@ -61,12 +60,8 @@ namespace CasADi{
     }
   }
 
-  const string& Variable::getName() const{
-    return (*this)->name_;
-  }
-
-  void Variable::setName(const string& name){
-    (*this)->name_ = name;
+  string Variable::getName() const{
+    return (*this)->var_.getName();
   }
 
   Variability Variable::getVariability() const{

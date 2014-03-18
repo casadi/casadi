@@ -26,7 +26,7 @@
 using namespace std;
 namespace CasADi{
   
-  VariableInternal::VariableInternal(const string& name) : name_(name){
+  VariableInternal::VariableInternal(const string& name){
     // Symbolic expression for the variable
     var_ = SX::sym(name);
 
@@ -60,17 +60,13 @@ namespace CasADi{
   VariableInternal::~VariableInternal(){
   }
 
-  const string& VariableInternal::getName() const{
-    return name_;
-  }
-
   void VariableInternal::repr(ostream &stream) const{
-    stream << name_;
+    var_.print(stream);
   }
 
 
   void VariableInternal::print(ostream &stream) const{
-    stream << name_;
+    var_.print(stream);
   }
 
   SX VariableInternal::atTime(double t, bool allocate) const{

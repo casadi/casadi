@@ -108,10 +108,7 @@ namespace CasADi{
     const VariableInternal* operator->() const;
 
     /// Get variable name
-    const std::string& getName() const;
-
-    /// Set variable name
-    void setName(const std::string& name);
+    std::string getName() const;
 
     /// Get the variability (see Fritzon)
     Variability getVariability() const;

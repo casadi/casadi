@@ -41,9 +41,6 @@ namespace CasADi{
       // Clone
       virtual VariableInternal* clone() const{ return new VariableInternal(*this);}
 
-      // Get name
-      const std::string& getName() const;
-
       // Timed variable (never allocate)
       SX atTime(double t, bool allocate) const;
 
@@ -57,7 +54,6 @@ namespace CasADi{
     protected:
       
       // Attributes
-      std::string name_;
       Variability variability_;
       Causality causality_;
       Category category_;
