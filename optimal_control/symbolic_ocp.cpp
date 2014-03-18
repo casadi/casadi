@@ -567,7 +567,7 @@ namespace CasADi{
       // Get the index of the time point
       int index;
       node.readAttribute("timePointIndex",index);
-      return atTime(node[0],tp[index]);
+      return readVariable(node[0]).atTime(tp[index]);
     }
 
     // throw error if reached this point
