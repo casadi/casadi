@@ -275,7 +275,23 @@ namespace CasADi{
     void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
     
     //@}
+
+    /// Scale the variables
+    void scaleVariables();
     
+    /// Scale the implicit equations
+    void scaleEquations();
+
+#ifndef SWIG
+    ///  Print representation
+    virtual void repr(std::ostream &stream=std::cout) const;
+
+    /// Print description 
+    virtual void print(std::ostream &stream=std::cout) const;
+
+    // Internal methods
+  protected:
+
     /// Get the qualified name
     static std::string qualifiedName(const XMLNode& nn);
     
@@ -288,18 +304,6 @@ namespace CasADi{
     /// Read a variable
     Variable& readVariable(const XMLNode& node);
 
-    /// Scale the variables
-    void scaleVariables();
-    
-    /// Scale the implicit equations
-    void scaleEquations();
-    
-#ifndef SWIG
-    ///  Print representation
-    virtual void repr(std::ostream &stream=std::cout) const;
-
-    /// Print description 
-    virtual void print(std::ostream &stream=std::cout) const;
 #endif // SWIG
 
   };
