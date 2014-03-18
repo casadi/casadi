@@ -103,7 +103,7 @@ namespace CasADi{
     /** \brief Differential states */
     std::vector<Variable> x;
     
-    /** \brief Algebraic states */
+    /** \brief Algebraic variables */
     std::vector<Variable> z;
     
     /** \brief Quadrature states (length == quad().size()) */
