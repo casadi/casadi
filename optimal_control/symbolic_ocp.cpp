@@ -996,10 +996,9 @@ void SymbolicOCP::makeExplicit(){
   
   // Block variables and equations
   vector<Variable> xb, xdb, xab;
-  vector<SXElement> fb;
 
   // Explicit ODE
-  vector<SXElement> ode_exp;
+  SX ode_exp;
   
   // Loop over blocks
   for(int b=0; b<nb; ++b){
@@ -1014,12 +1013,10 @@ void SymbolicOCP::makeExplicit(){
     }
 
     // Get equations in the block
-    fb.clear();
-    for(int i=rowblock[b]; i<rowblock[b+1]; ++i)
-      fb.push_back(ode.at(i));
+    SX fb = ode(Slice(rowblock[b],rowblock[b+1]));
 
     // Get local Jacobian
-    SX Jb = J(range(rowblock[b],rowblock[b+1]),range(colblock[b],colblock[b+1]));
+    SX Jb = J(Slice(rowblock[b],rowblock[b+1]),Slice(colblock[b],colblock[b+1]));
 
     // If Jb depends on xb, then the state derivative does not enter linearly in the ODE and we cannot solve for the state derivative
     casadi_assert_message(!dependsOn(Jb,der(xb)),"Cannot find an explicit expression for variable(s) " << xb);
@@ -1038,14 +1035,12 @@ void SymbolicOCP::makeExplicit(){
     }
 
     // Add to explicitly determined equations and variables
-    ode_exp.insert(ode_exp.end(),fb_exp.data().begin(),fb_exp.data().end());
+    ode_exp.append(fb_exp);
   }
   
   // Eliminate inter-dependencies
-  SX ode_expmat = ode_exp;
-  substituteInPlace(der(x),ode_expmat,false);
-  ode_exp = ode_expmat.data();
-  ode_exp.swap(ode.data());
+  substituteInPlace(der(x),ode_exp,false);
+  ode = ode_exp;
 }
 
 void SymbolicOCP::eliminateAlgebraic(){
