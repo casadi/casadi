@@ -16,6 +16,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_worhp_interface SHARED ${WORHP_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+target_link_libraries(casadi_worhp_interface casadi ${WORHP_LIBRARIES})
 install(TARGETS casadi_worhp_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

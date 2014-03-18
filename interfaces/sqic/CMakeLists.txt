@@ -29,6 +29,8 @@ if(ENABLE_SHARED)
 add_library(casadi_sqic_interface SHARED ${SQIC_INTERFACE_SRCS})
 add_library(sqic_fortran_c_bridge SHARED wsqic.f90)
 endif(ENABLE_SHARED)
+target_link_libraries(casadi_sqic_interface casadi sqic_fortran_c_bridge)
+target_link_libraries(sqic_fortran_c_bridge casadi ${SQIC_LIBRARIES})
 install(TARGETS casadi_sqic_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

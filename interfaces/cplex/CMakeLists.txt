@@ -14,6 +14,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_cplex_interface SHARED ${CPLEX_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+target_link_libraries(casadi_cplex_interface casadi ${CPLEX_LIBRARIES})
 install(TARGETS casadi_cplex_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

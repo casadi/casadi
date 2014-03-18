@@ -15,8 +15,8 @@ add_library(casadi_control STATIC ${CONTROL_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_control SHARED ${CONTROL_SRCS})
-target_link_libraries(casadi_control casadi)
 endif(ENABLE_SHARED)
+target_link_libraries(casadi_control casadi)
 install(TARGETS casadi_control
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
