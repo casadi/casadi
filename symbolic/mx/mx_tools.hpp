@@ -343,6 +343,11 @@ namespace CasADi{
   */
   std::vector<MX> getSymbols(const std::vector<MX>& e);
   
+  /** \brief Check if expression depends on any of the arguments
+    The arguments must be symbolic
+  */
+  bool dependsOn(const MX& ex, const std::vector<MX> &arg);
+  
   /** \brief Expand MX graph to SXFunction call
   *
   *  Expand the given expression e, optionally

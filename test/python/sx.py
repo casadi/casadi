@@ -1305,6 +1305,28 @@ class SXtests(casadiTestCase):
     J.evaluate()
     self.checkarray(J.output(),DMatrix([0]))
     
+  def test_dependsOn(self):
+    a = SX.sym("a")
+    b = SX.sym("b")
+    
+    self.assertTrue(dependsOn(a**2,a))
+    self.assertTrue(dependsOn(a,a))
+    self.assertFalse(dependsOn(0,a))
+    self.assertTrue(dependsOn(a**2,vertcat([a,b])))
+    self.assertTrue(dependsOn(a,vertcat([a,b])))
+    self.assertFalse(dependsOn(0,vertcat([a,b])))
+    self.assertTrue(dependsOn(b**2,vertcat([a,b])))
+    self.assertTrue(dependsOn(b,vertcat([a,b])))
+    self.assertTrue(dependsOn(a**2+b**2,vertcat([a,b])))
+    self.assertTrue(dependsOn(a+b,vertcat([a,b])))
+    self.assertTrue(dependsOn(vertcat([0,a]),a))
+    self.assertTrue(dependsOn(vertcat([a,0]),a))
+    self.assertTrue(dependsOn(vertcat([a**2,b**2]),vertcat([a,b])))
+    self.assertTrue(dependsOn(vertcat([a,0]),vertcat([a,b])))
+    self.assertTrue(dependsOn(vertcat([0,b]),vertcat([a,b])))
+    self.assertTrue(dependsOn(vertcat([b,0]),vertcat([a,b])))
+    self.assertFalse(dependsOn(vertcat([0,0]),vertcat([a,b])))
+    
 if __name__ == '__main__':
     unittest.main()
 

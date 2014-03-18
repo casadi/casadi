@@ -199,7 +199,9 @@ namespace CasADi{
 
 #endif
 
-  /// Check dependency: very inefficient algorithm
+  /** \brief Check if expression depends on the argument
+    The argument must be symbolic
+  */
   bool dependsOn(const SX& f, const SX &arg);
 
 

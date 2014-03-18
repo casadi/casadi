@@ -2326,6 +2326,32 @@ class MXtests(casadiTestCase):
 
     self.checkarray(R.output(),numpy.linalg.solve(A.T,b))
     self.checkarray(r.output(),R.output())
+
+  def test_dependsOn(self):
+    a = MX.sym("a")
+    b = MX.sym("b")
+    
+    self.assertTrue(dependsOn(a**2,[a]))
+    self.assertTrue(dependsOn(a,[a]))
+    self.assertFalse(dependsOn(0,[a]))
+    
+    self.assertTrue(dependsOn(a**2,[a,b]))
+    self.assertTrue(dependsOn(a,[a,b]))
+    self.assertFalse(dependsOn(0,[a,b]))
+    self.assertTrue(dependsOn(b**2,[a,b]))
+    self.assertTrue(dependsOn(b,[a,b]))
+    self.assertTrue(dependsOn(a**2+b**2,[a,b]))
+    self.assertTrue(dependsOn(a+b,[a,b]))
+    self.assertTrue(dependsOn(vertcat([0,a]),[a]))
+    self.assertTrue(dependsOn(vertcat([a,0]),[a]))
+    self.assertFalse(dependsOn(vertcat([0,b]),[a]))
+    self.assertFalse(dependsOn(vertcat([b,0]),[a]))
+    self.assertTrue(dependsOn(vertcat([a**2,b**2]),[a,b]))
+    self.assertTrue(dependsOn(vertcat([a,0]),[a,b]))
+    self.assertTrue(dependsOn(vertcat([0,b]),[a,b]))
+    self.assertTrue(dependsOn(vertcat([b,0]),[a,b]))
+    self.assertFalse(dependsOn(vertcat([0,0]),[a,b]))
+    
     
 if __name__ == '__main__':
     unittest.main()
