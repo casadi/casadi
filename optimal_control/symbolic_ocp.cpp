@@ -51,24 +51,8 @@ namespace CasADi{
     tf_free = false;
   }
 
-  void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& options){
-    // Default options
-    bool verbose = false;
-    bool scale_variables = false;
-  
-    // Read user options
-    for(Dictionary::const_iterator it=options.begin(); it!=options.end(); ++it){
-      if(it->first.compare("verbose")==0){
-        verbose = it->second;
-      } else if(it->first.compare("scale_variables")==0){
-        scale_variables = it->second;
-      } else {
-        stringstream ss;
-        ss << "Unknown option \"" << it->first << "\"" << endl;
-        throw CasadiException(ss.str());
-      }
-    }
-  
+  void SymbolicOCP::parseFMI(const std::string& filename){
+    
     // Load 
     TiXmlDocument doc;
     bool flag = doc.LoadFile(filename.c_str());
@@ -78,11 +62,9 @@ namespace CasADi{
     XMLNode document;
     document.addNode(&doc);
 
-    double time1 = clock();
-
     // **** Add model variables ****
     {
-      if(verbose) cout << "Adding model variables." << endl;
+      //if(verbose) cout << "Adding model variables." << endl;
   
       // Get a reference to the ModelVariables node
       const XMLNode& modvars = document[0]["ModelVariables"];
@@ -191,7 +173,7 @@ namespace CasADi{
   
     // **** Add binding equations ****
     {
-      if(verbose) cout << "Adding binding equations." << endl;
+      //if(verbose) cout << "Adding binding equations." << endl;
   
       // Get a reference to the BindingEquations node
       const XMLNode& bindeqs = document[0]["equ:BindingEquations"];
@@ -325,9 +307,7 @@ namespace CasADi{
               mterm.append(v);
             }
           } catch(exception& ex){
-            if(verbose){
-              throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
-            }
+            throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
           }
         } else if(onode.checkName("opt:IntegrandObjectiveFunction")){
           try{
@@ -419,15 +399,6 @@ namespace CasADi{
     casadi_assert_warning(z.size()==alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
     casadi_assert(q.size()==quad.size());
     casadi_assert(y.size()==dep.size());
-  
-    // Return a reference to the created ocp
-    double time2 = clock();
-    double tparse = double(time2-time1)/CLOCKS_PER_SEC;
-    if(verbose) cout << "... parsing complete after " << tparse << " seconds" << endl;
-
-    // Scale the variables
-    if(scale_variables)
-      scaleVariables();
   }
 
   Variable& SymbolicOCP::readVariable(const XMLNode& node){

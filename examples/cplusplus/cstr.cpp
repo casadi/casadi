@@ -42,10 +42,10 @@ int main(){
   SymbolicOCP ocp;
 
   // Load the XML file
-  Dictionary parse_options;
-  parse_options["scale_variables"] = true;
-  parse_options["verbose"] = true;
-  ocp.parseFMI("../examples/xml_files/cstr.xml",parse_options);
+  ocp.parseFMI("../examples/xml_files/cstr.xml");
+
+  // Scale the variables
+  ocp.scaleVariables();
 
   // Sort the equations
   ocp.sortODE();

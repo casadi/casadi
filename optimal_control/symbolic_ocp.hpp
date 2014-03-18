@@ -223,7 +223,7 @@ namespace CasADi{
     //@}
 
     /// Parse from XML to C++ format
-    void parseFMI(const std::string& filename, const Dictionary& options = Dictionary());
+    void parseFMI(const std::string& filename);
 
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
