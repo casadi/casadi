@@ -56,7 +56,6 @@ namespace CasADi{
     bool verbose = false;
     bool scale_variables = false;
     bool eliminate_dependent = true;
-    bool sort_equations = true;
   
     // Read user options
     for(Dictionary::const_iterator it=options.begin(); it!=options.end(); ++it){
@@ -66,8 +65,6 @@ namespace CasADi{
         scale_variables = it->second;
       } else if(it->first.compare("eliminate_dependent")==0){
         eliminate_dependent = it->second;
-      } else if(it->first.compare("sort_equations")==0){
-        sort_equations = it->second;
       } else {
         stringstream ss;
         ss << "Unknown option \"" << it->first << "\"" << endl;
@@ -441,13 +438,6 @@ namespace CasADi{
   
       // Eliminate the dependent variables
       eliminateDependent();
-    }
-
-    // Sort the equations and variables
-    if(sort_equations){
-      casadi_assert(eliminate_dependent);
-      sortODE();
-      sortALG();
     }
   }
 

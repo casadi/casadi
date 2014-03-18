@@ -47,6 +47,10 @@ int main(){
   parse_options["eliminate_dependent"] = true;
   parse_options["verbose"] = true;
   ocp.parseFMI("../examples/xml_files/cstr.xml",parse_options);
+
+  // Sort the equations
+  ocp.sortODE();
+  ocp.sortALG();
   
   // Make the OCP explicit
   ocp.makeExplicit();

@@ -199,6 +199,10 @@ class OCPtests(casadiTestCase):
     ocp = SymbolicOCP()
     ocp.parseFMI('data/cstr.xml')
     
+    # Sort the equations
+    ocp.sortODE()
+    ocp.sortALG()
+    
     self.assertEqual(ocp.t0,0)
     self.assertEqual(ocp.tf,150)
     #self.assertFalse(ocp.t0_free)

@@ -65,6 +65,10 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
+# Sort the equations
+ocp.sortODE()
+ocp.sortALG()
+
 # Make the OCP explicit
 ocp.makeExplicit()
 
@@ -129,6 +133,10 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
+# Sort the equations
+ocp.sortODE()
+ocp.sortALG()
+
 # Make the OCP explicit
 ocp.makeExplicit()
 
@@ -184,6 +192,10 @@ comp("BasicVolumeTest")
 # Allocate a parser and load the xml
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeTest.xml')
+
+# Sort the equations
+ocp.sortODE()
+ocp.sortALG()
 
 # Make explicit
 ocp.makeExplicit()
@@ -250,6 +262,10 @@ comp("CtrlFlowSystem")
 # Allocate a parser and load the xml
 ocp = SymbolicOCP()
 ocp.parseFMI('CtrlFlowSystem.xml')
+
+# Sort the equations
+ocp.sortODE()
+ocp.sortALG()
 
 # Make the OCP explicit
 ocp.makeExplicit()
