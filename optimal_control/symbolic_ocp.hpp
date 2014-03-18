@@ -347,7 +347,7 @@ namespace CasADi{
     std::map<std::string,Variable> varmap_;
 
     /// Read an equation
-    SX readExpr(const XMLNode& odenode, bool& has_der, bool elim_binding);
+    SX readExpr(const XMLNode& odenode, bool& has_der);
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);

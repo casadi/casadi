@@ -55,7 +55,6 @@ namespace CasADi{
     // Default options
     bool verbose = false;
     bool scale_variables = false;
-    bool eliminate_dependent = true;
   
     // Read user options
     for(Dictionary::const_iterator it=options.begin(); it!=options.end(); ++it){
@@ -63,8 +62,6 @@ namespace CasADi{
         verbose = it->second;
       } else if(it->first.compare("scale_variables")==0){
         scale_variables = it->second;
-      } else if(it->first.compare("eliminate_dependent")==0){
-        eliminate_dependent = it->second;
       } else {
         stringstream ss;
         ss << "Unknown option \"" << it->first << "\"" << endl;
@@ -207,7 +204,7 @@ namespace CasADi{
 
         // Get the binding equation
         bool has_der = false;
-        SX bexpr = readExpr(beq[1][0],has_der,eliminate_dependent);
+        SX bexpr = readExpr(beq[1][0],has_der);
         casadi_assert(!has_der);
       
         // Add binding equation
@@ -233,7 +230,7 @@ namespace CasADi{
 
         // Add the differential equation
         bool has_der = false;
-        SX de_new = readExpr(dnode[0],has_der,eliminate_dependent);
+        SX de_new = readExpr(dnode[0],has_der);
         if(has_der){
           ode.append(de_new);
         } else {
@@ -256,7 +253,7 @@ namespace CasADi{
         // Add the differential equations
         for(int i=0; i<inode.size(); ++i){
           bool has_der = false;
-          initial.append(readExpr(inode[i],has_der,eliminate_dependent));
+          initial.append(readExpr(inode[i],has_der));
         }
       }
     }
@@ -323,7 +320,7 @@ namespace CasADi{
             
               // Read expression
               bool has_der = false;
-              SX v = readExpr(var,has_der,eliminate_dependent);
+              SX v = readExpr(var,has_der);
               casadi_assert(!has_der);
               mterm.append(v);
             }
@@ -343,7 +340,7 @@ namespace CasADi{
             
               // Read expression
               bool has_der = false;
-              SX v = readExpr(var,has_der,eliminate_dependent);
+              SX v = readExpr(var,has_der);
               lterm.append(v);
             }
           } catch(exception& ex){
@@ -361,20 +358,20 @@ namespace CasADi{
           for(int i=0; i<onode.size(); ++i){
             const XMLNode& constr_i = onode[i];
             if(constr_i.checkName("opt:ConstraintLeq")){
-              SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-              SX ub = readExpr(constr_i[1],has_der,eliminate_dependent);
+              SX ex = readExpr(constr_i[0],has_der);
+              SX ub = readExpr(constr_i[1],has_der);
               point.append(ex-ub);
               point_min.append(-numeric_limits<double>::infinity());
               point_max.append(0.);
             } else if(constr_i.checkName("opt:ConstraintGeq")){
-              SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-              SX lb = readExpr(constr_i[1],has_der,eliminate_dependent);
+              SX ex = readExpr(constr_i[0],has_der);
+              SX lb = readExpr(constr_i[1],has_der);
               point.append(ex-lb);
               point_min.append(0.);
               point_max.append(numeric_limits<double>::infinity());
             } else if(constr_i.checkName("opt:ConstraintEq")){
-              SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-              SX eq = readExpr(constr_i[1],has_der,eliminate_dependent);
+              SX ex = readExpr(constr_i[0],has_der);
+              SX eq = readExpr(constr_i[1],has_der);
               point.append(ex-eq);
               point_min.append(0.);
               point_max.append(0.);
@@ -390,20 +387,20 @@ namespace CasADi{
           for(int i=0; i<onode.size(); ++i){
             const XMLNode& constr_i = onode[i];
             if(constr_i.checkName("opt:ConstraintLeq")){
-              SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-              SX ub = readExpr(constr_i[1],has_der,eliminate_dependent);
+              SX ex = readExpr(constr_i[0],has_der);
+              SX ub = readExpr(constr_i[1],has_der);
               path.append(ex-ub);
               path_min.append(-numeric_limits<double>::infinity());
               path_max.append(0.);
             } else if(constr_i.checkName("opt:ConstraintGeq")){
-              SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-              SX lb = readExpr(constr_i[1],has_der,eliminate_dependent);
+              SX ex = readExpr(constr_i[0],has_der);
+              SX lb = readExpr(constr_i[1],has_der);
               path.append(ex-lb);
               path_min.append(0.);
               path_max.append(numeric_limits<double>::infinity());
             } else if(constr_i.checkName("opt:ConstraintEq")){
-              SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
-              SX eq = readExpr(constr_i[1],has_der,eliminate_dependent);
+              SX ex = readExpr(constr_i[0],has_der);
+              SX eq = readExpr(constr_i[1],has_der);
               path.append(ex-eq);
               path_min.append(0.);
               path_max.append(0.);
@@ -431,14 +428,6 @@ namespace CasADi{
     // Scale the variables
     if(scale_variables)
       scaleVariables();
-
-    if(eliminate_dependent){
-      // Eliminate interdependencies
-      eliminateInterdependencies();
-  
-      // Eliminate the dependent variables
-      eliminateDependent();
-    }
   }
 
   Variable& SymbolicOCP::readVariable(const XMLNode& node){
@@ -449,7 +438,7 @@ namespace CasADi{
     return variable(qn);
   }
 
-  SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der, bool elim_binding){
+  SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der){
     const string& fullname = node.getName();
     if (fullname.find("exp:")== string::npos) {
       casadi_error("SymbolicOCP::readExpr: unknown - expression is supposed to start with 'exp:' , got " << fullname);
@@ -460,24 +449,24 @@ namespace CasADi{
 
     // The switch below is alphabetical, and can be thus made more efficient, for example by using a switch statement of the first three letters, if it would ever become a bottleneck
     if(name.compare("Add")==0){
-      return readExpr(node[0],has_der,elim_binding) + readExpr(node[1],has_der,elim_binding);
+      return readExpr(node[0],has_der) + readExpr(node[1],has_der);
     } else if(name.compare("Acos")==0){
-      return acos(readExpr(node[0],has_der,elim_binding));
+      return acos(readExpr(node[0],has_der));
     } else if(name.compare("Asin")==0){
-      return asin(readExpr(node[0],has_der,elim_binding));
+      return asin(readExpr(node[0],has_der));
     } else if(name.compare("Atan")==0){
-      return atan(readExpr(node[0],has_der,elim_binding));
+      return atan(readExpr(node[0],has_der));
     } else if(name.compare("Cos")==0){
-      return cos(readExpr(node[0],has_der,elim_binding));
+      return cos(readExpr(node[0],has_der));
     } else if(name.compare("Der")==0){
       Variable v = readVariable(node[0]);
       v.setDifferential(true);
       has_der = true;
       return v.der();
     } else if(name.compare("Div")==0){
-      return readExpr(node[0],has_der,elim_binding) / readExpr(node[1],has_der,elim_binding);
+      return readExpr(node[0],has_der) / readExpr(node[1],has_der);
     } else if(name.compare("Exp")==0){
-      return exp(readExpr(node[0],has_der,elim_binding));
+      return exp(readExpr(node[0],has_der));
     } else if(name.compare("Identifier")==0){
       return readVariable(node).var();
     } else if(name.compare("IntegerLiteral")==0){
@@ -489,42 +478,42 @@ namespace CasADi{
       node.getText(val);
       return val;
     } else if(name.compare("Log")==0){
-      return log(readExpr(node[0],has_der,elim_binding));
+      return log(readExpr(node[0],has_der));
     } else if(name.compare("LogLt")==0){ // Logical less than
-      return readExpr(node[0],has_der,elim_binding) < readExpr(node[1],has_der,elim_binding);
+      return readExpr(node[0],has_der) < readExpr(node[1],has_der);
     } else if(name.compare("LogGt")==0){ // Logical less than
-      return readExpr(node[0],has_der,elim_binding) > readExpr(node[1],has_der,elim_binding);
+      return readExpr(node[0],has_der) > readExpr(node[1],has_der);
     } else if(name.compare("Mul")==0){ // Multiplication
-      return readExpr(node[0],has_der,elim_binding) * readExpr(node[1],has_der,elim_binding);
+      return readExpr(node[0],has_der) * readExpr(node[1],has_der);
     } else if(name.compare("Neg")==0){
-      return -readExpr(node[0],has_der,elim_binding);
+      return -readExpr(node[0],has_der);
     } else if(name.compare("NoEvent")==0) {
       // NOTE: This is a workaround, we assume that whenever NoEvent occurs, what is meant is a switch
       int n = node.size();
     
       // Default-expression
-      SX ex = readExpr(node[n-1],has_der,elim_binding);
+      SX ex = readExpr(node[n-1],has_der);
     
       // Evaluate ifs
-      for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i],has_der,elim_binding),readExpr(node[i+1],has_der,elim_binding),ex);
+      for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i],has_der),readExpr(node[i+1],has_der),ex);
     
       return ex;
     } else if(name.compare("Pow")==0){
-      return pow(readExpr(node[0],has_der,elim_binding),readExpr(node[1],has_der,elim_binding));
+      return pow(readExpr(node[0],has_der),readExpr(node[1],has_der));
     } else if(name.compare("RealLiteral")==0){
       double val;
       node.getText(val);
       return val;
     } else if(name.compare("Sin")==0){
-      return sin(readExpr(node[0],has_der,elim_binding));
+      return sin(readExpr(node[0],has_der));
     } else if(name.compare("Sqrt")==0){
-      return sqrt(readExpr(node[0],has_der,elim_binding));
+      return sqrt(readExpr(node[0],has_der));
     } else if(name.compare("StringLiteral")==0){
       throw CasadiException(node.getText());
     } else if(name.compare("Sub")==0){
-      return readExpr(node[0],has_der,elim_binding) - readExpr(node[1],has_der,elim_binding);
+      return readExpr(node[0],has_der) - readExpr(node[1],has_der);
     } else if(name.compare("Tan")==0){
-      return tan(readExpr(node[0],has_der,elim_binding));
+      return tan(readExpr(node[0],has_der));
     } else if(name.compare("Time")==0){
       return t.toScalar();
     } else if(name.compare("TimedVariable")==0){

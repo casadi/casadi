@@ -44,7 +44,6 @@ int main(){
   // Load the XML file
   Dictionary parse_options;
   parse_options["scale_variables"] = true;
-  parse_options["eliminate_dependent"] = true;
   parse_options["verbose"] = true;
   ocp.parseFMI("../examples/xml_files/cstr.xml",parse_options);
 
