@@ -858,7 +858,7 @@ namespace CasADi{
       
         // The scaling factor is the maximum norm, ignoring not-a-number entries
         if(!isnan(J0.at(el))){
-          scale[rr] = max(scale[rr],fabs(J0.at(el)));
+          scale[rr] = std::max(scale[rr],fabs(J0.at(el)));
         }
       }
     }
@@ -1568,7 +1568,7 @@ namespace CasADi{
     return const_cast<SymbolicOCP*>(this)->variableByType(type);
   }
 
-  SX SymbolicOCP::operator()(const std::string& name) const{
+  std::pair<SymbolicOCPVariables,int> SymbolicOCP::find(const std::string& name) const{
     // For all variable types
     for(unsigned int i=0; i<NUM_VAR; ++i){
       const std::vector<Variable>& v = variableByType(SymbolicOCPVariables(i));
@@ -1577,13 +1577,79 @@ namespace CasADi{
       for(std::vector<Variable>::const_iterator it=v.begin(); it!=v.end(); ++it){
         // Check if name matches
         if(it->getName()==name){
-          return it->var();
+          return make_pair(SymbolicOCPVariables(i),std::distance(v.begin(),it));
         }
       }
     }
     // Not found
-    casadi_error("SymbolicOCP::var: Error, variable \"" + name + "\" not found.");
+    casadi_error("SymbolicOCP::find: Error, variable \"" + name + "\" not found.");
   }
+
+  SX SymbolicOCP::operator()(const std::string& name) const{
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    return variableByType(v.first).at(v.second).var();
+  }
+
+  double SymbolicOCP::nominal(const std::string& name) const{
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    return variableByType(v.first).at(v.second).getNominal();
+  }
+
+  void SymbolicOCP::setNominal(const std::string& name, double val){
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    variableByType(v.first).at(v.second).setNominal(val);
+  }
+
+  double SymbolicOCP::min(const std::string& name) const{
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    return variableByType(v.first).at(v.second).getMin();
+  }
+
+  void SymbolicOCP::setMin(const std::string& name, double val){
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    variableByType(v.first).at(v.second).setMin(val);
+  }
+
+  double SymbolicOCP::max(const std::string& name) const{
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    return variableByType(v.first).at(v.second).getMax();
+  }
+
+  void SymbolicOCP::setMax(const std::string& name, double val){
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    variableByType(v.first).at(v.second).setMax(val);
+  }
+
+  double SymbolicOCP::start(const std::string& name) const{
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    return variableByType(v.first).at(v.second).getStart();
+  }
+
+  void SymbolicOCP::setStart(const std::string& name, double val){
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    variableByType(v.first).at(v.second).setStart(val);
+  }
+
+  double SymbolicOCP::initialGuess(const std::string& name) const{
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    return variableByType(v.first).at(v.second).getInitialGuess();
+  }
+
+  void SymbolicOCP::setInitialGuess(const std::string& name, double val){
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    variableByType(v.first).at(v.second).setInitialGuess(val);
+  }
+
+  double SymbolicOCP::derivativeStart(const std::string& name) const{
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    return variableByType(v.first).at(v.second).getDerivativeStart();
+  }
+
+  void SymbolicOCP::setDerivativeStart(const std::string& name, double val){
+    std::pair<SymbolicOCPVariables,int> v = find(name);
+    variableByType(v.first).at(v.second).setDerivativeStart(val);
+  }
+
 
 } // namespace CasADi
 

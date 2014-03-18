@@ -282,8 +282,47 @@ namespace CasADi{
     /// Scale the implicit equations
     void scaleEquations();
 
+    /// Find a variable by name 
+    std::pair<SymbolicOCPVariables,int> find(const std::string& name) const;
+
     /// Find an expression by name
     SX operator()(const std::string& name) const;
+
+    /// Get the nominal value for a component
+    double nominal(const std::string& name) const;
+
+    /// Set the nominal value for a component
+    void setNominal(const std::string& name, double val);
+
+    /// Get the lower bound for a component
+    double min(const std::string& name) const;
+
+    /// Set the upper bound for a component
+    void setMin(const std::string& name, double val);
+
+    /// Get the upper bound for a component
+    double max(const std::string& name) const;
+
+    /// Set the upper bound for a component
+    void setMax(const std::string& name, double val);
+
+    /// Get the value at time 0 for a component
+    double start(const std::string& name) const;
+
+    /// Set the value at time 0 for a component
+    void setStart(const std::string& name, double val);
+
+    /// Get the initial guess for a component
+    double initialGuess(const std::string& name) const;
+
+    /// Set the initial guess for a component
+    void setInitialGuess(const std::string& name, double val);
+
+    /// Get the derivative at time 0 for a component
+    double derivativeStart(const std::string& name) const;
+
+    /// Set the derivative at time 0 for a component
+    void setDerivativeStart(const std::string& name, double val);
 
 #ifndef SWIG
     ///  Print representation

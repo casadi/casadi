@@ -213,23 +213,17 @@ class OCPtests(casadiTestCase):
     self.assertEquals(ocp.ode.size(),3)
     print type(ocp.x)
     self.assertEquals(len(ocp.x),3) # there are three states
-    c = ocp.variable("cstr.c")
-    T = ocp.variable("cstr.T")
-    cost = ocp.variable("cost")
-    self.assertTrue(isinstance(c,Variable))
+    c = ocp("cstr.c")
+    T = ocp("cstr.T")
+    cost = ocp("cost")
+    self.assertTrue(isinstance(c,SX))
     
     self.assertEquals(c.getName(),"cstr.c")
     self.assertEquals(T.getName(),"cstr.T")
     self.assertEquals(cost.getName(),"cost")
-    self.assertEquals(c.getNominal(),1000)
-       
-    #print c.atTime(0)
-       
-    c = c.var()
-    T = T.var()
-    cost = cost.var()
-    
-    u = ocp.variable("u").var()
+    self.assertEquals(ocp.nominal("cstr.c"),1000)
+   
+    u = ocp("u")
     self.assertEquals(ocp.path.size(),3)
     #self.assertEquals(len(ocp.cfcn_lb),3)
     #self.assertEquals(len(ocp.cfcn_ub),3)
