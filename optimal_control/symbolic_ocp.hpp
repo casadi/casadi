@@ -134,10 +134,10 @@ namespace CasADi{
     std::vector<Variable> u;
 
     /** \brief Get all variables of a certain type */
-    std::vector<Variable>& variableByType(SymbolicOCPVariables type);
+    std::vector<Variable>& variableByType(int type);
     
     /** \brief Get all variables of a certain type */
-    const std::vector<Variable>& variableByType(SymbolicOCPVariables type) const;
+    const std::vector<Variable>& variableByType(int type) const;
     //@}
     
     /** @name Equations
@@ -283,7 +283,7 @@ namespace CasADi{
     void scaleEquations();
 
     /// Find a variable by name 
-    std::pair<SymbolicOCPVariables,int> find(const std::string& name) const;
+    std::pair<int,int> find(const std::string& name, bool error_if_not_found=true) const;
 
     /// Find an expression by name
     SX operator()(const std::string& name) const;
