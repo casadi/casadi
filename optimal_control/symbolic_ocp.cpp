@@ -122,10 +122,10 @@ namespace CasADi{
         string qn = qualifiedName(nn);
       
         // Find variable
-        map<string,Variable>::iterator it = varmap_.find(qn);
+        pair<int,int> loc = find(qn,false);
       
         // Add variable, if not already added
-        if(it == varmap_.end()){
+        if(loc.first<0){
         
           // Create variable
           Variable var(name);
@@ -1202,9 +1202,9 @@ namespace CasADi{
   }
 
   void SymbolicOCP::addVariable(const std::string& name, const Variable& var){
-    // Try to find the name
-    map<string,Variable>::iterator it = varmap_.find(name);
-    if(it!=varmap_.end()){
+    // Try to find the component
+    pair<int,int> loc = find(name,false);
+    if(loc.first>=0){
       stringstream ss;
       ss << "Variable \"" << name << "\" has already been added.";
       throw CasadiException(ss.str());
