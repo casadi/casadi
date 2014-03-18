@@ -75,7 +75,7 @@ namespace CasADi{
     Variable();
 
     /// Create a new variable
-    explicit Variable(const std::string& name, bool create_expression = true);
+    explicit Variable(const std::string& name);
     
     /// Destructor
     virtual ~Variable();

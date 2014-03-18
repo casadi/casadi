@@ -29,14 +29,8 @@ namespace CasADi{
   Variable::Variable(){
   }
 
-  Variable::Variable(const string& name, bool create_expression){
+  Variable::Variable(const string& name){
     assignNode(new VariableInternal(name));
-    if(create_expression){
-      setExpression(SX::sym(name));
-      setDerivative(SX::sym("der_" + name));
-      setBinding(var(),false);
-      setBinding(der(),true);
-    }
   }
 
 

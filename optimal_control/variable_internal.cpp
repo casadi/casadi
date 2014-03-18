@@ -27,15 +27,15 @@ using namespace std;
 namespace CasADi{
   
   VariableInternal::VariableInternal(const string& name) : name_(name){
-    // No expression by default
-    var_ = SX::nan();
-  
-    // Not differentable by default
-    der_ = SX::nan();
-    
-    // Not binding expressions by default
-    binding_ = SX::nan();
-    der_binding_ = SX::nan();
+    // Symbolic expression for the variable
+    var_ = SX::sym(name);
+
+    // Symbolic expression for the time derivative of the variable
+    der_ = SX::sym("der_" + name);
+
+    // Set binding expressions
+    binding_ = var_;
+    der_binding_ = der_;
     
     variability_ = CONTINUOUS;
     causality_ = INTERNAL;
