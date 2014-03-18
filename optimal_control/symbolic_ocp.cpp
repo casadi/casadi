@@ -895,11 +895,7 @@ namespace CasADi{
     sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
     // Permute equations
-    SX ode_new = SX::zeros(ode.size());
-    for(int i=0; i<ode.size(); ++i){
-      ode_new.at(i) = ode.at(rowperm[i]);
-    }
-    ode = ode_new;
+    ode = ode(rowperm);
   
     // Permute variables
     vector<Variable> x_new(x.size());
