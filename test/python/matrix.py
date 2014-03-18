@@ -1057,7 +1057,13 @@ class Matrixtests(casadiTestCase):
     b = tril(a)
     self.checkarray(b, DMatrix([[1,0],[3,4]]) )
 
-
+  def test_nz(self):
+    a = sparse(IMatrix([[1,2],[0,0],[3,4]]))
+    self.checkarray(a.nz[:], IMatrix([1,3,2,4]) )
+    self.checkarray(len(a.nz), 4 )
+    self.checkarray(a.nz[:-1], IMatrix([1,3,2]) )
+    self.checkarray(a.nz[0], IMatrix([1]) )
+    
 if __name__ == '__main__':
     unittest.main()
 
