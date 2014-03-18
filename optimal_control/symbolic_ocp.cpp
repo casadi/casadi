@@ -310,7 +310,7 @@ namespace CasADi{
         // Allocate all the timed variables
         for(int k=0; k<tpnode[i].size(); ++k){
           string qn = qualifiedName(tpnode[i][k]);
-          variable(qn).atTime(value,true);
+          atTime(qn,value,true);
         }
       }
     
@@ -567,7 +567,7 @@ namespace CasADi{
       // Get the index of the time point
       int index;
       node.readAttribute("timePointIndex",index);
-      return readVariable(node[0]).atTime(tp[index]);
+      return atTime(node[0],tp[index]);
     }
 
     // throw error if reached this point
@@ -1654,6 +1654,16 @@ namespace CasADi{
   void SymbolicOCP::setDerivativeStart(const std::string& name, double val){
     std::pair<int,int> v = find(name);
     variableByType(v.first).at(v.second).setDerivativeStart(val);
+  }
+
+  SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate) const{
+    std::pair<int,int> v = find(name);
+    return variableByType(v.first).at(v.second).atTime(t,allocate);
+  }
+ 
+  SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate){
+    std::pair<int,int> v = find(name);
+    return variableByType(v.first).at(v.second).atTime(t,allocate);
   }
 
 

@@ -324,6 +324,12 @@ namespace CasADi{
     /// Set the derivative at time 0 for a component
     void setDerivativeStart(const std::string& name, double val);
 
+    /// Timed variable (never allocate)
+    SX atTime(const std::string& name, double t, bool allocate=false) const;
+
+    /// Timed variable (allocate if necessary)
+    SX atTime(const std::string& name, double t, bool allocate=false);
+
 #ifndef SWIG
     ///  Print representation
     virtual void repr(std::ostream &stream=std::cout) const;
