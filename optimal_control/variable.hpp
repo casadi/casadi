@@ -29,47 +29,47 @@
 
 namespace CasADi{
     
-    /// Time variability of a variable (see Fritzon page 89)
-    enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
+  /// Time variability of a variable (see Fritzon page 89)
+  enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
 
-    /// Causality of a variable
-    enum Causality{INPUT,OUTPUT,INTERNAL};
+  /// Causality of a variable
+  enum Causality{INPUT,OUTPUT,INTERNAL};
     
-    /// Dynamics of the variable
-    enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
+  /// Dynamics of the variable
+  enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
     
-    /// Dynamics of the variable
-    enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
+  /// Dynamics of the variable
+  enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
-    /// Variable category
-    enum Category{
-      /** Unknown, not set */
-      CAT_UNKNOWN,
-      /** A state derivative */
-      CAT_DERIVATIVE,
-      /** A differential state, i.e. a variable that appears differentiated in the model */
-      CAT_STATE, 
-      /** An independent constant: "constant Real c1 = 3" */
-      CAT_DEPENDENT_CONSTANT,
-      /** A dependent constant "constant Real c2=c1*3". */
-      CAT_INDEPENDENT_CONSTANT,
-      /** A dependent parameter "parameter Real p1=p2"*/
-      CAT_DEPENDENT_PARAMETER,
-      /** An independent parameter "parameter Real p2=3"*/
-      CAT_INDEPENDENT_PARAMETER,
-      /** An algebraic variabel or input */
-      CAT_ALGEBRAIC
-    };
+  /// Variable category
+  enum Category{
+    /** Unknown, not set */
+    CAT_UNKNOWN,
+    /** A state derivative */
+    CAT_DERIVATIVE,
+    /** A differential state, i.e. a variable that appears differentiated in the model */
+    CAT_STATE, 
+    /** An independent constant: "constant Real c1 = 3" */
+    CAT_DEPENDENT_CONSTANT,
+    /** A dependent constant "constant Real c2=c1*3". */
+    CAT_INDEPENDENT_CONSTANT,
+    /** A dependent parameter "parameter Real p1=p2"*/
+    CAT_DEPENDENT_PARAMETER,
+    /** An independent parameter "parameter Real p2=3"*/
+    CAT_INDEPENDENT_PARAMETER,
+    /** An algebraic variabel or input */
+    CAT_ALGEBRAIC
+  };
 
-    // Forward declaration
-    class VariableInternal;
+  // Forward declaration
+  class VariableInternal;
 
   /** \brief Smart pointer class to a Variable
-  *  
-  *  In a sense, a Variable is an SX expression with meta-data attached.
-  */
+   *  
+   *  In a sense, a Variable is an SX expression with meta-data attached.
+   */
   class Variable : public SharedObject{
-    public:
+  public:
     
     /// Default (empty) constructor
     Variable();
