@@ -418,16 +418,49 @@ class Dispatcher:
 class CasadiStructureDerivable:
 
   def __call__(self,arg=0):
+    mtype = None
     if isinstance(arg,DMatrix):
       a = arg
+      mtype = DMatrix
     else:
       try:
         a = DMatrix(arg)
+        mtype = DMatrix
       except:
-        raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
-    if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
-      a = DMatrix.ones(self.size,1)*a
-    return DMatrixStruct(self,data=a)
+        pass
+        
+    if mtype is None:
+      if isinstance(arg,MX):
+        a = arg
+        mtype = MX
+      else:
+        try:
+          a = MX(arg)
+          mtype = MX
+        except:
+          pass
+          
+    if mtype is None:
+      if isinstance(arg,SX):
+        a = arg
+        mtype = SX
+      else:
+        try:
+          a = SX(arg)
+          mtype = SX
+        except:
+          raise Exception("Call to Structure has weird argument: expecting DMatrix-like or MX-like or SXMatrix-like")
+          
+    if isinstance(a,DMatrix):
+      if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
+        a = DMatrix.ones(self.size,1)*a
+      return DMatrixStruct(self,data=a)
+      
+    if isinstance(a,MX):
+      return MXStruct(self,data=a)
+
+    if isinstance(a,SXMatrix):
+      return SXMatrixStruct(self,data=a)
     
   def repeated(self,arg=0):
     if isinstance(arg,DMatrix):
@@ -862,21 +895,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
   def __SX__(self):
     return self.cat
     
-class msymStruct(CasadiStructured,MasterGettable):
-  description = "MX.sym"
-  def __init__(self,struct,order=None):
-    CasadiStructured.__init__(self,struct,order=order)
-
-    if any(e.expr is not None for e in self.entries):
-      raise Exception("struct_symMX does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
-    if any(e.sym is not None for e in self.entries):
-      raise Exception("struct_symMX does not accept entries with an 'sym' argument.")
-
-    self.master = MX.sym("V",self.size,1)
-    
-    self.buildMap()
- 
-
+class VertsplitStructure:
   def buildMap(self,struct=None,parentIndex = (),parent=None):
     if struct is None:  struct = self.struct
     if parent is None:  parent = self.master
@@ -902,7 +921,21 @@ class msymStruct(CasadiStructured,MasterGettable):
     for it, k, sp,e in zip(its,vertsplit(parent,ks),sps,es):
       if not(e.isPrimitive()):
         self.buildMap(struct=e.struct,parentIndex = parentIndex + it,parent=k)
-      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else k[IMatrix(sp,range(sp.size()))]      
+      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else k.reshape(sp) #[IMatrix(sp,range(sp.size()))]      
+    
+class msymStruct(CasadiStructured,MasterGettable,VertsplitStructure):
+  description = "MX.sym"
+  def __init__(self,struct,order=None):
+    CasadiStructured.__init__(self,struct,order=order)
+
+    if any(e.expr is not None for e in self.entries):
+      raise Exception("struct_symMX does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
+    if any(e.sym is not None for e in self.entries):
+      raise Exception("struct_symMX does not accept entries with an 'sym' argument.")
+
+    self.master = MX.sym("V",self.size,1)
+    
+    self.buildMap()
 
   def __MX__(self):
     return self.cat
@@ -937,7 +970,7 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
         
     for e in self.entries:
       self[e.name] = e.expr
-      
+ 
 class DMatrixStruct(MatrixStruct):
 
   def save(self,filename):
@@ -967,9 +1000,11 @@ class SXStruct(MatrixStruct):
   def __SX__(self):
     return self.cat
     
-class MXStruct(MatrixStruct):
+class MXStruct(MatrixStruct,VertsplitStructure):
   def __init__(self,struct,data=None):
     MatrixStruct.__init__(self,struct,MX,data=data)
+    
+    self.buildMap()
 
   def __MX__(self):
     return self.cat

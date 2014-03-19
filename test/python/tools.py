@@ -733,6 +733,30 @@ class Toolstests(casadiTestCase):
     self.checkarray(X_sx.cat,DMatrix(range(n+n*(n+1)/2)))
     self.checkarray(X_mx.cat,DMatrix(range(n+n*(n+1)/2)))
     
+  def test_MX_result(self):
+    s = struct_symMX(["a",entry("b",shape=2),entry("c",shape=(2,2))])
+
+    V = s.cat
+
+    d = s(V)
+
+    print d["b"]
+
+    f = MXFunction([V],[d["a"],d["b"],d["c"]])
+    f.init()
+
+    s_ = s()
+    s_["a"] = 1
+    s_["b"] = DMatrix([2,3])
+    s_["c"] = DMatrix([[4,5],[6,7]])
+    f.setInput(s_)
+    f.evaluate()
+    
+    self.checkarray(f.output(0),s_["a"])
+    self.checkarray(f.output(1),s_["b"])
+    self.checkarray(f.output(2),s_["c"])
+
+    
 if __name__ == '__main__':
     unittest.main()
 
