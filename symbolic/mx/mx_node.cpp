@@ -692,6 +692,42 @@ namespace CasADi{
           c_split.push_back(*i);
         }
       }
+      if (CasadiOptions::simplification_on_the_fly) {
+        // Argument runs that completely enlist the contents of a horzsplit are simplified to their parent
+        // horzcat(horzsplit(x)) -> x
+        vector<MX> c_simplified = c_split;
+        
+        const MXNode* splitter = 0;
+        int splitter_i = 0;
+        int i=0;
+        // Loop over all arguments
+        for(vector<MX>::const_iterator it=c_split.begin(); it!=c_split.end(); ++it){
+          // Attempt to cast to OutputNode
+          const OutputNode* c = dynamic_cast<const OutputNode*>((*it).get());
+          if (c!=0 && (*it)->dep(0)->getOp()==OP_HORZSPLIT) {
+            if (splitter!=(*it)->dep(0).get()) {
+              splitter_i=0;
+              splitter = (*it)->dep(0).operator->();
+            }
+            if (c->oind_ == splitter_i++) {
+              if (splitter->getNumOutputs()==splitter_i) {
+                i-= splitter_i-1;
+                c_simplified.erase(c_simplified.begin()+i,c_simplified.begin()+i+splitter_i);
+                c_simplified.insert(c_simplified.begin()+i,splitter->dep(0));
+                splitter=0;
+              }
+            } else {
+              splitter=0;
+            }
+          } else {
+            splitter = 0;
+          }
+          i++;
+        }
+        if (c_simplified.size()!=c_split.size()) {
+          return getHorzcat(c_simplified);
+        }
+      }
       return MX::create(new Horzcat(c_split));
     }
   }
@@ -727,6 +763,43 @@ namespace CasADi{
           c_split.push_back(*i);
         }
       }
+      if (CasadiOptions::simplification_on_the_fly) {
+        // Argument runs that completely enlist the contents of a vertplit are simplified to their parent
+        // vertcat(vertsplit(x)) -> x
+        vector<MX> c_simplified = c_split;
+        
+        const MXNode* splitter = 0;
+        int splitter_i = 0;
+        int i=0;
+        // Loop over all arguments
+        for(vector<MX>::const_iterator it=c_split.begin(); it!=c_split.end(); ++it){
+          // Attempt to cast to OutputNode
+          const OutputNode* c = dynamic_cast<const OutputNode*>((*it).get());
+          if (c!=0 && (*it)->dep(0)->getOp()==OP_VERTSPLIT) {
+            if (splitter!=(*it)->dep(0).get()) {
+              splitter_i=0;
+              splitter = (*it)->dep(0).operator->();
+            }
+            if (c->oind_ == splitter_i++) {
+              if (splitter->getNumOutputs()==splitter_i) {
+                i-= splitter_i-1;
+                c_simplified.erase(c_simplified.begin()+i,c_simplified.begin()+i+splitter_i);
+                c_simplified.insert(c_simplified.begin()+i,splitter->dep(0));
+                splitter=0;
+              }
+            } else {
+              splitter=0;
+            }
+          } else {
+            splitter = 0;
+          }
+          i++;
+        }
+        if (c_simplified.size()!=c_split.size()) {
+          return getVertcat(c_simplified);
+        }
+      }
+
       return MX::create(new Vertcat(c_split));
     }
   }
@@ -739,7 +812,24 @@ namespace CasADi{
       }
       return ret;
     }
-    return MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
+    std::vector<MX> ret = MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
+    
+    if (CasadiOptions::simplification_on_the_fly) {
+      // Simplify horzsplit(horzcat)
+      if (getOp()==OP_HORZCAT) {
+        int offset_deps = 0;
+        int j = 0;
+        for (int i=0;i<output_offset.size();++i) {
+          while(offset_deps<output_offset[i]) { offset_deps+=dep(j).size2();++j; }
+          if (j>=ndep()) j = ndep()-1;
+          if (output_offset[i]==offset_deps && (i+1<output_offset.size()?output_offset[i+1]:size2()) ==offset_deps +dep(j).size2()) {
+            // Aligned with vertcat dependency
+            ret[i] = dep(j); 
+          }
+        }
+      }
+    }
+    return ret;
   }
 
   std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const{
@@ -750,7 +840,24 @@ namespace CasADi{
       }
       return ret;
     }
-    return MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
+    std::vector<MX> ret = MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
+    
+    if (CasadiOptions::simplification_on_the_fly) {
+      // Simplify vertsplit(vertcat)
+      if (getOp()==OP_VERTCAT) {
+        int offset_deps = 0;
+        int j = 0;
+        for (int i=0;i<output_offset.size();++i) {
+          while(offset_deps<output_offset[i]) { offset_deps+=dep(j).size1();++j; }
+          if (j>=ndep()) j = ndep()-1;
+          if (output_offset[i]==offset_deps && (i+1<output_offset.size()?output_offset[i+1]:size1()) ==offset_deps +dep(j).size1()) {
+            // Aligned with vertcat dependency
+            ret[i] = dep(j); 
+          }
+        }
+      }
+    }
+    return ret;
   }
 
   void MXNode::clearVector(const std::vector<std::vector<MX*> > v){

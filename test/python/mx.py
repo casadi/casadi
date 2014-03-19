@@ -82,7 +82,7 @@ def checkMXoperations3(self,ztf,zrf,name):
     zr = array([[L[0]*i,L[1]*i,L[2]*i] for i in range(8)])
     checkarray(self,zrf(zr),zt,name)
     return (zt,zrf(zr))
-
+    
 class MXtests(casadiTestCase):
 
   def setUp(self):
@@ -2353,6 +2353,265 @@ class MXtests(casadiTestCase):
     self.assertTrue(dependsOn(vertcat([b,0]),[a,b]))
     self.assertFalse(dependsOn(vertcat([0,0]),[a,b]))
     
+  def test_vertcat_simp(self):
+    x = MX.sym("x",10)
+    y = MX.sym("y")
+    z = MX.sym("z")
+    x_ = DMatrix(range(10))
+    y_ = DMatrix([20])
+    z_ = DMatrix([30])
     
+    def evalvertcat(a):
+      f = MXFunction([x,y,z],[vertcat(a)])
+      f.init()
+      f.setInput(x_,0)
+      f.setInput(y_,1)
+      f.setInput(z_,2)
+      f.evaluate()
+      return f.getOutput()
+
+    self.checkarray(evalvertcat(vertsplit(x)),x_)
+    self.checkarray(evalvertcat(vertsplit(x)+[y]),vertcat([x_,y_]))
+    self.checkarray(evalvertcat([z]+vertsplit(x)+[y] + vertsplit(x)+[z]),vertcat([z_,x_,y_,x_,z_]))
+    self.checkarray(evalvertcat(vertsplit(x)[:-1]),x_[:-1])
+    self.checkarray(evalvertcat(vertsplit(x)[:-1]+[y]),vertcat([x_[:-1],y_]))
+    self.checkarray(evalvertcat([z]+vertsplit(x)[:-1]+[y] + vertsplit(x)[:-1]+[z]),vertcat([z_,x_[:-1],y_,x_[:-1],z_]))
+    self.checkarray(evalvertcat(vertsplit(x)[1:]),x_[1:])
+    self.checkarray(evalvertcat(vertsplit(x)[1:]+[y]),vertcat([x_[1:],y_]))
+    self.checkarray(evalvertcat([z]+vertsplit(x)[1:]+[y] + vertsplit(x)[1:]+[z]),vertcat([z_,x_[1:],y_,x_[1:],z_]))
+    g = vertsplit(x)[5:]+vertsplit(x)[:5]
+    self.checkarray(evalvertcat(g),vertcat([x_[5:],x_[:5]]))
+    self.checkarray(evalvertcat(g+[y]),vertcat([x_[5:],x_[:5],y_]))
+    self.checkarray(evalvertcat([z]+g+[y] + g+[z]),vertcat([z_,x_[5:],x_[:5],y_,x_[5:],x_[:5],z_]))
+    
+    import __builtin__
+
+
+    w = vertsplit(x,2)
+    r = __builtin__.sum([vertsplit(i) for i in w],[])
+    
+    self.checkarray(evalvertcat(r),x_)
+
+    w = vertsplit(x,2)
+    r = __builtin__.sum([vertsplit(i)+[y] for i in w],[])
+    print "vertcat:", r
+    print "result:", vertcat(r)
+
+    w = vertsplit(x,2)
+    r = __builtin__.sum([vertsplit(i) for i in w],[])
+    print "vertcat:", r
+    print "result:", vertcat(r+[y])
+    
+    self.assertTrue(isEqual(vertcat(vertsplit(x)),x))
+    
+  def test_horzcat_simp(self):
+    x = MX.sym("x",1,10)
+    y = MX.sym("y")
+    z = MX.sym("z")
+    x_ = DMatrix(range(10)).T
+    y_ = DMatrix([20])
+    z_ = DMatrix([30])
+    
+    def evalhorzcat(a):
+      f = MXFunction([x,y,z],[horzcat(a)])
+      f.init()
+      f.setInput(x_,0)
+      f.setInput(y_,1)
+      f.setInput(z_,2)
+      f.evaluate()
+      return f.getOutput()
+
+    self.checkarray(evalhorzcat(horzsplit(x)),x_)
+    self.checkarray(evalhorzcat(horzsplit(x)+[y]),horzcat([x_,y_]))
+    self.checkarray(evalhorzcat([z]+horzsplit(x)+[y] + horzsplit(x)+[z]),horzcat([z_,x_,y_,x_,z_]))
+    self.checkarray(evalhorzcat(horzsplit(x)[:-1]),x_[0,:-1])
+    self.checkarray(evalhorzcat(horzsplit(x)[:-1]+[y]),horzcat([x_[0,:-1],y_]))
+    self.checkarray(evalhorzcat([z]+horzsplit(x)[:-1]+[y] + horzsplit(x)[:-1]+[z]),horzcat([z_,x_[0,:-1],y_,x_[0,:-1],z_]))
+    self.checkarray(evalhorzcat(horzsplit(x)[1:]),x_[0,1:])
+    self.checkarray(evalhorzcat(horzsplit(x)[1:]+[y]),horzcat([x_[0,1:],y_]))
+    self.checkarray(evalhorzcat([z]+horzsplit(x)[1:]+[y] + horzsplit(x)[1:]+[z]),horzcat([z_,x_[0,1:],y_,x_[0,1:],z_]))
+    g = horzsplit(x)[5:]+horzsplit(x)[:5]
+    self.checkarray(evalhorzcat(g),horzcat([x_[0,5:],x_[0,:5]]))
+    self.checkarray(evalhorzcat(g+[y]),horzcat([x_[0,5:],x_[0,:5],y_]))
+    self.checkarray(evalhorzcat([z]+g+[y] + g+[z]),horzcat([z_,x_[0,5:],x_[0,:5],y_,x_[0,5:],x_[0,:5],z_]))
+    
+    import __builtin__
+
+
+    w = horzsplit(x,2)
+    r = __builtin__.sum([horzsplit(i) for i in w],[])
+    
+    self.checkarray(evalhorzcat(r),x_)
+
+    w = horzsplit(x,2)
+    r = __builtin__.sum([horzsplit(i)+[y] for i in w],[])
+    print "vertcat:", r
+    print "result:", horzcat(r)
+
+    w = horzsplit(x,2)
+    r = __builtin__.sum([horzsplit(i) for i in w],[])
+    print "vertcat:", r
+    print "result:", horzcat(r+[y])
+
+    self.assertTrue(isEqual(horzcat(horzsplit(x)),x))
+    
+  def test_vertsplit_simp(self):
+    
+    dvars = [MX.sym("abcdefghijklm"[i]) for i in range(5) ]
+    dvars_ = range(5)
+
+    zz = MX.sym("zz",2)
+    zz_ = DMatrix([11,12])
+    y = MX.sym("y")
+    z = MX.sym("z")
+    y_ = DMatrix([20])
+    z_ = DMatrix([30])
+    
+    aa = MX.sym("aa",5)
+    aa_ = range(100,105)
+    
+    def evalvertsplit(a,*args):
+      print vertsplit(a,*args)
+      f = MXFunction(dvars+[y,z,zz,aa],vertsplit(a,*args))
+      f.init()
+      for i in range(5):
+        f.setInput(dvars_[i],i)
+      f.setInput(y_,5+0)
+      f.setInput(z_,5+1)
+      f.setInput(zz_,5+2)
+      f.setInput(aa_,5+3)
+      f.evaluate()
+      return [f.getOutput(i) for i in range(f.getNumOutputs())]
+      
+    s= evalvertsplit(vertcat([y]+dvars+[z]))
+    self.checkarray(s[0],y_)
+    for i in range(5):
+      self.checkarray(s[1+i],dvars_[i])
+    self.checkarray(s[6],z_)
+
+    s= evalvertsplit(vertcat([y]+dvars+[z]),2)
+    
+    self.checkarray(s[0],DMatrix([y_,dvars_[0]]))
+    self.checkarray(s[1],DMatrix([dvars_[1],dvars_[2]]))
+    self.checkarray(s[2],DMatrix([dvars_[3],dvars_[4]]))
+    self.checkarray(s[3],DMatrix([z_]))
+    
+    s= evalvertsplit(vertcat([y,zz,z,zz]),2)
+    
+    self.checkarray(s[0],DMatrix([y_,zz_[0]]))
+    self.checkarray(s[1],DMatrix([zz_[1],z_]))
+    self.checkarray(s[2],zz_)
+    
+    s= evalvertsplit(vertcat([y,zz,z,zz]),3)
+    
+    self.checkarray(s[0],DMatrix([y_,zz_[0],zz_[1]]))
+    self.checkarray(s[1],DMatrix([z_,zz_[0],zz_[1]]))
+    
+    s= evalvertsplit(vertcat([zz,zz]),2)
+    self.checkarray(s[0],zz_)
+    self.checkarray(s[1],zz_)
+
+    s= evalvertsplit(vertcat([zz]+dvars))
+    self.checkarray(s[0],zz_[0])
+    self.checkarray(s[1],zz_[1])
+    
+    for i in range(5):
+      self.checkarray(s[2+i],dvars_[i])
+
+    s= evalvertsplit(vertcat(dvars+[aa]),5)
+    self.checkarray(s[0],DMatrix(dvars_))
+    self.checkarray(s[1],DMatrix(aa_))
+
+    s= evalvertsplit(vertcat(dvars+[aa]),4)
+    self.checkarray(s[0],DMatrix(dvars_[:4]))
+    self.checkarray(s[1],DMatrix([dvars_[-1]]+aa_[:3]))
+    self.checkarray(s[2],DMatrix(aa_[3:]))
+
+    s= evalvertsplit(vertcat(dvars+[aa]),6)
+    self.checkarray(s[0],DMatrix(dvars_+[aa_[0]]))
+    self.checkarray(s[1],DMatrix(aa_[1:]))
+    
+    for i in range(5):
+      self.assertTrue(isEqual(vertsplit(vertcat(dvars))[i],dvars[i]))
+
+  def test_horzsplit_simp(self):
+    
+    dvars = [MX.sym("abcdefghijklm"[i]) for i in range(5) ]
+    dvars_ = range(5)
+
+    zz = MX.sym("zz",1,2)
+    zz_ = DMatrix([11,12]).T
+    y = MX.sym("y")
+    z = MX.sym("z")
+    y_ = DMatrix([20])
+    z_ = DMatrix([30])
+    
+    aa = MX.sym("aa",1,5)
+    aa_ = range(100,105)
+    
+    def evalhorzsplit(a,*args):
+      print horzsplit(a,*args)
+      f = MXFunction(dvars+[y,z,zz,aa],horzsplit(a,*args))
+      f.init()
+      for i in range(5):
+        f.setInput(dvars_[i],i)
+      f.setInput(y_,5+0)
+      f.setInput(z_,5+1)
+      f.setInput(zz_,5+2)
+      f.setInput(aa_,5+3)
+      f.evaluate()
+      return [f.getOutput(i) for i in range(f.getNumOutputs())]
+      
+    s= evalhorzsplit(horzcat([y]+dvars+[z]))
+    self.checkarray(s[0],y_)
+    for i in range(5):
+      self.checkarray(s[1+i],dvars_[i])
+    self.checkarray(s[6],z_)
+
+    s= evalhorzsplit(horzcat([y]+dvars+[z]),2)
+    
+    self.checkarray(s[0],DMatrix([y_,dvars_[0]]).T)
+    self.checkarray(s[1],DMatrix([dvars_[1],dvars_[2]]).T)
+    self.checkarray(s[2],DMatrix([dvars_[3],dvars_[4]]).T)
+    self.checkarray(s[3],DMatrix([z_]).T)
+    
+    s= evalhorzsplit(horzcat([y,zz,z,zz]),2)
+    
+    self.checkarray(s[0],DMatrix([y_,zz_[0,0]]).T)
+    self.checkarray(s[1],DMatrix([zz_[0,1],z_]).T)
+    self.checkarray(s[2],zz_)
+    
+    s= evalhorzsplit(horzcat([y,zz,z,zz]),3)
+    
+    self.checkarray(s[0],DMatrix([y_,zz_[0,0],zz_[0,1]]).T)
+    self.checkarray(s[1],DMatrix([z_,zz_[0,0],zz_[0,1]]).T)
+    
+    s= evalhorzsplit(horzcat([zz,zz]),2)
+    self.checkarray(s[0],zz_)
+    self.checkarray(s[1],zz_)
+
+    s= evalhorzsplit(horzcat([zz]+dvars))
+    self.checkarray(s[0],zz_[0,0])
+    self.checkarray(s[1],zz_[0,1])
+    
+    for i in range(5):
+      self.checkarray(s[2+i],dvars_[i])
+
+    s= evalhorzsplit(horzcat(dvars+[aa]),5)
+    self.checkarray(s[0],DMatrix(dvars_).T)
+    self.checkarray(s[1],DMatrix(aa_).T)
+
+    s= evalhorzsplit(horzcat(dvars+[aa]),4)
+    self.checkarray(s[0],DMatrix(dvars_[:4]).T)
+    self.checkarray(s[1],DMatrix([dvars_[-1]]+aa_[:3]).T)
+    self.checkarray(s[2],DMatrix(aa_[3:]).T)
+
+    s= evalhorzsplit(horzcat(dvars+[aa]),6)
+    self.checkarray(s[0],DMatrix(dvars_+[aa_[0]]).T)
+    self.checkarray(s[1],DMatrix(aa_[1:]).T)
+    
+    for i in range(5):
+      self.assertTrue(isEqual(horzsplit(horzcat(dvars))[i],dvars[i]))
+      
 if __name__ == '__main__':
     unittest.main()
