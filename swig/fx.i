@@ -132,7 +132,9 @@
 %include "symbolic/fx/external_function.hpp"
 %include "symbolic/fx/parallelizer.hpp"
 %include "symbolic/fx/custom_function.hpp"
+#ifndef SWIGOCTAVE
 %include "symbolic/functor.hpp"
+#endif
 %include "symbolic/fx/nullspace.hpp"
 
 %template(IntegratorVector) std::vector<CasADi::Integrator>;
