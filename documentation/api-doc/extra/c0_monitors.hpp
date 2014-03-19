@@ -94,9 +94,16 @@
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dx</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::SnoptInternal</td></tr>
 <tr><td>eval_nlp</td><td>CasADi::SnoptInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>qp</td><td>CasADi::SnoptInternal</td></tr>
 <tr><td>setup_nlp</td><td>CasADi::SnoptInternal</td></tr>
 </table>
 */
@@ -106,9 +113,16 @@
 <a name='monitors'></a><table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dx</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::SnoptInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::SnoptInternal</td></tr>
 <tr><td>eval_nlp</td><td>CasADi::SnoptInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>qp</td><td>CasADi::SnoptInternal</td></tr>
 <tr><td>setup_nlp</td><td>CasADi::SnoptInternal</td></tr>
 </table>
 */
