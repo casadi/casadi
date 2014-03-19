@@ -493,12 +493,12 @@ def lprint(s):
  
 def lprints(): 
   lprint("M")
-  lprint("M[0]")
-  lprint("M[1]")
-  lprint("M[2]")
-  lprint("M[3]")
-  lprint("M[-1]")
-  lprint("M[-2]")
+  lprint("M.nz[0]")
+  lprint("M.nz[1]")
+  lprint("M.nz[2]")
+  lprint("M.nz[3]")
+  lprint("M.nz[-1]")
+  lprint("M.nz[-2]")
   lprint("M[0,0]")
   lprint("M[0,1]")
   lprint("M[1,0]")
@@ -522,11 +522,11 @@ CasADi supports the full range of python slices.
 \begin{pytexoutput}
 M = DMatrix([[3,7,8,9],[4,5,6,1]])
 lprint("M")
-lprint("M[:]")    # [3,7,8,9,4,5,6,1]
-lprint("M[1:]")   # [  7,8,9,4,5,6,1]
-lprint("M[:-1]")  # [3,7,8,9,4,5,6  ]
-lprint("M[1:4]")  # [  7,8,9        ]
-lprint("M[::3]")  # [3,    9,    6  ]
+lprint("M.nz[:]")    # [3,4,7,5,8,6,9,1]
+lprint("M.nz[1:]")   # [  4,7,5,8,6,9,1]
+lprint("M.nz[:-1]")  # [3,4,7,5,8,6,9  ]
+lprint("M.nz[1:4]")  # [  4,7,5        ]
+lprint("M.nz[::3]")  # [3,    5,    9  ]
 lprint("M[1,:]")  # [[4,  5,  6,  1 ]]
 lprint("M[:,0]")  # [[3],[4]]
 lprint("M[0,1]")  # 7
@@ -538,8 +538,8 @@ lprint("M[:,1:]") # [[7,8,9],[5,6,1]]
 \begin{pytexoutput}
 M = DMatrix([[3,7,8,9],[4,5,6,1]])
 lprint("M")
-lprint("M[[0,1,2]]")      # [3,7,8]
-lprint("M[[6,1,3]]")      # [6,7,9]
+lprint("M.nz[[0,1,2]]")      # [3,4,7]
+lprint("M.nz[[6,1,3]]")      # [9,4,5]
 lprint("M[0,[0,3]]")      # [[3,  9]]
 lprint("M[[1,0],[0,3]]")  # [[4,  1],[3,  9]]
 \end{pytexoutput}
@@ -551,11 +551,11 @@ In the \emph{nonzero access} style, each number of the \texttt{IMatrix} supplied
 \begin{pytex}
 M = DMatrix([[3,7,8,9],[4,5,6,1]])
 k = IMatrix([[0],[1]])
-print M[k]    # [[3],[7]]
+print M[k]    # [[3],[4]]
 k = IMatrix([[0,1],[3,6]])
-print M[k]    # [[3,  7 ],[9,  6 ]]
+print M[k]    # [[3,  4 ],[5,  9 ]]
 k = diag(range(4))
-print M[k]    # diag([3,7,8,9])
+print M[k]    # diag([3,4,7,5])
 \end{pytex}
 
 \begin{pytex}
