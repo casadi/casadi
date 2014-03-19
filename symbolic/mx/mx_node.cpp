@@ -662,14 +662,6 @@ namespace CasADi{
   }
 
   MX MXNode::getHorzcat(const std::vector<MX>& c) const{
-    // If dependents are all-zero, produce a new constant
-    bool zero = true;
-    for (int i=0;i<c.size();++i) {
-      if (!c[i]->isZero()) { zero = false; break; }
-    }
-    if (zero) {
-      return MX::zeros(Horzcat(c).sparsity());
-    }
     // Split up existing horzcats
     vector<MX> c_split;
     c_split.reserve(c.size());
@@ -720,14 +712,6 @@ namespace CasADi{
   }
 
   MX MXNode::getVertcat(const std::vector<MX>& c) const{
-    // If dependents are all-zero, produce a new constant
-    bool zero = true;
-    for (int i=0;i<c.size();++i) {
-      if (!c[i]->isZero()) { zero = false; break; }
-    }
-    if (zero) {
-      return MX::zeros(Vertcat(c).sparsity());
-    }
     // Split up existing vertcats
     vector<MX> c_split;
     c_split.reserve(c.size());
