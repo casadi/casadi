@@ -89,6 +89,12 @@ namespace CasADi{
 
     /** \brief Get the operation */
     virtual int getOp() const{ return -1;}
+
+    /// Create a horizontal concatenation node
+    virtual MX getHorzcat(const std::vector<MX>& x) const{ return dep()->getHorzcat(x);}
+
+    /// Create a vertical concatenation node (vectors only)
+    virtual MX getVertcat(const std::vector<MX>& x) const{ return dep()->getVertcat(x);}
     
     /** \brief  Output index */
     int oind_;
