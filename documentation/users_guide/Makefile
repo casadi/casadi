@@ -1,4 +1,4 @@
-REVISION=$(shell git rev-parse HEAD)
+REVISION=$(shell python -c "import casadi;print casadi.__version__")
 
 default: html pdf
 
@@ -11,7 +11,7 @@ snippets:
 	
 pdf: casadi-users_guide.tex
 	rm -f pytex_*
-	pdflatex -interaction=nonstopmode $<
+	pdflatex -interaction=nonstopmode "\newcommand{\currentversion}{$(REVISION)\xspace} \input{casadi-users_guide.tex}"
 	python pytex.py
-	pdflatex -interaction=nonstopmode $<
+	pdflatex -interaction=nonstopmode "\newcommand{\currentversion}{$(REVISION)\xspace} \input{casadi-users_guide.tex}"
 	rm -f *.aux *.out *.toc #pytex_*
