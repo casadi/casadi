@@ -8,7 +8,7 @@ html: pdf
 	
 snippets:
 	rm -f pytex_*
-	pdflatex -interaction=nonstopmode casadi-users_guide.tex
+	pdflatex -interaction=nonstopmode "\newcommand{\currentversion}{$(REVISION)\xspace} \input{casadi-users_guide.tex}" -j    obname=casadi-users_guide
 	
 pdf: casadi-users_guide.tex
 	rm -f pytex_*
