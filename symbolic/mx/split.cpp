@@ -27,6 +27,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../fx/sx_function.hpp"
 #include "../matrix/sparsity_tools.hpp"
+#include "../casadi_options.hpp"
 
 using namespace std;
 
@@ -233,6 +234,90 @@ namespace CasADi{
         adjSens[d][0]->addToSum(vertcat(v));
       }
     }
+  }
+
+  MX Horzsplit::getHorzcat(const std::vector<MX>& x) const{
+    if (CasadiOptions::simplification_on_the_fly) {
+      // Argument runs that completely enlist the contents of a horzsplit are simplified to their parent
+      // horzcat(horzsplit(x)) -> x
+      vector<MX> c_simplified = x;
+        
+      const MXNode* splitter = 0;
+      int splitter_i = 0;
+      int i=0;
+      // Loop over all arguments
+      for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it){
+        // Attempt to cast to OutputNode
+        const OutputNode* c = dynamic_cast<const OutputNode*>((*it).get());
+        if (c!=0 && (*it)->dep(0)->getOp()==OP_HORZSPLIT) {
+          if (splitter!=(*it)->dep(0).get()) {
+            splitter_i=0;
+            splitter = (*it)->dep(0).operator->();
+          }
+          if (c->oind_ == splitter_i++) {
+            if (splitter->getNumOutputs()==splitter_i) {
+              i-= splitter_i-1;
+              c_simplified.erase(c_simplified.begin()+i,c_simplified.begin()+i+splitter_i);
+              c_simplified.insert(c_simplified.begin()+i,splitter->dep(0));
+              splitter=0;
+            }
+          } else {
+            splitter=0;
+          }
+        } else {
+          splitter = 0;
+        }
+        i++;
+      }
+      if (c_simplified.size()!=x.size()) {
+        return horzcat(c_simplified);
+      }
+    }
+
+    // Fall back on default implementation
+    return MXNode::getHorzcat(x);
+  }
+
+  MX Vertsplit::getVertcat(const std::vector<MX>& x) const{
+    if (CasadiOptions::simplification_on_the_fly) {
+      // Argument runs that completely enlist the contents of a vertplit are simplified to their parent
+      // vertcat(vertsplit(x)) -> x
+      vector<MX> c_simplified = x;
+        
+      const MXNode* splitter = 0;
+      int splitter_i = 0;
+      int i=0;
+      // Loop over all arguments
+      for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it){
+        // Attempt to cast to OutputNode
+        const OutputNode* c = dynamic_cast<const OutputNode*>((*it).get());
+        if (c!=0 && (*it)->dep(0)->getOp()==OP_VERTSPLIT) {
+          if (splitter!=(*it)->dep(0).get()) {
+            splitter_i=0;
+            splitter = (*it)->dep(0).operator->();
+          }
+          if (c->oind_ == splitter_i++) {
+            if (splitter->getNumOutputs()==splitter_i) {
+              i-= splitter_i-1;
+              c_simplified.erase(c_simplified.begin()+i,c_simplified.begin()+i+splitter_i);
+              c_simplified.insert(c_simplified.begin()+i,splitter->dep(0));
+              splitter=0;
+            }
+          } else {
+            splitter=0;
+          }
+        } else {
+          splitter = 0;
+        }
+        i++;
+      }
+      if (c_simplified.size()!=x.size()) {
+        return vertcat(c_simplified);
+      }
+    }
+
+    // Fall back on default implementation
+    return MXNode::getVertcat(x);    
   }
 
 } // namespace CasADi
