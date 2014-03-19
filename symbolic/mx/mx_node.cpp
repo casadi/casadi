@@ -661,7 +661,7 @@ namespace CasADi{
     return MX::create(new Norm1(shared_from_this<MX>()));
   }
 
-  MX MXNode::getHorzcat(const std::vector<MX>& c){
+  MX MXNode::getHorzcat(const std::vector<MX>& c) const{
     // If dependents are all-zero, produce a new constant
     bool zero = true;
     for (int i=0;i<c.size();++i) {
@@ -719,7 +719,7 @@ namespace CasADi{
     return MX::create(new Horzcat(c_split));
   }
 
-  MX MXNode::getVertcat(const std::vector<MX>& c){
+  MX MXNode::getVertcat(const std::vector<MX>& c) const{
     // If dependents are all-zero, produce a new constant
     bool zero = true;
     for (int i=0;i<c.size();++i) {

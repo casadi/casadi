@@ -55,7 +55,7 @@ namespace CasADi{
     } else if(has_empty(x)){
       return horzcat(trim_empty(x));
     } else {
-      return MXNode::getHorzcat(x);
+      return x.front()->getHorzcat(x);
     }
   }
 
@@ -72,7 +72,7 @@ namespace CasADi{
       for(vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
       return horzcat(xT).T();
     } else {
-      return MXNode::getVertcat(x);
+      return x.front()->getVertcat(x);
     }
   }
 
