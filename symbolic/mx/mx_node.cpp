@@ -661,27 +661,33 @@ namespace CasADi{
     return MX::create(new Norm1(shared_from_this<MX>()));
   }
 
-  MX MXNode::getHorzcat(const std::vector<MX>& c) const{
-    // Split up existing horzcats
-    vector<MX> c_split;
-    c_split.reserve(c.size());
-    for(vector<MX>::const_iterator i=c.begin(); i!=c.end(); ++i){
-      if(i->getOp()==OP_HORZCAT){        
-        c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
-      } else {
-        c_split.push_back(*i);
+  MX MXNode::getHorzcat(const std::vector<MX>& x) const{
+    // Check if there is any existing horzcat operation
+    for(vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i){
+      if(i->getOp()==OP_HORZCAT){
+        // Split up
+        vector<MX> x_split(x.begin(),i);
+        for(; i!=x.end(); ++i){
+          if(i->getOp()==OP_HORZCAT){        
+            x_split.insert(x_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
+          } else {
+            x_split.push_back(*i);
+          }
+        }
+        return horzcat(x_split);
       }
     }
+
     if (CasadiOptions::simplification_on_the_fly) {
       // Argument runs that completely enlist the contents of a horzsplit are simplified to their parent
       // horzcat(horzsplit(x)) -> x
-      vector<MX> c_simplified = c_split;
+      vector<MX> c_simplified = x;
         
       const MXNode* splitter = 0;
       int splitter_i = 0;
       int i=0;
       // Loop over all arguments
-      for(vector<MX>::const_iterator it=c_split.begin(); it!=c_split.end(); ++it){
+      for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it){
         // Attempt to cast to OutputNode
         const OutputNode* c = dynamic_cast<const OutputNode*>((*it).get());
         if (c!=0 && (*it)->dep(0)->getOp()==OP_HORZSPLIT) {
@@ -704,34 +710,40 @@ namespace CasADi{
         }
         i++;
       }
-      if (c_simplified.size()!=c_split.size()) {
+      if (c_simplified.size()!=x.size()) {
         return horzcat(c_simplified);
       }
     }
-    return MX::create(new Horzcat(c_split));
+    return MX::create(new Horzcat(x));
   }
 
-  MX MXNode::getVertcat(const std::vector<MX>& c) const{
-    // Split up existing vertcats
-    vector<MX> c_split;
-    c_split.reserve(c.size());
-    for(vector<MX>::const_iterator i=c.begin(); i!=c.end(); ++i){
-      if(i->getOp()==OP_VERTCAT){        
-        c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
-      } else {
-        c_split.push_back(*i);
+  MX MXNode::getVertcat(const std::vector<MX>& x) const{
+    // Check if there is any existing vertcat operation
+    for(vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i){
+      if(i->getOp()==OP_VERTCAT){
+        // Split up
+        vector<MX> x_split(x.begin(),i);
+        for(; i!=x.end(); ++i){
+          if(i->getOp()==OP_VERTCAT){        
+            x_split.insert(x_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
+          } else {
+            x_split.push_back(*i);
+          }
+        }
+        return vertcat(x_split);
       }
     }
+
     if (CasadiOptions::simplification_on_the_fly) {
       // Argument runs that completely enlist the contents of a vertplit are simplified to their parent
       // vertcat(vertsplit(x)) -> x
-      vector<MX> c_simplified = c_split;
+      vector<MX> c_simplified = x;
         
       const MXNode* splitter = 0;
       int splitter_i = 0;
       int i=0;
       // Loop over all arguments
-      for(vector<MX>::const_iterator it=c_split.begin(); it!=c_split.end(); ++it){
+      for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it){
         // Attempt to cast to OutputNode
         const OutputNode* c = dynamic_cast<const OutputNode*>((*it).get());
         if (c!=0 && (*it)->dep(0)->getOp()==OP_VERTSPLIT) {
@@ -754,12 +766,12 @@ namespace CasADi{
         }
         i++;
       }
-      if (c_simplified.size()!=c_split.size()) {
+      if (c_simplified.size()!=x.size()) {
         return vertcat(c_simplified);
       }
     }
 
-    return MX::create(new Vertcat(c_split));
+    return MX::create(new Vertcat(x));
   }
 
   std::vector<MX> MXNode::getHorzsplit(const std::vector<int>& output_offset) const{
