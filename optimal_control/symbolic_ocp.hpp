@@ -98,7 +98,7 @@ namespace CasADi{
     SX t;
     
     /** \brief Fully implific states (includes differential states and algebraic variables) */
-    std::vector<Variable> s;
+    SX sQQQ;
 
     /** \brief Differential states */
     SX xQQQ;
