@@ -685,7 +685,7 @@ namespace CasADi{
   
     // Variables
     SX _s = CasADi::var(this->s);
-    SX _sdot = CasADi::der(this->s);
+    SX _sdot = der(var(this->s));
     SX _x = CasADi::var(this->x);
     SX _pi = CasADi::var(this->pi);
     SX _pf = CasADi::var(this->pf);

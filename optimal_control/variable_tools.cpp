@@ -33,13 +33,4 @@ namespace CasADi{
     return vertcat(ret);
   }
     
-  SX der(const vector<Variable> v){
-    if(v.empty()) return SX::zeros(0,1);
-    vector<SX> ret(v.size());
-    for(int i=0; i<v.size(); ++i)
-      ret[i] = v[i].der();
-    return vertcat(ret);
-  }
-    
-    
 } // namespace CasADi

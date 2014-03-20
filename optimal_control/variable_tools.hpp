@@ -29,14 +29,6 @@ namespace CasADi{
   
   /// Get an expression from a vector of variables
   SX var(const std::vector<Variable> v);
-
-  /// Get a derivative expression from a vector of variables
-  SX der(const std::vector<Variable> v);
-
-#ifndef SWIG
-  /// Call a member function for all members of a vector (note: fcn pointer to member function)
-  std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal=false);
-#endif // SWIG
   
 } // namespace CasADi
 
