@@ -125,7 +125,7 @@ namespace CasADi{
 
     /** \brief Free parameters 
         A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
-    std::vector<Variable> pf;
+    SX pfQQQ;
     
     /** \brief Dependent variables (length == dep().size()) */
     SX yQQQ;
