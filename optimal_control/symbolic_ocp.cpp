@@ -63,7 +63,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->sQQQ=this->xQQQ=this->zQQQ=this->qQQQ=this->ciQQQ=this->cdQQQ=this->piQQQ=this->pdQQQ=this->pfQQQ=this->yQQQ=this->uQQQ = SX::zeros(0,1);
+    this->s=this->x=this->z=this->q=this->ci=this->cd=this->pi=this->pd=this->pf=this->y=this->u = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -200,7 +200,7 @@ namespace CasADi{
         SX bexpr = readExpr(beq[1][0]);
       
         // Add binding equation
-        this->yQQQ.append(var->var_);
+        this->y.append(var->var_);
         this->dep.append(bexpr);
       }
     
@@ -391,10 +391,10 @@ namespace CasADi{
     }
   
     // Make sure that the dimensions are consistent at this point
-    casadi_assert_warning(this->xQQQ.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
-    casadi_assert_warning(this->zQQQ.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
-    casadi_assert(this->qQQQ.size()==this->quad.size());
-    casadi_assert(this->yQQQ.size()==this->dep.size());
+    casadi_assert_warning(this->x.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
+    casadi_assert_warning(this->z.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
+    casadi_assert(this->q.size()==this->quad.size());
+    casadi_assert(this->y.size()==this->dep.size());
   }
 
   Variable& SymbolicOCP::readVariable(const XMLNode& node){
@@ -499,17 +499,17 @@ namespace CasADi{
 
   void SymbolicOCP::print(ostream &stream) const{
     stream << "Dimensions: "; 
-    stream << "#s = " << this->sQQQ.size() << ", ";
-    stream << "#x = " << this->xQQQ.size() << ", ";
-    stream << "#z = " << this->zQQQ.size() << ", ";
-    stream << "#q = " << this->qQQQ.size() << ", ";
-    stream << "#y = " << this->yQQQ.size() << ", ";
-    stream << "#pi = " << this->piQQQ.size() << ", ";
-    stream << "#pd = " << this->pdQQQ.size() << ", ";
-    stream << "#pf = " << this->pfQQQ.size() << ", ";
-    stream << "#ci =  " << this->ciQQQ.size() << ", ";
-    stream << "#cd =  " << this->cdQQQ.size() << ", ";
-    stream << "#u = " << this->uQQQ.size() << ", ";
+    stream << "#s = " << this->s.size() << ", ";
+    stream << "#x = " << this->x.size() << ", ";
+    stream << "#z = " << this->z.size() << ", ";
+    stream << "#q = " << this->q.size() << ", ";
+    stream << "#y = " << this->y.size() << ", ";
+    stream << "#pi = " << this->pi.size() << ", ";
+    stream << "#pd = " << this->pd.size() << ", ";
+    stream << "#pf = " << this->pf.size() << ", ";
+    stream << "#ci =  " << this->ci.size() << ", ";
+    stream << "#cd =  " << this->cd.size() << ", ";
+    stream << "#u = " << this->u.size() << ", ";
     stream << endl << endl;
 
     // Variables in the class hierarchy
@@ -518,17 +518,17 @@ namespace CasADi{
     // Print the variables
     stream << "{" << endl;
     stream << "  t = " << this->t.getDescription() << endl;
-    stream << "  s = " << this->sQQQ << endl;
-    stream << "  x = " << this->xQQQ << endl;
-    stream << "  z =  " << this->zQQQ << endl;
-    stream << "  q =  " << this->qQQQ << endl;
-    stream << "  y =  " << this->yQQQ << endl;
-    stream << "  pi =  " << this->piQQQ << endl;
-    stream << "  pd =  " << this->pdQQQ << endl;
-    stream << "  pf =  " << this->pfQQQ << endl;
-    stream << "  ci =  " << this->ciQQQ << endl;
-    stream << "  cd =  " << this->cdQQQ << endl;
-    stream << "  u =  " << this->uQQQ << endl;
+    stream << "  s = " << this->s << endl;
+    stream << "  x = " << this->x << endl;
+    stream << "  z =  " << this->z << endl;
+    stream << "  q =  " << this->q << endl;
+    stream << "  y =  " << this->y << endl;
+    stream << "  pi =  " << this->pi << endl;
+    stream << "  pd =  " << this->pd << endl;
+    stream << "  pf =  " << this->pf << endl;
+    stream << "  ci =  " << this->ci << endl;
+    stream << "  cd =  " << this->cd << endl;
+    stream << "  u =  " << this->u << endl;
     stream << "}" << endl;
   
     stream << "Fully-implicit differential-algebraic equations" << endl;
@@ -539,19 +539,19 @@ namespace CasADi{
 
     stream << "Differential equations" << endl;
     for(int k=0; k<this->ode.size(); ++k){
-      stream << der(this->xQQQ.at(k)).toScalar() << " == " << this->ode.at(k) << endl;
+      stream << der(this->x.at(k)).toScalar() << " == " << this->ode.at(k) << endl;
     }
     stream << endl;
 
     stream << "Algebraic equations" << endl;
-    for(int k=0; k<this->zQQQ.size(); ++k){
+    for(int k=0; k<this->z.size(); ++k){
       stream << "0 == " << this->alg.at(k) << endl;
     }
     stream << endl;
   
     stream << "Quadrature equations" << endl;
-    for(int k=0; k<this->qQQQ.size(); ++k){
-      stream << der(this->qQQQ.at(k)).toScalar() << " == " << this->quad.at(k) << endl;
+    for(int k=0; k<this->q.size(); ++k){
+      stream << der(this->q.at(k)).toScalar() << " == " << this->quad.at(k) << endl;
     }
     stream << endl;
 
@@ -563,8 +563,8 @@ namespace CasADi{
 
     // Dependent equations
     stream << "Dependent equations" << endl;
-    for(int i=0; i<this->yQQQ.size(); ++i)
-      stream << this->yQQQ.at(i) << " == " << this->dep.at(i) << endl;
+    for(int i=0; i<this->y.size(); ++i)
+      stream << this->y.at(i) << " == " << this->dep.at(i) << endl;
     stream << endl;
 
     // Mayer terms
@@ -599,14 +599,14 @@ namespace CasADi{
   }
 
   void SymbolicOCP::eliminateInterdependencies(){
-    substituteInPlace(this->yQQQ,this->dep,false);
+    substituteInPlace(this->y,this->dep,false);
   
     // Make sure that the dependent variables have been properly eliminated from the dependent expressions
-    casadi_assert(!dependsOn(this->dep,this->yQQQ));
+    casadi_assert(!dependsOn(this->dep,this->y));
   }
 
   vector<SX> SymbolicOCP::substituteDependents(const vector<SX>& x) const{
-    return substitute(x,vector<SX>(1,this->yQQQ),vector<SX>(1,this->dep));
+    return substitute(x,vector<SX>(1,this->y),vector<SX>(1,this->dep));
   }
 
   void SymbolicOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
@@ -654,7 +654,7 @@ namespace CasADi{
       addVariable(q_name.str(),qv);
     
       // Add to the quadrature states
-      this->qQQQ.append(qv.var());
+      this->q.append(qv.var());
 
       // Add the Lagrange term to the list of quadratures
       this->quad.append(*it);
@@ -670,8 +670,8 @@ namespace CasADi{
   void SymbolicOCP::eliminateQuadratureStates(){
   
     // Move all the quadratures to the list of differential states
-    this->xQQQ.append(this->qQQQ);
-    this->qQQQ = SX::zeros(0,1);
+    this->x.append(this->q);
+    this->q = SX::zeros(0,1);
   
     // Move the equations to the list of ODEs
     this->ode.append(this->quad);
@@ -683,38 +683,38 @@ namespace CasADi{
     double time1 = clock();
   
     // Variables
-    SX _sdot = der(this->sQQQ);
+    SX _sdot = der(this->s);
   
     // Collect all the variables
     SX v;
     v.append(this->t);
-    v.append(this->sQQQ);
+    v.append(this->s);
     v.append(_sdot);
-    v.append(this->xQQQ);
-    v.append(this->zQQQ);
-    v.append(this->piQQQ);
-    v.append(this->pfQQQ);
-    v.append(this->uQQQ);
+    v.append(this->x);
+    v.append(this->z);
+    v.append(this->pi);
+    v.append(this->pf);
+    v.append(this->u);
     
     // Nominal values
     SX t_n = 1.;
-    SX s_n = nominal(this->sQQQ);
-    SX x_n = nominal(this->xQQQ);
-    SX z_n = nominal(this->zQQQ);
-    SX pi_n = nominal(this->piQQQ);
-    SX pf_n = nominal(this->pfQQQ);
-    SX u_n = nominal(this->uQQQ);
+    SX s_n = nominal(this->s);
+    SX x_n = nominal(this->x);
+    SX z_n = nominal(this->z);
+    SX pi_n = nominal(this->pi);
+    SX pf_n = nominal(this->pf);
+    SX u_n = nominal(this->u);
   
     // Get all the old variables in expressed in the nominal ones
     SX v_old;
     v_old.append(this->t*t_n);
-    v_old.append(this->sQQQ*s_n);
+    v_old.append(this->s*s_n);
     v_old.append(_sdot*s_n);
-    v_old.append(this->xQQQ*x_n);
-    v_old.append(this->zQQQ*z_n);
-    v_old.append(this->piQQQ*pi_n);
-    v_old.append(this->pfQQQ*pf_n);
-    v_old.append(this->uQQQ*u_n);
+    v_old.append(this->x*x_n);
+    v_old.append(this->z*z_n);
+    v_old.append(this->pi*pi_n);
+    v_old.append(this->pf*pf_n);
+    v_old.append(this->u*u_n);
   
     // Temporary variable
     SX temp;
@@ -745,12 +745,12 @@ namespace CasADi{
     enum Variables{T,X,XDOT,Z,PI,PF,U,NUM_VAR};
     vector<SX > v(NUM_VAR); // all variables
     v[T] = this->t;
-    v[X] = this->xQQQ;
-    v[XDOT] = der(this->xQQQ); // BUG!!!
-    v[Z] = this->zQQQ;
-    v[PI] = this->piQQQ;
-    v[PF] = this->pfQQQ;
-    v[U] = this->uQQQ;
+    v[X] = this->x;
+    v[XDOT] = der(this->x); // BUG!!!
+    v[Z] = this->z;
+    v[PI] = this->pi;
+    v[PF] = this->pf;
+    v[U] = this->u;
 
     // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
     SX xz;
@@ -765,12 +765,12 @@ namespace CasADi{
     // Evaluate the Jacobian in the starting point
     J.init();
     J.setInput(0.0,T);
-    J.setInput(start(this->xQQQ,true),X);
+    J.setInput(start(this->x,true),X);
     J.input(XDOT).setAll(0.0);
-    J.setInput(start(this->zQQQ,true),Z);
-    J.setInput(start(this->piQQQ,true),PI);
-    J.setInput(start(this->pfQQQ,true),PF);
-    J.setInput(start(this->uQQQ,true),U);
+    J.setInput(start(this->z,true),Z);
+    J.setInput(start(this->pi,true),PI);
+    J.setInput(start(this->pf,true),PF);
+    J.setInput(start(this->u,true),U);
     J.evaluate();
   
     // Get the maximum of every row
@@ -809,10 +809,10 @@ namespace CasADi{
 
   void SymbolicOCP::sortDAE(){
     // Quick return if no differential states
-    if(this->xQQQ.isEmpty()) return;
+    if(this->x.isEmpty()) return;
 
     // Find out which differential equation depends on which differential state
-    SXFunction f(der(this->sQQQ),this->dae);
+    SXFunction f(der(this->s),this->dae);
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -824,15 +824,15 @@ namespace CasADi{
     this->dae = this->dae(rowperm);
   
     // Permute variables
-    this->sQQQ = this->sQQQ(colperm);
+    this->s = this->s(colperm);
   }
 
   void SymbolicOCP::sortALG(){
     // Quick return if no algebraic states
-    if(this->zQQQ.isEmpty()) return;
+    if(this->z.isEmpty()) return;
   
     // Find out which algebraic equation depends on which algebraic state
-    SXFunction f(this->zQQQ,this->alg);
+    SXFunction f(this->z,this->alg);
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -844,16 +844,16 @@ namespace CasADi{
     this->alg = this->alg(rowperm);
   
     // Permute variables
-    this->zQQQ = this->zQQQ(colperm);
+    this->z = this->z(colperm);
   }
 
   void SymbolicOCP::sortDependentParameters(){
     // Quick return if no dependent parameters
-    if(this->pdQQQ.isEmpty()) return;
+    if(this->pd.isEmpty()) return;
   
     // Find out which dependent parameter depends on which binding equation
-    SX v = this->pdQQQ;
-    SXFunction f(v,v-substitute(this->pdQQQ,this->yQQQ,dep));
+    SX v = this->pd;
+    SXFunction f(v,v-substitute(this->pd,this->y,dep));
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -862,15 +862,15 @@ namespace CasADi{
     sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
     // Permute variables
-    this->pdQQQ = this->pdQQQ(colperm);
+    this->pd = this->pd(colperm);
   }
 
   void SymbolicOCP::makeExplicit(){
     // Quick return if there are no implicitly defined states
-    if(this->sQQQ.isEmpty()) return;
+    if(this->s.isEmpty()) return;
     
     // Write the ODE as a function of the state derivatives
-    SXFunction f(der(this->sQQQ),this->dae);
+    SXFunction f(der(this->s),this->dae);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
@@ -884,10 +884,10 @@ namespace CasADi{
     this->dae = this->dae(rowperm);
   
     // Permute variables
-    this->sQQQ = this->sQQQ(colperm);
+    this->s = this->s(colperm);
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = SXFunction(der(this->sQQQ),this->dae);
+    f = SXFunction(der(this->s),this->dae);
     f.init();
 
     // Get the Jacobian
@@ -903,7 +903,7 @@ namespace CasADi{
       int bs = rowblock[b+1] - rowblock[b];
     
       // Get variables in the block
-      SX xb = this->sQQQ(Slice(colblock[b],colblock[b+1]));
+      SX xb = this->s(Slice(colblock[b],colblock[b+1]));
 
       // Get equations in the block
       SX fb = this->dae(Slice(rowblock[b],rowblock[b+1]));
@@ -932,20 +932,20 @@ namespace CasADi{
     }
   
     // Eliminate inter-dependencies
-    substituteInPlace(der(this->sQQQ),new_ode,false);
+    substituteInPlace(der(this->s),new_ode,false);
 
     // Add to explicit differential states and ODE
     this->ode.append(new_ode);
-    this->xQQQ.append(this->sQQQ);    
-    this->sQQQ = SX::zeros(0,1);
+    this->x.append(this->s);    
+    this->s = SX::zeros(0,1);
   }
 
   void SymbolicOCP::eliminateAlgebraic(){
     // Quick return if there are no algebraic states
-    if(this->zQQQ.isEmpty()) return;
+    if(this->z.isEmpty()) return;
   
     // Write the algebraic equations as a function of the algebraic states
-    SXFunction f(this->zQQQ,alg);
+    SXFunction f(this->z,alg);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
@@ -959,10 +959,10 @@ namespace CasADi{
     this->alg = this->alg(rowperm);
   
     // Permute variables
-    this->zQQQ = this->zQQQ(colperm);
+    this->z = this->z(colperm);
 
     // Rewrite the sorted algebraic equations as a function of the algebraic states
-    f = SXFunction(this->zQQQ,this->alg);
+    f = SXFunction(this->z,this->alg);
     f.init();
 
     // Get the Jacobian
@@ -981,7 +981,7 @@ namespace CasADi{
       int bs = rowblock[b+1] - rowblock[b];
     
       // Get local variables
-      SX zb = this->zQQQ(Slice(colblock[b],colblock[b+1]));
+      SX zb = this->z(Slice(colblock[b],colblock[b+1]));
 
       // Get local equations
       SX fb = this->alg(Slice(rowblock[b],rowblock[b+1]));
@@ -1023,11 +1023,11 @@ namespace CasADi{
     substituteInPlace(z_exp,f_exp,false);
 
     // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
-    this->yQQQ = vertcat(z_exp,this->yQQQ);
+    this->y = vertcat(z_exp,this->y);
     this->dep = vertcat(f_exp,this->dep);
   
     // Save new algebraic equations
-    this->zQQQ = z_imp;
+    this->z = z_imp;
     this->alg = f_imp;
   
     // Eliminate new dependent variables from the other equations
@@ -1071,29 +1071,29 @@ namespace CasADi{
       // Skip derivatives
       break;
     case CAT_STATE:
-      this->sQQQ.append(var->var_);
+      this->s.append(var->var_);
       break;
     case CAT_DEPENDENT_CONSTANT:
-      this->cdQQQ.append(var->var_);
+      this->cd.append(var->var_);
       break;
     case CAT_INDEPENDENT_CONSTANT:
-      this->ciQQQ.append(var->var_);
+      this->ci.append(var->var_);
       break;
     case CAT_DEPENDENT_PARAMETER:
-      this->pdQQQ.append(var->var_);
+      this->pd.append(var->var_);
       break;
     case CAT_INDEPENDENT_PARAMETER:
       if(var.getFree()){
-        this->pfQQQ.append(var->var_);
+        this->pf.append(var->var_);
       } else {
-        this->piQQQ.append(var->var_);
+        this->pi.append(var->var_);
       }
       break;
     case CAT_ALGEBRAIC:
       if(var.getCausality() == INTERNAL){
-        this->sQQQ.append(var->var_);
+        this->s.append(var->var_);
       } else if(var.getCausality() == INPUT){
-        this->uQQQ.append(var->var_);
+        this->u.append(var->var_);
       }
       break;
     default:
@@ -1210,7 +1210,7 @@ namespace CasADi{
     datfile << endl;
     
     // Parameter properties
-    SX p = vertcat(this->piQQQ,this->pfQQQ);
+    SX p = vertcat(this->pi,this->pf);
     if(!p.isEmpty()){
       datfile << "*  global model parameter start values, scale factors, and bounds" << endl;
       datfile << "p" << endl;
@@ -1257,139 +1257,139 @@ namespace CasADi{
     }
 
     // Differential state properties
-    if(!this->xQQQ.isEmpty()){
+    if(!this->x.isEmpty()){
       datfile << "*  differential state start values, scale factors, and bounds" << endl;
       datfile << "sd(*,*)" << endl;
-      for(int k=0; k<this->xQQQ.size(); ++k){
-        datfile << k << ": " << start(this->xQQQ[k]) << endl;
+      for(int k=0; k<this->x.size(); ++k){
+        datfile << k << ": " << start(this->x[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sd_sca(*,*)" << endl;
-      for(int k=0; k<this->xQQQ.size(); ++k){
-        datfile << k << ": " << nominal(this->xQQQ[k]) << endl;
+      for(int k=0; k<this->x.size(); ++k){
+        datfile << k << ": " << nominal(this->x[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sd_min(*,*)" << endl;
-      for(int k=0; k<this->xQQQ.size(); ++k){
-        datfile << k << ": " << min(this->xQQQ[k]) << endl;
+      for(int k=0; k<this->x.size(); ++k){
+        datfile << k << ": " << min(this->x[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sd_max(*,*)" << endl;
-      for(int k=0; k<this->xQQQ.size(); ++k){
-        datfile << k << ": " << max(this->xQQQ[k]) << endl;
+      for(int k=0; k<this->x.size(); ++k){
+        datfile << k << ": " << max(this->x[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sd_fix(*,*)" << endl;
-      for(int k=0; k<this->xQQQ.size(); ++k){
-        datfile << k << ": " << (min(this->xQQQ[k])==max(this->xQQQ[k])) << endl;
+      for(int k=0; k<this->x.size(); ++k){
+        datfile << k << ": " << (min(this->x[k])==max(this->x[k])) << endl;
       }
       datfile << endl;
 
       datfile << "xd_name" << endl;
-      for(int k=0; k<this->xQQQ.size(); ++k){
-        datfile << k << ": " << this->xQQQ[k].getName() << endl;
+      for(int k=0; k<this->x.size(); ++k){
+        datfile << k << ": " << this->x[k].getName() << endl;
       }
       datfile << endl;
 
       datfile << "xd_unit" << endl;
-      for(int k=0; k<this->xQQQ.size(); ++k){
-        datfile << k << ": " << unit(this->xQQQ[k]) << endl;
+      for(int k=0; k<this->x.size(); ++k){
+        datfile << k << ": " << unit(this->x[k]) << endl;
       }
       datfile << endl;
     }
   
     // Algebraic state properties
-    if(!this->zQQQ.isEmpty()){
+    if(!this->z.isEmpty()){
       datfile << "*  algebraic state start values, scale factors, and bounds" << endl;
       datfile << "sa(*,*)" << endl;
-      for(int k=0; k<this->zQQQ.size(); ++k){
-        datfile << k << ": " << start(this->zQQQ[k]) << endl;
+      for(int k=0; k<this->z.size(); ++k){
+        datfile << k << ": " << start(this->z[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sa_sca(*,*)" << endl;
-      for(int k=0; k<this->zQQQ.size(); ++k){
-        datfile << k << ": " << nominal(this->zQQQ[k]) << endl;
+      for(int k=0; k<this->z.size(); ++k){
+        datfile << k << ": " << nominal(this->z[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sa_min(*,*)" << endl;
-      for(int k=0; k<this->zQQQ.size(); ++k){
-        datfile << k << ": " << min(this->zQQQ[k]) << endl;
+      for(int k=0; k<this->z.size(); ++k){
+        datfile << k << ": " << min(this->z[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sa_max(*,*)" << endl;
-      for(int k=0; k<this->zQQQ.size(); ++k){
-        datfile << k << ": " << max(this->zQQQ[k]) << endl;
+      for(int k=0; k<this->z.size(); ++k){
+        datfile << k << ": " << max(this->z[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sa_fix(*,*)" << endl;
-      for(int k=0; k<this->zQQQ.size(); ++k){
-        datfile << k << ": " << (min(this->zQQQ[k])==max(this->zQQQ[k])) << endl;
+      for(int k=0; k<this->z.size(); ++k){
+        datfile << k << ": " << (min(this->z[k])==max(this->z[k])) << endl;
       }
       datfile << endl;
 
       datfile << "xa_name" << endl;
-      for(int k=0; k<this->zQQQ.size(); ++k){
-        datfile << k << ": " << this->zQQQ[k].getName() << endl;
+      for(int k=0; k<this->z.size(); ++k){
+        datfile << k << ": " << this->z[k].getName() << endl;
       }
       datfile << endl;
     
       datfile << "xa_unit" << endl;
-      for(int k=0; k<this->zQQQ.size(); ++k){
-        datfile << k << ": " << unit(this->zQQQ[k]) << endl;
+      for(int k=0; k<this->z.size(); ++k){
+        datfile << k << ": " << unit(this->z[k]) << endl;
       }
       datfile << endl;
     }
   
     // Control properties
-    if(!this->uQQQ.isEmpty()){
+    if(!this->u.isEmpty()){
       datfile << "* control start values, scale factors, and bounds" << endl;
       datfile << "u(*,*)" << endl;
-      for(int k=0; k<this->uQQQ.size(); ++k){
-        datfile << k << ": " << start(this->uQQQ[k]) << endl;
+      for(int k=0; k<this->u.size(); ++k){
+        datfile << k << ": " << start(this->u[k]) << endl;
       }
       datfile << endl;
     
       datfile << "u_sca(*,*)" << endl;
-      for(int k=0; k<this->uQQQ.size(); ++k){
-        datfile << k << ": " << nominal(this->uQQQ[k]) << endl;
+      for(int k=0; k<this->u.size(); ++k){
+        datfile << k << ": " << nominal(this->u[k]) << endl;
       }
       datfile << endl;
     
       datfile << "u_min(*,*)" << endl;
-      for(int k=0; k<this->uQQQ.size(); ++k){
-        datfile << k << ": " << min(this->uQQQ[k]) << endl;
+      for(int k=0; k<this->u.size(); ++k){
+        datfile << k << ": " << min(this->u[k]) << endl;
       }
       datfile << endl;
     
       datfile << "u_max(*,*)" << endl;
-      for(int k=0; k<this->uQQQ.size(); ++k){
-        datfile << k << ": " << max(this->uQQQ[k]) << endl;
+      for(int k=0; k<this->u.size(); ++k){
+        datfile << k << ": " << max(this->u[k]) << endl;
       }
       datfile << endl;
     
       datfile << "u_fix(*,*)" << endl;
-      for(int k=0; k<this->uQQQ.size(); ++k){
-        datfile << k << ": " << (min(this->uQQQ[k])==max(this->uQQQ[k])) << endl;
+      for(int k=0; k<this->u.size(); ++k){
+        datfile << k << ": " << (min(this->u[k])==max(this->u[k])) << endl;
       }
       datfile << endl;
     
       datfile << "u_name" << endl;
-      for(int k=0; k<this->uQQQ.size(); ++k){
-        datfile << k << ": " << this->uQQQ[k].getName() << endl;
+      for(int k=0; k<this->u.size(); ++k){
+        datfile << k << ": " << this->u[k].getName() << endl;
       }
       datfile << endl;
     
       datfile << "u_unit" << endl;
-      for(int k=0; k<this->uQQQ.size(); ++k){
-        datfile << k << ": " << unit(this->uQQQ[k]) << endl;
+      for(int k=0; k<this->u.size(); ++k){
+        datfile << k << ": " << unit(this->u[k]) << endl;
       }
       datfile << endl;
     }
@@ -1505,11 +1505,11 @@ namespace CasADi{
 
   void SymbolicOCP::identifyALG(){
     // Quick return if no s
-    if(this->sQQQ.isEmpty()) return;
+    if(this->s.isEmpty()) return;
 
     // We investigate the interdependencies in sdot -> dae
     vector<SX> f_in;
-    f_in.push_back(der(this->sQQQ));
+    f_in.push_back(der(this->s));
     SXFunction f(f_in,this->dae);
     f.init();
 
@@ -1556,10 +1556,10 @@ namespace CasADi{
     SX new_s,new_z;
     for(int i=0; i<ns; ++i){
       if(f_sdot[i]==bvec_t(1)){
-        new_s.append(this->sQQQ[i]);
+        new_s.append(this->s[i]);
       } else {
         casadi_assert(f_sdot[i]==bvec_t(0));
-        new_z.append(this->sQQQ[i]);
+        new_z.append(this->s[i]);
       }
     }
 
@@ -1568,9 +1568,9 @@ namespace CasADi{
     
     // Divide up the s and dae
     this->dae = new_dae;
-    this->sQQQ = new_s;
+    this->s = new_s;
     this->alg.append(new_alg);
-    this->zQQQ.append(new_z);
+    this->z.append(new_z);
   }
 
   std::vector<double> SymbolicOCP::nominal(const SX& var) const{

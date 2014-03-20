@@ -85,8 +85,8 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = ocp.xQQQ,
-  p = vertcat((ocp.piQQQ,ocp.pfQQQ))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.pf))
 )
 
 # Create an integrator
@@ -99,9 +99,9 @@ P = ocp("P")
 output_fcn_out = ocp.substituteDependents([m,P])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = ocp.xQQQ,
-  z = ocp.zQQQ,
-  p = vertcat((ocp.piQQQ,ocp.pfQQQ,ocp.uQQQ))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.pf,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -111,7 +111,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = ocp.start(ocp.xQQQ)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -160,8 +160,8 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = ocp.xQQQ,
-  p = vertcat((ocp.piQQQ,ocp.pfQQQ))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.pf))
 )
 
 # Create an integrator
@@ -173,9 +173,9 @@ T = ocp("T")
 output_fcn_out = ocp.substituteDependents([T])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = ocp.xQQQ,
-  z = ocp.zQQQ,
-  p = vertcat((ocp.piQQQ,ocp.pfQQQ,ocp.uQQQ))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.pf,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -185,7 +185,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = ocp.start(ocp.xQQQ)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -227,8 +227,8 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = ocp.xQQQ,
-  p = vertcat((ocp.piQQQ,ocp.pfQQQ))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.pf))
 )
 
 # Create an integrator
@@ -242,9 +242,9 @@ V = ocp("V")
 output_fcn_out = ocp.substituteDependents([T,U,V])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = ocp.xQQQ,
-  z = ocp.zQQQ,
-  p = vertcat((ocp.piQQQ,ocp.pfQQQ,ocp.uQQQ))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.pf,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -254,7 +254,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = ocp.start(ocp.xQQQ)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate

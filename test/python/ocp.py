@@ -218,8 +218,8 @@ class OCPtests(casadiTestCase):
     self.assertEquals(str(m),'cost.atTime(150)')
     print dir(ocp)
     self.assertEquals(ocp.dae.size(),3)
-    print type(ocp.sQQQ)
-    self.assertEquals(ocp.sQQQ.size(),3) # there are three states
+    print type(ocp.s)
+    self.assertEquals(ocp.s.size(),3) # there are three states
     c = ocp("cstr.c")
     T = ocp("cstr.T")
     cost = ocp("cost")
