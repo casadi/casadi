@@ -1503,10 +1503,10 @@ namespace CasADi{
     it->second.setNominal(val);
   }
 
-  double SymbolicOCP::min(const std::string& name) const{
+  double SymbolicOCP::min(const std::string& name, bool nominal) const{
     map<string,Variable>::const_iterator it = varmap_.find(name);
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.getMin();
+    return nominal ? it->second.getMin() / it->second.getNominal() : it->second.getMin();
   }
 
   void SymbolicOCP::setMin(const std::string& name, double val){
@@ -1515,10 +1515,10 @@ namespace CasADi{
     it->second.setMin(val);
   }
 
-  double SymbolicOCP::max(const std::string& name) const{
+  double SymbolicOCP::max(const std::string& name, bool nominal) const{
     map<string,Variable>::const_iterator it = varmap_.find(name);
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.getMax();
+    return nominal ? it->second.getMax() / it->second.getNominal() : it->second.getMax();
   }
 
   void SymbolicOCP::setMax(const std::string& name, double val){
@@ -1527,10 +1527,10 @@ namespace CasADi{
     it->second.setMax(val);
   }
 
-  double SymbolicOCP::start(const std::string& name) const{
+  double SymbolicOCP::start(const std::string& name, bool nominal) const{
     map<string,Variable>::const_iterator it = varmap_.find(name);
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.getStart();
+    return nominal ? it->second.getStart() / it->second.getNominal() : it->second.getStart();
   }
 
   void SymbolicOCP::setStart(const std::string& name, double val){
@@ -1539,10 +1539,10 @@ namespace CasADi{
     it->second.setStart(val);
   }
 
-  double SymbolicOCP::initialGuess(const std::string& name) const{
+  double SymbolicOCP::initialGuess(const std::string& name, bool nominal) const{
     map<string,Variable>::const_iterator it = varmap_.find(name);
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.getInitialGuess();
+    return nominal ? it->second.getInitialGuess() / it->second.getNominal() : it->second.getInitialGuess();
   }
 
   void SymbolicOCP::setInitialGuess(const std::string& name, double val){
@@ -1551,10 +1551,10 @@ namespace CasADi{
     it->second.setInitialGuess(val);
   }
 
-  double SymbolicOCP::derivativeStart(const std::string& name) const{
+  double SymbolicOCP::derivativeStart(const std::string& name, bool nominal) const{
     map<string,Variable>::const_iterator it = varmap_.find(name);
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.getDerivativeStart();
+    return nominal ? it->second.getDerivativeStart() / it->second.getNominal() : it->second.getDerivativeStart();
   }
 
   void SymbolicOCP::setDerivativeStart(const std::string& name, double val){
@@ -1655,47 +1655,47 @@ namespace CasADi{
     return ret;
   }
 
-  std::vector<double> SymbolicOCP::min(const SX& var) const{
+  std::vector<double> SymbolicOCP::min(const SX& var, bool nominal) const{
     casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::min: Argument must be a symbolic vector");
     std::vector<double> ret(var.size());
     for(int i=0; i<ret.size(); ++i){
-      ret[i] = min(var.at(i).getName());
+      ret[i] = min(var.at(i).getName(),nominal);
     }
     return ret;
   }
 
-  std::vector<double> SymbolicOCP::max(const SX& var) const{
+  std::vector<double> SymbolicOCP::max(const SX& var, bool nominal) const{
     casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::max: Argument must be a symbolic vector");
     std::vector<double> ret(var.size());
     for(int i=0; i<ret.size(); ++i){
-      ret[i] = max(var.at(i).getName());
+      ret[i] = max(var.at(i).getName(),nominal);
     }
     return ret;
   }
 
-  std::vector<double> SymbolicOCP::start(const SX& var) const{
+  std::vector<double> SymbolicOCP::start(const SX& var, bool nominal) const{
     casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::start: Argument must be a symbolic vector");
     std::vector<double> ret(var.size());
     for(int i=0; i<ret.size(); ++i){
-      ret[i] = start(var.at(i).getName());
+      ret[i] = start(var.at(i).getName(),nominal);
     }
     return ret;
   }
 
-  std::vector<double> SymbolicOCP::initialGuess(const SX& var) const{
+  std::vector<double> SymbolicOCP::initialGuess(const SX& var, bool nominal) const{
     casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::initialGuess: Argument must be a symbolic vector");
     std::vector<double> ret(var.size());
     for(int i=0; i<ret.size(); ++i){
-      ret[i] = initialGuess(var.at(i).getName());
+      ret[i] = initialGuess(var.at(i).getName(),nominal);
     }
     return ret;
   }
 
-  std::vector<double> SymbolicOCP::derivativeStart(const SX& var) const{
+  std::vector<double> SymbolicOCP::derivativeStart(const SX& var, bool nominal) const{
     casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::derivativeStart: Argument must be a symbolic vector");
     std::vector<double> ret(var.size());
     for(int i=0; i<ret.size(); ++i){
-      ret[i] = derivativeStart(var.at(i).getName());
+      ret[i] = derivativeStart(var.at(i).getName(),nominal);
     }
     return ret;
   }

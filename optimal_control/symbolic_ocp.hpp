@@ -304,46 +304,46 @@ namespace CasADi{
     void setNominal(const std::string& name, double val);
 
     /// Get the lower bound for a component
-    double min(const std::string& name) const;
+    double min(const std::string& name, bool nominal=false) const;
 
     /// Get the lower bound given a vector of symbolic variables
-    std::vector<double> min(const SX& var) const;
+    std::vector<double> min(const SX& var, bool nominal=false) const;
 
     /// Set the upper bound for a component
     void setMin(const std::string& name, double val);
 
     /// Get the upper bound for a component
-    double max(const std::string& name) const;
+    double max(const std::string& name, bool nominal=false) const;
 
     /// Get the upper bound given a vector of symbolic variables
-    std::vector<double> max(const SX& var) const;
+    std::vector<double> max(const SX& var, bool nominal=false) const;
 
     /// Set the upper bound for a component
     void setMax(const std::string& name, double val);
 
     /// Get the value at time 0 for a component
-    double start(const std::string& name) const;
+    double start(const std::string& name, bool nominal=false) const;
 
     /// Get the value at time 0 given a vector of symbolic variables
-    std::vector<double> start(const SX& var) const;
+    std::vector<double> start(const SX& var, bool nominal=false) const;
 
     /// Set the value at time 0 for a component
     void setStart(const std::string& name, double val);
 
     /// Get the initial guess for a component
-    double initialGuess(const std::string& name) const;
+    double initialGuess(const std::string& name, bool nominal=false) const;
 
     /// Get the initial guess given a vector of symbolic variables
-    std::vector<double> initialGuess(const SX& var) const;
+    std::vector<double> initialGuess(const SX& var, bool nominal=false) const;
 
     /// Set the initial guess for a component
     void setInitialGuess(const std::string& name, double val);
 
     /// Get the derivative at time 0 for a component
-    double derivativeStart(const std::string& name) const;
+    double derivativeStart(const std::string& name, bool nominal=false) const;
 
     /// Get the derivative at time 0 given a vector of symbolic variables
-    std::vector<double> derivativeStart(const SX& var) const;
+    std::vector<double> derivativeStart(const SX& var, bool nominal=false) const;
 
     /// Set the derivative at time 0 for a component
     void setDerivativeStart(const std::string& name, double val);
