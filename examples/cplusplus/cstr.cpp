@@ -73,13 +73,13 @@ int main(){
   
   // Variables
   SX t = ocp.t;
-  SX x = var(ocp.x);
+  SX x = ocp.xQQQ;
   SX u = ocp.uQQQ;
     
   // Initial guess and bounds for the state
-  vector<double> x0 = ocp.start(var(ocp.x),true);
-  vector<double> xmin = ocp.min(var(ocp.x),true);
-  vector<double> xmax = ocp.max(var(ocp.x),true);
+  vector<double> x0 = ocp.start(ocp.xQQQ,true);
+  vector<double> xmin = ocp.min(ocp.xQQQ,true);
+  vector<double> xmax = ocp.max(ocp.xQQQ,true);
   
   // Initial guess and bounds for the control
   vector<double> u0 = ocp.start(ocp.uQQQ,true);

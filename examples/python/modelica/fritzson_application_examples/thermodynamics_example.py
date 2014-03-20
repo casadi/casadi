@@ -85,7 +85,7 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
+  x = ocp.xQQQ,
   p = vertcat((ocp.piQQQ,ocp.pfQQQ))
 )
 
@@ -99,7 +99,7 @@ P = ocp("P")
 output_fcn_out = ocp.substituteDependents([m,P])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
+  x = ocp.xQQQ,
   z = ocp.zQQQ,
   p = vertcat((ocp.piQQQ,ocp.pfQQQ,ocp.uQQQ))
 )
@@ -111,7 +111,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = ocp.start(var(ocp.x))
+x0 = ocp.start(ocp.xQQQ)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -160,7 +160,7 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
+  x = ocp.xQQQ,
   p = vertcat((ocp.piQQQ,ocp.pfQQQ))
 )
 
@@ -173,7 +173,7 @@ T = ocp("T")
 output_fcn_out = ocp.substituteDependents([T])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
+  x = ocp.xQQQ,
   z = ocp.zQQQ,
   p = vertcat((ocp.piQQQ,ocp.pfQQQ,ocp.uQQQ))
 )
@@ -185,7 +185,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = ocp.start(var(ocp.x))
+x0 = ocp.start(ocp.xQQQ)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -227,7 +227,7 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
+  x = ocp.xQQQ,
   p = vertcat((ocp.piQQQ,ocp.pfQQQ))
 )
 
@@ -242,7 +242,7 @@ V = ocp("V")
 output_fcn_out = ocp.substituteDependents([T,U,V])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
+  x = ocp.xQQQ,
   z = ocp.zQQQ,
   p = vertcat((ocp.piQQQ,ocp.pfQQQ,ocp.uQQQ))
 )
@@ -254,7 +254,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = ocp.start(var(ocp.x))
+x0 = ocp.start(ocp.xQQQ)
 simulator.setInput(x0,"x0")
 
 # Simulate

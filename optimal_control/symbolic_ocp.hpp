@@ -101,7 +101,7 @@ namespace CasADi{
     std::vector<Variable> s;
 
     /** \brief Differential states */
-    std::vector<Variable> x;
+    SX xQQQ;
     
     /** \brief Algebraic variables */
     SX zQQQ;

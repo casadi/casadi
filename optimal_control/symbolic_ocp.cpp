@@ -63,7 +63,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->zQQQ = this->qQQQ = this->ciQQQ = this->cdQQQ = this->piQQQ = this->pdQQQ = this->pfQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
+    this->xQQQ=this->zQQQ=this->qQQQ=this->ciQQQ=this->cdQQQ=this->piQQQ=this->pdQQQ=this->pfQQQ=this->yQQQ=this->uQQQ = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -391,7 +391,7 @@ namespace CasADi{
     }
   
     // Make sure that the dimensions are consistent at this point
-    casadi_assert_warning(this->x.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
+    casadi_assert_warning(this->xQQQ.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
     casadi_assert_warning(this->zQQQ.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
     casadi_assert(this->qQQQ.size()==this->quad.size());
     casadi_assert(this->yQQQ.size()==this->dep.size());
@@ -500,7 +500,7 @@ namespace CasADi{
   void SymbolicOCP::print(ostream &stream) const{
     stream << "Dimensions: "; 
     stream << "#s = " << this->s.size() << ", ";
-    stream << "#x = " << this->x.size() << ", ";
+    stream << "#x = " << this->xQQQ.size() << ", ";
     stream << "#z = " << this->zQQQ.size() << ", ";
     stream << "#q = " << this->qQQQ.size() << ", ";
     stream << "#y = " << this->yQQQ.size() << ", ";
@@ -519,7 +519,7 @@ namespace CasADi{
     stream << "{" << endl;
     stream << "  t = " << this->t.getDescription() << endl;
     stream << "  s = " << this->s << endl;
-    stream << "  x = " << this->x << endl;
+    stream << "  x = " << this->xQQQ << endl;
     stream << "  z =  " << this->zQQQ << endl;
     stream << "  q =  " << this->qQQQ << endl;
     stream << "  y =  " << this->yQQQ << endl;
@@ -538,8 +538,8 @@ namespace CasADi{
     stream << endl;
 
     stream << "Differential equations" << endl;
-    for(int k=0; k<this->x.size(); ++k){
-      stream << "0 == " << this->ode.at(k) << endl;
+    for(int k=0; k<this->ode.size(); ++k){
+      stream << der(this->xQQQ.at(k)).toScalar() << " == " << this->ode.at(k) << endl;
     }
     stream << endl;
 
@@ -670,8 +670,7 @@ namespace CasADi{
   void SymbolicOCP::eliminateQuadratureStates(){
   
     // Move all the quadratures to the list of differential states
-    vector<Variable> yy = getVar(*this,this->qQQQ);
-    this->x.insert(this->x.end(),yy.begin(),yy.end());
+    this->xQQQ.append(this->qQQQ);
     this->qQQQ = SX::zeros(0,1);
   
     // Move the equations to the list of ODEs
@@ -686,14 +685,13 @@ namespace CasADi{
     // Variables
     SX _s = CasADi::var(this->s);
     SX _sdot = der(var(this->s));
-    SX _x = CasADi::var(this->x);
   
     // Collect all the variables
     SX v;
     v.append(this->t);
     v.append(_s);
     v.append(_sdot);
-    v.append(_x);
+    v.append(this->xQQQ);
     v.append(this->zQQQ);
     v.append(this->piQQQ);
     v.append(this->pfQQQ);
@@ -702,7 +700,7 @@ namespace CasADi{
     // Nominal values
     SX t_n = 1.;
     SX s_n = nominal(_s);
-    SX x_n = nominal(_x);
+    SX x_n = nominal(this->xQQQ);
     SX z_n = nominal(this->zQQQ);
     SX pi_n = nominal(this->piQQQ);
     SX pf_n = nominal(this->pfQQQ);
@@ -713,7 +711,7 @@ namespace CasADi{
     v_old.append(this->t*t_n);
     v_old.append(_s*s_n);
     v_old.append(_sdot*s_n);
-    v_old.append(_x*x_n);
+    v_old.append(this->xQQQ*x_n);
     v_old.append(this->zQQQ*z_n);
     v_old.append(this->piQQQ*pi_n);
     v_old.append(this->pfQQQ*pf_n);
@@ -739,6 +737,7 @@ namespace CasADi{
   }
     
   void SymbolicOCP::scaleEquations(){
+    casadi_error("SymbolicOCP::scaleEquations broken");
   
     cout << "Scaling equations ..." << endl;
     double time1 = clock();
@@ -747,8 +746,8 @@ namespace CasADi{
     enum Variables{T,X,XDOT,Z,PI,PF,U,NUM_VAR};
     vector<SX > v(NUM_VAR); // all variables
     v[T] = this->t;
-    v[X] = var(this->x);
-    v[XDOT] = der(var(this->x));
+    v[X] = this->xQQQ;
+    v[XDOT] = der(this->xQQQ); // BUG!!!
     v[Z] = this->zQQQ;
     v[PI] = this->piQQQ;
     v[PF] = this->pfQQQ;
@@ -767,7 +766,7 @@ namespace CasADi{
     // Evaluate the Jacobian in the starting point
     J.init();
     J.setInput(0.0,T);
-    J.setInput(start(var(this->x),true),X);
+    J.setInput(start(this->xQQQ,true),X);
     J.input(XDOT).setAll(0.0);
     J.setInput(start(this->zQQQ,true),Z);
     J.setInput(start(this->piQQQ,true),PI);
@@ -811,7 +810,7 @@ namespace CasADi{
 
   void SymbolicOCP::sortDAE(){
     // Quick return if no differential states
-    if(this->x.empty()) return;
+    if(this->xQQQ.isEmpty()) return;
 
     // Find out which differential equation depends on which differential state
     SXFunction f(der(var(this->s)),this->dae);
@@ -953,7 +952,7 @@ namespace CasADi{
 
     // Add to explicit differential states and ODE
     this->ode.append(new_ode);
-    this->x.insert(this->x.end(),this->s.begin(),this->s.end());
+    this->xQQQ.append(var(s));
     this->s.clear();
   }
 
@@ -1056,45 +1055,7 @@ namespace CasADi{
   }
 
   void SymbolicOCP::makeAlgebraic(const Variable& v){
-    casadi_assert(0);
-#if 0
-    // Find variable among the explicit variables
-    for(int k=0; k<this->x.size(); ++k){
-      if(this->x[k].get()==v.get()){
-      
-        // Add to list of algebraic variables and to the list of algebraic equations
-        this->zQQQ.append(v->var_);
-        this->alg.append(this->ode.at(k));
-      
-        // Remove from list of differential variables and the list of differential equations
-        this->x.erase(this->x.begin()+k);
-        vector<SXElement> ode_ = this->ode.data();
-        ode_.erase(ode_.begin()+k);
-        this->ode = ode_;
-
-        // Successfull return
-        return;
-      }
-    }
-  
-    // Find the variable among the implicit variables
-    for(int k=0; k<xz.size(); ++k){
-      if(xz[k].get()==v.get()){
-      
-        // Substitute the state derivative with zero
-        this->dae = substitute(this->dae,xz[k].der(),0.0);
-
-        // Remove the highest state derivative expression from the variable
-        xz[k].setDifferential(false);
-
-        // Successfull return
-        return;
-      }
-    }
-  
-    // Error if this point reached
-    throw CasadiException("v not a differential state");
-#endif
+    casadi_error("SymbolicOCP::makeAlgebraic broken");
   }
 
   Variable& SymbolicOCP::variable(const std::string& name){
@@ -1312,47 +1273,47 @@ namespace CasADi{
     }
 
     // Differential state properties
-    if(!x.empty()){
+    if(!this->xQQQ.isEmpty()){
       datfile << "*  differential state start values, scale factors, and bounds" << endl;
       datfile << "sd(*,*)" << endl;
-      for(int k=0; k<x.size(); ++k){
-        datfile << k << ": " << x[k].getStart() << endl;
+      for(int k=0; k<this->xQQQ.size(); ++k){
+        datfile << k << ": " << start(this->xQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sd_sca(*,*)" << endl;
-      for(int k=0; k<x.size(); ++k){
-        datfile << k << ": " << x[k].getNominal() << endl;
+      for(int k=0; k<this->xQQQ.size(); ++k){
+        datfile << k << ": " << nominal(this->xQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sd_min(*,*)" << endl;
-      for(int k=0; k<x.size(); ++k){
-        datfile << k << ": " << x[k].getMin() << endl;
+      for(int k=0; k<this->xQQQ.size(); ++k){
+        datfile << k << ": " << min(this->xQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sd_max(*,*)" << endl;
-      for(int k=0; k<x.size(); ++k){
-        datfile << k << ": " << x[k].getMax() << endl;
+      for(int k=0; k<this->xQQQ.size(); ++k){
+        datfile << k << ": " << max(this->xQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sd_fix(*,*)" << endl;
-      for(int k=0; k<x.size(); ++k){
-        datfile << k << ": " << (x[k].getMin()==x[k].getMax()) << endl;
+      for(int k=0; k<this->xQQQ.size(); ++k){
+        datfile << k << ": " << (min(this->xQQQ[k])==max(this->xQQQ[k])) << endl;
       }
       datfile << endl;
 
       datfile << "xd_name" << endl;
-      for(int k=0; k<x.size(); ++k){
-        datfile << k << ": " << x[k].getName() << endl;
+      for(int k=0; k<this->xQQQ.size(); ++k){
+        datfile << k << ": " << this->xQQQ[k].getName() << endl;
       }
       datfile << endl;
 
       datfile << "xd_unit" << endl;
-      for(int k=0; k<x.size(); ++k){
-        datfile << k << ": " << x[k].getUnit() << endl;
+      for(int k=0; k<this->xQQQ.size(); ++k){
+        datfile << k << ": " << unit(this->xQQQ[k]) << endl;
       }
       datfile << endl;
     }
