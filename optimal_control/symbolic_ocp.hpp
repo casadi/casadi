@@ -117,7 +117,7 @@ namespace CasADi{
 
     /** \brief Independent parameters 
         An independent parameter is a parameter whose value is determined by an expression that contains only literals: "parameter Real p1=2" or "parameter Boolean b(start=true)". In the latter case, the value of the parameter becomes true, and the Modelica compiler will generate a warning since there is no binding expression for the parameter. An independent parameter is fixed after the DAE has been initialized. */
-    std::vector<Variable> pi;
+    SX piQQQ;
 
     /** \brief Dependent parameters 
         A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */

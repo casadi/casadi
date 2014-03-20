@@ -51,7 +51,7 @@ void updateDependent(SymbolicOCP& ocp){
 
   // Create a function which evaluates the binding equations numerically
   SX ci = var(ocp.ci);
-  SX pi = var(ocp.pi);
+  SX pi = ocp.piQQQ;
   vector<SX> f_in(2);
   f_in[0] = ci;
   f_in[1] = pi;
@@ -60,7 +60,7 @@ void updateDependent(SymbolicOCP& ocp){
   
   // Evaluate the start attribute
   f.setInput(ocp.start(var(ocp.ci)),0);
-  f.setInput(ocp.start(var(ocp.pi)),1);
+  f.setInput(ocp.start(ocp.piQQQ),1);
   f.evaluate();
   const vector<double>& res = f.output().data();
   

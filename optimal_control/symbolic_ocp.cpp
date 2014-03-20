@@ -63,7 +63,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->zQQQ = this->qQQQ = this->pfQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
+    this->zQQQ = this->qQQQ = this->piQQQ = this->pfQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -504,7 +504,7 @@ namespace CasADi{
     stream << "#z = " << this->zQQQ.size() << ", ";
     stream << "#q = " << this->qQQQ.size() << ", ";
     stream << "#y = " << this->yQQQ.size() << ", ";
-    stream << "#pi = " << this->pi.size() << ", ";
+    stream << "#pi = " << this->piQQQ.size() << ", ";
     stream << "#pd = " << this->pd.size() << ", ";
     stream << "#pf = " << this->pfQQQ.size() << ", ";
     stream << "#ci =  " << this->ci.size() << ", ";
@@ -523,7 +523,7 @@ namespace CasADi{
     stream << "  z =  " << this->zQQQ << endl;
     stream << "  q =  " << this->qQQQ << endl;
     stream << "  y =  " << this->yQQQ << endl;
-    stream << "  pi =  " << this->pi << endl;
+    stream << "  pi =  " << this->piQQQ << endl;
     stream << "  pd =  " << this->pd << endl;
     stream << "  pf =  " << this->pfQQQ << endl;
     stream << "  ci =  " << this->ci << endl;
@@ -687,7 +687,6 @@ namespace CasADi{
     SX _s = CasADi::var(this->s);
     SX _sdot = der(var(this->s));
     SX _x = CasADi::var(this->x);
-    SX _pi = CasADi::var(this->pi);
   
     // Collect all the variables
     SX v;
@@ -696,7 +695,7 @@ namespace CasADi{
     v.append(_sdot);
     v.append(_x);
     v.append(this->zQQQ);
-    v.append(_pi);
+    v.append(this->piQQQ);
     v.append(this->pfQQQ);
     v.append(this->uQQQ);
     
@@ -704,10 +703,8 @@ namespace CasADi{
     SX t_n = 1.;
     SX s_n = nominal(_s);
     SX x_n = nominal(_x);
-
-    cout << zQQQ << endl;
     SX z_n = nominal(this->zQQQ);
-    SX pi_n = nominal(_pi);
+    SX pi_n = nominal(this->piQQQ);
     SX pf_n = nominal(this->pfQQQ);
     SX u_n = nominal(this->uQQQ);
   
@@ -718,7 +715,7 @@ namespace CasADi{
     v_old.append(_sdot*s_n);
     v_old.append(_x*x_n);
     v_old.append(this->zQQQ*z_n);
-    v_old.append(_pi*pi_n);
+    v_old.append(this->piQQQ*pi_n);
     v_old.append(this->pfQQQ*pf_n);
     v_old.append(this->uQQQ*u_n);
   
@@ -753,7 +750,7 @@ namespace CasADi{
     v[X] = var(this->x);
     v[XDOT] = der(var(this->x));
     v[Z] = this->zQQQ;
-    v[PI] = var(this->pi);
+    v[PI] = this->piQQQ;
     v[PF] = this->pfQQQ;
     v[U] = this->uQQQ;
 
@@ -773,7 +770,7 @@ namespace CasADi{
     J.setInput(start(var(this->x),true),X);
     J.input(XDOT).setAll(0.0);
     J.setInput(start(this->zQQQ,true),Z);
-    J.setInput(start(var(this->pi),true),PI);
+    J.setInput(start(this->piQQQ,true),PI);
     J.setInput(start(this->pfQQQ,true),PF);
     J.setInput(start(this->uQQQ,true),U);
     J.evaluate();
@@ -1148,7 +1145,7 @@ namespace CasADi{
       if(var.getFree()){
         this->pfQQQ.append(var->var_);
       } else {
-        this->pi.push_back(var);
+        this->piQQQ.append(var->var_);
       }
       break;
     case CAT_ALGEBRAIC:
@@ -1272,39 +1269,36 @@ namespace CasADi{
     datfile << endl;
     
     // Parameter properties
-    vector<Variable> p;
-    p.insert(p.end(),pi.begin(),pi.end());
-    vector<Variable> yy=getVar(*this,this->pfQQQ);
-    p.insert(p.end(),yy.begin(),yy.end());
-    if(!p.empty()){
+    SX p = vertcat(this->piQQQ,this->pfQQQ);
+    if(!p.isEmpty()){
       datfile << "*  global model parameter start values, scale factors, and bounds" << endl;
       datfile << "p" << endl;
       for(int k=0; k<p.size(); ++k){
-        datfile << k << ": " << p[k].getStart() << endl;
+        datfile << k << ": " << start(p[k]) << endl;
       }
       datfile << endl;
     
       datfile << "p_sca" << endl;
       for(int k=0; k<p.size(); ++k){
-        datfile << k << ": " << p[k].getNominal() << endl;
+        datfile << k << ": " << nominal(p[k]) << endl;
       }
       datfile << endl;
     
       datfile << "p_min" << endl;
       for(int k=0; k<p.size(); ++k){
-        datfile << k << ": " << p[k].getMin() << endl;
+        datfile << k << ": " << min(p[k]) << endl;
       }
       datfile << endl;
     
       datfile << "p_max" << endl;
       for(int k=0; k<p.size(); ++k){
-        datfile << k << ": " << p[k].getMax() << endl;
+        datfile << k << ": " << max(p[k]) << endl;
       }
       datfile << endl;
     
       datfile << "p_fix" << endl;
       for(int k=0; k<p.size(); ++k){
-        datfile << k << ": " << (p[k].getMin()==p[k].getMax()) << endl;
+        datfile << k << ": " << (min(p[k])==max(p[k])) << endl;
       }
       datfile << endl;
     
@@ -1316,7 +1310,7 @@ namespace CasADi{
     
       datfile << "p_unit" << endl;
       for(int k=0; k<p.size(); ++k){
-        datfile << k << ": " << p[k].getUnit() << endl;
+        datfile << k << ": " << unit(p[k]) << endl;
       }
       datfile << endl;
     }
