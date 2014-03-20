@@ -63,7 +63,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->zQQQ = this->qQQQ = this->piQQQ = this->pdQQQ = this->pfQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
+    this->zQQQ = this->qQQQ = this->ciQQQ = this->cdQQQ = this->piQQQ = this->pdQQQ = this->pfQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -507,8 +507,8 @@ namespace CasADi{
     stream << "#pi = " << this->piQQQ.size() << ", ";
     stream << "#pd = " << this->pdQQQ.size() << ", ";
     stream << "#pf = " << this->pfQQQ.size() << ", ";
-    stream << "#ci =  " << this->ci.size() << ", ";
-    stream << "#cd =  " << this->cd.size() << ", ";
+    stream << "#ci =  " << this->ciQQQ.size() << ", ";
+    stream << "#cd =  " << this->cdQQQ.size() << ", ";
     stream << "#u = " << this->uQQQ.size() << ", ";
     stream << endl << endl;
 
@@ -526,8 +526,8 @@ namespace CasADi{
     stream << "  pi =  " << this->piQQQ << endl;
     stream << "  pd =  " << this->pdQQQ << endl;
     stream << "  pf =  " << this->pfQQQ << endl;
-    stream << "  ci =  " << this->ci << endl;
-    stream << "  cd =  " << this->cd << endl;
+    stream << "  ci =  " << this->ciQQQ << endl;
+    stream << "  cd =  " << this->cdQQQ << endl;
     stream << "  u =  " << this->uQQQ << endl;
     stream << "}" << endl;
   
@@ -1129,10 +1129,10 @@ namespace CasADi{
       this->s.push_back(var);
       break;
     case CAT_DEPENDENT_CONSTANT:
-      this->cd.push_back(var);
+      this->cdQQQ.append(var->var_);
       break;
     case CAT_INDEPENDENT_CONSTANT:
-      this->ci.push_back(var);
+      this->ciQQQ.append(var->var_);
       break;
     case CAT_DEPENDENT_PARAMETER:
       this->pdQQQ.append(var->var_);
