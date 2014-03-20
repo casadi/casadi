@@ -116,19 +116,11 @@ namespace CasADi{
     return (*this)->min_;
   }
 
-  double& Variable::min(){
-    return (*this)->min_;
-  }
-
   void Variable::setMin(double min){
     (*this)->min_ = min;
   }
     
   double Variable::getMax() const{
-    return (*this)->max_;
-  }
-
-  double& Variable::max(){
     return (*this)->max_;
   }
 
@@ -144,10 +136,6 @@ namespace CasADi{
     (*this)->nominal_ = nominal;
   }
 
-  double& Variable::nominal(){
-    return (*this)->nominal_;
-  }
-    
   double Variable::getStart() const{
     return (*this)->start_;
   }
@@ -156,23 +144,11 @@ namespace CasADi{
     (*this)->start_ = start;
   }
 
-  double& Variable::start(){
-    return (*this)->start_;
-  }
-
   double Variable::getDerivativeStart() const{
     return (*this)->derivative_start_;
   }
 
-  double& Variable::derivativeStart(){
-    return (*this)->derivative_start_;
-  }
-
   double Variable::getInitialGuess() const{
-    return (*this)->initial_guess_;
-  }
-
-  double& Variable::initialGuess(){
     return (*this)->initial_guess_;
   }
 
@@ -188,19 +164,11 @@ namespace CasADi{
     return (*this)->unit_;
   }
 
-  string& Variable::unit(){
-    return (*this)->unit_;
-  }
-
   void Variable::setUnit(const string& unit){
     (*this)->unit_ = unit;
   }
     
   const string& Variable::getDisplayUnit() const{
-    return (*this)->displayUnit_;
-  }
-
-  string& Variable::displayUnit(){
     return (*this)->displayUnit_;
   }
 
@@ -245,10 +213,6 @@ namespace CasADi{
   }
     
   bool Variable::getFree() const{
-    return (*this)->free_;
-  }
-
-  bool& Variable::free(){
     return (*this)->free_;
   }
 

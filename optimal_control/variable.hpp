@@ -149,26 +149,17 @@ namespace CasADi{
     /// Set the lower bound
     void setMin(double min);
     
-    /// Access the lower bound
-    double& min();
-
     /// Get the upper bound
     double getMax() const;
 
     /// Set the upper bound
     void setMax(double max);
     
-    /// Access the upper bound
-    double& max();
-
     /// Get the nominal value of the variable
     double getNominal() const;
 
     /// Set the nominal value of the variable
     void setNominal(double nominal);
-    
-    /// Access the nominal value of the variable
-    double& nominal();
 
     /// Get the value at time 0
     double getStart() const;
@@ -176,17 +167,11 @@ namespace CasADi{
     /// Set the value at time 0
     void setStart(double start);
 
-    /// Access the value at time 0
-    double& start();
-        
     /// Get the lower bound
     double getInitialGuess() const;
 
     /// Set the lower bound
     void setInitialGuess(double initial_guess);
-
-    /// Access the lower bound
-    double& initialGuess();
 
     /// Get the derivative at time 0
     double getDerivativeStart() const;
@@ -194,26 +179,17 @@ namespace CasADi{
     /// Set the derivative at time 0
     void setDerivativeStart(double start);
     
-    /// Access the derivative at time 0
-    double& derivativeStart();
-
     /// Get the unit
     const std::string& getUnit() const;
 
     /// Set the unit
     void setUnit(const std::string& unit);
     
-    /// Access the unit
-    std::string& unit();
-    
     /// Get the display unit
     const std::string& getDisplayUnit() const;
 
     /// Set the display unit
     void setDisplayUnit(const std::string& displayUnit);
-
-    /// Get the display unit
-    std::string& displayUnit();
     
     /// Set the expression
     void setExpression(const SX& v);
@@ -232,9 +208,6 @@ namespace CasADi{
 
     /// Set the the free attribute
     void setFree(bool free);
-
-    /// Access the the free attribute
-    bool& free();
         
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

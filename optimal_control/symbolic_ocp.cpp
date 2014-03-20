@@ -135,14 +135,14 @@ namespace CasADi{
           // Other properties
           if(vnode.hasChild("Real")){
             const XMLNode& props = vnode["Real"];
-            props.readAttribute("unit",var.unit(),false);
-            props.readAttribute("displayUnit",var.displayUnit(),false);
-            props.readAttribute("min",var.min(),false);
-            props.readAttribute("max",var.max(),false);
-            props.readAttribute("start",var.start(),false);
-            props.readAttribute("nominal",var.nominal(),false);
-            props.readAttribute("free",var.free(),false);
-            props.readAttribute("initialGuess",var.initialGuess(),false);
+            props.readAttribute("unit",var->unit_,false);
+            props.readAttribute("displayUnit",var->displayUnit_,false);
+            props.readAttribute("min",var->min_,false);
+            props.readAttribute("max",var->max_,false);
+            props.readAttribute("start",var->start_,false);
+            props.readAttribute("nominal",var->nominal_,false);
+            props.readAttribute("free",var->free_,false);
+            props.readAttribute("initialGuess",var->initial_guess_,false);
           }
         
           // Variable category
