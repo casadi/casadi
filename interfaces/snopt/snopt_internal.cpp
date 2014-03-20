@@ -20,156 +20,161 @@
  *
  */
 
-#include "snopt_internal.hpp"
+#include <stdio.h>
+#include <string.h>
+#include <ctime>
+#include <utility>
+#include <string>
+#include <algorithm>
+#include <vector>
+
 #include "symbolic/std_vector_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/fx/mx_function.hpp"
-#include <ctime>
 
-#include <stdio.h>
-#include <string.h>
+#include "snopt_internal.hpp"
 #include "wsnopt.hpp"
 
-using namespace std;
+namespace CasADi {
 
-namespace CasADi{
+  SnoptInternal::SnoptInternal(const FX& nlp) : NLPSolverInternal(nlp) {
+    addOption("detect_linear", OT_BOOLEAN, true,
+              "Make an effort to treat linear constraints and linear variables specially.");
 
-  SnoptInternal::SnoptInternal(const FX& nlp) : NLPSolverInternal(nlp){
-    addOption("detect_linear",OT_BOOLEAN, true, "Make an effort to treat linear constraints and linear variables specially.");
-    
     // Monitors
     addOption("monitor", OT_STRINGVECTOR, GenericType(),  "", "eval_nlp|setup_nlp", true);
-    
+
     addOption("_start",  OT_STRING, "Cold",  "", "Cold|Warm");
     addOption("_iprint",  OT_INTEGER, 0);
     addOption("_isumm",   OT_INTEGER, 6);
 
     // Snopt options
-//    optionsmap_["_major_print_level"]     = std::pair<opt_type,std::string>(OT_INTEGER,"Major print level");
-//    optionsmap_["_minor_print_level"]     = std::pair<opt_type,std::string>(OT_INTEGER,"Minor print level");
-    optionsmap_["_verify_level"]          = std::pair<opt_type,std::string>(OT_INTEGER,"Verify level");
-    optionsmap_["_major_iteration_limit"] = std::pair<opt_type,std::string>(OT_INTEGER,"Major iteration limit");
-    optionsmap_["_minor_iteration_limit"] = std::pair<opt_type,std::string>(OT_INTEGER,"Minor iteration limit");
-    optionsmap_["_feasibility_tolerance"] = std::pair<opt_type,std::string>(OT_REAL,   "Feasibility tolerance");
-    optionsmap_["_optimality_tolerance"]  = std::pair<opt_type,std::string>(OT_REAL,   "Optimality tolerance");
-    
+    typedef std::pair<opt_type, std::string> optPair;
+    // optionsmap_["_major_print_level"]     = optPair(OT_INTEGER, "Major print level");
+    // optionsmap_["_minor_print_level"]     = optPair(OT_INTEGER, "Minor print level");
+    optionsmap_["_verify_level"]          = optPair(OT_INTEGER, "Verify level");
+    optionsmap_["_major_iteration_limit"] = optPair(OT_INTEGER, "Major iteration limit");
+    optionsmap_["_minor_iteration_limit"] = optPair(OT_INTEGER, "Minor iteration limit");
+    optionsmap_["_feasibility_tolerance"] = optPair(OT_REAL,    "Feasibility tolerance");
+    optionsmap_["_optimality_tolerance"]  = optPair(OT_REAL,    "Optimality tolerance");
+    optionsmap_["_scale_option"]          = optPair(OT_INTEGER, "Scale option");
+
     // Add the Snopt Options
-    for (OptionsMap::const_iterator it=optionsmap_.begin();it!=optionsmap_.end();it++) {
-      addOption(it->first,it->second.first, GenericType(), it->second.second);
+    for (OptionsMap::const_iterator it = optionsmap_.begin(); it != optionsmap_.end(); it++) {
+      addOption(it->first, it->second.first, GenericType(), it->second.second);
     }
-    
   }
 
-  SnoptInternal::~SnoptInternal(){
-
+  SnoptInternal::~SnoptInternal() {
   }
-  
-  SnoptInternal* SnoptInternal::clone() const{ 
+
+  SnoptInternal* SnoptInternal::clone() const {
     // Use default copy routine
-    SnoptInternal* node = new SnoptInternal(*this); 
-    
+    SnoptInternal* node = new SnoptInternal(*this);
+
     return node;
   }
 
-  void SnoptInternal::init(){
-
+  void SnoptInternal::init() {
     // Read in casadi options
     detect_linear_ = getOption("detect_linear");
-    
+
     // Call the init method of the base class
     NLPSolverInternal::init();
 
     // Get/generate required functions
     jacF();
     jacG();
-    
+
     // A large part of what follows is about classiyning variables
     //  and building a mapping
-    
-    // Classify the decision variables into (2: nonlinear, 1: linear, 0:zero) according to the objective
+
+    // Classify the decision variables into (2: nonlinear, 1: linear, 0:zero)
+    // according to the objective.
     // x_type_f_:  original variable index -> category w.r.t f
-    x_type_f_.resize(nx_);
     // x_type_g_:  original variable index -> category w.r.t g
-    x_type_g_.resize(nx_);
     // x_type_f_:  original constraint index -> category
+    x_type_f_.resize(nx_);
+    x_type_g_.resize(nx_);
     g_type_.resize(ng_);
-    
-    if (detect_linear_) { 
+
+    if (detect_linear_) {
+      jacF_.spInit(true);
       // Detect dependencies w.r.t. gradF
       // Dependency seeds
       bvec_t* input_v_x =  get_bvec_t(jacF_->inputNoCheck(GRADF_X).data());
       bvec_t* input_v_p =  get_bvec_t(jacF_->inputNoCheck(GRADF_P).data());
       // Make a column with all variables active
-      std::fill(input_v_x,input_v_x+nx_,bvec_t(1));
-      std::fill(input_v_p,input_v_p+np_,bvec_t(0));
+      std::fill(input_v_x, input_v_x+nx_, bvec_t(1));
+      std::fill(input_v_p, input_v_p+np_, bvec_t(0));
       bvec_t* output_v = get_bvec_t(jacF_->outputNoCheck().data());
       // Perform a single dependency sweep
       jacF_.spEvaluate(true);
-      
+
       // Harvest the results
-      for (int j=0;j<nx_;++j) {
-        if (jacF_.output().colind(j)==jacF_.output().colind(j+1)) {
+      for (int j = 0; j < nx_; ++j) {
+        if (jacF_.output().colind(j) == jacF_.output().colind(j+1)) {
           x_type_f_[j] = 0;
         } else {
           x_type_f_[j] = output_v[jacF_.output().colind(j)]?  2 : 1;
         }
       }
-      
-      if (!jacG_.isNull()) { // Detect dependencies w.r.t. jacG
+
+      if (!jacG_.isNull()) {  // Detect dependencies w.r.t. jacG
         // Dependency seeds
         bvec_t* input_v_x =  get_bvec_t(jacG_->inputNoCheck(JACG_X).data());
         bvec_t* input_v_p =  get_bvec_t(jacG_->inputNoCheck(JACG_P).data());
         // Make a column with all variables active
-        std::fill(input_v_x,input_v_x+nx_,bvec_t(1));
-        std::fill(input_v_p,input_v_p+np_,bvec_t(0));
+        std::fill(input_v_x, input_v_x+nx_, bvec_t(1));
+        std::fill(input_v_p, input_v_p+np_, bvec_t(0));
         bvec_t* output_v = get_bvec_t(jacG_->outputNoCheck().data());
         // Perform a single dependency sweep
         jacG_.spEvaluate(true);
-        
+
         DMatrix out_trans = trans(jacG_.output());
         bvec_t* output_v_trans = get_bvec_t(out_trans.data());
-        
-        for (int j=0;j<nx_;++j) { // Harvest the results
-          if (jacG_.output().colind(j)==jacG_.output().colind(j+1)) {
+
+        for (int j = 0; j < nx_; ++j) {  // Harvest the results
+          if (jacG_.output().colind(j) == jacG_.output().colind(j+1)) {
             x_type_g_[j] = 0;
           } else {
             bool linear = true;
-            for (int k=jacG_.output().colind(j);k<jacG_.output().colind(j+1);++k) {
+            for (int k = jacG_.output().colind(j); k < jacG_.output().colind(j+1); ++k) {
               linear = linear && !output_v[k];
             }
             x_type_g_[j] = linear? 1 : 2;
           }
         }
-        for (int j=0;j<ng_;++j) { // Harvest the results
-          if (out_trans.colind(j)==out_trans.colind(j+1)) {
+        for (int j = 0; j < ng_; ++j) {  // Harvest the results
+          if (out_trans.colind(j) == out_trans.colind(j+1)) {
             g_type_[j] = 0;
           } else {
             bool linear = true;
-            for (int k=out_trans.colind(j);k<out_trans.colind(j+1);++k) {
+            for (int k = out_trans.colind(j); k < out_trans.colind(j+1); ++k) {
               linear = linear && !output_v_trans[k];
             }
             g_type_[j] = linear? 1 : 2;
           }
         }
-      } else { // Assume all non-linear
-        std::fill(x_type_g_.begin(),x_type_g_.end(),1);
-        std::fill(g_type_.begin(),g_type_.end(),1);
+      } else {  // Assume all non-linear
+        std::fill(x_type_g_.begin(), x_type_g_.end(), 1);
+        std::fill(g_type_.begin(), g_type_.end(), 1);
       }
-      
-    } else { // Assume all non-linear variables
-      std::fill(x_type_f_.begin(),x_type_f_.end(),2);
-      std::fill(x_type_g_.begin(),x_type_g_.end(),2);
-      std::fill(g_type_.begin(),g_type_.end(),2);
+
+    } else {  // Assume all non-linear variables
+      std::fill(x_type_f_.begin(), x_type_f_.end(), 2);
+      std::fill(x_type_g_.begin(), x_type_g_.end(), 2);
+      std::fill(g_type_.begin(), g_type_.end(), 2);
     }
-   
-    if(monitored("setup_nlp")){
+
+    if (monitored("setup_nlp")) {
       std::cout << "Variable classification (obj): " << x_type_f_ << std::endl;
       std::cout << "Variable classification (con): " << x_type_g_ << std::endl;
       std::cout << "Constraint classification: " << g_type_ << std::endl;
     }
-    
+
     // An encoding of the desired sorting pattern
     // Digits xy  with x correspodning to x_type_f_ and y corresponding to x_type_g_
     std::vector<int> order_template;
@@ -183,30 +188,30 @@ namespace CasADi{
     order_template.push_back(10);
     order_template.push_back(1);
     order_template.push_back(0);
-    
+
     // prepare the mapping for variables
     x_order_.resize(0);
     x_order_.reserve(nx_);
-    
+
     // Populate the order vector
-    std::vector<int> x_order_count; // Cumulative index into x_order_
-    for (int p=0;p<order_template.size();++p) {
-      for (int k=0;k<nx_;++k) {
-        if (x_type_f_[k]*10+x_type_g_[k]==order_template[p]) {
+    std::vector<int> x_order_count;  // Cumulative index into x_order_
+    for (int p = 0; p < order_template.size(); ++p) {
+      for (int k = 0; k < nx_; ++k) {
+        if (x_type_f_[k]*10+x_type_g_[k] == order_template[p]) {
           x_order_.push_back(k);
         }
       }
       // Save a cumulative index
       x_order_count.push_back(x_order_.size());
     }
-    
+
     // prepare the mapping for constraints
     g_order_.resize(0);
     g_order_.reserve(ng_);
-    std::vector<int> g_order_count; // Cumulative index into g_order_
-    for (int p=2;p>=0;--p) {
-      for (int k=0;k<ng_;++k) {
-        if (g_type_[k]==p) {
+    std::vector<int> g_order_count;  // Cumulative index into g_order_
+    for (int p = 2; p >= 0; --p) {
+      for (int k = 0; k < ng_; ++k) {
+        if (g_type_[k] == p) {
           g_order_.push_back(k);
         }
       }
@@ -215,13 +220,17 @@ namespace CasADi{
     nnJac_ = x_order_count[2];
     nnObj_ = x_order_count[4];
     nnCon_ = g_order_count[0];
-    
-    if(monitored("setup_nlp")){
-      for (int p=0;p<order_template.size();++p) {
-        int start_k = (p>0 ?x_order_count[p-1]:0);
-        std::cout << "Variables (" << order_template[p]/10 << "," << order_template[p]%10 << ") - " << x_order_count[p]-start_k << ":" << std::vector<int>(x_order_.begin()+start_k,x_order_.begin()+std::min(x_order_count[p],200+start_k)) << std::endl;
+
+    if (monitored("setup_nlp")) {
+      for (int p = 0; p < order_template.size(); ++p) {
+        int start_k = (p > 0 ?x_order_count[p-1]:0);
+        std::cout << "Variables (" << order_template[p]/10 << ", "
+                  << order_template[p]%10 << ") - " << x_order_count[p]-start_k << ":"
+                  << std::vector<int>(x_order_.begin()+start_k,
+                                      x_order_.begin()+std::min(x_order_count[p], 200+start_k))
+                  << std::endl;
       }
- 
+
       std::cout << "Variable order:" << x_order_ << std::endl;
       std::cout << "Constraint order:" << g_order_ << std::endl;
       std::cout << "nnJac:" << nnJac_ << std::endl;
@@ -236,28 +245,29 @@ namespace CasADi{
     //  but with a special encoding: entries of gradF are encoded "-1-i" and
     //  entries of jacG are encoded "1+i"
     //  "0" is to be interpreted not as an index but as a literal zero
-    
-    IMatrix mapping_jacG  = IMatrix(0,nx_);
-    IMatrix mapping_gradF = IMatrix(jacF_.output().sparsity(),range(-1,-1-jacF_.output().size(),-1));
-    
+
+    IMatrix mapping_jacG  = IMatrix(0, nx_);
+    IMatrix mapping_gradF = IMatrix(jacF_.output().sparsity(),
+                                    range(-1, -1-jacF_.output().size(), -1));
+
     if (!jacG_.isNull()) {
-      mapping_jacG = IMatrix(jacG_.output().sparsity(),range(1,jacG_.output().size()+1));
+      mapping_jacG = IMatrix(jacG_.output().sparsity(), range(1, jacG_.output().size()+1));
     }
-    
+
     // First, remap jacG
-    A_structure_ = mapping_jacG(g_order_,x_order_);
-    
+    A_structure_ = mapping_jacG(g_order_, x_order_);
+
     m_ = ng_;
-    
+
     // Construct the linear objective row
-    IMatrix d=mapping_gradF(Slice(0),x_order_);
-  
+    IMatrix d = mapping_gradF(Slice(0), x_order_);
+
     std::vector<int> ii = mapping_gradF.sparsity().getCol();
-    for (int j=0;j<nnObj_;++j) {
-      if (d.colind(j)!=d.colind(j+1)) {
-        int k=d.colind(j);
-        int i=d.data()[k]; // Nonzero original index into gradF
-        if (x_type_f_[ii[-1-i]]==2) {
+    for (int j = 0; j < nnObj_; ++j) {
+      if (d.colind(j) != d.colind(j+1)) {
+        int k = d.colind(j);
+        int i = d.data()[k];  // Nonzero original index into gradF
+        if (x_type_f_[ii[-1-i]] == 2) {
           d[k] = 0;
         }
       }
@@ -265,46 +275,46 @@ namespace CasADi{
 
     // Make it as sparse as you can
     d = sparse(d);
-    
-    jacF_row_ = d.size()!=0;
-    if (jacF_row_) { // We need an objective gradient row
-      A_structure_ = vertcat(A_structure_,d);
+
+    jacF_row_ = d.size() != 0;
+    if (jacF_row_) {  // We need an objective gradient row
+      A_structure_ = vertcat(A_structure_, d);
       m_ +=1;
     }
     iObj_ = jacF_row_ ? m_ : 0;
-    
-    // Is the A matrix completely empty? 
-    dummyrow_ = A_structure_.size()==0; // Then we need a dummy row
+
+    // Is the A matrix completely empty?
+    dummyrow_ = A_structure_.size() == 0;  // Then we need a dummy row
     if (dummyrow_) {
-      IMatrix dummyrow(1,nx_);
-      dummyrow(0,0)=0;
-      A_structure_ = vertcat(A_structure_,dummyrow);
+      IMatrix dummyrow(1, nx_);
+      dummyrow(0, 0) = 0;
+      A_structure_ = vertcat(A_structure_, dummyrow);
       m_+=1;
     }
-    
+
     // We don't need a dummy row if a linear objective row is present
     casadi_assert(!(dummyrow_ && jacF_row_));
-        
-    if(monitored("setup_nlp")){
+
+    if (monitored("setup_nlp")) {
       std::cout << "Objective gradient row presence: " << jacF_row_ << std::endl;
       std::cout << "Dummy row presence: " << dummyrow_ << std::endl;
       std::cout << "iObj: " << iObj_ << std::endl;
     }
-    
+
     // The following section deals with querying SNOPT upfront
     // how much memory it needs
 
-    int iPrint=0;
-    int iSumm=0;
-    
+    int iPrint = 0;
+    int iSumm = 0;
+
     // Manual says 500 is a bare minimum, which we will correct later
     int clen = 500; int rlen = 500; int ilen = 500;
-    snopt_cw_.resize(clen*8,'a');
-    snopt_iw_.resize(ilen,0);
-    snopt_rw_.resize(rlen,0);
-    
+    snopt_cw_.resize(clen*8, 'a');
+    snopt_iw_.resize(ilen, 0);
+    snopt_rw_.resize(rlen, 0);
+
     snInit(iPrint, iSumm);
-    
+
     int mincw = 0;
     int miniw = 0;
     int minrw = 0;
@@ -312,14 +322,18 @@ namespace CasADi{
     // Number of nonzeros in entire A
     int neA = A_structure_.size();
     // Number of nonzeros in nonlinear part of A
-    int negCon = std::max(A_structure_(Slice(0,nnCon_),Slice(0,nnJac_)).size(),1); 
-    snopt_memb(&INFO, &m_,&nx_,&neA,&negCon,& nnCon_, &nnJac_, &nnObj_, &mincw, &miniw, &minrw, getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
+    int negCon = std::max(A_structure_(Slice(0, nnCon_), Slice(0, nnJac_)).size(), 1);
+    snopt_memb(&INFO, &m_, &nx_, &neA, &negCon, &nnCon_, &nnJac_, &nnObj_,
+               &mincw, &miniw, &minrw,
+               getPtr(snopt_cw_), &clen,
+               getPtr(snopt_iw_), &ilen,
+               getPtr(snopt_rw_), &rlen);
 
-    casadi_assert(INFO==104);
-    
-    snopt_cw_.resize(mincw*8,'a');
-    snopt_iw_.resize(miniw,0);
-    snopt_rw_.resize(minrw,0);
+    casadi_assert(INFO == 104);
+
+    snopt_cw_.resize(mincw*8, 'a');
+    snopt_iw_.resize(miniw, 0);
+    snopt_rw_.resize(minrw, 0);
     clen = mincw;
     ilen = miniw;
     rlen = minrw;
@@ -327,8 +341,8 @@ namespace CasADi{
     iPrint = getOption("_iprint");
     iSumm = getOption("_isumm");;
     snInit(iPrint, iSumm);
-    
-    for (OptionsMap::const_iterator it=optionsmap_.begin();it!=optionsmap_.end();it++) {
+
+    for (OptionsMap::const_iterator it = optionsmap_.begin(); it != optionsmap_.end(); it++) {
       int Error = 0;
       const std::string & snopt_name = it->second.second;
       int bufferlen = snopt_name.size();
@@ -349,31 +363,41 @@ namespace CasADi{
           default:
             casadi_error("Unkown type " << it->second.first);
         }
-        casadi_assert_message(Error==0,"snopt error setting option \"" + snopt_name + "\"")
-      } /* else {
-        switch (it->second.first) {
-          case OT_INTEGER: {
-            int value = 0;
-            snopt_geti(snopt_name.c_str(),&bufferlen,&value,&Error,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
-            setOption(it->first,value);
-          }; break;
-          case OT_REAL: {
-            double value = 0;
-            snopt_getr(snopt_name.c_str(),&bufferlen,&value,&Error,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
-            setOption(it->first,value);
-          }; break;
-          case OT_STRING: {
-            char value[8];
-            snopt_getc(snopt_name.c_str(),&bufferlen,value,&Error,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
-            setOption(it->first,std::string(value));
-            }; break;
-          default:
-            casadi_error("Unkown type " << it->second.first);
-        }
-        casadi_assert_message(Error==0,"snopt error getting option \"" + snopt_name + "\"")
-        }*/
+        casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
+      }
+      // else {
+      //   switch (it->second.first) {
+      //     case OT_INTEGER: {
+      //       int value = 0;
+      //       snopt_geti(snopt_name.c_str(), &bufferlen, &value, &Error,
+      //                  getPtr(snopt_cw_), &clen,
+      //                  getPtr(snopt_iw_), &ilen,
+      //                  getPtr(snopt_rw_), &rlen);
+      //       setOption(it->first, value);
+      //     }; break;
+      //     case OT_REAL: {
+      //       double value = 0;
+      //       snopt_getr(snopt_name.c_str(), &bufferlen, &value, &Error,
+      //                  getPtr(snopt_cw_), &clen,
+      //                  getPtr(snopt_iw_), &ilen,
+      //                  getPtr(snopt_rw_), &rlen);
+      //       setOption(it->first, value);
+      //     }; break;
+      //     case OT_STRING: {
+      //       char value[8];
+      //       snopt_getc(snopt_name.c_str(), &bufferlen, value, &Error,
+      //                  getPtr(snopt_cw_), &clen,
+      //                  getPtr(snopt_iw_), &ilen,
+      //                  getPtr(snopt_rw_), &rlen);
+      //       setOption(it->first, std::string(value));
+      //       }; break;
+      //     default:
+      //       casadi_error("Unkown type " << it->second.first);
+      //   }
+      //   casadi_assert_message(Error == 0, "snopt error getting option \"" + snopt_name + "\"")
+      // }
     }
-    
+
     // Allocate data structures needed in evaluate
     bl_.resize(nx_+m_);
     bu_.resize(nx_+m_);
@@ -382,23 +406,19 @@ namespace CasADi{
     pi_.resize(m_);
     rc_.resize(nx_+m_);
     A_data_.resize(A_structure_.size());
-    
   }
 
-  void SnoptInternal::reset(){
-
+  void SnoptInternal::reset() {
   }
 
   void SnoptInternal::setQPOptions() {
-
   }
 
   void SnoptInternal::passOptions() {
-
   }
 
   std::string SnoptInternal::formatStatus(int status) const {
-    if (status_.find(status)==status_.end()) {
+    if (status_.find(status) == status_.end()) {
       std::stringstream ss;
       ss << "Unknown status: " << status;
       return ss.str();
@@ -407,35 +427,35 @@ namespace CasADi{
     }
   }
 
-  void SnoptInternal::evaluate(){
+  void SnoptInternal::evaluate() {
     log("SnoptInternal::evaluate");
-     
+
     // Initial checks
     if (inputs_check_) checkInputs();
     checkInitialBounds();
-    
+
     std::string start = getOption("_start");
     int lenstart = start.size();
-    
+
     // Evaluate gradF and jacG at initial value
     if (!jacG_.isNull()) {
-      jacG_.setInput(input(NLP_SOLVER_X0),JACG_X);
-      jacG_.setInput(input(NLP_SOLVER_P),JACG_P);
+      jacG_.setInput(input(NLP_SOLVER_X0), JACG_X);
+      jacG_.setInput(input(NLP_SOLVER_P), JACG_P);
       jacG_.evaluate();
     }
-    jacF_.setInput(input(NLP_SOLVER_X0),GRADF_X);
-    jacF_.setInput(input(NLP_SOLVER_P),GRADF_P);
+    jacF_.setInput(input(NLP_SOLVER_X0), GRADF_X);
+    jacF_.setInput(input(NLP_SOLVER_P), GRADF_P);
 
     jacF_.evaluate();
-    
+
     // perform the mapping:
     // populate A_data_ (the nonzeros of A)
     // with numbers pulled from jacG and gradF
-    for (int k=0;k<A_structure_.size();++k) {
+    for (int k = 0; k < A_structure_.size(); ++k) {
       int i = A_structure_.data()[k];
-      if (i==0) {
+      if (i == 0) {
         A_data_[k] = 0;
-      } else if (i>0) {
+      } else if (i > 0) {
         A_data_[k] = jacG_.output().data()[i-1];
       } else {
         A_data_[k] = jacF_.output().data()[-i-1];
@@ -444,42 +464,42 @@ namespace CasADi{
 
     // Obtain constraint offsets for linear constraints
     if (detect_linear_) {
-      nlp_.setInput(0.0,NL_X);
+      nlp_.setInput(0.0, NL_X);
       // Setting the zero might actually be problematic
-      nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
       nlp_.evaluate();
     }
 
     int n = nx_;
     int nea = A_structure_.size();
-    int nNames=1;
+    int nNames = 1;
     double ObjAdd = 0;
-    
+
     // Problem name
-    std::string prob="  CasADi";
-    
+    std::string prob = "  CasADi";
+
     // Obtain sparsity pattern of A (fortan is Index-1 based)
     std::vector<int> row(A_structure_.size());
-    for (int k=0;k<A_structure_.size();++k) {
+    for (int k = 0; k < A_structure_.size(); ++k) {
       row[k] = 1+A_structure_.row()[k];
     }
-    
+
     std::vector<int> col(nx_+1);
-    for (int k=0;k<nx_+1;++k) {
+    for (int k = 0; k < nx_+1; ++k) {
       col[k] = 1+A_structure_.colind()[k];
     }
-    
+
     // Obtain initial guess and bounds through the mapping
-    for (int k=0;k<nx_;++k) {
-      int kk= x_order_[k];
+    for (int k = 0; k < nx_; ++k) {
+      int kk = x_order_[k];
       bl_[k] = input(NLP_SOLVER_LBX).data()[kk];
       bu_[k] = input(NLP_SOLVER_UBX).data()[kk];
       x_[k] = input(NLP_SOLVER_X0).data()[kk];
     }
-    for (int k=0;k<ng_;++k) {
-      int kk= g_order_[k];
-      if (g_type_[kk]<2) {
-        //casadi_error("woops");
+    for (int k = 0; k < ng_; ++k) {
+      int kk = g_order_[k];
+      if (g_type_[kk] < 2) {
+        // casadi_error("woops");
         bl_[nx_+k] = input(NLP_SOLVER_LBG).data()[kk]-nlp_.output(NL_G).data()[kk];
         bu_[nx_+k] = input(NLP_SOLVER_UBG).data()[kk]-nlp_.output(NL_G).data()[kk];
       } else {
@@ -488,139 +508,143 @@ namespace CasADi{
       }
       x_[nx_+k] = input(NLP_SOLVER_LAM_G0).data()[kk];
     }
-    
+
     // Objective row / dummy row should be unbounded
     if (dummyrow_ || jacF_row_) {
-      bl_.back() = -1e20;// -std::numeric_limits<double>::infinity();
-      bu_.back() = 1e20;//std::numeric_limits<double>::infinity();
+      bl_.back() = -1e20;  // -std::numeric_limits<double>::infinity();
+      bu_.back() = 1e20;  // std::numeric_limits<double>::infinity();
     }
-    
+
     int nS = 0;
     int clen = snopt_cw_.size()/8;
     int rlen = snopt_rw_.size();
     int ilen = snopt_iw_.size();
-    int info=0;
-    
+    int info = 0;
+
     // Outputs
-    int miniw=0,minrw=0,mincw=0;
-    int nInf=0;
-    double Obj= 0;
-    double sInf=0;
-    
-    casadi_assert(m_>0);
-    casadi_assert(n>0);
-    casadi_assert(nea>0);
-    casadi_assert(row.size()==nea);
-    casadi_assert(hs_.size()==n+m_);
-    casadi_assert(col.size()==n+1);
-    casadi_assert(A_structure_.size()==nea);
-    casadi_assert(bl_.size()==n+m_);
-    casadi_assert(bu_.size()==n+m_);
-    casadi_assert(pi_.size()==m_);
-    casadi_assert(x_.size()==n+m_);
-    casadi_assert(col.at(0)==1);
-    casadi_assert(col.at(n)==nea+1);
-    
+    int miniw = 0, minrw = 0, mincw = 0;
+    int nInf = 0;
+    double Obj = 0;
+    double sInf = 0;
+
+    casadi_assert(m_ > 0);
+    casadi_assert(n > 0);
+    casadi_assert(nea > 0);
+    casadi_assert(row.size() == nea);
+    casadi_assert(hs_.size() == n+m_);
+    casadi_assert(col.size() == n+1);
+    casadi_assert(A_structure_.size() == nea);
+    casadi_assert(bl_.size() == n+m_);
+    casadi_assert(bu_.size() == n+m_);
+    casadi_assert(pi_.size() == m_);
+    casadi_assert(x_.size() == n+m_);
+    casadi_assert(col.at(0) == 1);
+    casadi_assert(col.at(n) == nea+1);
+
     // Pointer magic, courtesy of Greg
     int iulen = 8;
     std::vector<int> iu(iulen);
     SnoptInternal* source = this;
     memcpy(&(iu[0]), &source, sizeof(SnoptInternal*));
 
-    casadi_assert_message(!jacF_.isNull(),"blaasssshc");
-    
-    if(monitored("setup_nlp")){
+    casadi_assert_message(!jacF_.isNull(), "blaasssshc");
+
+    if (monitored("setup_nlp")) {
       std::cout << "indA:" << row << std::endl;
       std::cout << "locA:" << col << std::endl;
       std::cout << "colA:" << A_data_ << std::endl;
       A_structure_.sparsity().spy();
-      std::cout << "A:" << DMatrix(A_structure_.sparsity(),A_data_) << std::endl;
+      std::cout << "A:" << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
       std::cout << "n:" << n << std::endl;
       std::cout << "m:" << m_ << std::endl;
       std::cout << "nea:" << nea << std::endl;
       std::cout << "bl_:" << bl_ << std::endl;
       std::cout << "bu_:" << bu_ << std::endl;
     }
-    
+
     // Run SNOPT
     snopt_c(
-      start.c_str(),&lenstart,&m_,&n,&nea,&nNames,&nnCon_,&nnObj_,&nnJac_,&iObj_,&ObjAdd,prob.c_str(),userfunPtr,
-      
-      getPtr(A_data_),getPtr(row),getPtr(col),getPtr(bl_),getPtr(bu_),
-      
+      start.c_str(), &lenstart, &m_, &n, &nea, &nNames,
+      &nnCon_, &nnObj_, &nnJac_, &iObj_, &ObjAdd,
+      prob.c_str(), userfunPtr,
+      getPtr(A_data_), getPtr(row), getPtr(col), getPtr(bl_), getPtr(bu_),
       0,
-      
       // Initial values
-      getPtr(hs_),getPtr(x_),getPtr(pi_),getPtr(rc_),
-      
+      getPtr(hs_), getPtr(x_), getPtr(pi_), getPtr(rc_),
       // Outputs
-      &info,&mincw,&miniw,&minrw,&nS,&nInf,&sInf,&Obj,
-      
+      &info, &mincw, &miniw, &minrw, &nS, &nInf, &sInf, &Obj,
       // Working spaces for usrfun
-      getPtr(snopt_cw_),&clen,getPtr(iu),&ilen,getPtr(snopt_rw_),&rlen,
+      getPtr(snopt_cw_), &clen,
+      getPtr(iu), &iulen,
+      getPtr(snopt_rw_), &rlen,
       // Working spaces for SNOPT
-      getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
-      
+      getPtr(snopt_cw_), &clen,
+      getPtr(snopt_iw_), &ilen,
+      getPtr(snopt_rw_), &rlen);
+
     stats_["return_status"] = info;
 
     // Store results into output
-    for (int k=0;k<nx_;++k) {
-      int kk= x_order_[k];
+    for (int k = 0; k < nx_; ++k) {
+      int kk =  x_order_[k];
       output(NLP_SOLVER_X).data()[kk] = x_[k];
       output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
     }
-    
-    setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0),NLP_SOLVER_F);
-    
-    for (int k=0;k<ng_;++k) {
-      int kk= g_order_[k];
+
+    setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLP_SOLVER_F);
+
+    for (int k = 0; k < ng_; ++k) {
+      int kk = g_order_[k];
       output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];
-      output(NLP_SOLVER_G).data()[kk] =x_[nx_+k]; // TODO: this is not quite right
-      //mul_no_alloc
+      output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];  // TODO(Joris): this is not quite right
+      // mul_no_alloc
     }
-
-
   }
 
   void SnoptInternal::setOptionsFromFile(const std::string & file) {
-    
   }
-  
-  void SnoptInternal::userfun(int& mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac, double* x, double &fObj, double*gObj, double* fCon, double* gCon, int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) {
+
+  void SnoptInternal::userfun(
+      int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
+      double* x, double* fObj, double*gObj, double* fCon, double* gCon,
+      int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) {
     try {
       double time1 = clock();
-      
-      casadi_assert_message(nnCon_==nnCon,"Con " << nnCon_ << " <-> " << nnCon );
-      casadi_assert_message(nnObj_==nnObj,"Obj " << nnObj_ << " <-> " << nnObj);
-      casadi_assert_message(nnJac_==nnJac,"Jac " << nnJac_ << " <-> " << nnJac);
+
+      casadi_assert_message(nnCon_ == nnCon, "Con " << nnCon_ << " <-> " << nnCon);
+      casadi_assert_message(nnObj_ == nnObj, "Obj " << nnObj_ << " <-> " << nnObj);
+      casadi_assert_message(nnJac_ == nnJac, "Jac " << nnJac_ << " <-> " << nnJac);
 
       // Evaluate gradF with the linear variables put to zero
-      jacF_.setInput(0.0,NL_X);
-      jacF_.setInput(input(NLP_SOLVER_P),NL_P);
-      for (int k=0;k<nnObj;++k) {
-        if (x_type_f_[x_order_[k]]==2) {
+      jacF_.setInput(0.0, NL_X);
+      jacF_.setInput(input(NLP_SOLVER_P), NL_P);
+      for (int k = 0; k < nnObj; ++k) {
+        if (x_type_f_[x_order_[k]] == 2) {
           jacF_.input(NL_X)[x_order_[k]] = x[k];
         }
       }
-      
-      if(monitored("eval_nlp")){
-        std::cout << "mode: " << mode << std::endl;
-        std::cout << "A before we touch it:" << DMatrix(A_structure_.sparsity(),A_data_) << std::endl;
-        std::cout << "x (obj - sorted indices   - all elements present):" << std::vector<double>(x,x+nnObj) << std::endl;
-        std::cout << "x (obj - original indices - linear elements zero):" << jacF_.input(NL_X) << std::endl;
+
+      if (monitored("eval_nlp")) {
+        std::cout << "mode: " << *mode << std::endl;
+        std::cout << "A before we touch it:"
+                  << DMatrix(A_structure_.sparsity(), A_data_) << std::endl;
+        std::cout << "x (obj - sorted indices   - all elements present):"
+                  << std::vector<double>(x, x+nnObj) << std::endl;
+        std::cout << "x (obj - original indices - linear elements zero):"
+                  << jacF_.input(NL_X) << std::endl;
       }
-      
+
       jacF_.evaluate();
-      
+
       // provide objective (without linear contributions) to SNOPT
-      fObj = jacF_.output(1).at(0);
-          
-      // provide nonlinear part of objective gradient to SNOPT 
-      for (int k=0;k<nnObj;++k) {
+      *fObj = jacF_.output(1).at(0);
+
+      // provide nonlinear part of objective gradient to SNOPT
+      for (int k = 0; k < nnObj; ++k) {
         int i = x_order_[k];
-        if (x_type_f_[i]==2) {
+        if (x_type_f_[i] == 2) {
           int el = jacF_.output().colind(i);
-          if (jacF_.output().colind(i+1)>el) {
+          if (jacF_.output().colind(i+1) > el) {
             gObj[k] = jacF_.output().data()[el];
           } else {
             gObj[k] = 0;
@@ -629,108 +653,115 @@ namespace CasADi{
           gObj[k] = 0;
         }
       }
-      
+
       jacF_.output().sparsity().sanityCheck(true);
       jacF_.output().sparsity().sanityCheck(false);
-      
-      if(monitored("eval_nlp")){
-        std::cout << "fObj:" << fObj << std::endl;
-        std::cout << "gradF:" << jacF_.output() << std::endl;
-        std::cout << "gObj:" << std::vector<double>(gObj,gObj+nnObj) << std::endl;
-      }
-      
-      if (!jacG_.isNull()) {
 
+      if (monitored("eval_nlp")) {
+        std::cout << "fObj:" << *fObj << std::endl;
+        std::cout << "gradF:" << jacF_.output() << std::endl;
+        std::cout << "gObj:" << std::vector<double>(gObj, gObj+nnObj) << std::endl;
+      }
+
+      if (!jacG_.isNull()) {
         // Evaluate jacG with the linear variabes put to zero
-        jacG_.setInput(0.0,JACG_X);
-        for (int k=0;k<nnJac ;++k) {
+        jacG_.setInput(0.0, JACG_X);
+        for (int k = 0; k < nnJac; ++k) {
           jacG_.input(JACG_X)[x_order_[k]] = x[k];
         }
-        if(monitored("eval_nlp")){
-          std::cout << "x (con - sorted indices   - all elements present):" << std::vector<double>(x,x+nnJac) << std::endl;
-          std::cout << "x (con - original indices - linear elements zero):" << jacG_.input(JACG_X) << std::endl;
+        if (monitored("eval_nlp")) {
+          std::cout << "x (con - sorted indices   - all elements present):"
+                    << std::vector<double>(x, x+nnJac) << std::endl;
+          std::cout << "x (con - original indices - linear elements zero):"
+                    << jacG_.input(JACG_X) << std::endl;
         }
-        jacG_.setInput(input(NLP_SOLVER_P),JACG_P);
-      
+        jacG_.setInput(input(NLP_SOLVER_P), JACG_P);
+
         // Evaluate the function
         jacG_.evaluate();
-        
-        // provide nonlinear part of constraint jacobian to SNOPT 
-        int kk=0;
-        for (int j=0;j<nnJac;++j) {
-          for (int k=A_structure_.colind(j);k<A_structure_.sparsity().colind(j+1);++k) {
-            if (A_structure_.row(k)>=nnCon) break;
+
+        // provide nonlinear part of constraint jacobian to SNOPT
+        int kk = 0;
+        for (int j = 0; j < nnJac; ++j) {
+          for (int k = A_structure_.colind(j); k < A_structure_.sparsity().colind(j+1); ++k) {
+            if (A_structure_.row(k) >= nnCon) break;
             int i = A_structure_.data()[k];
-            if (i>0) {
+            if (i > 0) {
               gCon[kk++] = jacG_.output().data()[i-1];
             }
           }
         }
-        
-        casadi_assert(kk==0 || kk==neJac);
-        
-        if(monitored("eval_nlp")){
+
+        casadi_assert(kk == 0 || kk == neJac);
+
+        if (monitored("eval_nlp")) {
           std::cout << jacG_.output(GRADF_G) << std::endl;
         }
-        
-        // provide nonlinear part of objective to SNOPT 
-        DMatrix g=jacG_.output();
-        for (int k=0;k<nnCon;++k) {
+
+        // provide nonlinear part of objective to SNOPT
+        DMatrix g = jacG_.output();
+        for (int k = 0; k < nnCon; ++k) {
           fCon[k] = jacG_.output(GRADF_G).data()[g_order_[k]];
         }
-        
-        if(monitored("eval_nlp")){
-          std::cout << "fCon:" << std::vector<double>(fCon,fCon+nnCon) << std::endl;
-          std::cout << "gCon:" << std::vector<double>(gCon,gCon+neJac) << std::endl;
+
+        if (monitored("eval_nlp")) {
+          std::cout << "fCon:" << std::vector<double>(fCon, fCon+nnCon) << std::endl;
+          std::cout << "gCon:" << std::vector<double>(gCon, gCon+neJac) << std::endl;
         }
-    }
+      }
 
-    if (!callback_.isNull()) {
-      for (int k=0;k<nx_;++k) {
-        int kk= x_order_[k];
-        output(NLP_SOLVER_X).data()[kk] = x_[k];
-        //output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
+      if (!callback_.isNull()) {
+        for (int k = 0; k < nx_; ++k) {
+          int kk = x_order_[k];
+          output(NLP_SOLVER_X).data()[kk] = x_[k];
+          // output(NLP_SOLVER_LAM_X).data()[kk] = -rc_[k];
+        }
+
+        // setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0), NLP_SOLVER_F);
+        for (int k = 0; k < ng_; ++k) {
+          int kk =  g_order_[k];
+          // output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];
+          output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];
+        }
+
+        *mode = callback_(ref_, user_data_);
       }
-      
-      //setOutput(Obj+ (jacF_row_? x_[nx_+ng_] : 0),NLP_SOLVER_F);
-      for (int k=0;k<ng_;++k) {
-        int kk= g_order_[k];
-        //output(NLP_SOLVER_LAM_G).data()[kk] = -rc_[nx_+k];
-        output(NLP_SOLVER_G).data()[kk] =x_[nx_+k];
-      }
-      
-      mode = callback_(ref_,user_data_);
+    } catch (std::exception& ex) {
+      std::cerr << "eval_nlp failed: " << ex.what() << std::endl;
+      *mode = -1;  // Reduce step size - we've got problems
+      return;
     }
-    
-   } catch (exception& ex){
-     cerr << "eval_nlp failed: " << ex.what() << endl;
-     mode = -1; // Reduce step size - we've got problems
-     return;
-   }
-    
   }
 
-  void SnoptInternal::userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac, double *x, double *fObj, double *gObj, double * fCon, double* gCon, int* nState, char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru) {
+  void SnoptInternal::userfunPtr(
+      int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac,
+      double *x, double *fObj, double *gObj, double * fCon, double* gCon,
+      int* nState,
+      char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru) {
+    SnoptInternal* interface;  // = reinterpret_cast<SnoptInternal*>(iu);
+    memcpy(&interface, &(iu[0]), sizeof(SnoptInternal*));
 
-    SnoptInternal* interface;//=reinterpret_cast<SnoptInternal*>(iu);
-    memcpy(&interface,&(iu[0]), sizeof(SnoptInternal*));
-
-    interface->userfun(*mode, *nnObj, *nnCon, *nJac, *nnL, *neJac, x,*fObj, gObj,fCon,gCon,  *nState,  cu,  *lencu,  iu, *leniu, ru, *lenru);
+    interface->userfun(mode, *nnObj, *nnCon, *nJac, *nnL, *neJac,
+                       x, fObj, gObj, fCon, gCon, *nState,
+                       cu, *lencu, iu, *leniu, ru, *lenru);
   }
 
-    void SnoptInternal::snInit(int iPrint, int iSumm){
+    void SnoptInternal::snInit(int iPrint, int iSumm) {
         int clen = snopt_cw_.size()/8;
         int ilen = snopt_iw_.size();
         int rlen = snopt_rw_.size();
-        //sninit_(&iPrint, &iSumm,
-        //        getPtr(snopt_cw_),&clen,
-        //        getPtr(snopt_iw_),&ilen,
-        //        getPtr(snopt_rw_),&rlen,
-        //        clen*8);
-        snopt_init(&iPrint,&iSumm,getPtr(snopt_cw_),&clen,getPtr(snopt_iw_),&ilen,getPtr(snopt_rw_),&rlen);
+        // sninit_(&iPrint, &iSumm,
+        //         getPtr(snopt_cw_), &clen,
+        //         getPtr(snopt_iw_), &ilen,
+        //         getPtr(snopt_rw_), &rlen,
+        //         clen*8);
+        snopt_init(&iPrint, &iSumm,
+                   getPtr(snopt_cw_), &clen,
+                   getPtr(snopt_iw_), &ilen,
+                   getPtr(snopt_rw_), &rlen);
     }
 
-    void SnoptInternal::snSeti(const std::string &snopt_name, int value){
+    void SnoptInternal::snSeti(const std::string &snopt_name, int value) {
         int bufferlen = snopt_name.size();
         int clen = snopt_cw_.size()/8;
         int ilen = snopt_iw_.size();
@@ -738,19 +769,19 @@ namespace CasADi{
         int iSumm = getOption("_isumm");
         int iPrint = getOption("_iprint");
         int Error = 0;
-        //snseti_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
-        //        getPtr(snopt_cw_),&clen,
-        //        getPtr(snopt_iw_),&ilen,
-        //        getPtr(snopt_rw_),&rlen,
-        //        bufferlen,clen*8);
+        // snseti_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
+        //         getPtr(snopt_cw_), &clen,
+        //         getPtr(snopt_iw_), &ilen,
+        //         getPtr(snopt_rw_), &rlen,
+        //         bufferlen, clen*8);
         snopt_seti(snopt_name.c_str(), &bufferlen, &value, &iPrint, &iSumm, &Error,
                    getPtr(snopt_cw_), &clen,
                    getPtr(snopt_iw_), &ilen,
                    getPtr(snopt_rw_), &rlen);
-        casadi_assert_message(Error==0,"snopt error setting option \"" + snopt_name + "\"")
+        casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
     }
 
-    void SnoptInternal::snSetr(const std::string &snopt_name, double value){
+    void SnoptInternal::snSetr(const std::string &snopt_name, double value) {
         int bufferlen = snopt_name.size();
         int clen = snopt_cw_.size()/8;
         int ilen = snopt_iw_.size();
@@ -758,22 +789,22 @@ namespace CasADi{
         int iSumm = getOption("_isumm");
         int iPrint = getOption("_iprint");
         int Error = 0;
-        //snsetr_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
-        //        getPtr(snopt_cw_),&clen,
-        //        getPtr(snopt_iw_),&ilen,
-        //        getPtr(snopt_rw_),&rlen,
-        //        bufferlen,clen*8);
+        // snsetr_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
+        //         getPtr(snopt_cw_),&clen,
+        //         getPtr(snopt_iw_),&ilen,
+        //         getPtr(snopt_rw_),&rlen,
+        //         bufferlen,clen*8);
         snopt_setr(snopt_name.c_str(), &bufferlen, &value, &iPrint, &iSumm, &Error,
                    getPtr(snopt_cw_), &clen,
                    getPtr(snopt_iw_), &ilen,
                    getPtr(snopt_rw_), &rlen);
-        casadi_assert_message(Error==0,"snopt error setting option \"" + snopt_name + "\"")
+        casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
     }
 
-    void SnoptInternal::snSet(const std::string &snopt_name, const std::string &value0){
+    void SnoptInternal::snSet(const std::string &snopt_name, const std::string &value0) {
         std::string value = value0;
-        assert(value.size()<=8);
-        value.append(8-value.size(),' ');
+        assert(value.size() <= 8);
+        value.append(8-value.size(), ' ');
         std::string buffer = snopt_name;
         buffer.append(" = ");
         buffer.append(value);
@@ -785,18 +816,17 @@ namespace CasADi{
         int iSumm = getOption("_isumm");
         int iPrint = getOption("_iprint");
         int Error = 0;
-        //snset_(buffer.c_str(), &iPrint, &iSumm, &Error,
-        //       getPtr(snopt_cw_), &clen,
-        //       getPtr(snopt_iw_), &ilen,
-        //       getPtr(snopt_rw_), &rlen,
-        //       bufferlen,clen*8);
+        // snset_(buffer.c_str(), &iPrint, &iSumm, &Error,
+        //        getPtr(snopt_cw_), &clen,
+        //        getPtr(snopt_iw_), &ilen,
+        //        getPtr(snopt_rw_), &rlen,
+        //        bufferlen, clen*8);
         snopt_set(buffer.c_str(), &bufferlen, &iPrint, &iSumm, &Error,
                   getPtr(snopt_cw_), &clen,
                   getPtr(snopt_iw_), &ilen,
                   getPtr(snopt_rw_), &rlen);
 
-        casadi_assert_message(Error==0,"snopt error setting option \"" + snopt_name + "\"")
+        casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
     }
 
-} // namespace CasADi
-
+}  // namespace CasADi

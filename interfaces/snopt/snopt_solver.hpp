@@ -26,9 +26,9 @@
 #include "symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
-  
+
   class SnoptInternal;
-  
+
   // List from worhp_internal.cpp
   /**
    *
@@ -60,7 +60,7 @@ namespace CasADi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Static creator function 
+    /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
 #endif

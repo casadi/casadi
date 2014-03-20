@@ -171,7 +171,7 @@ namespace CasADi{
 
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const std::vector<int>& cc){
-    casadi_assert_message(m.numel()==1 || (cc.size() == m.size2() && rr.size() == m.size1()),"Dimension mismatch." << std::endl << "lhs is " << cc.size() << " x " << rr.size() << ", while rhs is " << m.dimString());
+    casadi_assert_message(m.numel()==1 || (cc.size() == m.size2() && rr.size() == m.size1()),"Dimension mismatch." << std::endl << "lhs is " << rr.size() << " x " << cc.size() << ", while rhs is " << m.dimString());
 
     if (!inBounds(rr,size1())) {
       casadi_error("setSub[.,rr,cc] out of bounds. Your rr contains " << *std::min_element(rr.begin(),rr.end()) << " up to " << *std::max_element(rr.begin(),rr.end()) << ", which is outside of the matrix shape " << dimString() << ".");
@@ -1019,7 +1019,7 @@ namespace CasADi{
 
     // Get references to data for quick access
     const std::vector<DataType> &data = this->data();
-    const int size1 = this->size1();
+    //const int size1 = this->size1();
     const int size2 = this->size2();
     const std::vector<int>& colind = this->colind();
     const std::vector<int>& row = this->row();
@@ -2052,6 +2052,38 @@ namespace CasADi{
   std::string Matrix<DataType>::getName() const{
     throw CasadiException("\"getName\" not defined for instantiation");
   }
+
+  template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::setSparse(const Sparsity& sp, bool intersect) const{
+    if(intersect){
+      return setSparse(sp.patternIntersection(sparsity()),false);
+    } else {
+      Matrix<DataType> ret(sp);
+      ret.set(*this);
+      return ret;
+    }
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setMaxNumCallsInPrint(long num){
+    throw CasadiException("\"setMaxNumCallsInPrint\" not defined for instantiation");
+  }
+
+  template<typename DataType>
+  long Matrix<DataType>::getMaxNumCallsInPrint(){
+    throw CasadiException("\"getMaxNumCallsInPrint\" not defined for instantiation");
+  }
+
+  template<typename DataType>
+  void Matrix<DataType>::setEqualityCheckingDepth(int eq_depth){
+    throw CasadiException("\"setEqualityCheckingDepth\" not defined for instantiation");
+  }
+
+  template<typename DataType>
+  int Matrix<DataType>::getEqualityCheckingDepth(){
+    throw CasadiException("\"getEqualityCheckingDepth\" not defined for instantiation");
+  }
+
 
 } // namespace CasADi
 

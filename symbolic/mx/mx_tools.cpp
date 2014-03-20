@@ -867,6 +867,30 @@ namespace CasADi{
     return f.getFree();
   }
   
+  bool dependsOn(const MX& ex, const std::vector<MX> &arg){
+    if(ex.size()==0) return false;
+
+    // Construct a temporary algorithm
+    MXFunction temp(arg,ex);
+    temp.init();
+    temp.spInit(true);
+    
+    for (int i=0;i<temp.getNumInputs();++i) {
+      bvec_t* input_ =  get_bvec_t(temp.input(i).data());
+      std::fill(input_, input_+temp.input(i).size(), bvec_t(1));
+    }
+    bvec_t* output_ = get_bvec_t(temp.output().data());
+    // Perform a single dependency sweep
+    temp.spEvaluate(true);
+
+    // Loop over results
+    for (int i=0;i<temp.output().size();++i) {
+      if (output_[i]) return true;
+    }
+    
+    return false;
+  }
+  
   MX matrix_expand(const MX& e, const std::vector<MX> &boundary) {
     std::vector<MX> e_v(1,e);
     return matrix_expand(e_v,boundary).at(0);

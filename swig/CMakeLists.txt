@@ -32,6 +32,8 @@ if(NOT WITH_DEPRECATED)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITHOUT_PRE_1_9_X")
 endif()
 
+set(CASADI_SWIG_INTERFACES)
+
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT")
@@ -39,36 +41,43 @@ if(IPOPT_FOUND)
     set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT_CALLBACK")
   endif()
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_ipopt_interface ${IPOPT_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} ipopt)
 endif()
 
 if(WITH_SUNDIALS)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SUNDIALS")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_sundials_interface ${SUNDIALS_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} sundials)
 endif()
 
 if(QPOASES_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_QPOASES")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_qpoases_interface ${QPOASES_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} qpoases)
 endif()
 
 if(DSDP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DSDP")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_dsdp_interface ${DSDP_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} dsdp)
 endif()
 
 if(WITH_CSPARSE)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_CSPARSE")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_csparse_interface ${CSPARSE_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} csparse)
 endif()
 
 if(KNITRO_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_KNITRO")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_knitro_interface ${KNITRO_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} knitro)
 endif()
 
 if(CPLEX_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_CPLEX")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_cplex_interface ${CPLEX_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} cplex)
 endif()
 
 # if(GSL_FOUND)
@@ -79,31 +88,37 @@ endif()
 if(OOQP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_OOQP")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_ooqp_interface ${OOQP_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} ooqp)
 endif()
 
 if(SQIC_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SQIC")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_sqic_interface sqic_fortran_c_bridge ${SQIC_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} ooqp)
 endif()
 
 if(SLICOT_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SLICOT")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_slicot_interface  ${SLICOT_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} slicot)
 endif()
 
 if(WORHP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_WORHP")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_worhp_interface ${WORHP_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} worhp)
 endif()
 
 if(SNOPT_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SNOPT")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_snopt_interface snopt_fortran_c_bridge ${SNOPT_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} snopt)
 endif()
 
 if(LAPACK_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_LAPACK")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_lapack_interface ${LAPACK_LIBRARIES})
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} lapack)
 endif()
 
 # enabling openmp support if requesed
@@ -147,6 +162,9 @@ set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DCASADI_MODULE")
 
 set(CASADI_SWIG_MAIN_MODULE casadi_main)
 set(CASADI_SWIG_SEPARATE_MODULES casadi_main casadi_primitive casadi_primitive_tools casadi_noncore)
+foreach(my_interface ${CASADI_SWIG_INTERFACES})
+set(CASADI_SWIG_SEPARATE_MODULES ${CASADI_SWIG_SEPARATE_MODULES} casadi_interface_${my_interface})
+endforeach()
 
 #set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-noproxydel") # This should be active during python, and nonactive during octave. How?
 
@@ -220,7 +238,11 @@ make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 # adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
 
 if(WITH_SWIG_SPLIT)
-  add_custom_target(_python_modules DEPENDS _casadi_main _casadi_primitive _casadi_primitive_tools _casadi_noncore) # the python interface is created with the command "make python"
+  set(modules_python)
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+    set(modules_python _${my_module})
+  endforeach()
+  add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
   add_custom_target(_octave_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave) # the octave interface is created with the command "make octave"
   add_custom_target(_haskell_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave casadiTree.hs) # the haskell interface is created with the command "make octave"
 else(WITH_SWIG_SPLIT)
@@ -339,10 +361,7 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
     USE_SOURCE_PERMISSIONS
     PATTERN .pyc EXCLUDE
     PATTERN .svn EXCLUDE
-  )
-  install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py 
-    DESTINATION ${PYTHON_PREFIX}/casadi
-    COMPONENT install_python
+    PATTERN .py EXCLUDE
   )
   
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
@@ -356,6 +375,23 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
     DESTINATION ${PYTHON_PREFIX}/casadi
     COMPONENT install_python
   )
+  if(WITH_SWIG_SPLIT)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py
+      DESTINATION ${PYTHON_PREFIX}/casadi
+      COMPONENT install_python
+    )
+    foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+      install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py 
+        DESTINATION ${PYTHON_PREFIX}/casadi
+        COMPONENT install_python
+      )
+    endforeach()
+  else()
+    install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py 
+      DESTINATION ${PYTHON_PREFIX}/casadi
+      COMPONENT install_python
+    )
+  endif()
   
   #creation of a custom installation command
   if(WITH_SWIG_SPLIT)

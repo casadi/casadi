@@ -225,7 +225,7 @@ class MXtests(casadiTestCase):
     # evaluates correctly for x=3,y=7
     # now with single input, multi output
     xy = MX.sym("xy",1,2)
-    f = MXFunction([xy],[xy[0]+xy[1],xy[0]*xy[1]])
+    f = MXFunction([xy],[xy[0,0]+xy[0,1],xy[0,0]*xy[0,1]])
     self.assertEqual(f.getNumInputs(),1,"MXFunction fails to indicate correct number of inputs")
     self.assertEqual(f.getNumOutputs(),2,"MXFunction fails to indicate correct number of outputs")
     f.init()
@@ -506,10 +506,10 @@ class MXtests(casadiTestCase):
     self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]")
     self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]")
     self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:2], lambda x: matrix(x)[[0,1],0:2],[x],x0,name="x[[0,1],0:2]")
-    self.numpyEvaluationCheck(lambda x: x[0][[0,2,3]], lambda x: matrix([x[0,0],x[2,0],x[0,1]]).T,[x],x0,name="x[[0,2,3]]")
+    self.numpyEvaluationCheck(lambda x: x[0].nz[[0,2,3]], lambda x: matrix([x[0,0],x[2,0],x[0,1]]).T,[x],x0,name="x[[0,2,3]]")
 
-    self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(x.T.ravel()[1]).T,[x],x0,name="x[1] on dense matrix")
-    self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(x.ravel()[-1]).T,[x],x0,name="x[-1] on dense matrix")
+    self.numpyEvaluationCheck(lambda x: x[0].nz[1], lambda x: matrix(x.T.ravel()[1]).T,[x],x0,name="x[1] on dense matrix")
+    self.numpyEvaluationCheck(lambda x: x[0].nz[-1], lambda x: matrix(x.ravel()[-1]).T,[x],x0,name="x[-1] on dense matrix")
     self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:1],lambda x: x[[0,1],0:1],[x],x0,name='x[:,0:1]')
     self.numpyEvaluationCheck(lambda x: x[0][0:1,[0,1]],lambda x: x[0:1,[0,1]],[x],x0,name='x[0:1,:]')
     
@@ -532,10 +532,10 @@ class MXtests(casadiTestCase):
     self.numpyEvaluationCheck(lambda x: x[0][0:-2,0:-1], lambda x: matrix(x)[0:-2,0:-1],[x],x0,name="x[0:-2,0:-1]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0][0:2,0:2], lambda x: matrix(x)[0:2,0:2],[x],x0,name="x[0:2,0:2]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0][[0,1],0:2], lambda x: matrix(x)[[0,1],0:2],[x],x0,name="x[[0,1],0:2]",setx0=[sx0])
-    self.numpyEvaluationCheck(lambda x: x[0][[2,1]], lambda x: matrix([x[1,2],x[2,0]]).T,[x],x0,name="x[[2,1]]")
-    self.numpyEvaluationCheck(lambda x: x[0][0:2], lambda x: matrix(sx0[0:2]).T,[x],x0,name="x[0:2] on dense matrix")
-    self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(sx0[1]).T,[x],x0,name="x[1]",setx0=[sx0])
-    self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(sx0[-1]).T,[x],x0,name="x[-1]",setx0=[sx0])
+    self.numpyEvaluationCheck(lambda x: x[0].nz[[2,1]], lambda x: matrix([x[1,2],x[2,0]]).T,[x],x0,name="x[[2,1]]")
+    self.numpyEvaluationCheck(lambda x: x[0].nz[0:2], lambda x: matrix(sx0[0:2]).T,[x],x0,name="x[0:2] on dense matrix")
+    self.numpyEvaluationCheck(lambda x: x[0].nz[1], lambda x: matrix(sx0[1]).T,[x],x0,name="x[1]",setx0=[sx0])
+    self.numpyEvaluationCheck(lambda x: x[0].nz[-1], lambda x: matrix(sx0[-1]).T,[x],x0,name="x[-1]",setx0=[sx0])
     
   def test_getinputExpr(self):
     self.message("outputExpr/inputExpr")
@@ -672,10 +672,10 @@ class MXtests(casadiTestCase):
 
     nx=DMatrix(spx,0)
     for k in range(nx.size()):
-      nx[k]= numpy.random.rand()
+      nx.nz[k]= numpy.random.rand()
     ny=DMatrix(spy,0)
     for k in range(nx.size()):
-      ny[k]= numpy.random.rand()
+      ny.nz[k]= numpy.random.rand()
       
     nxn = nx.toArray()
     nyn = ny.toArray()
@@ -848,14 +848,14 @@ class MXtests(casadiTestCase):
      for k in kl:
        r[s.row()[k],s.getCol()[k]]=1.0
      
-     y[kl]=MX(1)
+     y.nz[kl]=MX(1)
      fy = MXFunction([x],[y])
      fy.init()
      fy.setInput(xn)
      fy.evaluate()
      self.checkarray(fy.getOutput(),r,"subscripted assigment")
      
-     y[kl]=x[[0,1,2,3]]
+     y.nz[kl]=x.nz[[0,1,2,3]]
      s=y.sparsity()
      sx=x.sparsity()
      cnt=0
@@ -960,7 +960,7 @@ class MXtests(casadiTestCase):
       As = randsparsity(m,n)
       A_ = DMatrix(As)
       for k in range(As.size()):
-        A_[k]= numpy.random.rand()
+        A_.nz[k]= numpy.random.rand()
       A = MX.sym("A",As)
       return (A_.toCsc_matrix(),A)
     
@@ -1036,7 +1036,7 @@ class MXtests(casadiTestCase):
       As = randsparsity(m,n)
       A_ = DMatrix(As)
       for k in range(As.size()):
-        A_[k]= numpy.random.rand()
+        A_.nz[k]= numpy.random.rand()
       A = MX.sym("A",As)
       return (A_.toCsc_matrix(),A)
     
@@ -2280,6 +2280,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f.output(3),A)
     self.checkarray(f.output(4),A)
       
+  @requires("CSparse")
   def test_bizarre_bug(self):
 
     A = [[-26.9091,00,00,1,00,00,00,00,00,00,00,00,00,00,00],
@@ -2326,6 +2327,32 @@ class MXtests(casadiTestCase):
 
     self.checkarray(R.output(),numpy.linalg.solve(A.T,b))
     self.checkarray(r.output(),R.output())
+
+  def test_dependsOn(self):
+    a = MX.sym("a")
+    b = MX.sym("b")
+    
+    self.assertTrue(dependsOn(a**2,[a]))
+    self.assertTrue(dependsOn(a,[a]))
+    self.assertFalse(dependsOn(0,[a]))
+    
+    self.assertTrue(dependsOn(a**2,[a,b]))
+    self.assertTrue(dependsOn(a,[a,b]))
+    self.assertFalse(dependsOn(0,[a,b]))
+    self.assertTrue(dependsOn(b**2,[a,b]))
+    self.assertTrue(dependsOn(b,[a,b]))
+    self.assertTrue(dependsOn(a**2+b**2,[a,b]))
+    self.assertTrue(dependsOn(a+b,[a,b]))
+    self.assertTrue(dependsOn(vertcat([0,a]),[a]))
+    self.assertTrue(dependsOn(vertcat([a,0]),[a]))
+    self.assertFalse(dependsOn(vertcat([0,b]),[a]))
+    self.assertFalse(dependsOn(vertcat([b,0]),[a]))
+    self.assertTrue(dependsOn(vertcat([a**2,b**2]),[a,b]))
+    self.assertTrue(dependsOn(vertcat([a,0]),[a,b]))
+    self.assertTrue(dependsOn(vertcat([0,b]),[a,b]))
+    self.assertTrue(dependsOn(vertcat([b,0]),[a,b]))
+    self.assertFalse(dependsOn(vertcat([0,0]),[a,b]))
+    
     
 if __name__ == '__main__':
     unittest.main()

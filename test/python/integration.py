@@ -673,8 +673,8 @@ class Integrationtests(casadiTestCase):
     J.init()
     J.setInput([1,0])
     J.evaluate()
-    print "jac=",J.getOutput()[0]-exp(1)
-    self.assertAlmostEqual(J.getOutput()[0],exp(1),5,"Evaluation output mismatch")
+    print "jac=",J.getOutput().nz[0]-exp(1)
+    self.assertAlmostEqual(J.getOutput()[0,0],exp(1),5,"Evaluation output mismatch")
     
   def test_eval(self):
     self.message('CVodes integration: evaluation')

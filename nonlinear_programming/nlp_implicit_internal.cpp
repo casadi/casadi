@@ -60,7 +60,7 @@ namespace CasADi {
   
     // Add auxiliary inputs
     vector<double>::iterator nlp_p = nlp_solver_.input(NLP_SOLVER_P).begin();
-    for(int i=0, k=0; i<getNumInputs(); ++i){
+    for(int i=0; i<getNumInputs(); ++i){
       if(i!=iin_){
         std::copy(input(i).begin(),input(i).end(),nlp_p);
         nlp_p += input(i).size();

@@ -26,41 +26,41 @@
 using namespace std;
 namespace CasADi{
 
-Simulator::Simulator(){
-}
+  Simulator::Simulator(){
+  }
 
-Simulator::Simulator(const Integrator& integrator, const FX& output_fcn, const vector<double>& grid){
-  assignNode(new SimulatorInternal(integrator,output_fcn,grid));
-}
+  Simulator::Simulator(const Integrator& integrator, const FX& output_fcn, const vector<double>& grid){
+    assignNode(new SimulatorInternal(integrator,output_fcn,grid));
+  }
 
-Simulator::Simulator(const Integrator& integrator, const FX& output_fcn, const Matrix<double>& grid){
-  casadi_assert_message(grid.isVector(),"Simulator::Simulator: grid must be a column vector, but got " << grid.dimString());
-  casadi_assert_message(grid.isDense(),"Simulator::Simulator: grid must be dense, but got " << grid.dimString());
-  assignNode(new SimulatorInternal(integrator,output_fcn,grid.data()));
-}
+  Simulator::Simulator(const Integrator& integrator, const FX& output_fcn, const Matrix<double>& grid){
+    casadi_assert_message(grid.isVector(),"Simulator::Simulator: grid must be a column vector, but got " << grid.dimString());
+    casadi_assert_message(grid.isDense(),"Simulator::Simulator: grid must be dense, but got " << grid.dimString());
+    assignNode(new SimulatorInternal(integrator,output_fcn,grid.data()));
+  }
 
-Simulator::Simulator(const Integrator& integrator, const vector<double>& grid){
-  assignNode(new SimulatorInternal(integrator,FX(),grid));
-}
+  Simulator::Simulator(const Integrator& integrator, const vector<double>& grid){
+    assignNode(new SimulatorInternal(integrator,FX(),grid));
+  }
 
-Simulator::Simulator(const Integrator& integrator, const Matrix<double>& grid){
-  casadi_assert_message(grid.isVector(),"Simulator::Simulator: grid must be column vector, but got " << grid.dimString());
-  casadi_assert_message(grid.isDense(),"Simulator::Simulator: grid must be dense, but got " << grid.dimString());
-  assignNode(new SimulatorInternal(integrator,FX(),grid.data()));
-}
+  Simulator::Simulator(const Integrator& integrator, const Matrix<double>& grid){
+    casadi_assert_message(grid.isVector(),"Simulator::Simulator: grid must be column vector, but got " << grid.dimString());
+    casadi_assert_message(grid.isDense(),"Simulator::Simulator: grid must be dense, but got " << grid.dimString());
+    assignNode(new SimulatorInternal(integrator,FX(),grid.data()));
+  }
 
 
-SimulatorInternal* Simulator::operator->(){
-  return (SimulatorInternal*)(FX::operator->());
-}
+  SimulatorInternal* Simulator::operator->(){
+    return static_cast<SimulatorInternal*>(FX::operator->());
+  }
 
-const SimulatorInternal* Simulator::operator->() const{
-   return (const SimulatorInternal*)(FX::operator->()); 
-}
+  const SimulatorInternal* Simulator::operator->() const{
+    return static_cast<const SimulatorInternal*>(FX::operator->()); 
+  }
 
-bool Simulator::checkNode() const{
-  return dynamic_cast<const SimulatorInternal*>(get())!=0;
-}
+  bool Simulator::checkNode() const{
+    return dynamic_cast<const SimulatorInternal*>(get())!=0;
+  }
 
 
 } // namespace CasADi

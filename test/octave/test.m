@@ -148,7 +148,7 @@ assert(s(1,2).toScalar()==6)
 assert(s(2,1).toScalar()==4)
 assert(s(2,2).toScalar()==9)
 
-q = s([1 2])
+q = s{[1 2]}
 assert(q(1).toScalar()==5)
 assert(q(2).toScalar()==4)
 
@@ -174,8 +174,8 @@ assert(q(1).toScalar()==5)
 assert(q(2).toScalar()==4)
 
 q = s(1,[1 2])
-assert(q(1).toScalar()==5)
-assert(q(2).toScalar()==6)
+assert(q(1,1).toScalar()==5)
+assert(q(1,2).toScalar()==6)
 
 disp('slicing assigment')
 s = DMatrix([ 5 6; 4 9])

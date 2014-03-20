@@ -347,12 +347,14 @@ namespace CasADi{
     //@{
     /// Indexing for interfaced languages
     /// get a non-zero
-    const Matrix<DataType> indexed_one_based(int k) const{ return this->operator[](k-1);}
-    const Matrix<DataType> indexed_zero_based(int k) const{ return this->operator[](k);}
+    const Matrix<DataType> nz_indexed_one_based(int k) const{ return this->operator[](k-1);}
+    const Matrix<DataType> nz_indexed_zero_based(int k) const{ return this->operator[](k);}
+    const Matrix<DataType> nz_indexed_one_based(const Matrix<int>& k) const{ return this->operator[](k-1);}
+    const Matrix<DataType> nz_indexed_zero_based(const Matrix<int>& k) const{ return this->operator[](k);}
     const Matrix<DataType> indexed_one_based(const Matrix<int>& k) const{ return this->operator[](k-1);}
     const Matrix<DataType> indexed_zero_based(const Matrix<int>& k) const{ return this->operator[](k);}
-    const Matrix<DataType> indexed(const Slice &k) const{ return this->operator[](k);}
-    const Matrix<DataType> indexed(const IndexList &k) const{
+    const Matrix<DataType> nz_indexed(const Slice &k) const{ return this->operator[](k);}
+    const Matrix<DataType> nz_indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
     
@@ -375,14 +377,24 @@ namespace CasADi{
       return (*this)(rr,cc);
     }
     const Matrix<DataType> indexed(const Sparsity &sp) const{ return (*this)(sp); }
+
+    /// Get a vector element
+    const Matrix<DataType> indexed_one_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr-1);}
+    const Matrix<DataType> indexed_zero_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr);}
+    const Matrix<DataType> indexed(const Slice &rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr); }
+    const Matrix<DataType> indexed(const IndexList &rr) const{ 
+      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ; return (*this)(rr.getAll(size1()));
+    }
     
     /// set a non-zero
-    void indexed_one_based_assignment(int k, const DataType & m){ at(k-1) = m;}
-    void indexed_zero_based_assignment(int k, const DataType & m){ at(k) = m;}
-    void indexed_assignment(const Slice &k, const Matrix<DataType>& m){ (*this)[k] = m;}
+    void nz_indexed_one_based_assignment(int k, const DataType & m){ at(k-1) = m;}
+    void nz_indexed_zero_based_assignment(int k, const DataType & m){ at(k) = m;}
+    void nz_indexed_assignment(const Slice &k, const Matrix<DataType>& m){ (*this)[k] = m;}
     void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k-1] = m;}
     void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k] = m;}
-    void indexed_assignment(const IndexList &k, const Matrix<DataType>& m){
+    void nz_indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k-1] = m;}
+    void nz_indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k] = m;}
+    void nz_indexed_assignment(const IndexList &k, const Matrix<DataType>& m){
       (*this)[k.getAll(size())] = m;
     }
     
@@ -415,11 +427,22 @@ namespace CasADi{
     }
     //@}
     
+    /// set a vector element
+    void indexed_one_based_assignment(int rr, const DataType & m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;elem(rr-1) = m;}
+    void indexed_zero_based_assignment(int rr, const DataType & m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;elem(rr) = m;}
+    void indexed_assignment(const Slice &rr, const Matrix<DataType>& m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr,Slice(0)) = m; }
+    void indexed_assignment(const IndexList &rr, const Matrix<DataType>& m){
+      (*this)(rr.getAll(size1()),0) = m;
+    }
+    
     /// Set all elements to zero
     void setZero();
     
     /// Set all elements to a value
     void setAll(const DataType& val);
+
+    /** \brief Set sparse */
+    Matrix<DataType> setSparse(const Sparsity& sp, bool intersect=false) const;
 
     /// Make the matrix dense
     void densify(const DataType& val = 0);
@@ -529,6 +552,18 @@ namespace CasADi{
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
     //@}
     
+    /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
+    static void setMaxNumCallsInPrint(long num=10000);
+
+    /** \brief Get the maximum number of calls to the printing function when printing an expression */
+    static long getMaxNumCallsInPrint();
+    
+    /** \brief Set or reset the depth to which equalities are being checked for simplifications */
+    static void setEqualityCheckingDepth(int eq_depth=1);
+
+    /** \brief Get the depth to which equalities are being checked for simplifications */
+    static int getEqualityCheckingDepth();
+
     //@{
     /// Printing
 #ifndef SWIG

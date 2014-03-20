@@ -101,10 +101,10 @@ public:
   FX f_fwd_, g_fwd_;
   
   /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual FX getJacobian()=0;
+  virtual FX getJac()=0;
   
   /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual FX getJacobianB()=0;
+  virtual FX getJacB()=0;
   
 };
   

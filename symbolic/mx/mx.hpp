@@ -111,12 +111,12 @@ namespace CasADi{
     /// Indexing for interfaced languages
     
     /// get a non-zero
-    const MX indexed_one_based(int k) const{ return at(k-1);}
-    const MX indexed_zero_based(int k) const{ return at(k);}
-    const MX indexed(const IndexList &k) const{
+    const MX nz_indexed_one_based(int k) const{ return at(k-1);}
+    const MX nz_indexed_zero_based(int k) const{ return at(k);}
+    const MX nz_indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
-    const MX indexed(const Slice &k) const{ 
+    const MX nz_indexed(const Slice &k) const{ 
       return (*this)[k.getAll(size())];
     }
     
@@ -147,13 +147,23 @@ namespace CasADi{
       return (*this)(rr,cc);
     }
     
+    // get a vector element
+    const MX indexed_one_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr-1);}
+    const MX indexed_zero_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr);}
+    const MX indexed(const IndexList &rr) const{ 
+      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr.getAll(size1()));
+    }
+    const MX indexed(const Slice &rr) const{ 
+      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr.getAll(size1()));
+    }
+    
     /// set a non-zero
-    void indexed_one_based_assignment(int k, const MX &m){ at(k-1) = m(0,0);}
-    void indexed_zero_based_assignment(int k, const MX &m){ at(k) = m(0,0);}
-    void indexed_assignment(const IndexList &k, const MX &m){
+    void nz_indexed_one_based_assignment(int k, const MX &m){ at(k-1) = m(0,0);}
+    void nz_indexed_zero_based_assignment(int k, const MX &m){ at(k) = m(0,0);}
+    void nz_indexed_assignment(const IndexList &k, const MX &m){
       (*this)[k.getAll(size())] = m;
     }
-    void indexed_assignment(const Slice &k, const MX &m){
+    void nz_indexed_assignment(const Slice &k, const MX &m){
       (*this)[k.getAll(size())] = m;
     }
     
@@ -190,6 +200,17 @@ namespace CasADi{
       (*this)(rr,cc) = m;
     } 
     //@}
+    
+    // set a vector element
+    void indexed_one_based_assignment(int rr, const MX &m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr-1) = m;}
+    void indexed_zero_based_assignment(int rr, const MX &m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr) = m;}
+    void indexed_assignment(const IndexList &rr, const MX &m){
+      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr.getAll(size1())) = m;
+    }
+    
+    void indexed_assignment(const Slice &rr, const MX &m){
+      (*this)(rr.getAll(size1())) = m;
+    }
     
     /// Scalar type
     typedef MX ScalarType;

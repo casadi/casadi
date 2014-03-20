@@ -80,17 +80,16 @@ option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SQIC "Enable SQIC interface" OFF)
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
-option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
-option(WITH_WORHP "Compile the WORHP interface" OFF) 
-option(WITH_SNOPT "Compile the SNOPT interface" OFF) 
-option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
-option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
+option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF)
+option(WITH_WORHP "Compile the WORHP interface" OFF)
+option(WITH_SNOPT "Compile the SNOPT interface" OFF)
+option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF)
+option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
-option(WITH_BUILD_IPOPT "Download and compile IPOPT" OFF)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
@@ -132,11 +131,11 @@ foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
-      ${CMAKE_BINARY_DIR} 
+      ${CMAKE_BINARY_DIR}
       ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11.cpp
       CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
       OUTPUT_VARIABLE OUTPUT)
-    
+
     # Save flag, if successful
     if(USE_CXX11)
       set(CXX11FLAG ${CXX11FLAG_TEST} CACHE INTERNAL "C++11 compile flag")
@@ -158,7 +157,7 @@ add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficienc
 
 if(CXX11FLAG)
   try_compile(HAS_COPYSIGN
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_copysign.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -167,7 +166,7 @@ if(CXX11FLAG)
   endif()
 
   try_compile(HAS_ERF
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_erf.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -176,7 +175,7 @@ if(CXX11FLAG)
   endif()
 
   try_compile(HAS_ERFINV
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_erfinv.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -189,6 +188,7 @@ endif()
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi -pedantic -Wall -Wno-sign-compare")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-delete-non-virtual-dtor -Wno-sign-compare")
 
 # the following commands are needed to fix a problem with the libraries
 # for linux 64 bits
@@ -254,27 +254,11 @@ add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
-find_package(LibXml2) 
+find_package(LibXml2)
 if(WITH_LAPACK)
   find_package(LAPACK)
 endif()
 add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
-
-# download and build ipopt
-if(WITH_BUILD_IPOPT)
-  include(ExternalProject)
-  ExternalProject_Add(
-    build_ipopt
-    SVN_REPOSITORY https://projects.coin-or.org/svn/Ipopt/stable/3.10
-    UPDATE_COMMAND "" # svn update unneccesary
-    PREFIX ${CMAKE_BINARY_DIR}/CoinIpopt
-    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt/configure #--prefix=${CMAKE_CURRENT_SOURCE_DIR}/lib/libbuildipopt
-    BUILD_COMMAND make -j4
-  )
-  set(BUILD_IPOPT_LIB_DIR ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt-build)
-  message(STATUS "BUILD_IPOPT_LIB_DIR: ${BUILD_IPOPT_LIB_DIR}")
-endif(WITH_BUILD_IPOPT)
-add_feature_info(get-ipopt WITH_BUILD_IPOPT "Download and build Ipopt.")
 
 if(WITH_IPOPT)
   find_package(IPOPT)
@@ -400,4 +384,3 @@ CONFIGURE_FILE(
 if(EXTRA_CMAKE)
   include(${EXTRA_CMAKE})
 endif()
-

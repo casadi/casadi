@@ -5,6 +5,8 @@ import numpy as np
 import operator
 import sys
 
+import __builtin__
+
 def isInteger(a):
   return isinstance(a,int) or isinstance(a,np.integer)
   
@@ -528,8 +530,8 @@ class SetterDispatcher(Dispatcher):
             self.master[i] = payload[i.sparsity()]
         else:
           raise Exception("Cannot handle type '%s'." % entry.type)
-      except NotImplementedError:
-        raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s and b %s." % (str(canonicalIndex),str(self.master),str(payload)))
+      except NotImplementedError as e:
+        raise CompatibilityException("Error in canonicalIndex slicing for %s: Incompatible types in a[i]=b with a %s (%s) and b %s (%s) and i %s (%s). Error: %s" % (str(canonicalIndex),str(self.master),str(__builtin__.type(self.master)),str(payload),str(__builtin__.type(payload)),str(i),str(__builtin__.type(i)),str(e)))
       except Exception as e:
         exc_class, exc, tb = sys.exc_info()
         new_exc = Exception("Error in powerIndex slicing for canonicalIndex %s:\n%s" % (str(canonicalIndex),str(e)))
@@ -872,13 +874,19 @@ class msymStruct(CasadiStructured,MasterGettable):
 
     self.master = MX.sym("V",self.size,1)
     
+    self.buildMap()
  
-    ks = []
+
+  def buildMap(self,struct=None,parentIndex = (),parent=None):
+    if struct is None:  struct = self.struct
+    if parent is None:  parent = self.master
+    ks  = []
     its = []
     sps = []
+    es  = []
     k = 0 # Global index counter
-    for i in self.struct.traverseCanonicalIndex(limit=1):
-      e = self.struct.getStructEntryByCanonicalIndex(i)
+    for i in struct.traverseCanonicalIndex(limit=1):
+      e = struct.getStructEntryByCanonicalIndex(i)
       sp = None
       if e.isPrimitive():
         sp = Sparsity.dense(1,1) if e.sparsity is None else e.sparsity
@@ -886,13 +894,15 @@ class msymStruct(CasadiStructured,MasterGettable):
         sp = Sparsity.dense(e.struct.size,1)
       ks.append(k)
       it = tuple(i)
+      es.append(e)
       its.append(it)
       sps.append(sp)
       k += sp.size()
       
-    for it, k, sp in zip(its,vertsplit(self.master,ks),sps):
-      self.priority_object_map[it] = k if k.sparsity()==sp else k[IMatrix(sp,range(sp.size()))] #.reshape(sp)
-      
+    for it, k, sp,e in zip(its,vertsplit(parent,ks),sps,es):
+      if not(e.isPrimitive()):
+        self.buildMap(struct=e.struct,parentIndex = parentIndex + it,parent=k)
+      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else k[IMatrix(sp,range(sp.size()))]      
 
   def __MX__(self):
     return self.cat
@@ -1270,11 +1280,11 @@ class DataReferenceRepeated(DataReference):
     self.v = a.T.reshape((n*a.size2(),1))
     
   def __setitem__(self,a,b):
-    self.v.__setitem__(a,b)
+    self.v.__NZsetitem__(a,b)
     self.a.set(self.v.data(),DENSETRANS)
 
   def __getitem__(self,a):
-    return self.v.__getitem__(a)
+    return self.v.__NZgetitem__(a)
 
 class DataReferenceSquared(DataReference):
   def __init__(self,a,n):
@@ -1284,10 +1294,10 @@ class DataReferenceSquared(DataReference):
     self.n = n
     
   def __setitem__(self,a,b):
-    self.a.__setitem__(a,b)
+    self.a.__NZsetitem__(a,b)
 
   def __getitem__(self,a):
-    return self.a.__getitem__(a)
+    return self.a.__NZgetitem__(a)
 
   @property
   def shape(self):
@@ -1302,14 +1312,14 @@ class DataReferenceSquaredRepeated(DataReference):
     self.v = horzcat([i for i in vertsplit(a,N) ]).reshape((n*n*N,1))
     
   def __setitem__(self,a,b):
-    self.v.__setitem__(a,b)
+    self.v.__NZsetitem__(a,b)
     print "setitem", a, b
     for i in range(self.N):
       print self.v.data()[i*self.n*self.n:(i+1)*self.n*self.n]
       self.a[i*self.n:(i+1)*self.n,:] = self.v[i*self.n*self.n:(i+1)*self.n*self.n].reshape((self.n,self.n))
 
   def __getitem__(self,a):
-    return self.v.__getitem__(a)
+    return self.v.__NZgetitem__(a)
     
 def struct_load(filename):
     import pickle

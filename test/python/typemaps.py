@@ -502,6 +502,9 @@ class typemaptests(casadiTestCase):
     #self.assertEqual(f.getOption("monitor")[0],"foo")
     #f.setOption("monitor",[])
     
+  @requires("CVodesIntegrator")
+  def testGenericType2bis(self):
+  
     t=SXElement.sym("t")
 
     x=SXElement.sym("x") 
@@ -509,7 +512,7 @@ class typemaptests(casadiTestCase):
 
     f=SXFunction(daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
     f.init()
-
+   
     integrator = CVodesIntegrator(f)
     integrator.setOption("fsens_scaling_factors",[5.0,7])
     integrator.setOption("fsens_scaling_factors",[])

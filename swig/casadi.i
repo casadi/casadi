@@ -21,9 +21,9 @@
  */
 
 #ifdef SWIGOCTAVE
-%module(naturalvar=1) casadi_interface
+%module casadi_interface
 #else
-%module(naturalvar=1) casadi
+%module casadi
 #endif
 
 //  The things needed to make each casadi_*.i  compilable by itself: typemaps

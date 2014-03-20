@@ -29,14 +29,14 @@ x = MX("x",2,3)
 y = MX("y",3,2)
 print x
 for i in range(6):
-	print x[i]
+	print x.nz[i]
 
 for i in range(2):
 	for j in range(3):
 		print "x[%d,%d] = %s" % (i,j,str(x[i,j]))
 		
 print x[1,1]
-print x[3] # Note that index is flattened. x[0,0] is illegal.
+print x.nz[3] # Note that index is flattened. x[0,0] is illegal.
 print norm_2(x)
 z= mul(x,y)
 print z

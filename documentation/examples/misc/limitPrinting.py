@@ -31,7 +31,7 @@ for i in range(5):
 #! With default printlimit
 print x
 
-SXElement.setMaxNumCallsInPrint(3)
+SX.setMaxNumCallsInPrint(3)
 
 print x
 

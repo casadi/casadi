@@ -382,10 +382,24 @@ namespace CasADi{
   bool dependsOn(const SX& ex, const SX &arg){
     if(ex.size()==0) return false;
 
+    // Construct a temporary algorithm
     SXFunction temp(arg,ex);
     temp.init();
-    Sparsity Jsp = temp.jacSparsity();
-    return Jsp.size()!=0;
+    temp.spInit(true);
+    
+    bvec_t* input_ =  get_bvec_t(temp.input().data());
+    // Make a column with all variables active
+    std::fill(input_, input_+temp.input().size(), bvec_t(1));
+    bvec_t* output_ = get_bvec_t(temp.output().data());
+    // Perform a single dependency sweep
+    temp.spEvaluate(true);
+
+    // Loop over results
+    for (int i=0;i<temp.output().size();++i) {
+      if (output_[i]) return true;
+    }
+    
+    return false;
   }
 
   SX gradient(const SX& ex, const SX &arg) {

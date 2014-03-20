@@ -41,7 +41,11 @@ namespace CasADi{
 
   void SetSparse::printPart(std::ostream &stream, int part) const{
     if(part==0){
-      stream << "dense(";
+      if(sparsity().isDense()){
+        stream << "full(";
+      } else {
+        stream << "set_sparse(";
+      }
     } else {
       stream << ")";
     }

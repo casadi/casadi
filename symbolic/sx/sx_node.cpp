@@ -28,102 +28,104 @@
 using namespace std;
 namespace CasADi{
 
-SXNode::SXNode(){
-  count = 0;
-  temp = 0;
-}
+  SXNode::SXNode(){
+    count = 0;
+    temp = 0;
+  }
 
-SXNode::~SXNode(){
-  // Make sure that this is there are no scalar expressions pointing to it when it is destroyed
-  assert(count==0);
-}
+  SXNode::~SXNode(){
+    // Make sure that this is there are no scalar expressions pointing to it when it is destroyed
+    assert(count==0);
+  }
 
-double SXNode::getValue() const{
-  return numeric_limits<double>::quiet_NaN();
-/*  std::cerr << "getValue() not defined for class " << typeid(*this).name() << std::endl;
-  throw "SXNode::getValue()";*/
-}
+  double SXNode::getValue() const{
+    return numeric_limits<double>::quiet_NaN();
+    /*  std::cerr << "getValue() not defined for class " << typeid(*this).name() << std::endl;
+        throw "SXNode::getValue()";*/
+  }
 
-int SXNode::getIntValue() const{
-  throw CasadiException(string("getIntValue() not defined for class ") + typeid(*this).name());
-}
+  int SXNode::getIntValue() const{
+    throw CasadiException(string("getIntValue() not defined for class ") + typeid(*this).name());
+  }
 
-bool SXNode::isZero() const{
-  return false;
-}
+  bool SXNode::isZero() const{
+    return false;
+  }
 
-bool SXNode::isAlmostZero(double tol) const{
-  return false;
-}
+  bool SXNode::isAlmostZero(double tol) const{
+    return false;
+  }
 
-bool SXNode::isOne() const{
-  return false;
-}
+  bool SXNode::isOne() const{
+    return false;
+  }
 
-bool SXNode::isMinusOne() const{
-  return false;
-}
+  bool SXNode::isMinusOne() const{
+    return false;
+  }
 
-bool SXNode::isNan() const{
-  return false;
-}
+  bool SXNode::isNan() const{
+    return false;
+  }
 
-bool SXNode::isInf() const{
-  return false;
-}
+  bool SXNode::isInf() const{
+    return false;
+  }
 
-bool SXNode::isMinusInf() const{
-  return false;
-}
+  bool SXNode::isMinusInf() const{
+    return false;
+  }
 
-bool SXNode::isConstant() const{
-  return false;
-}
+  bool SXNode::isConstant() const{
+    return false;
+  }
 
-bool SXNode::isInteger() const{
-  return false;
-}
+  bool SXNode::isInteger() const{
+    return false;
+  }
 
-bool SXNode::isSymbolic() const{
-  return false;
-}
+  bool SXNode::isSymbolic() const{
+    return false;
+  }
 
-bool SXNode::hasDep() const{
-  return false;
-}
+  bool SXNode::hasDep() const{
+    return false;
+  }
 
-bool SXNode::isEqual(const SXNode* node, int depth) const{
-  return false;
-}
+  bool SXNode::isEqual(const SXNode* node, int depth) const{
+    return false;
+  }
 
-const std::string& SXNode::getName() const{
-  throw CasadiException("SXNode::getName failed, the node must be symbolic");
-}
+  const std::string& SXNode::getName() const{
+    throw CasadiException("SXNode::getName failed, the node must be symbolic");
+  }
 
-const SXElement& SXNode::dep(int i) const{
-  casadi_error("child() not defined for class " << typeid(*this).name());
-}
+  const SXElement& SXNode::dep(int i) const{
+    casadi_error("child() not defined for class " << typeid(*this).name());
+  }
 
-SXElement& SXNode::dep(int i){
-  casadi_error("child() not defined for class " << typeid(*this).name());
-}
+  SXElement& SXNode::dep(int i){
+    casadi_error("child() not defined for class " << typeid(*this).name());
+  }
 
-bool SXNode::isSmooth() const{
-  return true; // nodes are smooth by default
-}
+  bool SXNode::isSmooth() const{
+    return true; // nodes are smooth by default
+  }
 
-void SXNode::print(std::ostream &stream) const{
-  long remaining_calls = SXElement::getMaxNumCallsInPrint();
-  print(stream,remaining_calls);
-}
+  void SXNode::print(std::ostream &stream) const{
+    long remaining_calls = max_num_calls_in_print_;
+    print(stream,remaining_calls);
+  }
 
-bool SXNode::marked() const{
-  return temp<0;
-}
+  bool SXNode::marked() const{
+    return temp<0;
+  }
     
-void SXNode::mark(){
-  temp = -temp-1;
-}
+  void SXNode::mark(){
+    temp = -temp-1;
+  }
 
+  long SXNode::max_num_calls_in_print_ = 10000;
+  int SXNode::eq_depth_ = 1;
 
 } // namespace CasADi

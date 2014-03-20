@@ -106,7 +106,7 @@ class Sparsitytests(casadiTestCase):
     A = DMatrix(a,1)
     Ad = DMatrix(array(A))
     for i in a.getElements():
-      self.assertEqual(Ad[i],1)
+      self.assertEqual(Ad.nz[i],1)
 
   def test_enlarge(self):
     self.message("enlarge")
@@ -139,7 +139,7 @@ class Sparsitytests(casadiTestCase):
   def tomatrix(self,s):
     d = DMatrix(s,1)
     for k in range(d.size()):
-      d[k] = k+1
+      d.nz[k] = k+1
     return d
 
   def test_NZ(self):

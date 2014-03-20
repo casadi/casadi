@@ -194,17 +194,17 @@ namespace CasADi{
             y.hasDep() && y.getOp()==OP_MUL && 
             getDep(0).isConstant() && getDep(0).getValue()==0.5 && 
             y.getDep(0).isConstant() && y.getDep(0).getValue()==0.5 &&
-            y.getDep(1).isEqual(getDep(1),eq_depth_)) // 0.5x+0.5x = x
+            y.getDep(1).isEqual(getDep(1),SXNode::eq_depth_)) // 0.5x+0.5x = x
       return getDep(1);
     else if(hasDep() && getOp()==OP_DIV && 
             y.hasDep() && y.getOp()==OP_DIV && 
             getDep(1).isConstant() && getDep(1).getValue()==2 && 
             y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
-            y.getDep(0).isEqual(getDep(0),eq_depth_)) // x/2+x/2 = x
+            y.getDep(0).isEqual(getDep(0),SXNode::eq_depth_)) // x/2+x/2 = x
       return getDep(0);
-    else if(hasDep() && getOp()==OP_SUB && getDep(1).isEqual(y,eq_depth_))
+    else if(hasDep() && getOp()==OP_SUB && getDep(1).isEqual(y,SXNode::eq_depth_))
       return getDep(0);
-    else if(y.hasDep() && y.getOp()==OP_SUB && isEqual(y.getDep(1),eq_depth_))
+    else if(y.hasDep() && y.getOp()==OP_SUB && isEqual(y.getDep(1),SXNode::eq_depth_))
       return y.getDep(0);
     else // create a new branch
       return BinarySX::create(OP_ADD,*this, y);
@@ -219,17 +219,17 @@ namespace CasADi{
       return *this;
     if(node->isZero()) // term1 is zero
       return -y;
-    if(isEqual(y,eq_depth_)) // the terms are equal
+    if(isEqual(y,SXNode::eq_depth_)) // the terms are equal
       return 0;
     else if(y.hasDep() && y.getOp()==OP_NEG) // x - (-y) -> x + y
       return __add__(-y);
-    else if(hasDep() && getOp()==OP_ADD && getDep(1).isEqual(y,eq_depth_))
+    else if(hasDep() && getOp()==OP_ADD && getDep(1).isEqual(y,SXNode::eq_depth_))
       return getDep(0);
-    else if(hasDep() && getOp()==OP_ADD && getDep(0).isEqual(y,eq_depth_))
+    else if(hasDep() && getOp()==OP_ADD && getDep(0).isEqual(y,SXNode::eq_depth_))
       return getDep(1);
-    else if(y.hasDep() && y.getOp()==OP_ADD && isEqual(y.getDep(1),eq_depth_))
+    else if(y.hasDep() && y.getOp()==OP_ADD && isEqual(y.getDep(1),SXNode::eq_depth_))
       return -y.getDep(0);
-    else if(y.hasDep() && y.getOp()==OP_ADD && isEqual(y.getDep(0),eq_depth_))
+    else if(y.hasDep() && y.getOp()==OP_ADD && isEqual(y.getDep(0),SXNode::eq_depth_))
       return -y.getDep(1);
     else // create a new branch
       return BinarySX::create(OP_SUB,*this,y);
@@ -240,7 +240,7 @@ namespace CasADi{
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_MUL,*this,y);
     
     // Only simplifications that do not result in extra nodes area allowed
-    if(y.isEqual(*this,eq_depth_))
+    if(y.isEqual(*this,SXNode::eq_depth_))
       return sq();
     else if(!isConstant() && y.isConstant())
       return y.__mul__(*this);
@@ -262,9 +262,9 @@ namespace CasADi{
       return y.getDep(1);
     else if(isConstant() && y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isConstant() && getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
       return y.getDep(0);
-    else if(hasDep() && getOp()==OP_DIV && getDep(1).isEqual(y,eq_depth_)) // ((2/x)*x)
+    else if(hasDep() && getOp()==OP_DIV && getDep(1).isEqual(y,SXNode::eq_depth_)) // ((2/x)*x)
       return getDep(0);
-    else if(y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isEqual(*this,eq_depth_)) // ((2/x)*x)
+    else if(y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isEqual(*this,SXNode::eq_depth_)) // ((2/x)*x)
       return y.getDep(0);
     else     // create a new branch
       return BinarySX::create(OP_MUL,*this,y);
@@ -272,7 +272,7 @@ namespace CasADi{
 
 
   bool SXElement::isDoubled() const{
-    return isOp(OP_ADD) && node->dep(0).isEqual(node->dep(1),eq_depth_);
+    return isOp(OP_ADD) && node->dep(0).isEqual(node->dep(1),SXNode::eq_depth_);
   }
     
   SXElement SXElement::__div__(const SXElement& y) const{
@@ -288,13 +288,13 @@ namespace CasADi{
       return *this;
     else if(y->isMinusOne())
       return -(*this);
-    else if(isEqual(y,eq_depth_)) // terms are equal
+    else if(isEqual(y,SXNode::eq_depth_)) // terms are equal
       return 1;
     else if(isDoubled() && y.isEqual(2))
       return node->dep(0);
-    else if(isOp(OP_MUL) && y.isEqual(node->dep(0),eq_depth_))
+    else if(isOp(OP_MUL) && y.isEqual(node->dep(0),SXNode::eq_depth_))
       return node->dep(1);
-    else if(isOp(OP_MUL) && y.isEqual(node->dep(1),eq_depth_))
+    else if(isOp(OP_MUL) && y.isEqual(node->dep(1),SXNode::eq_depth_))
       return node->dep(0);
     else if(node->isOne())
       return y.inv();
@@ -304,15 +304,15 @@ namespace CasADi{
       return node->dep(0) / y->dep(0);
     else if(y.isConstant() && hasDep() && getOp()==OP_DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2 
       return getDep(0);
-    else if(y.hasDep() && y.getOp()==OP_MUL && y.getDep(1).isEqual(*this,eq_depth_)) // x/(2*x) = 1/2
+    else if(y.hasDep() && y.getOp()==OP_MUL && y.getDep(1).isEqual(*this,SXNode::eq_depth_)) // x/(2*x) = 1/2
       return BinarySX::create(OP_DIV,1,y.getDep(0));
-    else if(hasDep() && getOp()==OP_NEG && getDep(0).isEqual(y,eq_depth_))      // (-x)/x = -1
+    else if(hasDep() && getOp()==OP_NEG && getDep(0).isEqual(y,SXNode::eq_depth_))      // (-x)/x = -1
       return -1;
-    else if(y.hasDep() && y.getOp()==OP_NEG && y.getDep(0).isEqual(*this,eq_depth_))      // x/(-x) = 1
+    else if(y.hasDep() && y.getOp()==OP_NEG && y.getDep(0).isEqual(*this,SXNode::eq_depth_))      // x/(-x) = 1
       return -1;
-    else if(y.hasDep() && y.getOp()==OP_NEG && hasDep() && getOp()==OP_NEG && getDep(0).isEqual(y.getDep(0),eq_depth_))      // (-x)/(-x) = 1
+    else if(y.hasDep() && y.getOp()==OP_NEG && hasDep() && getOp()==OP_NEG && getDep(0).isEqual(y.getDep(0),SXNode::eq_depth_))      // (-x)/(-x) = 1
       return 1;
-    else if(isOp(OP_DIV) && y.isEqual(node->dep(0),eq_depth_))
+    else if(isOp(OP_DIV) && y.isEqual(node->dep(0),SXNode::eq_depth_))
       return node->dep(1).inv();
     else // create a new branch
       return BinarySX::create(OP_DIV,*this,y);
@@ -769,24 +769,24 @@ namespace CasADi{
     (*this)->mark();
   }
 
-  long SXElement::max_num_calls_in_print_ = 10000;
-
-  void SXElement::setMaxNumCallsInPrint(long num){
-    max_num_calls_in_print_ = num;
+  template<>
+  void SX::setMaxNumCallsInPrint(long num){
+    SXNode::max_num_calls_in_print_ = num;
   }
 
-  long SXElement::getMaxNumCallsInPrint(){
-    return max_num_calls_in_print_;
+  template<>
+  long SX::getMaxNumCallsInPrint(){
+    return SXNode::max_num_calls_in_print_;
   }
 
-  int SXElement::eq_depth_ = 1;
-
-  void SXElement::setEqualityCheckingDepth(int eq_depth){
-    eq_depth_ = eq_depth;
+  template<>
+  void SX::setEqualityCheckingDepth(int eq_depth){
+    SXNode::eq_depth_ = eq_depth;
   }
 
-  int SXElement::getEqualityCheckingDepth(){
-    return eq_depth_;
+  template<>
+  int SX::getEqualityCheckingDepth(){
+    return SXNode::eq_depth_;
   }
 
   template<>

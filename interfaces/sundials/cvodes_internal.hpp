@@ -87,17 +87,17 @@ public:
   
   /** \brief  Get the integrator Jacobian for the forward problem (generic) */
   template<typename FunctionType>
-  FunctionType getJacobianGen();
+  FunctionType getJacGen();
   
   /** \brief  Get the integrator Jacobian for the backward problem (generic) */
   template<typename FunctionType>
-  FunctionType getJacobianGenB();
+  FunctionType getJacGenB();
   
   /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual FX getJacobian();
+  virtual FX getJac();
   
   /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual FX getJacobianB();
+  virtual FX getJacB();
   
   protected:
 

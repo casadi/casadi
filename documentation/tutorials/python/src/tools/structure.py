@@ -330,7 +330,7 @@ output = DMatrix.zeros(8,states.size)
 #! The helper construct is 'repeated' here. Instead of "states(output)", we have
 outputs = states.repeated(output)
 
-#! Know we have an object that supports powerIndexing:
+#! Now we have an object that supports powerIndexing:
 outputs[-1] = DMatrix([1,2,3])
 outputs[:,"x"] = range(8) 
 

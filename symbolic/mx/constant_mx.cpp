@@ -154,16 +154,16 @@ namespace CasADi{
     return x_.isIdentity();
   }
 
-  MX ConstantMX::getMultiplication(const MX& y) const{
-    if(y.isConstant()){
-      // Constant folding
-      DMatrix xv = getMatrixValue();
-      DMatrix yv = y->getMatrixValue();
-      return mul(xv,yv);
-    } else {
-      return MXNode::getMultiplication(y);
-    }
-  }
+  // MX ConstantMX::getMultiplication(const MX& y) const{
+  //   if(y.isConstant()){
+  //     // Constant folding
+  //     DMatrix xv = getMatrixValue();
+  //     DMatrix yv = y->getMatrixValue();
+  //     return mul(xv,yv);
+  //   } else {
+  //     return MXNode::getMultiplication(y);
+  //   }
+  // }
 
   MX ConstantMX::getInnerProd(const MX& y) const{
     if(y.isConstant()){

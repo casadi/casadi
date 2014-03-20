@@ -28,35 +28,43 @@
 
 namespace CasADi{
 
-/** \brief Simulator data storage classs
-  \author Joel Andersson 
-  \date 2010
-*/
-class SimulatorInternal : public FXInternal{
-public:
+  /** \brief Simulator data storage classs
+      \author Joel Andersson 
+      \date 2010
+  */
+  class SimulatorInternal : public FXInternal{
+  public:
   
-  /** \brief  Constructor */
-  SimulatorInternal(const Integrator& integrator, const FX& output_fcn, const std::vector<double>& grid);
+    /** \brief  Constructor */
+    SimulatorInternal(const Integrator& integrator, const FX& output_fcn, const std::vector<double>& grid);
   
-  /** \brief  Destructor */
-  virtual ~SimulatorInternal();
+    /** \brief  Destructor */
+    virtual ~SimulatorInternal();
   
-  /** \brief  Clone */
-  virtual SimulatorInternal* clone() const{ return new SimulatorInternal(deepcopy(integrator_),deepcopy(output_fcn_),grid_);}
+    /** \brief  Clone */
+    virtual SimulatorInternal* clone() const{ return new SimulatorInternal(*this);}
 
-  /** \brief  initialize */
-  virtual void init();
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
-  /** \brief  Integrate */
-  virtual void evaluate();
+    /** \brief  initialize */
+    virtual void init();
+
+    /** \brief  Integrate */
+    virtual void evaluate();
   
-  Integrator integrator_;
-  FX output_fcn_;
+    // Integrator instance
+    Integrator integrator_;
+
+    // Output function to be evaluated at each grid point
+    FX output_fcn_;
   
-  std::vector<double> grid_;
+    // Time grid
+    std::vector<double> grid_;
   
-  std::vector< Matrix<double> > states_;
-};
+    // Iterators to current outputs
+    std::vector<std::vector<double>::iterator> output_its_;
+  };
   
 } // namespace CasADi
 

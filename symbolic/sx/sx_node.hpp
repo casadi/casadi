@@ -33,87 +33,94 @@
 
 namespace CasADi{
 
-/** \brief  Interal node class for SX
-  \author Joel Andersson 
-  \date 2010
-*/
-class SXNode{
-friend class SXElement;
+  /** \brief  Interal node class for SX
+      \author Joel Andersson 
+      \date 2010
+  */
+  class SXNode{
+    friend class SXElement;
+    friend class Matrix<SXElement>;
 
-public:
+  public:
 
-/** \brief  constructor */
-SXNode();
+    /** \brief  constructor */
+    SXNode();
 
-/** \brief  destructor  */
-virtual ~SXNode();
+    /** \brief  destructor  */
+    virtual ~SXNode();
 
-//@{
-/** \brief  check properties of a node */
-virtual bool isConstant() const; // check if constant
-virtual bool isInteger() const; // check if integer
-virtual bool isSymbolic() const; // check if symbolic
-virtual bool hasDep() const; // check if binary
-virtual bool isZero() const; // check if zero
-virtual bool isAlmostZero(double tol) const; // check if almost zero
-virtual bool isOne() const; // check if one
-virtual bool isMinusOne() const; // check if minus one
-virtual bool isNan() const; // check if not a number
-virtual bool isInf() const; // check if infinity
-virtual bool isMinusInf() const; // check if minus infinity
-//@}
+    //@{
+    /** \brief  check properties of a node */
+    virtual bool isConstant() const; // check if constant
+    virtual bool isInteger() const; // check if integer
+    virtual bool isSymbolic() const; // check if symbolic
+    virtual bool hasDep() const; // check if binary
+    virtual bool isZero() const; // check if zero
+    virtual bool isAlmostZero(double tol) const; // check if almost zero
+    virtual bool isOne() const; // check if one
+    virtual bool isMinusOne() const; // check if minus one
+    virtual bool isNan() const; // check if not a number
+    virtual bool isInf() const; // check if infinity
+    virtual bool isMinusInf() const; // check if minus infinity
+    //@}
 
-//@{
-/** \brief  Get value of a constant node */
-virtual double getValue() const;  // only works for constant nodes
-virtual int getIntValue() const;  // only works for integer nodes
-//@}
+    //@{
+    /** \brief  Get value of a constant node */
+    virtual double getValue() const;  // only works for constant nodes
+    virtual int getIntValue() const;  // only works for integer nodes
+    //@}
 
-virtual const std::string& getName() const; // get the name
+    virtual const std::string& getName() const; // get the name
 
-/** \brief get the operation */
-virtual int getOp() const=0;
+    /** \brief get the operation */
+    virtual int getOp() const=0;
 
-/** \brief Check if two nodes are equivalent up to a given depth */
-virtual bool isEqual(const SXNode* node, int depth) const;
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool isEqual(const SXNode* node, int depth) const;
 
-/** \brief  Number of dependencies */
-virtual int ndep() const{ return 0;}
+    /** \brief  Number of dependencies */
+    virtual int ndep() const{ return 0;}
 
-/** \brief  get the reference of a child */
-virtual const SXElement& dep(int i) const;
+    /** \brief  get the reference of a child */
+    virtual const SXElement& dep(int i) const;
 
-/** \brief  get the reference of a child */
-virtual SXElement& dep(int i);
+    /** \brief  get the reference of a child */
+    virtual SXElement& dep(int i);
 
-/** \brief  Initialize the node (currently used only to give a similar interface to MXNode) */
-void init(){}
+    /** \brief  Initialize the node (currently used only to give a similar interface to MXNode) */
+    void init(){}
 
-/** \brief  Check if smooth */
-virtual bool isSmooth() const;
+    /** \brief  Check if smooth */
+    virtual bool isSmooth() const;
 
-/** \brief  print */
-virtual void print(std::ostream &stream) const;
+    /** \brief  print */
+    virtual void print(std::ostream &stream) const;
 
-/** \brief  print */
-virtual void print(std::ostream &stream, long& remaining_calls) const = 0;
+    /** \brief  print */
+    virtual void print(std::ostream &stream, long& remaining_calls) const = 0;
 
-// Check if marked (i.e. temporary is negative)
-bool marked() const;
+    // Check if marked (i.e. temporary is negative)
+    bool marked() const;
     
-// Mark by flipping the sign of the temporary and decreasing by one
-void mark();
+    // Mark by flipping the sign of the temporary and decreasing by one
+    void mark();
 
-/** Temporary variables to be used in user algorithms like sorting, 
- the user is resposible of making sure that use is thread-safe
- The variable is initialized to zero
-*/
-int temp;
+    // Maximum number of calls
+    static long max_num_calls_in_print_;
+    
+    // Depth when checking equalities
+    static int eq_depth_;
 
-// Reference counter -- counts the number of parents of the node
-unsigned int count;
+    /** Temporary variables to be used in user algorithms like sorting, 
+        the user is resposible of making sure that use is thread-safe
+        The variable is initialized to zero
+    */
+    int temp;
 
-};
+    // Reference counter -- counts the number of parents of the node
+    unsigned int count;
+
+  };
 
 } // namespace CasADi
 
