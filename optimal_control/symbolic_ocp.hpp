@@ -226,8 +226,11 @@ namespace CasADi{
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
     
+    //@{
     /// Access a variable by name
     Variable& variable(const std::string& name);
+    const Variable& variable(const std::string& name) const;
+    //@}
     
     /** @name Manipulation
      *  Reformulate the dynamic optimization problem.
@@ -358,8 +361,6 @@ namespace CasADi{
     /// Timed variable (allocate if necessary)
     SX atTime(const std::string& name, double t, bool allocate=false);
 
-
-
 #ifndef SWIG
     ///  Print representation
     virtual void repr(std::ostream &stream=std::cout) const;
@@ -368,7 +369,7 @@ namespace CasADi{
     virtual void print(std::ostream &stream=std::cout) const;
 
     // Internal methods
-    //  protected:
+  protected:
 
     /// Get the qualified name
     static std::string qualifiedName(const XMLNode& nn);

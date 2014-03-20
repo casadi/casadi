@@ -43,18 +43,6 @@
 using namespace std;
 namespace CasADi{
 
-  // temporary
-  vector<Variable> getVar(const SymbolicOCP& ocp, const SX& var){
-    casadi_assert(var.isVector() && var.isSymbolic());
-    vector<Variable> ret(var.size());
-    for(int i=0; i<ret.size(); ++i){
-      map<string,Variable>::const_iterator it = ocp.varmap_.find(var.at(i).getName());
-      casadi_assert(it!=ocp.varmap_.end());
-      ret[i] = it->second;
-    }
-    return ret;
-  }
-
   SymbolicOCP::SymbolicOCP(){
     t = SX::sym("t");
     t0 = t0_guess = numeric_limits<double>::quiet_NaN();
@@ -1034,6 +1022,10 @@ namespace CasADi{
     eliminateDependent();
   }
 
+  const Variable& SymbolicOCP::variable(const std::string& name) const{
+    return const_cast<SymbolicOCP*>(this)->variable(name);
+  }
+
   Variable& SymbolicOCP::variable(const std::string& name){
     // Find the variable
     map<string,Variable>::iterator it = varmap_.find(name);
@@ -1047,8 +1039,7 @@ namespace CasADi{
 
   void SymbolicOCP::addVariable(const std::string& name, const Variable& var){
     // Try to find the component
-    map<string,Variable>::iterator it = varmap_.find(name);
-    if(it!=varmap_.end()){
+    if(varmap_.find(name)!=varmap_.end()){
       stringstream ss;
       ss << "Variable \"" << name << "\" has already been added.";
       throw CasadiException(ss.str());
@@ -1391,15 +1382,11 @@ namespace CasADi{
   }
 
   SX SymbolicOCP::operator()(const std::string& name) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.var();
+    return variable(name)->var_;
   }
 
   SX SymbolicOCP::der(const std::string& name) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.der();
+    return variable(name)->der_;
   } 
 
   SX SymbolicOCP::der(const SX& var) const{
@@ -1412,87 +1399,64 @@ namespace CasADi{
   }
 
   double SymbolicOCP::nominal(const std::string& name) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.getNominal();
+    return variable(name)->nominal_;
   }
 
   void SymbolicOCP::setNominal(const std::string& name, double val){
-    map<string,Variable>::iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    it->second.setNominal(val);
+    variable(name)->nominal_ = val;
   }
 
   double SymbolicOCP::min(const std::string& name, bool nominal) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return nominal ? it->second.getMin() / it->second.getNominal() : it->second.getMin();
+    const Variable& v = variable(name);
+    return nominal ? v->min_ / v->nominal_ : v->min_;
   }
 
   void SymbolicOCP::setMin(const std::string& name, double val){
-    map<string,Variable>::iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    it->second.setMin(val);
+    variable(name)->min_ = val;
   }
 
   double SymbolicOCP::max(const std::string& name, bool nominal) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return nominal ? it->second.getMax() / it->second.getNominal() : it->second.getMax();
+    const Variable& v = variable(name);
+    return nominal ? v->max_ / v->nominal_ : v->max_;
   }
 
   void SymbolicOCP::setMax(const std::string& name, double val){
-    map<string,Variable>::iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    it->second.setMax(val);
+    variable(name)->max_ = val;
   }
 
   double SymbolicOCP::start(const std::string& name, bool nominal) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return nominal ? it->second.getStart() / it->second.getNominal() : it->second.getStart();
+    const Variable& v = variable(name);
+    return nominal ? v->start_ / v->nominal_ : v->start_;
   }
 
   void SymbolicOCP::setStart(const std::string& name, double val){
-    map<string,Variable>::iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    it->second.setStart(val);
+    variable(name)->start_ = val;
   }
 
   double SymbolicOCP::initialGuess(const std::string& name, bool nominal) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return nominal ? it->second.getInitialGuess() / it->second.getNominal() : it->second.getInitialGuess();
+    const Variable& v = variable(name);
+    return nominal ? v->initial_guess_ / v->nominal_ : v->initial_guess_;
   }
 
   void SymbolicOCP::setInitialGuess(const std::string& name, double val){
-    map<string,Variable>::iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    it->second.setInitialGuess(val);
+    variable(name)->initial_guess_ = val;
   }
 
   double SymbolicOCP::derivativeStart(const std::string& name, bool nominal) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return nominal ? it->second.getDerivativeStart() / it->second.getNominal() : it->second.getDerivativeStart();
+    const Variable& v = variable(name);
+    return nominal ? v->derivative_start_ / v->nominal_ : v->derivative_start_;
   }
 
   void SymbolicOCP::setDerivativeStart(const std::string& name, double val){
-    map<string,Variable>::iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    it->second.setDerivativeStart(val);
+    variable(name)->derivative_start_ = val;
   }
 
   SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.atTime(t,allocate);
+    return variable(name).atTime(t,allocate);
   }
  
   SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate){
-    map<string,Variable>::iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second.atTime(t,allocate);
+    return variable(name).atTime(t,allocate);
   }
 
   void SymbolicOCP::identifyALG(){
@@ -1628,9 +1592,7 @@ namespace CasADi{
   }
 
   std::string SymbolicOCP::unit(const std::string& name) const{
-    map<string,Variable>::const_iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    return it->second->unit_;
+    return variable(name)->unit_;
   }
 
   std::string SymbolicOCP::unit(const SX& var) const{
@@ -1647,9 +1609,7 @@ namespace CasADi{
   }
 
   void SymbolicOCP::setUnit(const std::string& name, const std::string& val){
-    map<string,Variable>::iterator it = varmap_.find(name);
-    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
-    it->second->unit_ = val;
+    variable(name)->unit_ = val;
   }
 
 
