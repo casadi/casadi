@@ -291,9 +291,6 @@ namespace CasADi{
     /// Scale the implicit equations
     void scaleEquations();
 
-    /// Find a variable by name 
-    std::pair<int,int> find(const std::string& name, bool error_if_not_found=true) const;
-
     /// Find an expression by name
     SX operator()(const std::string& name) const;
 
