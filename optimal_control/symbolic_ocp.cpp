@@ -1462,29 +1462,6 @@ namespace CasADi{
     datfile.close();
   }
 
-  std::vector<Variable>& SymbolicOCP::variableByType(int type){
-    switch(type){
-    case VAR_S: return this->s;
-    case VAR_X: return this->x;
-    case VAR_Z: return this->z;
-    case VAR_Q: return this->q;
-    case VAR_CI: return this->ci;
-    case VAR_CD: return this->cd;
-    case VAR_PI: return this->pi;
-    case VAR_PD: return this->pd;
-    case VAR_PF: return this->pf;
-    case VAR_Y: return this->y;
-    case VAR_U: return this->u;
-    default:
-      casadi_error("SymbolicOCPVariable " << type << " out of range."); 
-      return this->x; // avoid -Wreturn-type
-    }
-  }
-    
-  const std::vector<Variable>& SymbolicOCP::variableByType(int type) const{
-    return const_cast<SymbolicOCP*>(this)->variableByType(type);
-  }
-
   SX SymbolicOCP::operator()(const std::string& name) const{
     map<string,Variable>::const_iterator it = varmap_.find(name);
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
