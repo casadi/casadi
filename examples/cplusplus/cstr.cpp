@@ -45,16 +45,16 @@ int main(){
   ocp.parseFMI("../examples/xml_files/cstr.xml");
 
   // Identify the algebraic variables and separate them from the states
-  ocp.identifyAlg();
+  ocp.identifyALG();
 
   // Scale the variables
   ocp.scaleVariables();
 
   // Sort the equations
-  ocp.sortODE();
+  ocp.sortDAE();
   ocp.sortALG();
   
-  // Make the OCP explicit
+  // Make the ODE explicit
   ocp.makeExplicit();
   
   // Eliminate dependent variables created during the makeExplicit step

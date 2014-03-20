@@ -673,8 +673,8 @@ namespace CasADi{
   
     // Variables
     SX _s = CasADi::var(this->s);
+    SX _sdot = der(this->s);
     SX _x = CasADi::var(this->x);
-    SX _xdot = der(this->x);
     SX _z = CasADi::var(this->z);
     SX _pi = CasADi::var(this->pi);
     SX _pf = CasADi::var(this->pf);
@@ -684,8 +684,8 @@ namespace CasADi{
     SX v;
     v.append(this->t);
     v.append(_s);
+    v.append(_sdot);
     v.append(_x);
-    v.append(_xdot);
     v.append(_z);
     v.append(_pi);
     v.append(_pf);
@@ -704,8 +704,8 @@ namespace CasADi{
     SX v_old;
     v_old.append(this->t*t_n);
     v_old.append(_s*s_n);
+    v_old.append(_sdot*s_n);
     v_old.append(_x*x_n);
-    v_old.append(_xdot*x_n);
     v_old.append(_z*z_n);
     v_old.append(_pi*pi_n);
     v_old.append(_pf*pf_n);
@@ -801,12 +801,12 @@ namespace CasADi{
     cout << "... equation scaling complete after " << dt << " seconds." << endl;
   }
 
-  void SymbolicOCP::sortODE(){
+  void SymbolicOCP::sortDAE(){
     // Quick return if no differential states
     if(this->x.empty()) return;
 
     // Find out which differential equation depends on which differential state
-    SXFunction f(der(this->x),this->ode);
+    SXFunction f(der(this->s),this->dae);
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -815,14 +815,14 @@ namespace CasADi{
     sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
     // Permute equations
-    this->ode = this->ode(rowperm);
+    this->dae = this->dae(rowperm);
   
     // Permute variables
-    vector<Variable> x_new(this->x.size());
-    for(int i=0; i<this->x.size(); ++i){
-      x_new[i]= this->x[colperm[i]];
+    vector<Variable> s_new(this->s.size());
+    for(int i=0; i<this->s.size(); ++i){
+      s_new[i]= this->s[colperm[i]];
     }
-    x_new.swap(this->x);
+    s_new.swap(this->s);
   }
 
   void SymbolicOCP::sortALG(){
@@ -872,17 +872,11 @@ namespace CasADi{
   }
 
   void SymbolicOCP::makeExplicit(){
-    // Quick return if there are no differential states
-    if(this->x.empty()) return;
-  
-    // Make sure that the ODE is not already explicit
-    if(!dependsOn(this->ode,der(this->x))){
-      casadi_warning("The ODE is already explicit");
-      return;
-    }
-  
+    // Quick return if there are no implicitly defined states
+    if(this->s.empty()) return;
+    
     // Write the ODE as a function of the state derivatives
-    SXFunction f(der(this->x),this->ode);
+    SXFunction f(der(this->s),this->dae);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
@@ -893,18 +887,18 @@ namespace CasADi{
     int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
     // Permute equations
-    ode = ode(rowperm);
+    this->dae = this->dae(rowperm);
   
     // Permute variables
-    vector<Variable> x_new(this->x.size());
-    for(int i=0; i<this->x.size(); ++i){
-      x_new[i]= this->x[colperm[i]];
+    vector<Variable> s_new(this->s.size());
+    for(int i=0; i<this->s.size(); ++i){
+      s_new[i]= this->s[colperm[i]];
     }
-    x_new.swap(this->x);
-    x_new.clear();
+    s_new.swap(this->s);
+    s_new.clear();
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = SXFunction(der(this->x),this->ode);
+    f = SXFunction(der(this->s),this->dae);
     f.init();
 
     // Get the Jacobian
@@ -914,7 +908,7 @@ namespace CasADi{
     vector<Variable> xb, xdb, xab;
 
     // Explicit ODE
-    SX ode_exp;
+    SX new_ode;
   
     // Loop over blocks
     for(int b=0; b<nb; ++b){
@@ -925,11 +919,11 @@ namespace CasADi{
       // Get variables in the block
       xb.clear();
       for(int i=colblock[b]; i<colblock[b+1]; ++i){
-        xb.push_back(this->x[i]);
+        xb.push_back(this->s[i]);
       }
 
       // Get equations in the block
-      SX fb = ode(Slice(rowblock[b],rowblock[b+1]));
+      SX fb = dae(Slice(rowblock[b],rowblock[b+1]));
 
       // Get local Jacobian
       SX Jb = J(Slice(rowblock[b],rowblock[b+1]),Slice(colblock[b],colblock[b+1]));
@@ -951,12 +945,16 @@ namespace CasADi{
       }
 
       // Add to explicitly determined equations and variables
-      ode_exp.append(fb_exp);
+      new_ode.append(fb_exp);
     }
   
     // Eliminate inter-dependencies
-    substituteInPlace(der(x),ode_exp,false);
-    ode = ode_exp;
+    substituteInPlace(der(s),new_ode,false);
+
+    // Add to explicit differential states and ODE
+    this->ode.append(new_ode);
+    this->x.insert(this->x.end(),this->s.begin(),this->s.end());
+    this->s.clear();
   }
 
   void SymbolicOCP::eliminateAlgebraic(){
@@ -1587,7 +1585,7 @@ namespace CasADi{
     return variableByType(v.first).at(v.second).atTime(t,allocate);
   }
 
-  void SymbolicOCP::identifyAlg(){
+  void SymbolicOCP::identifyALG(){
     // Quick return if no s
     if(this->s.empty()) return;
 
@@ -1616,10 +1614,10 @@ namespace CasADi{
     f.spEvaluate(true);
     
     // Get the new differential and algebraic equations
-    SX new_ode, new_alg;
+    SX new_dae, new_alg;
     for(int i=0; i<ns; ++i){
       if(f_dae[i]==bvec_t(1)){
-        new_ode.append(this->dae[i]);
+        new_dae.append(this->dae[i]);
       } else {
         casadi_assert(f_dae[i]==bvec_t(0));
         new_alg.append(this->dae[i]);
@@ -1648,15 +1646,14 @@ namespace CasADi{
     }
 
     // Make sure split was successful
-    casadi_assert(new_ode.size()==new_s.size());
+    casadi_assert(new_dae.size()==new_s.size());
     
     // Divide up the s and dae
     s.clear();
-    dae = SX();
-    ode.append(new_ode);
-    alg.append(new_alg);
-    x.insert(x.end(),new_s.begin(),new_s.end()); // FIXME
-    z.insert(z.end(),new_z.begin(),new_z.end()); // FIXME
+    this->dae = new_dae;
+    this->s = new_s;
+    this->alg.append(new_alg);
+    z.insert(z.end(),new_z.begin(),new_z.end());
   }
 
 } // namespace CasADi

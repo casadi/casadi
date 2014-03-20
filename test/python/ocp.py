@@ -200,10 +200,10 @@ class OCPtests(casadiTestCase):
     ocp.parseFMI('data/cstr.xml')
     
     # Identify algebraic variables
-    ocp.identifyAlg()
+    ocp.identifyALG()
 
     # Sort the equations
-    ocp.sortODE()
+    ocp.sortDAE()
     ocp.sortALG()
     
     self.assertEqual(ocp.t0,0)
@@ -217,9 +217,9 @@ class OCPtests(casadiTestCase):
     self.assertTrue(isinstance(ocp.t,SX))
     self.assertEquals(str(m),'cost.atTime(150)')
     print dir(ocp)
-    self.assertEquals(ocp.ode.size(),3)
-    print type(ocp.x)
-    self.assertEquals(len(ocp.x),3) # there are three states
+    self.assertEquals(ocp.dae.size(),3)
+    print type(ocp.s)
+    self.assertEquals(len(ocp.s),3) # there are three states
     c = ocp("cstr.c")
     T = ocp("cstr.T")
     cost = ocp("cost")

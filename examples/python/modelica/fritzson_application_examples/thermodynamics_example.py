@@ -66,17 +66,17 @@ ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
 # Separate algebraic variables
-ocp.identifyAlg()
+ocp.identifyALG()
 
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
 
 # Sort the equations
-ocp.sortODE()
+ocp.sortDAE()
 ocp.sortALG()
 
-# Make the OCP explicit
+# Make the ODE explicit
 ocp.makeExplicit()
 
 # Eliminate the algebraic states
@@ -141,17 +141,17 @@ ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
 # Separate algebraic variables
-ocp.identifyAlg()
+ocp.identifyALG()
 
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
 
 # Sort the equations
-ocp.sortODE()
+ocp.sortDAE()
 ocp.sortALG()
 
-# Make the OCP explicit
+# Make the ODE explicit
 ocp.makeExplicit()
 
 # Eliminate the algebraic states
@@ -208,17 +208,17 @@ ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeTest.xml')
 
 # Separate algebraic variables
-ocp.identifyAlg()
+ocp.identifyALG()
 
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
 
 # Sort the equations
-ocp.sortODE()
+ocp.sortDAE()
 ocp.sortALG()
 
-# Make explicit
+# Make the ODE explicit
 ocp.makeExplicit()
 
 # Eliminate the algebraic states
@@ -285,17 +285,17 @@ ocp = SymbolicOCP()
 ocp.parseFMI('CtrlFlowSystem.xml')
 
 # Separate algebraic variables
-ocp.identifyAlg()
+ocp.identifyALG()
 
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
 
 # Sort the equations
-ocp.sortODE()
+ocp.sortDAE()
 ocp.sortALG()
 
-# Make the OCP explicit
+# Make the ODE explicit
 ocp.makeExplicit()
 
 # Print the ocp

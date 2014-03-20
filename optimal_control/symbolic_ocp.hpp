@@ -260,10 +260,10 @@ namespace CasADi{
     void eliminateQuadratureStates();
     
     /// Identify the algebraic variables and separate them from the states
-    void identifyAlg();
+    void identifyALG();
 
-    /// Sort the ODE and differential states
-    void sortODE();
+    /// Sort the DAE and implicly defined states
+    void sortDAE();
 
     /// Sort the algebraic equations and algebraic states
     void sortALG();
