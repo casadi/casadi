@@ -185,9 +185,7 @@ namespace CasADi{
         Variable var = readVariable(beq[0]);
 
         // Get the binding equation
-        bool has_der = false;
-        SX bexpr = readExpr(beq[1][0],has_der);
-        casadi_assert(!has_der);
+        SX bexpr = readExpr(beq[1][0]);
       
         // Add binding equation
         var.setBinding(bexpr);
@@ -211,13 +209,8 @@ namespace CasADi{
         const XMLNode& dnode = dyneqs[i];
 
         // Add the differential equation
-        bool has_der = false;
-        SX de_new = readExpr(dnode[0],has_der);
-        if(has_der){
-          ode.append(de_new);
-        } else {
-          alg.append(de_new);
-        }
+        SX de_new = readExpr(dnode[0]);
+        dae.append(de_new);
       }
     }
   
@@ -234,8 +227,7 @@ namespace CasADi{
 
         // Add the differential equations
         for(int i=0; i<inode.size(); ++i){
-          bool has_der = false;
-          initial.append(readExpr(inode[i],has_der));
+          initial.append(readExpr(inode[i]));
         }
       }
     }
@@ -301,9 +293,7 @@ namespace CasADi{
                 continue;
             
               // Read expression
-              bool has_der = false;
-              SX v = readExpr(var,has_der);
-              casadi_assert(!has_der);
+              SX v = readExpr(var);
               mterm.append(v);
             }
           } catch(exception& ex){
@@ -319,8 +309,7 @@ namespace CasADi{
                 continue;
             
               // Read expression
-              bool has_der = false;
-              SX v = readExpr(var,has_der);
+              SX v = readExpr(var);
               lterm.append(v);
             }
           } catch(exception& ex){
@@ -333,25 +322,23 @@ namespace CasADi{
         } else if(onode.checkName("opt:TimePoints")) {
           // Ignore, treated above
         } else if(onode.checkName("opt:PointConstraints")) {
-          bool has_der = false; // Should we check that this remains false, i.e. should state derivatives be allowed in constraints?
-
           for(int i=0; i<onode.size(); ++i){
             const XMLNode& constr_i = onode[i];
             if(constr_i.checkName("opt:ConstraintLeq")){
-              SX ex = readExpr(constr_i[0],has_der);
-              SX ub = readExpr(constr_i[1],has_der);
+              SX ex = readExpr(constr_i[0]);
+              SX ub = readExpr(constr_i[1]);
               point.append(ex-ub);
               point_min.append(-numeric_limits<double>::infinity());
               point_max.append(0.);
             } else if(constr_i.checkName("opt:ConstraintGeq")){
-              SX ex = readExpr(constr_i[0],has_der);
-              SX lb = readExpr(constr_i[1],has_der);
+              SX ex = readExpr(constr_i[0]);
+              SX lb = readExpr(constr_i[1]);
               point.append(ex-lb);
               point_min.append(0.);
               point_max.append(numeric_limits<double>::infinity());
             } else if(constr_i.checkName("opt:ConstraintEq")){
-              SX ex = readExpr(constr_i[0],has_der);
-              SX eq = readExpr(constr_i[1],has_der);
+              SX ex = readExpr(constr_i[0]);
+              SX eq = readExpr(constr_i[1]);
               point.append(ex-eq);
               point_min.append(0.);
               point_max.append(0.);
@@ -362,25 +349,23 @@ namespace CasADi{
           }
         
         } else if(onode.checkName("opt:Constraints") || onode.checkName("opt:PathConstraints")) {
-        
-          bool has_der = false; // Should we check that this remains false, i.e. should state derivatives be allowed in constraints?
           for(int i=0; i<onode.size(); ++i){
             const XMLNode& constr_i = onode[i];
             if(constr_i.checkName("opt:ConstraintLeq")){
-              SX ex = readExpr(constr_i[0],has_der);
-              SX ub = readExpr(constr_i[1],has_der);
+              SX ex = readExpr(constr_i[0]);
+              SX ub = readExpr(constr_i[1]);
               path.append(ex-ub);
               path_min.append(-numeric_limits<double>::infinity());
               path_max.append(0.);
             } else if(constr_i.checkName("opt:ConstraintGeq")){
-              SX ex = readExpr(constr_i[0],has_der);
-              SX lb = readExpr(constr_i[1],has_der);
+              SX ex = readExpr(constr_i[0]);
+              SX lb = readExpr(constr_i[1]);
               path.append(ex-lb);
               path_min.append(0.);
               path_max.append(numeric_limits<double>::infinity());
             } else if(constr_i.checkName("opt:ConstraintEq")){
-              SX ex = readExpr(constr_i[0],has_der);
-              SX eq = readExpr(constr_i[1],has_der);
+              SX ex = readExpr(constr_i[0]);
+              SX eq = readExpr(constr_i[1]);
               path.append(ex-eq);
               path_min.append(0.);
               path_max.append(0.);
@@ -409,7 +394,7 @@ namespace CasADi{
     return variable(qn);
   }
 
-  SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der){
+  SX SymbolicOCP::readExpr(const XMLNode& node){
     const string& fullname = node.getName();
     if (fullname.find("exp:")== string::npos) {
       casadi_error("SymbolicOCP::readExpr: unknown - expression is supposed to start with 'exp:' , got " << fullname);
@@ -420,24 +405,22 @@ namespace CasADi{
 
     // The switch below is alphabetical, and can be thus made more efficient, for example by using a switch statement of the first three letters, if it would ever become a bottleneck
     if(name.compare("Add")==0){
-      return readExpr(node[0],has_der) + readExpr(node[1],has_der);
+      return readExpr(node[0]) + readExpr(node[1]);
     } else if(name.compare("Acos")==0){
-      return acos(readExpr(node[0],has_der));
+      return acos(readExpr(node[0]));
     } else if(name.compare("Asin")==0){
-      return asin(readExpr(node[0],has_der));
+      return asin(readExpr(node[0]));
     } else if(name.compare("Atan")==0){
-      return atan(readExpr(node[0],has_der));
+      return atan(readExpr(node[0]));
     } else if(name.compare("Cos")==0){
-      return cos(readExpr(node[0],has_der));
+      return cos(readExpr(node[0]));
     } else if(name.compare("Der")==0){
       Variable v = readVariable(node[0]);
-      v.setDifferential(true);
-      has_der = true;
       return v.der();
     } else if(name.compare("Div")==0){
-      return readExpr(node[0],has_der) / readExpr(node[1],has_der);
+      return readExpr(node[0]) / readExpr(node[1]);
     } else if(name.compare("Exp")==0){
-      return exp(readExpr(node[0],has_der));
+      return exp(readExpr(node[0]));
     } else if(name.compare("Identifier")==0){
       return readVariable(node).var();
     } else if(name.compare("IntegerLiteral")==0){
@@ -449,42 +432,42 @@ namespace CasADi{
       node.getText(val);
       return val;
     } else if(name.compare("Log")==0){
-      return log(readExpr(node[0],has_der));
+      return log(readExpr(node[0]));
     } else if(name.compare("LogLt")==0){ // Logical less than
-      return readExpr(node[0],has_der) < readExpr(node[1],has_der);
+      return readExpr(node[0]) < readExpr(node[1]);
     } else if(name.compare("LogGt")==0){ // Logical less than
-      return readExpr(node[0],has_der) > readExpr(node[1],has_der);
+      return readExpr(node[0]) > readExpr(node[1]);
     } else if(name.compare("Mul")==0){ // Multiplication
-      return readExpr(node[0],has_der) * readExpr(node[1],has_der);
+      return readExpr(node[0]) * readExpr(node[1]);
     } else if(name.compare("Neg")==0){
-      return -readExpr(node[0],has_der);
+      return -readExpr(node[0]);
     } else if(name.compare("NoEvent")==0) {
       // NOTE: This is a workaround, we assume that whenever NoEvent occurs, what is meant is a switch
       int n = node.size();
     
       // Default-expression
-      SX ex = readExpr(node[n-1],has_der);
+      SX ex = readExpr(node[n-1]);
     
       // Evaluate ifs
-      for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i],has_der),readExpr(node[i+1],has_der),ex);
+      for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i]),readExpr(node[i+1]),ex);
     
       return ex;
     } else if(name.compare("Pow")==0){
-      return pow(readExpr(node[0],has_der),readExpr(node[1],has_der));
+      return pow(readExpr(node[0]),readExpr(node[1]));
     } else if(name.compare("RealLiteral")==0){
       double val;
       node.getText(val);
       return val;
     } else if(name.compare("Sin")==0){
-      return sin(readExpr(node[0],has_der));
+      return sin(readExpr(node[0]));
     } else if(name.compare("Sqrt")==0){
-      return sqrt(readExpr(node[0],has_der));
+      return sqrt(readExpr(node[0]));
     } else if(name.compare("StringLiteral")==0){
       throw CasadiException(node.getText());
     } else if(name.compare("Sub")==0){
-      return readExpr(node[0],has_der) - readExpr(node[1],has_der);
+      return readExpr(node[0]) - readExpr(node[1]);
     } else if(name.compare("Tan")==0){
-      return tan(readExpr(node[0],has_der));
+      return tan(readExpr(node[0]));
     } else if(name.compare("Time")==0){
       return t.toScalar();
     } else if(name.compare("TimedVariable")==0){
@@ -505,6 +488,7 @@ namespace CasADi{
 
   void SymbolicOCP::print(ostream &stream) const{
     stream << "Dimensions: "; 
+    stream << "#s = " << this->s.size() << ", ";
     stream << "#x = " << this->x.size() << ", ";
     stream << "#z = " << this->z.size() << ", ";
     stream << "#q = " << this->q.size() << ", ";
@@ -523,6 +507,7 @@ namespace CasADi{
     // Print the variables
     stream << "{" << endl;
     stream << "  t = " << this->t.getDescription() << endl;
+    stream << "  s = " << this->s << endl;
     stream << "  x = " << this->x << endl;
     stream << "  z =  " << this->z << endl;
     stream << "  q =  " << this->q << endl;
@@ -535,6 +520,12 @@ namespace CasADi{
     stream << "  u =  " << this->u << endl;
     stream << "}" << endl;
   
+    stream << "Fully-implicit differential-algebraic equations" << endl;
+    for(int k=0; k<this->dae.size(); ++k){
+      stream << "0 == " << this->dae.at(k) << endl;
+    }
+    stream << endl;
+
     stream << "Differential equations" << endl;
     for(int k=0; k<this->x.size(); ++k){
       stream << "0 == " << this->ode.at(k) << endl;
@@ -681,6 +672,7 @@ namespace CasADi{
     double time1 = clock();
   
     // Variables
+    SX _s = CasADi::var(this->s);
     SX _x = CasADi::var(this->x);
     SX _xdot = der(this->x);
     SX _z = CasADi::var(this->z);
@@ -691,6 +683,7 @@ namespace CasADi{
     // Collect all the variables
     SX v;
     v.append(this->t);
+    v.append(_s);
     v.append(_x);
     v.append(_xdot);
     v.append(_z);
@@ -700,6 +693,7 @@ namespace CasADi{
     
     // Nominal values
     SX t_n = 1.;
+    SX s_n = getNominal(this->s);
     SX x_n = getNominal(this->x);
     SX z_n = getNominal(this->z);
     SX pi_n = getNominal(this->pi);
@@ -709,6 +703,7 @@ namespace CasADi{
     // Get all the old variables in expressed in the nominal ones
     SX v_old;
     v_old.append(this->t*t_n);
+    v_old.append(_s*s_n);
     v_old.append(_x*x_n);
     v_old.append(_xdot*x_n);
     v_old.append(_z*z_n);
@@ -720,6 +715,7 @@ namespace CasADi{
     SX temp;
 
     // Substitute equations
+    this->dae = substitute(this->dae,v,v_old);
     this->ode = substitute(this->ode,v,v_old);
     this->alg = substitute(this->alg,v,v_old);
     this->quad = substitute(this->quad,v,v_old);
@@ -1143,29 +1139,29 @@ namespace CasADi{
       // Skip derivatives
       break;
     case CAT_STATE:
-      x.push_back(var);
+      this->s.push_back(var);
       break;
     case CAT_DEPENDENT_CONSTANT:
-      cd.push_back(var);
+      this->cd.push_back(var);
       break;
     case CAT_INDEPENDENT_CONSTANT:
-      ci.push_back(var);
+      this->ci.push_back(var);
       break;
     case CAT_DEPENDENT_PARAMETER:
-      pd.push_back(var);
+      this->pd.push_back(var);
       break;
     case CAT_INDEPENDENT_PARAMETER:
       if(var.getFree()){
-        pf.push_back(var);
+        this->pf.push_back(var);
       } else {
-        pi.push_back(var);
+        this->pi.push_back(var);
       }
       break;
     case CAT_ALGEBRAIC:
       if(var.getCausality() == INTERNAL){
-        z.push_back(var);
+        this->s.push_back(var);
       } else if(var.getCausality() == INPUT){
-        u.push_back(var);
+        this->u.push_back(var);
       }
       break;
     default:
@@ -1474,6 +1470,7 @@ namespace CasADi{
 
   std::vector<Variable>& SymbolicOCP::variableByType(int type){
     switch(type){
+    case VAR_S: return this->s;
     case VAR_X: return this->x;
     case VAR_Z: return this->z;
     case VAR_Q: return this->q;
@@ -1590,6 +1587,77 @@ namespace CasADi{
     return variableByType(v.first).at(v.second).atTime(t,allocate);
   }
 
+  void SymbolicOCP::identifyAlg(){
+    // Quick return if no s
+    if(this->s.empty()) return;
+
+    // We investigate the interdependencies in sdot -> dae
+    vector<SX> f_in;
+    f_in.push_back(der(this->s));
+    SXFunction f(f_in,this->dae);
+    f.init();
+
+    // Number of s
+    int ns = f.input().size();
+    casadi_assert(f.output().size()==ns);
+
+    // Input/output arrays
+    bvec_t* f_sdot = reinterpret_cast<bvec_t*>(f.input().ptr());
+    bvec_t* f_dae = reinterpret_cast<bvec_t*>(f.output().ptr());
+
+    // First find out which equations depend on sdot
+    f.spInit(true);
+    
+    // Seed all inputs
+    std::fill(f_sdot,f_sdot+ns,bvec_t(1));
+
+    // Propagate to f_dae
+    std::fill(f_dae,f_dae+ns,bvec_t(0));
+    f.spEvaluate(true);
+    
+    // Get the new differential and algebraic equations
+    SX new_ode, new_alg;
+    for(int i=0; i<ns; ++i){
+      if(f_dae[i]==bvec_t(1)){
+        new_ode.append(this->dae[i]);
+      } else {
+        casadi_assert(f_dae[i]==bvec_t(0));
+        new_alg.append(this->dae[i]);
+      }
+    }
+
+    // Now find out what sdot enter in the equations
+    f.spInit(false);
+
+    // Seed all outputs
+    std::fill(f_dae,f_dae+ns,bvec_t(1));
+    
+    // Propagate to f_sdot
+    std::fill(f_sdot,f_sdot+ns,bvec_t(0));
+    f.spEvaluate(false);
+
+    // Get the new algebraic variables and new states
+    vector<Variable> new_s, new_z;
+    for(int i=0; i<ns; ++i){
+      if(f_sdot[i]==bvec_t(1)){
+        new_s.push_back(this->s[i]);
+      } else {
+        casadi_assert(f_sdot[i]==bvec_t(0));
+        new_z.push_back(this->s[i]);
+      }
+    }
+
+    // Make sure split was successful
+    casadi_assert(new_ode.size()==new_s.size());
+    
+    // Divide up the s and dae
+    s.clear();
+    dae = SX();
+    ode.append(new_ode);
+    alg.append(new_alg);
+    x.insert(x.end(),new_s.begin(),new_s.end()); // FIXME
+    z.insert(z.end(),new_z.begin(),new_z.end()); // FIXME
+  }
 
 } // namespace CasADi
 

@@ -226,13 +226,7 @@ namespace CasADi{
                 
     /// Set the variable index
     void setIndex(int ind);
-    
-    /// Is differential?
-    bool isDifferential() const;
-    
-    /// Set differential
-    void setDifferential(bool is_differential);
-    
+        
     /// Get the the free attribute
     bool getFree() const;
 

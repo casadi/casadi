@@ -82,9 +82,6 @@ namespace CasADi{
             
       // Index
       int index_;
-      
-      // Does the expression appear differentiated
-      bool is_differential_;
   };
   
   

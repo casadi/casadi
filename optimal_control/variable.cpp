@@ -244,14 +244,6 @@ namespace CasADi{
     (*this)->index_ = ind;
   }
     
-  bool Variable::isDifferential() const{
-    return (*this)->is_differential_;
-  }
-
-  void Variable::setDifferential(bool is_differential){
-    (*this)->is_differential_ = is_differential;
-  }
-
   bool Variable::getFree() const{
     return (*this)->free_;
   }

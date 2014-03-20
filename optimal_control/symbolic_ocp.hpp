@@ -31,7 +31,7 @@ namespace CasADi{
   class XMLNode;
     
   // All the types of variables in the SymbolicOCP class
-  enum SymbolicOCPVariables{VAR_X, VAR_Z, VAR_Q, VAR_CI, VAR_CD, VAR_PI, VAR_PD, VAR_PF, VAR_Y, VAR_U, NUM_VAR};
+  enum SymbolicOCPVariables{VAR_S, VAR_X, VAR_Z, VAR_Q, VAR_CI, VAR_CD, VAR_PI, VAR_PD, VAR_PF, VAR_Y, VAR_U, NUM_VAR};
   
   /** \brief A flat OCP representation coupled to an XML file
 
@@ -100,6 +100,9 @@ namespace CasADi{
     /** \brief Time */
     SX t;
     
+    /** \brief Fully implific states (includes differential states and algebraic variables) */
+    std::vector<Variable> s;
+
     /** \brief Differential states */
     std::vector<Variable> x;
     
@@ -145,10 +148,13 @@ namespace CasADi{
      */
     //@{
       
-    /// Explicit or implicit ODE
+    /// Fully implific DAE
+    SX dae;
+
+    /// Explicit ODE
     SX ode;
     
-    /// Algebraic equations
+    /// Algebraic constraints
     SX alg;
     
     /// Quadrature equations
@@ -253,6 +259,9 @@ namespace CasADi{
     /// Eliminate quadrature states and turn them into ODE states
     void eliminateQuadratureStates();
     
+    /// Identify the algebraic variables and separate them from the states
+    void identifyAlg();
+
     /// Sort the ODE and differential states
     void sortODE();
 
@@ -347,7 +356,7 @@ namespace CasADi{
     std::map<std::string,Variable> varmap_;
 
     /// Read an equation
-    SX readExpr(const XMLNode& odenode, bool& has_der);
+    SX readExpr(const XMLNode& odenode);
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);

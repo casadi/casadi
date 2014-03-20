@@ -65,6 +65,9 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
+# Separate algebraic variables
+ocp.identifyAlg()
+
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
@@ -137,6 +140,9 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
+# Separate algebraic variables
+ocp.identifyAlg()
+
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
@@ -200,6 +206,9 @@ comp("BasicVolumeTest")
 # Allocate a parser and load the xml
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeTest.xml')
+
+# Separate algebraic variables
+ocp.identifyAlg()
 
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
@@ -274,6 +283,9 @@ comp("CtrlFlowSystem")
 # Allocate a parser and load the xml
 ocp = SymbolicOCP()
 ocp.parseFMI('CtrlFlowSystem.xml')
+
+# Separate algebraic variables
+ocp.identifyAlg()
 
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()

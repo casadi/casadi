@@ -44,6 +44,9 @@ int main(){
   // Load the XML file
   ocp.parseFMI("../examples/xml_files/cstr.xml");
 
+  // Identify the algebraic variables and separate them from the states
+  ocp.identifyAlg();
+
   // Scale the variables
   ocp.scaleVariables();
 

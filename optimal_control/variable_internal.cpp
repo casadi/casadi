@@ -52,7 +52,6 @@ namespace CasADi{
     unit_ = "";
     displayUnit_ = "";
     free_ = false;
-    is_differential_ = false;
 
     index_ = -1;
   }
