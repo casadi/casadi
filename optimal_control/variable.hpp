@@ -61,82 +61,92 @@ namespace CasADi{
     CAT_ALGEBRAIC
   };
 
-  // Forward declaration
-  class VariableInternal;
-
   /** \brief Smart pointer class to a Variable
    *  
    *  A Variable is an SX expression with meta-data attached.
    */
-  class Variable : public SharedObject{
-  public:
+  struct Variable : public PrintableObject{
     
-    /// Default (empty) constructor
+    /// Default constructor
     Variable();
 
     /// Create a new variable
     explicit Variable(const std::string& name);
     
-    /// Destructor
-    virtual ~Variable();
-        
     /// Variable name
     std::string name() const;
 
     /// Variable expression
+    SX v; 
+
+    // Derivative expression
+    SX d;            
+
+    /// Variability (see Fritzon)
+    Variability variability;
+
+    /// Causality (see Fritzon)
+    Causality causality;
+
+    /// Variable category
+    Category category;
+
+    /// Is the variable is an alias variable?
+    Alias alias;
     
-    /// Differential expression
+    /// Description
+    std::string description;
+
+    /// Variable reference (XML)
+    int valueReference;
+    
+    /// Nominal value
+    double nominal;
+    
+    /// Value at time 0
+    double start;
+
+    /// Lower bound
+    double min;
+
+    /// Upper bound
+    double max;
+
+    /// Derivative at time 0
+    double derivativeStart;
+
+    /// Initial guess
+    double initialGuess;
+    
+    /// Unit
+    std::string unit;
+
+    /// Display unit
+    std::string displayUnit;
+    
+    /// Variable index
+    int index;
+
+    /// Free attribute
+    bool free;
 
     /// Timed variable (never allocate)
     SX atTime(double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
     SX atTime(double t, bool allocate=false);
-    
-    /// Variable index
         
-    /// Access functions of the node
-    VariableInternal* operator->();
+  private:
+#ifndef SWIG
 
-    /// Const access functions of the node
-    const VariableInternal* operator->() const;
+    // Timed variables
+    std::map<double,SX> timed_sx_;
 
-    /// Variability (see Fritzon)
+    // Print
+    virtual void repr(std::ostream &stream) const;
+    virtual void print(std::ostream &stream) const;
+#endif // SWIG
 
-    /// Causality (see Fritzon)
-
-    /// Variable category
-
-    /// Is the variable is an alias variable?
-    
-    /// Description
-
-    /// Variable reference (XML)
-    
-    /// Nominal value
-
-    /// Value at time 0
-
-    /// Lower bound
-
-    /// Upper bound
-
-    /// Derivative at time 0
-
-    /// Unit
-
-    /// Display unit
-    
-    /// Expression
-
-    /// Derivative expression
-                
-    /// Variable index
-
-    /// Free attribute
-        
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
   };
 } // namespace CasADi
 

@@ -20,8 +20,8 @@
  *
  */
 
-#include "variable_internal.hpp"
 #include "../symbolic/casadi_exception.hpp"
+#include "variable.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -30,35 +30,68 @@ namespace CasADi{
   }
 
   Variable::Variable(const string& name){
-    assignNode(new VariableInternal(name));
+    this->v = SX::sym(name);
+    this->d = SX::sym("der_" + name);
+    this->variability = CONTINUOUS;
+    this->causality = INTERNAL;
+    this->category = CAT_UNKNOWN;
+    this->alias = NO_ALIAS;
+    this->description = "";
+    this->valueReference = -1; //?
+    this->min = -numeric_limits<double>::infinity();
+    this->max = numeric_limits<double>::infinity();
+    this->initialGuess = 0;
+    this->nominal = 1.0;
+    this->start = 0.0;
+    this->derivativeStart = 0.0;
+    this->unit = "";
+    this->displayUnit = "";
+    this->free = false;
+    this->index = -1;
   }
 
-  Variable::~Variable(){
-  }
-
-  VariableInternal* Variable::operator->(){
-    return static_cast<VariableInternal*>(SharedObject::operator->());
-  }
-
-  const VariableInternal* Variable::operator->() const{
-    return static_cast<const VariableInternal*>(SharedObject::operator->());
-  }
-  
   string Variable::name() const{
-    return (*this)->var_.getName();
-  }
-
-  bool Variable::checkNode() const{
-    return dynamic_cast<const VariableInternal*>(get())!=0;
+    return this->v.getName();
   }
 
   SX Variable::atTime(double t, bool allocate) const{
-    return (*this)->atTime(t,allocate);
+    casadi_assert(!allocate);
+    return const_cast<Variable*>(this)->atTime(t,false);
   }
 
   SX Variable::atTime(double t, bool allocate){
-    return (*this)->atTime(t,allocate);
+    // Find an existing element
+    map<double,SX>::const_iterator it = timed_sx_.find(t);
+  
+    // If not found
+    if(it==timed_sx_.end()){
+      if(allocate){
+        // Create a timed variable
+        stringstream ss;
+        ss << name() << ".atTime(" << t << ")";
+        SX tvar = SX::sym(ss.str());
+      
+        // Save to map
+        timed_sx_[t] = tvar;
+      
+        // Return the expression
+        return tvar;
+      } else {
+        casadi_error(" has no timed variable with t = " << t << ".");
+      }
+    
+    } else {
+      // Return the expression
+      return it->second;
+    }    
   }
 
+  void Variable::repr(ostream &stream) const{
+    stream << name();
+  }
+
+  void Variable::print(ostream &stream) const{
+    stream << name();
+  }
 
 } // namespace CasADi

@@ -21,7 +21,6 @@
  */
 
 #include "symbolic_ocp.hpp"
-#include "variable_internal.hpp"
 #include "xml_node.hpp"
 
 #include <map>
@@ -100,67 +99,67 @@ namespace CasADi{
           Variable var(name);
         
           // Value reference
-          var->valueReference_ = valueReference;
+          var.valueReference = valueReference;
         
           // Variability
           if(variability.compare("constant")==0)
-            var->variability_ = CONSTANT;
+            var.variability = CONSTANT;
           else if(variability.compare("parameter")==0)
-            var->variability_ = PARAMETER;
+            var.variability = PARAMETER;
           else if(variability.compare("discrete")==0)
-            var->variability_ = DISCRETE;
+            var.variability = DISCRETE;
           else if(variability.compare("continuous")==0)
-            var->variability_ = CONTINUOUS;
+            var.variability = CONTINUOUS;
           else throw CasadiException("Unknown variability");
     
           // Causality
           if(causality.compare("input")==0)
-            var->causality_ = INPUT;
+            var.causality = INPUT;
           else if(causality.compare("output")==0)
-            var->causality_ = OUTPUT;
+            var.causality = OUTPUT;
           else if(causality.compare("internal")==0)
-            var->causality_ = INTERNAL;
+            var.causality = INTERNAL;
           else throw CasadiException("Unknown causality");
         
           // Alias
           if(alias.compare("noAlias")==0)
-            var->alias_ = NO_ALIAS;
+            var.alias = NO_ALIAS;
           else if(alias.compare("alias")==0)
-            var->alias_ = ALIAS;
+            var.alias = ALIAS;
           else if(alias.compare("negatedAlias")==0)
-            var->alias_ = NEGATED_ALIAS;
+            var.alias = NEGATED_ALIAS;
           else throw CasadiException("Unknown alias");
         
           // Other properties
           if(vnode.hasChild("Real")){
             const XMLNode& props = vnode["Real"];
-            props.readAttribute("unit",var->unit_,false);
-            props.readAttribute("displayUnit",var->displayUnit_,false);
-            props.readAttribute("min",var->min_,false);
-            props.readAttribute("max",var->max_,false);
-            props.readAttribute("start",var->start_,false);
-            props.readAttribute("nominal",var->nominal_,false);
-            props.readAttribute("free",var->free_,false);
-            props.readAttribute("initialGuess",var->initial_guess_,false);
+            props.readAttribute("unit",var.unit,false);
+            props.readAttribute("displayUnit",var.displayUnit,false);
+            props.readAttribute("min",var.min,false);
+            props.readAttribute("max",var.max,false);
+            props.readAttribute("start",var.start,false);
+            props.readAttribute("nominal",var.nominal,false);
+            props.readAttribute("free",var.free,false);
+            props.readAttribute("initialGuess",var.initialGuess,false);
           }
         
           // Variable category
           if(vnode.hasChild("VariableCategory")){
             string cat = vnode["VariableCategory"].getText();
             if(cat.compare("derivative")==0)
-              var->category_ = CAT_DERIVATIVE;
+              var.category = CAT_DERIVATIVE;
             else if(cat.compare("state")==0)
-              var->category_ = CAT_STATE;
+              var.category = CAT_STATE;
             else if(cat.compare("dependentConstant")==0)
-              var->category_ = CAT_DEPENDENT_CONSTANT;
+              var.category = CAT_DEPENDENT_CONSTANT;
             else if(cat.compare("independentConstant")==0)
-              var->category_ = CAT_INDEPENDENT_CONSTANT;
+              var.category = CAT_INDEPENDENT_CONSTANT;
             else if(cat.compare("dependentParameter")==0)
-              var->category_ = CAT_DEPENDENT_PARAMETER;
+              var.category = CAT_DEPENDENT_PARAMETER;
             else if(cat.compare("independentParameter")==0)
-              var->category_ = CAT_INDEPENDENT_PARAMETER;
+              var.category = CAT_INDEPENDENT_PARAMETER;
             else if(cat.compare("algebraic")==0)
-              var->category_ = CAT_ALGEBRAIC;
+              var.category = CAT_ALGEBRAIC;
             else throw CasadiException("Unknown variable category: " + cat);
           }
         
@@ -187,7 +186,7 @@ namespace CasADi{
         SX bexpr = readExpr(beq[1][0]);
       
         // Add binding equation
-        this->y.append(var->var_);
+        this->y.append(var.v);
         this->dep.append(bexpr);
       }
     
@@ -414,13 +413,13 @@ namespace CasADi{
       return cos(readExpr(node[0]));
     } else if(name.compare("Der")==0){
       Variable v = readVariable(node[0]);
-      return v->der_;
+      return v.d;
     } else if(name.compare("Div")==0){
       return readExpr(node[0]) / readExpr(node[1]);
     } else if(name.compare("Exp")==0){
       return exp(readExpr(node[0]));
     } else if(name.compare("Identifier")==0){
-      return readVariable(node)->var_;
+      return readVariable(node).v;
     } else if(name.compare("IntegerLiteral")==0){
       int val;
       node.getText(val);
@@ -632,22 +631,22 @@ namespace CasADi{
     
       // Create a new quadrature state
       Variable qv(q_name.str());
-      qv->variability_ = CONTINUOUS;
-      qv->causality_ = INTERNAL;
-      qv->start_ = 0.0;
-      if(tf==tf) qv->nominal_ = this->tf; // if not not-a-number
+      qv.variability = CONTINUOUS;
+      qv.causality = INTERNAL;
+      qv.start = 0.0;
+      if(tf==tf) qv.nominal = this->tf; // if not not-a-number
   
       // Add to the list of variables
       addVariable(q_name.str(),qv);
     
       // Add to the quadrature states
-      this->q.append(qv->var_);
+      this->q.append(qv.v);
 
       // Add the Lagrange term to the list of quadratures
       this->quad.append(*it);
     
       // Add to the list of Mayer terms
-      this->mterm.append(qv->var_);
+      this->mterm.append(qv.v);
     }
   
     // Remove the Lagrange terms
@@ -1048,34 +1047,34 @@ namespace CasADi{
     varmap_[name] = var;
   
     // Sort by category
-    switch(var->category_){
+    switch(var.category){
     case CAT_DERIVATIVE:
       // Skip derivatives
       break;
     case CAT_STATE:
-      this->s.append(var->var_);
+      this->s.append(var.v);
       break;
     case CAT_DEPENDENT_CONSTANT:
-      this->cd.append(var->var_);
+      this->cd.append(var.v);
       break;
     case CAT_INDEPENDENT_CONSTANT:
-      this->ci.append(var->var_);
+      this->ci.append(var.v);
       break;
     case CAT_DEPENDENT_PARAMETER:
-      this->pd.append(var->var_);
+      this->pd.append(var.v);
       break;
     case CAT_INDEPENDENT_PARAMETER:
-      if(var->free_){
-        this->pf.append(var->var_);
+      if(var.free){
+        this->pf.append(var.v);
       } else {
-        this->pi.append(var->var_);
+        this->pi.append(var.v);
       }
       break;
     case CAT_ALGEBRAIC:
-      if(var->causality_ == INTERNAL){
-        this->s.append(var->var_);
-      } else if(var->causality_ == INPUT){
-        this->u.append(var->var_);
+      if(var.causality == INTERNAL){
+        this->s.append(var.v);
+      } else if(var.causality == INPUT){
+        this->u.append(var.v);
       }
       break;
     default:
@@ -1381,11 +1380,11 @@ namespace CasADi{
   }
 
   SX SymbolicOCP::operator()(const std::string& name) const{
-    return variable(name)->var_;
+    return variable(name).v;
   }
 
   SX SymbolicOCP::der(const std::string& name) const{
-    return variable(name)->der_;
+    return variable(name).d;
   } 
 
   SX SymbolicOCP::der(const SX& var) const{
@@ -1398,56 +1397,56 @@ namespace CasADi{
   }
 
   double SymbolicOCP::nominal(const std::string& name) const{
-    return variable(name)->nominal_;
+    return variable(name).nominal;
   }
 
   void SymbolicOCP::setNominal(const std::string& name, double val){
-    variable(name)->nominal_ = val;
+    variable(name).nominal = val;
   }
 
   double SymbolicOCP::min(const std::string& name, bool nominal) const{
     const Variable& v = variable(name);
-    return nominal ? v->min_ / v->nominal_ : v->min_;
+    return nominal ? v.min / v.nominal : v.min;
   }
 
   void SymbolicOCP::setMin(const std::string& name, double val){
-    variable(name)->min_ = val;
+    variable(name).min = val;
   }
 
   double SymbolicOCP::max(const std::string& name, bool nominal) const{
     const Variable& v = variable(name);
-    return nominal ? v->max_ / v->nominal_ : v->max_;
+    return nominal ? v.max / v.nominal : v.max;
   }
 
   void SymbolicOCP::setMax(const std::string& name, double val){
-    variable(name)->max_ = val;
+    variable(name).max = val;
   }
 
   double SymbolicOCP::start(const std::string& name, bool nominal) const{
     const Variable& v = variable(name);
-    return nominal ? v->start_ / v->nominal_ : v->start_;
+    return nominal ? v.start / v.nominal : v.start;
   }
 
   void SymbolicOCP::setStart(const std::string& name, double val){
-    variable(name)->start_ = val;
+    variable(name).start = val;
   }
 
   double SymbolicOCP::initialGuess(const std::string& name, bool nominal) const{
     const Variable& v = variable(name);
-    return nominal ? v->initial_guess_ / v->nominal_ : v->initial_guess_;
+    return nominal ? v.initialGuess / v.nominal : v.initialGuess;
   }
 
   void SymbolicOCP::setInitialGuess(const std::string& name, double val){
-    variable(name)->initial_guess_ = val;
+    variable(name).initialGuess = val;
   }
 
   double SymbolicOCP::derivativeStart(const std::string& name, bool nominal) const{
     const Variable& v = variable(name);
-    return nominal ? v->derivative_start_ / v->nominal_ : v->derivative_start_;
+    return nominal ? v.derivativeStart / v.nominal : v.derivativeStart;
   }
 
   void SymbolicOCP::setDerivativeStart(const std::string& name, double val){
-    variable(name)->derivative_start_ = val;
+    variable(name).derivativeStart = val;
   }
 
   SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate) const{
@@ -1591,7 +1590,7 @@ namespace CasADi{
   }
 
   std::string SymbolicOCP::unit(const std::string& name) const{
-    return variable(name)->unit_;
+    return variable(name).unit;
   }
 
   std::string SymbolicOCP::unit(const SX& var) const{
@@ -1608,7 +1607,7 @@ namespace CasADi{
   }
 
   void SymbolicOCP::setUnit(const std::string& name, const std::string& val){
-    variable(name)->unit_ = val;
+    variable(name).unit = val;
   }
 
 
