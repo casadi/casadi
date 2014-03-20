@@ -59,8 +59,8 @@ void updateDependent(SymbolicOCP& ocp){
   f.init();
   
   // Evaluate the start attribute
-  f.setInput(getStart(ocp.ci),0);
-  f.setInput(getStart(ocp.pi),1);
+  f.setInput(ocp.start(var(ocp.ci)),0);
+  f.setInput(ocp.start(var(ocp.pi)),1);
   f.evaluate();
   const vector<double>& res = f.output().data();
   

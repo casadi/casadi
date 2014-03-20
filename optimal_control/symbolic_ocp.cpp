@@ -689,12 +689,12 @@ namespace CasADi{
     
     // Nominal values
     SX t_n = 1.;
-    SX s_n = getNominal(this->s);
-    SX x_n = getNominal(this->x);
-    SX z_n = getNominal(this->z);
-    SX pi_n = getNominal(this->pi);
-    SX pf_n = getNominal(this->pf);
-    SX u_n = getNominal(this->u);
+    SX s_n = nominal(_s);
+    SX x_n = nominal(_x);
+    SX z_n = nominal(_z);
+    SX pi_n = nominal(_pi);
+    SX pf_n = nominal(_pf);
+    SX u_n = nominal(_u);
   
     // Get all the old variables in expressed in the nominal ones
     SX v_old;
@@ -755,12 +755,12 @@ namespace CasADi{
     // Evaluate the Jacobian in the starting point
     J.init();
     J.setInput(0.0,T);
-    J.setInput(getStart(x,true),X);
+    J.setInput(start(var(this->x),true),X);
     J.input(XDOT).setAll(0.0);
-    J.setInput(getStart(z,true),Z);
-    J.setInput(getStart(pi,true),PI);
-    J.setInput(getStart(pf,true),PF);
-    J.setInput(getStart(u,true),U);
+    J.setInput(start(var(this->z),true),Z);
+    J.setInput(start(var(this->pi),true),PI);
+    J.setInput(start(var(this->pf),true),PF);
+    J.setInput(start(var(this->u),true),U);
     J.evaluate();
   
     // Get the maximum of every row

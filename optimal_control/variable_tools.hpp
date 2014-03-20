@@ -38,24 +38,6 @@ namespace CasADi{
   std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal=false);
 #endif // SWIG
   
-  /// Get a vector of the nominal values of a vector of variables
-  std::vector<double> getNominal(const std::vector<Variable> v);
-
-  /// Get a vector of the values at the initial time for a vector of variables
-  std::vector<double> getStart(const std::vector<Variable> v, bool nominal=false);
-
-  /// Get a vector of the values of the derivative at the initial time for a vector of variables
-  std::vector<double> getDerivativeStart(const std::vector<Variable> v, bool nominal=false);
-
-  /// Get a upper bounds
-  std::vector<double> getMax(const std::vector<Variable> v, bool nominal=false);
-
-  /// Get a lower bounds
-  std::vector<double> getMin(const std::vector<Variable> v, bool nominal=false);
-
-  /// Get the initial guess
-  std::vector<double> getInitialGuess(const std::vector<Variable> v, bool nominal=false);
-
 } // namespace CasADi
 
 #endif // VARIABLE_TOOLS_HPP

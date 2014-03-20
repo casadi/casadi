@@ -111,7 +111,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(var(ocp.x))
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -185,7 +185,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(var(ocp.x))
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -254,7 +254,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(var(ocp.x))
 simulator.setInput(x0,"x0")
 
 # Simulate

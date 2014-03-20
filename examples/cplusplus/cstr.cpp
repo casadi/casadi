@@ -77,14 +77,14 @@ int main(){
   SX u = var(ocp.u);
     
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.x,true);
-  vector<double> xmin = getMin(ocp.x,true);
-  vector<double> xmax = getMax(ocp.x,true);
+  vector<double> x0 = ocp.start(var(ocp.x),true);
+  vector<double> xmin = ocp.min(var(ocp.x),true);
+  vector<double> xmax = ocp.max(var(ocp.x),true);
   
   // Initial guess and bounds for the control
-  vector<double> u0 = getStart(ocp.u,true);
-  vector<double> umin = getMin(ocp.u,true);
-  vector<double> umax = getMax(ocp.u,true);
+  vector<double> u0 = ocp.start(var(ocp.u),true);
+  vector<double> umin = ocp.min(var(ocp.u),true);
+  vector<double> umax = ocp.max(var(ocp.u),true);
   
   // Number of shooting nodes
   int num_nodes = 100;
