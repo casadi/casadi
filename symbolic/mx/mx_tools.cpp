@@ -31,8 +31,49 @@ using namespace std;
 
 namespace CasADi{
 
-  MX horzcat(const vector<MX>& comp){
-    return MXNode::getHorzcat(comp);
+  // Helper function
+  bool has_empty(const vector<MX>& x){
+    for(vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i){
+      if(i->isEmpty()) return true;
+    }
+    return false;
+  }
+
+  vector<MX> trim_empty(const vector<MX>& x){
+    vector<MX> ret;
+    for(vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i){
+      if(!i->isEmpty()) ret.push_back(*i);
+    }
+    return ret;
+  }
+
+  MX horzcat(const vector<MX>& x){
+    if(x.empty()){
+      return MX();
+    } else if(x.size()==1){
+      return x.front();
+    } else if(has_empty(x)){
+      return horzcat(trim_empty(x));
+    } else {
+      return x.front()->getHorzcat(x);
+    }
+  }
+
+  MX vertcat(const vector<MX>& x){
+    if(x.empty()){
+      return MX();
+    } else if(x.size()==1){
+      return x.front();
+    } else if(has_empty(x)){
+      return vertcat(trim_empty(x));
+    } else if(!x.front().isVector()){
+      // Vertcat operation only supports vectors, rewrite using horzcat
+      vector<MX> xT = x;
+      for(vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
+      return horzcat(xT).T();
+    } else {
+      return x.front()->getVertcat(x);
+    }
   }
 
   std::vector<MX> horzsplit(const MX& x, const std::vector<int>& offset){
@@ -55,23 +96,6 @@ namespace CasADi{
   std::vector<MX> horzsplit(const MX& x, int incr){
     casadi_assert(incr>=1);
     return horzsplit(x,range(0,x.size2(),incr));
-  }
-
-  MX vertcat(const vector<MX>& comp){
-    // Check if vector
-    bool is_vector = true;
-    for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it){
-      // Rewrite with horzcat and transpose if not a vector
-      if(!it->isEmpty(true) && !(it->size1()==0 && it->size2()==0) && !it->isVector()){
-        vector<MX> v(comp.size());
-        for(int i=0; i<v.size(); ++i)
-          v[i] = comp[i].T();
-        return horzcat(v).T();
-      }
-    }
-
-    // Vector if reached this point
-    return MXNode::getVertcat(comp);
   }
   
   std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset){

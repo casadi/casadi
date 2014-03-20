@@ -123,7 +123,7 @@ void IpoptUserClass::finalize_solution(SolverReturn status,
                                   const IpoptData* ip_data,
                                   IpoptCalculatedQuantities* ip_cq)
 {
-  solver->finalize_solution(x,z_L,z_U,g,lambda,obj_value, ip_data->iter_count());
+  solver->finalize_solution(x,z_L,z_U,g,lambda,obj_value, ip_data? ip_data->iter_count(): 0);
 }
 
   

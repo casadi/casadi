@@ -67,6 +67,12 @@ class NZproxy:
 
   def __setitem__(self,s,val):
     return self.matrix.__NZsetitem__(s,val)
+
+  def __len__(self):
+    return self.matrix.size()
+    
+  def __iter__(self):
+      return self.matrix.data().__iter__()
 %}
 
 %define %matrix_convertors
@@ -467,8 +473,8 @@ int meta< CasADi::Slice >::as(PyObject * p,CasADi::Slice &m) {
     return true;
   } else if (PySlice_Check(p)) {
     PySliceObject *r = (PySliceObject*)(p);
-    m.start_ = (r->start == Py_None) ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
-    m.stop_  = (r->stop ==Py_None) ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop) ;
+    m.start_ = (r->start == Py_None || PyInt_AsLong(r->start) < std::numeric_limits<int>::min()) ? std::numeric_limits<int>::min() : PyInt_AsLong(r->start);
+    m.stop_  = (r->stop ==Py_None || PyInt_AsLong(r->stop)> std::numeric_limits<int>::max()) ? std::numeric_limits<int>::max() : PyInt_AsLong(r->stop) ;
     if(r->step !=Py_None) m.step_  = PyInt_AsLong(r->step);
     return true;
   } else {

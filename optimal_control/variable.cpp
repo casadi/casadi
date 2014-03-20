@@ -29,16 +29,9 @@ namespace CasADi{
   Variable::Variable(){
   }
 
-  Variable::Variable(const string& name, bool create_expression){
+  Variable::Variable(const string& name){
     assignNode(new VariableInternal(name));
-    if(create_expression){
-      setExpression(SXElement::sym(name));
-      setDerivative(SXElement::sym("der_" + name));
-      setBinding(var(),false);
-      setBinding(der(),true);
-    }
   }
-
 
   Variable::~Variable(){
   }
@@ -51,15 +44,15 @@ namespace CasADi{
     return static_cast<const VariableInternal*>(SharedObject::operator->());
   }
   
-  SXElement Variable::der() const{
+  SX Variable::der() const{
     return (*this)->der_;
   }
 
-  SXElement Variable::var() const{
+  SX Variable::var() const{
     return (*this)->var_;
   }
 
-  SXElement Variable::binding(bool derivative) const{
+  SX Variable::binding(bool derivative) const{
     if(derivative){
       return (*this)->der_binding_;
     } else {
@@ -67,12 +60,8 @@ namespace CasADi{
     }
   }
 
-  const string& Variable::getName() const{
-    return (*this)->name_;
-  }
-
-  void Variable::setName(const string& name){
-    (*this)->name_ = name;
+  string Variable::getName() const{
+    return (*this)->var_.getName();
   }
 
   Variability Variable::getVariability() const{
@@ -219,15 +208,15 @@ namespace CasADi{
     (*this)->displayUnit_ = displayUnit;
   }
 
-  void Variable::setExpression(const SXElement& v){
+  void Variable::setExpression(const SX& v){
     (*this)->var_ = v;
   }
 
-  void Variable::setDerivative(const SXElement& d){
+  void Variable::setDerivative(const SX& d){
     (*this)->der_ = d;
   }
 
-  void Variable::setBinding(const SXElement& binding, bool derivative){
+  void Variable::setBinding(const SX& binding, bool derivative){
     if(derivative){
       (*this)->der_binding_ = binding;
     } else {
@@ -239,11 +228,11 @@ namespace CasADi{
     return dynamic_cast<const VariableInternal*>(get())!=0;
   }
 
-  SXElement Variable::atTime(double t, bool allocate) const{
+  SX Variable::atTime(double t, bool allocate) const{
     return (*this)->atTime(t,allocate);
   }
 
-  SXElement Variable::atTime(double t, bool allocate){
+  SX Variable::atTime(double t, bool allocate){
     return (*this)->atTime(t,allocate);
   }
 
@@ -261,14 +250,6 @@ namespace CasADi{
 
   void Variable::setDifferential(bool is_differential){
     (*this)->is_differential_ = is_differential;
-  }
-
-  SXElement Variable::highest() const{
-    if(isDifferential()){
-      return der();
-    } else {
-      return var();
-    }
   }
 
   bool Variable::getFree() const{

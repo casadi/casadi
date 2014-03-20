@@ -26,16 +26,16 @@
 using namespace std;
 namespace CasADi{
   
-  VariableInternal::VariableInternal(const string& name) : name_(name){
-    // No expression by default
-    var_ = casadi_limits<SXElement>::nan;
-  
-    // Not differentable by default
-    der_ = casadi_limits<SXElement>::nan;
-    
-    // Not binding expressions by default
-    binding_ = casadi_limits<SXElement>::nan;
-    der_binding_ = casadi_limits<SXElement>::nan;
+  VariableInternal::VariableInternal(const string& name){
+    // Symbolic expression for the variable
+    var_ = SX::sym(name);
+
+    // Symbolic expression for the time derivative of the variable
+    der_ = SX::sym("der_" + name);
+
+    // Set binding expressions
+    binding_ = var_;
+    der_binding_ = der_;
     
     variability_ = CONTINUOUS;
     causality_ = INTERNAL;
@@ -60,35 +60,31 @@ namespace CasADi{
   VariableInternal::~VariableInternal(){
   }
 
-  const string& VariableInternal::getName() const{
-    return name_;
-  }
-
   void VariableInternal::repr(ostream &stream) const{
-    stream << name_;
+    var_.print(stream);
   }
 
 
   void VariableInternal::print(ostream &stream) const{
-    stream << name_;
+    var_.print(stream);
   }
 
-  SXElement VariableInternal::atTime(double t, bool allocate) const{
+  SX VariableInternal::atTime(double t, bool allocate) const{
     casadi_assert(!allocate);
     return const_cast<VariableInternal*>(this)->atTime(t,false);
   }
 
-  SXElement VariableInternal::atTime(double t, bool allocate){
+  SX VariableInternal::atTime(double t, bool allocate){
     // Find an existing element
-    map<double,SXElement>::const_iterator it = timed_sx_.find(t);
+    map<double,SX>::const_iterator it = timed_sx_.find(t);
   
     // If not found
     if(it==timed_sx_.end()){
       if(allocate){
         // Create a timed variable
         stringstream ss;
-        ss << var_ << ".atTime(" << t << ")";
-        SXElement tvar = SXElement::sym(ss.str());
+        ss << var_.getName() << ".atTime(" << t << ")";
+        SX tvar = SX::sym(ss.str());
       
         // Save to map
         timed_sx_[t] = tvar;

@@ -26,31 +26,27 @@ using namespace std;
 namespace CasADi{
 
   SX var(const vector<Variable> v){
-    vector<SXElement> ret(v.size());
+    if(v.empty()) return SX::zeros(0,1);
+    vector<SX> ret(v.size());
     for(int i=0; i<v.size(); ++i)
       ret[i] = v[i].var();
-    return ret;
+    return vertcat(ret);
   }
     
   SX der(const vector<Variable> v){
-    vector<SXElement> ret(v.size());
+    if(v.empty()) return SX::zeros(0,1);
+    vector<SX> ret(v.size());
     for(int i=0; i<v.size(); ++i)
       ret[i] = v[i].der();
-    return ret;
+    return vertcat(ret);
   }
     
-  SX highest(const vector<Variable> v){
-    vector<SXElement> ret(v.size());
-    for(int i=0; i<v.size(); ++i)
-      ret[i] = v[i].highest();
-    return ret;
-  }
-
   SX binding(const vector<Variable> v){
-    vector<SXElement> ret(v.size());
+    if(v.empty()) return SX::zeros(0,1);
+    vector<SX> ret(v.size());
     for(int i=0; i<v.size(); ++i)
       ret[i] = v[i].binding();
-    return ret;
+    return vertcat(ret);
   }
 
   vector<double> getNominal(const vector<Variable> v){

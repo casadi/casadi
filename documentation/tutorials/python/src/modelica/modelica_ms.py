@@ -35,8 +35,11 @@ fmux.extract('modelDescription.xml','.')
 #$ The logic for importing Modelica models is located in the SymbolicOCP class:
 from casadi import *
 ocp = SymbolicOCP()
-parse_options = {"eliminate_dependent":True}
-ocp.parseFMI("modelDescription.xml",parse_options)
+
+ocp.parseFMI("modelDescription.xml")
+ocp.eliminateInterdependencies()
+ocp.eliminateDependent()
+
 #! Let us have a look at the flat optimal control problem:
 print ocp
 #$ As we see, the optimal control problem (OCP) has two differential states (cstr.c and cstr.T),

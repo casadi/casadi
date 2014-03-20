@@ -268,16 +268,16 @@ namespace CasADi{
     virtual Matrix<int> mapping() const;
 
     /// Create a horizontal concatenation node
-    static MX getHorzcat(const std::vector<MX>& x);
+    virtual MX getHorzcat(const std::vector<MX>& x) const;
 
     /// Create a horizontal split node
-    std::vector<MX> getHorzsplit(const std::vector<int>& output_offset) const;
+    virtual std::vector<MX> getHorzsplit(const std::vector<int>& output_offset) const;
 
     /// Create a vertical concatenation node (vectors only)
-    static MX getVertcat(const std::vector<MX>& x);
+    virtual MX getVertcat(const std::vector<MX>& x) const;
 
     /// Create a vertical split node (vectors only)
-    std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
+    virtual std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
 
     /// Transpose
     virtual MX getTranspose() const;

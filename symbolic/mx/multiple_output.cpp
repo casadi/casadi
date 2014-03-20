@@ -28,38 +28,38 @@ using namespace std;
 
 namespace CasADi{
 
-MultipleOutput::MultipleOutput(){
-}
-
-MultipleOutput::~MultipleOutput(){
-}
-
-MX MultipleOutput::getOutput(int oind) const{
-  MX this_ = shared_from_this<MX>();
-  return MX::create(new OutputNode(this_,oind));
-}
-
-OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind){
-  setDependencies(parent);
-  
-  // Save the sparsity pattern
-  setSparsity(dep(0)->sparsity(oind));
-}
-
-OutputNode::~OutputNode(){
-}
-
-void OutputNode::printPart(std::ostream &stream, int part) const{
-  if(part==0){
-    if(ndep()>1)
-      stream << "[";
-  } else if(part==ndep()){
-    if(ndep()>1)
-      stream << "]";
-    stream << "{" << oind_ << "}";
-  } else {
-    stream << ",";
+  MultipleOutput::MultipleOutput(){
   }
-}
+
+  MultipleOutput::~MultipleOutput(){
+  }
+
+  MX MultipleOutput::getOutput(int oind) const{
+    MX this_ = shared_from_this<MX>();
+    return MX::create(new OutputNode(this_,oind));
+  }
+
+  OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind){
+    setDependencies(parent);
+  
+    // Save the sparsity pattern
+    setSparsity(dep(0)->sparsity(oind));
+  }
+
+  OutputNode::~OutputNode(){
+  }
+
+  void OutputNode::printPart(std::ostream &stream, int part) const{
+    if(part==0){
+      if(ndep()>1)
+        stream << "[";
+    } else if(part==ndep()){
+      if(ndep()>1)
+        stream << "]";
+      stream << "{" << oind_ << "}";
+    } else {
+      stream << ",";
+    }
+  }
 
 } // namespace CasADi

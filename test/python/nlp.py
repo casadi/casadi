@@ -1439,7 +1439,30 @@ class NLPtests(casadiTestCase):
       self.checkarray(solver.output("x"),DMatrix([1,1]),digits=7)
       self.checkarray(solver.output("lam_x"),DMatrix([0,0]),digits=7)
     
+  def test_pathological4(self):      
+    x=SX.sym("x")
+    nlp=SXFunction(nlpIn(x=x),nlpOut(f=x*x))
 
+    for Solver, solver_options in solvers:
+      self.message(str(Solver))
+      if "Worhp" in str(Solver): continue
+      solver = Solver(nlp)
+          
+      #solver.setOption("detect_linear",False)
+      solver.setOption("verbose",True)
+      solver.setOption(solver_options)
+
+      solver.init()
+      solver.setInput([0],"x0")
+      solver.setInput([0],"lbx")
+      solver.setInput([0],"ubx")
+      
+      solver.solve()
+      
+      self.checkarray(solver.output("f"),DMatrix([0]),digits=7)
+      self.checkarray(solver.output("x"),DMatrix([0]),digits=7)
+      self.checkarray(solver.output("lam_x"),DMatrix([0]),digits=7)
+      
 if __name__ == '__main__':
     unittest.main()
     print solvers

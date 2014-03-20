@@ -33,69 +33,69 @@ namespace CasADi{
   // All the types of variables in the SymbolicOCP class
   enum SymbolicOCPVariables{VAR_X, VAR_Z, VAR_Q, VAR_CI, VAR_CD, VAR_PI, VAR_PD, VAR_PF, VAR_Y, VAR_U, NUM_VAR};
   
-/** \brief A flat OCP representation coupled to an XML file
+  /** \brief A flat OCP representation coupled to an XML file
 
- <H3>Variables:  </H3>
-  \verbatim
-   x:      differential states
-   z:      algebraic states
-   p :     independent parameters
-   t :     time
-   u :     control signals
-   q :     quadrature states
-   y :     dependent variables
-  \endverbatim 
+      <H3>Variables:  </H3>
+      \verbatim
+      x:      differential states
+      z:      algebraic states
+      p :     independent parameters
+      t :     time
+      u :     control signals
+      q :     quadrature states
+      y :     dependent variables
+      \endverbatim 
 
-  <H3>Equations:  </H3>
-  \verbatim
-  explicit or implicit ODE: \dot{x} = ode(t,x,z,u,p_free,pi,pd)
-     or                           0 = ode(t,x,z,\dot{x},u,p_free,pi,pd)
-  algebraic equations:            0 = alg(t,x,z,u,p_free,pi,pd)
-  quadratures:              \dot{q} = quad(t,x,z,u,p_free,pi,pd)
-  dependent equations:            y = dep(t,x,z,u,p_free,pi,pd)
-  initial equations:              0 = initial(t,x,z,u,p_free,pi,pd)
-  \endverbatim 
+      <H3>Equations:  </H3>
+      \verbatim
+      explicit or implicit ODE: \dot{x} = ode(t,x,z,u,p_free,pi,pd)
+      or                           0 = ode(t,x,z,\dot{x},u,p_free,pi,pd)
+      algebraic equations:            0 = alg(t,x,z,u,p_free,pi,pd)
+      quadratures:              \dot{q} = quad(t,x,z,u,p_free,pi,pd)
+      dependent equations:            y = dep(t,x,z,u,p_free,pi,pd)
+      initial equations:              0 = initial(t,x,z,u,p_free,pi,pd)
+      \endverbatim 
 
-  <H3>Objective function terms:  </H3>
-  \verbatim
-  Mayer terms:          \sum{mterm_k}
-  Lagrange terms:       \sum{\integral{mterm}}
-  \endverbatim
+      <H3>Objective function terms:  </H3>
+      \verbatim
+      Mayer terms:          \sum{mterm_k}
+      Lagrange terms:       \sum{\integral{mterm}}
+      \endverbatim
 
-  Note that when parsed, all dynamic equations end up in the implicit category "dae". 
-  At a later state, the DAE can be reformulated, for example in semi-explicit form, 
-  possibly in addition to a set of quadrature states.
+      Note that when parsed, all dynamic equations end up in the implicit category "dae". 
+      At a later state, the DAE can be reformulated, for example in semi-explicit form, 
+      possibly in addition to a set of quadrature states.
  
-  The functions for reformulation is are provided as member functions to this class or as independent
-  functions located in the header file "ocp_tools.hpp".
+      The functions for reformulation is are provided as member functions to this class or as independent
+      functions located in the header file "ocp_tools.hpp".
 
-  <H3>Usage skeleton:</H3>
+      <H3>Usage skeleton:</H3>
   
-  1. Call default constructor 
-  > SymbolicOCP ocp;
+      1. Call default constructor 
+      > SymbolicOCP ocp;
   
-  2. Parse an FMI conformant XML file <BR>
-  > ocp.parseFMI(xml_file_name)
+      2. Parse an FMI conformant XML file <BR>
+      > ocp.parseFMI(xml_file_name)
   
-  3. Modify/add variables, equations, optimization <BR>
-  > ...
+      3. Modify/add variables, equations, optimization <BR>
+      > ...
   
-  When the optimal control problem is in a suitable form, it is possible to either generate functions
-  for numeric/symbolic evaluation or exporting the OCP formulation into a new FMI conformant XML file.
-  The latter functionality is not yet available.
+      When the optimal control problem is in a suitable form, it is possible to either generate functions
+      for numeric/symbolic evaluation or exporting the OCP formulation into a new FMI conformant XML file.
+      The latter functionality is not yet available.
 
-  \date 2012
-  \author Joel Andersson
-*/
-class SymbolicOCP : public PrintableObject{
+      \date 2012
+      \author Joel Andersson
+  */
+  class SymbolicOCP : public PrintableObject{
   public:
 
     /// Default constructor
     SymbolicOCP();
     
     /** @name Variables categories
-    *  Public data members
-    */
+     *  Public data members
+     */
     //@{
     /** \brief Time */
     SX t;
@@ -103,7 +103,7 @@ class SymbolicOCP : public PrintableObject{
     /** \brief Differential states */
     std::vector<Variable> x;
     
-    /** \brief Algebraic states */
+    /** \brief Algebraic variables */
     std::vector<Variable> z;
     
     /** \brief Quadrature states (length == quad().size()) */
@@ -116,15 +116,15 @@ class SymbolicOCP : public PrintableObject{
     std::vector<Variable> cd;
 
     /** \brief Independent parameters 
-     An independent parameter is a parameter whose value is determined by an expression that contains only literals: "parameter Real p1=2" or "parameter Boolean b(start=true)". In the latter case, the value of the parameter becomes true, and the Modelica compiler will generate a warning since there is no binding expression for the parameter. An independent parameter is fixed after the DAE has been initialized. */
+        An independent parameter is a parameter whose value is determined by an expression that contains only literals: "parameter Real p1=2" or "parameter Boolean b(start=true)". In the latter case, the value of the parameter becomes true, and the Modelica compiler will generate a warning since there is no binding expression for the parameter. An independent parameter is fixed after the DAE has been initialized. */
     std::vector<Variable> pi;
 
     /** \brief Dependent parameters 
-     A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */
+        A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */
     std::vector<Variable> pd;
 
     /** \brief Free parameters 
-     A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
+        A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
     std::vector<Variable> pf;
     
     /** \brief Dependent variables (length == dep().size()) */
@@ -134,15 +134,15 @@ class SymbolicOCP : public PrintableObject{
     std::vector<Variable> u;
 
     /** \brief Get all variables of a certain type */
-    std::vector<Variable>& variableByType(SymbolicOCPVariables type);
+    std::vector<Variable>& variableByType(int type);
     
     /** \brief Get all variables of a certain type */
-    const std::vector<Variable>& variableByType(SymbolicOCPVariables type) const;
+    const std::vector<Variable>& variableByType(int type) const;
     //@}
     
     /** @name Equations
-    *  Get all equations of a particular type 
-    */
+     *  Get all equations of a particular type 
+     */
     //@{
       
     /// Explicit or implicit ODE
@@ -162,7 +162,7 @@ class SymbolicOCP : public PrintableObject{
     //@}
     
     /** @name Time points
-    */
+     */
     //@{
 
     /// Interval start time
@@ -189,8 +189,8 @@ class SymbolicOCP : public PrintableObject{
     //@}
 
     /** @name Objective function terms
-    *  Terms in the objective function.
-    */
+     *  Terms in the objective function.
+     */
     //@{
       
     /// Mayer terms in the objective (point terms)
@@ -201,7 +201,7 @@ class SymbolicOCP : public PrintableObject{
     //@}
 
     /** @name Path constraints of the optimal control problem
-    */
+     */
     //@{
 
     /// Path constraint functions
@@ -212,7 +212,7 @@ class SymbolicOCP : public PrintableObject{
     //@}
 
     /** @name Point constraints of the optimal control problem
-    */
+     */
     //@{
 
     /// Point constraint functions
@@ -223,7 +223,7 @@ class SymbolicOCP : public PrintableObject{
     //@}
 
     /// Parse from XML to C++ format
-    void parseFMI(const std::string& filename, const Dictionary& options = Dictionary());
+    void parseFMI(const std::string& filename);
 
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
@@ -238,8 +238,8 @@ class SymbolicOCP : public PrintableObject{
     void makeAlgebraic(const std::string& name);
     
     /** @name Manipulation
-    *  Reformulate the dynamic optimization problem.
-    */
+     *  Reformulate the dynamic optimization problem.
+     */
     //@{
     /// Eliminate interdependencies in the dependent equations
     void eliminateInterdependencies();
@@ -275,7 +275,71 @@ class SymbolicOCP : public PrintableObject{
     void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
     
     //@}
+
+    /// Scale the variables
+    void scaleVariables();
     
+    /// Scale the implicit equations
+    void scaleEquations();
+
+    /// Find a variable by name 
+    std::pair<int,int> find(const std::string& name, bool error_if_not_found=true) const;
+
+    /// Find an expression by name
+    SX operator()(const std::string& name) const;
+
+    /// Get the nominal value for a component
+    double nominal(const std::string& name) const;
+
+    /// Set the nominal value for a component
+    void setNominal(const std::string& name, double val);
+
+    /// Get the lower bound for a component
+    double min(const std::string& name) const;
+
+    /// Set the upper bound for a component
+    void setMin(const std::string& name, double val);
+
+    /// Get the upper bound for a component
+    double max(const std::string& name) const;
+
+    /// Set the upper bound for a component
+    void setMax(const std::string& name, double val);
+
+    /// Get the value at time 0 for a component
+    double start(const std::string& name) const;
+
+    /// Set the value at time 0 for a component
+    void setStart(const std::string& name, double val);
+
+    /// Get the initial guess for a component
+    double initialGuess(const std::string& name) const;
+
+    /// Set the initial guess for a component
+    void setInitialGuess(const std::string& name, double val);
+
+    /// Get the derivative at time 0 for a component
+    double derivativeStart(const std::string& name) const;
+
+    /// Set the derivative at time 0 for a component
+    void setDerivativeStart(const std::string& name, double val);
+
+    /// Timed variable (never allocate)
+    SX atTime(const std::string& name, double t, bool allocate=false) const;
+
+    /// Timed variable (allocate if necessary)
+    SX atTime(const std::string& name, double t, bool allocate=false);
+
+#ifndef SWIG
+    ///  Print representation
+    virtual void repr(std::ostream &stream=std::cout) const;
+
+    /// Print description 
+    virtual void print(std::ostream &stream=std::cout) const;
+
+    // Internal methods
+  protected:
+
     /// Get the qualified name
     static std::string qualifiedName(const XMLNode& nn);
     
@@ -283,26 +347,14 @@ class SymbolicOCP : public PrintableObject{
     std::map<std::string,Variable> varmap_;
 
     /// Read an equation
-    SXElement readExpr(const XMLNode& odenode, bool& has_der, bool elim_binding);
+    SX readExpr(const XMLNode& odenode, bool& has_der);
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);
 
-    /// Scale the variables
-    void scaleVariables();
-    
-    /// Scale the implicit equations
-    void scaleEquations();
-    
-    #ifndef SWIG
-    ///  Print representation
-    virtual void repr(std::ostream &stream=std::cout) const;
+#endif // SWIG
 
-    /// Print description 
-    virtual void print(std::ostream &stream=std::cout) const;
-    #endif // SWIG
-
-};
+  };
 
 } // namespace CasADi
 

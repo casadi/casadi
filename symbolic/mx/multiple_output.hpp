@@ -29,15 +29,15 @@
 
 namespace CasADi{
 
-/// Forward declaration
-class OutputNode;
+  /// Forward declaration
+  class OutputNode;
   
-/** 
-  \author Joel Andersson 
-  \date 2010
-*/
-class MultipleOutput : public MXNode{
-  friend class OutputNode;
+  /** 
+      \author Joel Andersson 
+      \date 2010
+  */
+  class MultipleOutput : public MXNode{
+    friend class OutputNode;
   public:
 
     /** \brief  Constructor */
@@ -58,9 +58,9 @@ class MultipleOutput : public MXNode{
     /** \brief  Check if a multiple output node */
     virtual bool isMultipleOutput() const{return true;}
 
-};
+  };
 
-class OutputNode : public MXNode{
+  class OutputNode : public MXNode{
   public:
   
     /** \brief  Constructor */
@@ -89,17 +89,16 @@ class OutputNode : public MXNode{
 
     /** \brief Get the operation */
     virtual int getOp() const{ return -1;}
+
+    /// Create a horizontal concatenation node
+    virtual MX getHorzcat(const std::vector<MX>& x) const{ return dep()->getHorzcat(x);}
+
+    /// Create a vertical concatenation node (vectors only)
+    virtual MX getVertcat(const std::vector<MX>& x) const{ return dep()->getVertcat(x);}
     
     /** \brief  Output index */
     int oind_;
-};
-
-
-
-
-
-
-
+  };
 
 } // namespace CasADi
 

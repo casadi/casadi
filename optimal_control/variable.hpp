@@ -29,74 +29,71 @@
 
 namespace CasADi{
     
-    /// Time variability of a variable (see Fritzon page 89)
-    enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
+  /// Time variability of a variable (see Fritzon page 89)
+  enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
 
-    /// Causality of a variable
-    enum Causality{INPUT,OUTPUT,INTERNAL};
+  /// Causality of a variable
+  enum Causality{INPUT,OUTPUT,INTERNAL};
     
-    /// Dynamics of the variable
-    enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
+  /// Dynamics of the variable
+  enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
     
-    /// Dynamics of the variable
-    enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
+  /// Dynamics of the variable
+  enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
-    /// Variable category
-    enum Category{
-      /** Unknown, not set */
-      CAT_UNKNOWN,
-      /** A state derivative */
-      CAT_DERIVATIVE,
-      /** A differential state, i.e. a variable that appears differentiated in the model */
-      CAT_STATE, 
-      /** An independent constant: "constant Real c1 = 3" */
-      CAT_DEPENDENT_CONSTANT,
-      /** A dependent constant "constant Real c2=c1*3". */
-      CAT_INDEPENDENT_CONSTANT,
-      /** A dependent parameter "parameter Real p1=p2"*/
-      CAT_DEPENDENT_PARAMETER,
-      /** An independent parameter "parameter Real p2=3"*/
-      CAT_INDEPENDENT_PARAMETER,
-      /** An algebraic variabel or input */
-      CAT_ALGEBRAIC
-    };
+  /// Variable category
+  enum Category{
+    /** Unknown, not set */
+    CAT_UNKNOWN,
+    /** A state derivative */
+    CAT_DERIVATIVE,
+    /** A differential state, i.e. a variable that appears differentiated in the model */
+    CAT_STATE, 
+    /** An independent constant: "constant Real c1 = 3" */
+    CAT_DEPENDENT_CONSTANT,
+    /** A dependent constant "constant Real c2=c1*3". */
+    CAT_INDEPENDENT_CONSTANT,
+    /** A dependent parameter "parameter Real p1=p2"*/
+    CAT_DEPENDENT_PARAMETER,
+    /** An independent parameter "parameter Real p2=3"*/
+    CAT_INDEPENDENT_PARAMETER,
+    /** An algebraic variabel or input */
+    CAT_ALGEBRAIC
+  };
 
-    // Forward declaration
-    class VariableInternal;
+  // Forward declaration
+  class VariableInternal;
 
   /** \brief Smart pointer class to a Variable
-  *  
-  *  In a sense, a Variable is an SX expression with meta-data attached.
-  */
+   *  
+   *  A Variable is an SX expression with meta-data attached.
+   */
   class Variable : public SharedObject{
-    public:
+  public:
     
     /// Default (empty) constructor
     Variable();
 
     /// Create a new variable
-    explicit Variable(const std::string& name, bool create_expression = true);
+    explicit Variable(const std::string& name);
     
     /// Destructor
     virtual ~Variable();
     
     /// Get the variable expression
-    SXElement var() const;
+    SX var() const;
     
     /// Get differential expression
-    SXElement der() const;
+    SX der() const;
     
     /// Get the binding expression for the variable or its derivative
-    SXElement binding(bool derivative=false) const;
-    
-    /// Get the highest order derivative (i.e. der() or var())
-    SXElement highest() const;
+    SX binding(bool derivative=false) const;
     
     /// Timed variable (never allocate)
-    SXElement atTime(double t, bool allocate=false) const;
+    SX atTime(double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
-    SXElement atTime(double t, bool allocate=false);
+    SX atTime(double t, bool allocate=false);
     
     /// Get the variable index
     int index() const;
@@ -108,10 +105,7 @@ namespace CasADi{
     const VariableInternal* operator->() const;
 
     /// Get variable name
-    const std::string& getName() const;
-
-    /// Set variable name
-    void setName(const std::string& name);
+    std::string getName() const;
 
     /// Get the variability (see Fritzon)
     Variability getVariability() const;
@@ -222,13 +216,13 @@ namespace CasADi{
     std::string& displayUnit();
     
     /// Set the expression
-    void setExpression(const SXElement& v);
+    void setExpression(const SX& v);
 
     /// Set the derivative expression
-    void setDerivative(const SXElement& d);
+    void setDerivative(const SX& d);
                 
     /// Set the binding expression for the variable or its derivative
-    void setBinding(const SXElement& binding, bool derivative=false);
+    void setBinding(const SX& binding, bool derivative=false);
                 
     /// Set the variable index
     void setIndex(int ind);

@@ -661,74 +661,45 @@ namespace CasADi{
     return MX::create(new Norm1(shared_from_this<MX>()));
   }
 
-  MX MXNode::getHorzcat(const std::vector<MX>& x){
-    // Remove nulls and empty matrices
-    vector<MX> c;
-    c.reserve(x.size());
-    for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it)
-      if(!it->isEmpty())
-        c.push_back(*it);
-  
-    if(c.empty()){
-      return MX();
-    } else if(c.size()==1){
-      return c[0];
-    } else {
-      // If dependents are all-zero, produce a new constant
-      bool zero = true;
-      for (int i=0;i<c.size();++i) {
-        if (!c[i]->isZero()) { zero = false; break; }
-      }
-      if (zero) {
-        return MX::zeros(Horzcat(c).sparsity());
-      }
-      // Split up existing horzcats
-      vector<MX> c_split;
-      c_split.reserve(c.size());
-      for(vector<MX>::const_iterator i=c.begin(); i!=c.end(); ++i){
-        if(i->getOp()==OP_HORZCAT){        
-          c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
-        } else {
-          c_split.push_back(*i);
+  MX MXNode::getHorzcat(const std::vector<MX>& x) const{
+    // Check if there is any existing horzcat operation
+    for(vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i){
+      if(i->getOp()==OP_HORZCAT){
+        // Split up
+        vector<MX> x_split(x.begin(),i);
+        for(; i!=x.end(); ++i){
+          if(i->getOp()==OP_HORZCAT){        
+            x_split.insert(x_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
+          } else {
+            x_split.push_back(*i);
+          }
         }
+        return horzcat(x_split);
       }
-      return MX::create(new Horzcat(c_split));
     }
+
+    // Create a Horzcat node
+    return MX::create(new Horzcat(x));
   }
 
-  MX MXNode::getVertcat(const std::vector<MX>& x){
-    // Remove nulls and empty matrices
-    vector<MX> c;
-    c.reserve(x.size());
-    for(vector<MX>::const_iterator it=x.begin(); it!=x.end(); ++it)
-      if(!it->isEmpty())
-        c.push_back(*it);
-  
-    if(c.empty()){
-      return MX();
-    } else if(c.size()==1){
-      return c[0];
-    } else {
-      // If dependents are all-zero, produce a new constant
-      bool zero = true;
-      for (int i=0;i<c.size();++i) {
-        if (!c[i]->isZero()) { zero = false; break; }
-      }
-      if (zero) {
-        return MX::zeros(Vertcat(c).sparsity());
-      }
-      // Split up existing vertcats
-      vector<MX> c_split;
-      c_split.reserve(c.size());
-      for(vector<MX>::const_iterator i=c.begin(); i!=c.end(); ++i){
-        if(i->getOp()==OP_VERTCAT){        
-          c_split.insert(c_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
-        } else {
-          c_split.push_back(*i);
+  MX MXNode::getVertcat(const std::vector<MX>& x) const{
+    // Check if there is any existing vertcat operation
+    for(vector<MX>::const_iterator i=x.begin(); i!=x.end(); ++i){
+      if(i->getOp()==OP_VERTCAT){
+        // Split up
+        vector<MX> x_split(x.begin(),i);
+        for(; i!=x.end(); ++i){
+          if(i->getOp()==OP_VERTCAT){        
+            x_split.insert(x_split.end(),(*i)->dep_.begin(),(*i)->dep_.end());
+          } else {
+            x_split.push_back(*i);
+          }
         }
+        return vertcat(x_split);
       }
-      return MX::create(new Vertcat(c_split));
     }
+
+    return MX::create(new Vertcat(x));
   }
 
   std::vector<MX> MXNode::getHorzsplit(const std::vector<int>& output_offset) const{
@@ -739,7 +710,24 @@ namespace CasADi{
       }
       return ret;
     }
-    return MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
+    std::vector<MX> ret = MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
+    
+    if (CasadiOptions::simplification_on_the_fly) {
+      // Simplify horzsplit(horzcat)
+      if (getOp()==OP_HORZCAT) {
+        int offset_deps = 0;
+        int j = 0;
+        for (int i=0;i<output_offset.size();++i) {
+          while(offset_deps<output_offset[i]) { offset_deps+=dep(j).size2();++j; }
+          if (j>=ndep()) j = ndep()-1;
+          if (output_offset[i]==offset_deps && (i+1<output_offset.size()?output_offset[i+1]:size2()) ==offset_deps +dep(j).size2()) {
+            // Aligned with vertcat dependency
+            ret[i] = dep(j); 
+          }
+        }
+      }
+    }
+    return ret;
   }
 
   std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const{
@@ -750,7 +738,24 @@ namespace CasADi{
       }
       return ret;
     }
-    return MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
+    std::vector<MX> ret = MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
+    
+    if (CasadiOptions::simplification_on_the_fly) {
+      // Simplify vertsplit(vertcat)
+      if (getOp()==OP_VERTCAT) {
+        int offset_deps = 0;
+        int j = 0;
+        for (int i=0;i<output_offset.size();++i) {
+          while(offset_deps<output_offset[i]) { offset_deps+=dep(j).size1();++j; }
+          if (j>=ndep()) j = ndep()-1;
+          if (output_offset[i]==offset_deps && (i+1<output_offset.size()?output_offset[i+1]:size1()) ==offset_deps +dep(j).size1()) {
+            // Aligned with vertcat dependency
+            ret[i] = dep(j); 
+          }
+        }
+      }
+    }
+    return ret;
   }
 
   void MXNode::clearVector(const std::vector<std::vector<MX*> > v){

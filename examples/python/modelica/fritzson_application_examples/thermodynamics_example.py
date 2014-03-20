@@ -65,6 +65,14 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
+# Eliminate the dependent variables
+ocp.eliminateInterdependencies()
+ocp.eliminateDependent()
+
+# Sort the equations
+ocp.sortODE()
+ocp.sortALG()
+
 # Make the OCP explicit
 ocp.makeExplicit()
 
@@ -83,8 +91,8 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-m = ocp.variable("m").var()
-P = ocp.variable("P").var()
+m = ocp("m")
+P = ocp("P")
 output_fcn_out = ocp.substituteDependents([m,P])
 output_fcn_in = daeIn(
   t=ocp.t,
@@ -129,6 +137,14 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
+# Eliminate the dependent variables
+ocp.eliminateInterdependencies()
+ocp.eliminateDependent()
+
+# Sort the equations
+ocp.sortODE()
+ocp.sortALG()
+
 # Make the OCP explicit
 ocp.makeExplicit()
 
@@ -147,7 +163,7 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp.variable("T").var()
+T = ocp("T")
 output_fcn_out = ocp.substituteDependents([T])
 output_fcn_in = daeIn(
   t=ocp.t,
@@ -185,6 +201,14 @@ comp("BasicVolumeTest")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeTest.xml')
 
+# Eliminate the dependent variables
+ocp.eliminateInterdependencies()
+ocp.eliminateDependent()
+
+# Sort the equations
+ocp.sortODE()
+ocp.sortALG()
+
 # Make explicit
 ocp.makeExplicit()
 
@@ -203,9 +227,9 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp.variable("T").var()
-U = ocp.variable("U").var()
-V = ocp.variable("V").var()
+T = ocp("T")
+U = ocp("U")
+V = ocp("V")
 output_fcn_out = ocp.substituteDependents([T,U,V])
 output_fcn_in = daeIn(
   t=ocp.t,
@@ -250,6 +274,14 @@ comp("CtrlFlowSystem")
 # Allocate a parser and load the xml
 ocp = SymbolicOCP()
 ocp.parseFMI('CtrlFlowSystem.xml')
+
+# Eliminate the dependent variables
+ocp.eliminateInterdependencies()
+ocp.eliminateDependent()
+
+# Sort the equations
+ocp.sortODE()
+ocp.sortALG()
 
 # Make the OCP explicit
 ocp.makeExplicit()

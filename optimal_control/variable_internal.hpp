@@ -41,14 +41,11 @@ namespace CasADi{
       // Clone
       virtual VariableInternal* clone() const{ return new VariableInternal(*this);}
 
-      // Get name
-      const std::string& getName() const;
-
       // Timed variable (never allocate)
-      SXElement atTime(double t, bool allocate) const;
+      SX atTime(double t, bool allocate) const;
 
       // Timed variable (allocate if necessary)
-      SXElement atTime(double t, bool allocate);
+      SX atTime(double t, bool allocate);
 
       // Print
       virtual void repr(std::ostream &stream) const;
@@ -57,7 +54,6 @@ namespace CasADi{
     protected:
       
       // Attributes
-      std::string name_;
       Variability variability_;
       Causality causality_;
       Category category_;
@@ -70,19 +66,19 @@ namespace CasADi{
       std::string unit_, displayUnit_;
       
       // variable expression
-      SXElement var_; 
+      SX var_; 
 
       // Derivative expression
-      SXElement der_;
+      SX der_;
           
       // Binding expression
-      SXElement binding_;
+      SX binding_;
           
       // Binding expression for the derivative
-      SXElement der_binding_;
+      SX der_binding_;
           
       // Timed variables
-      std::map<double,SXElement> timed_sx_;
+      std::map<double,SX> timed_sx_;
             
       // Index
       int index_;

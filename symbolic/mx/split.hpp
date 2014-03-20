@@ -92,6 +92,9 @@ namespace CasADi{
         
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_HORZSPLIT;}    
+
+    /// Create a horizontal concatenation node
+    virtual MX getHorzcat(const std::vector<MX>& x) const;
   };
 
   /** \brief Vertical split of vectors, x -> x0, x1,...
@@ -118,6 +121,9 @@ namespace CasADi{
         
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_VERTSPLIT;}
+
+    /// Create a vertical concatenation node (vectors only)
+    virtual MX getVertcat(const std::vector<MX>& x) const;
   };
 
 } // namespace CasADi
