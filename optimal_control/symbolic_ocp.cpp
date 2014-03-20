@@ -1034,14 +1034,6 @@ namespace CasADi{
     eliminateDependent();
   }
 
-  void SymbolicOCP::makeAlgebraic(const std::string& name){
-    makeAlgebraic(variable(name));
-  }
-
-  void SymbolicOCP::makeAlgebraic(const Variable& v){
-    casadi_error("SymbolicOCP::makeAlgebraic broken");
-  }
-
   Variable& SymbolicOCP::variable(const std::string& name){
     // Find the variable
     map<string,Variable>::iterator it = varmap_.find(name);

@@ -228,12 +228,6 @@ namespace CasADi{
     
     /// Access a variable by name
     Variable& variable(const std::string& name);
-
-    /// Make a differential state algebraic by replacing its time derivative by 0
-    void makeAlgebraic(const Variable& v);
-
-    /// Make a differential state algebraic by replacing its time derivative by 0
-    void makeAlgebraic(const std::string& name);
     
     /** @name Manipulation
      *  Reformulate the dynamic optimization problem.
