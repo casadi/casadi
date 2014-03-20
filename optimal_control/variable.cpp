@@ -52,14 +52,6 @@ namespace CasADi{
     return (*this)->var_;
   }
 
-  SX Variable::binding(bool derivative) const{
-    if(derivative){
-      return (*this)->der_binding_;
-    } else {
-      return (*this)->binding_;
-    }
-  }
-
   string Variable::getName() const{
     return (*this)->var_.getName();
   }
@@ -182,14 +174,6 @@ namespace CasADi{
 
   void Variable::setDerivative(const SX& d){
     (*this)->der_ = d;
-  }
-
-  void Variable::setBinding(const SX& binding, bool derivative){
-    if(derivative){
-      (*this)->der_binding_ = binding;
-    } else {
-      (*this)->binding_ = binding;
-    }
   }
 
   bool Variable::checkNode() const{

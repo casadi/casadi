@@ -33,10 +33,6 @@ namespace CasADi{
     // Symbolic expression for the time derivative of the variable
     der_ = SX::sym("der_" + name);
 
-    // Set binding expressions
-    binding_ = var_;
-    der_binding_ = der_;
-    
     variability_ = CONTINUOUS;
     causality_ = INTERNAL;
     category_ = CAT_UNKNOWN;

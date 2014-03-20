@@ -41,14 +41,6 @@ namespace CasADi{
     return vertcat(ret);
   }
     
-  SX binding(const vector<Variable> v){
-    if(v.empty()) return SX::zeros(0,1);
-    vector<SX> ret(v.size());
-    for(int i=0; i<v.size(); ++i)
-      ret[i] = v[i].binding();
-    return vertcat(ret);
-  }
-
   vector<double> getNominal(const vector<Variable> v){
     vector<double> ret(v.size());
     for(int i=0; i<v.size(); ++i)

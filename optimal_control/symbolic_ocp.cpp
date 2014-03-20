@@ -188,7 +188,6 @@ namespace CasADi{
         SX bexpr = readExpr(beq[1][0]);
       
         // Add binding equation
-        var.setBinding(bexpr);
         this->y.push_back(var);
         this->dep.append(bexpr);
       }
@@ -854,8 +853,8 @@ namespace CasADi{
     if(this->pd.empty()) return;
   
     // Find out which dependent parameter depends on which binding equation
-    SX v = CasADi::var(this->pd);
-    SXFunction f(v,v-binding(this->pd));
+    SX v = var(this->pd);
+    SXFunction f(v,v-substitute(var(this->pd),var(this->y),dep));
     f.init();
     Sparsity sp = f.jacSparsity();
   

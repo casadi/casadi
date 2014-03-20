@@ -33,9 +33,6 @@ namespace CasADi{
   /// Get a derivative expression from a vector of variables
   SX der(const std::vector<Variable> v);
 
-  /// Get an expression for the binding expressions from a vector of variables
-  SX binding(const std::vector<Variable> v);
-
 #ifndef SWIG
   /// Call a member function for all members of a vector (note: fcn pointer to member function)
   std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal=false);

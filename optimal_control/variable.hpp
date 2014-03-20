@@ -86,9 +86,6 @@ namespace CasADi{
     /// Get differential expression
     SX der() const;
     
-    /// Get the binding expression for the variable or its derivative
-    SX binding(bool derivative=false) const;
-    
     /// Timed variable (never allocate)
     SX atTime(double t, bool allocate=false) const;
 
@@ -196,9 +193,6 @@ namespace CasADi{
 
     /// Set the derivative expression
     void setDerivative(const SX& d);
-                
-    /// Set the binding expression for the variable or its derivative
-    void setBinding(const SX& binding, bool derivative=false);
                 
     /// Set the variable index
     void setIndex(int ind);
