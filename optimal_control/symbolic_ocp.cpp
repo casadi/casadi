@@ -1120,8 +1120,8 @@ namespace CasADi{
 
   void SymbolicOCP::addVariable(const std::string& name, const Variable& var){
     // Try to find the component
-    pair<int,int> loc = find(name,false);
-    if(loc.first>=0){
+    map<string,Variable>::iterator it = varmap_.find(name);
+    if(it!=varmap_.end()){
       stringstream ss;
       ss << "Variable \"" << name << "\" has already been added.";
       throw CasadiException(ss.str());
