@@ -63,7 +63,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->zQQQ = this->yQQQ = SX::zeros(0,1);
+    this->zQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -509,7 +509,7 @@ namespace CasADi{
     stream << "#pf = " << this->pf.size() << ", ";
     stream << "#ci =  " << this->ci.size() << ", ";
     stream << "#cd =  " << this->cd.size() << ", ";
-    stream << "#u = " << this->u.size() << ", ";
+    stream << "#u = " << this->uQQQ.size() << ", ";
     stream << endl << endl;
 
     // Variables in the class hierarchy
@@ -528,7 +528,7 @@ namespace CasADi{
     stream << "  pf =  " << this->pf << endl;
     stream << "  ci =  " << this->ci << endl;
     stream << "  cd =  " << this->cd << endl;
-    stream << "  u =  " << this->u << endl;
+    stream << "  u =  " << this->uQQQ << endl;
     stream << "}" << endl;
   
     stream << "Fully-implicit differential-algebraic equations" << endl;
@@ -688,7 +688,6 @@ namespace CasADi{
     SX _x = CasADi::var(this->x);
     SX _pi = CasADi::var(this->pi);
     SX _pf = CasADi::var(this->pf);
-    SX _u = CasADi::var(this->u);
   
     // Collect all the variables
     SX v;
@@ -699,7 +698,7 @@ namespace CasADi{
     v.append(this->zQQQ);
     v.append(_pi);
     v.append(_pf);
-    v.append(_u);
+    v.append(this->uQQQ);
     
     // Nominal values
     SX t_n = 1.;
@@ -710,7 +709,7 @@ namespace CasADi{
     SX z_n = nominal(this->zQQQ);
     SX pi_n = nominal(_pi);
     SX pf_n = nominal(_pf);
-    SX u_n = nominal(_u);
+    SX u_n = nominal(this->uQQQ);
   
     // Get all the old variables in expressed in the nominal ones
     SX v_old;
@@ -721,7 +720,7 @@ namespace CasADi{
     v_old.append(this->zQQQ*z_n);
     v_old.append(_pi*pi_n);
     v_old.append(_pf*pf_n);
-    v_old.append(_u*u_n);
+    v_old.append(this->uQQQ*u_n);
   
     // Temporary variable
     SX temp;
@@ -756,7 +755,7 @@ namespace CasADi{
     v[Z] = this->zQQQ;
     v[PI] = CasADi::var(this->pi);
     v[PF] = CasADi::var(this->pf);
-    v[U] = CasADi::var(this->u);
+    v[U] = this->uQQQ;
 
     // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
     SX xz;
@@ -776,7 +775,7 @@ namespace CasADi{
     J.setInput(start(this->zQQQ,true),Z);
     J.setInput(start(var(this->pi),true),PI);
     J.setInput(start(var(this->pf),true),PF);
-    J.setInput(start(var(this->u),true),U);
+    J.setInput(start(this->uQQQ,true),U);
     J.evaluate();
   
     // Get the maximum of every row
@@ -1156,7 +1155,7 @@ namespace CasADi{
       if(var.getCausality() == INTERNAL){
         this->s.push_back(var);
       } else if(var.getCausality() == INPUT){
-        this->u.push_back(var);
+        this->uQQQ.append(var->var_);
       }
       break;
     default:
@@ -1414,47 +1413,47 @@ namespace CasADi{
     }
   
     // Control properties
-    if(!u.empty()){
+    if(!this->uQQQ.isEmpty()){
       datfile << "* control start values, scale factors, and bounds" << endl;
       datfile << "u(*,*)" << endl;
-      for(int k=0; k<u.size(); ++k){
-        datfile << k << ": " << u[k].getStart() << endl;
+      for(int k=0; k<this->uQQQ.size(); ++k){
+        datfile << k << ": " << start(this->uQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "u_sca(*,*)" << endl;
-      for(int k=0; k<u.size(); ++k){
-        datfile << k << ": " << u[k].getNominal() << endl;
+      for(int k=0; k<this->uQQQ.size(); ++k){
+        datfile << k << ": " << nominal(this->uQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "u_min(*,*)" << endl;
-      for(int k=0; k<u.size(); ++k){
-        datfile << k << ": " << u[k].getMin() << endl;
+      for(int k=0; k<this->uQQQ.size(); ++k){
+        datfile << k << ": " << min(this->uQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "u_max(*,*)" << endl;
-      for(int k=0; k<u.size(); ++k){
-        datfile << k << ": " << u[k].getMax() << endl;
+      for(int k=0; k<this->uQQQ.size(); ++k){
+        datfile << k << ": " << max(this->uQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "u_fix(*,*)" << endl;
-      for(int k=0; k<u.size(); ++k){
-        datfile << k << ": " << (u[k].getMin()==u[k].getMax()) << endl;
+      for(int k=0; k<this->uQQQ.size(); ++k){
+        datfile << k << ": " << (min(this->uQQQ[k])==max(this->uQQQ[k])) << endl;
       }
       datfile << endl;
     
       datfile << "u_name" << endl;
-      for(int k=0; k<u.size(); ++k){
-        datfile << k << ": " << u[k].getName() << endl;
+      for(int k=0; k<this->uQQQ.size(); ++k){
+        datfile << k << ": " << this->uQQQ[k].getName() << endl;
       }
       datfile << endl;
     
       datfile << "u_unit" << endl;
-      for(int k=0; k<u.size(); ++k){
-        datfile << k << ": " << u[k].getUnit() << endl;
+      for(int k=0; k<this->uQQQ.size(); ++k){
+        datfile << k << ": " << unit(this->uQQQ[k]) << endl;
       }
       datfile << endl;
     }

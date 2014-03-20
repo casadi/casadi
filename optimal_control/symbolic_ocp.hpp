@@ -131,7 +131,7 @@ namespace CasADi{
     SX yQQQ;
     
     /** \brief Control signals */
-    std::vector<Variable> u;
+    SX uQQQ;
 
     //@}
     

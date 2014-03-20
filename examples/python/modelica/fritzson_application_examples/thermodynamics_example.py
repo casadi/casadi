@@ -101,7 +101,7 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = var(ocp.x),
   z = ocp.zQQQ,
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  p = vertcat((var(ocp.pi),var(ocp.pf),ocp.uQQQ))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -175,7 +175,7 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = var(ocp.x),
   z = ocp.zQQQ,
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  p = vertcat((var(ocp.pi),var(ocp.pf),ocp.uQQQ))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -244,7 +244,7 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = var(ocp.x),
   z = ocp.zQQQ,
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  p = vertcat((var(ocp.pi),var(ocp.pf),ocp.uQQQ))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
