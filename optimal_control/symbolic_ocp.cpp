@@ -43,12 +43,27 @@
 using namespace std;
 namespace CasADi{
 
+  // temporary
+  vector<Variable> getVar(const SymbolicOCP& ocp, const SX& var){
+    casadi_assert(var.isVector() && var.isSymbolic());
+    vector<Variable> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      map<string,Variable>::const_iterator it = ocp.varmap_.find(var.at(i).getName());
+      casadi_assert(it!=ocp.varmap_.end());
+      ret[i] = it->second;
+    }
+    return ret;
+  }
+
   SymbolicOCP::SymbolicOCP(){
     t = SX::sym("t");
     t0 = t0_guess = numeric_limits<double>::quiet_NaN();
     tf = tf_guess = numeric_limits<double>::quiet_NaN();
     t0_free = false;
     tf_free = false;
+
+    // Start with vectors of zero length
+    this->zQQQ = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -377,7 +392,7 @@ namespace CasADi{
   
     // Make sure that the dimensions are consistent at this point
     casadi_assert_warning(x.size()==ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
-    casadi_assert_warning(z.size()==alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
+    casadi_assert_warning(this->zQQQ.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
     casadi_assert(q.size()==quad.size());
     casadi_assert(y.size()==dep.size());
   }
@@ -486,7 +501,7 @@ namespace CasADi{
     stream << "Dimensions: "; 
     stream << "#s = " << this->s.size() << ", ";
     stream << "#x = " << this->x.size() << ", ";
-    stream << "#z = " << this->z.size() << ", ";
+    stream << "#z = " << this->zQQQ.size() << ", ";
     stream << "#q = " << this->q.size() << ", ";
     stream << "#y = " << this->y.size() << ", ";
     stream << "#pi = " << this->pi.size() << ", ";
@@ -505,7 +520,7 @@ namespace CasADi{
     stream << "  t = " << this->t.getDescription() << endl;
     stream << "  s = " << this->s << endl;
     stream << "  x = " << this->x << endl;
-    stream << "  z =  " << this->z << endl;
+    stream << "  z =  " << this->zQQQ << endl;
     stream << "  q =  " << this->q << endl;
     stream << "  y =  " << this->y << endl;
     stream << "  pi =  " << this->pi << endl;
@@ -529,7 +544,7 @@ namespace CasADi{
     stream << endl;
 
     stream << "Algebraic equations" << endl;
-    for(int k=0; k<this->z.size(); ++k){
+    for(int k=0; k<this->zQQQ.size(); ++k){
       stream << "0 == " << this->alg.at(k) << endl;
     }
     stream << endl;
@@ -671,7 +686,6 @@ namespace CasADi{
     SX _s = CasADi::var(this->s);
     SX _sdot = der(this->s);
     SX _x = CasADi::var(this->x);
-    SX _z = CasADi::var(this->z);
     SX _pi = CasADi::var(this->pi);
     SX _pf = CasADi::var(this->pf);
     SX _u = CasADi::var(this->u);
@@ -682,7 +696,7 @@ namespace CasADi{
     v.append(_s);
     v.append(_sdot);
     v.append(_x);
-    v.append(_z);
+    v.append(this->zQQQ);
     v.append(_pi);
     v.append(_pf);
     v.append(_u);
@@ -691,7 +705,9 @@ namespace CasADi{
     SX t_n = 1.;
     SX s_n = nominal(_s);
     SX x_n = nominal(_x);
-    SX z_n = nominal(_z);
+
+    cout << zQQQ << endl;
+    SX z_n = nominal(this->zQQQ);
     SX pi_n = nominal(_pi);
     SX pf_n = nominal(_pf);
     SX u_n = nominal(_u);
@@ -702,7 +718,7 @@ namespace CasADi{
     v_old.append(_s*s_n);
     v_old.append(_sdot*s_n);
     v_old.append(_x*x_n);
-    v_old.append(_z*z_n);
+    v_old.append(this->zQQQ*z_n);
     v_old.append(_pi*pi_n);
     v_old.append(_pf*pf_n);
     v_old.append(_u*u_n);
@@ -737,7 +753,7 @@ namespace CasADi{
     v[T] = this->t;
     v[X] = CasADi::var(this->x);
     v[XDOT] = der(this->x);
-    v[Z] = CasADi::var(this->z);
+    v[Z] = this->zQQQ;
     v[PI] = CasADi::var(this->pi);
     v[PF] = CasADi::var(this->pf);
     v[U] = CasADi::var(this->u);
@@ -757,7 +773,7 @@ namespace CasADi{
     J.setInput(0.0,T);
     J.setInput(start(var(this->x),true),X);
     J.input(XDOT).setAll(0.0);
-    J.setInput(start(var(this->z),true),Z);
+    J.setInput(start(this->zQQQ,true),Z);
     J.setInput(start(var(this->pi),true),PI);
     J.setInput(start(var(this->pf),true),PF);
     J.setInput(start(var(this->u),true),U);
@@ -823,10 +839,10 @@ namespace CasADi{
 
   void SymbolicOCP::sortALG(){
     // Quick return if no algebraic states
-    if(this->z.empty()) return;
+    if(this->zQQQ.isEmpty()) return;
   
     // Find out which algebraic equation depends on which algebraic state
-    SXFunction f(CasADi::var(this->z),this->alg);
+    SXFunction f(this->zQQQ,this->alg);
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -838,11 +854,7 @@ namespace CasADi{
     this->alg = this->alg(rowperm);
   
     // Permute variables
-    vector<Variable> z_new(this->z.size());
-    for(int i=0; i<this->z.size(); ++i){
-      z_new[i]= this->z[colperm[i]];
-    }
-    z_new.swap(this->z);
+    this->zQQQ = this->zQQQ(colperm);
   }
 
   void SymbolicOCP::sortDependentParameters(){
@@ -955,10 +967,10 @@ namespace CasADi{
 
   void SymbolicOCP::eliminateAlgebraic(){
     // Quick return if there are no algebraic states
-    if(z.empty()) return;
+    if(this->zQQQ.isEmpty()) return;
   
     // Write the algebraic equations as a function of the algebraic states
-    SXFunction f(CasADi::var(z),alg);
+    SXFunction f(this->zQQQ,alg);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
@@ -972,25 +984,17 @@ namespace CasADi{
     this->alg = this->alg(rowperm);
   
     // Permute variables
-    vector<Variable> z_new(this->z.size());
-    for(int i=0; i<this->z.size(); ++i){
-      z_new[i]= this->z[colperm[i]];
-    }
-    z_new.swap(this->z);
-    z_new.clear();
+    this->zQQQ = this->zQQQ(colperm);
 
     // Rewrite the sorted algebraic equations as a function of the algebraic states
-    f = SXFunction(CasADi::var(this->z),this->alg);
+    f = SXFunction(this->zQQQ,this->alg);
     f.init();
 
     // Get the Jacobian
     SX J = f.jac();
   
-    // Block variables and equations
-    vector<Variable> zb;
-
     // Variables where we have found an explicit expression and where we haven't
-    vector<Variable> z_exp, z_imp;
+    SX z_exp, z_imp;
   
     // Explicit and implicit equations
     SX f_exp, f_imp;
@@ -1002,30 +1006,27 @@ namespace CasADi{
       int bs = rowblock[b+1] - rowblock[b];
     
       // Get local variables
-      zb.clear();
-      for(int i=colblock[b]; i<colblock[b+1]; ++i){
-        zb.push_back(this->z[i]);
-      }
+      SX zb = this->zQQQ(Slice(colblock[b],colblock[b+1]));
 
       // Get local equations
-      SX fb = alg(Slice(rowblock[b],rowblock[b+1]));
+      SX fb = this->alg(Slice(rowblock[b],rowblock[b+1]));
 
       // Get local Jacobian
       SX Jb = J(Slice(rowblock[b],rowblock[b+1]),Slice(colblock[b],colblock[b+1]));
 
       // If Jb depends on zb, then we cannot (currently) solve for it explicitly
-      if(dependsOn(Jb,CasADi::var(zb))){
+      if(dependsOn(Jb,zb)){
       
         // Add the equations to the new list of algebraic equations
         f_imp.append(fb);
         
         // ... and the variables accordingly
-        z_imp.insert(z_imp.end(),zb.begin(),zb.end());
+        z_imp.append(zb);
       
       } else { // The variables that we wish to determine enter linearly
       
         // Divide fb into a part which depends on vb and a part which doesn't according to "fb == mul(Jb,vb) + fb_res"
-        SX fb_res = substitute(fb,CasADi::var(zb),SX::zeros(zb.size())).data();
+        SX fb_res = substitute(fb,zb,SX::zeros(zb.sparsity()));
       
         // Solve for vb
         SX fb_exp;
@@ -1038,20 +1039,21 @@ namespace CasADi{
         }
 
         // Add to explicitly determined equations and variables
-        z_exp.insert(z_exp.end(),zb.begin(),zb.end());
+        z_exp.append(zb);
         f_exp.append(fb_exp);
       }
     }
   
     // Eliminate inter-dependencies in fb_exp
-    substituteInPlace(CasADi::var(z_exp),f_exp,false);
+    substituteInPlace(z_exp,f_exp,false);
 
     // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
-    this->y.insert(y.begin(),z_exp.begin(),z_exp.end());
+    vector<Variable> yy = getVar(*this,z_exp);
+    this->y.insert(y.begin(),yy.begin(),yy.end());
     this->dep = vertcat(f_exp,dep);
   
     // Save new algebraic equations
-    this->z = z_imp;
+    this->zQQQ = z_imp;
     this->alg = f_imp;
   
     // Eliminate new dependent variables from the other equations
@@ -1070,7 +1072,7 @@ namespace CasADi{
       if(this->x[k].get()==v.get()){
       
         // Add to list of algebraic variables and to the list of algebraic equations
-        this->z.push_back(v);
+        this->zQQQ.append(v->var_);
         this->alg.append(this->ode.at(k));
       
         // Remove from list of differential variables and the list of differential equations
@@ -1367,47 +1369,47 @@ namespace CasADi{
     }
   
     // Algebraic state properties
-    if(!z.empty()){
+    if(!this->zQQQ.isEmpty()){
       datfile << "*  algebraic state start values, scale factors, and bounds" << endl;
       datfile << "sa(*,*)" << endl;
-      for(int k=0; k<z.size(); ++k){
-        datfile << k << ": " << z[k].getStart() << endl;
+      for(int k=0; k<this->zQQQ.size(); ++k){
+        datfile << k << ": " << start(this->zQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sa_sca(*,*)" << endl;
-      for(int k=0; k<z.size(); ++k){
-        datfile << k << ": " << z[k].getNominal() << endl;
+      for(int k=0; k<this->zQQQ.size(); ++k){
+        datfile << k << ": " << nominal(this->zQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sa_min(*,*)" << endl;
-      for(int k=0; k<z.size(); ++k){
-        datfile << k << ": " << z[k].getMin() << endl;
+      for(int k=0; k<this->zQQQ.size(); ++k){
+        datfile << k << ": " << min(this->zQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sa_max(*,*)" << endl;
-      for(int k=0; k<z.size(); ++k){
-        datfile << k << ": " << z[k].getMax() << endl;
+      for(int k=0; k<this->zQQQ.size(); ++k){
+        datfile << k << ": " << max(this->zQQQ[k]) << endl;
       }
       datfile << endl;
     
       datfile << "sa_fix(*,*)" << endl;
-      for(int k=0; k<z.size(); ++k){
-        datfile << k << ": " << (z[k].getMin()==z[k].getMax()) << endl;
+      for(int k=0; k<this->zQQQ.size(); ++k){
+        datfile << k << ": " << (min(this->zQQQ[k])==max(this->zQQQ[k])) << endl;
       }
       datfile << endl;
 
       datfile << "xa_name" << endl;
-      for(int k=0; k<z.size(); ++k){
-        datfile << k << ": " << z[k].getName() << endl;
+      for(int k=0; k<this->zQQQ.size(); ++k){
+        datfile << k << ": " << this->zQQQ[k].getName() << endl;
       }
       datfile << endl;
     
       datfile << "xa_unit" << endl;
-      for(int k=0; k<z.size(); ++k){
-        datfile << k << ": " << z[k].getUnit() << endl;
+      for(int k=0; k<this->zQQQ.size(); ++k){
+        datfile << k << ": " << unit(this->zQQQ[k]) << endl;
       }
       datfile << endl;
     }
@@ -1602,13 +1604,14 @@ namespace CasADi{
     f.spEvaluate(false);
 
     // Get the new algebraic variables and new states
-    vector<Variable> new_s, new_z;
+    vector<Variable> new_s;
+    SX new_z;
     for(int i=0; i<ns; ++i){
       if(f_sdot[i]==bvec_t(1)){
         new_s.push_back(this->s[i]);
       } else {
         casadi_assert(f_sdot[i]==bvec_t(0));
-        new_z.push_back(this->s[i]);
+        new_z.append(this->s[i]->var_);
       }
     }
 
@@ -1620,7 +1623,7 @@ namespace CasADi{
     this->dae = new_dae;
     this->s = new_s;
     this->alg.append(new_alg);
-    z.insert(z.end(),new_z.begin(),new_z.end());
+    this->zQQQ.append(new_z);
   }
 
   std::vector<double> SymbolicOCP::nominal(const SX& var) const{
@@ -1675,6 +1678,31 @@ namespace CasADi{
       ret[i] = derivativeStart(var.at(i).getName(),nominal);
     }
     return ret;
+  }
+
+  std::string SymbolicOCP::unit(const std::string& name) const{
+    map<string,Variable>::const_iterator it = varmap_.find(name);
+    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
+    return it->second->unit_;
+  }
+
+  std::string SymbolicOCP::unit(const SX& var) const{
+    casadi_assert_message(!var.isVector() && var.isSymbolic(),"SymbolicOCP::unit: Argument must be a symbolic vector");
+    if(var.isEmpty()){
+      return "n/a";
+    } else {
+      string ret = unit(var.at(0).getName());
+      for(int i=1; i<var.size(); ++i){
+        casadi_assert_message(ret == unit(var.at(i).getName()),"SymbolicOCP::unit: Argument has mixed units");
+      }
+      return ret;
+    }
+  }
+
+  void SymbolicOCP::setUnit(const std::string& name, const std::string& val){
+    map<string,Variable>::iterator it = varmap_.find(name);
+    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
+    it->second->unit_ = val;
   }
 
 } // namespace CasADi

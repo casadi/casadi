@@ -104,7 +104,7 @@ namespace CasADi{
     std::vector<Variable> x;
     
     /** \brief Algebraic variables */
-    std::vector<Variable> z;
+    SX zQQQ;
     
     /** \brief Quadrature states (length == quad().size()) */
     std::vector<Variable> q;
@@ -340,11 +340,21 @@ namespace CasADi{
     /// Set the derivative at time 0 for a component
     void setDerivativeStart(const std::string& name, double val);
 
+    /// Get the unit for a component
+    std::string unit(const std::string& name) const;
+
+    /// Get the unit given a vector of symbolic variables (all units must be identical)
+    std::string unit(const SX& var) const;
+
+    /// Set the unit for a component
+    void setUnit(const std::string& name, const std::string& val);
+
     /// Timed variable (never allocate)
     SX atTime(const std::string& name, double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
     SX atTime(const std::string& name, double t, bool allocate=false);
+
 
 #ifndef SWIG
     ///  Print representation
@@ -354,7 +364,7 @@ namespace CasADi{
     virtual void print(std::ostream &stream=std::cout) const;
 
     // Internal methods
-  protected:
+    //  protected:
 
     /// Get the qualified name
     static std::string qualifiedName(const XMLNode& nn);

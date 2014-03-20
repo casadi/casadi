@@ -100,7 +100,7 @@ output_fcn_out = ocp.substituteDependents([m,P])
 output_fcn_in = daeIn(
   t=ocp.t,
   x = var(ocp.x),
-  z = var(ocp.z),
+  z = ocp.zQQQ,
   p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
@@ -174,7 +174,7 @@ output_fcn_out = ocp.substituteDependents([T])
 output_fcn_in = daeIn(
   t=ocp.t,
   x = var(ocp.x),
-  z = var(ocp.z),
+  z = ocp.zQQQ,
   p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
@@ -243,7 +243,7 @@ output_fcn_out = ocp.substituteDependents([T,U,V])
 output_fcn_in = daeIn(
   t=ocp.t,
   x = var(ocp.x),
-  z = var(ocp.z),
+  z = ocp.zQQQ,
   p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
