@@ -107,7 +107,7 @@ namespace CasADi{
     SX zQQQ;
     
     /** \brief Quadrature states (length == quad().size()) */
-    std::vector<Variable> q;
+    SX qQQQ;
 
     /** \brief Independent constants */
     std::vector<Variable> ci;
@@ -286,6 +286,12 @@ namespace CasADi{
     /// Find an expression by name
     SX operator()(const std::string& name) const;
 
+    /// Find an derivative expression by name
+    SX der(const std::string& name) const;
+
+    /// Find an derivative expression by non-differentiated expression
+    SX der(const SX& var) const;
+
     /// Get the nominal value for a component
     double nominal(const std::string& name) const;
     
@@ -354,6 +360,7 @@ namespace CasADi{
 
     /// Timed variable (allocate if necessary)
     SX atTime(const std::string& name, double t, bool allocate=false);
+
 
 
 #ifndef SWIG

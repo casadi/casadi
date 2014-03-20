@@ -63,7 +63,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->zQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
+    this->zQQQ = this->qQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -393,7 +393,7 @@ namespace CasADi{
     // Make sure that the dimensions are consistent at this point
     casadi_assert_warning(this->x.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
     casadi_assert_warning(this->zQQQ.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
-    casadi_assert(q.size()==quad.size());
+    casadi_assert(this->qQQQ.size()==this->quad.size());
     casadi_assert(this->yQQQ.size()==this->dep.size());
   }
 
@@ -502,7 +502,7 @@ namespace CasADi{
     stream << "#s = " << this->s.size() << ", ";
     stream << "#x = " << this->x.size() << ", ";
     stream << "#z = " << this->zQQQ.size() << ", ";
-    stream << "#q = " << this->q.size() << ", ";
+    stream << "#q = " << this->qQQQ.size() << ", ";
     stream << "#y = " << this->yQQQ.size() << ", ";
     stream << "#pi = " << this->pi.size() << ", ";
     stream << "#pd = " << this->pd.size() << ", ";
@@ -521,7 +521,7 @@ namespace CasADi{
     stream << "  s = " << this->s << endl;
     stream << "  x = " << this->x << endl;
     stream << "  z =  " << this->zQQQ << endl;
-    stream << "  q =  " << this->q << endl;
+    stream << "  q =  " << this->qQQQ << endl;
     stream << "  y =  " << this->yQQQ << endl;
     stream << "  pi =  " << this->pi << endl;
     stream << "  pd =  " << this->pd << endl;
@@ -550,8 +550,8 @@ namespace CasADi{
     stream << endl;
   
     stream << "Quadrature equations" << endl;
-    for(int k=0; k<this->q.size(); ++k){
-      stream << this->q.at(k).der() << " == " << this->quad.at(k) << endl;
+    for(int k=0; k<this->qQQQ.size(); ++k){
+      stream << der(this->qQQQ.at(k)).toScalar() << " == " << this->quad.at(k) << endl;
     }
     stream << endl;
 
@@ -654,7 +654,7 @@ namespace CasADi{
       addVariable(q_name.str(),qv);
     
       // Add to the quadrature states
-      this->q.push_back(qv);
+      this->qQQQ.append(qv.var());
 
       // Add the Lagrange term to the list of quadratures
       this->quad.append(*it);
@@ -670,12 +670,13 @@ namespace CasADi{
   void SymbolicOCP::eliminateQuadratureStates(){
   
     // Move all the quadratures to the list of differential states
-    this->x.insert(this->x.end(),this->q.begin(),this->q.end());
-    this->q.clear();
+    vector<Variable> yy = getVar(*this,this->qQQQ);
+    this->x.insert(this->x.end(),yy.begin(),yy.end());
+    this->qQQQ = SX::zeros(0,1);
   
     // Move the equations to the list of ODEs
     this->ode.append(this->quad);
-    this->quad.clear();
+    this->quad = SX::zeros(0,1);
   }
 
   void SymbolicOCP::scaleVariables(){
@@ -684,7 +685,7 @@ namespace CasADi{
   
     // Variables
     SX _s = CasADi::var(this->s);
-    SX _sdot = der(this->s);
+    SX _sdot = CasADi::der(this->s);
     SX _x = CasADi::var(this->x);
     SX _pi = CasADi::var(this->pi);
     SX _pf = CasADi::var(this->pf);
@@ -750,11 +751,11 @@ namespace CasADi{
     enum Variables{T,X,XDOT,Z,PI,PF,U,NUM_VAR};
     vector<SX > v(NUM_VAR); // all variables
     v[T] = this->t;
-    v[X] = CasADi::var(this->x);
-    v[XDOT] = der(this->x);
+    v[X] = var(this->x);
+    v[XDOT] = der(var(this->x));
     v[Z] = this->zQQQ;
-    v[PI] = CasADi::var(this->pi);
-    v[PF] = CasADi::var(this->pf);
+    v[PI] = var(this->pi);
+    v[PF] = var(this->pf);
     v[U] = this->uQQQ;
 
     // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
@@ -817,7 +818,7 @@ namespace CasADi{
     if(this->x.empty()) return;
 
     // Find out which differential equation depends on which differential state
-    SXFunction f(der(this->s),this->dae);
+    SXFunction f(der(var(this->s)),this->dae);
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -883,7 +884,7 @@ namespace CasADi{
     if(this->s.empty()) return;
     
     // Write the ODE as a function of the state derivatives
-    SXFunction f(der(this->s),this->dae);
+    SXFunction f(der(var(this->s)),this->dae);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
@@ -905,7 +906,7 @@ namespace CasADi{
     s_new.clear();
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = SXFunction(der(this->s),this->dae);
+    f = SXFunction(der(var(this->s)),this->dae);
     f.init();
 
     // Get the Jacobian
@@ -936,10 +937,10 @@ namespace CasADi{
       SX Jb = J(Slice(rowblock[b],rowblock[b+1]),Slice(colblock[b],colblock[b+1]));
 
       // If Jb depends on xb, then the state derivative does not enter linearly in the ODE and we cannot solve for the state derivative
-      casadi_assert_message(!dependsOn(Jb,der(xb)),"Cannot find an explicit expression for variable(s) " << xb);
+      casadi_assert_message(!dependsOn(Jb,der(var(xb))),"Cannot find an explicit expression for variable(s) " << xb);
       
       // Divide fb into a part which depends on vb and a part which doesn't according to "fb == mul(Jb,vb) + fb_res"
-      SX fb_res = substitute(fb,der(xb),SX::zeros(xb.size())).data();
+      SX fb_res = substitute(fb,der(var(xb)),SX::zeros(xb.size())).data();
       SX fb_exp;
       
       // Solve for vb
@@ -956,7 +957,7 @@ namespace CasADi{
     }
   
     // Eliminate inter-dependencies
-    substituteInPlace(der(s),new_ode,false);
+    substituteInPlace(der(var(this->s)),new_ode,false);
 
     // Add to explicit differential states and ODE
     this->ode.append(new_ode);
@@ -1468,6 +1469,21 @@ namespace CasADi{
     return it->second.var();
   }
 
+  SX SymbolicOCP::der(const std::string& name) const{
+    map<string,Variable>::const_iterator it = varmap_.find(name);
+    casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
+    return it->second.der();
+  } 
+
+  SX SymbolicOCP::der(const SX& var) const{
+    casadi_assert(var.isVector() && var.isSymbolic());
+    SX ret = SX::zeros(var.sparsity());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = der(var.at(i).getName());
+    }
+    return ret;
+  }
+
   double SymbolicOCP::nominal(const std::string& name) const{
     map<string,Variable>::const_iterator it = varmap_.find(name);
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
@@ -1558,7 +1574,7 @@ namespace CasADi{
 
     // We investigate the interdependencies in sdot -> dae
     vector<SX> f_in;
-    f_in.push_back(der(this->s));
+    f_in.push_back(der(var(this->s)));
     SXFunction f(f_in,this->dae);
     f.init();
 
@@ -1702,6 +1718,7 @@ namespace CasADi{
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
     it->second->unit_ = val;
   }
+
 
 } // namespace CasADi
 
