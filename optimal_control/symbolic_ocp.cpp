@@ -34,7 +34,6 @@
 
 #include "../symbolic/casadi_exception.hpp"
 #include "../symbolic/std_vector_tools.hpp"
-#include "variable_tools.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/sx/sx_tools.hpp"
 #include "../symbolic/fx/integrator.hpp"
@@ -101,35 +100,35 @@ namespace CasADi{
           Variable var(name);
         
           // Value reference
-          var.setValueReference(valueReference);
+          var->valueReference_ = valueReference;
         
           // Variability
           if(variability.compare("constant")==0)
-            var.setVariability(CONSTANT);
+            var->variability_ = CONSTANT;
           else if(variability.compare("parameter")==0)
-            var.setVariability(PARAMETER);
+            var->variability_ = PARAMETER;
           else if(variability.compare("discrete")==0)
-            var.setVariability(DISCRETE);
+            var->variability_ = DISCRETE;
           else if(variability.compare("continuous")==0)
-            var.setVariability(CONTINUOUS);
+            var->variability_ = CONTINUOUS;
           else throw CasadiException("Unknown variability");
     
           // Causality
           if(causality.compare("input")==0)
-            var.setCausality(INPUT);
+            var->causality_ = INPUT;
           else if(causality.compare("output")==0)
-            var.setCausality(OUTPUT);
+            var->causality_ = OUTPUT;
           else if(causality.compare("internal")==0)
-            var.setCausality(INTERNAL);
+            var->causality_ = INTERNAL;
           else throw CasadiException("Unknown causality");
         
           // Alias
           if(alias.compare("noAlias")==0)
-            var.setAlias(NO_ALIAS);
+            var->alias_ = NO_ALIAS;
           else if(alias.compare("alias")==0)
-            var.setAlias(ALIAS);
+            var->alias_ = ALIAS;
           else if(alias.compare("negatedAlias")==0)
-            var.setAlias(NEGATED_ALIAS);
+            var->alias_ = NEGATED_ALIAS;
           else throw CasadiException("Unknown alias");
         
           // Other properties
@@ -149,19 +148,19 @@ namespace CasADi{
           if(vnode.hasChild("VariableCategory")){
             string cat = vnode["VariableCategory"].getText();
             if(cat.compare("derivative")==0)
-              var.setCategory(CAT_DERIVATIVE);
+              var->category_ = CAT_DERIVATIVE;
             else if(cat.compare("state")==0)
-              var.setCategory(CAT_STATE);
+              var->category_ = CAT_STATE;
             else if(cat.compare("dependentConstant")==0)
-              var.setCategory(CAT_DEPENDENT_CONSTANT);
+              var->category_ = CAT_DEPENDENT_CONSTANT;
             else if(cat.compare("independentConstant")==0)
-              var.setCategory(CAT_INDEPENDENT_CONSTANT);
+              var->category_ = CAT_INDEPENDENT_CONSTANT;
             else if(cat.compare("dependentParameter")==0)
-              var.setCategory(CAT_DEPENDENT_PARAMETER);
+              var->category_ = CAT_DEPENDENT_PARAMETER;
             else if(cat.compare("independentParameter")==0)
-              var.setCategory(CAT_INDEPENDENT_PARAMETER);
+              var->category_ = CAT_INDEPENDENT_PARAMETER;
             else if(cat.compare("algebraic")==0)
-              var.setCategory(CAT_ALGEBRAIC);
+              var->category_ = CAT_ALGEBRAIC;
             else throw CasadiException("Unknown variable category: " + cat);
           }
         
@@ -415,13 +414,13 @@ namespace CasADi{
       return cos(readExpr(node[0]));
     } else if(name.compare("Der")==0){
       Variable v = readVariable(node[0]);
-      return v.der();
+      return v->der_;
     } else if(name.compare("Div")==0){
       return readExpr(node[0]) / readExpr(node[1]);
     } else if(name.compare("Exp")==0){
       return exp(readExpr(node[0]));
     } else if(name.compare("Identifier")==0){
-      return readVariable(node).var();
+      return readVariable(node)->var_;
     } else if(name.compare("IntegerLiteral")==0){
       int val;
       node.getText(val);
@@ -633,22 +632,22 @@ namespace CasADi{
     
       // Create a new quadrature state
       Variable qv(q_name.str());
-      qv.setVariability(CONTINUOUS);
-      qv.setCausality(INTERNAL);
-      qv.setStart(0.0);
-      if(tf==tf) qv.setNominal(this->tf); // if not not-a-number
+      qv->variability_ = CONTINUOUS;
+      qv->causality_ = INTERNAL;
+      qv->start_ = 0.0;
+      if(tf==tf) qv->nominal_ = this->tf; // if not not-a-number
   
       // Add to the list of variables
       addVariable(q_name.str(),qv);
     
       // Add to the quadrature states
-      this->q.append(qv.var());
+      this->q.append(qv->var_);
 
       // Add the Lagrange term to the list of quadratures
       this->quad.append(*it);
     
       // Add to the list of Mayer terms
-      this->mterm.append(qv.var());
+      this->mterm.append(qv->var_);
     }
   
     // Remove the Lagrange terms
@@ -1049,7 +1048,7 @@ namespace CasADi{
     varmap_[name] = var;
   
     // Sort by category
-    switch(var.getCategory()){
+    switch(var->category_){
     case CAT_DERIVATIVE:
       // Skip derivatives
       break;
@@ -1066,16 +1065,16 @@ namespace CasADi{
       this->pd.append(var->var_);
       break;
     case CAT_INDEPENDENT_PARAMETER:
-      if(var.getFree()){
+      if(var->free_){
         this->pf.append(var->var_);
       } else {
         this->pi.append(var->var_);
       }
       break;
     case CAT_ALGEBRAIC:
-      if(var.getCausality() == INTERNAL){
+      if(var->causality_ == INTERNAL){
         this->s.append(var->var_);
-      } else if(var.getCausality() == INPUT){
+      } else if(var->causality_ == INPUT){
         this->u.append(var->var_);
       }
       break;

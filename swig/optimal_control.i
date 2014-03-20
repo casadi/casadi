@@ -23,7 +23,6 @@
 %{
 #include "optimal_control/variable.hpp"
 #include "optimal_control/symbolic_ocp.hpp"
-#include "optimal_control/variable_tools.hpp"
 #include "optimal_control/ocp_tools.hpp"
 #include "optimal_control/direct_single_shooting.hpp"
 #include "optimal_control/direct_multiple_shooting.hpp"
@@ -32,7 +31,6 @@
 
 %include "optimal_control/variable.hpp"
 %include "optimal_control/symbolic_ocp.hpp"
-%include "optimal_control/variable_tools.hpp"
 %include "optimal_control/ocp_tools.hpp"
 %include "optimal_control/direct_single_shooting.hpp"
 %include "optimal_control/direct_multiple_shooting.hpp"

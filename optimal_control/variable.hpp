@@ -79,21 +79,21 @@ namespace CasADi{
     
     /// Destructor
     virtual ~Variable();
+        
+    /// Variable name
+    std::string name() const;
+
+    /// Variable expression
     
-    /// Get the variable expression
-    SX var() const;
-    
-    /// Get differential expression
-    SX der() const;
-    
+    /// Differential expression
+
     /// Timed variable (never allocate)
     SX atTime(double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
     SX atTime(double t, bool allocate=false);
     
-    /// Get the variable index
-    int index() const;
+    /// Variable index
         
     /// Access functions of the node
     VariableInternal* operator->();
@@ -101,107 +101,39 @@ namespace CasADi{
     /// Const access functions of the node
     const VariableInternal* operator->() const;
 
-    /// Get variable name
-    std::string getName() const;
+    /// Variability (see Fritzon)
 
-    /// Get the variability (see Fritzon)
-    Variability getVariability() const;
+    /// Causality (see Fritzon)
 
-    /// Set the variability (see Fritzon)
-    void setVariability(Variability variability);
+    /// Variable category
 
-    /// Get the causality (see Fritzon)
-    Causality getCausality() const;
-
-    /// Set the causality (see Fritzon)
-    void setCausality(Causality causality);
-
-    /// Get the variable category
-    Category getCategory() const;
-
-    /// Set the variable category
-    void setCategory(Category category);
-
-    /// Check if the variable is an alias variable
-    Alias getAlias() const;
-
-    /// Set if the variable is an alias variable
-    void setAlias(Alias alias);
+    /// Is the variable is an alias variable?
     
-    /// Get the description
-    const std::string& getDescription() const;
+    /// Description
+
+    /// Variable reference (XML)
     
-    /// Set the description
-    void setDescription(const std::string& description);
+    /// Nominal value
+
+    /// Value at time 0
+
+    /// Lower bound
+
+    /// Upper bound
+
+    /// Derivative at time 0
+
+    /// Unit
+
+    /// Display unit
     
-    /// Get the variable reference (XML)
-    int getValueReference() const;
+    /// Expression
 
-    /// Set the variable reference (XML)
-    void setValueReference(int valueReference);
-    
-    /// Get the lower bound
-    double getMin() const;
-
-    /// Set the lower bound
-    void setMin(double min);
-    
-    /// Get the upper bound
-    double getMax() const;
-
-    /// Set the upper bound
-    void setMax(double max);
-    
-    /// Get the nominal value of the variable
-    double getNominal() const;
-
-    /// Set the nominal value of the variable
-    void setNominal(double nominal);
-
-    /// Get the value at time 0
-    double getStart() const;
-
-    /// Set the value at time 0
-    void setStart(double start);
-
-    /// Get the lower bound
-    double getInitialGuess() const;
-
-    /// Set the lower bound
-    void setInitialGuess(double initial_guess);
-
-    /// Get the derivative at time 0
-    double getDerivativeStart() const;
-
-    /// Set the derivative at time 0
-    void setDerivativeStart(double start);
-    
-    /// Get the unit
-    const std::string& getUnit() const;
-
-    /// Set the unit
-    void setUnit(const std::string& unit);
-    
-    /// Get the display unit
-    const std::string& getDisplayUnit() const;
-
-    /// Set the display unit
-    void setDisplayUnit(const std::string& displayUnit);
-    
-    /// Set the expression
-    void setExpression(const SX& v);
-
-    /// Set the derivative expression
-    void setDerivative(const SX& d);
+    /// Derivative expression
                 
-    /// Set the variable index
-    void setIndex(int ind);
-        
-    /// Get the the free attribute
-    bool getFree() const;
+    /// Variable index
 
-    /// Set the the free attribute
-    void setFree(bool free);
+    /// Free attribute
         
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

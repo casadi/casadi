@@ -30,7 +30,6 @@
 
 #include <optimal_control/symbolic_ocp.hpp>
 #include <optimal_control/ocp_tools.hpp>
-#include <optimal_control/variable_tools.hpp>
 #include <optimal_control/direct_multiple_shooting.hpp>
 
 using namespace CasADi;
@@ -64,12 +63,12 @@ int main(){
   ocp.print();
   
   // Correct the inital guess and bounds on variables
-  ocp.variable("u").setStart(280);
-  ocp.variable("u").setMin(230);
-  ocp.variable("u").setMax(370);
+  ocp.setStart("u",280);
+  ocp.setMin("u",230);
+  ocp.setMax("u",370);
 
   // Correct bound on state
-  ocp.variable("cstr.T").setMax(350);
+  ocp.setMax("cstr.T",350);
   
   // Variables
   SX t = ocp.t;

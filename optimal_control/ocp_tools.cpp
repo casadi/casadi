@@ -24,7 +24,6 @@
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/fx/sx_function.hpp"
 #include "symbolic/std_vector_tools.hpp"
-#include "variable_tools.hpp"
 
 #include <algorithm>
 #include <set>
