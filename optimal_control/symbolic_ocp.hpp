@@ -296,6 +296,9 @@ namespace CasADi{
 
     /// Get the nominal value for a component
     double nominal(const std::string& name) const;
+    
+    /// Get the nominal values given a vector of symbolic variables
+    std::vector<double> nominal(const SX& var) const;
 
     /// Set the nominal value for a component
     void setNominal(const std::string& name, double val);
@@ -303,11 +306,17 @@ namespace CasADi{
     /// Get the lower bound for a component
     double min(const std::string& name) const;
 
+    /// Get the lower bound given a vector of symbolic variables
+    std::vector<double> min(const SX& var) const;
+
     /// Set the upper bound for a component
     void setMin(const std::string& name, double val);
 
     /// Get the upper bound for a component
     double max(const std::string& name) const;
+
+    /// Get the upper bound given a vector of symbolic variables
+    std::vector<double> max(const SX& var) const;
 
     /// Set the upper bound for a component
     void setMax(const std::string& name, double val);
@@ -315,17 +324,26 @@ namespace CasADi{
     /// Get the value at time 0 for a component
     double start(const std::string& name) const;
 
+    /// Get the value at time 0 given a vector of symbolic variables
+    std::vector<double> start(const SX& var) const;
+
     /// Set the value at time 0 for a component
     void setStart(const std::string& name, double val);
 
     /// Get the initial guess for a component
     double initialGuess(const std::string& name) const;
 
+    /// Get the initial guess given a vector of symbolic variables
+    std::vector<double> initialGuess(const SX& var) const;
+
     /// Set the initial guess for a component
     void setInitialGuess(const std::string& name, double val);
 
     /// Get the derivative at time 0 for a component
     double derivativeStart(const std::string& name) const;
+
+    /// Get the derivative at time 0 given a vector of symbolic variables
+    std::vector<double> derivativeStart(const SX& var) const;
 
     /// Set the derivative at time 0 for a component
     void setDerivativeStart(const std::string& name, double val);

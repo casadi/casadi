@@ -1646,5 +1646,59 @@ namespace CasADi{
     z.insert(z.end(),new_z.begin(),new_z.end());
   }
 
+  std::vector<double> SymbolicOCP::nominal(const SX& var) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::nominal: Argument must be a symbolic vector");
+    std::vector<double> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = nominal(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  std::vector<double> SymbolicOCP::min(const SX& var) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::min: Argument must be a symbolic vector");
+    std::vector<double> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = min(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  std::vector<double> SymbolicOCP::max(const SX& var) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::max: Argument must be a symbolic vector");
+    std::vector<double> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = max(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  std::vector<double> SymbolicOCP::start(const SX& var) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::start: Argument must be a symbolic vector");
+    std::vector<double> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = start(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  std::vector<double> SymbolicOCP::initialGuess(const SX& var) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::initialGuess: Argument must be a symbolic vector");
+    std::vector<double> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = initialGuess(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  std::vector<double> SymbolicOCP::derivativeStart(const SX& var) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::derivativeStart: Argument must be a symbolic vector");
+    std::vector<double> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = derivativeStart(var.at(i).getName());
+    }
+    return ret;
+  }
+
 } // namespace CasADi
 
