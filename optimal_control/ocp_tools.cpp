@@ -37,13 +37,13 @@ namespace CasADi{
   
 void updateDependent(SymbolicOCP& ocp){
   // Quick return if no dependent parameters
-  if(ocp.pd.empty()) return;
+  if(ocp.pdQQQ.isEmpty()) return;
   
   // Get the binding equations
-  SX pd_def = substitute(var(ocp.pd),ocp.yQQQ,ocp.dep);
+  SX pd_def = substitute(ocp.pdQQQ,ocp.yQQQ,ocp.dep);
   
   // Get expressions for the variables
-  SX pd = var(ocp.pd);
+  SX pd = ocp.pdQQQ;
   
   // Sort out interdependencies
   bool reverse=false;
@@ -65,9 +65,7 @@ void updateDependent(SymbolicOCP& ocp){
   const vector<double>& res = f.output().data();
   
   // Save to variables
-  for(int k=0; k<ocp.pd.size(); ++k){
-    ocp.pd[k].setStart(res[k]);
-  }
+  ocp.setStart(ocp.pdQQQ,res);
 }
 
 } // namespace CasADi

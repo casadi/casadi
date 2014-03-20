@@ -63,7 +63,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->zQQQ = this->qQQQ = this->piQQQ = this->pfQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
+    this->zQQQ = this->qQQQ = this->piQQQ = this->pdQQQ = this->pfQQQ = this->yQQQ = this->uQQQ = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -505,7 +505,7 @@ namespace CasADi{
     stream << "#q = " << this->qQQQ.size() << ", ";
     stream << "#y = " << this->yQQQ.size() << ", ";
     stream << "#pi = " << this->piQQQ.size() << ", ";
-    stream << "#pd = " << this->pd.size() << ", ";
+    stream << "#pd = " << this->pdQQQ.size() << ", ";
     stream << "#pf = " << this->pfQQQ.size() << ", ";
     stream << "#ci =  " << this->ci.size() << ", ";
     stream << "#cd =  " << this->cd.size() << ", ";
@@ -524,7 +524,7 @@ namespace CasADi{
     stream << "  q =  " << this->qQQQ << endl;
     stream << "  y =  " << this->yQQQ << endl;
     stream << "  pi =  " << this->piQQQ << endl;
-    stream << "  pd =  " << this->pd << endl;
+    stream << "  pd =  " << this->pdQQQ << endl;
     stream << "  pf =  " << this->pfQQQ << endl;
     stream << "  ci =  " << this->ci << endl;
     stream << "  cd =  " << this->cd << endl;
@@ -854,12 +854,12 @@ namespace CasADi{
   }
 
   void SymbolicOCP::sortDependentParameters(){
-    // Quick return if no algebraic states
-    if(this->pd.empty()) return;
+    // Quick return if no dependent parameters
+    if(this->pdQQQ.isEmpty()) return;
   
     // Find out which dependent parameter depends on which binding equation
-    SX v = var(this->pd);
-    SXFunction f(v,v-substitute(var(this->pd),this->yQQQ,dep));
+    SX v = this->pdQQQ;
+    SXFunction f(v,v-substitute(this->pdQQQ,this->yQQQ,dep));
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -868,11 +868,7 @@ namespace CasADi{
     sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
 
     // Permute variables
-    vector<Variable> pd_new(this->pd.size());
-    for(int i=0; i<this->pd.size(); ++i){
-      pd_new[i]= this->pd[colperm[i]];
-    }
-    pd_new.swap(this->pd);  
+    this->pdQQQ = this->pdQQQ(colperm);
   }
 
   void SymbolicOCP::makeExplicit(){
@@ -1139,7 +1135,7 @@ namespace CasADi{
       this->ci.push_back(var);
       break;
     case CAT_DEPENDENT_PARAMETER:
-      this->pd.push_back(var);
+      this->pdQQQ.append(var->var_);
       break;
     case CAT_INDEPENDENT_PARAMETER:
       if(var.getFree()){
@@ -1670,6 +1666,14 @@ namespace CasADi{
     return ret;
   }
 
+  void SymbolicOCP::setStart(const SX& var, const std::vector<double>& val){
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::setStart: Argument must be a symbolic vector");
+    casadi_assert_message(var.size()==var.size(),"SymbolicOCP::setStart: Dimension mismatch");
+    for(int i=0; i<val.size(); ++i){
+      setStart(var.at(i).getName(),val.at(i));
+    }
+  }
+
   std::vector<double> SymbolicOCP::initialGuess(const SX& var, bool nominal) const{
     casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::initialGuess: Argument must be a symbolic vector");
     std::vector<double> ret(var.size());
@@ -1712,6 +1716,7 @@ namespace CasADi{
     casadi_assert_message(it!=varmap_.end(),"Variable \"" + name + "\" not found.");
     it->second->unit_ = val;
   }
+
 
 
 } // namespace CasADi

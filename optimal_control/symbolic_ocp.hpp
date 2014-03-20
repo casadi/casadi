@@ -121,7 +121,7 @@ namespace CasADi{
 
     /** \brief Dependent parameters 
         A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */
-    std::vector<Variable> pd;
+    SX pdQQQ;
 
     /** \brief Free parameters 
         A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
@@ -327,6 +327,9 @@ namespace CasADi{
 
     /// Set the value at time 0 for a component
     void setStart(const std::string& name, double val);
+
+    /// Set the value at time 0 for a component
+    void setStart(const SX& var, const std::vector<double>& val);
 
     /// Get the initial guess for a component
     double initialGuess(const std::string& name, bool nominal=false) const;
