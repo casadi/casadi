@@ -96,8 +96,12 @@ namespace CasADi{
         if(varmap_.find(qn)==varmap_.end()){
         
           // Create variable
-          Variable var(name);
-        
+          Variable var;
+
+          // Create symbolic expressions
+          var.v = SX::sym(name);
+          var.d = SX::sym("der_" + name);
+
           // Value reference
           var.valueReference = valueReference;
         
@@ -630,7 +634,13 @@ namespace CasADi{
       q_name << "q_" << ind++;
     
       // Create a new quadrature state
-      Variable qv(q_name.str());
+      Variable qv;
+
+      // Create symbolic expressions
+      qv.v = SX::sym(q_name.str());
+      qv.d = SX::sym("der_" + q_name.str());
+
+      // Set attributes
       qv.variability = CONTINUOUS;
       qv.causality = INTERNAL;
       qv.start = 0.0;

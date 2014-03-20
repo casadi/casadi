@@ -61,17 +61,14 @@ namespace CasADi{
     CAT_ALGEBRAIC
   };
 
-  /** \brief Smart pointer class to a Variable
-   *  
-   *  A Variable is an SX expression with meta-data attached.
+  /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
+      \date 2012-2014
+      \author Joel Andersson
    */
   struct Variable : public PrintableObject{
     
     /// Default constructor
     Variable();
-
-    /// Create a new variable
-    explicit Variable(const std::string& name);
     
     /// Variable name
     std::string name() const;
@@ -138,9 +135,8 @@ namespace CasADi{
         
   private:
 #ifndef SWIG
-
     // Timed variables
-    std::map<double,SX> timed_sx_;
+    std::map<double,SX> timed_;
 
     // Print
     virtual void repr(std::ostream &stream) const;
@@ -149,12 +145,6 @@ namespace CasADi{
 
   };
 } // namespace CasADi
-
-#ifdef SWIG
-// Template instantiations
-%template(VariableVector) std::vector<CasADi::Variable>;
-#endif // SWIG  
-
 
 #endif // VARIABLE_HPP
 

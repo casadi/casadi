@@ -27,11 +27,6 @@ using namespace std;
 namespace CasADi{
 
   Variable::Variable(){
-  }
-
-  Variable::Variable(const string& name){
-    this->v = SX::sym(name);
-    this->d = SX::sym("der_" + name);
     this->variability = CONTINUOUS;
     this->causality = INTERNAL;
     this->category = CAT_UNKNOWN;
@@ -61,10 +56,10 @@ namespace CasADi{
 
   SX Variable::atTime(double t, bool allocate){
     // Find an existing element
-    map<double,SX>::const_iterator it = timed_sx_.find(t);
+    map<double,SX>::const_iterator it = timed_.find(t);
   
     // If not found
-    if(it==timed_sx_.end()){
+    if(it==timed_.end()){
       if(allocate){
         // Create a timed variable
         stringstream ss;
@@ -72,7 +67,7 @@ namespace CasADi{
         SX tvar = SX::sym(ss.str());
       
         // Save to map
-        timed_sx_[t] = tvar;
+        timed_[t] = tvar;
       
         // Return the expression
         return tvar;
