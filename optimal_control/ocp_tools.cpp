@@ -40,7 +40,7 @@ void updateDependent(SymbolicOCP& ocp){
   if(ocp.pd.empty()) return;
   
   // Get the binding equations
-  SX pd_def = substitute(var(ocp.pd),var(ocp.y),ocp.dep);
+  SX pd_def = substitute(var(ocp.pd),ocp.yQQQ,ocp.dep);
   
   // Get expressions for the variables
   SX pd = var(ocp.pd);

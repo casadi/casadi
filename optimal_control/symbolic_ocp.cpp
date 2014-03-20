@@ -63,7 +63,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->zQQQ = SX::zeros(0,1);
+    this->zQQQ = this->yQQQ = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -200,7 +200,7 @@ namespace CasADi{
         SX bexpr = readExpr(beq[1][0]);
       
         // Add binding equation
-        this->y.push_back(var);
+        this->yQQQ.append(var->var_);
         this->dep.append(bexpr);
       }
     
@@ -391,10 +391,10 @@ namespace CasADi{
     }
   
     // Make sure that the dimensions are consistent at this point
-    casadi_assert_warning(x.size()==ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
+    casadi_assert_warning(this->x.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
     casadi_assert_warning(this->zQQQ.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
     casadi_assert(q.size()==quad.size());
-    casadi_assert(y.size()==dep.size());
+    casadi_assert(this->yQQQ.size()==this->dep.size());
   }
 
   Variable& SymbolicOCP::readVariable(const XMLNode& node){
@@ -503,7 +503,7 @@ namespace CasADi{
     stream << "#x = " << this->x.size() << ", ";
     stream << "#z = " << this->zQQQ.size() << ", ";
     stream << "#q = " << this->q.size() << ", ";
-    stream << "#y = " << this->y.size() << ", ";
+    stream << "#y = " << this->yQQQ.size() << ", ";
     stream << "#pi = " << this->pi.size() << ", ";
     stream << "#pd = " << this->pd.size() << ", ";
     stream << "#pf = " << this->pf.size() << ", ";
@@ -522,7 +522,7 @@ namespace CasADi{
     stream << "  x = " << this->x << endl;
     stream << "  z =  " << this->zQQQ << endl;
     stream << "  q =  " << this->q << endl;
-    stream << "  y =  " << this->y << endl;
+    stream << "  y =  " << this->yQQQ << endl;
     stream << "  pi =  " << this->pi << endl;
     stream << "  pd =  " << this->pd << endl;
     stream << "  pf =  " << this->pf << endl;
@@ -563,8 +563,8 @@ namespace CasADi{
 
     // Dependent equations
     stream << "Dependent equations" << endl;
-    for(int i=0; i<this->y.size(); ++i)
-      stream << this->y.at(i) << " == " << this->dep.at(i) << endl;
+    for(int i=0; i<this->yQQQ.size(); ++i)
+      stream << this->yQQQ.at(i) << " == " << this->dep.at(i) << endl;
     stream << endl;
 
     // Mayer terms
@@ -599,14 +599,14 @@ namespace CasADi{
   }
 
   void SymbolicOCP::eliminateInterdependencies(){
-    substituteInPlace(CasADi::var(y),dep,false);
+    substituteInPlace(this->yQQQ,this->dep,false);
   
     // Make sure that the dependent variables have been properly eliminated from the dependent expressions
-    casadi_assert(!dependsOn(dep,CasADi::var(y)));
+    casadi_assert(!dependsOn(this->dep,this->yQQQ));
   }
 
   vector<SX> SymbolicOCP::substituteDependents(const vector<SX>& x) const{
-    return substitute(x,vector<SX>(1,CasADi::var(y)),vector<SX>(1,dep));
+    return substitute(x,vector<SX>(1,this->yQQQ),vector<SX>(1,this->dep));
   }
 
   void SymbolicOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
@@ -863,7 +863,7 @@ namespace CasADi{
   
     // Find out which dependent parameter depends on which binding equation
     SX v = var(this->pd);
-    SXFunction f(v,v-substitute(var(this->pd),var(this->y),dep));
+    SXFunction f(v,v-substitute(var(this->pd),this->yQQQ,dep));
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -1048,9 +1048,8 @@ namespace CasADi{
     substituteInPlace(z_exp,f_exp,false);
 
     // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
-    vector<Variable> yy = getVar(*this,z_exp);
-    this->y.insert(y.begin(),yy.begin(),yy.end());
-    this->dep = vertcat(f_exp,dep);
+    this->yQQQ = vertcat(z_exp,this->yQQQ);
+    this->dep = vertcat(f_exp,this->dep);
   
     // Save new algebraic equations
     this->zQQQ = z_imp;

@@ -128,7 +128,7 @@ namespace CasADi{
     std::vector<Variable> pf;
     
     /** \brief Dependent variables (length == dep().size()) */
-    std::vector<Variable> y;
+    SX yQQQ;
     
     /** \brief Control signals */
     std::vector<Variable> u;
