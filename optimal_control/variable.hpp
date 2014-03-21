@@ -61,197 +61,93 @@ namespace CasADi{
     CAT_ALGEBRAIC
   };
 
-  // Forward declaration
-  class VariableInternal;
-
-  /** \brief Smart pointer class to a Variable
-   *  
-   *  A Variable is an SX expression with meta-data attached.
+  /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
+      \date 2012-2014
+      \author Joel Andersson
    */
-  class Variable : public SharedObject{
-  public:
+  struct Variable : public PrintableObject{
     
-    /// Default (empty) constructor
+    /// Default constructor
     Variable();
+    
+    /// Variable name
+    std::string name() const;
 
-    /// Create a new variable
-    explicit Variable(const std::string& name);
+    /// Variable expression
+    SX v; 
+
+    /// Derivative expression
+    SX d;            
+
+    /// (Current) value of the variable
+    double value;
+
+    /// Nominal value
+    double nominal;
     
-    /// Destructor
-    virtual ~Variable();
+    /// Value at time 0
+    double start;
+
+    /// Lower bound
+    double min;
+
+    /// Upper bound
+    double max;
+
+    /// Derivative at time 0
+    double derivativeStart;
+
+    /// Initial guess
+    double initialGuess;
+
+    /// Variability (see Fritzon)
+    Variability variability;
+
+    /// Causality (see Fritzon)
+    Causality causality;
+
+    /// Variable category
+    Category category;
+
+    /// Is the variable is an alias variable?
+    Alias alias;
     
-    /// Get the variable expression
-    SX var() const;
+    /// Description
+    std::string description;
+
+    /// Variable reference (XML)
+    int valueReference;
+        
+    /// Unit
+    std::string unit;
+
+    /// Display unit
+    std::string displayUnit;
     
-    /// Get differential expression
-    SX der() const;
-    
-    /// Get the binding expression for the variable or its derivative
-    SX binding(bool derivative=false) const;
-    
+    /// Variable index
+    int index;
+
+    /// Free attribute
+    bool free;
+
     /// Timed variable (never allocate)
     SX atTime(double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
     SX atTime(double t, bool allocate=false);
-    
-    /// Get the variable index
-    int index() const;
         
-    /// Access functions of the node
-    VariableInternal* operator->();
+  private:
+#ifndef SWIG
+    // Timed variables
+    std::map<double,SX> timed_;
 
-    /// Const access functions of the node
-    const VariableInternal* operator->() const;
+    // Print
+    virtual void repr(std::ostream &stream) const;
+    virtual void print(std::ostream &stream) const;
+#endif // SWIG
 
-    /// Get variable name
-    std::string getName() const;
-
-    /// Get the variability (see Fritzon)
-    Variability getVariability() const;
-
-    /// Set the variability (see Fritzon)
-    void setVariability(Variability variability);
-
-    /// Get the causality (see Fritzon)
-    Causality getCausality() const;
-
-    /// Set the causality (see Fritzon)
-    void setCausality(Causality causality);
-
-    /// Get the variable category
-    Category getCategory() const;
-
-    /// Set the variable category
-    void setCategory(Category category);
-
-    /// Check if the variable is an alias variable
-    Alias getAlias() const;
-
-    /// Set if the variable is an alias variable
-    void setAlias(Alias alias);
-    
-    /// Get the description
-    const std::string& getDescription() const;
-    
-    /// Set the description
-    void setDescription(const std::string& description);
-    
-    /// Get the variable reference (XML)
-    int getValueReference() const;
-
-    /// Set the variable reference (XML)
-    void setValueReference(int valueReference);
-    
-    /// Get the lower bound
-    double getMin() const;
-
-    /// Set the lower bound
-    void setMin(double min);
-    
-    /// Access the lower bound
-    double& min();
-
-    /// Get the upper bound
-    double getMax() const;
-
-    /// Set the upper bound
-    void setMax(double max);
-    
-    /// Access the upper bound
-    double& max();
-
-    /// Get the nominal value of the variable
-    double getNominal() const;
-
-    /// Set the nominal value of the variable
-    void setNominal(double nominal);
-    
-    /// Access the nominal value of the variable
-    double& nominal();
-
-    /// Get the value at time 0
-    double getStart() const;
-
-    /// Set the value at time 0
-    void setStart(double start);
-
-    /// Access the value at time 0
-    double& start();
-        
-    /// Get the lower bound
-    double getInitialGuess() const;
-
-    /// Set the lower bound
-    void setInitialGuess(double initial_guess);
-
-    /// Access the lower bound
-    double& initialGuess();
-
-    /// Get the derivative at time 0
-    double getDerivativeStart() const;
-
-    /// Set the derivative at time 0
-    void setDerivativeStart(double start);
-    
-    /// Access the derivative at time 0
-    double& derivativeStart();
-
-    /// Get the unit
-    const std::string& getUnit() const;
-
-    /// Set the unit
-    void setUnit(const std::string& unit);
-    
-    /// Access the unit
-    std::string& unit();
-    
-    /// Get the display unit
-    const std::string& getDisplayUnit() const;
-
-    /// Set the display unit
-    void setDisplayUnit(const std::string& displayUnit);
-
-    /// Get the display unit
-    std::string& displayUnit();
-    
-    /// Set the expression
-    void setExpression(const SX& v);
-
-    /// Set the derivative expression
-    void setDerivative(const SX& d);
-                
-    /// Set the binding expression for the variable or its derivative
-    void setBinding(const SX& binding, bool derivative=false);
-                
-    /// Set the variable index
-    void setIndex(int ind);
-    
-    /// Is differential?
-    bool isDifferential() const;
-    
-    /// Set differential
-    void setDifferential(bool is_differential);
-    
-    /// Get the the free attribute
-    bool getFree() const;
-
-    /// Set the the free attribute
-    void setFree(bool free);
-
-    /// Access the the free attribute
-    bool& free();
-        
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
   };
 } // namespace CasADi
-
-#ifdef SWIG
-// Template instantiations
-%template(VariableVector) std::vector<CasADi::Variable>;
-#endif // SWIG  
-
 
 #endif // VARIABLE_HPP
 

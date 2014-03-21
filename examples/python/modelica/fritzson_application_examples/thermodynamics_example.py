@@ -65,25 +65,14 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
-# Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
-
-# Sort the equations
-ocp.sortODE()
-ocp.sortALG()
-
-# Make the OCP explicit
+# Transform into an explicit ODE
 ocp.makeExplicit()
-
-# Eliminate the algebraic states
-ocp.eliminateAlgebraic()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
-  p = vertcat((var(ocp.pi),var(ocp.pf)))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -91,14 +80,12 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-m = ocp("m")
-P = ocp("P")
-output_fcn_out = ocp.substituteDependents([m,P])
+output_fcn_out = [ocp.binding("m"),ocp.binding("P")]
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
-  z = var(ocp.z),
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -108,7 +95,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -137,25 +124,17 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
-# Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
-
-# Sort the equations
-ocp.sortODE()
-ocp.sortALG()
-
-# Make the OCP explicit
+# Transform into an explicit ODE
 ocp.makeExplicit()
 
-# Eliminate the algebraic states
-ocp.eliminateAlgebraic()
+# Eliminate the independent variables
+ocp.eliminateIndependentParameters()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
-  p = vertcat((var(ocp.pi),var(ocp.pf)))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -163,13 +142,12 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp("T")
-output_fcn_out = ocp.substituteDependents([T])
+output_fcn_out = [ocp.binding("T")]
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
-  z = var(ocp.z),
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -179,7 +157,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -202,24 +180,16 @@ ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeTest.xml')
 
 # Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
+ocp.eliminateIndependentParameters()
 
-# Sort the equations
-ocp.sortODE()
-ocp.sortALG()
-
-# Make explicit
+# Transform into an explicit ODE
 ocp.makeExplicit()
-
-# Eliminate the algebraic states
-ocp.eliminateAlgebraic()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
-  p = vertcat((var(ocp.pi),var(ocp.pf)))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -227,15 +197,12 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp("T")
-U = ocp("U")
-V = ocp("V")
-output_fcn_out = ocp.substituteDependents([T,U,V])
+output_fcn_out = [ocp.binding("T"),ocp.binding("U"),ocp.binding("V")]
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
-  z = var(ocp.z),
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -245,7 +212,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -275,16 +242,8 @@ comp("CtrlFlowSystem")
 ocp = SymbolicOCP()
 ocp.parseFMI('CtrlFlowSystem.xml')
 
-# Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
-
-# Sort the equations
-ocp.sortODE()
-ocp.sortALG()
-
-# Make the OCP explicit
-ocp.makeExplicit()
+# Transform into a semi-explicit ODE
+ocp.makeSemiExplicit()
 
 # Print the ocp
 print ocp

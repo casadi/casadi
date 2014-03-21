@@ -961,11 +961,22 @@ namespace CasADi{
     std::vector<MatType> ret_out;
     ret_out.reserve(outputv_.size()*(1+nfdir) + inputv_.size()*nadir);
     ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-    for(int dir=0; dir<nfdir; ++dir)
+    for(int dir=0; dir<nfdir; ++dir) {
+      for(int i=0; i<getNumOutputs(); ++i) { // Correct sparsities #1025
+        if (fsens[dir][i].sparsity()!=outputv_[i].sparsity()) {
+          fsens[dir][i] = fsens[dir][i].setSparse(outputv_[i].sparsity());
+        }
+      }
       ret_out.insert(ret_out.end(),fsens[dir].begin(),fsens[dir].end());
-    for(int dir=0; dir<nadir; ++dir)
+    }
+    for(int dir=0; dir<nadir; ++dir) {
+      for(int i=0; i<getNumInputs(); ++i) { // Correct sparsities #1025
+        if (asens[dir][i].sparsity()!=inputv_[i].sparsity()) {
+          asens[dir][i] = asens[dir][i].setSparse(inputv_[i].sparsity());
+        }
+      }
       ret_out.insert(ret_out.end(),asens[dir].begin(),asens[dir].end());
-
+    }
     // Assemble function and return
     PublicType ret(ret_in,ret_out);
     ret.init();

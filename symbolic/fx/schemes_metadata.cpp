@@ -450,7 +450,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_ControlSimulatorInput: 
       if(i==0) return "Differential or algebraic state at t0  (dimension nx-by-1)";
       if(i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";
-      if(i==2) return "Parameters that change over the integration intervals (dimension (ns-1)-by-nu)";
+      if(i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";
       break;
     case SCHEME_DAEInput: 
       if(i==0) return "Differential state";

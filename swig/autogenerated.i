@@ -223,7 +223,7 @@ def controlsimulatorIn(*dummy,**kwargs):
   Keyword arguments:
     x0 -- Differential or algebraic state at t0  (dimension nx-by-1) [CONTROLSIMULATOR_X0]
     p  -- Parameters that are fixed over the entire horizon  (dimension np-by-1) [CONTROLSIMULATOR_P]
-    u  -- Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [CONTROLSIMULATOR_U]
+    u  -- Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [CONTROLSIMULATOR_U]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controlsimulatorIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlSimulatorInput,n)] for n in dummy[1:]]

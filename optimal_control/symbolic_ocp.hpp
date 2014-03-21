@@ -29,10 +29,7 @@ namespace CasADi{
   
   // Forward declarations
   class XMLNode;
-    
-  // All the types of variables in the SymbolicOCP class
-  enum SymbolicOCPVariables{VAR_X, VAR_Z, VAR_Q, VAR_CI, VAR_CD, VAR_PI, VAR_PD, VAR_PF, VAR_Y, VAR_U, NUM_VAR};
-  
+      
   /** \brief A flat OCP representation coupled to an XML file
 
       <H3>Variables:  </H3>
@@ -66,9 +63,6 @@ namespace CasADi{
       At a later state, the DAE can be reformulated, for example in semi-explicit form, 
       possibly in addition to a set of quadrature states.
  
-      The functions for reformulation is are provided as member functions to this class or as independent
-      functions located in the header file "ocp_tools.hpp".
-
       <H3>Usage skeleton:</H3>
   
       1. Call default constructor 
@@ -93,77 +87,79 @@ namespace CasADi{
     /// Default constructor
     SymbolicOCP();
     
-    /** @name Variables categories
+    /** @name Variables and equations
      *  Public data members
      */
     //@{
-    /** \brief Time */
+    /** \brief Independent variable (usually time) */
     SX t;
     
-    /** \brief Differential states */
-    std::vector<Variable> x;
+    /** \brief Differential-algebraic equation (DAE) with corresponding state vector and initial conditions
+     * DAE in fully-implicit form and corresponding states and algebraic variables. 
+     * dae and s have matching dimensions and 0 == dae(der(s),s,...) implicitly defines der(s).
+     * At t==0, 0 == initial(der(s),s,...) holds in addition to the dae.
+     */
+    SX s, dae, initial;
+
+    /** \brief Ordinary differential equation (ODE) and corresponding state vector
+     * ODE in explicit form and corresponding state vector.
+     * ode and x have matching dimensions and der(x) == ode(x,...).
+     */
+    SX x, ode;
+
+    /** \brief Algebraic equations and corresponding algebraic variables
+     * alg and z have matching dimensions and 0 == alg(z,...) implicitly defines z.
+     */
+    SX z, alg;
+
+    /** \brief Quadrature equations and corresponding quadrature states
+     * Quadrature equation, e.g. an ODE whose state does not enter in the right-hand-side.
+     * quad and q have matching dimensions and der(q) == quad(...)
+     */
+    SX q, quad;
+
+    /** \brief Output variables and corresponding definitions
+     * Interdependencies are allowed but must be non-cyclic.
+     * y and def_y have matching dimensions and y == y_def(y,...)
+     */
+    SX y, y_def;
+
+    /** \brief Free controls 
+     * The trajectories of the free controls are decision variables of the optimal control problem. They are chosen by
+     * the optimization algorithm in order to minimize the cost functional.
+     */
+    SX u;
     
-    /** \brief Algebraic variables */
-    std::vector<Variable> z;
-    
-    /** \brief Quadrature states (length == quad().size()) */
-    std::vector<Variable> q;
-
-    /** \brief Independent constants */
-    std::vector<Variable> ci;
-
-    /** \brief Dependent constants */
-    std::vector<Variable> cd;
-
-    /** \brief Independent parameters 
-        An independent parameter is a parameter whose value is determined by an expression that contains only literals: "parameter Real p1=2" or "parameter Boolean b(start=true)". In the latter case, the value of the parameter becomes true, and the Modelica compiler will generate a warning since there is no binding expression for the parameter. An independent parameter is fixed after the DAE has been initialized. */
-    std::vector<Variable> pi;
-
-    /** \brief Dependent parameters 
-        A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */
-    std::vector<Variable> pd;
-
     /** \brief Free parameters 
-        A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
-    std::vector<Variable> pf;
-    
-    /** \brief Dependent variables (length == dep().size()) */
-    std::vector<Variable> y;
-    
-    /** \brief Control signals */
-    std::vector<Variable> u;
+     * A free parameter is variables which is constant over time, but whose value is chosen by the optimization algorithm
+     * in order to minimize the cost functional.
+     */
+    SX p;
 
-    /** \brief Get all variables of a certain type */
-    std::vector<Variable>& variableByType(int type);
-    
-    /** \brief Get all variables of a certain type */
-    const std::vector<Variable>& variableByType(int type) const;
-    //@}
-    
-    /** @name Equations
-     *  Get all equations of a particular type 
+    /** \brief Independent parameters
+     * An independent parameter is a parameter whose value is determined by an expression that contains only literals.
+     * An independent parameter is fixed after the DAE has been initialized.
+     * Its value is located in the "value" attribute.
      */
-    //@{
-      
-    /// Explicit or implicit ODE
-    SX ode;
-    
-    /// Algebraic equations
-    SX alg;
-    
-    /// Quadrature equations
-    SX quad;
-    
-    /// Dependent equations
-    SX dep;
-    
-    /// Initial equations (remove?)
-    SX initial;
-    //@}
-    
-    /** @name Time points
+    SX pi;
+
+    /** \brief Dependent parameters and corresponding definitions
+        A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters.
+        A dependent parameter is fixed after the DAE has been initialized.        
+    */
+    SX pd, pd_def;
+
+    /** \brief Independent constant
+     * An independent constant is a constant whose value is determined by an expression that contains only literals.
+     * Its value is located in the "value" attribute.
      */
-    //@{
+    SX ci;
+
+    /** \brief Dependent constants and correspinding definitions
+     * A dependent constant is a constant whose value is determined by an expression which contains references to other constants.
+    */
+    SX cd, cd_def;
+    //@}
 
     /// Interval start time
     double t0;
@@ -228,24 +224,49 @@ namespace CasADi{
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
     
+    //@{
     /// Access a variable by name
     Variable& variable(const std::string& name);
-
-    /// Make a differential state algebraic by replacing its time derivative by 0
-    void makeAlgebraic(const Variable& v);
-
-    /// Make a differential state algebraic by replacing its time derivative by 0
-    void makeAlgebraic(const std::string& name);
+    const Variable& variable(const std::string& name) const;
+    //@}
     
     /** @name Manipulation
      *  Reformulate the dynamic optimization problem.
      */
     //@{
-    /// Eliminate interdependencies in the dependent equations
-    void eliminateInterdependencies();
+
+    /// Identify and separate the algebraic variables and equations in the DAE
+    void separateAlgebraic();
+
+    /// Eliminate algebraic variables, transforming them into outputs
+    void eliminateAlgebraic();
+
+    /// Transform the implicit DAE to a semi-explicit DAE
+    void makeSemiExplicit();
+
+    /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
+    void makeExplicit();
+
+    /// Eliminate independent parameters
+    void eliminateIndependentParameters();
     
-    /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
-    void eliminateDependent(bool eliminate_dependents_with_bounds=true);
+    /// Sort the dependent parameters
+    void sortDependentParameters();
+    
+    /// Eliminate interdependencies amongst the dependent parameters
+    void eliminateDependentParameterInterdependencies();
+
+    /// Eliminate dependent parameters
+    void eliminateDependentParameters();
+
+    /// Sort the outputs
+    void sortOutputs();
+
+    /// Eliminate interdependencies amongst the outputs
+    void eliminateOutputInterdependencies();
+
+    /// Eliminate outputs
+    void eliminateOutputs();
 
     /// Eliminate Lagrange terms from the objective function and make them quadrature states
     void eliminateLagrangeTerms();
@@ -253,24 +274,12 @@ namespace CasADi{
     /// Eliminate quadrature states and turn them into ODE states
     void eliminateQuadratureStates();
     
-    /// Sort the ODE and differential states
-    void sortODE();
+    /// Sort the DAE and implictly defined states
+    void sortDAE();
 
     /// Sort the algebraic equations and algebraic states
     void sortALG();
-
-    /// Sort the dependent parameters
-    void sortDependentParameters();
-    
-    /// Transform the implicit ODE to an explicit ODE
-    void makeExplicit();
-    
-    /// Eliminate algebraic states, transforming them into outputs
-    void eliminateAlgebraic();
-    
-    /// Substitute the dependents from a set of expressions
-    std::vector<SX> substituteDependents(const std::vector<SX>& x) const;
-    
+        
     /// Generate a MUSCOD-II compatible DAT file
     void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
     
@@ -282,53 +291,120 @@ namespace CasADi{
     /// Scale the implicit equations
     void scaleEquations();
 
-    /// Find a variable by name 
-    std::pair<int,int> find(const std::string& name, bool error_if_not_found=true) const;
-
     /// Find an expression by name
     SX operator()(const std::string& name) const;
 
-    /// Get the nominal value for a component
-    double nominal(const std::string& name) const;
+    /// Find an derivative expression by name
+    SX der(const std::string& name) const;
 
-    /// Set the nominal value for a component
+    /// Find an derivative expression by non-differentiated expression
+    SX der(const SX& var) const;
+
+    /// Find a binding expression by name
+    SX binding(const std::string& name) const;
+
+    /// Find an binding expression by non-differentiated expression
+    SX binding(const SX& var) const;
+    
+    /// Get the nominal value by name
+    double nominal(const std::string& name) const;
+    
+    /// Get the nominal value(s) by expression
+    std::vector<double> nominal(const SX& var) const;
+
+    /// Set the nominal value by name
     void setNominal(const std::string& name, double val);
 
-    /// Get the lower bound for a component
-    double min(const std::string& name) const;
+    /// Set the nominal value(s) by expression
+    void setNominal(const SX& var, const std::vector<double>& val);
 
-    /// Set the upper bound for a component
-    void setMin(const std::string& name, double val);
+    /// Get the (optionally normalized) current value by name
+    double value(const std::string& name, bool normalized=false) const;
 
-    /// Get the upper bound for a component
-    double max(const std::string& name) const;
+    /// Get the (optionally normalized) current value(s) by expression
+    std::vector<double> value(const SX& var, bool normalized=false) const;
 
-    /// Set the upper bound for a component
-    void setMax(const std::string& name, double val);
+    /// Set the (optionally normalized) current value by name
+    void setValue(const std::string& name, double val, bool normalized=false);
 
-    /// Get the value at time 0 for a component
-    double start(const std::string& name) const;
+    /// Set the (optionally normalized) current value(s) by expression
+    void setValue(const SX& var, const std::vector<double>& val, bool normalized=false);
 
-    /// Set the value at time 0 for a component
-    void setStart(const std::string& name, double val);
+    /// Get the (optionally normalized) lower bound by name
+    double min(const std::string& name, bool normalized=false) const;
 
-    /// Get the initial guess for a component
-    double initialGuess(const std::string& name) const;
+    /// Get the (optionally normalized) lower bound(s) by expression
+    std::vector<double> min(const SX& var, bool normalized=false) const;
 
-    /// Set the initial guess for a component
-    void setInitialGuess(const std::string& name, double val);
+    /// Set the (optionally normalized) lower bound by name
+    void setMin(const std::string& name, double val, bool normalized=false);
 
-    /// Get the derivative at time 0 for a component
-    double derivativeStart(const std::string& name) const;
+    /// Set the (optionally normalized) lower bound(s) by expression
+    void setMin(const SX& var, const std::vector<double>& val, bool normalized=false);
 
-    /// Set the derivative at time 0 for a component
-    void setDerivativeStart(const std::string& name, double val);
+    /// Get the (optionally normalized) upper bound by name
+    double max(const std::string& name, bool normalized=false) const;
+
+    /// Get the (optionally normalized) upper bound(s) by expression
+    std::vector<double> max(const SX& var, bool normalized=false) const;
+
+    /// Set the (optionally normalized) upper bound by name
+    void setMax(const std::string& name, double val, bool normalized=false);
+
+    /// Set the (optionally normalized) upper bound(s) by expression
+    void setMax(const SX& var, const std::vector<double>& val, bool normalized=false);
+
+    /// Get the (optionally normalized) value at time 0 by name
+    double start(const std::string& name, bool normalized=false) const;
+
+    /// Get the (optionally normalized) value(s) at time 0 by expression
+    std::vector<double> start(const SX& var, bool normalized=false) const;
+
+    /// Set the (optionally normalized) value at time 0 by name
+    void setStart(const std::string& name, double val, bool normalized=false);
+
+    /// Set the (optionally normalized) value(s) at time 0 by expression
+    void setStart(const SX& var, const std::vector<double>& val, bool normalized=false);
+
+    /// Get the (optionally normalized) initial guess by name
+    double initialGuess(const std::string& name, bool normalized=false) const;
+
+    /// Get the (optionally normalized) initial guess(es) by expression
+    std::vector<double> initialGuess(const SX& var, bool normalized=false) const;
+
+    /// Set the (optionally normalized) initial guess by name
+    void setInitialGuess(const std::string& name, double val, bool normalized=false);
+
+    /// Set the (optionally normalized) initial guess(es) by expression
+    void setInitialGuess(const SX& var, const std::vector<double>& val, bool normalized=false);
+
+    /// Get the (optionally normalized) derivative value at time 0 by name
+    double derivativeStart(const std::string& name, bool normalized=false) const;
+
+    /// Get the (optionally normalized) derivative value(s) at time 0 by expression
+    std::vector<double> derivativeStart(const SX& var, bool normalized=false) const;
+
+    /// Set the (optionally normalized) derivative value at time 0 by name
+    void setDerivativeStart(const std::string& name, double val, bool normalized=false);
+
+    /// Set the (optionally normalized) derivative value(s) at time 0 by expression
+    void setDerivativeStart(const SX& var, const std::vector<double>& val, bool normalized=false);
+
+    /// Get the unit for a component
+    std::string unit(const std::string& name) const;
+
+    /// Get the unit given a vector of symbolic variables (all units must be identical)
+    std::string unit(const SX& var) const;
+
+    /// Set the unit for a component
+    void setUnit(const std::string& name, const std::string& val);
 
     /// Timed variable (never allocate)
     SX atTime(const std::string& name, double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
     SX atTime(const std::string& name, double t, bool allocate=false);
+
 
 #ifndef SWIG
     ///  Print representation
@@ -347,10 +423,18 @@ namespace CasADi{
     std::map<std::string,Variable> varmap_;
 
     /// Read an equation
-    SX readExpr(const XMLNode& odenode, bool& has_der);
+    SX readExpr(const XMLNode& odenode);
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);
+
+    /// Get an attribute by expression
+    typedef double (SymbolicOCP::*getAtt)(const std::string& name, bool normalized) const;
+    std::vector<double> attribute(getAtt f, const SX& var, bool normalized) const;
+
+    /// Set an attribute by expression
+    typedef void (SymbolicOCP::*setAtt)(const std::string& name, double val, bool normalized);  
+    void setAttribute(setAtt f, const SX& var, const std::vector<double>& val, bool normalized);
 
 #endif // SWIG
 

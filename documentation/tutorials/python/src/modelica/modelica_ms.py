@@ -35,11 +35,7 @@ fmux.extract('modelDescription.xml','.')
 #$ The logic for importing Modelica models is located in the SymbolicOCP class:
 from casadi import *
 ocp = SymbolicOCP()
-
 ocp.parseFMI("modelDescription.xml")
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
-
 #! Let us have a look at the flat optimal control problem:
 print ocp
 #$ As we see, the optimal control problem (OCP) has two differential states (cstr.c and cstr.T),
@@ -48,11 +44,11 @@ print ocp
 #$ By insprecting the equations, we see that it is relatively both straightforward to eliminate 
 #$ the algebraic variables from the problem and to rewrite the DAE as an explicit ODE.
 #$ Indeed, for cases like this one, CasADi can do this reformulation automatically:
-ocp.eliminateAlgebraic()
+ocp.eliminateIndependentParameters()
 ocp.makeExplicit()
 #! Let us extract variables for the states, the control and equations
-x = SX(var(ocp.x))
-u = SX(var(ocp.u))
+x = ocp.x
+u = ocp.u
 f = ocp.ode
 L = ocp.lterm
 I = ocp.initial
@@ -71,12 +67,12 @@ print hessian(L,x)
 #$ We can also retrieve other information from the model such as the end time,
 #$ variable bounds and initial guess:
 tf = ocp.tf
-ubx = getMax(ocp.x)
-lbx = getMin(ocp.x)
-ubu = getMax(ocp.u)
-lbu = getMin(ocp.u)
-x0 = getInitialGuess(ocp.x)
-u0 = getInitialGuess(ocp.u)
+ubx = ocp.max(x)
+lbx = ocp.min(x)
+ubu = ocp.max(u)
+lbu = ocp.min(u)
+x0 = ocp.initialGuess(x)
+u0 = ocp.initialGuess(u)
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
 #$  $$ \begin{array}{cl}   \textbf{minimize}    &  \displaystyle\int_{t=0}^{\texttt{tf}}{\texttt{L} \, dt} \\ \\
 #$                         \textbf{subject to}  &  \texttt{I}(t) = 0, \quad \text{for} \quad t=0 \\

@@ -79,13 +79,13 @@ tsf = sim.getMinorT()
 
 figure(1)
 #! Plot the default output, i.e. the states
-plot(tsf,sim.getOutput()[:,0])
+plot(tsf,sim.getOutput()[0,:].T)
 xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts[:-1],sim.getInput("u")[:,0],'o') # Sampled on the coarse grid
-plot(tsf[:-1],array(sim.getMinorU())[:,0],'.')           # Sampled on the fine grid 
+plot(ts[:-1],sim.getInput("u")[0,:].T,'o') # Sampled on the coarse grid
+plot(tsf[:-1],sim.getMinorU()[0,:].T,'.')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 
 show()
@@ -118,8 +118,8 @@ sim.evaluate()
 
 figure(1)
 
-plot(tsf,sim.getOutput(1),'x') 
-plot(tsf,sim.getOutput(0),'*') 
+plot(tsf,sim.getOutput(1).T,'x') 
+plot(tsf,sim.getOutput(0).T,'*') 
 legend(('x','u (coarse)','u (fine)','u (output)','x0 (output)'),loc='lower left')
 show()
 
@@ -169,13 +169,13 @@ tsf = sim.getMinorT()
 
 figure(2)
 #! Plot the default output, i.e. the states
-plot(tsf,sim.getOutput()[:,0])
+plot(tsf,sim.getOutput()[0,:].T)
 xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts,sim.getInput("u")[:,0],'o') # Sampled on the coarse grid
-plot(tsf,sim.getOutput(1),'-')           # Sampled on the fine grid 
+plot(ts,sim.getInput("u")[0,:].T,'o') # Sampled on the coarse grid
+plot(tsf,sim.getOutput(1).T,'-')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 
 show()
