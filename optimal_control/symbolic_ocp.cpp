@@ -189,12 +189,16 @@ namespace CasADi{
 
         switch(var.category){
         case CAT_DEPENDENT_CONSTANT:
+          this->cd.append(var.v);
+          this->cd_def.append(bexpr);
           break;
         case CAT_INDEPENDENT_CONSTANT:
           casadi_assert(bexpr.isConstant());
           var.value = bexpr.getValue();
           break;
         case CAT_DEPENDENT_PARAMETER:
+          this->pd.append(var.v);
+          this->pd_def.append(bexpr);
           break;
         case CAT_INDEPENDENT_PARAMETER:
           casadi_assert(bexpr.isConstant());
@@ -202,11 +206,11 @@ namespace CasADi{
           var.value = bexpr.getValue();
           break;
         default:
-          casadi_warning("Binding equation for " + str(var) + " ignored");
+          casadi_warning("Binding equation for " + str(var) + " not handled properly. Added to list of outputs");
         }
 
         this->y.append(var.v);
-        this->dep.append(bexpr);
+        this->y_def.append(bexpr);
       }
     }
 
@@ -396,7 +400,7 @@ namespace CasADi{
     casadi_assert_warning(this->x.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
     casadi_assert_warning(this->z.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
     casadi_assert(this->q.size()==this->quad.size());
-    casadi_assert(this->y.size()==this->dep.size());
+    casadi_assert(this->y.size()==this->y_def.size());
   }
 
   Variable& SymbolicOCP::readVariable(const XMLNode& node){
@@ -533,65 +537,94 @@ namespace CasADi{
     stream << "  u =  " << str(this->u) << endl;
     stream << "}" << endl;
   
-    stream << "Fully-implicit differential-algebraic equations" << endl;
-    for(int k=0; k<this->dae.size(); ++k){
-      stream << "0 == " << this->dae.at(k) << endl;
+    if(!this->dae.isEmpty()){
+      stream << "Fully-implicit differential-algebraic equations" << endl;
+      for(int k=0; k<this->dae.size(); ++k){
+        stream << "0 == " << this->dae.at(k) << endl;
+      }
+      stream << endl;
     }
-    stream << endl;
 
-    stream << "Differential equations" << endl;
-    for(int k=0; k<this->ode.size(); ++k){
-      stream << str(der(this->x[k])) << " == " << str(this->ode[k]) << endl;
+    if(!this->ode.isEmpty()){
+      stream << "Differential equations" << endl;
+      for(int k=0; k<this->ode.size(); ++k){
+        stream << str(der(this->x[k])) << " == " << str(this->ode[k]) << endl;
+      }
+      stream << endl;
     }
-    stream << endl;
 
-    stream << "Algebraic equations" << endl;
-    for(int k=0; k<this->z.size(); ++k){
-      stream << "0 == " << str(this->alg[k]) << endl;
+    if(!this->alg.isEmpty()){
+      stream << "Algebraic equations" << endl;
+      for(int k=0; k<this->z.size(); ++k){
+        stream << "0 == " << str(this->alg[k]) << endl;
+      }
+      stream << endl;
     }
-    stream << endl;
   
-    stream << "Quadrature equations" << endl;
-    for(int k=0; k<this->q.size(); ++k){
-      stream << str(der(this->q[k])) << " == " << str(this->quad[k]) << endl;
+    if(!this->quad.isEmpty()){
+      stream << "Quadrature equations" << endl;
+      for(int k=0; k<this->q.size(); ++k){
+        stream << str(der(this->q[k])) << " == " << str(this->quad[k]) << endl;
+      }
+      stream << endl;
     }
-    stream << endl;
 
-    stream << "Initial equations" << endl;
-    for(SX::const_iterator it=this->initial.begin(); it!=this->initial.end(); it++){
-      stream << "0 == " << *it << endl;
+    if(!this->initial.isEmpty()){
+      stream << "Initial equations" << endl;
+      for(SX::const_iterator it=this->initial.begin(); it!=this->initial.end(); it++){
+        stream << "0 == " << *it << endl;
+      }
+      stream << endl;
     }
-    stream << endl;
 
-    // Dependent equations
-    stream << "Dependent equations" << endl;
-    for(int i=0; i<this->y.size(); ++i)
-      stream << this->y.at(i) << " == " << this->dep.at(i) << endl;
-    stream << endl;
+    if(!this->pd.isEmpty()){
+      stream << "Dependent parameters" << endl;
+      for(int i=0; i<this->pd.size(); ++i)
+        stream << this->pd.at(i) << " == " << this->pd_def.at(i) << endl;
+      stream << endl;
+    }
 
-    // Mayer terms
-    stream << "Mayer objective terms" << endl;
-    for(int i=0; i<this->mterm.size(); ++i)
-      stream << this->mterm.at(i) << endl;
-    stream << endl;
+    if(!this->cd.isEmpty()){
+      stream << "Dependent constants" << endl;
+      for(int i=0; i<this->cd.size(); ++i)
+        stream << this->cd.at(i) << " == " << this->cd_def.at(i) << endl;
+      stream << endl;
+    }
+
+    if(!this->y.isEmpty()){
+      stream << "Output variables" << endl;
+      for(int i=0; i<this->y.size(); ++i)
+        stream << this->y.at(i) << " == " << this->y_def.at(i) << endl;
+      stream << endl;
+    }
+
+    if(!this->mterm.isEmpty()){
+      stream << "Mayer objective terms" << endl;
+      for(int i=0; i<this->mterm.size(); ++i)
+        stream << this->mterm.at(i) << endl;
+      stream << endl;
+    }
   
-    // Lagrange terms
-    stream << "Lagrange objective terms" << endl;
-    for(int i=0; i<this->lterm.size(); ++i)
-      stream << this->lterm.at(i) << endl;
-    stream << endl;
+    if(!this->lterm.isEmpty()){
+      stream << "Lagrange objective terms" << endl;
+      for(int i=0; i<this->lterm.size(); ++i)
+        stream << this->lterm.at(i) << endl;
+      stream << endl;
+    }
   
-    // Path constraint functions
-    stream << "Path constraint functions" << endl;
-    for(int i=0; i<this->path.size(); ++i)
-      stream << this->path_min.at(i) << " <= " << this->path.at(i) << " <= " << this->path_max.at(i) << endl;
-    stream << endl;
+    if(!this->path.isEmpty()){
+      stream << "Path constraint functions" << endl;
+      for(int i=0; i<this->path.size(); ++i)
+        stream << this->path_min.at(i) << " <= " << this->path.at(i) << " <= " << this->path_max.at(i) << endl;
+      stream << endl;
+    }
   
-    // Point constraint functions
-    stream << "Point constraint functions" << endl;
-    for(int i=0; i<this->point.size(); ++i)
-      stream << this->point_min.at(i) << " <= " << this->point.at(i) << " <= " << this->point_max.at(i) << endl;
-    stream << endl;
+    if(!this->point.isEmpty()){
+      stream << "Point constraint functions" << endl;
+      for(int i=0; i<this->point.size(); ++i)
+        stream << this->point_min.at(i) << " <= " << this->point.at(i) << " <= " << this->point_max.at(i) << endl;
+      stream << endl;
+    }
   
     // Constraint functions
     stream << "Time horizon" << endl;
@@ -601,14 +634,14 @@ namespace CasADi{
   }
 
   void SymbolicOCP::eliminateInterdependencies(){
-    substituteInPlace(this->y,this->dep,false);
+    substituteInPlace(this->y,this->y_def,false);
   
     // Make sure that the dependent variables have been properly eliminated from the dependent expressions
-    casadi_assert(!dependsOn(this->dep,this->y));
+    casadi_assert(!dependsOn(this->y_def,this->y));
   }
 
   vector<SX> SymbolicOCP::substituteDependents(const vector<SX>& x) const{
-    return substitute(x,vector<SX>(1,this->y),vector<SX>(1,this->dep));
+    return substitute(x,vector<SX>(1,this->y),vector<SX>(1,this->y_def));
   }
 
   void SymbolicOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
@@ -732,7 +765,7 @@ namespace CasADi{
     this->ode = substitute(this->ode,v,v_old);
     this->alg = substitute(this->alg,v,v_old);
     this->quad = substitute(this->quad,v,v_old);
-    this->dep = substitute(this->dep,v,v_old);
+    this->y_def = substitute(this->y_def,v,v_old);
     this->initial = substitute(this->initial,v,v_old);
     this->path    = substitute(this->path,v,v_old);
     this->mterm   = substitute(this->mterm,v,v_old);
@@ -861,7 +894,7 @@ namespace CasADi{
   
     // Find out which dependent parameter depends on which binding equation
     SX v = this->pd;
-    SXFunction f(v,v-substitute(this->pd,this->y,dep));
+    SXFunction f(v,v-substitute(this->pd,this->y,this->y_def));
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -1032,7 +1065,7 @@ namespace CasADi{
 
     // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
     this->y = vertcat(z_exp,this->y);
-    this->dep = vertcat(f_exp,this->dep);
+    this->y_def = vertcat(f_exp,this->y_def);
   
     // Save new algebraic equations
     this->z = z_imp;
@@ -1071,19 +1104,19 @@ namespace CasADi{
     // Sort by category
     switch(var.category){
     case CAT_DERIVATIVE:
-      // Skip derivatives
+      // Skip - meta information about time derivatives is kept together with its parent variable
       break;
     case CAT_STATE:
       this->s.append(var.v);
       break;
     case CAT_DEPENDENT_CONSTANT:
-      this->cd.append(var.v);
+      // Skip - dependent constants are added together with their binding equations
       break;
     case CAT_INDEPENDENT_CONSTANT:
       this->ci.append(var.v);
       break;
     case CAT_DEPENDENT_PARAMETER:
-      this->pd.append(var.v);
+      // Skip - dependent parameters are added together with their binding equations
       break;
     case CAT_INDEPENDENT_PARAMETER:
       if(var.free){
