@@ -65,9 +65,6 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
-# Eliminate the dependent variables
-ocp.eliminateDependentParameters()
-
 # Transform into an explicit ODE
 ocp.makeExplicit()
 
@@ -127,11 +124,11 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
-# Eliminate the dependent variables
-ocp.eliminateIndependentParameters()
-
 # Transform into an explicit ODE
 ocp.makeExplicit()
+
+# Eliminate the independent variables
+ocp.eliminateIndependentParameters()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
@@ -245,15 +242,7 @@ comp("CtrlFlowSystem")
 ocp = SymbolicOCP()
 ocp.parseFMI('CtrlFlowSystem.xml')
 
-# Print the ocp
-print ocp
-
-# Eliminate the dependent variables
-ocp.eliminateIndependentParameters()
-
-ocp.separateAlgebraic()
-
-# Make the ODE semi-explicit
+# Transform into a semi-explicit ODE
 ocp.makeSemiExplicit()
 
 # Print the ocp
