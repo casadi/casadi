@@ -76,8 +76,29 @@ namespace CasADi{
     /// Variable expression
     SX v; 
 
-    // Derivative expression
+    /// Derivative expression
     SX d;            
+
+    /// (Current) value of the variable
+    double value;
+
+    /// Nominal value
+    double nominal;
+    
+    /// Value at time 0
+    double start;
+
+    /// Lower bound
+    double min;
+
+    /// Upper bound
+    double max;
+
+    /// Derivative at time 0
+    double derivativeStart;
+
+    /// Initial guess
+    double initialGuess;
 
     /// Variability (see Fritzon)
     Variability variability;
@@ -96,25 +117,7 @@ namespace CasADi{
 
     /// Variable reference (XML)
     int valueReference;
-    
-    /// Nominal value
-    double nominal;
-    
-    /// Value at time 0
-    double start;
-
-    /// Lower bound
-    double min;
-
-    /// Upper bound
-    double max;
-
-    /// Derivative at time 0
-    double derivativeStart;
-
-    /// Initial guess
-    double initialGuess;
-    
+        
     /// Unit
     std::string unit;
 

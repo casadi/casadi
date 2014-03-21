@@ -1401,59 +1401,6 @@ namespace CasADi{
     return ret;
   }
 
-  double SymbolicOCP::nominal(const std::string& name) const{
-    return variable(name).nominal;
-  }
-
-  void SymbolicOCP::setNominal(const std::string& name, double val){
-    variable(name).nominal = val;
-  }
-
-  double SymbolicOCP::min(const std::string& name, bool nominal) const{
-    const Variable& v = variable(name);
-    return nominal ? v.min / v.nominal : v.min;
-  }
-
-  void SymbolicOCP::setMin(const std::string& name, double val){
-    variable(name).min = val;
-  }
-
-  double SymbolicOCP::max(const std::string& name, bool nominal) const{
-    const Variable& v = variable(name);
-    return nominal ? v.max / v.nominal : v.max;
-  }
-
-  void SymbolicOCP::setMax(const std::string& name, double val){
-    variable(name).max = val;
-  }
-
-  double SymbolicOCP::start(const std::string& name, bool nominal) const{
-    const Variable& v = variable(name);
-    return nominal ? v.start / v.nominal : v.start;
-  }
-
-  void SymbolicOCP::setStart(const std::string& name, double val){
-    variable(name).start = val;
-  }
-
-  double SymbolicOCP::initialGuess(const std::string& name, bool nominal) const{
-    const Variable& v = variable(name);
-    return nominal ? v.initialGuess / v.nominal : v.initialGuess;
-  }
-
-  void SymbolicOCP::setInitialGuess(const std::string& name, double val){
-    variable(name).initialGuess = val;
-  }
-
-  double SymbolicOCP::derivativeStart(const std::string& name, bool nominal) const{
-    const Variable& v = variable(name);
-    return nominal ? v.derivativeStart / v.nominal : v.derivativeStart;
-  }
-
-  void SymbolicOCP::setDerivativeStart(const std::string& name, double val){
-    variable(name).derivativeStart = val;
-  }
-
   SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate) const{
     return variable(name).atTime(t,allocate);
   }
@@ -1532,68 +1479,6 @@ namespace CasADi{
     this->z.append(new_z);
   }
 
-  std::vector<double> SymbolicOCP::nominal(const SX& var) const{
-    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::nominal: Argument must be a symbolic vector");
-    std::vector<double> ret(var.size());
-    for(int i=0; i<ret.size(); ++i){
-      ret[i] = nominal(var.at(i).getName());
-    }
-    return ret;
-  }
-
-  std::vector<double> SymbolicOCP::min(const SX& var, bool nominal) const{
-    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::min: Argument must be a symbolic vector");
-    std::vector<double> ret(var.size());
-    for(int i=0; i<ret.size(); ++i){
-      ret[i] = min(var.at(i).getName(),nominal);
-    }
-    return ret;
-  }
-
-  std::vector<double> SymbolicOCP::max(const SX& var, bool nominal) const{
-    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::max: Argument must be a symbolic vector");
-    std::vector<double> ret(var.size());
-    for(int i=0; i<ret.size(); ++i){
-      ret[i] = max(var.at(i).getName(),nominal);
-    }
-    return ret;
-  }
-
-  std::vector<double> SymbolicOCP::start(const SX& var, bool nominal) const{
-    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::start: Argument must be a symbolic vector");
-    std::vector<double> ret(var.size());
-    for(int i=0; i<ret.size(); ++i){
-      ret[i] = start(var.at(i).getName(),nominal);
-    }
-    return ret;
-  }
-
-  void SymbolicOCP::setStart(const SX& var, const std::vector<double>& val){
-    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::setStart: Argument must be a symbolic vector");
-    casadi_assert_message(var.size()==var.size(),"SymbolicOCP::setStart: Dimension mismatch");
-    for(int i=0; i<val.size(); ++i){
-      setStart(var.at(i).getName(),val.at(i));
-    }
-  }
-
-  std::vector<double> SymbolicOCP::initialGuess(const SX& var, bool nominal) const{
-    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::initialGuess: Argument must be a symbolic vector");
-    std::vector<double> ret(var.size());
-    for(int i=0; i<ret.size(); ++i){
-      ret[i] = initialGuess(var.at(i).getName(),nominal);
-    }
-    return ret;
-  }
-
-  std::vector<double> SymbolicOCP::derivativeStart(const SX& var, bool nominal) const{
-    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::derivativeStart: Argument must be a symbolic vector");
-    std::vector<double> ret(var.size());
-    for(int i=0; i<ret.size(); ++i){
-      ret[i] = derivativeStart(var.at(i).getName(),nominal);
-    }
-    return ret;
-  }
-
   std::string SymbolicOCP::unit(const std::string& name) const{
     return variable(name).unit;
   }
@@ -1615,6 +1500,155 @@ namespace CasADi{
     variable(name).unit = val;
   }
 
+  double SymbolicOCP::nominal(const std::string& name) const{
+    return variable(name).nominal;
+  }
+
+  void SymbolicOCP::setNominal(const std::string& name, double val){
+    variable(name).nominal = val;
+  }
+
+  std::vector<double> SymbolicOCP::nominal(const SX& var) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::nominal: Argument must be a symbolic vector");
+    std::vector<double> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = nominal(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  void SymbolicOCP::setNominal(const SX& var, const std::vector<double>& val){
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::nominal: Argument must be a symbolic vector");
+    casadi_assert_message(var.size()==var.size(),"SymbolicOCP::nominal: Dimension mismatch");
+    for(int i=0; i<val.size(); ++i){
+      setNominal(var.at(i).getName(),val.at(i));
+    }
+  }
+
+  std::vector<double> SymbolicOCP::attribute(getAtt f, const SX& var, bool normalized) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::attribute: Argument must be a symbolic vector");
+    std::vector<double> ret(var.size());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = (this->*f)(var.at(i).getName(),normalized);
+    }
+    return ret;
+  }
+
+  void SymbolicOCP::setAttribute(setAtt f, const SX& var, const std::vector<double>& val, bool normalized){
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::setAttribute: Argument must be a symbolic vector");
+    casadi_assert_message(var.size()==var.size(),"SymbolicOCP::setAttribute: Dimension mismatch");
+    for(int i=0; i<val.size(); ++i){
+      (this->*f)(var.at(i).getName(),val.at(i),normalized);
+    }    
+  }
+
+  double SymbolicOCP::value(const std::string& name, bool normalized) const{
+    const Variable& v = variable(name);
+    return normalized ? v.value / v.nominal : v.value;
+  }
+
+  std::vector<double> SymbolicOCP::value(const SX& var, bool normalized) const{
+    return attribute(&SymbolicOCP::value,var,normalized);
+  }
+
+  void SymbolicOCP::setValue(const std::string& name, double val, bool normalized){
+    Variable& v = variable(name);
+    v.value = normalized ? val*v.nominal : val;
+  }
+
+  void SymbolicOCP::setValue(const SX& var, const std::vector<double>& val, bool normalized){
+    setAttribute(&SymbolicOCP::setValue,var,val,normalized);
+  }
+
+  double SymbolicOCP::min(const std::string& name, bool normalized) const{
+    const Variable& v = variable(name);
+    return normalized ? v.min / v.nominal : v.min;
+  }
+
+  std::vector<double> SymbolicOCP::min(const SX& var, bool normalized) const{
+    return attribute(&SymbolicOCP::min,var,normalized);
+  }
+
+  void SymbolicOCP::setMin(const std::string& name, double val, bool normalized){
+    Variable& v = variable(name);
+    v.min = normalized ? val*v.nominal : val;
+  }
+
+  void SymbolicOCP::setMin(const SX& var, const std::vector<double>& val, bool normalized){
+    setAttribute(&SymbolicOCP::setMin,var,val,normalized);
+  }
+
+  double SymbolicOCP::max(const std::string& name, bool normalized) const{
+    const Variable& v = variable(name);
+    return normalized ? v.max / v.nominal : v.max;
+  }
+
+  std::vector<double> SymbolicOCP::max(const SX& var, bool normalized) const{
+    return attribute(&SymbolicOCP::max,var,normalized);
+  }
+
+  void SymbolicOCP::setMax(const std::string& name, double val, bool normalized){
+    Variable& v = variable(name);
+    v.max = normalized ? val*v.nominal : val;
+  }
+
+  void SymbolicOCP::setMax(const SX& var, const std::vector<double>& val, bool normalized){
+    setAttribute(&SymbolicOCP::setMax,var,val,normalized);
+  }
+
+  double SymbolicOCP::start(const std::string& name, bool normalized) const{
+    const Variable& v = variable(name);
+    return normalized ? v.start / v.nominal : v.start;
+  }
+
+  std::vector<double> SymbolicOCP::start(const SX& var, bool normalized) const{
+    return attribute(&SymbolicOCP::start,var,normalized);
+  }
+
+  void SymbolicOCP::setStart(const std::string& name, double val, bool normalized){
+    Variable& v = variable(name);
+    v.start = normalized ? val*v.nominal : val;
+  }
+
+  void SymbolicOCP::setStart(const SX& var, const std::vector<double>& val, bool normalized){
+    setAttribute(&SymbolicOCP::setStart,var,val,normalized);
+  }
+
+  double SymbolicOCP::initialGuess(const std::string& name, bool normalized) const{
+    const Variable& v = variable(name);
+    return normalized ? v.initialGuess / v.nominal : v.initialGuess;
+  }
+
+  std::vector<double> SymbolicOCP::initialGuess(const SX& var, bool normalized) const{
+    return attribute(&SymbolicOCP::initialGuess,var,normalized);
+  }
+
+  void SymbolicOCP::setInitialGuess(const std::string& name, double val, bool normalized){
+    Variable& v = variable(name);
+    v.initialGuess = normalized ? val*v.nominal : val;
+  }
+
+  void SymbolicOCP::setInitialGuess(const SX& var, const std::vector<double>& val, bool normalized){
+    setAttribute(&SymbolicOCP::setInitialGuess,var,val,normalized);
+  }
+
+  double SymbolicOCP::derivativeStart(const std::string& name, bool normalized) const{
+    const Variable& v = variable(name);
+    return normalized ? v.derivativeStart / v.nominal : v.derivativeStart;
+  }
+
+  std::vector<double> SymbolicOCP::derivativeStart(const SX& var, bool normalized) const{
+    return attribute(&SymbolicOCP::derivativeStart,var,normalized);
+  }
+
+  void SymbolicOCP::setDerivativeStart(const std::string& name, double val, bool normalized){
+    Variable& v = variable(name);
+    v.derivativeStart = normalized ? val*v.nominal : val;
+  }
+
+  void SymbolicOCP::setDerivativeStart(const SX& var, const std::vector<double>& val, bool normalized){
+    setAttribute(&SymbolicOCP::setDerivativeStart,var,val,normalized);
+  }
 
 
 } // namespace CasADi

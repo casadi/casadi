@@ -137,19 +137,22 @@ namespace CasADi{
      */
     SX p;
 
-    /** \brief Independent constants */
-    SX ci;
-
-    /** \brief Dependent constants */
-    SX cd;
-
-    /** \brief Independent parameters 
-        An independent parameter is a parameter whose value is determined by an expression that contains only literals: "parameter Real p1=2" or "parameter Boolean b(start=true)". In the latter case, the value of the parameter becomes true, and the Modelica compiler will generate a warning since there is no binding expression for the parameter. An independent parameter is fixed after the DAE has been initialized. */
+    /** \brief Independent parameters
+     * An independent parameter is a parameter whose value is determined by an expression that contains only literals.
+     * An independent parameter is fixed after the DAE has been initialized.
+     * Its value is located in the "value" attribute.
+     */
     SX pi;
 
     /** \brief Dependent parameters 
         A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */
     SX pd;
+
+    /** \brief Independent constants */
+    SX ci;
+
+    /** \brief Dependent constants */
+    SX cd;
 
     //@}
 
@@ -279,62 +282,89 @@ namespace CasADi{
     /// Find an derivative expression by non-differentiated expression
     SX der(const SX& var) const;
 
-    /// Get the nominal value for a component
+    /// Get the nominal value by name
     double nominal(const std::string& name) const;
     
-    /// Get the nominal values given a vector of symbolic variables
+    /// Get the nominal value(s) by expression
     std::vector<double> nominal(const SX& var) const;
 
-    /// Set the nominal value for a component
+    /// Set the nominal value by name
     void setNominal(const std::string& name, double val);
 
-    /// Get the lower bound for a component
-    double min(const std::string& name, bool nominal=false) const;
+    /// Set the nominal value(s) by expression
+    void setNominal(const SX& var, const std::vector<double>& val);
 
-    /// Get the lower bound given a vector of symbolic variables
-    std::vector<double> min(const SX& var, bool nominal=false) const;
+    /// Get the (optionally normalized) current value by name
+    double value(const std::string& name, bool normalized=false) const;
 
-    /// Set the upper bound for a component
-    void setMin(const std::string& name, double val);
+    /// Get the (optionally normalized) current value(s) by expression
+    std::vector<double> value(const SX& var, bool normalized=false) const;
 
-    /// Get the upper bound for a component
-    double max(const std::string& name, bool nominal=false) const;
+    /// Set the (optionally normalized) current value by name
+    void setValue(const std::string& name, double val, bool normalized=false);
 
-    /// Get the upper bound given a vector of symbolic variables
-    std::vector<double> max(const SX& var, bool nominal=false) const;
+    /// Set the (optionally normalized) current value(s) by expression
+    void setValue(const SX& var, const std::vector<double>& val, bool normalized=false);
 
-    /// Set the upper bound for a component
-    void setMax(const std::string& name, double val);
+    /// Get the (optionally normalized) lower bound by name
+    double min(const std::string& name, bool normalized=false) const;
 
-    /// Get the value at time 0 for a component
-    double start(const std::string& name, bool nominal=false) const;
+    /// Get the (optionally normalized) lower bound(s) by expression
+    std::vector<double> min(const SX& var, bool normalized=false) const;
 
-    /// Get the value at time 0 given a vector of symbolic variables
-    std::vector<double> start(const SX& var, bool nominal=false) const;
+    /// Set the (optionally normalized) lower bound by name
+    void setMin(const std::string& name, double val, bool normalized=false);
 
-    /// Set the value at time 0 for a component
-    void setStart(const std::string& name, double val);
+    /// Set the (optionally normalized) lower bound(s) by expression
+    void setMin(const SX& var, const std::vector<double>& val, bool normalized=false);
 
-    /// Set the value at time 0 for a component
-    void setStart(const SX& var, const std::vector<double>& val);
+    /// Get the (optionally normalized) upper bound by name
+    double max(const std::string& name, bool normalized=false) const;
 
-    /// Get the initial guess for a component
-    double initialGuess(const std::string& name, bool nominal=false) const;
+    /// Get the (optionally normalized) upper bound(s) by expression
+    std::vector<double> max(const SX& var, bool normalized=false) const;
 
-    /// Get the initial guess given a vector of symbolic variables
-    std::vector<double> initialGuess(const SX& var, bool nominal=false) const;
+    /// Set the (optionally normalized) upper bound by name
+    void setMax(const std::string& name, double val, bool normalized=false);
 
-    /// Set the initial guess for a component
-    void setInitialGuess(const std::string& name, double val);
+    /// Set the (optionally normalized) upper bound(s) by expression
+    void setMax(const SX& var, const std::vector<double>& val, bool normalized=false);
 
-    /// Get the derivative at time 0 for a component
-    double derivativeStart(const std::string& name, bool nominal=false) const;
+    /// Get the (optionally normalized) value at time 0 by name
+    double start(const std::string& name, bool normalized=false) const;
 
-    /// Get the derivative at time 0 given a vector of symbolic variables
-    std::vector<double> derivativeStart(const SX& var, bool nominal=false) const;
+    /// Get the (optionally normalized) value(s) at time 0 by expression
+    std::vector<double> start(const SX& var, bool normalized=false) const;
 
-    /// Set the derivative at time 0 for a component
-    void setDerivativeStart(const std::string& name, double val);
+    /// Set the (optionally normalized) value at time 0 by name
+    void setStart(const std::string& name, double val, bool normalized=false);
+
+    /// Set the (optionally normalized) value(s) at time 0 by expression
+    void setStart(const SX& var, const std::vector<double>& val, bool normalized=false);
+
+    /// Get the (optionally normalized) initial guess by name
+    double initialGuess(const std::string& name, bool normalized=false) const;
+
+    /// Get the (optionally normalized) initial guess(es) by expression
+    std::vector<double> initialGuess(const SX& var, bool normalized=false) const;
+
+    /// Set the (optionally normalized) initial guess by name
+    void setInitialGuess(const std::string& name, double val, bool normalized=false);
+
+    /// Set the (optionally normalized) initial guess(es) by expression
+    void setInitialGuess(const SX& var, const std::vector<double>& val, bool normalized=false);
+
+    /// Get the (optionally normalized) derivative value at time 0 by name
+    double derivativeStart(const std::string& name, bool normalized=false) const;
+
+    /// Get the (optionally normalized) derivative value(s) at time 0 by expression
+    std::vector<double> derivativeStart(const SX& var, bool normalized=false) const;
+
+    /// Set the (optionally normalized) derivative value at time 0 by name
+    void setDerivativeStart(const std::string& name, double val, bool normalized=false);
+
+    /// Set the (optionally normalized) derivative value(s) at time 0 by expression
+    void setDerivativeStart(const SX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the unit for a component
     std::string unit(const std::string& name) const;
@@ -372,6 +402,14 @@ namespace CasADi{
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);
+
+    /// Get an attribute by expression
+    typedef double (SymbolicOCP::*getAtt)(const std::string& name, bool normalized) const;
+    std::vector<double> attribute(getAtt f, const SX& var, bool normalized) const;
+
+    /// Set an attribute by expression
+    typedef void (SymbolicOCP::*setAtt)(const std::string& name, double val, bool normalized);  
+    void setAttribute(setAtt f, const SX& var, const std::vector<double>& val, bool normalized);
 
 #endif // SWIG
 

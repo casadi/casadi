@@ -33,6 +33,7 @@ namespace CasADi{
     this->alias = NO_ALIAS;
     this->description = "";
     this->valueReference = -1; //?
+    this->value = numeric_limits<double>::quiet_NaN();
     this->min = -numeric_limits<double>::infinity();
     this->max = numeric_limits<double>::infinity();
     this->initialGuess = 0;
