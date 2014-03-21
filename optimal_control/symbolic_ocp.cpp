@@ -507,18 +507,18 @@ namespace CasADi{
 
     // Print the variables
     stream << "{" << endl;
-    stream << "  t = " << this->t.getDescription() << endl;
-    stream << "  s = " << this->s << endl;
-    stream << "  x = " << this->x << endl;
-    stream << "  z =  " << this->z << endl;
-    stream << "  q =  " << this->q << endl;
-    stream << "  y =  " << this->y << endl;
-    stream << "  pi =  " << this->pi << endl;
-    stream << "  pd =  " << this->pd << endl;
-    stream << "  pf =  " << this->pf << endl;
-    stream << "  ci =  " << this->ci << endl;
-    stream << "  cd =  " << this->cd << endl;
-    stream << "  u =  " << this->u << endl;
+    stream << "  t = " << str(this->t) << endl;
+    stream << "  s = " << str(this->s) << endl;
+    stream << "  x = " << str(this->x) << endl;
+    stream << "  z =  " << str(this->z) << endl;
+    stream << "  q =  " << str(this->q) << endl;
+    stream << "  y =  " << str(this->y) << endl;
+    stream << "  pi =  " << str(this->pi) << endl;
+    stream << "  pd =  " << str(this->pd) << endl;
+    stream << "  pf =  " << str(this->pf) << endl;
+    stream << "  ci =  " << str(this->ci) << endl;
+    stream << "  cd =  " << str(this->cd) << endl;
+    stream << "  u =  " << str(this->u) << endl;
     stream << "}" << endl;
   
     stream << "Fully-implicit differential-algebraic equations" << endl;
@@ -529,19 +529,19 @@ namespace CasADi{
 
     stream << "Differential equations" << endl;
     for(int k=0; k<this->ode.size(); ++k){
-      stream << der(this->x.at(k)).toScalar() << " == " << this->ode.at(k) << endl;
+      stream << str(der(this->x[k])) << " == " << str(this->ode[k]) << endl;
     }
     stream << endl;
 
     stream << "Algebraic equations" << endl;
     for(int k=0; k<this->z.size(); ++k){
-      stream << "0 == " << this->alg.at(k) << endl;
+      stream << "0 == " << str(this->alg[k]) << endl;
     }
     stream << endl;
   
     stream << "Quadrature equations" << endl;
     for(int k=0; k<this->q.size(); ++k){
-      stream << der(this->q.at(k)).toScalar() << " == " << this->quad.at(k) << endl;
+      stream << str(der(this->q[k])) << " == " << str(this->quad[k]) << endl;
     }
     stream << endl;
 
