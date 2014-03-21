@@ -57,11 +57,13 @@ void SimulatorInternal::init(){
   if(output_fcn_.isNull()){
     SXMatrix t = ssym("t");
     SXMatrix x = ssym("x",integrator_.input(INTEGRATOR_X0).sparsity());
+    SXMatrix z = ssym("z",integrator_.input(INTEGRATOR_Z0).sparsity());
     SXMatrix p = ssym("p",integrator_.input(INTEGRATOR_P).sparsity());
 
     vector<SXMatrix> arg(DAE_NUM_IN);
     arg[DAE_T] = t;
     arg[DAE_X] = x;
+    arg[DAE_Z] = z;
     arg[DAE_P] = p;
 
     vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
@@ -111,6 +113,7 @@ void SimulatorInternal::evaluate(){
   
   // Pass the parameters and initial state
   integrator_.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);
+  integrator_.setInput(input(INTEGRATOR_Z0),INTEGRATOR_Z0);
   integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
   
   if (monitored("initial")) {
@@ -127,7 +130,7 @@ void SimulatorInternal::evaluate(){
 
     if (monitored("step")) {
       std::cout << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
-      std::cout << " y0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
+      std::cout << " y0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;       
       std::cout << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
     }
   
@@ -143,6 +146,8 @@ void SimulatorInternal::evaluate(){
       output_fcn_.setInput(grid_[k],DAE_T);
     if(output_fcn_.input(DAE_X).size()!=0)
       output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_X);
+    if(output_fcn_.input(DAE_Z).size()!=0)
+      output_fcn_.setInput(integrator_.output(INTEGRATOR_ZF),DAE_Z);
     if(output_fcn_.input(DAE_P).size()!=0)
       output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
       
