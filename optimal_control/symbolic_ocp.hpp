@@ -90,24 +90,55 @@ namespace CasADi{
     /// Default constructor
     SymbolicOCP();
     
-    /** @name Variables categories
+    /** @name Variables and equations
      *  Public data members
      */
     //@{
-    /** \brief Time */
+    /** \brief Independent variable (usually time) */
     SX t;
     
-    /** \brief Fully implicit states (includes differential states and algebraic variables) */
-    SX s;
+    /** \brief Differential-algebraic equation (DAE) with corresponding state vector and initial conditions
+     * DAE in fully-implicit form and corresponding states and algebraic variables. 
+     * dae and s have matching dimensions and 0 == dae(der(s),s,...) implicitly defines der(s).
+     * At t==0, 0 == initial(der(s),s,...) holds in addition to the dae.
+     */
+    SX dae, s, initial;
 
-    /** \brief Differential states */
-    SX x;
+    /** \brief Ordinary differential equation (ODE) and corresponding state vector
+     * ODE in explicit form and corresponding state vector.
+     * ode and x have matching dimensions and der(x) == ode(x,...).
+     */
+    SX ode, x;
+
+    /** \brief Algebraic equations and corresponding algebraic variables
+     * alg and z have matching dimensions and 0 == alg(z,...) implicitly defines z.
+     */
+    SX alg, z;
+
+    /** \brief Quadrature equations and corresponding quadrature states
+     * Quadrature equation, e.g. an ODE whose state does not enter in the right-hand-side.
+     * quad and q have matching dimensions and der(q) == quad(...)
+     */
+    SX quad, q;
+
+    /** \brief Dependent equations and corresponding variables
+     * Set of intermediate variables with explicit definitions.
+     * Interdependencies are allowed but must be non-cyclic.
+     * dep and y have matching dimensions and y == dep(y,...)
+     */
+    SX dep, y;
+
+    /** \brief Free controls 
+     * The trajectories of the free controls are decision variables of the optimal control problem. They are chosen by
+     * the optimization algorithm in order to minimize the cost functional.
+     */
+    SX u;
     
-    /** \brief Algebraic variables */
-    SX z;
-    
-    /** \brief Quadrature states (length == quad().size()) */
-    SX q;
+    /** \brief Free parameters 
+     * A free parameter is variables which is constant over time, but whose value is chosen by the optimization algorithm
+     * in order to minimize the cost functional.
+     */
+    SX pf;
 
     /** \brief Independent constants */
     SX ci;
@@ -123,45 +154,7 @@ namespace CasADi{
         A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */
     SX pd;
 
-    /** \brief Free parameters 
-        A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
-    SX pf;
-    
-    /** \brief Dependent variables (length == dep().size()) */
-    SX y;
-    
-    /** \brief Control signals */
-    SX u;
-
     //@}
-    
-    /** @name Equations
-     *  Get all equations of a particular type 
-     */
-    //@{
-      
-    /// Fully implific DAE
-    SX dae;
-
-    /// Explicit ODE
-    SX ode;
-    
-    /// Algebraic constraints
-    SX alg;
-    
-    /// Quadrature equations
-    SX quad;
-    
-    /// Dependent equations
-    SX dep;
-    
-    /// Initial equations (remove?)
-    SX initial;
-    //@}
-    
-    /** @name Time points
-     */
-    //@{
 
     /// Interval start time
     double t0;

@@ -184,18 +184,13 @@ namespace CasADi{
         const XMLNode& beq = bindeqs[i];
 
         // Get the variable
-        Variable var = readVariable(beq[0]);
+        const Variable& var = readVariable(beq[0]);
+        this->y.append(var.v);
 
         // Get the binding equation
         SX bexpr = readExpr(beq[1][0]);
-      
-        // Add binding equation
-        this->y.append(var.v);
         this->dep.append(bexpr);
       }
-    
-      // Resort the dependant parameters
-      sortDependentParameters();
     }
 
     // **** Add dynamic equations ****
@@ -416,7 +411,7 @@ namespace CasADi{
     } else if(name.compare("Cos")==0){
       return cos(readExpr(node[0]));
     } else if(name.compare("Der")==0){
-      Variable v = readVariable(node[0]);
+      const Variable& v = readVariable(node[0]);
       return v.d;
     } else if(name.compare("Div")==0){
       return readExpr(node[0]) / readExpr(node[1]);
