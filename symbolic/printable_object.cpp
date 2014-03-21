@@ -55,11 +55,11 @@ namespace CasADi{
     return ss.str();
   }
     
-  std::string PrintableObject::__str__() const{ 
+  std::string PrintableObject::getDescription() const{ 
     return CasADi::str(*this);
   }
 
-  std::string PrintableObject::__repr__() const{ 
+  std::string PrintableObject::getRepresentation() const{ 
     return CasADi::repr(*this);
   }
 

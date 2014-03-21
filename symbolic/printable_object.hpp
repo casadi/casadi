@@ -57,11 +57,18 @@ namespace CasADi{
 #endif // SWIG
 
     /// Return a string with a representation (for SWIG)
-    std::string __str__() const;
+    std::string getRepresentation() const;
 
     /// Return a string with a destription (for SWIG)
-    std::string __repr__() const;
+    std::string getDescription() const;
   };
+
+#ifdef SWIG
+  %extend PrintableObject{
+    std::string __str__()  { return $self->getDescription(); }
+    std::string __repr__()  { return $self->getRepresentation(); }
+  }
+#endif // SWIG    
 
 } // namespace CasADi
 
