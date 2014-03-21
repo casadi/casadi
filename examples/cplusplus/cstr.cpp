@@ -29,8 +29,6 @@
 #include <interfaces/csparse/csparse.hpp>
 
 #include <optimal_control/symbolic_ocp.hpp>
-#include <optimal_control/ocp_tools.hpp>
-#include <optimal_control/variable_tools.hpp>
 #include <optimal_control/direct_multiple_shooting.hpp>
 
 using namespace CasADi;
@@ -44,14 +42,17 @@ int main(){
   // Load the XML file
   ocp.parseFMI("../examples/xml_files/cstr.xml");
 
+  // Identify the algebraic variables and separate them from the states
+  ocp.identifyALG();
+
   // Scale the variables
   ocp.scaleVariables();
 
   // Sort the equations
-  ocp.sortODE();
+  ocp.sortDAE();
   ocp.sortALG();
   
-  // Make the OCP explicit
+  // Make the ODE explicit
   ocp.makeExplicit();
   
   // Eliminate dependent variables created during the makeExplicit step
@@ -61,27 +62,27 @@ int main(){
   ocp.print();
   
   // Correct the inital guess and bounds on variables
-  ocp.variable("u").setStart(280);
-  ocp.variable("u").setMin(230);
-  ocp.variable("u").setMax(370);
+  ocp.setStart("u",280);
+  ocp.setMin("u",230);
+  ocp.setMax("u",370);
 
   // Correct bound on state
-  ocp.variable("cstr.T").setMax(350);
+  ocp.setMax("cstr.T",350);
   
   // Variables
   SX t = ocp.t;
-  SX x = var(ocp.x);
-  SX u = var(ocp.u);
+  SX x = ocp.x;
+  SX u = ocp.u;
     
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.x,true);
-  vector<double> xmin = getMin(ocp.x,true);
-  vector<double> xmax = getMax(ocp.x,true);
+  vector<double> x0 = ocp.start(ocp.x,true);
+  vector<double> xmin = ocp.min(ocp.x,true);
+  vector<double> xmax = ocp.max(ocp.x,true);
   
   // Initial guess and bounds for the control
-  vector<double> u0 = getStart(ocp.u,true);
-  vector<double> umin = getMin(ocp.u,true);
-  vector<double> umax = getMax(ocp.u,true);
+  vector<double> u0 = ocp.start(ocp.u,true);
+  vector<double> umin = ocp.min(ocp.u,true);
+  vector<double> umax = ocp.max(ocp.u,true);
   
   // Number of shooting nodes
   int num_nodes = 100;

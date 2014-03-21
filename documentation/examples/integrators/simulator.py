@@ -60,7 +60,7 @@ sim.setInput([0.1,0.1,0.1,0.3,0.1],"p")
 sim.evaluate()
 
 #! Plot the solution
-plot(array(sim.getOutput())[:,0],array(sim.getOutput())[:,1])
+plot(array(sim.getOutput())[0,:],array(sim.getOutput())[1,:])
 xlabel("u")
 ylabel("u_dot")
 show()

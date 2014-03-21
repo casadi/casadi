@@ -65,15 +65,18 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
+# Separate algebraic variables
+ocp.identifyALG()
+
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
 
 # Sort the equations
-ocp.sortODE()
+ocp.sortDAE()
 ocp.sortALG()
 
-# Make the OCP explicit
+# Make the ODE explicit
 ocp.makeExplicit()
 
 # Eliminate the algebraic states
@@ -82,8 +85,8 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
-  p = vertcat((var(ocp.pi),var(ocp.pf)))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -96,9 +99,9 @@ P = ocp("P")
 output_fcn_out = ocp.substituteDependents([m,P])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
-  z = var(ocp.z),
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -108,7 +111,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -137,15 +140,18 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
+# Separate algebraic variables
+ocp.identifyALG()
+
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
 
 # Sort the equations
-ocp.sortODE()
+ocp.sortDAE()
 ocp.sortALG()
 
-# Make the OCP explicit
+# Make the ODE explicit
 ocp.makeExplicit()
 
 # Eliminate the algebraic states
@@ -154,8 +160,8 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
-  p = vertcat((var(ocp.pi),var(ocp.pf)))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -167,9 +173,9 @@ T = ocp("T")
 output_fcn_out = ocp.substituteDependents([T])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
-  z = var(ocp.z),
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -179,7 +185,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -201,15 +207,18 @@ comp("BasicVolumeTest")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeTest.xml')
 
+# Separate algebraic variables
+ocp.identifyALG()
+
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
 
 # Sort the equations
-ocp.sortODE()
+ocp.sortDAE()
 ocp.sortALG()
 
-# Make explicit
+# Make the ODE explicit
 ocp.makeExplicit()
 
 # Eliminate the algebraic states
@@ -218,8 +227,8 @@ ocp.eliminateAlgebraic()
 # Inputs to the integrator
 dae_fcn_in = daeIn(
   t = ocp.t,
-  x = var(ocp.x),
-  p = vertcat((var(ocp.pi),var(ocp.pf)))
+  x = ocp.x,
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -233,9 +242,9 @@ V = ocp("V")
 output_fcn_out = ocp.substituteDependents([T,U,V])
 output_fcn_in = daeIn(
   t=ocp.t,
-  x = var(ocp.x),
-  z = var(ocp.z),
-  p = vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u)))
+  x = ocp.x,
+  z = ocp.z,
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -245,7 +254,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.x)
+x0 = ocp.start(ocp.x)
 simulator.setInput(x0,"x0")
 
 # Simulate
@@ -275,15 +284,18 @@ comp("CtrlFlowSystem")
 ocp = SymbolicOCP()
 ocp.parseFMI('CtrlFlowSystem.xml')
 
+# Separate algebraic variables
+ocp.identifyALG()
+
 # Eliminate the dependent variables
 ocp.eliminateInterdependencies()
 ocp.eliminateDependent()
 
 # Sort the equations
-ocp.sortODE()
+ocp.sortDAE()
 ocp.sortALG()
 
-# Make the OCP explicit
+# Make the ODE explicit
 ocp.makeExplicit()
 
 # Print the ocp

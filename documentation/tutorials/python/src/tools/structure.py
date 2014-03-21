@@ -319,13 +319,13 @@ initial["z"] = 3
 #! -------------------
 
 #! If you work with Simulator, ControlSimulator, you typically end up
-#! with wanting to index a DMatrix that is N x n
+#! with wanting to index a DMatrix that is n x N
 #! with n the size of a statespace and N an arbitrary integer
 
 states = struct(["x","y","z"])
 
-#! We artificially construct here a DMAtrix that could be a Simulator output.
-output = DMatrix.zeros(8,states.size)
+#! We artificially construct here a DMatrix that could be a Simulator output.
+output = DMatrix.zeros(states.size,8)
 
 #! The helper construct is 'repeated' here. Instead of "states(output)", we have
 outputs = states.repeated(output)
@@ -358,8 +358,8 @@ print P()
 P0.set(P)
 
 #! Next we represent the 'squared_repeated' helper construct
-#! Imagine we somehow obtain a matrix that represents a vertical concatenation of covariance
-P0 = vertcat([DMatrix.zeros(states.size,states.size),DMatrix.ones(states.size,states.size)])
+#! Imagine we somehow obtain a matrix that represents a horizontal concatenation of covariance
+P0 = horzcat([DMatrix.zeros(states.size,states.size),DMatrix.ones(states.size,states.size)])
 
 #! We can conveniently access it as follows:
 P = states.squared_repeated(P0)

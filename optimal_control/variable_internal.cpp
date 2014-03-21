@@ -27,34 +27,6 @@ using namespace std;
 namespace CasADi{
   
   VariableInternal::VariableInternal(const string& name){
-    // Symbolic expression for the variable
-    var_ = SX::sym(name);
-
-    // Symbolic expression for the time derivative of the variable
-    der_ = SX::sym("der_" + name);
-
-    // Set binding expressions
-    binding_ = var_;
-    der_binding_ = der_;
-    
-    variability_ = CONTINUOUS;
-    causality_ = INTERNAL;
-    category_ = CAT_UNKNOWN;
-    alias_ = NO_ALIAS;
-    description_ = "";
-    valueReference_ = -1; //?
-    min_ = -numeric_limits<double>::infinity();
-    max_ = numeric_limits<double>::infinity();
-    initial_guess_ = 0;
-    nominal_ = 1.0;
-    start_ = 0.0;
-    derivative_start_ = 0.0;
-    unit_ = "";
-    displayUnit_ = "";
-    free_ = false;
-    is_differential_ = false;
-
-    index_ = -1;
   }
 
   VariableInternal::~VariableInternal(){

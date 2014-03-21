@@ -830,18 +830,21 @@ namespace CasADi{
 
   MX jacobian(const MX& ex, const MX &arg) {
     MXFunction temp(arg,ex); // make a runtime
+    temp.setOption("name","helper_jacobian_MX");
     temp.init();
     return temp.jac();
   }
 
   MX gradient(const MX& ex, const MX &arg) {
     MXFunction temp(arg,ex); // make a runtime
+    temp.setOption("name","helper_gradient_MX");
     temp.init();
     return temp.grad();
   }
 
   MX tangent(const MX& ex, const MX &arg) {
     MXFunction temp(arg,ex); // make a runtime
+    temp.setOption("name","helper_tangent_MX");
     temp.init();
     return temp.tang();
   }
@@ -979,6 +982,7 @@ namespace CasADi{
   MX nullspace(const MX& A) {
     SX n = SX::sym("A",A.sparsity());
     SXFunction f(n,nullspace(n));
+    f.setOption("name","nullspace");
     f.init();
     return f(A).at(0);
   }
