@@ -65,22 +65,11 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
-# Separate algebraic variables
-ocp.identifyALG()
-
 # Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
+ocp.eliminateDependentParameters()
 
-# Sort the equations
-ocp.sortDAE()
-ocp.sortALG()
-
-# Make the ODE explicit
+# Transform into an explicit ODE
 ocp.makeExplicit()
-
-# Eliminate the algebraic states
-ocp.eliminateAlgebraic()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
@@ -94,9 +83,7 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-m = ocp("m")
-P = ocp("P")
-output_fcn_out = ocp.substituteDependents([m,P])
+output_fcn_out = [ocp.binding("m"),ocp.binding("P")]
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -140,22 +127,11 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
-# Separate algebraic variables
-ocp.identifyALG()
-
 # Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
+ocp.eliminateDependentParameters()
 
-# Sort the equations
-ocp.sortDAE()
-ocp.sortALG()
-
-# Make the ODE explicit
+# Transform into an explicit ODE
 ocp.makeExplicit()
-
-# Eliminate the algebraic states
-ocp.eliminateAlgebraic()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
@@ -169,8 +145,7 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp("T")
-output_fcn_out = ocp.substituteDependents([T])
+output_fcn_out = [ocp.binding("T")]
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -288,15 +263,10 @@ ocp.parseFMI('CtrlFlowSystem.xml')
 ocp.identifyALG()
 
 # Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
-
-# Sort the equations
-ocp.sortDAE()
-ocp.sortALG()
+ocp.eliminateDependentParameters()
 
 # Make the ODE explicit
-ocp.makeExplicit()
+ocp.makeSemiExplicit()
 
 # Print the ocp
 print ocp
