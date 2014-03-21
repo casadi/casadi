@@ -135,7 +135,7 @@ namespace CasADi{
      * A free parameter is variables which is constant over time, but whose value is chosen by the optimization algorithm
      * in order to minimize the cost functional.
      */
-    SX pf;
+    SX p;
 
     /** \brief Independent constants */
     SX ci;

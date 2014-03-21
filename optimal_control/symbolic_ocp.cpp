@@ -49,7 +49,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->s=this->x=this->z=this->q=this->ci=this->cd=this->pi=this->pd=this->pf=this->y=this->u = SX::zeros(0,1);
+    this->s=this->x=this->z=this->q=this->ci=this->cd=this->pi=this->pd=this->p=this->y=this->u = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -491,7 +491,7 @@ namespace CasADi{
     stream << "#y = " << this->y.size() << ", ";
     stream << "#pi = " << this->pi.size() << ", ";
     stream << "#pd = " << this->pd.size() << ", ";
-    stream << "#pf = " << this->pf.size() << ", ";
+    stream << "#pf = " << this->p.size() << ", ";
     stream << "#ci =  " << this->ci.size() << ", ";
     stream << "#cd =  " << this->cd.size() << ", ";
     stream << "#u = " << this->u.size() << ", ";
@@ -510,7 +510,7 @@ namespace CasADi{
     stream << "  y =  " << str(this->y) << endl;
     stream << "  pi =  " << str(this->pi) << endl;
     stream << "  pd =  " << str(this->pd) << endl;
-    stream << "  pf =  " << str(this->pf) << endl;
+    stream << "  pf =  " << str(this->p) << endl;
     stream << "  ci =  " << str(this->ci) << endl;
     stream << "  cd =  " << str(this->cd) << endl;
     stream << "  u =  " << str(this->u) << endl;
@@ -684,7 +684,7 @@ namespace CasADi{
     v.append(this->x);
     v.append(this->z);
     v.append(this->pi);
-    v.append(this->pf);
+    v.append(this->p);
     v.append(this->u);
     
     // Nominal values
@@ -693,7 +693,7 @@ namespace CasADi{
     SX x_n = nominal(this->x);
     SX z_n = nominal(this->z);
     SX pi_n = nominal(this->pi);
-    SX pf_n = nominal(this->pf);
+    SX pf_n = nominal(this->p);
     SX u_n = nominal(this->u);
   
     // Get all the old variables in expressed in the nominal ones
@@ -704,7 +704,7 @@ namespace CasADi{
     v_old.append(this->x*x_n);
     v_old.append(this->z*z_n);
     v_old.append(this->pi*pi_n);
-    v_old.append(this->pf*pf_n);
+    v_old.append(this->p*pf_n);
     v_old.append(this->u*u_n);
   
     // Temporary variable
@@ -740,7 +740,7 @@ namespace CasADi{
     v[XDOT] = der(this->x); // BUG!!!
     v[Z] = this->z;
     v[PI] = this->pi;
-    v[PF] = this->pf;
+    v[PF] = this->p;
     v[U] = this->u;
 
     // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
@@ -760,7 +760,7 @@ namespace CasADi{
     J.input(XDOT).setAll(0.0);
     J.setInput(start(this->z,true),Z);
     J.setInput(start(this->pi,true),PI);
-    J.setInput(start(this->pf,true),PF);
+    J.setInput(start(this->p,true),PF);
     J.setInput(start(this->u,true),U);
     J.evaluate();
   
@@ -1070,7 +1070,7 @@ namespace CasADi{
       break;
     case CAT_INDEPENDENT_PARAMETER:
       if(var.free){
-        this->pf.append(var.v);
+        this->p.append(var.v);
       } else {
         this->pi.append(var.v);
       }
@@ -1196,7 +1196,7 @@ namespace CasADi{
     datfile << endl;
     
     // Parameter properties
-    SX p = vertcat(this->pi,this->pf);
+    SX p = vertcat(this->pi,this->p);
     if(!p.isEmpty()){
       datfile << "*  global model parameter start values, scale factors, and bounds" << endl;
       datfile << "p" << endl;

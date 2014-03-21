@@ -86,7 +86,7 @@ ocp.eliminateAlgebraic()
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = ocp.x,
-  p = vertcat((ocp.pi,ocp.pf))
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -101,7 +101,7 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
   z = ocp.z,
-  p = vertcat((ocp.pi,ocp.pf,ocp.u))
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -161,7 +161,7 @@ ocp.eliminateAlgebraic()
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = ocp.x,
-  p = vertcat((ocp.pi,ocp.pf))
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -175,7 +175,7 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
   z = ocp.z,
-  p = vertcat((ocp.pi,ocp.pf,ocp.u))
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
@@ -228,7 +228,7 @@ ocp.eliminateAlgebraic()
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = ocp.x,
-  p = vertcat((ocp.pi,ocp.pf))
+  p = vertcat((ocp.pi,ocp.p))
 )
 
 # Create an integrator
@@ -244,7 +244,7 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
   z = ocp.z,
-  p = vertcat((ocp.pi,ocp.pf,ocp.u))
+  p = vertcat((ocp.pi,ocp.p,ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
