@@ -2243,5 +2243,46 @@ class MXtests(casadiTestCase):
     
     
     
+<<<<<<< HEAD
+=======
+    self.checkarray(s[0],DMatrix([y_,zz_[0,0],zz_[0,1]]).T)
+    self.checkarray(s[1],DMatrix([z_,zz_[0,0],zz_[0,1]]).T)
+    
+    s= evalhorzsplit(horzcat([zz,zz]),2)
+    self.checkarray(s[0],zz_)
+    self.checkarray(s[1],zz_)
+
+    s= evalhorzsplit(horzcat([zz]+dvars))
+    self.checkarray(s[0],zz_[0,0])
+    self.checkarray(s[1],zz_[0,1])
+    
+    for i in range(5):
+      self.checkarray(s[2+i],dvars_[i])
+
+    s= evalhorzsplit(horzcat(dvars+[aa]),5)
+    self.checkarray(s[0],DMatrix(dvars_).T)
+    self.checkarray(s[1],DMatrix(aa_).T)
+
+    s= evalhorzsplit(horzcat(dvars+[aa]),4)
+    self.checkarray(s[0],DMatrix(dvars_[:4]).T)
+    self.checkarray(s[1],DMatrix([dvars_[-1]]+aa_[:3]).T)
+    self.checkarray(s[2],DMatrix(aa_[3:]).T)
+
+    s= evalhorzsplit(horzcat(dvars+[aa]),6)
+    self.checkarray(s[0],DMatrix(dvars_+[aa_[0]]).T)
+    self.checkarray(s[1],DMatrix(aa_[1:]).T)
+    
+    for i in range(5):
+      self.assertTrue(isEqual(horzsplit(horzcat(dvars))[i],dvars[i]))
+      
+  def test_vertsplit_derivative(self):
+    m = MX.sym("X",10)
+
+    f = MXFunction([m],[vertsplit(m)[0]])
+    f.init()
+
+    f.derivative(0,1)
+      
+>>>>>>> 8be91a0... #1025 fixing derivative sparsity
 if __name__ == '__main__':
     unittest.main()
