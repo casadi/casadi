@@ -470,10 +470,10 @@ class CasadiStructureDerivable:
         a = DMatrix(arg)
       except:
         raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
-    if not(a.shape[1] == self.size):
-       raise Exception("Expecting n x %d DMatrix. Got %s" % (self.size,a.dimString()))  
-    s = struct([entry("t",struct=self,repeat=a.shape[0])])
-    numbers = DMatrixStruct(s,data=DataReferenceRepeated(a,a.shape[0]))
+    if not(a.shape[0] == self.size):
+       raise Exception("Expecting %d x n DMatrix. Got %s" % (self.size,a.dimString()))  
+    s = struct([entry("t",struct=self,repeat=a.shape[1])])
+    numbers = DMatrixStruct(s,data=DataReferenceRepeated(a,a.shape[1]))
     p = numbers.prefix["t"]
     p.castmaster = True
     return p  
@@ -504,10 +504,10 @@ class CasadiStructureDerivable:
         a = DMatrix(arg)
       except:
         raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
-    if not(a.shape[1]==self.size and a.shape[0] % self.size == 0):
-       raise Exception("Expecting N x square DMatrix. Got %s" % (self.size,a.dimString()))
-    s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[0] / self.size)])
-    numbers = DMatrixStruct(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[0] / self.size))
+    if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):
+       raise Exception("Expecting square (%d) DMatrix by N. Got %s" % (self.size,a.dimString()))
+    s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[1] / self.size)])
+    numbers = DMatrixStruct(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[1] / self.size))
     p = numbers.prefix["t"]
     p.castmaster = True
     return p  
@@ -1306,17 +1306,20 @@ class DataReference:
   @property
   def shape(self):
     return self.v.shape
+    
+  def dimString(self):
+    return self.v.dimString()
   
 class DataReferenceRepeated(DataReference):
   def __init__(self,a,n):
     assert(a.isDense())
     self.a = a
     self.n = n
-    self.v = a.T.reshape((n*a.size2(),1))
+    self.v = a.reshape((n*a.size1(),1))
     
   def __setitem__(self,a,b):
     self.v.__NZsetitem__(a,b)
-    self.a.set(self.v.data(),DENSETRANS)
+    self.a.set(self.v.data(),DENSE)
 
   def __getitem__(self,a):
     return self.v.__NZgetitem__(a)
@@ -1344,14 +1347,11 @@ class DataReferenceSquaredRepeated(DataReference):
     self.a = a
     self.n = n
     self.N = N
-    self.v = horzcat([i for i in vertsplit(a,N) ]).reshape((n*n*N,1))
+    self.v = a.reshape((n*n*N,1))
     
   def __setitem__(self,a,b):
     self.v.__NZsetitem__(a,b)
-    print "setitem", a, b
-    for i in range(self.N):
-      print self.v.data()[i*self.n*self.n:(i+1)*self.n*self.n]
-      self.a[i*self.n:(i+1)*self.n,:] = self.v[i*self.n*self.n:(i+1)*self.n*self.n].reshape((self.n,self.n))
+    self.a.set(self.v.data(),DENSE)
 
   def __getitem__(self,a):
     return self.v.__NZgetitem__(a)
