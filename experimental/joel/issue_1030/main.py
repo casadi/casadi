@@ -127,26 +127,14 @@ X0 = vstack([delta0, omega_delta0])
 #===============================================================================
 #Simulates
 
-f.init()
-J = f.jacobian("z","alg")
-J.init()
-J.setInput(X0,"x")
-J.setInput(Pm0,"p")
-J.setInput(Z0,"z")
-J.evaluate()
-
-print det(J.getOutput())
-
-
 # Creates IdasIntegrator
 I = IdasIntegrator(f)
-I.setOption("linear_solver",CSparse)
-I.setOption("linear_solver_type","user_defined")
+#I.setOption("linear_solver",CSparse)
+#I.setOption("linear_solver_type","user_defined")
 
 if runWith171==1:
     I.setOption("init_z",Z0)
 I.setOption("calc_ic", calc_ic)
-I.setOption("tf",60)
 I.init()
 
 I.setInput(X0,INTEGRATOR_X0)
@@ -166,6 +154,8 @@ if runWith180 or runWith190:
 sim.evaluate()
 
 sol = sim.output().toArray()
+if runWith190:
+  sol = sol.T
 
 figure(1)
 plot(ts,sol[:,2],ts,sol[:,3])
