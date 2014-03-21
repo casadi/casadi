@@ -63,9 +63,6 @@ namespace CasADi{
       At a later state, the DAE can be reformulated, for example in semi-explicit form, 
       possibly in addition to a set of quadrature states.
  
-      The functions for reformulation is are provided as member functions to this class or as independent
-      functions located in the header file "ocp_tools.hpp".
-
       <H3>Usage skeleton:</H3>
   
       1. Call default constructor 

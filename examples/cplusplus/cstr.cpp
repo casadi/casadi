@@ -29,7 +29,6 @@
 #include <interfaces/csparse/csparse.hpp>
 
 #include <optimal_control/symbolic_ocp.hpp>
-#include <optimal_control/ocp_tools.hpp>
 #include <optimal_control/direct_multiple_shooting.hpp>
 
 using namespace CasADi;
