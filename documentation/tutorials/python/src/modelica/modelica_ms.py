@@ -26,9 +26,9 @@
 #$ For this we extract the file modelDescription.xml from FMUX file as follows:
 import zipfile
 import os
-curr_dir = os.path.dirname(os.path.abspath(__file__))
+#curr_dir = os.path.dirname(os.path.abspath(__file__))
 #curr_dir = '/home/jaeandersson/dev/casadi/documentation/tutorials/python/src/modelica'
-#curr_dir = '/home/janderss/casadi/documentation/tutorials/python/src/modelica'
+curr_dir = '/home/janderss/casadi/documentation/tutorials/python/src/modelica'
 fmux = zipfile.ZipFile(curr_dir+"/CSTR_CSTR_Opt2.fmux",'r')
 fmux.extract('modelDescription.xml','.')
 #$ This file can be imported into CasADi, building up a symbolic representation of the model
