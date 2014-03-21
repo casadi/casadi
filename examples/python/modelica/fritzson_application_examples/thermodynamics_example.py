@@ -65,11 +65,22 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
-# Eliminate the dependent variables
-ocp.eliminateDependentParameters()
+# Separate algebraic variables
+ocp.identifyALG()
 
-# Transform into an explicit ODE
+# Eliminate the dependent variables
+ocp.eliminateInterdependencies()
+ocp.eliminateDependent()
+
+# Sort the equations
+ocp.sortDAE()
+ocp.sortALG()
+
+# Make the ODE explicit
 ocp.makeExplicit()
+
+# Eliminate the algebraic states
+ocp.eliminateAlgebraic()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
@@ -83,7 +94,9 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-output_fcn_out = [ocp.binding("m"),ocp.binding("P")]
+m = ocp("m")
+P = ocp("P")
+output_fcn_out = ocp.substituteDependents([m,P])
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -127,11 +140,22 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
-# Eliminate the dependent variables
-ocp.eliminateDependentParameters()
+# Separate algebraic variables
+ocp.identifyALG()
 
-# Transform into an explicit ODE
+# Eliminate the dependent variables
+ocp.eliminateInterdependencies()
+ocp.eliminateDependent()
+
+# Sort the equations
+ocp.sortDAE()
+ocp.sortALG()
+
+# Make the ODE explicit
 ocp.makeExplicit()
+
+# Eliminate the algebraic states
+ocp.eliminateAlgebraic()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
@@ -145,7 +169,8 @@ dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-output_fcn_out = [ocp.binding("T")]
+T = ocp("T")
+output_fcn_out = ocp.substituteDependents([T])
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -263,10 +288,15 @@ ocp.parseFMI('CtrlFlowSystem.xml')
 ocp.identifyALG()
 
 # Eliminate the dependent variables
-ocp.eliminateDependentParameters()
+ocp.eliminateInterdependencies()
+ocp.eliminateDependent()
+
+# Sort the equations
+ocp.sortDAE()
+ocp.sortALG()
 
 # Make the ODE explicit
-ocp.makeSemiExplicit()
+ocp.makeExplicit()
 
 # Print the ocp
 print ocp

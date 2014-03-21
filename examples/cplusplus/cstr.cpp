@@ -42,14 +42,21 @@ int main(){
   // Load the XML file
   ocp.parseFMI("../examples/xml_files/cstr.xml");
 
-  // Transform into an explicit ODE
-  ocp.makeExplicit();
+  // Identify the algebraic variables and separate them from the states
+  ocp.identifyALG();
 
   // Scale the variables
   ocp.scaleVariables();
+
+  // Sort the equations
+  ocp.sortDAE();
+  ocp.sortALG();
   
-  // Eliminate the independent parameters
-  ocp.eliminateIndependentParameters();
+  // Make the ODE explicit
+  ocp.makeExplicit();
+  
+  // Eliminate dependent variables created during the makeExplicit step
+  ocp.eliminateDependent();
 
   // Print the ocp to screen
   ocp.print();
@@ -61,7 +68,12 @@ int main(){
 
   // Correct bound on state
   ocp.setMax("cstr.T",350);
-      
+  
+  // Variables
+  SX t = ocp.t;
+  SX x = ocp.x;
+  SX u = ocp.u;
+    
   // Initial guess and bounds for the state
   vector<double> x0 = ocp.start(ocp.x,true);
   vector<double> xmin = ocp.min(ocp.x,true);
@@ -82,10 +94,11 @@ int main(){
   integrator_options["tf"]=ocp.tf/num_nodes;
 
   // Mayer objective function
-  SXFunction mterm(ocp.x,ocp("cost"));
+  SX xf = SX::sym("xf",x.size(),1);
+  SXFunction mterm(xf, xf[0]);
   
   // DAE residual function
-  SXFunction dae(daeIn("x",ocp.x,"p",ocp.u,"t",ocp.t),daeOut("ode",ocp.ode));
+  SXFunction dae(daeIn("x",x, "p",u, "t",t),daeOut("ode",ocp.ode));
 
   // Create a multiple shooting discretization
   DirectMultipleShooting ocp_solver;
@@ -111,13 +124,13 @@ int main(){
   ocp_solver.init();
 
   // Initial condition
-  for(int i=0; i<ocp.x.size(); ++i){
+  for(int i=0; i<x.size(); ++i){
     ocp_solver.input("x_init")(i,0) = ocp_solver.input("lbx")(i,0) = ocp_solver.input("ubx")(i,0) = x0[i];
   }
 
   // State bounds
   for(int k=1; k<=num_nodes; ++k){
-    for(int i=0; i<ocp.x.size(); ++i){
+    for(int i=0; i<x.size(); ++i){
       ocp_solver.input("x_init")(i,k) = x0[i];
       ocp_solver.input("lbx")(i,k) = xmin[i];
       ocp_solver.input("ubx")(i,k) = xmax[i];
@@ -126,7 +139,7 @@ int main(){
 
   // Control bounds
   for(int k=0; k<num_nodes; ++k){
-    for(int i=0; i<ocp.u.size(); ++i){
+    for(int i=0; i<u.size(); ++i){
       ocp_solver.input("u_init")(i,k) = u0[i];
       ocp_solver.input("lbu")(i,k) = umin[i];
       ocp_solver.input("ubu")(i,k) = umax[i];

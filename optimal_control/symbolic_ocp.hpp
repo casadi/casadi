@@ -234,39 +234,11 @@ namespace CasADi{
      *  Reformulate the dynamic optimization problem.
      */
     //@{
-
-    /// Identify and separate the algebraic variables and equations in the DAE
-    void separateAlgebraic();
-
-    /// Eliminate algebraic variables, transforming them into outputs
-    void eliminateAlgebraic();
-
-    /// Transform the implicit DAE to a semi-explicit DAE
-    void makeSemiExplicit();
-
-    /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
-    void makeExplicit();
-
-    /// Eliminate independent parameters
-    void eliminateIndependentParameters();
+    /// Eliminate interdependencies in the dependent equations
+    void eliminateInterdependencies();
     
-    /// Sort the dependent parameters
-    void sortDependentParameters();
-    
-    /// Eliminate interdependencies amongst the dependent parameters
-    void eliminateDependentParameterInterdependencies();
-
-    /// Eliminate dependent parameters
-    void eliminateDependentParameters();
-
-    /// Sort the outputs
-    void sortOutputs();
-
-    /// Eliminate interdependencies amongst the outputs
-    void eliminateOutputInterdependencies();
-
-    /// Eliminate outputs
-    void eliminateOutputs();
+    /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
+    void eliminateDependent(bool eliminate_dependents_with_bounds=true);
 
     /// Eliminate Lagrange terms from the objective function and make them quadrature states
     void eliminateLagrangeTerms();
@@ -274,12 +246,27 @@ namespace CasADi{
     /// Eliminate quadrature states and turn them into ODE states
     void eliminateQuadratureStates();
     
-    /// Sort the DAE and implictly defined states
+    /// Identify the algebraic variables and separate them from the states
+    void identifyALG();
+
+    /// Sort the DAE and implicly defined states
     void sortDAE();
 
     /// Sort the algebraic equations and algebraic states
     void sortALG();
-        
+
+    /// Sort the dependent parameters
+    void sortDependentParameters();
+    
+    /// Transform the implicit ODE to an explicit ODE
+    void makeExplicit();
+    
+    /// Eliminate algebraic states, transforming them into outputs
+    void eliminateAlgebraic();
+    
+    /// Substitute the dependents from a set of expressions
+    std::vector<SX> substituteDependents(const std::vector<SX>& x) const;
+    
     /// Generate a MUSCOD-II compatible DAT file
     void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
     
@@ -300,12 +287,6 @@ namespace CasADi{
     /// Find an derivative expression by non-differentiated expression
     SX der(const SX& var) const;
 
-    /// Find a binding expression by name
-    SX binding(const std::string& name) const;
-
-    /// Find an binding expression by non-differentiated expression
-    SX binding(const SX& var) const;
-    
     /// Get the nominal value by name
     double nominal(const std::string& name) const;
     
@@ -404,7 +385,6 @@ namespace CasADi{
 
     /// Timed variable (allocate if necessary)
     SX atTime(const std::string& name, double t, bool allocate=false);
-
 
 #ifndef SWIG
     ///  Print representation
