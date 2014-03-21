@@ -2613,5 +2613,13 @@ class MXtests(casadiTestCase):
     for i in range(5):
       self.assertTrue(isEqual(horzsplit(horzcat(dvars))[i],dvars[i]))
       
+  def test_vertsplit_derivative(self):
+    m = MX.sym("X",10)
+
+    f = MXFunction([m],[vertsplit(m)[0]])
+    f.init()
+
+    f.derivative(0,1)
+      
 if __name__ == '__main__':
     unittest.main()
