@@ -130,9 +130,15 @@ namespace CasADi{
     return blkdiag(v);
   }
 
-  std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& output_offset){
+  std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& offset){
+    // Consistency check
+    casadi_assert(offset.size()>=1);
+    casadi_assert(offset.front()==0);
+    casadi_assert_message(offset.back()==sp.size2(),"horzsplit(Sparsity,std::vector<int>): Last elements of offset (" << offset.back() << ") must equal the number of columns (" << sp.size2() << ")");
+    casadi_assert(isMonotone(offset));
+
     // Number of outputs
-    int n = output_offset.size()-1;
+    int n = offset.size()-1;
 
     // Get the sparsity of the input
     const vector<int>& colind_x = sp.colind();
@@ -148,8 +154,8 @@ namespace CasADi{
 
     // Get the sparsity patterns of the outputs
     for(int i=0; i<n; ++i){
-      int first_col = output_offset[i];
-      int last_col = output_offset[i+1];
+      int first_col = offset[i];
+      int last_col = offset[i+1];
       ncol = last_col - first_col;
 
       // Construct the sparsity pattern
@@ -168,8 +174,8 @@ namespace CasADi{
     return ret;
   }
 
-  std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& output_offset){
-    std::vector<Sparsity> ret = horzsplit(sp.T(),output_offset);
+  std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& offset){
+    std::vector<Sparsity> ret = horzsplit(sp.T(),offset);
     for(std::vector<Sparsity>::iterator it=ret.begin(); it!=ret.end(); ++it){
       *it = it->T();
     }

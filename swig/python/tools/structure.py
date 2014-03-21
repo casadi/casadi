@@ -917,6 +917,7 @@ class VertsplitStructure:
       its.append(it)
       sps.append(sp)
       k += sp.size()
+    ks.append(parent.size1())
       
     for it, k, sp,e in zip(its,vertsplit(parent,ks),sps,es):
       if not(e.isPrimitive()):
