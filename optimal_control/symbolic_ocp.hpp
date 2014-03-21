@@ -148,7 +148,10 @@ namespace CasADi{
         A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */
     SX pd;
 
-    /** \brief Independent constants */
+    /** \brief Independent constant
+     * An independent constant is a constant whose value is determined by an expression that contains only literals.
+     * Its value is located in the "value" attribute.
+     */
     SX ci;
 
     /** \brief Dependent constants */

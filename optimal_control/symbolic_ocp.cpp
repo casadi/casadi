@@ -183,12 +183,29 @@ namespace CasADi{
       for(int i=0; i<bindeqs.size(); ++i){
         const XMLNode& beq = bindeqs[i];
 
-        // Get the variable
-        const Variable& var = readVariable(beq[0]);
-        this->y.append(var.v);
-
-        // Get the binding equation
+        // Get the variable and binding expression
+        Variable& var = readVariable(beq[0]);
         SX bexpr = readExpr(beq[1][0]);
+
+        switch(var.category){
+        case CAT_DEPENDENT_CONSTANT:
+          break;
+        case CAT_INDEPENDENT_CONSTANT:
+          casadi_assert(bexpr.isConstant());
+          var.value = bexpr.getValue();
+          break;
+        case CAT_DEPENDENT_PARAMETER:
+          break;
+        case CAT_INDEPENDENT_PARAMETER:
+          casadi_assert(bexpr.isConstant());
+          casadi_assert(!var.free);
+          var.value = bexpr.getValue();
+          break;
+        default:
+          casadi_warning("Binding equation for " + str(var) + " ignored");
+        }
+
+        this->y.append(var.v);
         this->dep.append(bexpr);
       }
     }
@@ -1083,7 +1100,7 @@ namespace CasADi{
       }
       break;
     default:
-      casadi_assert_message(0,"Unknown category");
+      casadi_error("Unknown category");
     }
   }
 
