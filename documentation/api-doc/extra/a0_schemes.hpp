@@ -399,7 +399,7 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>CONTROLSIMULATOR_X0</td><td>x0</td><td>Differential or algebraic state at t0 (dimension nx-by-1) .</td></tr>
 <tr><td>CONTROLSIMULATOR_P</td><td>p</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1) .</td></tr>
-<tr><td>CONTROLSIMULATOR_U</td><td>u</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu) .</td></tr>
+<tr><td>CONTROLSIMULATOR_U</td><td>u</td><td>Parameters that change over the integration intervals (dimension nu-by-(ns-1)) .</td></tr>
 </table>
 */
 /** \defgroup scheme_JacGInput
