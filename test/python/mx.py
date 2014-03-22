@@ -1812,7 +1812,7 @@ class MXtests(casadiTestCase):
       
   def test_vertsplit(self):
     a = MX.sym("X",Sparsity.tril(5))
-    v = vertsplit(a,[0,2,4])
+    v = vertsplit(a,[0,2,4,5])
     
     f = MXFunction([a],v)
     f.init()
@@ -1856,7 +1856,7 @@ class MXtests(casadiTestCase):
     self.checkarray(v[1],DMatrix([[2,6,9,0,0],[3,7,10,12,0]]))
     self.checkarray(v[2],DMatrix([[4,8,11,13,14]]))
     
-    v = vertsplit(a,[0,0,3])
+    v = vertsplit(a,[0,0,3,a.size1()])
     
     f = MXFunction([a],v)
     f.init()
@@ -1873,7 +1873,7 @@ class MXtests(casadiTestCase):
  
   def test_horzsplit(self):
     a = MX.sym("X",Sparsity.tril(5))
-    v = horzsplit(a,[0,2,4])
+    v = horzsplit(a,[0,2,4,5])
     
     f = MXFunction([a],v)
     f.init()
@@ -1915,7 +1915,7 @@ class MXtests(casadiTestCase):
     self.checkarray(v[1],DMatrix([[0,0],[0,0],[9,0],[10,12],[11,13]]))
     self.checkarray(v[2],DMatrix([[0],[0],[0],[0],[14]]))
     
-    v = horzsplit(a,[0,0,3])
+    v = horzsplit(a,[0,0,3,a.size2()])
     f = MXFunction([a],v)
     f.init()
     f.setInput(range(5*6/2))
@@ -1931,7 +1931,7 @@ class MXtests(casadiTestCase):
     
   def test_blocksplit(self):
     a = MX.sym("X",Sparsity.tril(5))
-    v = blocksplit(a,[0,2,4],[0,1,3])
+    v = blocksplit(a,[0,2,4,5],[0,1,3,5])
     
     fs = [MXFunction([a],vr) for vr in v]
     for f in fs:

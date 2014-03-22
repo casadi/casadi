@@ -63,11 +63,13 @@ namespace CasADi{
     if(output_fcn_.isNull()){
       SX t = SX::sym("t");
       SX x = SX::sym("x",integrator_.input(INTEGRATOR_X0).sparsity());
+      SX z = SX::sym("z",integrator_.input(INTEGRATOR_Z0).sparsity());
       SX p = SX::sym("p",integrator_.input(INTEGRATOR_P).sparsity());
 
       vector<SX> arg(DAE_NUM_IN);
       arg[DAE_T] = t;
       arg[DAE_X] = x;
+      arg[DAE_Z] = z;
       arg[DAE_P] = p;
 
       vector<SX> out(INTEGRATOR_NUM_OUT);
@@ -114,11 +116,13 @@ namespace CasADi{
   
     // Pass the parameters and initial state
     integrator_.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);
+    integrator_.setInput(input(INTEGRATOR_Z0),INTEGRATOR_Z0);
     integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
   
     if (monitored("initial")) {
       std::cout << "SimulatorInternal::evaluate: initial condition:" << std::endl;
-      std::cout << " y0     = "  << input(INTEGRATOR_X0) << std::endl;
+      std::cout << " x0     = "  << input(INTEGRATOR_X0) << std::endl;
+      std::cout << " z0     = "  << input(INTEGRATOR_Z0) << std::endl;
       std::cout << " p      = "   << input(INTEGRATOR_P) << std::endl;
     }
       
@@ -133,7 +137,8 @@ namespace CasADi{
 
       if (monitored("step")) {
         std::cout << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
-        std::cout << " y0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
+        std::cout << " x0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
+        std::cout << " z0       = "  << integrator_.input(INTEGRATOR_Z0) << std::endl;
         std::cout << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
       }
   
@@ -141,7 +146,8 @@ namespace CasADi{
       integrator_.integrate(grid_[k]);
 
       if (monitored("step")) {
-        std::cout << " y_final  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
+        std::cout << " xf  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
+        std::cout << " zf  = "  << integrator_.output(INTEGRATOR_ZF) << std::endl;
       }
     
       // Pass integrator output to the output function
@@ -149,6 +155,8 @@ namespace CasADi{
         output_fcn_.setInput(grid_[k],DAE_T);
       if(output_fcn_.input(DAE_X).size()!=0)
         output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_X);
+      if(output_fcn_.input(DAE_Z).size()!=0)
+        output_fcn_.setInput(integrator_.output(INTEGRATOR_ZF),DAE_Z);
       if(output_fcn_.input(DAE_P).size()!=0)
         output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
       

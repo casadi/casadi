@@ -98,11 +98,6 @@ namespace CasADi{
 
   Horzsplit::Horzsplit(const MX& x, const std::vector<int>& offset) : Split(x,offset){
     
-    // Add trailing elemement if needed
-    if(offset_.back()!=x.size2()){
-      offset_.push_back(x.size2());
-    }
-
     // Split up the sparsity pattern
     output_sparsity_ = horzsplit(x.sparsity(),offset_);
 
@@ -168,11 +163,6 @@ namespace CasADi{
 
   Vertsplit::Vertsplit(const MX& x, const std::vector<int>& offset) : Split(x,offset){
     
-    // Add trailing elemement if needed
-    if(offset_.back()!=x.size1()){
-      offset_.push_back(x.size1());
-    }
-
     // Split up the sparsity pattern
     output_sparsity_ = vertsplit(x.sparsity(),offset_);
 
