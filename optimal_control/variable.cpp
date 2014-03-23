@@ -33,7 +33,6 @@ namespace CasADi{
     this->alias = NO_ALIAS;
     this->description = "";
     this->valueReference = -1; //?
-    this->value = numeric_limits<double>::quiet_NaN();
     this->min = -numeric_limits<double>::infinity();
     this->max = numeric_limits<double>::infinity();
     this->initialGuess = 0;
@@ -50,14 +49,19 @@ namespace CasADi{
     return this->v.getName();
   }
 
-  SX Variable::atTime(double t, bool allocate) const{
+  void Variable::setName(const std::string& name){
+    this->v = this->beq = SXElement::sym(name);
+    this->d = this->ode = SXElement::sym("der_" + name);
+  }
+
+  SXElement Variable::atTime(double t, bool allocate) const{
     casadi_assert(!allocate);
     return const_cast<Variable*>(this)->atTime(t,false);
   }
 
-  SX Variable::atTime(double t, bool allocate){
+  SXElement Variable::atTime(double t, bool allocate){
     // Find an existing element
-    map<double,SX>::const_iterator it = timed_.find(t);
+    map<double,SXElement>::const_iterator it = timed_.find(t);
   
     // If not found
     if(it==timed_.end()){
@@ -65,7 +69,7 @@ namespace CasADi{
         // Create a timed variable
         stringstream ss;
         ss << name() << ".atTime(" << t << ")";
-        SX tvar = SX::sym(ss.str());
+        SXElement tvar = SXElement::sym(ss.str());
       
         // Save to map
         timed_[t] = tvar;

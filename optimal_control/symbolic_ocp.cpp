@@ -97,10 +97,7 @@ namespace CasADi{
         
           // Create variable
           Variable var;
-
-          // Create symbolic expressions
-          var.v = SX::sym(name);
-          var.d = SX::sym("der_" + name);
+          var.setName(name);
 
           // Value reference
           var.valueReference = valueReference;
@@ -169,6 +166,41 @@ namespace CasADi{
         
           // Add to list of variables
           addVariable(qn,var);
+
+          // Sort expression
+          switch(var.category){
+          case CAT_DERIVATIVE:
+            // Skip - meta information about time derivatives is kept together with its parent variable
+            break;
+          case CAT_STATE:
+            this->s.append(var.v);
+            break;
+          case CAT_DEPENDENT_CONSTANT:
+            this->cd.append(var.v);
+            break;
+          case CAT_INDEPENDENT_CONSTANT:
+            this->ci.append(var.v);
+            break;
+          case CAT_DEPENDENT_PARAMETER:
+            this->pd.append(var.v);
+            break;
+          case CAT_INDEPENDENT_PARAMETER:
+            if(var.free){
+              this->p.append(var.v);
+            } else {
+              this->pi.append(var.v);
+            }
+            break;
+          case CAT_ALGEBRAIC:
+            if(var.causality == INTERNAL){
+              this->s.append(var.v);
+            } else if(var.causality == INPUT){
+              this->u.append(var.v);
+            }
+            break;
+          default:
+            casadi_error("Unknown category");
+          }
         }
       }
     }
@@ -186,30 +218,7 @@ namespace CasADi{
         // Get the variable and binding expression
         Variable& var = readVariable(beq[0]);
         SX bexpr = readExpr(beq[1][0]);
-
-        switch(var.category){
-        case CAT_DEPENDENT_CONSTANT:
-          this->cd.append(var.v);
-          this->cd_def.append(bexpr);
-          break;
-        case CAT_INDEPENDENT_CONSTANT:
-          casadi_assert(bexpr.isConstant());
-          var.value = bexpr.getValue();
-          break;
-        case CAT_DEPENDENT_PARAMETER:
-          this->pd.append(var.v);
-          this->pd_def.append(bexpr);
-          break;
-        case CAT_INDEPENDENT_PARAMETER:
-          casadi_assert(bexpr.isConstant());
-          casadi_assert(!var.free);
-          var.value = bexpr.getValue();
-          break;
-        default:
-          casadi_warning("Binding equation for " + str(var) + " not handled properly. Added to list of outputs");
-          this->y.append(var.v);
-          this->y_def.append(bexpr);
-        }
+        setBeq(var.v,bexpr.toScalar());
       }
     }
 
@@ -396,10 +405,8 @@ namespace CasADi{
     }
   
     // Make sure that the dimensions are consistent at this point
-    casadi_assert_warning(this->x.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
+    casadi_assert_warning(this->s.size()==this->dae.size(),"The number of differential-algebraic equations does not match the number of implicitly defined states.");
     casadi_assert_warning(this->z.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
-    casadi_assert(this->q.size()==this->quad.size());
-    casadi_assert(this->y.size()==this->y_def.size());
   }
 
   Variable& SymbolicOCP::readVariable(const XMLNode& node){
@@ -544,10 +551,10 @@ namespace CasADi{
       stream << endl;
     }
 
-    if(!this->ode.isEmpty()){
+    if(!this->x.isEmpty()){
       stream << "Differential equations" << endl;
-      for(int k=0; k<this->ode.size(); ++k){
-        stream << str(der(this->x[k])) << " == " << str(this->ode[k]) << endl;
+      for(int k=0; k<this->x.size(); ++k){
+        stream << str(der(this->x[k])) << " == " << str(ode(this->x[k])) << endl;
       }
       stream << endl;
     }
@@ -560,10 +567,10 @@ namespace CasADi{
       stream << endl;
     }
   
-    if(!this->quad.isEmpty()){
+    if(!this->q.isEmpty()){
       stream << "Quadrature equations" << endl;
       for(int k=0; k<this->q.size(); ++k){
-        stream << str(der(this->q[k])) << " == " << str(this->quad[k]) << endl;
+        stream << str(der(this->q[k])) << " == " << str(ode(this->q[k])) << endl;
       }
       stream << endl;
     }
@@ -579,35 +586,35 @@ namespace CasADi{
     if(!this->pi.isEmpty()){
       stream << "Independent parameters" << endl;
       for(int i=0; i<this->pi.size(); ++i)
-        stream << this->pi.at(i) << " == " << value(this->pi.at(i)).at(0) << endl;
+        stream << this->pi.at(i) << " == " << str(beq(this->pi.at(i))) << endl;
       stream << endl;
     }
 
     if(!this->pd.isEmpty()){
       stream << "Dependent parameters" << endl;
       for(int i=0; i<this->pd.size(); ++i)
-        stream << this->pd.at(i) << " == " << this->pd_def.at(i) << endl;
+        stream << this->pd.at(i) << " == " << str(beq(this->pd.at(i))) << endl;
       stream << endl;
     }
 
     if(!this->ci.isEmpty()){
       stream << "Independent constants" << endl;
       for(int i=0; i<this->ci.size(); ++i)
-        stream << this->ci.at(i) << " == " << value(this->ci.at(i)).at(0) << endl;
+        stream << this->ci.at(i) << " == " << str(beq(this->ci.at(i))) << endl;
       stream << endl;
     }
 
     if(!this->cd.isEmpty()){
       stream << "Dependent constants" << endl;
       for(int i=0; i<this->cd.size(); ++i)
-        stream << this->cd.at(i) << " == " << this->cd_def.at(i) << endl;
+        stream << this->cd.at(i) << " == " << str(beq(this->cd.at(i))) << endl;
       stream << endl;
     }
 
     if(!this->y.isEmpty()){
       stream << "Output variables" << endl;
       for(int i=0; i<this->y.size(); ++i)
-        stream << this->y.at(i) << " == " << this->y_def.at(i) << endl;
+        stream << this->y.at(i) << " == " << str(beq(this->y.at(i))) << endl;
       stream << endl;
     }
 
@@ -658,10 +665,7 @@ namespace CasADi{
     
       // Create a new quadrature state
       Variable qv;
-
-      // Create symbolic expressions
-      qv.v = SX::sym(q_name.str());
-      qv.d = SX::sym("der_" + q_name.str());
+      qv.setName(q_name.str());
 
       // Set attributes
       qv.variability = CONTINUOUS;
@@ -671,12 +675,12 @@ namespace CasADi{
   
       // Add to the list of variables
       addVariable(q_name.str(),qv);
-    
+
       // Add to the quadrature states
       this->q.append(qv.v);
 
       // Add the Lagrange term to the list of quadratures
-      this->quad.append(*it);
+      setOde(qv.v,*it);
     
       // Add to the list of Mayer terms
       this->mterm.append(qv.v);
@@ -687,14 +691,9 @@ namespace CasADi{
   }
 
   void SymbolicOCP::eliminateQuadratureStates(){
-  
     // Move all the quadratures to the list of differential states
     this->x.append(this->q);
     this->q = SX::zeros(0,1);
-  
-    // Move the equations to the list of ODEs
-    this->ode.append(this->quad);
-    this->quad = SX::zeros(0,1);
   }
 
   void SymbolicOCP::scaleVariables(){
@@ -718,10 +717,10 @@ namespace CasADi{
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode);
+    ex.push_back(ode(this->x));
     ex.push_back(this->alg);
-    ex.push_back(this->quad);
-    ex.push_back(this->y_def);
+    ex.push_back(ode(this->q));
+    ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->path);
     ex.push_back(this->mterm);
@@ -733,10 +732,10 @@ namespace CasADi{
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode = *it++ / x_nom;
+    setOde(this->x,*it++ / x_nom);
     this->alg = *it++;
-    this->quad = *it++;
-    this->y_def = *it++;
+    setOde(this->q,*it++);
+    setBeq(this->y,*it++);
     this->initial = *it++;
     this->path = *it++;
     this->mterm = *it++;
@@ -748,31 +747,31 @@ namespace CasADi{
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode);
+    ex.push_back(ode(this->x));
     ex.push_back(this->alg);
-    ex.push_back(this->quad);
-    ex.push_back(this->y_def);
+    ex.push_back(ode(this->q));
+    ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->path);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
-    ex.push_back(this->pd_def);
+    ex.push_back(beq(this->pd));
   
     // Substitute all at once (since they may have common subexpressions)
-    ex = substitute(ex,vector<SX>(1,this->pi),vector<SX>(1,value(this->pi)));
+    ex = substitute(ex,vector<SX>(1,this->pi),vector<SX>(1,beq(this->pi)));
     
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode = *it++;
+    setOde(this->x,*it++);
     this->alg = *it++;
-    this->quad = *it++;
-    this->y_def = *it++;
+    setOde(this->q,*it++);
+    setBeq(this->y,*it++);
     this->initial = *it++;
     this->path = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
-    this->pd_def = *it++;
+    setBeq(this->pd,*it++);
     casadi_assert(it==ex.end());
   }
 
@@ -781,7 +780,7 @@ namespace CasADi{
     if(this->pd.isEmpty()) return;
   
     // Find out which dependent parameter depends on which binding equation
-    SXFunction f(this->pd,this->pd - this->pd_def);
+    SXFunction f(this->pd,this->pd - beq(this->pd));
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -791,7 +790,6 @@ namespace CasADi{
 
     // Permute variables
     this->pd = this->pd(colperm);    
-    this->pd_def = this->pd_def(colperm);
   }
 
   void SymbolicOCP::eliminateDependentParameterInterdependencies(){
@@ -802,10 +800,14 @@ namespace CasADi{
     sortDependentParameters();
 
     // Sort the equations by causality
-    substituteInPlace(this->pd,this->pd_def,false);
+    SX pd_def = beq(this->pd);
+    substituteInPlace(this->pd,pd_def,false);
   
     // Make sure that the dependent variables have been properly eliminated from the definitions
-    casadi_assert(!dependsOn(this->pd_def,this->pd));
+    casadi_assert(!dependsOn(pd_def,this->pd));
+    
+    // Save new binding equations
+    setBeq(this->pd,pd_def);
   }
 
   void SymbolicOCP::eliminateDependentParameters(){
@@ -818,25 +820,25 @@ namespace CasADi{
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode);
+    ex.push_back(ode(this->x));
     ex.push_back(this->alg);
-    ex.push_back(this->quad);
-    ex.push_back(this->y_def);
+    ex.push_back(ode(this->q));
+    ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->path);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
   
     // Substitute all at once (since they may have common subexpressions)
-    ex = substitute(ex,vector<SX>(1,this->pd),vector<SX>(1,this->pd_def));
+    ex = substitute(ex,vector<SX>(1,this->pd),vector<SX>(1,beq(this->pd)));
     
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode = *it++;
+    setOde(this->x,*it++);
     this->alg = *it++;
-    this->quad = *it++;
-    this->y_def = *it++;
+    setOde(this->q,*it++);
+    setBeq(this->y,*it++);
     this->initial = *it++;
     this->path = *it++;
     this->mterm = *it++;
@@ -849,7 +851,7 @@ namespace CasADi{
     if(this->y.isEmpty()) return;
   
     // Find out which dependent parameter depends on which binding equation
-    SXFunction f(this->y,this->y - this->y_def);
+    SXFunction f(this->y,this->y - beq(this->y));
     f.init();
     Sparsity sp = f.jacSparsity();
   
@@ -859,7 +861,6 @@ namespace CasADi{
 
     // Permute variables
     this->y = this->y(colperm);    
-    this->y_def = this->y_def(colperm);    
   }
 
   void SymbolicOCP::eliminateOutputInterdependencies(){
@@ -870,10 +871,14 @@ namespace CasADi{
     sortOutputs();
 
     // Sort the equations by causality
-    substituteInPlace(this->y,this->y_def,false);
-  
+    SX y_def = beq(this->y);
+    substituteInPlace(this->y,y_def,false);
+ 
     // Make sure that the outputs have been properly eliminated from the output definitions
-    casadi_assert(!dependsOn(this->y_def,this->y));
+    casadi_assert(!dependsOn(y_def,this->y));
+    
+    // Save new binding equations
+    setBeq(this->y,y_def);
   }
 
   void SymbolicOCP::eliminateOutputs(){
@@ -886,25 +891,25 @@ namespace CasADi{
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode);
-    ex.push_back(this->alg);
-    ex.push_back(this->quad);
-    ex.push_back(this->y_def);
+    ex.push_back(ode(this->x));
+    ex.push_back(this->alg);    
+    ex.push_back(ode(this->q));
+    ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->path);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
   
     // Substitute all at once (since they may have common subexpressions)
-    ex = substitute(ex,vector<SX>(1,this->y),vector<SX>(1,this->y_def));
+    ex = substitute(ex,vector<SX>(1,this->y),vector<SX>(1,beq(this->y)));
     
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode = *it++;
+    setOde(this->x,*it++);
     this->alg = *it++;
-    this->quad = *it++;
-    this->y_def = *it++;
+    setOde(this->q,*it++);
+    setBeq(this->y,*it++);
     this->initial = *it++;
     this->path = *it++;
     this->mterm = *it++;
@@ -936,7 +941,7 @@ namespace CasADi{
     xz.append(v[PI]);
     xz.append(v[PF]);
     xz.append(v[U]);
-    SXFunction fcn = SXFunction(xz,ode);
+    SXFunction fcn = SXFunction(xz,ode(this->x));
     SXFunction J(v,fcn.jac());
 
     // Evaluate the Jacobian in the starting point
@@ -969,15 +974,13 @@ namespace CasADi{
     // Make sure nonzero factor found
     for(int rr=0; rr<J0.size1(); ++rr){
       if(scale[rr]==0){
-        cout << "Warning: Could not generate a scaling factor for equation " << rr << "(0 == " << ode.at(rr) << "), selecting 1." << endl;
+        cout << "Warning: Could not generate a scaling factor for equation " << rr;
         scale[rr]=1.;
       }
     }
   
     // Scale the equations
-    for(int i=0; i<ode.size(); ++i){
-      ode[i] /= scale[i];
-    }
+    setOde(this->x,ode(this->x)/scale);
   
     double time2 = clock();
     double dt = double(time2-time1)/CLOCKS_PER_SEC;
@@ -1097,7 +1100,7 @@ namespace CasADi{
     substituteInPlace(der(this->s),new_ode,false);
 
     // Add to explicit differential states and ODE
-    this->ode.append(new_ode);
+    setOde(this->s,new_ode);
     this->x.append(this->s);    
     this->dae = this->s = SX::zeros(0,1);
   }
@@ -1186,7 +1189,7 @@ namespace CasADi{
 
     // Add to the beginning of the dependent variables (since the other dependent variable might depend on them)
     this->y = vertcat(z_exp,this->y);
-    this->y_def = vertcat(f_exp,this->y_def);
+    setBeq(z_exp,f_exp);
   
     // Save new algebraic equations
     this->z = z_imp;
@@ -1232,41 +1235,6 @@ namespace CasADi{
   
     // Add to the map of all variables
     varmap_[name] = var;
-  
-    // Sort by category
-    switch(var.category){
-    case CAT_DERIVATIVE:
-      // Skip - meta information about time derivatives is kept together with its parent variable
-      break;
-    case CAT_STATE:
-      this->s.append(var.v);
-      break;
-    case CAT_DEPENDENT_CONSTANT:
-      // Skip - dependent constants are added together with their binding equations
-      break;
-    case CAT_INDEPENDENT_CONSTANT:
-      this->ci.append(var.v);
-      break;
-    case CAT_DEPENDENT_PARAMETER:
-      // Skip - dependent parameters are added together with their binding equations
-      break;
-    case CAT_INDEPENDENT_PARAMETER:
-      if(var.free){
-        this->p.append(var.v);
-      } else {
-        this->pi.append(var.v);
-      }
-      break;
-    case CAT_ALGEBRAIC:
-      if(var.causality == INTERNAL){
-        this->s.append(var.v);
-      } else if(var.causality == INPUT){
-        this->u.append(var.v);
-      }
-      break;
-    default:
-      casadi_error("Unknown category");
-    }
   }
 
   std::string SymbolicOCP::qualifiedName(const XMLNode& nn){
@@ -1572,7 +1540,7 @@ namespace CasADi{
 
   SX SymbolicOCP::der(const std::string& name) const{
     return variable(name).d;
-  } 
+  }
 
   SX SymbolicOCP::der(const SX& var) const{
     casadi_assert(var.isVector() && var.isSymbolic());
@@ -1581,6 +1549,56 @@ namespace CasADi{
       ret[i] = der(var.at(i).getName());
     }
     return ret;
+  }
+
+  SX SymbolicOCP::beq(const std::string& name) const{
+    return variable(name).beq;
+  }
+
+  SX SymbolicOCP::beq(const SX& var) const{
+    casadi_assert(var.isVector() && var.isSymbolic());
+    SX ret = SX::zeros(var.sparsity());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = beq(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  void SymbolicOCP::setBeq(const std::string& name, const SX& val){
+    variable(name).beq = val.toScalar();
+  }
+
+  void SymbolicOCP::setBeq(const SX& var, const SX& val){    
+    casadi_assert(var.isVector() && var.isSymbolic());
+    casadi_assert(var.sparsity()==val.sparsity());
+    for(int i=0; i<var.size(); ++i){
+      setBeq(var.at(i).getName(),val.at(i));
+    }
+  }
+
+  SX SymbolicOCP::ode(const std::string& name) const{
+    return variable(name).ode;
+  }
+  
+  SX SymbolicOCP::ode(const SX& var) const{
+    casadi_assert(var.isVector() && var.isSymbolic());
+    SX ret = SX::zeros(var.sparsity());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = ode(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  void SymbolicOCP::setOde(const std::string& name, const SX& val){
+    variable(name).ode = val.toScalar();
+  }
+
+  void SymbolicOCP::setOde(const SX& var, const SX& val){
+    casadi_assert(var.isVector() && var.isSymbolic());
+    casadi_assert(var.sparsity()==val.sparsity());
+    for(int i=0; i<var.size(); ++i){
+      setOde(var.at(i).getName(),val.at(i));
+    }
   }
 
   SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate) const{
@@ -1724,24 +1742,6 @@ namespace CasADi{
     }    
   }
 
-  double SymbolicOCP::value(const std::string& name, bool normalized) const{
-    const Variable& v = variable(name);
-    return normalized ? v.value / v.nominal : v.value;
-  }
-
-  std::vector<double> SymbolicOCP::value(const SX& var, bool normalized) const{
-    return attribute(&SymbolicOCP::value,var,normalized);
-  }
-
-  void SymbolicOCP::setValue(const std::string& name, double val, bool normalized){
-    Variable& v = variable(name);
-    v.value = normalized ? val*v.nominal : val;
-  }
-
-  void SymbolicOCP::setValue(const SX& var, const std::vector<double>& val, bool normalized){
-    setAttribute(&SymbolicOCP::setValue,var,val,normalized);
-  }
-
   double SymbolicOCP::min(const std::string& name, bool normalized) const{
     const Variable& v = variable(name);
     return normalized ? v.min / v.nominal : v.min;
@@ -1831,38 +1831,6 @@ namespace CasADi{
   void SymbolicOCP::setDerivativeStart(const SX& var, const std::vector<double>& val, bool normalized){
     setAttribute(&SymbolicOCP::setDerivativeStart,var,val,normalized);
   }
-
-  SX SymbolicOCP::binding(const std::string& name) const{
-    // Look amongst the dependent parameters
-    for(SX::const_iterator i=this->pd.begin(); i!=this->pd.end(); ++i){
-      if(i->getName()==name) return pd_def[distance(this->pd.begin(),i)];
-    }
-
-    // Look amongst the outputs
-    for(SX::const_iterator i=this->y.begin(); i!=this->y.end(); ++i){
-      if(i->getName()==name) return y_def[distance(this->y.begin(),i)];
-    }
-    
-    // Look amongst the dependent constants
-    for(SX::const_iterator i=this->cd.begin(); i!=this->cd.end(); ++i){
-      if(i->getName()==name) return cd_def[distance(this->cd.begin(),i)];
-    }
-
-    // Return the expression itself by default
-    return variable(name).v;
-  }
  
-  SX SymbolicOCP::binding(const SX& var) const{
-    casadi_assert(var.isVector() && var.isSymbolic());
-    SX ret = SX::zeros(var.sparsity());
-    for(int i=0; i<ret.size(); ++i){
-      // Make sure that the expression matches
-      const Variable& v = variable(var.at(i).getName());
-      casadi_assert(v.v.toScalar().isEqual(var.at(i)));
-      ret[i] = binding(var.at(i).getName());
-    }
-    return ret;
-  }
-
 } // namespace CasADi
 
