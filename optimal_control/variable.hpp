@@ -134,15 +134,15 @@ namespace CasADi{
     bool free;
 
     /// Timed variable (never allocate)
-    SX atTime(double t, bool allocate=false) const;
+    SXElement atTime(double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
-    SX atTime(double t, bool allocate=false);
+    SXElement atTime(double t, bool allocate=false);
         
   private:
 #ifndef SWIG
     // Timed variables
-    std::map<double,SX> timed_;
+    std::map<double,SXElement> timed_;
 
     // Print
     virtual void repr(std::ostream &stream) const;
