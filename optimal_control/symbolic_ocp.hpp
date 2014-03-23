@@ -101,28 +101,27 @@ namespace CasADi{
      */
     SX s, dae, initial;
 
-    /** \brief Ordinary differential equation (ODE) and corresponding state vector
-     * ODE in explicit form and corresponding state vector.
-     * ode and x have matching dimensions and der(x) == ode(x,...).
+    /** \brief Differential states defined by ordinary differential equations (ODE)
+     * The ODE can be retrieved by calling the method "ode" with x as argument.
      */
-    SX x, ode;
+    SX x;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * alg and z have matching dimensions and 0 == alg(z,...) implicitly defines z.
      */
     SX z, alg;
 
-    /** \brief Quadrature equations and corresponding quadrature states
-     * Quadrature equation, e.g. an ODE whose state does not enter in the right-hand-side.
-     * quad and q have matching dimensions and der(q) == quad(...)
+    /** \brief Quadrature states
+     * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
+     * The ODE can be retrieved by calling the method "ode" with q as argument.
      */
-    SX q, quad;
+    SX q;
 
-    /** \brief Output variables and corresponding definitions
+    /** \brief Output variables
      * Interdependencies are allowed but must be non-cyclic.
-     * y and def_y have matching dimensions and y == y_def(y,...)
+     * The definitions can be retrieved by calling the method "beq" with y as argument.
      */
-    SX y, y_def;
+    SX y;
 
     /** \brief Free controls 
      * The trajectories of the free controls are decision variables of the optimal control problem. They are chosen by
@@ -139,26 +138,30 @@ namespace CasADi{
     /** \brief Independent parameters
      * An independent parameter is a parameter whose value is determined by an expression that contains only literals.
      * An independent parameter is fixed after the DAE has been initialized.
-     * Its value is located in the "value" attribute.
+     * The definitions can be retrieved by calling the method "beq" with pi as argument.
      */
     SX pi;
 
     /** \brief Dependent parameters and corresponding definitions
-        A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters.
-        A dependent parameter is fixed after the DAE has been initialized.        
+     * A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters.
+     * A dependent parameter is fixed after the DAE has been initialized.        
+     * Interdependencies are allowed but must be non-cyclic.
+     * The definitions can be retrieved by calling the method "beq" with pd as argument.
     */
-    SX pd, pd_def;
+    SX pd;
 
     /** \brief Independent constant
      * An independent constant is a constant whose value is determined by an expression that contains only literals.
-     * Its value is located in the "value" attribute.
+     * The definitions can be retrieved by calling the method "beq" with ci as argument.
      */
     SX ci;
 
     /** \brief Dependent constants and correspinding definitions
      * A dependent constant is a constant whose value is determined by an expression which contains references to other constants.
+     * Interdependencies are allowed but must be non-cyclic.
+     * The definitions can be retrieved by calling the method "beq" with cd as argument.
     */
-    SX cd, cd_def;
+    SX cd;
     //@}
 
     /// Interval start time
@@ -234,11 +237,39 @@ namespace CasADi{
      *  Reformulate the dynamic optimization problem.
      */
     //@{
-    /// Eliminate interdependencies in the dependent equations
-    void eliminateInterdependencies();
+
+    /// Identify and separate the algebraic variables and equations in the DAE
+    void separateAlgebraic();
+
+    /// Eliminate algebraic variables, transforming them into outputs
+    void eliminateAlgebraic();
+
+    /// Transform the implicit DAE to a semi-explicit DAE
+    void makeSemiExplicit();
+
+    /// Transform the implicit DAE or semi-explicit DAE into an explicit ODE
+    void makeExplicit();
+
+    /// Eliminate independent parameters
+    void eliminateIndependentParameters();
     
-    /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
-    void eliminateDependent(bool eliminate_dependents_with_bounds=true);
+    /// Sort the dependent parameters
+    void sortDependentParameters();
+    
+    /// Eliminate interdependencies amongst the dependent parameters
+    void eliminateDependentParameterInterdependencies();
+
+    /// Eliminate dependent parameters
+    void eliminateDependentParameters();
+
+    /// Sort the outputs
+    void sortOutputs();
+
+    /// Eliminate interdependencies amongst the outputs
+    void eliminateOutputInterdependencies();
+
+    /// Eliminate outputs
+    void eliminateOutputs();
 
     /// Eliminate Lagrange terms from the objective function and make them quadrature states
     void eliminateLagrangeTerms();
@@ -246,27 +277,12 @@ namespace CasADi{
     /// Eliminate quadrature states and turn them into ODE states
     void eliminateQuadratureStates();
     
-    /// Identify the algebraic variables and separate them from the states
-    void identifyALG();
-
-    /// Sort the DAE and implicly defined states
+    /// Sort the DAE and implictly defined states
     void sortDAE();
 
     /// Sort the algebraic equations and algebraic states
     void sortALG();
-
-    /// Sort the dependent parameters
-    void sortDependentParameters();
-    
-    /// Transform the implicit ODE to an explicit ODE
-    void makeExplicit();
-    
-    /// Eliminate algebraic states, transforming them into outputs
-    void eliminateAlgebraic();
-    
-    /// Substitute the dependents from a set of expressions
-    std::vector<SX> substituteDependents(const std::vector<SX>& x) const;
-    
+        
     /// Generate a MUSCOD-II compatible DAT file
     void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
     
@@ -278,15 +294,39 @@ namespace CasADi{
     /// Scale the implicit equations
     void scaleEquations();
 
-    /// Find an expression by name
+    /// Get variable expression by name
     SX operator()(const std::string& name) const;
 
-    /// Find an derivative expression by name
+    /// Get a derivative expression by name
     SX der(const std::string& name) const;
 
-    /// Find an derivative expression by non-differentiated expression
+    /// Get a derivative expression by non-differentiated expression
     SX der(const SX& var) const;
 
+    /// Get a binding equation by name
+    SX beq(const std::string& name) const;
+
+    /// Get a binding equation by non-differentiated expression
+    SX beq(const SX& var) const;
+
+    /// Set a binding equation by name
+    void setBeq(const std::string& name, const SX& val);
+
+    /// Set an binding expression by non-differentiated expression
+    void setBeq(const SX& var, const SX& val);
+
+    /// Get a derivative binding equation (i.e. ordinary differential equation, ODE) by name. Returns variable expression if unknwon.
+    SX ode(const std::string& name) const;
+
+    /// Get a derivative binding expression (i.e. ordinary differential equation, ODE) by non-differentiated expression. Returns derivative expression if unknown.
+    SX ode(const SX& var) const;
+
+    /// Set a derivative binding equation by name
+    void setOde(const std::string& name, const SX& val);
+
+    /// Set an derivative binding expression by non-differentiated expression
+    void setOde(const SX& var, const SX& val);
+    
     /// Get the nominal value by name
     double nominal(const std::string& name) const;
     
@@ -298,18 +338,6 @@ namespace CasADi{
 
     /// Set the nominal value(s) by expression
     void setNominal(const SX& var, const std::vector<double>& val);
-
-    /// Get the (optionally normalized) current value by name
-    double value(const std::string& name, bool normalized=false) const;
-
-    /// Get the (optionally normalized) current value(s) by expression
-    std::vector<double> value(const SX& var, bool normalized=false) const;
-
-    /// Set the (optionally normalized) current value by name
-    void setValue(const std::string& name, double val, bool normalized=false);
-
-    /// Set the (optionally normalized) current value(s) by expression
-    void setValue(const SX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) lower bound by name
     double min(const std::string& name, bool normalized=false) const;
@@ -385,6 +413,7 @@ namespace CasADi{
 
     /// Timed variable (allocate if necessary)
     SX atTime(const std::string& name, double t, bool allocate=false);
+
 
 #ifndef SWIG
     ///  Print representation

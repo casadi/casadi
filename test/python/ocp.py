@@ -199,12 +199,8 @@ class OCPtests(casadiTestCase):
     ocp = SymbolicOCP()
     ocp.parseFMI('data/cstr.xml')
     
-    # Identify algebraic variables
-    ocp.identifyALG()
-
-    # Sort the equations
-    ocp.sortDAE()
-    ocp.sortALG()
+    # Separate differential and algebraic variables
+    ocp.separateAlgebraic()
     
     self.assertEqual(ocp.t0,0)
     self.assertEqual(ocp.tf,150)

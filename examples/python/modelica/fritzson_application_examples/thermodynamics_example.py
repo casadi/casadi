@@ -65,22 +65,8 @@ comp("BasicVolumeMassConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeMassConservation.xml')
 
-# Separate algebraic variables
-ocp.identifyALG()
-
-# Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
-
-# Sort the equations
-ocp.sortDAE()
-ocp.sortALG()
-
-# Make the ODE explicit
+# Transform into an explicit ODE
 ocp.makeExplicit()
-
-# Eliminate the algebraic states
-ocp.eliminateAlgebraic()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
@@ -90,13 +76,11 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-m = ocp("m")
-P = ocp("P")
-output_fcn_out = ocp.substituteDependents([m,P])
+output_fcn_out = [ocp.beq("m"),ocp.beq("P")]
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -140,22 +124,11 @@ comp("BasicVolumeEnergyConservation")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
-# Separate algebraic variables
-ocp.identifyALG()
-
-# Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
-
-# Sort the equations
-ocp.sortDAE()
-ocp.sortALG()
-
-# Make the ODE explicit
+# Transform into an explicit ODE
 ocp.makeExplicit()
 
-# Eliminate the algebraic states
-ocp.eliminateAlgebraic()
+# Eliminate the independent variables
+ocp.eliminateIndependentParameters()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
@@ -165,12 +138,11 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp("T")
-output_fcn_out = ocp.substituteDependents([T])
+output_fcn_out = [ocp.beq("T")]
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -207,22 +179,11 @@ comp("BasicVolumeTest")
 ocp = SymbolicOCP()
 ocp.parseFMI('BasicVolumeTest.xml')
 
-# Separate algebraic variables
-ocp.identifyALG()
-
 # Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
+ocp.eliminateIndependentParameters()
 
-# Sort the equations
-ocp.sortDAE()
-ocp.sortALG()
-
-# Make the ODE explicit
+# Transform into an explicit ODE
 ocp.makeExplicit()
-
-# Eliminate the algebraic states
-ocp.eliminateAlgebraic()
 
 # Inputs to the integrator
 dae_fcn_in = daeIn(
@@ -232,14 +193,11 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-T = ocp("T")
-U = ocp("U")
-V = ocp("V")
-output_fcn_out = ocp.substituteDependents([T,U,V])
+output_fcn_out = [ocp.beq("T"),ocp.beq("U"),ocp.beq("V")]
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -284,19 +242,8 @@ comp("CtrlFlowSystem")
 ocp = SymbolicOCP()
 ocp.parseFMI('CtrlFlowSystem.xml')
 
-# Separate algebraic variables
-ocp.identifyALG()
-
-# Eliminate the dependent variables
-ocp.eliminateInterdependencies()
-ocp.eliminateDependent()
-
-# Sort the equations
-ocp.sortDAE()
-ocp.sortALG()
-
-# Make the ODE explicit
-ocp.makeExplicit()
+# Transform into a semi-explicit ODE
+ocp.makeSemiExplicit()
 
 # Print the ocp
 print ocp
