@@ -105,7 +105,7 @@ namespace CasADi{
      * ODE in explicit form and corresponding state vector.
      * ode and x have matching dimensions and der(x) == ode(x,...).
      */
-    SX x, ode;
+    SX x, odeQQQ;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * alg and z have matching dimensions and 0 == alg(z,...) implicitly defines z.

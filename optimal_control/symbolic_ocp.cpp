@@ -393,7 +393,7 @@ namespace CasADi{
     }
   
     // Make sure that the dimensions are consistent at this point
-    casadi_assert_warning(this->x.size()==this->ode.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
+    casadi_assert_warning(this->x.size()==this->odeQQQ.size(),"The number of differential equations (equations involving differentiated variables) does not match the number of differential states.");
     casadi_assert_warning(this->z.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
     casadi_assert(this->q.size()==this->quad.size());
     casadi_assert(this->y.size()==this->y_def.size());
@@ -541,10 +541,10 @@ namespace CasADi{
       stream << endl;
     }
 
-    if(!this->ode.isEmpty()){
+    if(!this->odeQQQ.isEmpty()){
       stream << "Differential equations" << endl;
-      for(int k=0; k<this->ode.size(); ++k){
-        stream << str(der(this->x[k])) << " == " << str(this->ode[k]) << endl;
+      for(int k=0; k<this->odeQQQ.size(); ++k){
+        stream << str(der(this->x[k])) << " == " << str(this->odeQQQ[k]) << endl;
       }
       stream << endl;
     }
@@ -687,7 +687,7 @@ namespace CasADi{
     this->q = SX::zeros(0,1);
   
     // Move the equations to the list of ODEs
-    this->ode.append(this->quad);
+    this->odeQQQ.append(this->quad);
     this->quad = SX::zeros(0,1);
   }
 
@@ -712,7 +712,7 @@ namespace CasADi{
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode);
+    ex.push_back(this->odeQQQ);
     ex.push_back(this->alg);
     ex.push_back(this->quad);
     ex.push_back(this->y_def);
@@ -727,7 +727,7 @@ namespace CasADi{
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode = *it++ / x_nom;
+    this->odeQQQ = *it++ / x_nom;
     this->alg = *it++;
     this->quad = *it++;
     this->y_def = *it++;
@@ -742,7 +742,7 @@ namespace CasADi{
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode);
+    ex.push_back(this->odeQQQ);
     ex.push_back(this->alg);
     ex.push_back(this->quad);
     ex.push_back(this->y_def);
@@ -758,7 +758,7 @@ namespace CasADi{
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode = *it++;
+    this->odeQQQ = *it++;
     this->alg = *it++;
     this->quad = *it++;
     this->y_def = *it++;
@@ -812,7 +812,7 @@ namespace CasADi{
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode);
+    ex.push_back(this->odeQQQ);
     ex.push_back(this->alg);
     ex.push_back(this->quad);
     ex.push_back(this->y_def);
@@ -827,7 +827,7 @@ namespace CasADi{
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode = *it++;
+    this->odeQQQ = *it++;
     this->alg = *it++;
     this->quad = *it++;
     this->y_def = *it++;
@@ -880,7 +880,7 @@ namespace CasADi{
     // Collect all expressions to be replaced
     vector<SX> ex;
     ex.push_back(this->dae);
-    ex.push_back(this->ode);
+    ex.push_back(this->odeQQQ);
     ex.push_back(this->alg);
     ex.push_back(this->quad);
     ex.push_back(this->y_def);
@@ -895,7 +895,7 @@ namespace CasADi{
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    this->ode = *it++;
+    this->odeQQQ = *it++;
     this->alg = *it++;
     this->quad = *it++;
     this->y_def = *it++;
@@ -930,7 +930,7 @@ namespace CasADi{
     xz.append(v[PI]);
     xz.append(v[PF]);
     xz.append(v[U]);
-    SXFunction fcn = SXFunction(xz,ode);
+    SXFunction fcn = SXFunction(xz,this->odeQQQ);
     SXFunction J(v,fcn.jac());
 
     // Evaluate the Jacobian in the starting point
@@ -963,14 +963,14 @@ namespace CasADi{
     // Make sure nonzero factor found
     for(int rr=0; rr<J0.size1(); ++rr){
       if(scale[rr]==0){
-        cout << "Warning: Could not generate a scaling factor for equation " << rr << "(0 == " << ode.at(rr) << "), selecting 1." << endl;
+        cout << "Warning: Could not generate a scaling factor for equation " << rr << "(0 == " << this->odeQQQ.at(rr) << "), selecting 1." << endl;
         scale[rr]=1.;
       }
     }
   
     // Scale the equations
-    for(int i=0; i<ode.size(); ++i){
-      ode[i] /= scale[i];
+    for(int i=0; i<this->odeQQQ.size(); ++i){
+      this->odeQQQ[i] /= scale[i];
     }
   
     double time2 = clock();
@@ -1091,7 +1091,7 @@ namespace CasADi{
     substituteInPlace(der(this->s),new_ode,false);
 
     // Add to explicit differential states and ODE
-    this->ode.append(new_ode);
+    this->odeQQQ.append(new_ode);
     this->x.append(this->s);    
     this->dae = this->s = SX::zeros(0,1);
   }
