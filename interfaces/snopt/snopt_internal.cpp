@@ -133,7 +133,7 @@ namespace CasADi {
         // Perform a single dependency sweep
         jacG_.spEvaluate(true);
 
-        DMatrix out_trans = trans(jacG_.output());
+        DMatrix out_trans = jacG_.output().T();
         bvec_t* output_v_trans = get_bvec_t(out_trans.data());
 
         for (int j = 0; j < nx_; ++j) {  // Harvest the results
@@ -246,7 +246,7 @@ namespace CasADi {
     //  entries of jacG are encoded "1+i"
     //  "0" is to be interpreted not as an index but as a literal zero
 
-    IMatrix mapping_jacG  = IMatrix(0, nx_);
+    IMatrix mapping_jacG  = IMatrix::sparse(0, nx_);
     IMatrix mapping_gradF = IMatrix(jacF_.output().sparsity(),
                                     range(-1, -1-jacF_.output().size(), -1));
 
@@ -286,7 +286,7 @@ namespace CasADi {
     // Is the A matrix completely empty?
     dummyrow_ = A_structure_.size() == 0;  // Then we need a dummy row
     if (dummyrow_) {
-      IMatrix dummyrow(1, nx_);
+      IMatrix dummyrow = IMatrix::sparse(1, nx_);
       dummyrow(0, 0) = 0;
       A_structure_ = vertcat(A_structure_, dummyrow);
       m_+=1;

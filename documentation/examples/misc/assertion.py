@@ -65,7 +65,7 @@ def dummy(f):
   f.setOutput(int(m>2))
 
 
-foo = CustomFunction(dummy, [x.sparsity()], [sp_dense(1,1)] )
+foo = CustomFunction(dummy, [x.sparsity()], [Sparsity.dense(1,1)] )
 foo.init()
 
 y = sin(x)

@@ -29,7 +29,7 @@ from casadi import *
 #! The function calculates the factorial of its input
 #! We annotate the function with the pyfunction decorator
 
-@pyfunction([sp_dense(1,1)], [sp_dense(1,1)])
+@pyfunction([Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
 def fac(inputs):
   x = inputs[0]
   y = 1
@@ -46,12 +46,12 @@ fac.setInput(4)
 #! Evaluate
 fac.evaluate()
 
-print "4! = ", fac.output().toScalar()
+print "4! = ", fac.getOutput()
 
 #! Using the function in a graph
 #!==============================
 
-x = MX("x")
+x = MX.sym("x")
 [y] = fac.call([x])
 
 f = MXFunction([x],[y])
@@ -61,7 +61,7 @@ f.init()
 f.setInput(5)
 f.evaluate()
 
-print "5! = ", f.output().toScalar()
+print "5! = ", f.getOutput()
 
 
 #! Passing userdata
@@ -86,7 +86,7 @@ class Fun:
     z2 = sin(z1)
     z.set(z2)
             
-c = PyFunction(Fun(12345), [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
+c = PyFunction(Fun(12345), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
 c.init()
 
 c.setInput(1.2,0)
@@ -150,7 +150,7 @@ class Fun:
       x_bar.set(bx)
       y_bar.set(by)
 
-c = PyFunction(Fun(), [sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)] )
+c = PyFunction(Fun(), [Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)] )
 c.init()
 
 J = c.jacobian(1) # jacobian w.r.t second argument
@@ -164,7 +164,7 @@ print J.getOutput(), cos(1.2+3*1.5)*3
 
   
 #! Another way to provide sensitivities is by providing the full Jacobian, i.e. the Jacobian of all inputs strung together with respect to all outputs strung together.
-@pyfunction([sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
+@pyfunction([Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
 def fun((x,y)):
   # sin(x+3*y)
 
@@ -176,7 +176,7 @@ def fun((x,y)):
 
 fun.init()
 
-@pyfunction([sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,2),sp_dense(1,1)])
+@pyfunction([Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,2),Sparsity.dense(1,1)])
 def funjac((x,y)):
 
   # First output, the full Jacobian
@@ -263,7 +263,7 @@ class Fun:
       outputs[num_out + nfwd*num_out + num_in*i+1].set(by)
     
 
-Fun = PyFunction(Fun(),[sp_dense(1,1),sp_dense(1,1)], [sp_dense(1,1)])
+Fun = PyFunction(Fun(),[Sparsity.dense(1,1),Sparsity.dense(1,1)], [Sparsity.dense(1,1)])
 Fun.init()
 J = Fun.jacobian(1)
 J.init()

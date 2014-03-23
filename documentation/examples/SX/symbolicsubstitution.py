@@ -36,7 +36,7 @@ f.init()
 
 #! We can substitute a leaf in the graph
 w = SX.sym("w")
-q = f.eval([vertcat((w,y))])[0]
+q = f([vertcat((w,y))])[0]
 #! f.eval() returns a tuple with all outputs, we selected the first
 print type(q), q
 #! Note how q is now an SX
