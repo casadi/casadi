@@ -85,7 +85,7 @@ int main(){
   SXFunction mterm(ocp.x,ocp("cost"));
   
   // DAE residual function
-  SXFunction dae(daeIn("x",ocp.x,"p",ocp.u,"t",ocp.t),daeOut("ode",ocp.odeQQQ));
+  SXFunction dae(daeIn("x",ocp.x,"p",ocp.u,"t",ocp.t),daeOut("ode",ocp.ode(ocp.x)));
 
   // Create a multiple shooting discretization
   DirectMultipleShooting ocp_solver;
