@@ -253,7 +253,7 @@ foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 add_custom_command(
   TARGET _python_modules
   COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PROJECT_BINARY_DIR}/${my_module}.py ${PROJECT_BINARY_DIR}/python/casadi/${my_module}.py
+  ARGS -E copy ${PROJECT_BINARY_DIR}/swig/${my_module}.py ${PROJECT_BINARY_DIR}/python/casadi/${my_module}.py
 )
 endforeach()
 add_custom_command(
