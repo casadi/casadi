@@ -77,10 +77,16 @@ namespace CasADi{
     void setName(const std::string& name);
 
     /// Variable expression
-    SXElement v; 
+    SXElement v;
 
     /// Derivative expression
-    SXElement d;            
+    SXElement d;
+
+    /// Binding equation. Equal to "v" if unknown
+    SXElement beq;
+
+    /// Derivative binding equation, i.e. ordinary differential equation (ODE). Equal do "d" if unknown
+    SXElement ode;
 
     /// (Current) value of the variable
     double value;
