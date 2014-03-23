@@ -20,12 +20,9 @@
 # 
 # 
 from casadi import *
-from casadi.tools.variables import Variables
 from numpy import Inf
 
 def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolating=True):
-  if isinstance(labels,Variables):
-    labels = labels.getLabels()
   if hasattr(labels,"labels"):
     labels = labels.labels()
 
