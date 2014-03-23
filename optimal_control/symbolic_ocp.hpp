@@ -117,11 +117,11 @@ namespace CasADi{
      */
     SX q;
 
-    /** \brief Output variables and corresponding definitions
+    /** \brief Output variables
      * Interdependencies are allowed but must be non-cyclic.
-     * y and def_y have matching dimensions and y == y_def(y,...)
+     * The definitions can be retrieved by calling the method "beq" with y as argument.
      */
-    SX y, y_def;
+    SX y;
 
     /** \brief Free controls 
      * The trajectories of the free controls are decision variables of the optimal control problem. They are chosen by
