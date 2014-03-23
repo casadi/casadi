@@ -1566,7 +1566,7 @@ namespace CasADi{
 
   SX SymbolicOCP::der(const std::string& name) const{
     return variable(name).d;
-  } 
+  }
 
   SX SymbolicOCP::der(const SX& var) const{
     casadi_assert(var.isVector() && var.isSymbolic());
@@ -1575,6 +1575,56 @@ namespace CasADi{
       ret[i] = der(var.at(i).getName());
     }
     return ret;
+  }
+
+  SX SymbolicOCP::beq(const std::string& name) const{
+    return variable(name).beq;
+  }
+
+  SX SymbolicOCP::beq(const SX& var) const{
+    casadi_assert(var.isVector() && var.isSymbolic());
+    SX ret = SX::zeros(var.sparsity());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = beq(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  void SymbolicOCP::setBeq(const std::string& name, const SX& val){
+    variable(name).beq = val.toScalar();
+  }
+
+  void SymbolicOCP::setBeq(const SX& var, const SX& val){    
+    casadi_assert(var.isVector() && var.isSymbolic());
+    casadi_assert(var.sparsity()==val.sparsity());
+    for(int i=0; i<var.size(); ++i){
+      setBeq(var.at(i).getName(),val.at(i));
+    }
+  }
+
+  SX SymbolicOCP::ode(const std::string& name) const{
+    return variable(name).ode;
+  }
+  
+  SX SymbolicOCP::ode(const SX& var) const{
+    casadi_assert(var.isVector() && var.isSymbolic());
+    SX ret = SX::zeros(var.sparsity());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = ode(var.at(i).getName());
+    }
+    return ret;
+  }
+
+  void SymbolicOCP::setOde(const std::string& name, const SX& val){
+    variable(name).ode = val.toScalar();
+  }
+
+  void SymbolicOCP::setOde(const SX& var, const SX& val){
+    casadi_assert(var.isVector() && var.isSymbolic());
+    casadi_assert(var.sparsity()==val.sparsity());
+    for(int i=0; i<var.size(); ++i){
+      setOde(var.at(i).getName(),val.at(i));
+    }
   }
 
   SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate) const{

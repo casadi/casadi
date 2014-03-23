@@ -291,14 +291,38 @@ namespace CasADi{
     /// Scale the implicit equations
     void scaleEquations();
 
-    /// Find an expression by name
+    /// Get variable expression by name
     SX operator()(const std::string& name) const;
 
-    /// Find an derivative expression by name
+    /// Get a derivative expression by name
     SX der(const std::string& name) const;
 
-    /// Find an derivative expression by non-differentiated expression
+    /// Get a derivative expression by non-differentiated expression
     SX der(const SX& var) const;
+
+    /// Get a binding equation by name
+    SX beq(const std::string& name) const;
+
+    /// Get a binding equation by non-differentiated expression
+    SX beq(const SX& var) const;
+
+    /// Set a binding equation by name
+    void setBeq(const std::string& name, const SX& val);
+
+    /// Set an binding expression by non-differentiated expression
+    void setBeq(const SX& var, const SX& val);
+
+    /// Get a derivative binding equation (i.e. ordinary differential equation, ODE) by name. Returns variable expression if unknwon.
+    SX ode(const std::string& name) const;
+
+    /// Get a derivative binding expression (i.e. ordinary differential equation, ODE) by non-differentiated expression. Returns derivative expression if unknown.
+    SX ode(const SX& var) const;
+
+    /// Set a derivative binding equation by name
+    void setOde(const std::string& name, const SX& val);
+
+    /// Set an derivative binding expression by non-differentiated expression
+    void setOde(const SX& var, const SX& val);
 
     /// Find a binding expression by name
     SX binding(const std::string& name) const;
