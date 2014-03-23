@@ -148,7 +148,7 @@ namespace CasADi{
      * Interdependencies are allowed but must be non-cyclic.
      * The definitions can be retrieved by calling the method "beq" with pd as argument.
     */
-    SX pd, pd_def;
+    SX pd;
 
     /** \brief Independent constant
      * An independent constant is a constant whose value is determined by an expression that contains only literals.
@@ -326,12 +326,6 @@ namespace CasADi{
 
     /// Set an derivative binding expression by non-differentiated expression
     void setOde(const SX& var, const SX& val);
-
-    /// Find a binding expression by name
-    SX binding(const std::string& name) const;
-
-    /// Find an binding expression by non-differentiated expression
-    SX binding(const SX& var) const;
     
     /// Get the nominal value by name
     double nominal(const std::string& name) const;
