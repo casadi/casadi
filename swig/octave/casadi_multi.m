@@ -24,18 +24,79 @@ casadi_primitive
 casadi_primitive_tools
 casadi_noncore
 
+failedimport = "Not implemented"
+
+try
 casadi_interface_ipopt
+catch
+casadi_interface_ipopt = failedimport
+end_try_catch
+
+try
 casadi_interface_sundials
+catch
+casadi_interface_sundials = failedimport
+end_try_catch
+
+try
 casadi_interface_qpoases
+catch
+casadi_interface_qpoases = failedimport
+end_try_catch
+
+try
 casadi_interface_dsdp
+catch
+casadi_interface_dsdp = failedimport
+end_try_catch
+
+try
 casadi_interface_csparse
+catch
+casadi_interface_csparse = failedimport
+end_try_catch
+
+try
 casadi_interface_knitro
+catch
+casadi_interface_knitro = failedimport
+end_try_catch
+
+try
 casadi_interface_cplex
+catch
+casadi_interface_cplex = failedimport
+end_try_catch
+
+try
 casadi_interface_ooqp
+catch
+casadi_interface_ooqp = failedimport
+end_try_catch
+
+try
 casadi_interface_slicot
+catch
+casadi_interface_slicot = failedimport
+end_try_catch
+
+try
 casadi_interface_worhp
+catch
+casadi_interface_worhp = failedimport
+end_try_catch
+
+try
 casadi_interface_snopt
+catch
+casadi_interface_snopt = failedimport
+end_try_catch
+
+try
 casadi_interface_lapack
+catch
+casadi_interface_lapack = failedimport
+end_try_catch
 
 global casadi = struct();
 names = {'casadi_main','casadi_primitive','casadi_primitive_tools', 'casadi_noncore','casadi_interface_ipopt','casadi_interface_sundials','casadi_interface_qpoases','casadi_interface_dsdp','casadi_interface_csparse','casadi_interface_knitro','casadi_interface_cplex','casadi_interface_ooqp','casadi_interface_slicot','casadi_interface_worhp','casadi_interface_snopt','casadi_interface_lapack'};
