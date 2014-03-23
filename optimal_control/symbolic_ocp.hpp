@@ -101,11 +101,10 @@ namespace CasADi{
      */
     SX s, dae, initial;
 
-    /** \brief Ordinary differential equation (ODE) and corresponding state vector
-     * ODE in explicit form and corresponding state vector.
-     * ode and x have matching dimensions and der(x) == ode(x,...).
+    /** \brief Differential states defined by ordinary differential equations (ODE)
+     * The ODE can be retrieved by calling the method "ode" with x as argument.
      */
-    SX x, odeQQQ;
+    SX x;
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * alg and z have matching dimensions and 0 == alg(z,...) implicitly defines z.
