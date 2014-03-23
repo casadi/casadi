@@ -138,26 +138,30 @@ namespace CasADi{
     /** \brief Independent parameters
      * An independent parameter is a parameter whose value is determined by an expression that contains only literals.
      * An independent parameter is fixed after the DAE has been initialized.
-     * Its value is located in the "value" attribute.
+     * The definitions can be retrieved by calling the method "beq" with pi as argument.
      */
     SX pi;
 
     /** \brief Dependent parameters and corresponding definitions
-        A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters.
-        A dependent parameter is fixed after the DAE has been initialized.        
+     * A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters.
+     * A dependent parameter is fixed after the DAE has been initialized.        
+     * Interdependencies are allowed but must be non-cyclic.
+     * The definitions can be retrieved by calling the method "beq" with pd as argument.
     */
     SX pd, pd_def;
 
     /** \brief Independent constant
      * An independent constant is a constant whose value is determined by an expression that contains only literals.
-     * Its value is located in the "value" attribute.
+     * The definitions can be retrieved by calling the method "beq" with ci as argument.
      */
     SX ci;
 
     /** \brief Dependent constants and correspinding definitions
      * A dependent constant is a constant whose value is determined by an expression which contains references to other constants.
+     * Interdependencies are allowed but must be non-cyclic.
+     * The definitions can be retrieved by calling the method "beq" with cd as argument.
     */
-    SX cd, cd_def;
+    SX cd;
     //@}
 
     /// Interval start time
