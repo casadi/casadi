@@ -111,11 +111,11 @@ namespace CasADi{
      */
     SX z, alg;
 
-    /** \brief Quadrature equations and corresponding quadrature states
-     * Quadrature equation, e.g. an ODE whose state does not enter in the right-hand-side.
-     * quad and q have matching dimensions and der(q) == quad(...)
+    /** \brief Quadrature states
+     * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
+     * The ODE can be retrieved by calling the method "ode" with q as argument.
      */
-    SX q, quad;
+    SX q;
 
     /** \brief Output variables and corresponding definitions
      * Interdependencies are allowed but must be non-cyclic.

@@ -395,7 +395,6 @@ namespace CasADi{
     // Make sure that the dimensions are consistent at this point
     casadi_assert_warning(this->s.size()==this->dae.size(),"The number of differential-algebraic equations does not match the number of implicitly defined states.");
     casadi_assert_warning(this->z.size()==this->alg.size(),"The number of algebraic equations (equations not involving differentiated variables) does not match the number of algebraic variables.");
-    casadi_assert(this->q.size()==this->quad.size());
     casadi_assert(this->y.size()==this->y_def.size());
   }
 
@@ -557,10 +556,10 @@ namespace CasADi{
       stream << endl;
     }
   
-    if(!this->quad.isEmpty()){
+    if(!this->q.isEmpty()){
       stream << "Quadrature equations" << endl;
       for(int k=0; k<this->q.size(); ++k){
-        stream << str(der(this->q[k])) << " == " << str(this->quad[k]) << endl;
+        stream << str(der(this->q[k])) << " == " << str(ode(this->q[k])) << endl;
       }
       stream << endl;
     }
@@ -670,7 +669,7 @@ namespace CasADi{
       this->q.append(qv.v);
 
       // Add the Lagrange term to the list of quadratures
-      this->quad.append(*it);
+      setOde(qv.v,*it);
     
       // Add to the list of Mayer terms
       this->mterm.append(qv.v);
@@ -681,14 +680,9 @@ namespace CasADi{
   }
 
   void SymbolicOCP::eliminateQuadratureStates(){
-  
     // Move all the quadratures to the list of differential states
     this->x.append(this->q);
     this->q = SX::zeros(0,1);
-  
-    // Move the equations to the list of ODEs
-    setOde(q,quad);
-    this->quad = SX::zeros(0,1);
   }
 
   void SymbolicOCP::scaleVariables(){
@@ -714,7 +708,7 @@ namespace CasADi{
     ex.push_back(this->dae);
     ex.push_back(ode(this->x));
     ex.push_back(this->alg);
-    ex.push_back(this->quad);
+    ex.push_back(ode(this->q));
     ex.push_back(this->y_def);
     ex.push_back(this->initial);
     ex.push_back(this->path);
@@ -729,7 +723,7 @@ namespace CasADi{
     this->dae = *it++;
     setOde(this->x,*it++ / x_nom);
     this->alg = *it++;
-    this->quad = *it++;
+    setOde(this->q,*it++);
     this->y_def = *it++;
     this->initial = *it++;
     this->path = *it++;
@@ -744,7 +738,7 @@ namespace CasADi{
     ex.push_back(this->dae);
     ex.push_back(ode(this->x));
     ex.push_back(this->alg);
-    ex.push_back(this->quad);
+    ex.push_back(ode(this->q));
     ex.push_back(this->y_def);
     ex.push_back(this->initial);
     ex.push_back(this->path);
@@ -760,7 +754,7 @@ namespace CasADi{
     this->dae = *it++;
     setOde(this->x,*it++);
     this->alg = *it++;
-    this->quad = *it++;
+    setOde(this->q,*it++);
     this->y_def = *it++;
     this->initial = *it++;
     this->path = *it++;
@@ -814,7 +808,7 @@ namespace CasADi{
     ex.push_back(this->dae);
     ex.push_back(ode(this->x));
     ex.push_back(this->alg);
-    ex.push_back(this->quad);
+    ex.push_back(ode(this->q));
     ex.push_back(this->y_def);
     ex.push_back(this->initial);
     ex.push_back(this->path);
@@ -829,7 +823,7 @@ namespace CasADi{
     this->dae = *it++;
     setOde(this->x,*it++);
     this->alg = *it++;
-    this->quad = *it++;
+    setOde(this->q,*it++);
     this->y_def = *it++;
     this->initial = *it++;
     this->path = *it++;
@@ -881,8 +875,8 @@ namespace CasADi{
     vector<SX> ex;
     ex.push_back(this->dae);
     ex.push_back(ode(this->x));
-    ex.push_back(this->alg);
-    ex.push_back(this->quad);
+    ex.push_back(this->alg);    
+    ex.push_back(ode(this->q));
     ex.push_back(this->y_def);
     ex.push_back(this->initial);
     ex.push_back(this->path);
@@ -897,7 +891,7 @@ namespace CasADi{
     this->dae = *it++;
     setOde(this->x,*it++);
     this->alg = *it++;
-    this->quad = *it++;
+    setOde(this->q,*it++);
     this->y_def = *it++;
     this->initial = *it++;
     this->path = *it++;
