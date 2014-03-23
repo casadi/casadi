@@ -847,6 +847,12 @@ class Matrixtests(casadiTestCase):
     
     with self.assertRaises(Exception):
       tril2symm(DMatrix.ones(5,5))
+
+  def test_not_null(self):
+    x = MX.sym('x',3,1)
+    sp = sp_triu(2)
+    MX(sp,x)
+
       
   def test_append_empty(self):
     a = DMatrix.sparse(0,0)
