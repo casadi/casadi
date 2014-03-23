@@ -191,7 +191,7 @@ namespace CasADi{
           break;
         case CAT_INDEPENDENT_CONSTANT:
           casadi_assert(bexpr.isConstant());
-          var.value = bexpr.getValue();
+          setBeq(var.v,bexpr.toScalar());
           break;
         case CAT_DEPENDENT_PARAMETER:
           this->pd.append(var.v);
@@ -200,7 +200,7 @@ namespace CasADi{
         case CAT_INDEPENDENT_PARAMETER:
           casadi_assert(bexpr.isConstant());
           casadi_assert(!var.free);
-          var.value = bexpr.getValue();
+          setBeq(var.v,bexpr.toScalar());
           break;
         default:
           casadi_warning("Binding equation for " + str(var) + " not handled properly. Added to list of outputs");
@@ -575,7 +575,7 @@ namespace CasADi{
     if(!this->pi.isEmpty()){
       stream << "Independent parameters" << endl;
       for(int i=0; i<this->pi.size(); ++i)
-        stream << this->pi.at(i) << " == " << value(this->pi.at(i)).at(0) << endl;
+        stream << this->pi.at(i) << " == " << str(beq(this->pi.at(i))) << endl;
       stream << endl;
     }
 
@@ -589,7 +589,7 @@ namespace CasADi{
     if(!this->ci.isEmpty()){
       stream << "Independent constants" << endl;
       for(int i=0; i<this->ci.size(); ++i)
-        stream << this->ci.at(i) << " == " << value(this->ci.at(i)).at(0) << endl;
+        stream << this->ci.at(i) << " == " << str(beq(this->ci.at(i))) << endl;
       stream << endl;
     }
 
@@ -747,7 +747,7 @@ namespace CasADi{
     ex.push_back(this->pd_def);
   
     // Substitute all at once (since they may have common subexpressions)
-    ex = substitute(ex,vector<SX>(1,this->pi),vector<SX>(1,value(this->pi)));
+    ex = substitute(ex,vector<SX>(1,this->pi),vector<SX>(1,beq(this->pi)));
     
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
@@ -1758,24 +1758,6 @@ namespace CasADi{
     for(int i=0; i<val.size(); ++i){
       (this->*f)(var.at(i).getName(),val.at(i),normalized);
     }    
-  }
-
-  double SymbolicOCP::value(const std::string& name, bool normalized) const{
-    const Variable& v = variable(name);
-    return normalized ? v.value / v.nominal : v.value;
-  }
-
-  std::vector<double> SymbolicOCP::value(const SX& var, bool normalized) const{
-    return attribute(&SymbolicOCP::value,var,normalized);
-  }
-
-  void SymbolicOCP::setValue(const std::string& name, double val, bool normalized){
-    Variable& v = variable(name);
-    v.value = normalized ? val*v.nominal : val;
-  }
-
-  void SymbolicOCP::setValue(const SX& var, const std::vector<double>& val, bool normalized){
-    setAttribute(&SymbolicOCP::setValue,var,val,normalized);
   }
 
   double SymbolicOCP::min(const std::string& name, bool normalized) const{

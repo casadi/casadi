@@ -341,18 +341,6 @@ namespace CasADi{
     /// Set the nominal value(s) by expression
     void setNominal(const SX& var, const std::vector<double>& val);
 
-    /// Get the (optionally normalized) current value by name
-    double value(const std::string& name, bool normalized=false) const;
-
-    /// Get the (optionally normalized) current value(s) by expression
-    std::vector<double> value(const SX& var, bool normalized=false) const;
-
-    /// Set the (optionally normalized) current value by name
-    void setValue(const std::string& name, double val, bool normalized=false);
-
-    /// Set the (optionally normalized) current value(s) by expression
-    void setValue(const SX& var, const std::vector<double>& val, bool normalized=false);
-
     /// Get the (optionally normalized) lower bound by name
     double min(const std::string& name, bool normalized=false) const;
 

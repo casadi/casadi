@@ -88,9 +88,6 @@ namespace CasADi{
     /// Derivative binding equation, i.e. ordinary differential equation (ODE). Equal do "d" if unknown
     SXElement ode;
 
-    /// (Current) value of the variable
-    double value;
-
     /// Nominal value
     double nominal;
     
