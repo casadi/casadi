@@ -74,9 +74,9 @@ f.setInput(3)
 f.evaluate()
 print f.getOutput()
 #! We can evaluate symbolically, too:
-print f.eval([y])
+print f([y])
 #! Since numbers get cast to SXConstant object, you can also write the following non-efficient code:
-print f.eval([2])
+print f([2])
 #! We can do symbolic derivatives: f' = dz/dx . 
 #$ The result is $2 x \cos(x^2)+2 x$:
 print f.grad()
@@ -103,16 +103,16 @@ b=SX.sym("b")
 f = SXFunction([x,vertcat((a,b))],[a*x + b]) 
 f.init()
 
-print f.eval([x,vertcat([a,b])])
-print f.eval([SXElement(1.0),vertcat((a,b))])
-print f.eval([x,vertcat((SX.sym("c"),SX.sym("d")))])
-print f.eval([SXElement(),vertcat([SX.sym("c"),SX.sym("d")])])
+print f([x,vertcat([a,b])])
+print f([SX(1.0),vertcat((a,b))])
+print f([x,vertcat((SX.sym("c"),SX.sym("d")))])
+print f([SX(),vertcat([SX.sym("c"),SX.sym("d")])])
 
 #$ We can make an accompanying $g(x) = f(x;a;b)$ by making a and b implicity:
 
 k = SX(a)
-print f.eval([x,vertcat((k[0],b))])
-print f.eval([x,vertcat((SX.sym("c"),SX.sym("d")))])
+print f([x,vertcat((k[0],b))])
+print f([x,vertcat((SX.sym("c"),SX.sym("d")))])
 
 #! Functions with vector valued input
 #! ----------------------------------
@@ -148,7 +148,7 @@ print x*y # Not a dot product
 f = SXFunction([x,y], [x*y])
 f.init()
 print "%d -> %d" % (f.getNumInputs(),f.getNumOutputs())
-print f.eval([x,y])
+print f([x,y])
 f.init()
 f.setInput([1,2,3,4],0); # instead of f.setInput([[1,2],[3,4]],0);
 f.setInput([4,5,6,7],1);
@@ -162,19 +162,19 @@ print 12
 f = SXFunction([x,y], [x*y,x+y])
 f.init()
 print type(x)
-print f.eval([x,y])
-print type(f.eval([x,y]))
-print type(f.eval([x,y])[0])
-print type(f.eval([x,y])[0][0,0])
+print f([x,y])
+print type(f([x,y]))
+print type(f([x,y])[0])
+print type(f([x,y])[0][0,0])
 
 
 f = SXFunction([x], [x+y])
 f.init()
 print type(x)
-print f.eval([x])
-print type(f.eval([x]))
-print type(f.eval([x])[0])
-print type(f.eval([x])[0][0,0])
+print f([x])
+print type(f([x]))
+print type(f([x])[0])
+print type(f([x])[0][0,0])
 
 #! A current limitation is that matrix valued input/ouput is handled through flattened vectors
 #! Note the peculiar form of the gradient.

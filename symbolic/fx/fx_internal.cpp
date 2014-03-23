@@ -1840,7 +1840,18 @@ namespace CasADi{
                         const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens, 
                         const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
                         bool always_inline, bool never_inline){
-    casadi_error("Not implemented");
+    if (fseed.size()==0 || aseed.size()==0) {
+      for (int i=0;i<arg.size();++i) {
+        setInput(arg[i],i);
+      }
+      evaluate();
+      res.resize(getNumOutputs());
+      for (int i=0;i<res.size();++i) {
+        res[i]=output(i);
+      }
+    } else {
+      casadi_error("Not implemented");
+    }
   }
 
   FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric){

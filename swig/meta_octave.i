@@ -142,7 +142,7 @@ int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<doub
   }
   if((p.is_real_matrix() && p.is_numeric_type())){
     Matrix mat = p.matrix_value();
-    m = CasADi::DMatrix(mat.rows(),mat.cols(),0);
+    m = CasADi::DMatrix::zeros(mat.rows(),mat.cols());
     for(int i=0; i<mat.rows(); ++i){
       for(int j=0; j<mat.cols(); ++j){
         m(i,j) = mat(i,j);
@@ -151,7 +151,7 @@ int meta< CasADi::Matrix<double> >::as(const octave_value& p,CasADi::Matrix<doub
     return true;
   }
   if ((p.is_real_scalar() && p.is_numeric_type())) {
-    m = CasADi::DMatrix(1,1,p.double_value());
+    m = CasADi::DMatrix(p.double_value());
     return true;
   } 
   return false;
@@ -208,7 +208,7 @@ int meta< CasADi::Matrix<CasADi::SXElement> >::as(const octave_value& p,CasADi::
   NATIVERETURN(CasADi::SXElement, m)
   if((p.is_real_matrix() && p.is_numeric_type())){
     Matrix mat = p.matrix_value();
-    m = CasADi::SX(mat.rows(),mat.cols(),0);
+    m = CasADi::SX::zeros(mat.rows(),mat.cols());
     for(int i=0; i<mat.rows(); ++i){
       for(int j=0; j<mat.cols(); ++j){
         m(i,j) = mat(i,j);

@@ -109,7 +109,7 @@ for N in range(1,11):
       rhs = 0
       for j in range(K+1):
         rhs += Z[i,j]*C[j,k]
-      [FF] = F.eval([Z[i,k]])
+      [FF] = F([Z[i,k]])
       g.append(h*FF-rhs)
 
     # Add continuity equation to NLP
