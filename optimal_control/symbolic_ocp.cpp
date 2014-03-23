@@ -183,15 +183,14 @@ namespace CasADi{
         // Get the variable and binding expression
         Variable& var = readVariable(beq[0]);
         SX bexpr = readExpr(beq[1][0]);
+        setBeq(var.v,bexpr.toScalar());
 
         switch(var.category){
         case CAT_DEPENDENT_CONSTANT:
           this->cd.append(var.v);
-          this->cd_def.append(bexpr);
           break;
         case CAT_INDEPENDENT_CONSTANT:
           casadi_assert(bexpr.isConstant());
-          setBeq(var.v,bexpr.toScalar());
           break;
         case CAT_DEPENDENT_PARAMETER:
           this->pd.append(var.v);
@@ -200,12 +199,10 @@ namespace CasADi{
         case CAT_INDEPENDENT_PARAMETER:
           casadi_assert(bexpr.isConstant());
           casadi_assert(!var.free);
-          setBeq(var.v,bexpr.toScalar());
           break;
         default:
           casadi_warning("Binding equation for " + str(var) + " not handled properly. Added to list of outputs");
           this->y.append(var.v);
-          setBeq(var.v,bexpr.toScalar());
         }
       }
     }
@@ -595,7 +592,7 @@ namespace CasADi{
     if(!this->cd.isEmpty()){
       stream << "Dependent constants" << endl;
       for(int i=0; i<this->cd.size(); ++i)
-        stream << this->cd.at(i) << " == " << this->cd_def.at(i) << endl;
+        stream << this->cd.at(i) << " == " << str(beq(this->cd.at(i))) << endl;
       stream << endl;
     }
 
@@ -1856,11 +1853,6 @@ namespace CasADi{
       if(i->getName()==name) return pd_def[distance(this->pd.begin(),i)];
     }
     
-    // Look amongst the dependent constants
-    for(SX::const_iterator i=this->cd.begin(); i!=this->cd.end(); ++i){
-      if(i->getName()==name) return cd_def[distance(this->cd.begin(),i)];
-    }
-
     // Return the expression itself by default
     return variable(name).beq;
   }
