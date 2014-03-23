@@ -166,6 +166,41 @@ namespace CasADi{
         
           // Add to list of variables
           addVariable(qn,var);
+
+          // Sort expression
+          switch(var.category){
+          case CAT_DERIVATIVE:
+            // Skip - meta information about time derivatives is kept together with its parent variable
+            break;
+          case CAT_STATE:
+            this->s.append(var.v);
+            break;
+          case CAT_DEPENDENT_CONSTANT:
+            this->cd.append(var.v);
+            break;
+          case CAT_INDEPENDENT_CONSTANT:
+            this->ci.append(var.v);
+            break;
+          case CAT_DEPENDENT_PARAMETER:
+            this->pd.append(var.v);
+            break;
+          case CAT_INDEPENDENT_PARAMETER:
+            if(var.free){
+              this->p.append(var.v);
+            } else {
+              this->pi.append(var.v);
+            }
+            break;
+          case CAT_ALGEBRAIC:
+            if(var.causality == INTERNAL){
+              this->s.append(var.v);
+            } else if(var.causality == INPUT){
+              this->u.append(var.v);
+            }
+            break;
+          default:
+            casadi_error("Unknown category");
+          }
         }
       }
     }
@@ -640,7 +675,7 @@ namespace CasADi{
   
       // Add to the list of variables
       addVariable(q_name.str(),qv);
-    
+
       // Add to the quadrature states
       this->q.append(qv.v);
 
@@ -1200,41 +1235,6 @@ namespace CasADi{
   
     // Add to the map of all variables
     varmap_[name] = var;
-  
-    // Sort by category
-    switch(var.category){
-    case CAT_DERIVATIVE:
-      // Skip - meta information about time derivatives is kept together with its parent variable
-      break;
-    case CAT_STATE:
-      this->s.append(var.v);
-      break;
-    case CAT_DEPENDENT_CONSTANT:
-      this->cd.append(var.v);
-      break;
-    case CAT_INDEPENDENT_CONSTANT:
-      this->ci.append(var.v);
-      break;
-    case CAT_DEPENDENT_PARAMETER:
-      this->pd.append(var.v);
-      break;
-    case CAT_INDEPENDENT_PARAMETER:
-      if(var.free){
-        this->p.append(var.v);
-      } else {
-        this->pi.append(var.v);
-      }
-      break;
-    case CAT_ALGEBRAIC:
-      if(var.causality == INTERNAL){
-        this->s.append(var.v);
-      } else if(var.causality == INPUT){
-        this->u.append(var.v);
-      }
-      break;
-    default:
-      casadi_error("Unknown category");
-    }
   }
 
   std::string SymbolicOCP::qualifiedName(const XMLNode& nn){
