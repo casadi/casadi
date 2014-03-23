@@ -544,3 +544,20 @@
    fun:PyEval_EvalFrameEx
 }
 
+{
+   memory leak in swig multiple modules
+   Memcheck:Leak
+   fun:malloc
+   fun:SwigPyClientData_New
+   fun:DMatrixVector_swigregister
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   obj:/usr/bin/python2.7
+   fun:PyEval_CallObjectWithKeywords
+}
+
