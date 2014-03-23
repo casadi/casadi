@@ -73,6 +73,9 @@ namespace CasADi{
     /// Variable name
     std::string name() const;
 
+    /// Set the variable name (and corresponding expressions)
+    void setName(const std::string& name);
+
     /// Variable expression
     SX v; 
 

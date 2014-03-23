@@ -50,6 +50,11 @@ namespace CasADi{
     return this->v.getName();
   }
 
+  void Variable::setName(const std::string& name){
+    this->v = SX::sym(name);
+    this->d = SX::sym("der_" + name);    
+  }
+
   SX Variable::atTime(double t, bool allocate) const{
     casadi_assert(!allocate);
     return const_cast<Variable*>(this)->atTime(t,false);

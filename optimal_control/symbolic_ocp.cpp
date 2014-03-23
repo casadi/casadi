@@ -97,10 +97,7 @@ namespace CasADi{
         
           // Create variable
           Variable var;
-
-          // Create symbolic expressions
-          var.v = SX::sym(name);
-          var.d = SX::sym("der_" + name);
+          var.setName(name);
 
           // Value reference
           var.valueReference = valueReference;
@@ -658,10 +655,7 @@ namespace CasADi{
     
       // Create a new quadrature state
       Variable qv;
-
-      // Create symbolic expressions
-      qv.v = SX::sym(q_name.str());
-      qv.d = SX::sym("der_" + q_name.str());
+      qv.setName(q_name.str());
 
       // Set attributes
       qv.variability = CONTINUOUS;
