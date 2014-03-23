@@ -76,7 +76,7 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.odeQQQ))
 integrator = CVodesIntegrator(dae)
 
 # Output function
@@ -138,7 +138,7 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.odeQQQ))
 integrator = CVodesIntegrator(dae)
 
 # Output function
@@ -193,7 +193,7 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.odeQQQ))
 integrator = CVodesIntegrator(dae)
 
 # Output function
