@@ -55,14 +55,14 @@ namespace CasADi{
     this->d = SXElement::sym("der_" + name);
   }
 
-  SX Variable::atTime(double t, bool allocate) const{
+  SXElement Variable::atTime(double t, bool allocate) const{
     casadi_assert(!allocate);
     return const_cast<Variable*>(this)->atTime(t,false);
   }
 
-  SX Variable::atTime(double t, bool allocate){
+  SXElement Variable::atTime(double t, bool allocate){
     // Find an existing element
-    map<double,SX>::const_iterator it = timed_.find(t);
+    map<double,SXElement>::const_iterator it = timed_.find(t);
   
     // If not found
     if(it==timed_.end()){
@@ -70,7 +70,7 @@ namespace CasADi{
         // Create a timed variable
         stringstream ss;
         ss << name() << ".atTime(" << t << ")";
-        SX tvar = SX::sym(ss.str());
+        SXElement tvar = SXElement::sym(ss.str());
       
         // Save to map
         timed_[t] = tvar;
