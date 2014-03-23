@@ -51,8 +51,8 @@ namespace CasADi{
   }
 
   void Variable::setName(const std::string& name){
-    this->v = SX::sym(name);
-    this->d = SX::sym("der_" + name);    
+    this->v = SXElement::sym(name);
+    this->d = SXElement::sym("der_" + name);
   }
 
   SX Variable::atTime(double t, bool allocate) const{

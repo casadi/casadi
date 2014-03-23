@@ -1852,7 +1852,7 @@ namespace CasADi{
     for(int i=0; i<ret.size(); ++i){
       // Make sure that the expression matches
       const Variable& v = variable(var.at(i).getName());
-      casadi_assert(v.v.toScalar().isEqual(var.at(i)));
+      casadi_assert(v.v.isEqual(var.at(i)));
       ret[i] = binding(var.at(i).getName());
     }
     return ret;

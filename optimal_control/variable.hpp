@@ -77,10 +77,10 @@ namespace CasADi{
     void setName(const std::string& name);
 
     /// Variable expression
-    SX v; 
+    SXElement v; 
 
     /// Derivative expression
-    SX d;            
+    SXElement d;            
 
     /// (Current) value of the variable
     double value;
