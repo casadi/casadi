@@ -106,11 +106,11 @@ int main(){
   
   // Print the solution
   cout << "-----" << endl;
-  cout << "Optimal solution for p = " << solver.input("p").getDescription() << ":" << endl;
-  cout << setw(30) << "Objective: " << solver.output("f").getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output("x").getDescription() << endl;
-  cout << setw(30) << "Dual solution (x): " << solver.output("lam_x").getDescription() << endl;
-  cout << setw(30) << "Dual solution (g): " << solver.output("lam_g").getDescription() << endl;
+  cout << "Optimal solution for p = " << str(solver.input("p")) << ":" << endl;
+  cout << setw(30) << "Objective: " << str(solver.output("f")) << endl;
+  cout << setw(30) << "Primal solution: " << str(solver.output("x")) << endl;
+  cout << setw(30) << "Dual solution (x): " << str(solver.output("lam_x")) << endl;
+  cout << setw(30) << "Dual solution (g): " << str(solver.output("lam_g")) << endl;
   
   // Change the parameter and resolve
   p0[0] = 4.5;
@@ -119,11 +119,11 @@ int main(){
   
   // Print the new solution
   cout << "-----" << endl;
-  cout << "Optimal solution for p = " << solver.input("p").getDescription() << ":" << endl;
-  cout << setw(30) << "Objective: " << solver.output("f").getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output("x").getDescription() << endl;
-  cout << setw(30) << "Dual solution (x): " << solver.output("lam_x").getDescription() << endl;
-  cout << setw(30) << "Dual solution (g): " << solver.output("lam_g").getDescription() << endl;
+  cout << "Optimal solution for p = " << str(solver.input("p")) << ":" << endl;
+  cout << setw(30) << "Objective: " << str(solver.output("f")) << endl;
+  cout << setw(30) << "Primal solution: " << str(solver.output("x")) << endl;
+  cout << setw(30) << "Dual solution (x): " << str(solver.output("lam_x")) << endl;
+  cout << setw(30) << "Dual solution (g): " << str(solver.output("lam_g")) << endl;
   
   return 0;
 }

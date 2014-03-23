@@ -57,7 +57,7 @@ namespace CasADi{
     CONTROLSIMULATOR_X0, 
     /// Parameters that are fixed over the entire horizon  (dimension np-by-1) [p]
     CONTROLSIMULATOR_P, 
-    /// Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [u]
+    /// Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [u]
     CONTROLSIMULATOR_U, 
     /// Number of input arguments of a piecewise simulator
     CONTROLSIMULATOR_NUM_IN};

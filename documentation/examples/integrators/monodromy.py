@@ -77,7 +77,7 @@ figure(1)
 for x1_0 in [-3.5,-3.1,-3,-2,-1,0]:
   sim.setInput([x1_0,x2_0],"x0")
   sim.evaluate()
-  plot(sim.getOutput()[:,0],sim.getOutput()[:,1],'k')
+  plot(sim.getOutput()[0,:],sim.getOutput()[1,:],'k')
 
 title('phase portrait for mu_1 = 0, mu_2 = 0')
 xlabel('x_1')
@@ -100,6 +100,10 @@ jac.evaluate()
 Ji = jac.getOutput()
 
 print Ji
+
+#! Note the remainder of this file depends on Jacobian of Simulator,
+#!  a feature that is currently disabled 
+#! https://github.com/casadi/casadi/issues/929
 
 # #! Monodromy matrix at various instances - Jacobian of Simulator
 # #! =============================================================

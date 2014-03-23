@@ -1275,11 +1275,13 @@ namespace CasADi{
     vector<MX> f_out = f_G;
     f_out.insert(f_out.end(),g.begin(),g.end());
     vdef_fcn = MXFunction(f_in,f_out);
+    vdef_fcn.setOption("name","lifting_variable_definition");
 
     // Initial guess of intermediate variables
     f_in = inputv_;
     f_out = x_init;
     vinit_fcn = MXFunction(f_in,f_out);
+    vinit_fcn.setOption("name","lifting_variable_guess");
   }
 
 } // namespace CasADi

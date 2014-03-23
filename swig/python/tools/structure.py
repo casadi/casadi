@@ -418,16 +418,49 @@ class Dispatcher:
 class CasadiStructureDerivable:
 
   def __call__(self,arg=0):
+    mtype = None
     if isinstance(arg,DMatrix):
       a = arg
+      mtype = DMatrix
     else:
       try:
         a = DMatrix(arg)
+        mtype = DMatrix
       except:
-        raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
-    if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
-      a = DMatrix.ones(self.size,1)*a
-    return DMatrixStruct(self,data=a)
+        pass
+        
+    if mtype is None:
+      if isinstance(arg,MX):
+        a = arg
+        mtype = MX
+      else:
+        try:
+          a = MX(arg)
+          mtype = MX
+        except:
+          pass
+          
+    if mtype is None:
+      if isinstance(arg,SX):
+        a = arg
+        mtype = SX
+      else:
+        try:
+          a = SX(arg)
+          mtype = SX
+        except:
+          raise Exception("Call to Structure has weird argument: expecting DMatrix-like or MX-like or SXMatrix-like")
+          
+    if isinstance(a,DMatrix):
+      if a.shape[0] == 1 and a.shape[1] == 1 and self.size>1:
+        a = DMatrix.ones(self.size,1)*a
+      return DMatrixStruct(self,data=a)
+      
+    if isinstance(a,MX):
+      return MXStruct(self,data=a)
+
+    if isinstance(a,SXMatrix):
+      return SXMatrixStruct(self,data=a)
     
   def repeated(self,arg=0):
     if isinstance(arg,DMatrix):
@@ -437,10 +470,10 @@ class CasadiStructureDerivable:
         a = DMatrix(arg)
       except:
         raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
-    if not(a.shape[1] == self.size):
-       raise Exception("Expecting n x %d DMatrix. Got %s" % (self.size,a.dimString()))  
-    s = struct([entry("t",struct=self,repeat=a.shape[0])])
-    numbers = DMatrixStruct(s,data=DataReferenceRepeated(a,a.shape[0]))
+    if not(a.shape[0] == self.size):
+       raise Exception("Expecting %d x n DMatrix. Got %s" % (self.size,a.dimString()))  
+    s = struct([entry("t",struct=self,repeat=a.shape[1])])
+    numbers = DMatrixStruct(s,data=DataReferenceRepeated(a,a.shape[1]))
     p = numbers.prefix["t"]
     p.castmaster = True
     return p  
@@ -471,10 +504,10 @@ class CasadiStructureDerivable:
         a = DMatrix(arg)
       except:
         raise Exception("Call to Structure has weird argument: expecting DMatrix-like")
-    if not(a.shape[1]==self.size and a.shape[0] % self.size == 0):
-       raise Exception("Expecting N x square DMatrix. Got %s" % (self.size,a.dimString()))
-    s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[0] / self.size)])
-    numbers = DMatrixStruct(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[0] / self.size))
+    if not(a.shape[0]==self.size and a.shape[1] % self.size == 0):
+       raise Exception("Expecting square (%d) DMatrix by N. Got %s" % (self.size,a.dimString()))
+    s = struct([entry("t",shapestruct=(self,self),repeat=a.shape[1] / self.size)])
+    numbers = DMatrixStruct(s,data=DataReferenceSquaredRepeated(a,self.size,a.shape[1] / self.size))
     p = numbers.prefix["t"]
     p.castmaster = True
     return p  
@@ -862,21 +895,7 @@ class ssymStruct(CasadiStructured,MasterGettable):
   def __SX__(self):
     return self.cat
     
-class msymStruct(CasadiStructured,MasterGettable):
-  description = "MX.sym"
-  def __init__(self,struct,order=None):
-    CasadiStructured.__init__(self,struct,order=order)
-
-    if any(e.expr is not None for e in self.entries):
-      raise Exception("struct_symMX does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
-    if any(e.sym is not None for e in self.entries):
-      raise Exception("struct_symMX does not accept entries with an 'sym' argument.")
-
-    self.master = MX.sym("V",self.size,1)
-    
-    self.buildMap()
- 
-
+class VertsplitStructure:
   def buildMap(self,struct=None,parentIndex = (),parent=None):
     if struct is None:  struct = self.struct
     if parent is None:  parent = self.master
@@ -898,11 +917,26 @@ class msymStruct(CasadiStructured,MasterGettable):
       its.append(it)
       sps.append(sp)
       k += sp.size()
+    ks.append(parent.size1())
       
     for it, k, sp,e in zip(its,vertsplit(parent,ks),sps,es):
       if not(e.isPrimitive()):
         self.buildMap(struct=e.struct,parentIndex = parentIndex + it,parent=k)
-      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else k[IMatrix(sp,range(sp.size()))]      
+      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else k.reshape(sp) #[IMatrix(sp,range(sp.size()))]      
+    
+class msymStruct(CasadiStructured,MasterGettable,VertsplitStructure):
+  description = "MX.sym"
+  def __init__(self,struct,order=None):
+    CasadiStructured.__init__(self,struct,order=order)
+
+    if any(e.expr is not None for e in self.entries):
+      raise Exception("struct_symMX does not accept entries with an 'expr' argument, because such an element is not purely symbolic.")
+    if any(e.sym is not None for e in self.entries):
+      raise Exception("struct_symMX does not accept entries with an 'sym' argument.")
+
+    self.master = MX.sym("V",self.size,1)
+    
+    self.buildMap()
 
   def __MX__(self):
     return self.cat
@@ -937,7 +971,7 @@ class MatrixStruct(CasadiStructured,MasterGettable,MasterSettable):
         
     for e in self.entries:
       self[e.name] = e.expr
-      
+ 
 class DMatrixStruct(MatrixStruct):
 
   def save(self,filename):
@@ -967,9 +1001,11 @@ class SXStruct(MatrixStruct):
   def __SX__(self):
     return self.cat
     
-class MXStruct(MatrixStruct):
+class MXStruct(MatrixStruct,VertsplitStructure):
   def __init__(self,struct,data=None):
     MatrixStruct.__init__(self,struct,MX,data=data)
+    
+    self.buildMap()
 
   def __MX__(self):
     return self.cat
@@ -1271,17 +1307,20 @@ class DataReference:
   @property
   def shape(self):
     return self.v.shape
+    
+  def dimString(self):
+    return self.v.dimString()
   
 class DataReferenceRepeated(DataReference):
   def __init__(self,a,n):
     assert(a.isDense())
     self.a = a
     self.n = n
-    self.v = a.T.reshape((n*a.size2(),1))
+    self.v = a.reshape((n*a.size1(),1))
     
   def __setitem__(self,a,b):
     self.v.__NZsetitem__(a,b)
-    self.a.set(self.v.data(),DENSETRANS)
+    self.a.set(self.v.data(),DENSE)
 
   def __getitem__(self,a):
     return self.v.__NZgetitem__(a)
@@ -1309,14 +1348,11 @@ class DataReferenceSquaredRepeated(DataReference):
     self.a = a
     self.n = n
     self.N = N
-    self.v = horzcat([i for i in vertsplit(a,N) ]).reshape((n*n*N,1))
+    self.v = a.reshape((n*n*N,1))
     
   def __setitem__(self,a,b):
     self.v.__NZsetitem__(a,b)
-    print "setitem", a, b
-    for i in range(self.N):
-      print self.v.data()[i*self.n*self.n:(i+1)*self.n*self.n]
-      self.a[i*self.n:(i+1)*self.n,:] = self.v[i*self.n*self.n:(i+1)*self.n*self.n].reshape((self.n,self.n))
+    self.a.set(self.v.data(),DENSE)
 
   def __getitem__(self,a):
     return self.v.__NZgetitem__(a)

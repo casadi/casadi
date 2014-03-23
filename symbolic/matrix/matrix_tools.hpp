@@ -632,49 +632,33 @@ namespace CasADi{
 
   template<typename DataType>
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset) {
-    // Consistency check
-    casadi_assert(offset.size()>=1);
-    casadi_assert(offset.front()==0);
-    casadi_assert_message(offset.back()<=v.size2(),"horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset): Last elements of offset (" << offset.back() << ") must be at maximum the number of cols in v (" << v.size2() << ")");
-    casadi_assert(isMonotone(offset));
-  
+    // Split up the sparsity pattern
+    std::vector<Sparsity> sp = horzsplit(v.sparsity(),offset);
+    
+    // Return object
     std::vector<Matrix<DataType> > ret;
-  
-    // Obtain sparsity pattern
-    const std::vector<int> & colind = v.sparsity().colind();
-    const std::vector<int> & row = v.sparsity().row();
-  
-    for(int i=0; i<offset.size(); ++i) {
-      int start = offset[i];
-      int stop = i+1 < offset.size() ? offset[i+1] : v.size2(); 
-  
-      // colind for the submatrix: a portion of the original colind, 
-      // but with a common offset substracted such that colind_s[0]==0
-      std::vector<int> colind_s(stop-start+1,-colind[start]);
-      std::transform(colind.begin()+start,colind.begin()+stop+1,colind_s.begin(),colind_s.begin(),std::plus<int>());
-    
-      // row for the submatrix: a portion of the original row
-      std::vector<int> row_s(colind[stop]-colind[start]);
-      std::copy(row.begin()+colind[start],row.begin()+colind[stop],row_s.begin());
-    
-      Sparsity s = Sparsity(v.size1(),stop-start,colind_s,row_s);
-      Matrix<DataType> r(s);
-    
-      // data for the submatrix: a portion of the original data
-      std::copy(v.begin()+colind[start],v.begin()+colind[stop],r.begin());
-    
-      // Append submatrix to list
-      ret.push_back(r);
+    ret.reserve(sp.size());
+
+    // Copy data
+    typename std::vector<DataType>::const_iterator data_start=v.begin(), data_stop;
+    for(std::vector<Sparsity>::const_iterator j=sp.begin(); j!=sp.end(); ++j){
+      data_stop = data_start + j->size();
+      ret.push_back(Matrix<DataType>(*j,std::vector<DataType>(data_start,data_stop)));
+      data_start = data_stop;
     }
+
+    // Return the assembled matrix
+    casadi_assert(data_stop==v.end());
     return ret;
   }
 
   template<typename DataType>
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr) {
     casadi_assert(incr>=1);
-    return horzsplit(v,range(0,v.size2(),incr));
+    std::vector<int> offset2 = range(0,v.size2(),incr);
+    offset2.push_back(v.size2());
+    return horzsplit(v,offset2);
   }
-
 
   template<typename DataType>
   Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v){
@@ -695,7 +679,9 @@ namespace CasADi{
   template<typename DataType>
   std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x, int incr){
     casadi_assert(incr>=1);
-    return vertsplit(x,range(0,x.size1(),incr));
+    std::vector<int> offset1 = range(0,x.size1(),incr);
+    offset1.push_back(x.size1());
+    return vertsplit(x,offset1);
   }
 
   template<typename DataType>
@@ -712,7 +698,11 @@ namespace CasADi{
   std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, int vert_incr, int horz_incr) {
     casadi_assert(horz_incr>=1);
     casadi_assert(vert_incr>=1);
-    return blocksplit(x,range(0,x.size1(),vert_incr),range(0,x.size2(),horz_incr));
+    std::vector<int> offset1 = range(0,x.size1(),vert_incr);
+    offset1.push_back(x.size1());
+    std::vector<int> offset2 = range(0,x.size2(),horz_incr);
+    offset2.push_back(x.size2());
+    return blocksplit(x,offset1,offset2);
   }
 
   template<typename DataType>
@@ -747,7 +737,7 @@ namespace CasADi{
 
   template<typename DataType>
   Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y){
-    return mul(x,y.T());  
+    return mul(x,y.T());
   }
 
   template<typename DataType>

@@ -27,6 +27,7 @@
 #include "../sx/sx_tools.hpp"
 #include "../fx/sx_function.hpp"
 #include "../matrix/sparsity_tools.hpp"
+#include "../casadi_options.hpp"
 
 using namespace std;
 
@@ -97,11 +98,6 @@ namespace CasADi{
 
   Horzsplit::Horzsplit(const MX& x, const std::vector<int>& offset) : Split(x,offset){
     
-    // Add trailing elemement if needed
-    if(offset_.back()!=x.size2()){
-      offset_.push_back(x.size2());
-    }
-
     // Split up the sparsity pattern
     output_sparsity_ = horzsplit(x.sparsity(),offset_);
 
@@ -167,11 +163,6 @@ namespace CasADi{
 
   Vertsplit::Vertsplit(const MX& x, const std::vector<int>& offset) : Split(x,offset){
     
-    // Add trailing elemement if needed
-    if(offset_.back()!=x.size1()){
-      offset_.push_back(x.size1());
-    }
-
     // Split up the sparsity pattern
     output_sparsity_ = vertsplit(x.sparsity(),offset_);
 
@@ -233,6 +224,40 @@ namespace CasADi{
         adjSens[d][0]->addToSum(vertcat(v));
       }
     }
+  }
+
+  MX Horzsplit::getHorzcat(const std::vector<MX>& x) const{
+    // Check x length
+    if(x.size()!=getNumOutputs()){
+      return MXNode::getHorzcat(x);
+    }
+
+    // Check x content
+    for(int i=0; i<x.size(); ++i){
+      if(!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)){
+        return MXNode::getHorzcat(x);
+      }
+    }
+
+    // OK if reached this point
+    return dep();
+  }
+
+  MX Vertsplit::getVertcat(const std::vector<MX>& x) const{
+    // Check x length
+    if(x.size()!=getNumOutputs()){
+      return MXNode::getVertcat(x);
+    }
+
+    // Check x content
+    for(int i=0; i<x.size(); ++i){
+      if(!(x[i]->isOutputNode() && x[i]->getFunctionOutput()==i && x[i]->dep().get()==this)){
+        return MXNode::getVertcat(x);
+      }
+    }
+
+    // OK if reached this point
+    return dep();
   }
 
 } // namespace CasADi

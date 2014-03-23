@@ -266,6 +266,7 @@ for d in r.findall('*//namespace/cdecl'):
   if d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function": continue
 
   dname = d.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
+  if dname == "dummy": continue
   if d.find('attributelist/parmlist') is None:
     params = []
   else:

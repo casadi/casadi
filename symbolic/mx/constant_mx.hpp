@@ -140,20 +140,6 @@ namespace CasADi{
     Matrix<double> x_;
   };
 
-  /** \brief Constant known at runtime */
-  template<typename T>
-  struct RuntimeConst{
-    const T value;
-    RuntimeConst(){}
-    RuntimeConst(T v) : value(v){}
-  };
-  
-  /** \brief  Constant known at compiletime */
-  template<int v>
-  struct CompiletimeConst{
-    static const int value = v;
-  };
-
   /// A zero-by-zero matrix
   class ZeroByZero : public ConstantMX{
   private:
@@ -215,6 +201,20 @@ namespace CasADi{
     
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
+  };
+
+  /** \brief Constant known at runtime */
+  template<typename T>
+  struct RuntimeConst{
+    const T value;
+    RuntimeConst(){}
+    RuntimeConst(T v) : value(v){}
+  };
+  
+  /** \brief  Constant known at compiletime */
+  template<int v>
+  struct CompiletimeConst{
+    static const int value = v;
   };
 
   /// A constant with all entries identical
@@ -280,10 +280,52 @@ namespace CasADi{
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
 
+    /// Create a horizontal concatenation node
+    virtual MX getHorzcat(const std::vector<MX>& x) const;
+
+    /// Create a vertical concatenation node (vectors only)
+    virtual MX getVertcat(const std::vector<MX>& x) const;
+
     /** \brief The actual numerical value */
     Value v_;
   };
   
+  template<typename Value>
+  MX Constant<Value>::getHorzcat(const std::vector<MX>& x) const{
+    // Check if all arguments have the same constant value
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      if(!(*i)->isValue(v_.value)){
+        // Not all the same value, fall back to base class
+        return ConstantMX::getHorzcat(x);
+      }
+    }
+
+    // Assemble the sparsity pattern
+    Sparsity sp = sparsity();
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      sp.appendColumns(i->sparsity());
+    }
+    return MX(sp,v_.value);
+  }
+
+  template<typename Value>
+  MX Constant<Value>::getVertcat(const std::vector<MX>& x) const{
+    // Check if all arguments have the same constant value
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      if(!(*i)->isValue(v_.value)){
+        // Not all the same value, fall back to base class
+        return ConstantMX::getVertcat(x);
+      }
+    }
+
+    // Assemble the sparsity pattern
+    Sparsity sp = sparsity();
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      sp.append(i->sparsity());
+    }
+    return MX(sp,v_.value);
+  }
+
   template<typename Value>
   MX Constant<Value>::getReshape(const Sparsity& sp) const{
     return MX::create(new Constant<Value>(sp,v_)); 
