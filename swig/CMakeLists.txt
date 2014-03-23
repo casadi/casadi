@@ -241,7 +241,11 @@ if(WITH_SWIG_SPLIT)
     list(APPEND modules_octave ${my_module}_octave)
   endforeach()
   add_custom_target(_octave_modules DEPENDS ${modules_octave}) # the octave interface is created with the command "make octave"
-  add_custom_target(_haskell_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave casadiTree.hs) # the haskell interface is created with the command "make octave"
+  set(modules_haskell)
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+    list(APPEND modules_haskell ${my_module}_tree.hs)
+  endforeach()
+  add_custom_target(_haskell_modules DEPENDS ${modules_haskell}) # the haskell interface is created with the command "make octave"
 else(WITH_SWIG_SPLIT)
   add_custom_target(_python_modules DEPENDS _casadi ) # the python interface is created with the command "make python"
   add_custom_target(_octave_modules DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
@@ -437,23 +441,28 @@ endif()
 # haskell interface
 if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-  SWIG_ADD_MODULE_XML (${my_module}_haskell casadi.i)
+  SWIG_ADD_MODULE_XML (${my_module}_haskell ${my_module}.i)
 endforeach()
 else()
   SWIG_ADD_MODULE_XML (casadi_haskell casadi.i) # -xmllang python)
   #SET_SOURCE_FILES_PROPERTIES( ${swig_generated_file_fullname}   PROPERTIES COMPILE_FLAGS "-bla")
 endif()
 
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 ADD_CUSTOM_COMMAND(
-   OUTPUT casadiTree.hs 
-   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml
-   DEPENDS ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
+   OUTPUT ${my_module}_tree.hs 
+   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
+   DEPENDS ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
 )
+endforeach()
 
-install(FILES ${PROJECT_BINARY_DIR}/swig/CasadiTree.hs ${PROJECT_BINARY_DIR}/swig/CasadiClasses.hs ${PROJECT_BINARY_DIR}/swig/swiginclude.hpp
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}_tree.hs ${PROJECT_BINARY_DIR}/swig/${my_module}_classes.hs ${PROJECT_BINARY_DIR}/swig/${my_module}_swiginclude.hpp
   DESTINATION share/casadi
   COMPONENT componenthaskell
 )
+endforeach()
+
 
 #SET(CPACK_MONOLITHIC_INSTALL FALSE)
 SET(CPACK_TGZ_COMPONENT_INSTALL TRUE)
