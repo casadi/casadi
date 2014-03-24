@@ -304,10 +304,13 @@ namespace CasADi{
     void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc){ setSub(m,rr.getAll(size1()),cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const std::vector<int>& cc);
     void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc) {return setSub(m,rr,cc.getAll(size2()));}
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc) {return setSub(m,rr.getAll(size1()),cc);}
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc) {setSub(m,rr,cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc) {setSub(m,rr.getAll(size1()),cc);}
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc);
+    void setSub(const Matrix<DataType>& m, const Slice& rr, int cc){setSub(m,rr.getAll(size1()),std::vector<int>(1,cc));}
+    void setSub(const Matrix<DataType>& m, const int rr, const Slice& cc){setSub(m,std::vector<int>(1,rr),cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy);
+
     //@}
 
     //@{
