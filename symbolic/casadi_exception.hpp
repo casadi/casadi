@@ -82,6 +82,17 @@ class CasadiException : public std::exception{
 };
 
 
+class CasadiDeprecationException : public CasadiException {
+  public:
+  //! \brief Default constructor
+  CasadiDeprecationException() {
+  }
+    
+  //! \brief Form message string    
+  explicit CasadiDeprecationException(const std::string& msg) : CasadiException("This syntax is deprecated. " + msg){}
+  
+};
+
 // Assertion similar to the standard C assert statement, with the difference that it throws an exception with the same information
 #ifdef CASADI_NDEBUG
 // Release mode
@@ -150,7 +161,11 @@ std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". 
     ) . str() )
 
 #endif // CASADI_NDEBUG
-  
+#define deprecation_warning(msg) \
+if (CasadiOptions::deprecation_warning_as_exception) { \
+  throw CasADi::CasadiDeprecationException(msg); \
+} 
+
 } // namespace CasADi
 
 #endif // CASADI_EXCEPTION_HPP

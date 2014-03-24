@@ -24,13 +24,19 @@ struct linestat {
   long dependency;
 };
 
+typedef ProfilingData_IO iostat;
+
 struct functionstat {
   std::string name;
   std::vector<linestat> lines;
   double total_time;
+  double external_time; // Part of time spent in calls
+  double overhead_time; // Part of time not spent in evaluating lines or external calls
   int count;
   int algorithm_size;
   ProfilingData_FXType type;
+  std::vector<iostat> inputs;
+  std::vector<iostat> outputs;
 };
 
 typedef std::map<long,functionstat> Stats;
@@ -91,15 +97,28 @@ int main(int argc, char* argv[])
         functionstat f;
         f.count = 0;
         f.total_time = 0;
+        f.external_time = 0;
+        f.overhead_time = 0;
         data[s.thisp] = f;
         it = data.find(s.thisp);
       }
       name[s.length] = 0; // Null-terminated
-      it->second.name = name;
-      it->second.algorithm_size = s.algorithm_size;
-      it->second.type = s.type;
-      //std::cout << s.thisp << ": " << s.length << std::endl;
-      //std::cout << s.thisp << ": " << name << std::endl;
+      
+      functionstat &f = it->second;
+      f.name = name;
+      f.algorithm_size = s.algorithm_size;
+      f.type = s.type;
+      
+      f.inputs.resize(s.numin);
+      //std::cout << name << std::endl;
+      //std::cout << "n" << s.numin << "," << s.numout << std::endl;
+      for (int i=0;i<s.numin;++i) {
+        myfile.read(reinterpret_cast<char*>(&f.inputs[i]), sizeof(iostat));
+      }
+      f.outputs.resize(s.numout);
+      for (int i=0;i<s.numout;++i) {
+        myfile.read(reinterpret_cast<char*>(&f.outputs[i]), sizeof(iostat));
+      }
      }; break;
      case (ProfilingData_Type_ENTRY) : {
       ProfilingData_ENTRY s;
@@ -136,19 +155,129 @@ int main(int argc, char* argv[])
     }*/
   }
   
+  // Calculate external_time and overhead_time
+  for (Stats::iterator it = data.begin();it!=data.end();++it) {
+    functionstat & f = it->second;
+    if (f.type==ProfilingData_FXType_MXFunction) {
+      f.overhead_time = f.total_time;
+      for (std::vector<linestat>::const_iterator it2 = f.lines.begin();it2!=f.lines.end();++it2) {
+        const linestat & l = *it2;
+        f.overhead_time-= l.total_time;
+        if (l.dependency) {
+          f.external_time+= l.total_time;
+        }
+      }
+    }
+  }
+  
   std::ofstream report ("prof.html");
   
-  report << "<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Strict//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"">\n<html xmlns=""http://www.w3.org/1999/xhtml"">\n<body>\n<img src=""callgraph.png""/>";
+  report << "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>\n<html xmlns='http://www.w3.org/1999/xhtml'>\n<head><script src='http://d3js.org/d3.v3.min.js'></script><script src='http://cpettitt.github.io/project/dagre-d3/v0.1.5/dagre-d3.min.js'></script>";
+  
+  report << "<style>"
+"svg {"
+"    overflow: hidden;"
+"}"
+""
+".node rect {"
+"    stroke: #333;"
+"    stroke-width: 1.5px;"
+"    fill: #fff;"
+"}"
+""
+".edgeLabel rect {"
+"    fill: #fff;"
+"}"
+""
+".edgePath {"
+"    stroke: #333;"
+"    stroke-width: 1.5px;"
+"    fill: none;"
+"}"
+".outer {"
+"    width: 1024px;"
+"    height: 960px;"
+"    overflow: auto;"
+"}"
+".inner {"
+"    width: 8000px;"
+"    height: 6000px;"
+"}"
+"svg {"
+"    display: block;"
+"    width: 100%;"
+"    height: 100%;"
+"}"
+  "</style>";
+  
+  report << "</head><body>\n";
+  report << "<div id='chart3'></div>" << std::endl;
+  
 
-  report << "<table><thead><tr><th>Id</th><th>#calls</th><th>Algorithm size</th><th>Total (s)</th></tr></thead>" << std::endl;
+
+  report << "<table><thead><tr><th>Id</th><th>#calls</th><th>Internal (s)</th><th>External (s)</th><th>Overhead (s)</th><th>Algorithm size</th><th>#inputs</th><th>#input nz</th><th>#outputs</th><th>#output nz</th></tr></thead>" << std::endl;
+  
+
   
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
     if (f.count ==0 ) continue;
-    report << "<tr><td><a href='#" << it->first << "'>" << f.name << "</a></td><td>" << f.count << "</td><td>" << f.algorithm_size <<  "</td><td>" << f.total_time <<  "</td></tr>\n";
+    int nz_in = 0;
+    int nz_out = 0;
+    for (int i=0;i<f.inputs.size();++i) {
+      nz_in+= f.inputs[i].ndata;
+    }
+    for (int i=0;i<f.outputs.size();++i) {
+      nz_out+= f.outputs[i].ndata;
+    }
+    
+    report << "<tr><td><a href='#" << it->first << "'>" << f.name << "</a></td><td>" << f.count << "</td><td>"  << f.total_time-f.external_time-f.overhead_time << "</td><td>"  << f.external_time << "</td><td>"  << f.overhead_time << "</td><td>" << f.algorithm_size <<  "</td><td>" << f.inputs.size() <<  "</td><td>" << nz_in <<  "</td><td>" << f.outputs.size() <<  "</td><td>" << nz_out <<  "</td></tr>\n";
   }
   
   report << "</table>";
+  
+  // data
+  report << "<script>var functions={";
+  for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
+    const functionstat & f = it->second;
+    
+    if (f.type== ProfilingData_FXType_Other ) continue;
+
+    report << it->first  << ": {name:" << '"' << f.name << '"' << "}," << std::endl;
+  }
+  report << "};" << std::endl;
+  
+  report << "var functioncalls=[";
+  for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
+    const functionstat & f = it->second;
+    if (f.type== ProfilingData_FXType_Other ) continue;
+    
+    std::map<long,int> callmap;
+    for (int i=0;i<f.lines.size();++i) {
+      if (f.lines[i].dependency!=0) {
+      
+        Stats::iterator itd = data.find(f.lines[i].dependency);
+        
+        if (itd->second.type== ProfilingData_FXType_Other ) continue;
+        
+        std::map<long,int>::iterator it = callmap.find(f.lines[i].dependency);
+        if (it==callmap.end()) {
+          callmap[f.lines[i].dependency] = f.lines[i].count;
+        } else {
+          it->second += f.lines[i].count;
+        }
+      }
+    }
+    
+    for (std::map<long,int>::iterator it2=callmap.begin();it2!=callmap.end();++it2) {
+      report << " {source:" << it->first << ", target:" << it2->first << "," << "ncalls:" << it2->second << "},";
+    }
+    
+    
+  }
+  report << "];\n</script>\n";
+  
+  
   
   //Binning
   std::vector<int> type_binning_ncalls(CasADi::NUM_BUILT_IN_OPS);
@@ -165,6 +294,27 @@ int main(int argc, char* argv[])
     }
   }
   
+
+  report << "<div class='outer'><div class='inner'><svg>"
+"    <g transform='translate(20,20)'/>"
+"</svg></div></div>";
+  
+  report << "<script>"
+"var g = new dagreD3.Digraph();"
+"Object.keys(functions).forEach(function(key) {"
+"g.addNode(   key.toString(), { label: functions[key].name });"
+"});"
+"functioncalls.forEach(function(link) {"
+"g.addEdge(null, link.source.toString(),   link.target.toString(), { label: link.ncalls.toString() });"
+"});"
+"g=g.filterNodes(function(u) { return g.neighbors(u).length >0 });"
+"var layout = dagreD3.layout()"
+"                    .nodeSep(20)"
+"                    .rankDir('LR');"
+"var renderer = new dagreD3.Renderer();"
+"renderer.layout(layout).run(g, d3.select('svg g'));"
+"</script>";
+  
   report << "<table><thead><tr><th>Operation code</th><th>Operation</th><th>total (s)</th><th>ncalls</th></tr></thead>\n";
   for (int i=0;i<CasADi::NUM_BUILT_IN_OPS;++i) {
     report << "<tr><td>" << i << "</td><td>";
@@ -179,7 +329,19 @@ int main(int argc, char* argv[])
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
     if (f.count ==0 ) continue;
-    report << "<a name='" << it->first << "'><h2>" << f.name << "</h2></a><dl><dt>#calls</dt><dd>" << f.count << "</dd><dt>Algorithm size</dt><dd>" << f.algorithm_size << "</dd><dt>Total (s)</dt><dd>" << f.total_time << "</dd></dl>\n";
+    report << "<a name='" << it->first << "'><h2>" << f.name << "</h2></a><dl><dt>#calls</dt><dd>" << f.count << "</dd><dt>Algorithm size</dt><dd>" << f.algorithm_size << "</dd><dt>Total (s)</dt><dd>" << f.total_time << "</dd>" << std::endl;
+    report << "<dt>Inputs</dt><dd><table><thead><tr><td>i</td><td>rows</td><td>cols</td><td>nonzeros</td></tr></thead>" << std::endl;
+    for (int i=0;i<f.inputs.size();++i) {
+      report << "<tr><td>" << i << "</td><td>" << f.inputs[i].nrow << "</td><td>" << f.inputs[i].ncol <<  "</td><td>" << f.inputs[i].ndata << "</td></tr>" << std::endl;
+    }
+    report << "</table></dd>" << std::endl;
+    report << "<dt>Outputs</dt><dd><table><thead><tr><td>i</td><td>rows</td><td>cols</td><td>nonzeros</td></tr></thead>" << std::endl;
+    for (int i=0;i<f.outputs.size();++i) {
+      report << "<tr><td>" << i << "</td><td>" << f.outputs[i].nrow << "</td><td>" << f.outputs[i].ncol <<  "</td><td>" << f.outputs[i].ndata << "</td></tr>" << std::endl;
+    }
+    report << "</table></dd>" << std::endl;
+    
+    report << "</dl>\n";
 
     if (f.type==ProfilingData_FXType_MXFunction || f.type==ProfilingData_FXType_Other) {
       report << "<table><thead><tr><th>Codeline</th><th>total (ms)</th><th>ncalls</th><th>souce</th></tr></thead>\n";
