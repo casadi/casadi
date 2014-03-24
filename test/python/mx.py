@@ -2620,6 +2620,23 @@ class MXtests(casadiTestCase):
     f.init()
 
     f.derivative(0,1)
+
+  def test_MX_const_sp(self):
+    x = MX.sym("x",4,1)
+
+    sp = Sparsity.triplet(3,3,[0,1,2,2],[0,0,1,2])
+
+    f = MXFunction([x],[x[IMatrix(sp,range(sp.size()))]])
+    f.init()
+
+    g = MXFunction([x],[MX(sp,x)])
+    g.init()
+    
+    f.setInput(range(1,5))
+    g.setInput(range(1,5))
+    
+    self.checkfx(f,g)
+    
       
 if __name__ == '__main__':
     unittest.main()
