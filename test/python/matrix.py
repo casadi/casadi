@@ -850,7 +850,7 @@ class Matrixtests(casadiTestCase):
 
   def test_not_null(self):
     x = MX.sym('x',3,1)
-    sp = sp_triu(2)
+    sp = Sparsity.triu(2)
     MX(sp,x)
 
       
