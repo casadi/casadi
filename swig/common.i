@@ -398,13 +398,23 @@ namespace std {
 %include "symbolic/casadi_options.hpp"
 %include "symbolic/casadi_meta.hpp"
 
+#ifdef SWIGPYTHON
+%pythoncode %{
+  CasadiOptions.setDeprecatedWarningAsException(True)
+%}
+#endif
+
 #ifdef CASADI_MODULE
+
+#ifdef SWIGPYTHON
 %{
 #define START \
   if (CasADi::CasadiOptions::catch_errors_python){ \
   try {
   
 #define STOP \
+  } catch (const CasADi::CasadiDeprecationException& e) { \
+    PyErr_WarnEx(PyExc_SyntaxWarning,e.what(),2); \
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_RuntimeError, e.what()); \
   } catch (const char* e) { \
@@ -412,6 +422,25 @@ namespace std {
   } \
 } else
 %}
+#endif
+
+#ifdef SWIGOCTAVE
+%{
+#define START \
+  if (CasADi::CasadiOptions::catch_errors_python){ \
+  try {
+  
+#define STOP \
+  } catch (const CasADi::CasadiDeprecationException& e) { \
+    warning(e.what()); \
+  } catch (const std::exception& e) { \
+  SWIG_exception(SWIG_RuntimeError, e.what()); \
+  } catch (const char* e) { \
+    SWIG_exception(SWIG_RuntimeError, e); \
+  } \
+} else
+%}
+#endif
 
 // Exceptions handling
 %include "exception.i"

@@ -26,6 +26,7 @@
 #include "sx_element.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/generic_matrix_tools.hpp"
+#include "../casadi_options.hpp"
 
 /** Functions using SXElement */
 
@@ -330,14 +331,17 @@ namespace CasADi{
   inline SX ssym(const std::string& name, const Sparsity& sp){ return SX::sym(name,sp);}
   inline SX ssym(const Matrix<double>& x){ return SX(x);}
   inline bool isRegular(const SXElement& ex){ return ex.isRegular();}
-  inline bool isRegular(const SX& ex){ return ex.isRegular();}
-  inline bool isSmooth(const SX& ex){ return ex.isSmooth();}
+  inline bool isRegular(const SX& ex) { return ex.isRegular();}
+
+  inline bool isSmooth(const SX& ex){ deprecation_warning("use ex.isSmooth()"); return ex.isSmooth();}
   inline bool isSymbolic(const SX& ex){ return ex.isSymbolic();}
   inline bool isSymbolicSparse(const SX& ex){ return ex.isSymbolicSparse();}
   inline double getValue(const SX& ex) { return ex.elem(0,0).getValue(); }
   inline int getIntValue(const SX& ex) { return ex.elem(0,0).getIntValue(); }
   inline std::string getName(const SX &ex){ return ex.toScalar().getName();}
   //@}
+
+
 #endif
 
 } // namespace CasADi

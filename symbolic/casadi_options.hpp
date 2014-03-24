@@ -69,6 +69,9 @@ namespace CasADi {
       
       static bool profilingBinary;
       
+      /** \brief Flag to indicate if run-time use of deprecated function constitutes an error */
+      static bool deprecation_warning_as_exception;
+      
 #endif //SWIG
       // Setter and getter for catch_errors_python
       static void setCatchErrorsPython(bool flag) { catch_errors_python = flag; }
@@ -89,6 +92,9 @@ namespace CasADi {
       
       static void setProfilingBinary(bool flag) {  profilingBinary = flag; }
       static bool getProfilingBinary() { return  profilingBinary; }
+      
+      static void setDeprecatedWarningAsException(bool flag) { deprecation_warning_as_exception = true; } 
+      static bool getDeprecatedWarningAsException() { return deprecation_warning_as_exception; } 
       
   };
 
