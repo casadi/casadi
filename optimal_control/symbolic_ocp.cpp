@@ -697,50 +697,66 @@ namespace CasADi{
   }
 
   void SymbolicOCP::scaleVariables(){
-    // Helper
-    SX s_der = der(this->s);
-    SX s_nom = nominal(this->s);
-    SX x_der = der(this->x);
-    SX x_nom = nominal(this->x);
-  
-    // Collect all variables and the expressions that we will replace them with in the expressions
-    vector<SX> v, v_rep;
-    v.push_back(this->s);  v_rep.push_back(s_nom*this->s);
-    v.push_back(s_der);    v_rep.push_back(s_nom*s_der);
-    v.push_back(this->x);  v_rep.push_back(x_nom*this->x);
-    v.push_back(x_der);    v_rep.push_back(x_nom*x_der);
-    v.push_back(this->z);  v_rep.push_back(nominal(this->z)*this->z);
-    v.push_back(this->p);  v_rep.push_back(nominal(this->p)*this->p);
-    v.push_back(this->pi); v_rep.push_back(nominal(this->pi)*this->pi);
-    v.push_back(this->u);  v_rep.push_back(nominal(this->u)*this->u);
+    // Gather variables and expressions to replace
+    vector<SXElement> v_id,v_rep,ex_rep;
+    for(VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
+      if(it->second.nominal!=1){
+        Variable& v=it->second;
+        casadi_assert(v.nominal!=0);
+        v.beq *= v.nominal;
+        v.ode /= v.nominal;
+        v.min /= v.nominal;
+        v.max /= v.nominal;
+        v.start /= v.nominal;
+        v.derivativeStart /= v.nominal;
+        v.initialGuess /= v.nominal;
+        v_id.push_back(v.v);
+        v_rep.push_back(v.beq);
+        v_id.push_back(v.d);
+        v_rep.push_back(v.d * v.nominal);
+        ex_rep.push_back(v.ode);
+        ex_rep.push_back(v.beq);
+      }
+    }
+
+    // Quick return if no expressions to substitute
+    if(v_id.empty()) return;
 
     // Collect all expressions to be replaced
     vector<SX> ex;
+    ex.push_back(ex_rep);
     ex.push_back(this->dae);
-    ex.push_back(ode(this->x));
     ex.push_back(this->alg);
-    ex.push_back(ode(this->q));
-    ex.push_back(beq(this->y));
     ex.push_back(this->initial);
     ex.push_back(this->path);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
   
-    // Substitute all at once (since they may have common subexpressions)
-    ex = substitute(ex,v,v_rep);
+    // Substitute all at once (more efficient since they may have common subexpressions)
+    ex = substitute(ex,vector<SX>(1,v_id),vector<SX>(1,v_rep));
     
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
+    ex_rep = (*it++).data();
     this->dae = *it++;
-    setOde(this->x,*it++ / x_nom);
     this->alg = *it++;
-    setOde(this->q,*it++);
-    setBeq(this->y,*it++);
     this->initial = *it++;
     this->path = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
     casadi_assert(it==ex.end());
+
+    // Save the substituted expressions
+    vector<SXElement>::iterator ex_rep_it = ex_rep.begin();
+    for(VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
+      Variable& v=it->second;
+      if(v.nominal!=1){
+        v.ode = *ex_rep_it++;
+        v.beq = *ex_rep_it++;
+        v.nominal=1;
+      }
+    }
+    casadi_assert(ex_rep_it==ex_rep.end());
   }
 
   void SymbolicOCP::eliminateIndependentParameters(){
@@ -1216,7 +1232,7 @@ namespace CasADi{
 
   Variable& SymbolicOCP::variable(const std::string& name){
     // Find the variable
-    map<string,Variable>::iterator it = varmap_.find(name);
+    VarMap::iterator it = varmap_.find(name);
     if(it==varmap_.end()){
       casadi_error("No such variable: \"" << name << "\".");
     }

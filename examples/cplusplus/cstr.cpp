@@ -42,6 +42,14 @@ int main(){
   // Load the XML file
   ocp.parseFMI("../examples/xml_files/cstr.xml");
 
+  // Correct the inital guess and bounds on variables
+  ocp.setStart("u",280);
+  ocp.setMin("u",230);
+  ocp.setMax("u",370);
+
+  // Correct bound on state
+  ocp.setMax("cstr.T",350);
+
   // Transform into an explicit ODE
   ocp.makeExplicit();
 
@@ -53,15 +61,7 @@ int main(){
 
   // Print the ocp to screen
   ocp.print();
-  
-  // Correct the inital guess and bounds on variables
-  ocp.setStart("u",280);
-  ocp.setMin("u",230);
-  ocp.setMax("u",370);
-
-  // Correct bound on state
-  ocp.setMax("cstr.T",350);
-      
+        
   // Initial guess and bounds for the state
   vector<double> x0 = ocp.start(ocp.x,true);
   vector<double> xmin = ocp.min(ocp.x,true);

@@ -429,7 +429,8 @@ namespace CasADi{
     static std::string qualifiedName(const XMLNode& nn);
     
     /// Find of variable by name
-    std::map<std::string,Variable> varmap_;
+    typedef std::map<std::string,Variable> VarMap;
+    VarMap varmap_;
 
     /// Read an equation
     SX readExpr(const XMLNode& odenode);
