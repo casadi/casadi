@@ -85,7 +85,7 @@ namespace CasADi{
   public:
 
     /// Default constructor
-    SymbolicOCP();
+    SymbolicOCP(bool ignore_timed_variables=true);
     
     /** @name Variables and equations
      *  Public data members
@@ -400,7 +400,6 @@ namespace CasADi{
     /// Timed variable (allocate if necessary)
     SX atTime(const std::string& name, double t, bool allocate=false);
 
-
 #ifndef SWIG
     ///  Print representation
     virtual void repr(std::ostream &stream=std::cout) const;
@@ -417,6 +416,9 @@ namespace CasADi{
     /// Find of variable by name
     typedef std::map<std::string,Variable> VarMap;
     VarMap varmap_;
+
+    /// Allow timed variables?
+    bool ignore_timed_variables_;
 
     /// Read an equation
     SX readExpr(const XMLNode& odenode);

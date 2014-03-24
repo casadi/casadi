@@ -41,7 +41,7 @@
 using namespace std;
 namespace CasADi{
 
-  SymbolicOCP::SymbolicOCP(){
+  SymbolicOCP::SymbolicOCP(bool ignore_timed_variables) : ignore_timed_variables_(ignore_timed_variables){
     t = SX::sym("t");
     t0 = t0_guess = numeric_limits<double>::quiet_NaN();
     tf = tf_guess = numeric_limits<double>::quiet_NaN();
@@ -303,10 +303,12 @@ namespace CasADi{
         tpnode[i].readAttribute("value",value);
         tp[i] = value;
       
-        // Allocate all the timed variables
-        for(int k=0; k<tpnode[i].size(); ++k){
-          string qn = qualifiedName(tpnode[i][k]);
-          atTime(qn,value,true);
+        if(!ignore_timed_variables_){
+          // Allocate all the timed variables
+          for(int k=0; k<tpnode[i].size(); ++k){
+            string qn = qualifiedName(tpnode[i][k]);
+            atTime(qn,value,true);
+          }
         }
       }
     
@@ -506,10 +508,14 @@ namespace CasADi{
     } else if(name.compare("Time")==0){
       return t.toScalar();
     } else if(name.compare("TimedVariable")==0){
-      // Get the index of the time point
-      int index;
-      node.readAttribute("timePointIndex",index);
-      return readVariable(node[0]).atTime(tp[index]);
+      if(ignore_timed_variables_){
+        return readVariable(node[0]).v;
+      } else {
+        // Get the index of the time point
+        int index;
+        node.readAttribute("timePointIndex",index);
+        return readVariable(node[0]).atTime(tp[index]);
+      }
     }
 
     // throw error if reached this point
