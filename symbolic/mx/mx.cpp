@@ -96,7 +96,9 @@ namespace CasADi{
 #endif
 
   MX::MX(const Sparsity& sp, const MX& val){
-    if(val.isScalar()){
+    if(sp.isReshape(val.sparsity())){
+      *this = reshape(val,sp);
+    } else if(val.isScalar()){
       // Dense matrix if val dense
       if(val.isDense()){
         if(val.isConstant()){
