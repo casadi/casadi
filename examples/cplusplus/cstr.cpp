@@ -62,15 +62,18 @@ int main(){
   // Print the ocp to screen
   ocp.print();
         
-  // Initial guess and bounds for the state
-  vector<double> x0 = ocp.start(ocp.x,true);
-  vector<double> xmin = ocp.min(ocp.x,true);
-  vector<double> xmax = ocp.max(ocp.x,true);
-  
-  // Initial guess and bounds for the control
-  vector<double> u0 = ocp.start(ocp.u,true);
-  vector<double> umin = ocp.min(ocp.u,true);
-  vector<double> umax = ocp.max(ocp.u,true);
+  // Initial guess 
+
+  // Function to evaluate the initial guess and bounds for all time points
+  vector<SX> bfcn_out;
+  bfcn_out.push_back(ocp.start(ocp.x));
+  bfcn_out.push_back(ocp.min(ocp.x));
+  bfcn_out.push_back(ocp.max(ocp.x));
+  bfcn_out.push_back(ocp.start(ocp.u));
+  bfcn_out.push_back(ocp.min(ocp.u));
+  bfcn_out.push_back(ocp.max(ocp.u));
+  SXFunction bfcn(ocp.t,bfcn_out);
+  bfcn.init();
   
   // Number of shooting nodes
   int num_nodes = 100;
@@ -110,26 +113,24 @@ int main(){
   ocp_solver.setOption("nlp_solver_options",nlp_solver_dict);
   ocp_solver.init();
 
-  // Initial condition
-  for(int i=0; i<ocp.x.size(); ++i){
-    ocp_solver.input("x_init")(i,0) = ocp_solver.input("lbx")(i,0) = ocp_solver.input("ubx")(i,0) = x0[i];
-  }
+  // Pass the bounds and initial guess
+  for(int i=0; i<num_nodes+1; ++i){
+    // Evaluate the function
+    bfcn.setInput((i*ocp.tf)/num_nodes);
+    bfcn.evaluate();
 
-  // State bounds
-  for(int k=1; k<=num_nodes; ++k){
-    for(int i=0; i<ocp.x.size(); ++i){
-      ocp_solver.input("x_init")(i,k) = x0[i];
-      ocp_solver.input("lbx")(i,k) = xmin[i];
-      ocp_solver.input("ubx")(i,k) = xmax[i];
+    if(i==0){
+      ocp_solver.input("x_init")(Slice(),i) = ocp_solver.input("lbx")(Slice(),i) = ocp_solver.input("ubx")(Slice(),i) = bfcn.output(0);
+    } else {
+      ocp_solver.input("x_init")(Slice(),i) = bfcn.output(0);
+      ocp_solver.input("lbx")(Slice(),i) = bfcn.output(1);
+      ocp_solver.input("ubx")(Slice(),i) = bfcn.output(2);
     }
-  }
 
-  // Control bounds
-  for(int k=0; k<num_nodes; ++k){
-    for(int i=0; i<ocp.u.size(); ++i){
-      ocp_solver.input("u_init")(i,k) = u0[i];
-      ocp_solver.input("lbu")(i,k) = umin[i];
-      ocp_solver.input("ubu")(i,k) = umax[i];
+    if(i<num_nodes){
+      ocp_solver.input("u_init")(Slice(),i) = bfcn.output(3);
+      ocp_solver.input("lbu")(Slice(),i) = bfcn.output(4);
+      ocp_solver.input("ubu")(Slice(),i) = bfcn.output(5);
     }
   }
 
