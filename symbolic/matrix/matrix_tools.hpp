@@ -582,8 +582,8 @@ namespace CasADi{
     if(sp==x.sparsity())
       return x;
   
-    // make sure that the number of zeros agree
-    casadi_assert(x.size()==sp.size());
+    // make sure that the patterns match
+    casadi_assert(sp.isReshape(x.sparsity()));
   
     return Matrix<DataType>(sp,x.data());
   }
