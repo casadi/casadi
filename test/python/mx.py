@@ -2637,6 +2637,21 @@ class MXtests(casadiTestCase):
     
     self.checkfx(f,g)
     
+  def test_reshape_sp(self):
+    x = MX.sym("x",4,1)
+
+    f = MXFunction([x],[x.reshape((2,2))])
+    f.init()
+    
+    sx = SX.sym("x",4,1)
+
+    g = SXFunction([sx],[sx.reshape((2,2))])
+    g.init()
+    
+    f.setInput(range(1,5))
+    g.setInput(range(1,5))
+    
+    self.checkfx(f,g)
       
 if __name__ == '__main__':
     unittest.main()
