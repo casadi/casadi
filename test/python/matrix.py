@@ -853,6 +853,12 @@ class Matrixtests(casadiTestCase):
     sp = Sparsity.triu(2)
     MX(sp,x)
 
+  def test_segfault(self):
+    x = MX.sym('x',10,1)
+    sp = Sparsity.triu(2)
+    y = triu2symm(MX(sp,x[1:4]))
+    f = MXFunction([x],[y])
+    f.init()
       
   def test_append_empty(self):
     a = DMatrix.sparse(0,0)
