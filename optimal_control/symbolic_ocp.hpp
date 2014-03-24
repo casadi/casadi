@@ -363,6 +363,18 @@ namespace CasADi{
     /// Set the upper bound(s) by expression
     void setMax(const SX& var, const SX& val);
 
+    /// Get the initial guess by name
+    SX initialGuess(const std::string& name) const;
+
+    /// Get the initial guess(es) by expression
+    SX initialGuess(const SX& var) const;
+
+    /// Set the initial guess by name
+    void setInitialGuess(const std::string& name, const SX& val);
+
+    /// Set the initial guess(es) by expression
+    void setInitialGuess(const SX& var, const SX& val);
+
     /// Get the (optionally normalized) value at time 0 by name
     double start(const std::string& name, bool normalized=false) const;
 
@@ -374,18 +386,6 @@ namespace CasADi{
 
     /// Set the (optionally normalized) value(s) at time 0 by expression
     void setStart(const SX& var, const std::vector<double>& val, bool normalized=false);
-
-    /// Get the (optionally normalized) initial guess by name
-    double initialGuess(const std::string& name, bool normalized=false) const;
-
-    /// Get the (optionally normalized) initial guess(es) by expression
-    std::vector<double> initialGuess(const SX& var, bool normalized=false) const;
-
-    /// Set the (optionally normalized) initial guess by name
-    void setInitialGuess(const std::string& name, double val, bool normalized=false);
-
-    /// Set the (optionally normalized) initial guess(es) by expression
-    void setInitialGuess(const SX& var, const std::vector<double>& val, bool normalized=false);
 
     /// Get the (optionally normalized) derivative value at time 0 by name
     double derivativeStart(const std::string& name, bool normalized=false) const;

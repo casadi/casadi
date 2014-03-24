@@ -100,11 +100,11 @@ namespace CasADi{
     /// Upper bound
     SXElement max;
 
+    /// Initial guess
+    SXElement initialGuess;
+
     /// Derivative at time 0
     double derivativeStart;
-
-    /// Initial guess
-    double initialGuess;
 
     /// Variability (see Fritzon)
     Variability variability;

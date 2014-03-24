@@ -69,8 +69,8 @@ ubx = evalf(ocp.max(x))
 lbx = evalf(ocp.min(x))
 ubu = evalf(ocp.max(u))
 lbu = evalf(ocp.min(u))
-x0 = ocp.initialGuess(x)
-u0 = ocp.initialGuess(u)
+x0 = evalf(ocp.initialGuess(x))
+u0 = evalf(ocp.initialGuess(u))
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
 #$  $$ \begin{array}{cl}   \textbf{minimize}    &  \displaystyle\int_{t=0}^{\texttt{tf}}{\texttt{L} \, dt} \\ \\
 #$                         \textbf{subject to}  &  \texttt{I}(t) = 0, \quad \text{for} \quad t=0 \\
@@ -166,7 +166,7 @@ uk = [i[2]  for i in vk]
 #$ at the beginning of each interval:
 lbv = repmat(vertcat((lbx,lbu)),nk,1)
 ubv = repmat(vertcat((ubx,ubu)),nk,1)
-v0 = (x0 + u0) * nk
+v0 = repmat(vertcat((x0,u0)),nk,1)
 #$ Next, let us build up expressions for the objective (cost) function and the nonlinear constraints,
 #$ starting with zero cost and and empty list of constraints:
 J = 0;  eq = []

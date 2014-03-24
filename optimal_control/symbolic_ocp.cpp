@@ -142,10 +142,12 @@ namespace CasADi{
             double dmax =  numeric_limits<double>::infinity();
             props.readAttribute("max",dmax,false);
             var.max = dmax;
+            double dinitialGuess = 0;
+            props.readAttribute("initialGuess",dinitialGuess,false);
+            var.initialGuess = dinitialGuess;
             props.readAttribute("start",var.start,false);
             props.readAttribute("nominal",var.nominal,false);
             props.readAttribute("free",var.free,false);
-            props.readAttribute("initialGuess",var.initialGuess,false);
           }
         
           // Variable category
@@ -1802,6 +1804,22 @@ namespace CasADi{
     setAttribute(&SymbolicOCP::setMax,var,val);
   }
 
+  SX SymbolicOCP::initialGuess(const std::string& name) const{
+    return variable(name).initialGuess;
+  }
+
+  SX SymbolicOCP::initialGuess(const SX& var) const{
+    return attribute(&SymbolicOCP::initialGuess,var);
+  }
+
+  void SymbolicOCP::setInitialGuess(const std::string& name, const SX& val){
+    variable(name).initialGuess = val.toScalar();
+  }
+
+  void SymbolicOCP::setInitialGuess(const SX& var, const SX& val){
+    setAttribute(&SymbolicOCP::setInitialGuess,var,val);
+  }
+
   double SymbolicOCP::start(const std::string& name, bool normalized) const{
     const Variable& v = variable(name);
     return normalized ? v.start / v.nominal : v.start;
@@ -1818,24 +1836,6 @@ namespace CasADi{
 
   void SymbolicOCP::setStart(const SX& var, const std::vector<double>& val, bool normalized){
     setAttribute(&SymbolicOCP::setStart,var,val,normalized);
-  }
-
-  double SymbolicOCP::initialGuess(const std::string& name, bool normalized) const{
-    const Variable& v = variable(name);
-    return normalized ? v.initialGuess / v.nominal : v.initialGuess;
-  }
-
-  std::vector<double> SymbolicOCP::initialGuess(const SX& var, bool normalized) const{
-    return attribute(&SymbolicOCP::initialGuess,var,normalized);
-  }
-
-  void SymbolicOCP::setInitialGuess(const std::string& name, double val, bool normalized){
-    Variable& v = variable(name);
-    v.initialGuess = normalized ? val*v.nominal : val;
-  }
-
-  void SymbolicOCP::setInitialGuess(const SX& var, const std::vector<double>& val, bool normalized){
-    setAttribute(&SymbolicOCP::setInitialGuess,var,val,normalized);
   }
 
   double SymbolicOCP::derivativeStart(const std::string& name, bool normalized) const{
