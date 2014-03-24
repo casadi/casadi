@@ -95,10 +95,10 @@ namespace CasADi{
     double start;
 
     /// Lower bound
-    double min;
+    SXElement min;
 
     /// Upper bound
-    double max;
+    SXElement max;
 
     /// Derivative at time 0
     double derivativeStart;

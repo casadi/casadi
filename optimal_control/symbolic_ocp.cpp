@@ -136,8 +136,12 @@ namespace CasADi{
             const XMLNode& props = vnode["Real"];
             props.readAttribute("unit",var.unit,false);
             props.readAttribute("displayUnit",var.displayUnit,false);
-            props.readAttribute("min",var.min,false);
-            props.readAttribute("max",var.max,false);
+            double dmin = -numeric_limits<double>::infinity();
+            props.readAttribute("min",dmin,false);
+            var.min = dmin;
+            double dmax =  numeric_limits<double>::infinity();
+            props.readAttribute("max",dmax,false);
+            var.max = dmax;
             props.readAttribute("start",var.start,false);
             props.readAttribute("nominal",var.nominal,false);
             props.readAttribute("free",var.free,false);
@@ -1572,24 +1576,15 @@ namespace CasADi{
   }
 
   SX SymbolicOCP::beq(const SX& var) const{
-    casadi_assert(var.isVector() && var.isSymbolic());
-    SX ret = SX::zeros(var.sparsity());
-    for(int i=0; i<ret.size(); ++i){
-      ret[i] = beq(var.at(i).getName());
-    }
-    return ret;
+    return attribute(&SymbolicOCP::beq,var);
   }
 
   void SymbolicOCP::setBeq(const std::string& name, const SX& val){
     variable(name).beq = val.toScalar();
   }
 
-  void SymbolicOCP::setBeq(const SX& var, const SX& val){    
-    casadi_assert(var.isVector() && var.isSymbolic());
-    casadi_assert(var.sparsity()==val.sparsity());
-    for(int i=0; i<var.size(); ++i){
-      setBeq(var.at(i).getName(),val.at(i));
-    }
+  void SymbolicOCP::setBeq(const SX& var, const SX& val){
+    setAttribute(&SymbolicOCP::setBeq,var,val);
   }
 
   SX SymbolicOCP::ode(const std::string& name) const{
@@ -1750,48 +1745,61 @@ namespace CasADi{
     return ret;
   }
 
+  SX SymbolicOCP::attribute(getAttS f, const SX& var) const{
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::attribute: Argument must be a symbolic vector");
+    SX ret = SX::zeros(var.sparsity());
+    for(int i=0; i<ret.size(); ++i){
+      ret[i] = (this->*f)(var.at(i).getName());
+    }
+    return ret;
+  }
+
   void SymbolicOCP::setAttribute(setAtt f, const SX& var, const std::vector<double>& val, bool normalized){
     casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::setAttribute: Argument must be a symbolic vector");
-    casadi_assert_message(var.size()==var.size(),"SymbolicOCP::setAttribute: Dimension mismatch");
+    casadi_assert_message(var.size()==val.size(),"SymbolicOCP::setAttribute: Dimension mismatch");
     for(int i=0; i<val.size(); ++i){
       (this->*f)(var.at(i).getName(),val.at(i),normalized);
     }    
   }
 
-  double SymbolicOCP::min(const std::string& name, bool normalized) const{
-    const Variable& v = variable(name);
-    return normalized ? v.min / v.nominal : v.min;
+  void SymbolicOCP::setAttribute(setAttS f, const SX& var, const SX& val){
+    casadi_assert_message(var.isVector() && var.isSymbolic(),"SymbolicOCP::setAttribute: Argument must be a symbolic vector");
+    casadi_assert_message(var.sparsity()==val.sparsity(),"SymbolicOCP::setAttribute: Sparsity mismatch");
+    for(int i=0; i<val.size(); ++i){
+      (this->*f)(var.at(i).getName(),val.at(i));
+    }    
   }
 
-  std::vector<double> SymbolicOCP::min(const SX& var, bool normalized) const{
-    return attribute(&SymbolicOCP::min,var,normalized);
+  SX SymbolicOCP::min(const std::string& name) const{
+    return variable(name).min;
   }
 
-  void SymbolicOCP::setMin(const std::string& name, double val, bool normalized){
-    Variable& v = variable(name);
-    v.min = normalized ? val*v.nominal : val;
+  SX SymbolicOCP::min(const SX& var) const{
+    return attribute(&SymbolicOCP::min,var);
   }
 
-  void SymbolicOCP::setMin(const SX& var, const std::vector<double>& val, bool normalized){
-    setAttribute(&SymbolicOCP::setMin,var,val,normalized);
+  void SymbolicOCP::setMin(const std::string& name, const SX& val){
+    variable(name).min = val.toScalar();
   }
 
-  double SymbolicOCP::max(const std::string& name, bool normalized) const{
-    const Variable& v = variable(name);
-    return normalized ? v.max / v.nominal : v.max;
+  void SymbolicOCP::setMin(const SX& var, const SX& val){
+    setAttribute(&SymbolicOCP::setMin,var,val);
   }
 
-  std::vector<double> SymbolicOCP::max(const SX& var, bool normalized) const{
-    return attribute(&SymbolicOCP::max,var,normalized);
+  SX SymbolicOCP::max(const std::string& name) const{
+    return variable(name).max;
   }
 
-  void SymbolicOCP::setMax(const std::string& name, double val, bool normalized){
-    Variable& v = variable(name);
-    v.max = normalized ? val*v.nominal : val;
+  SX SymbolicOCP::max(const SX& var) const{
+    return attribute(&SymbolicOCP::max,var);
   }
 
-  void SymbolicOCP::setMax(const SX& var, const std::vector<double>& val, bool normalized){
-    setAttribute(&SymbolicOCP::setMax,var,val,normalized);
+  void SymbolicOCP::setMax(const std::string& name, const SX& val){
+    variable(name).max = val.toScalar();
+  }
+
+  void SymbolicOCP::setMax(const SX& var, const SX& val){
+    setAttribute(&SymbolicOCP::setMax,var,val);
   }
 
   double SymbolicOCP::start(const std::string& name, bool normalized) const{

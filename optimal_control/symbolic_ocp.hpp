@@ -339,29 +339,29 @@ namespace CasADi{
     /// Set the nominal value(s) by expression
     void setNominal(const SX& var, const std::vector<double>& val);
 
-    /// Get the (optionally normalized) lower bound by name
-    double min(const std::string& name, bool normalized=false) const;
+    /// Get the lower bound by name
+    SX min(const std::string& name) const;
 
-    /// Get the (optionally normalized) lower bound(s) by expression
-    std::vector<double> min(const SX& var, bool normalized=false) const;
+    /// Get the lower bound(s) by expression
+    SX min(const SX& var) const;
 
-    /// Set the (optionally normalized) lower bound by name
-    void setMin(const std::string& name, double val, bool normalized=false);
+    /// Set the lower bound by name
+    void setMin(const std::string& name, const SX& val);
 
-    /// Set the (optionally normalized) lower bound(s) by expression
-    void setMin(const SX& var, const std::vector<double>& val, bool normalized=false);
+    /// Set the lower bound(s) by expression
+    void setMin(const SX& var, const SX& val);
 
-    /// Get the (optionally normalized) upper bound by name
-    double max(const std::string& name, bool normalized=false) const;
+    /// Get the upper bound by name
+    SX max(const std::string& name) const;
 
-    /// Get the (optionally normalized) upper bound(s) by expression
-    std::vector<double> max(const SX& var, bool normalized=false) const;
+    /// Get the upper bound(s) by expression
+    SX max(const SX& var) const;
 
-    /// Set the (optionally normalized) upper bound by name
-    void setMax(const std::string& name, double val, bool normalized=false);
+    /// Set the upper bound by name
+    void setMax(const std::string& name, const SX& val);
 
-    /// Set the (optionally normalized) upper bound(s) by expression
-    void setMax(const SX& var, const std::vector<double>& val, bool normalized=false);
+    /// Set the upper bound(s) by expression
+    void setMax(const SX& var, const SX& val);
 
     /// Get the (optionally normalized) value at time 0 by name
     double start(const std::string& name, bool normalized=false) const;
@@ -442,9 +442,17 @@ namespace CasADi{
     typedef double (SymbolicOCP::*getAtt)(const std::string& name, bool normalized) const;
     std::vector<double> attribute(getAtt f, const SX& var, bool normalized) const;
 
+    /// Get a symbolic attribute by expression
+    typedef SX (SymbolicOCP::*getAttS)(const std::string& name) const;
+    SX attribute(getAttS f, const SX& var) const;
+
     /// Set an attribute by expression
     typedef void (SymbolicOCP::*setAtt)(const std::string& name, double val, bool normalized);  
     void setAttribute(setAtt f, const SX& var, const std::vector<double>& val, bool normalized);
+
+    /// Set a symbolic attribute by expression
+    typedef void (SymbolicOCP::*setAttS)(const std::string& name, const SX& val);  
+    void setAttribute(setAttS f, const SX& var, const SX& val);
 
 #endif // SWIG
 
