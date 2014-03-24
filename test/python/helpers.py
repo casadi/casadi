@@ -261,7 +261,7 @@ class casadiTestCase(unittest.TestCase):
         continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
-  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False):
+  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True):
 
     if indirect:
       ins = trial.symbolicInput()
@@ -387,13 +387,24 @@ class casadiTestCase(unittest.TestCase):
 
     if evals:
 
-      def remove00(x):
+      def remove_first(x):
         ret = DMatrix(x)
-        ret[0,0] = DMatrix.sparse(1,1)
-        return ret
+        if ret.numel()>0:
+          ret[0,0] = DMatrix.sparse(1,1)
+          return ret
+        else:
+          return ret
+
+      def remove_last(x):
+        ret = DMatrix(x)
+        if ret.size()>0:
+          ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix.sparse(1,1)
+          return ret
+        else:
+          return x
         
-      spmods = [lambda x: x , remove00]
-      spmods = [lambda x: x]
+      spmods = [lambda x: x , remove_first, remove_last]
+      #spmods = [lambda x: x]
       
       sym = MX.sym
       Function = MXFunction

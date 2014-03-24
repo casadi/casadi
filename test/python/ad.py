@@ -517,13 +517,23 @@ class ADtests(casadiTestCase):
     yyy2[[1,0],0] = x**2
     
 
-    def remove00(x):
+    def remove_first(x):
       ret = DMatrix(x)
       if ret.numel()>0:
         ret[0,0] = DMatrix.sparse(1,1)
-      return ret
+        return ret
+      else:
+        return ret
+
+    def remove_last(x):
+      ret = DMatrix(x)
+      if ret.size()>0:
+        ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix.sparse(1,1)
+        return ret
+      else:
+        return x
       
-    spmods = [lambda x: x , remove00]
+    spmods = [lambda x: x , remove_first, remove_last]
     
     # TODO: sparse seeding
     
