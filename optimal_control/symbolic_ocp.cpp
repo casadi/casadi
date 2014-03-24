@@ -382,28 +382,30 @@ namespace CasADi{
         } else if(onode.checkName("opt:Constraints") || onode.checkName("opt:PathConstraints")) {
           for(int i=0; i<onode.size(); ++i){
             const XMLNode& constr_i = onode[i];
+            // Create a new variable
+            Variable v;
+            stringstream ss;
+            ss << "path_" << i;
+            v.setName(ss.str());
+
+            // Get the definition and bounds
             if(constr_i.checkName("opt:ConstraintLeq")){
-              SX ex = readExpr(constr_i[0]);
-              SX ub = readExpr(constr_i[1]);
-              path.append(ex-ub);
-              path_min.append(-numeric_limits<double>::infinity());
-              path_max.append(0.);
+              v.beq = readExpr(constr_i[0]).toScalar();
+              v.max = readExpr(constr_i[1]).toScalar();
             } else if(constr_i.checkName("opt:ConstraintGeq")){
-              SX ex = readExpr(constr_i[0]);
-              SX lb = readExpr(constr_i[1]);
-              path.append(ex-lb);
-              path_min.append(0.);
-              path_max.append(numeric_limits<double>::infinity());
+              v.beq = readExpr(constr_i[0]).toScalar();
+              v.min = readExpr(constr_i[1]).toScalar();
             } else if(constr_i.checkName("opt:ConstraintEq")){
-              SX ex = readExpr(constr_i[0]);
-              SX eq = readExpr(constr_i[1]);
-              path.append(ex-eq);
-              path_min.append(0.);
-              path_max.append(0.);
+              v.beq = readExpr(constr_i[0]).toScalar();
+              v.max = v.min = readExpr(constr_i[1]).toScalar();
             } else {
               cerr << "unknown constraint type" << constr_i.getName() << endl;
               throw CasadiException("SymbolicOCP::addConstraints");
             }
+            
+            // Add to list of variables and outputs
+            addVariable(ss.str(),v);
+            this->y.append(v.v);
           }
         
         } else throw CasadiException(string("SymbolicOCP::addOptimization: Unknown node ")+onode.getName());
@@ -618,7 +620,7 @@ namespace CasADi{
     }
 
     if(!this->y.isEmpty()){
-      stream << "Output variables" << endl;
+      stream << "Output variables (also path constraints)" << endl;
       for(int i=0; i<this->y.size(); ++i)
         stream << this->y.at(i) << " == " << str(beq(this->y.at(i))) << endl;
       stream << endl;
@@ -635,13 +637,6 @@ namespace CasADi{
       stream << "Lagrange objective terms" << endl;
       for(int i=0; i<this->lterm.size(); ++i)
         stream << this->lterm.at(i) << endl;
-      stream << endl;
-    }
-  
-    if(!this->path.isEmpty()){
-      stream << "Path constraint functions" << endl;
-      for(int i=0; i<this->path.size(); ++i)
-        stream << this->path_min.at(i) << " <= " << this->path.at(i) << " <= " << this->path_max.at(i) << endl;
       stream << endl;
     }
   
@@ -734,7 +729,6 @@ namespace CasADi{
     ex.push_back(this->dae);
     ex.push_back(this->alg);
     ex.push_back(this->initial);
-    ex.push_back(this->path);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
   
@@ -747,7 +741,6 @@ namespace CasADi{
     this->dae = *it++;
     this->alg = *it++;
     this->initial = *it++;
-    this->path = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
     casadi_assert(it==ex.end());
@@ -774,7 +767,6 @@ namespace CasADi{
     ex.push_back(ode(this->q));
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
-    ex.push_back(this->path);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
     ex.push_back(beq(this->pd));
@@ -790,7 +782,6 @@ namespace CasADi{
     setOde(this->q,*it++);
     setBeq(this->y,*it++);
     this->initial = *it++;
-    this->path = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
     setBeq(this->pd,*it++);
@@ -847,7 +838,6 @@ namespace CasADi{
     ex.push_back(ode(this->q));
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
-    ex.push_back(this->path);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
   
@@ -862,7 +852,6 @@ namespace CasADi{
     setOde(this->q,*it++);
     setBeq(this->y,*it++);
     this->initial = *it++;
-    this->path = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
     casadi_assert(it==ex.end());
@@ -918,7 +907,6 @@ namespace CasADi{
     ex.push_back(ode(this->q));
     ex.push_back(beq(this->y));
     ex.push_back(this->initial);
-    ex.push_back(this->path);
     ex.push_back(this->mterm);
     ex.push_back(this->lterm);
   
@@ -933,7 +921,6 @@ namespace CasADi{
     setOde(this->q,*it++);
     setBeq(this->y,*it++);
     this->initial = *it++;
-    this->path = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
     casadi_assert(it==ex.end());

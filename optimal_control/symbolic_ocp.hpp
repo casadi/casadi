@@ -199,17 +199,6 @@ namespace CasADi{
     SX lterm;
     //@}
 
-    /** @name Path constraints of the optimal control problem
-     */
-    //@{
-
-    /// Path constraint functions
-    SX path;
-    
-    /// Path constraint functions bounds
-    DMatrix path_min, path_max;
-    //@}
-
     /** @name Point constraints of the optimal control problem
      */
     //@{
