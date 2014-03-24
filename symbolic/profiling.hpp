@@ -26,6 +26,7 @@
 #include <fstream>
 #include <cstring>
 #include <iostream>
+
 /*
  * Author:  David Robert Nadeau
  * Site:    http://NadeauSoftware.com/
@@ -42,7 +43,7 @@
  */
 double getRealTime( );
 
-enum ProfilingData_Type { ProfilingData_Type_TIMELINE, ProfilingData_Type_SOURCE, ProfilingData_Type_NAME, ProfilingData_Type_ENTRY, ProfilingData_Type_EXIT };
+enum ProfilingData_Type { ProfilingData_Type_TIMELINE, ProfilingData_Type_SOURCE, ProfilingData_Type_NAME, ProfilingData_Type_ENTRY, ProfilingData_Type_EXIT, ProfilingData_Type_IO };
 
 enum ProfilingData_FXType { ProfilingData_FXType_MXFunction, ProfilingData_FXType_SXFunction, ProfilingData_FXType_Other };
 
@@ -70,6 +71,14 @@ struct ProfilingData_NAME {
   int length;
   ProfilingData_FXType type;
   int algorithm_size;
+  int numin;
+  int numout;
+};
+
+struct ProfilingData_IO {
+  int nrow;
+  int ncol;
+  int ndata;
 };
 
 struct ProfilingData_ENTRY {
@@ -94,12 +103,20 @@ template<>
 inline ProfilingData_Type ProfilingType<ProfilingData_ENTRY>() { return ProfilingData_Type_ENTRY; }
 template<>
 inline ProfilingData_Type ProfilingType<ProfilingData_EXIT>() { return ProfilingData_Type_EXIT; }
+template<>
+inline ProfilingData_Type ProfilingType<ProfilingData_IO>() { return ProfilingData_Type_IO; }
+
 
 template<typename T>
 void profileWrite(std::ofstream &f,const T& s) {
   ProfilingHeader hd;
   hd.type   = ProfilingType<T>();
   f.write(reinterpret_cast<const char*>(&hd), sizeof(hd));
+  f.write(reinterpret_cast<const char*>(&s), sizeof(s));
+}
+
+template<typename T>
+void profileWriteBare(std::ofstream &f,const T& s) {
   f.write(reinterpret_cast<const char*>(&s), sizeof(s));
 }
 
@@ -117,9 +134,25 @@ void profileWriteName(std::ofstream &f,T *a,const std::string &name, ProfilingDa
   s.length=name.size();
   s.type = type;
   s.algorithm_size = algorithm_size;
-  //std::cout << name << s.thisp << ":" << s.length << ":" << s.type << ":" << s.algorithm_size << std::endl;
+  //std::cout << name << s.thisp << ":" << s.length << ":" << s.type << ":" << s.algorithm_size << "|" << a->getNumInputs() << "," << a->getNumOutputs() << std::endl;
+  s.numin = a->getNumInputs();
+  s.numout = a->getNumOutputs();
   profileWrite(f,s);
   f << name;
+  for (int i=0;i<s.numin;++i) {
+    ProfilingData_IO ss;
+    ss.nrow = a->input(i).size1();
+    ss.ncol = a->input(i).size2();
+    ss.ndata = a->input(i).size();
+    profileWriteBare(f,ss);
+  }
+  for (int i=0;i<s.numout;++i) {
+    ProfilingData_IO ss;
+    ss.nrow = a->output(i).size1();
+    ss.ncol = a->output(i).size2();
+    ss.ndata = a->output(i).size();
+    profileWriteBare(f,ss);
+  }
 }
 
 template<typename T>
