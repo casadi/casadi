@@ -49,7 +49,7 @@ namespace CasADi{
     tf_free = false;
 
     // Start with vectors of zero length
-    this->s=this->x=this->z=this->q=this->ci=this->cd=this->pi=this->pd=this->p=this->y=this->u = SX::zeros(0,1);
+    this->s=this->x=this->z=this->q=this->ci=this->cd=this->pi=this->pd=this->p=this->y=this->u=this->path=this->point = SX::zeros(0,1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename){
@@ -358,30 +358,32 @@ namespace CasADi{
         } else if(onode.checkName("opt:PointConstraints")) {
           for(int i=0; i<onode.size(); ++i){
             const XMLNode& constr_i = onode[i];
+
+            // Create a new variable
+            Variable v;
+            stringstream ss;
+            ss << "point_" << i;
+            v.setName(ss.str());
+          
+            // Get the definition and bounds
             if(constr_i.checkName("opt:ConstraintLeq")){
-              SX ex = readExpr(constr_i[0]);
-              SX ub = readExpr(constr_i[1]);
-              point.append(ex-ub);
-              point_min.append(-numeric_limits<double>::infinity());
-              point_max.append(0.);
+              v.beq = readExpr(constr_i[0]).toScalar();
+              v.max = readExpr(constr_i[1]).toScalar();
             } else if(constr_i.checkName("opt:ConstraintGeq")){
-              SX ex = readExpr(constr_i[0]);
-              SX lb = readExpr(constr_i[1]);
-              point.append(ex-lb);
-              point_min.append(0.);
-              point_max.append(numeric_limits<double>::infinity());
+              v.beq = readExpr(constr_i[0]).toScalar();
+              v.min = readExpr(constr_i[1]).toScalar();
             } else if(constr_i.checkName("opt:ConstraintEq")){
-              SX ex = readExpr(constr_i[0]);
-              SX eq = readExpr(constr_i[1]);
-              point.append(ex-eq);
-              point_min.append(0.);
-              point_max.append(0.);
+              v.beq = readExpr(constr_i[0]).toScalar();
+              v.max = v.min = readExpr(constr_i[1]).toScalar();
             } else {
               cerr << "unknown constraint type" << constr_i.getName() << endl;
               throw CasadiException("SymbolicOCP::addConstraints");
             }
-          }
-        
+          
+            // Add to list of variables and outputs
+            addVariable(ss.str(),v);
+            this->path.append(v.v);
+          }        
         } else if(onode.checkName("opt:Constraints") || onode.checkName("opt:PathConstraints")) {
           for(int i=0; i<onode.size(); ++i){
             const XMLNode& constr_i = onode[i];
@@ -408,9 +410,8 @@ namespace CasADi{
             
             // Add to list of variables and outputs
             addVariable(ss.str(),v);
-            this->y.append(v.v);
-          }
-        
+            this->point.append(v.v);
+          }        
         } else throw CasadiException(string("SymbolicOCP::addOptimization: Unknown node ")+onode.getName());
       }
     }
@@ -623,7 +624,7 @@ namespace CasADi{
     }
 
     if(!this->y.isEmpty()){
-      stream << "Output variables (also path constraints)" << endl;
+      stream << "Output variables" << endl;
       for(int i=0; i<this->y.size(); ++i)
         stream << this->y.at(i) << " == " << str(beq(this->y.at(i))) << endl;
       stream << endl;
@@ -642,14 +643,21 @@ namespace CasADi{
         stream << this->lterm.at(i) << endl;
       stream << endl;
     }
-  
-    if(!this->point.isEmpty()){
-      stream << "Point constraint functions" << endl;
-      for(int i=0; i<this->point.size(); ++i)
-        stream << this->point_min.at(i) << " <= " << this->point.at(i) << " <= " << this->point_max.at(i) << endl;
+
+    if(!this->path.isEmpty()){
+      stream << "Path constraints" << endl;
+      for(int i=0; i<this->path.size(); ++i)
+        stream << str(max(this->path.at(i))) << " <= " << this->path.at(i) << " <= " << str(max(this->path.at(i))) << endl;
       stream << endl;
     }
-  
+
+    if(!this->point.isEmpty()){
+      stream << "Point constraints" << endl;
+      for(int i=0; i<this->point.size(); ++i)
+        stream << str(max(this->point.at(i))) << " <= " << this->point.at(i) << " <= " << str(max(this->point.at(i))) << endl;
+      stream << endl;
+    }
+    
     // Constraint functions
     stream << "Time horizon" << endl;
     stream << "t0 = " << this->t0 << endl;

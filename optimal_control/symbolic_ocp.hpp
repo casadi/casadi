@@ -199,16 +199,13 @@ namespace CasADi{
     SX lterm;
     //@}
 
-    /** @name Point constraints of the optimal control problem
+    /** \brief Path constraints of the optimal control problem
      */
-    //@{
+    SX path;
 
-    /// Point constraint functions
+    /** \brief Point constraints of the optimal control problem
+     */
     SX point;
-    
-    /// Path constraint functions bounds
-    DMatrix point_min, point_max;
-    //@}
 
     /// Parse from XML to C++ format
     void parseFMI(const std::string& filename);
