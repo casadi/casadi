@@ -10,8 +10,6 @@ set(SNOPT_INTERFACE_SRCS
   snopt_solver.cpp
 )
 
-set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})
-
 if(ENABLE_STATIC)
 add_library(casadi_snopt_interface STATIC ${SNOPT_INTERFACE_SRCS})
 add_library(snopt_fortran_c_bridge STATIC wsnopt.f90)
@@ -20,7 +18,7 @@ if(ENABLE_SHARED)
 add_library(casadi_snopt_interface SHARED ${SNOPT_INTERFACE_SRCS})
 add_library(snopt_fortran_c_bridge SHARED wsnopt.f90)
 endif(ENABLE_SHARED)
-target_link_libraries(casadi_snopt_interface casadi snopt_fortran_c_bridge)
+target_link_libraries(casadi_snopt_interface casadi snopt_fortran_c_bridge ${CMAKE_DL_LIBS})
 target_link_libraries(snopt_fortran_c_bridge ${SNOPT_LIBRARIES})
 install(TARGETS casadi_snopt_interface
   LIBRARY DESTINATION lib

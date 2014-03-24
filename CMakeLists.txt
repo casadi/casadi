@@ -233,19 +233,10 @@ endif()
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
-if(WITH_DL)
-  # Core needs support for dynamic linking
-  set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})
-else(WITH_DL)
-  # No dependencies
-  set(CASADI_DEPENDENCIES)
-endif(WITH_DL)
-
 # OpenCL
 if(WITH_OPENCL)
   # Core depends on OpenCL for GPU calculations
   find_package(OpenCL REQUIRED)
-  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${OPENCL_LIBRARIES})
   add_definitions(-DWITH_OPENCL)
   include_directories(${OPENCL_INCLUDE_DIRS})
 endif(WITH_OPENCL)
