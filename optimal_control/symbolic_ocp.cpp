@@ -113,6 +113,9 @@ namespace CasADi{
             var.variability = CONTINUOUS;
           else throw CasadiException("Unknown variability");
     
+          // ODE is zero for non-continuous variables
+          if(var.variability!=CONTINUOUS) var.ode = 0;
+
           // Causality
           if(causality.compare("input")==0)
             var.causality = INPUT;
