@@ -384,7 +384,7 @@ namespace CasADi{
           
             // Add to list of variables and outputs
             addVariable(ss.str(),v);
-            this->path.append(v.v);
+            this->point.append(v.v);
           }        
         } else if(onode.checkName("opt:Constraints") || onode.checkName("opt:PathConstraints")) {
           for(int i=0; i<onode.size(); ++i){
@@ -412,7 +412,7 @@ namespace CasADi{
             
             // Add to list of variables and outputs
             addVariable(ss.str(),v);
-            this->point.append(v.v);
+            this->path.append(v.v);
           }        
         } else throw CasadiException(string("SymbolicOCP::addOptimization: Unknown node ")+onode.getName());
       }
