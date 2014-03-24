@@ -567,6 +567,10 @@ namespace CasADi{
     return (*this)->isTranspose(*y);
   }
 
+  bool Sparsity::isReshape(const Sparsity& y) const{
+    return (*this)->isReshape(*y);
+  }
+
   std::size_t Sparsity::hash() const{
     return (*this)->hash();
   }

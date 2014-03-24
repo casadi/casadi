@@ -56,6 +56,9 @@ namespace CasADi{
     /// Check if the sparsity is the transpose of another
     bool isTranspose(const SparsityInternal& y) const;
 
+    /// Check if the sparsity is a reshape of another
+    bool isReshape(const SparsityInternal& y) const;
+
     /// Breadth-first search for coarse decomposition: see cs_bfs in CSparse
     void breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj, std::vector<int>& queue, const std::vector<int>& imatch, const std::vector<int>& jmatch, int mark) const;
     

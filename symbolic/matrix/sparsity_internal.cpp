@@ -3421,6 +3421,42 @@ namespace CasADi{
     return true;
   }
 
+  bool SparsityInternal::isReshape(const SparsityInternal& y) const{
+    // Quick true if the objects are the same
+    if(this==&y) return true;  
+
+    // If same number of rows, check if patterns are equal
+    if(nrow_==y.nrow_)
+      return isEqual(y.nrow_,y.ncol_,y.colind_,y.row_);
+
+    // Assert dimensions and number of nonzeros
+    if(ncol_*nrow_!=y.nrow_*y.ncol_ || size()!=y.size())
+      return false;
+  
+    // Quick return if empty or dense
+    if(size()==0 || isDense())
+      return true;
+    
+    // Loop over the elements
+    for(int cc=0; cc<ncol_; ++cc){
+      for(int el=colind_[cc]; el<colind_[cc+1]; ++el){
+        int rr=row_[el];
+
+        // Get row and column of y
+        int loc = rr+nrow_*cc;
+        int rr_y = loc % y.nrow_;
+        int cc_y = loc / y.nrow_;
+
+        // Make sure matching
+        if(rr_y != y.row_[el] || el<y.colind_[cc_y] || el>=y.colind_[cc_y+1])
+          return false;
+      }
+    }
+
+    // Reshape if reached this point
+    return true;
+  }
+
   void SparsityInternal::spy(std::ostream &stream) const {
 
     // Index counter for each column

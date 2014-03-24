@@ -358,6 +358,9 @@ namespace CasADi{
     /// Check if the sparsity is the transpose of another
     bool isTranspose(const Sparsity& y) const;
 
+    /// Check if the sparsity is a reshape of another
+    bool isReshape(const Sparsity& y) const;
+
     /// @{
     /** \brief Combine two sparsity patterns
         Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
