@@ -922,7 +922,7 @@ class VertsplitStructure:
     for it, k, sp,e in zip(its,vertsplit(parent,ks),sps,es):
       if not(e.isPrimitive()):
         self.buildMap(struct=e.struct,parentIndex = parentIndex + it,parent=k)
-      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else k.reshape(sp) #[IMatrix(sp,range(sp.size()))]      
+      self.priority_object_map[parentIndex+it] = k if k.sparsity()==sp else MX(sp,k) #[IMatrix(sp,range(sp.size()))]      
     
 class msymStruct(CasadiStructured,MasterGettable,VertsplitStructure):
   description = "MX.sym"
