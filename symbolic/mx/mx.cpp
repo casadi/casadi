@@ -110,7 +110,7 @@ namespace CasADi{
       }
     } else {
       casadi_assert(val.isVector() && sp.size()==val.size1());
-      *this = full(val)->getGetNonzeros(sp,range(size1()));
+      *this = full(val)->getGetNonzeros(sp,range(sp.size1()));
     }
   }
 
