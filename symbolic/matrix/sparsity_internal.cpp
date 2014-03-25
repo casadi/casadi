@@ -3422,11 +3422,8 @@ namespace CasADi{
   }
 
   bool SparsityInternal::isReshape(const SparsityInternal& y) const{
-    // Quick true if the objects are the same
-    if(this==&y) return true;  
-    
-    // Quick return if empty 
-    if(size()==0) return true;
+    // Quick true if the objects are the same or are empty
+    if(this==&y || isEmpty()) return true;  
     
     // If same number of rows, check if patterns are equal
     if(nrow_==y.nrow_)
@@ -3437,8 +3434,7 @@ namespace CasADi{
       return false;
   
     // Quick return if dense
-    if(size()==0 || isDense())
-      return true;
+    if(isDense()) return true;
     
     // Loop over the elements
     for(int cc=0; cc<ncol_; ++cc){
