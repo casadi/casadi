@@ -2664,18 +2664,11 @@ class MXtests(casadiTestCase):
     H = f.hessian()
     H.init()
     
-  @known_bug()
-  def test_vertsplit_derivative(self):
+  def test_bug_1042(self):
 
-    dvs = MX.sym('x',3,1)
-
-    t = dvs[0]
-    x0 = dvs[1]
-
-    obj = x0*x0
-    g = veccat([(dvs[1:3])/t])
-
-    mf = MXFunction([dvs,MX.sym('y',0,1)],[obj,g])
+    x = MX.sym('x',2,1)
+    
+    mf = MXFunction([x],[x*x[0,0]])
     mf.init()
     
     mfx = mf.expand()
@@ -2688,11 +2681,46 @@ class MXtests(casadiTestCase):
     mfxg.init()
     
     for f in [mfg,mfxg]:
-      f.setInput([1,2,3],0)
-      f.setInput(0.1,2)
-      f.setInput([4,5],3)
+      f.setInput([1,2],0)
+      #f.setInput(0.1,)
+      f.setInput([4,5],1)
     
     self.checkfx(mfg,mfxg)
+    
+  def test_bug_1042bis(self):
+    x = MX.sym('x',2,1)
+    a = MX.sym("ax",2,1)
+    i1 = x[0,0]
+    z = i1*x
+    i3 = i1*a
+    i3= inner_prod(x,a)
+    d = MXFunction([x,a],[z,i3])
+    d.init()
+    d.setInput([1,2],0)
+    d.setInput([3,4],1)
+
+    dx = d.expand()
+    dx.init()
+    dx.setInput([1,2],0)
+    dx.setInput([3,4],1)
+    
+    self.checkfx(d,dx)
+    
+  def test_bug_1042tris(self):
+    x = MX.sym('x',2,1)
+    a = MX.sym("ax",2,1)
+    d = MXFunction([x,a],[inner_prod(x,a)])
+    d.init()
+    d.setInput([1,2],0)
+    d.setInput([3,4],1)
+
+    dx = d.expand()
+    dx.init()
+    dx.setInput([1,2],0)
+    dx.setInput([3,4],1)
+    
+    self.checkfx(d,dx)
+    
       
 if __name__ == '__main__':
     unittest.main()

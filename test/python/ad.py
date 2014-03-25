@@ -557,6 +557,7 @@ class ADtests(casadiTestCase):
           (in1,v1,vertsplit(x,[0,1,2])[1],sparse(DMatrix([[0,1]]))),
           (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
           (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX(1,1),2*x[1]]])),
+          (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX(1,1),6*x[1]**5]])),
           (in1,v1,horzcat([x[1],x[0]]).T,sparse(DMatrix([[0,1],[1,0]]))),
           (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
           (in1,v1,x[[0,1]],sparse(DMatrix([[1,0],[0,1]]))),
@@ -602,6 +603,7 @@ class ADtests(casadiTestCase):
           #(in1,v1,f1.call([[],y])[1],DMatrix.zeros(2,2)),
           (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2)),
           (in1,v1,(x**2).setSparse(sparse(DMatrix([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
+          (in1,v1,c.inner_prod(x,y[:,0]),y[:,0].T),
      ]:
       print out
       fun = MXFunction(inputs,[out,jac])
