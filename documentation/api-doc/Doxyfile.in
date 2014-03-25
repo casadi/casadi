@@ -33,6 +33,8 @@ PROJECT_NAME           = "CasADi"
 
 PROJECT_NUMBER         = 
 
+PROJECT_BRIEF          = 
+
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
 # If a relative path is entered, it will be relative to the location 
