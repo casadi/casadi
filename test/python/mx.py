@@ -2663,6 +2663,36 @@ class MXtests(casadiTestCase):
 
     H = f.hessian()
     H.init()
+    
+  @known_bug()
+  def test_vertsplit_derivative(self):
+
+    dvs = MX.sym('x',3,1)
+
+    t = dvs[0]
+    x0 = dvs[1]
+
+    obj = x0*x0
+    g = veccat([(dvs[1:3])/t])
+
+    mf = MXFunction([dvs,MX.sym('y',0,1)],[obj,g])
+    mf.init()
+    
+    mfx = mf.expand()
+    mfx.init()
+    
+    mfg = mf.derivative(0,1)
+    mfg.init()
+    
+    mfxg = mfx.derivative(0,1)
+    mfxg.init()
+    
+    for f in [mfg,mfxg]:
+      f.setInput([1,2,3],0)
+      f.setInput(0.1,2)
+      f.setInput([4,5],3)
+    
+    self.checkfx(mfg,mfxg)
       
 if __name__ == '__main__':
     unittest.main()
