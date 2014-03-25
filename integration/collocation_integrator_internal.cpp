@@ -145,13 +145,13 @@ namespace CasADi{
       vector<MX> f_res = f_.call(f_arg);
 
       // Get an expression for the state derivative at the collocation point
-      MX xp_j = (C[0][j]/h_) * x0;
+      MX xp_j = C[0][j] * x0;
       for(int r=1; r<deg_+1; ++r){
-        xp_j += (C[r][j]/h_) * x[r];
+        xp_j += C[r][j] * x[r];
       }
       
       // Add collocation equation
-      eq.push_back(vec(f_res[DAE_ODE] - xp_j));
+      eq.push_back(vec(h_*f_res[DAE_ODE] - xp_j));
         
       // Add the algebraic conditions
       eq.push_back(vec(f_res[DAE_ALG]));
@@ -222,26 +222,26 @@ namespace CasADi{
         g_arg[RDAE_Z] = z[j];
         g_arg[RDAE_RX] = rx[j];
         g_arg[RDAE_RZ] = rz[j];
-        g_arg[RDAE_RP] = (-B[j]*h_)*rp; // why minus?
+        g_arg[RDAE_RP] = rp;
         vector<MX> g_res = g_.call(g_arg);
 
         // Get an expression for the state derivative at the collocation point
-        MX rxp_j = D[j]*rx0;
+        MX rxp_j = -D[j]*rx0;
         for(int r=1; r<deg_+1; ++r){
-          rxp_j += (C[j][r]/h_) * rx[r];
+          rxp_j += (B[r]*C[j][r]) * rx[r];
         }
 
         // Add collocation equation
-        eq.push_back(vec(g_res[RDAE_ODE] - rxp_j));
+        eq.push_back(vec(h_*B[j]*g_res[RDAE_ODE] - rxp_j));
         
         // Add the algebraic conditions
         eq.push_back(vec(g_res[RDAE_ALG]));
 
         // Add contribution to the final state
-        rxf += (C[0][j]/h_)*rx[j];
+        rxf += -B[j]*C[0][j]*rx[j];
         
         // Add contribution to quadratures
-        rqf += g_res[RDAE_QUAD];
+        rqf += h_*B[j]*g_res[RDAE_QUAD];
       }
 
       // Form backward discrete time dynamics
@@ -256,7 +256,7 @@ namespace CasADi{
       vector<MX> G_out(RDAE_NUM_OUT);
       G_out[RDAE_ODE] = rxf;
       G_out[RDAE_ALG] = vertcat(eq);
-      G_out[RDAE_QUAD] = -rqf; // why minus?
+      G_out[RDAE_QUAD] = rqf;
       G_ = MXFunction(G_in,G_out);
       G_.init();
     }
