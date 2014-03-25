@@ -440,22 +440,45 @@ As mentioned above, matrices in \CasADi are stored using the \emph{compressed co
 
 Sparsity patterns in CasADi are \emph{reference-counted} and \emph{cached}, meaning that multiple matrices can share the same sparsity pattern, including \texttt{MX} expression graphs and instances of \texttt{SX} and \texttt{DMatrix}.
 
-\chapter{Working with \CasADi's types}
+\chapter{Overview of operations}
+In this chapter, we list the most central operations of \CasADi's symbolic framework. The list is not exhaustive, for more operations, search the API documentation or post a question in the \htmladdnormallink{forum}{http://forum.casadi.org/}.
 
-This chapter aims to give you an in-depth overview of available manipulations on the \CasADi primitives, with a focus on the matrix types \texttt{MX} and \texttt{SX}.
+%% \section{Creating sparsity patterns}
+%% The following functions can be used to create new sparsity patterns:
+%% \begin{description}
+%%   \item[\texttt{Sparsity.dense}(\emph{nrow,ncol})]: Create a dense \emph{nrow}-by-\emph{ncol} pattern
+%%   \item[\texttt{Sparsity.sparse(\emph{nrow,ncol})}]: Create a sparse \emph{nrow}-by-\emph{ncol} pattern
+%%   \item[\texttt{Sparsity.diag(\emph{n})}]: Create a square \emph{n}-by-\emph{n} diagonal pattern
+%%   \item[\texttt{Sparsity.triu(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} upper triangular pattern
+%% \end{description}
 
-\section{Indexing and slicing}
-CasADi offers a variety of different ways to get or set specific elements or blocks of elements in matrix types. Most slicing techniques fall into one of the following two categories:
-
+\section{Creating matrices}
+The following functions can be used to create new matrices:
 \begin{description}
-\item[nonzero access] aims at non-zeros, specified by their (single) index 
-\item[full access] aims at elements in general -- which may well be structural zeros --  specified by a (row, col) pair.
+  \item[\texttt{SX.sym}(\emph{name,nrow,ncol})]: Create a \emph{nrow}-by-\emph{ncol} symbolic primitive
+  \item[\texttt{SX.zeros(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} dense matrix with all zeros
+  \item[\texttt{SX.sparse(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} sparse matrix with all \emph{structural} zeros
+  \item[\texttt{SX.ones(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} dense matrix with all ones
+  \item[\texttt{SX.repmat(\emph{v,nrow,ncol})}]: Repeat expression \emph{v} \emph{nrow} times vertically and \emph{ncol} times horizontally. \verb|SX.repmat(3,2,1)| will create a 2-by-1 matrix with all elements 3.
+  \item[\texttt{SX.eye(\emph{n})}]: Create a \emph{n}-by-\emph{n} diagonal matrix with ones on the diagonal and structural zeros elsewhere.
+  \item[\texttt{SX}(\emph{scalar})]: Create a scalar (1-by-1 matrix) with value \emph{scalar}. This method can be used explicitly, e.g. \verb|SX(9)|, or implicitly, e.g. \verb|9 * SX.ones(2,2)|.
+  \item[\texttt{SX}(\emph{list})]: Create a column vector (n-by-1 matrix) with the elements in the list, e.g. \verb|SX([1,2,3])|
+  \item[\texttt{SX}(\emph{list of lists})]: Create a dense matrix with the elemets in the lists, e.g. \verb|SX([[1,2],[3,4]])|.
 \end{description}
 
-This section gives an exhaustive overview of the possibilities of indexing and slicing. The methods can be used both for setting and getting and they apply to all matrix types: \texttt{MX}, \texttt{SMatrix}, \texttt{DMatrix}, \texttt{IMatrix}.
+To create matrices using the matrix expression graph type, replace \texttt{SX} with \texttt{MX} above. All the above functions have multiple overloads. E.g. to create an upper triangular matrix with all ones on and above the diagonal, the syntax would be \texttt{SX.ones}(\texttt{Sparsity.triu}(\emph{nrow,ncol})). Details can be found in the API documentation.
 
-In python and C++ indexing starts from zero, while in octave indexing starts from 1.
-In python, it is customary to use negative indices to specify an index counted from the end of a list. \CasADi supports this, too.
+\section{Getting and setting elements in matrices}
+\CasADi offers a variety of different ways to get or set specific elements or blocks of elements in matrix types. There are two different categories for this:
+
+\begin{description}
+\item[Element access and assignment] Access or set elements of a matrix -- which may well be structural zeros --  by their (row, col) pairs. This is done with the syntax \verb|A = B[i,j]|, \verb|A[i,j] = B| in Python, and \verb|A = B(i,j)|, \verb|A(i,j) = B| in C++ and Octave.
+\item[Nonzero access and assignment] Access or set a particular nonzero of the (sparse) matrices. Entries are ordered by columns using the compressed column storage (CCS) format. The syntax for this is \verb|A = B.el[k]|, \verb|A.el[k] = B| in Python, \verb|A = B[k]|, \verb|A[k] = B| in C++ and \verb|A = B{k}|, \verb|A{k} = B| in Octave.
+\end{description}
+
+In Python and C++, indexing starts from zero, while in Octave indexing starts from one. In Python, negative indices to specify an index counted from the end of a list.
+
+The discussion in the following applies to all matrix types: \texttt{SX}, \texttt{MX}, \texttt{DMatrix}.
 
 \subsection{Getting and setting}
 
@@ -464,27 +487,27 @@ In python, it is customary to use negative indices to specify an index counted f
 Each type of slicing comes with a get or set variant.
 \begin{pytex}
 M = DMatrix([[3,7],[4,5]])
-print M[0,:]  # Get
+print M[0,:]
 \end{pytex}
 \begin{pytex}
-M[0,:] = 1    # Set
+M[0,:] = 1
 print M
 \end{pytex}
 
-Unlike numpy, \CasADi slices are not views into the data of the left hand side; rather, a slice access copies the data. As a result, the matrix $M$ is not changed in the following examples: 
-\begin{pytex}
-M = DMatrix([[3,7],[4,5]])
-A = M[0,:]
-A.set([1,1])
-print A
-print M
-\end{pytex}
+Unlike NumPy, \CasADi slices are not views into the data of the left hand side; rather, a slice access copies the data. As a result, the matrix $M$ is not changed in the following example: 
+%% \begin{pytex}
+%% M = DMatrix([[3,7],[4,5]])
+%% A = M[0,:]
+%% A.set([1,1])
+%% print A
+%% print M
+%% \end{pytex}
 
-\begin{pytex}
-M = DMatrix([[3,7],[4,5]])
-M[0,:].set([1,1])
-print M
-\end{pytex}
+%% \begin{pytex}
+%% M = DMatrix([[3,7],[4,5]])
+%% M[0,:].set([1,1])
+%% print M
+%% \end{pytex}
 
 \begin{pytex}
 M = DMatrix([[3,7],[4,5]])
@@ -492,11 +515,9 @@ M[0,:][0,0] = 1
 print M
 \end{pytex}
 
-\subsection{Flavours of slices}
+%\subsection{Flavours of slices}
 
-\paragraph{Scalar access} is used to target individual elements. The \emph{nonzero access} flavour uses one number, the non-zero index, in rectangular brackets. The \emph{full access} flavour uses two.
-
-An example with a dense matrix:
+\paragraph{Single elements} are sets by providing scalar indices:
 \begin{pytexoutput}
 M = DMatrix([[3,7],[4,5]])
 
@@ -505,16 +526,10 @@ def lprint(s):
  
 def lprints(): 
   lprint("M")
-  lprint("M.nz[0]")
-  lprint("M.nz[1]")
-  lprint("M.nz[2]")
   lprint("M.nz[3]")
-  lprint("M.nz[-1]")
   lprint("M.nz[-2]")
   lprint("M[0,0]")
-  lprint("M[0,1]")
   lprint("M[1,0]")
-  lprint("M[1,1]")
   lprint("M[-1,-1]")
   
 lprints()
