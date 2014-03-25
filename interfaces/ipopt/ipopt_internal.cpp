@@ -45,7 +45,7 @@ namespace CasADi{
     addOption("print_time",               OT_BOOLEAN, true, "print information about execution time");
   
     // Monitors
-    addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f", true);
+    addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
 
     // For passing metadata to IPOPT
     addOption("var_string_md",            OT_DICTIONARY, GenericType(), "String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT");
@@ -500,6 +500,12 @@ namespace CasADi{
         // Get results
         hessLag_.output().get(values,SPARSESYM);
       
+        if(monitored("eval_h")){
+          cout << "x = " << hessLag_.input(NL_X).data() << endl;
+          cout << "J = " << endl;
+          hessLag_.output().printSparse();
+        }
+        
         if (regularity_check_ && !isRegular(hessLag_.output().data())) casadi_error("IpoptInternal::h: NaN or Inf detected.");
       
       }
