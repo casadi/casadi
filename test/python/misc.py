@@ -90,6 +90,7 @@ class Misctests(casadiTestCase):
         return
     
     self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["abc"]))
+    self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["eval_f","abc"]))
     g.setOption("monitor",["eval_f"])
     
     
