@@ -122,7 +122,7 @@ namespace CasADi{
       G.input(RDAE_X).set(x_tape_.at(k_));
       G.input(RDAE_Z).set(Z_tape_.at(k_));
       G.input(RDAE_P).set(input(INTEGRATOR_P));
-      G.input(RDAE_RX).set(output(INTEGRATOR_RX0));
+      G.input(RDAE_RX).set(output(INTEGRATOR_RXF));
       G.input(RDAE_RZ).set(RZ_);
       G.input(RDAE_RP).set(input(INTEGRATOR_RP));
       G.evaluate();
