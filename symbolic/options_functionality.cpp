@@ -148,18 +148,21 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
 
   // If allowed values are listed, check them.
   if (!allowed_vals_[name].empty()) {
-    bool found = false;
+    bool found;
     GenericType problem = op;
     if (op.isStringVector()) {
+      found = true;
       const std::vector<std::string> & opv = op.toStringVector();
       for (std::vector<std::string>::const_iterator it=opv.begin();it!=opv.end();it++) {
+        std::cout << "checking " << *it << std::endl;
         if (std::find(allowed_vals_[name].begin(), allowed_vals_[name].end(), (*it))==allowed_vals_[name].end()) {
-         problem = (*it);
-         break;
-       }
-       found = true;
+          problem = (*it);
+          found = false;
+          break;
+        }
       }
     } else {
+      found = false;
       for (std::vector<GenericType>::const_iterator it=allowed_vals_[name].begin();it!=allowed_vals_[name].end();it++) {
        found = found || (*it) == op;
       }
