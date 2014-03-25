@@ -521,6 +521,13 @@ namespace CasADi{
     // Calculate with adjoint mode AD
     std::vector<MatType> res(outputv_);
     call(inputv_,res,fseed,fsens,aseed,asens,true,false);
+    
+    int dir = 0;
+    for(int i=0; i<getNumInputs(); ++i) { // Correct sparsities #1025
+      if (asens[dir][i].sparsity()!=inputv_[i].sparsity()) {
+        asens[dir][i] = asens[dir][i].setSparse(inputv_[i].sparsity());
+      }
+    }
   
     // Return adjoint directional derivative
     return asens[0].at(iind);
@@ -564,6 +571,10 @@ namespace CasADi{
       jac_shape.first = compact ? output(oind).size() : output(oind).numel();
       jac_shape.second = compact ? input(iind).size() : input(iind).numel();
       return MatType::sparse(jac_shape);
+    }
+    
+    if (symmetric) {
+      casadi_assert(output(oind).isDense());
     }
     
     // Create return object

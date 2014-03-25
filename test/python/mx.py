@@ -2652,6 +2652,17 @@ class MXtests(casadiTestCase):
     g.setInput(range(1,5))
     
     self.checkfx(f,g)
+    
+  def test_issue1041(self):
+    x = MX.sym("x",2)
+
+    y = vertsplit(x,[0,1,2])[1]
+
+    f = MXFunction([x],[y])
+    f.init()
+
+    H = f.hessian()
+    H.init()
       
 if __name__ == '__main__':
     unittest.main()
