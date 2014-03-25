@@ -502,7 +502,7 @@ namespace CasADi{
       
         if(monitored("eval_h")){
           cout << "x = " << hessLag_.input(NL_X).data() << endl;
-          cout << "J = " << endl;
+          cout << "H = " << endl;
           hessLag_.output().printSparse();
         }
         
