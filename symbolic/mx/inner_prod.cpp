@@ -94,7 +94,7 @@ namespace CasADi{
     if(fwd){
       res = 0;
       for(int i=0; i<n; ++i){
-        res |= *arg0++ & *arg1++;
+        res |= *arg0++ | *arg1++;
       }
     } else {
       for(int i=0; i<n; ++i){
