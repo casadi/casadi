@@ -165,12 +165,10 @@ namespace CasADi{
   }
   
   MX veccat(const vector<MX>& comp) {
-        MX (&f)(const MX&) = vec;
-    return vertcat(applymap(f,comp));
+    return vertcat(applymap(vec,comp));
   }
 
   MX vecNZcat(const vector<MX>& comp) {
-    MX (&f)(const MX&) = vecNZ;
     return vertcat(applymap(vecNZ,comp));
   }
 

@@ -407,9 +407,6 @@ namespace CasADi{
       casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
     }
   
-    // Tape counter
-    int tt = 0;
-  
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     int alg_counter = 0;
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter){

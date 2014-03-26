@@ -219,7 +219,7 @@ namespace CasADi{
     const std::vector<int>& A_row = A_sp.row();
     int nrhs = r_sp.size2();
     int n = r_sp.size1();
-    int nnz = A_sp.size();
+    //    int nnz = A_sp.size();
 
     // Get pointers to data
     bvec_t* B_ptr = reinterpret_cast<bvec_t*>(input[0]->ptr());

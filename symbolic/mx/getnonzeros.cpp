@@ -187,7 +187,7 @@ namespace CasADi{
     
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
-    const vector<int>& irow = isp.row();
+    //const vector<int>& irow = isp.row();
     vector<int> icol = isp.getCol();
 
     // Get all input elements

@@ -126,14 +126,6 @@ namespace CasADi{
 
   void ImplicitFunctionInternal::evaluate(){
 
-    // Set up timers for profiling
-    double time_zero;
-    double time_start;
-    double time_stop;
-    if(CasadiOptions::profiling) {
-      time_zero = getRealTime();
-    }
-
     // Mark factorization as out-of-date. TODO: make this conditional
     fact_up_to_date_ = false;
 

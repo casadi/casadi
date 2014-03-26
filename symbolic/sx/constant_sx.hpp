@@ -95,6 +95,7 @@ class RealtypeSX : public ConstantSX{
     virtual ~RealtypeSX(){
       size_t num_erased = cached_constants_.erase(value); 
       assert(num_erased==1);
+      (void)num_erased;
     }
     
     /// Static creator function (use instead of constructor)
@@ -149,6 +150,7 @@ class IntegerSX : public ConstantSX{
     virtual ~IntegerSX(){
       size_t num_erased = cached_constants_.erase(value); 
       assert(num_erased==1);
+      (void)num_erased;
     }
     
     /// Static creator function (use instead of constructor)
