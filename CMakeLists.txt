@@ -188,7 +188,15 @@ endif()
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi -pedantic -Wall -Wno-sign-compare")
+# add compiler warnings
+if(    ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-delete-non-virtual-dtor")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # I don't know the MSVC warnings, so do nothing for now
+endif()
 
 # the following commands are needed to fix a problem with the libraries
 # for linux 64 bits
