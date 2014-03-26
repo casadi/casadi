@@ -374,6 +374,11 @@ namespace CasADi{
   */
   MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
 
+  /** \brief Solve a system of equations A*x = b
+   * Internally uses SX solve(SX,SX).
+  */
+  MX solve(const MX& A, const MX& b);
+
   /** \brief Computes the Moore-Penrose pseudo-inverse
   * 
   * If the matrix A is fat (size1>size2), mul(A,pinv(A)) is unity.
