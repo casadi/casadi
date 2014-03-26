@@ -270,7 +270,7 @@ namespace CasADi {
     }
     int ret = 0;
     if ( meta< int >::couldbe(r)) {
-      int res = meta< int >::as(r,ret);    
+      /*int res = */ meta< int >::as(r,ret);    
     }
     
     Py_DECREF(r);
