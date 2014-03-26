@@ -978,26 +978,6 @@ namespace CasADi{
     return mysolver.solve(A,b,false);
   }
   
-  MX solve(const MX& A, const MX& b) {
-      SX sxA = SX::sym("A", A.sparsity());
-      SX sxb = SX::sym("b", b.sparsity());
-      SX sxX = solve(sxA, sxb);
-
-      std::vector<SX> sxInputs;
-      sxInputs.push_back(sxA);
-      sxInputs.push_back(sxb);
-
-      SXFunction f = SXFunction(sxInputs, sxX);
-      f.setOption("name","MX solve internal function");
-      f.init();
-
-      std::vector<MX> mxInputs;
-      mxInputs.push_back(A);
-      mxInputs.push_back(b);
-
-      return f.call(mxInputs)[0];
-  }
-
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict) {
     if (A.size1()>=A.size2()) {
       return solve(mul(A.T(),A),A.T(),lsolver,dict);
