@@ -214,7 +214,7 @@ namespace CasADi{
   
 #ifndef SWIGOCTAVE
   /** \brief  Make the matrix dense if not already */
-  MX full(const MX& x);
+  MX dense(const MX& x);
 #endif // SWIGOCTAVE
 
   /** \brief  Create a parent MX on which all given MX's will depend.

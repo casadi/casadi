@@ -555,7 +555,7 @@ class LinearSolverTests(casadiTestCase):
       
       self.checkarray(mul(A,C),b)
       
-      for As_,A_ in [(As,A),(full(As),full(A)),(full(As).T,full(A).T),(full(As.T),full(A.T)),(As.T,A.T)]:
+      for As_,A_ in [(As,A),(dense(As),dense(A)),(dense(As).T,dense(A).T),(dense(As.T),dense(A.T)),(As.T,A.T)]:
         f = MXFunction([As,bs],[solve(As_,bs,Solver,options)])
         f.init()
         f.setInput(A,0)

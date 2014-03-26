@@ -118,6 +118,7 @@ def deprecatedfun(func,message):
 ssym = deprecatedfun(SX.sym,"ssym will soon be replaced by SX.sym")
 msym = deprecatedfun(MX.sym,"ssym will soon be replaced by MX.sym")
 
+full = deprecatedfun(dense,"full will soon be replaced by dense")
 
 
 __version__ = CasadiMeta.getVersion()

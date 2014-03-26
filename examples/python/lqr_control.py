@@ -202,7 +202,7 @@ Wt  = states["Wt"]
 t1 = te
 
 # Initial conditions
-e = full(DMatrix.eye(ns))
+e = dense(DMatrix.eye(ns))
 states_ = states(0)
 states_["eAt"] = e
 states_["Wt"] = 0
@@ -304,7 +304,7 @@ integrator.setOption("reltol",1e-16)
 integrator.setOption("stop_at_end",False)
 integrator.init()
 # Start from P = identity matrix
-u = full(DMatrix.eye(ns))
+u = dense(DMatrix.eye(ns))
 integrator.reset()
 integrator.setInput(vec(u),"x0")
 integrator.integrate(0)

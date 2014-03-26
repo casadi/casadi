@@ -342,7 +342,7 @@ namespace CasADi{
      }
   */
 
-  MX full(const MX& x){
+  MX dense(const MX& x){
     MX ret = x;
     ret.densify();
     return ret;

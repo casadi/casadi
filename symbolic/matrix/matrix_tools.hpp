@@ -352,7 +352,7 @@ namespace CasADi{
 #ifndef SWIGOCTAVE
   /** \brief  Make a matrix dense */
   template<typename DataType>
-  Matrix<DataType> full(const Matrix<DataType>& A);
+  Matrix<DataType> dense(const Matrix<DataType>& A);
 
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<typename DataType>
@@ -1076,7 +1076,7 @@ namespace CasADi{
   }
 
   template<typename DataType>
-  Matrix<DataType> full(const Matrix<DataType>& A){    
+  Matrix<DataType> dense(const Matrix<DataType>& A){    
     Matrix<DataType> ret = A;
     ret.densify();
     return ret;
@@ -1270,7 +1270,7 @@ namespace CasADi{
 #define MATRIX_TOOLS_TEMPLATES(DataType)               \
   MATRIX_TOOLS_TEMPLATES_COMMON(DataType)              \
   MTT_INST(DataType,sparse)                            \
-  MTT_INST(DataType,full)
+  MTT_INST(DataType,dense)
 #endif //SWIGOCTAVE
 
 #endif // MATRIX_TOOLS_HPP

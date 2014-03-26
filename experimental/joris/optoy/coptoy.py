@@ -237,7 +237,7 @@ def minimize(f,gl=[],verbose=False):
   solver.input("f").set(f.output(4).data())
   solver.input("g").set((-f.output(5)).data())
   
-  solver.setInput(full(f.output(6)),"c")
+  solver.setInput(dense(f.output(6)),"c")
   
   # Solve the problem numerically
   solver.evaluate()
