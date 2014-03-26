@@ -2002,6 +2002,7 @@ class MXtests(casadiTestCase):
     with self.assertRaises(RuntimeError):
       d = x / c
       
+  @slow()
   @memory_heavy()
   def test_MX_shapes(self):
       self.message("MX unary operations")

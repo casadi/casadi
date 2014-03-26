@@ -49,7 +49,7 @@ class ControlTests(casadiTestCase):
   def test_dple_small(self):
     
     for Solver, options in dplesolvers:
-      for K in [1,2,3,4]:
+      for K in ([1,2,3,4] if args.run_slow else [1,2,3]):
         for n in [2,3]:
           numpy.random.seed(1)
           print (n,K)
@@ -113,8 +113,8 @@ class ControlTests(casadiTestCase):
     
     for Solver, options in dplesolvers:
       if "Simple" in str(Solver): continue
-      for K in [1,2,3,4,5]:
-        for n in [2,3,4,8,16,32]:
+      for K in ([1,2,3,4,5] if args.run_slow else [1,2,3]):
+        for n in ([2,3,4,8,16,32] if args.run_slow else [2,3,4]):
           numpy.random.seed(1)
           print (n,K)
           A_ = [DMatrix(numpy.random.random((n,n))) for i in range(K)]

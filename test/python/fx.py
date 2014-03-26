@@ -310,8 +310,8 @@ class FXtests(casadiTestCase):
       test(Sparsity.tril(i))
       test(Sparsity.tril(i).T)
     
-    for n in [63,64,65,127,128,129]:
-      for m in [63,64,65,127,128,129]:
+    for n in ([63,64,65,127,128,129] if args.run_slow else [63,64,65]):
+      for m in ([63,64,65,127,128,129] if args.run_slow else [63,64,65]):
         print (n,m)
         sp = Sparsity.dense(n,m)
         

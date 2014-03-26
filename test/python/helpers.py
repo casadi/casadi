@@ -36,6 +36,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--known_bugs', help='Run with known bugs', action='store_true')
 parser.add_argument('--ignore_memory_heavy', help='Skip those tests that have a high memory footprint', action='store_true')
 parser.add_argument('--ignore_memory_light', help='Skip those tests that have a lightweight memory footprint', action='store_true')
+parser.add_argument('--run_slow', help='Skip those tests that take a long time to run', action='store_true')
 parser.add_argument('unittest_args', nargs='*')
 
 args = parser.parse_args()
@@ -97,7 +98,8 @@ class casadiTestCase(unittest.TestCase):
     fun = getattr(getattr(self,margs[0]),'im_func')
     if not hasattr(fun,'tag_memory_heavy'):
       fun.tag_memory_heavy = False
-    
+    if not hasattr(fun,'tag_slow'):
+      fun.tag_slow = False
     
     if args.ignore_memory_heavy and fun.tag_memory_heavy:
       fun.__unittest_skip__ = True
@@ -105,6 +107,10 @@ class casadiTestCase(unittest.TestCase):
     if args.ignore_memory_light and not(fun.tag_memory_heavy):
       fun.__unittest_skip__ = True
       fun.__unittest_skip_why__ = "Ignoring memory_light tests (--ignore_memory_light)"
+
+    if not(args.run_slow) and fun.tag_slow:
+      fun.__unittest_skip__ = True
+      fun.__unittest_skip_why__ = "Ignoring slow tests (--run_slow)"
       
     unittest.TestCase.__init__(self,*margs,**kwargs)
 
@@ -550,4 +556,13 @@ class memory_heavy(object):
   def __call__(self, c):
     print c
     c.tag_memory_heavy = True
+    return c
+    
+class slow(object):
+  def __init__(self):
+    pass
+    
+  def __call__(self, c):
+    print "slow", c
+    c.tag_slow = True
     return c
