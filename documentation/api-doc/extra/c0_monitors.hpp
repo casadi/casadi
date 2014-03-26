@@ -135,6 +135,7 @@
 <tr><td>eval_f</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_g</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_grad_f</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_jac_g</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
@@ -149,6 +150,7 @@
 <tr><td>eval_f</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_g</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_grad_f</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>eval_jac_g</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
