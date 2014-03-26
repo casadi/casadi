@@ -28,6 +28,7 @@
 #include "../matrix/generic_matrix_tools.hpp"
 #include "../matrix/generic_expression_tools.hpp"
 #include "../fx/linear_solver.hpp"
+#include "../fx/symbolic_qr.hpp"
 
 namespace CasADi{
 
@@ -372,7 +373,7 @@ namespace CasADi{
 
   /** \brief Solve a system of equations: A*x = b 
   */
-  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver = SymbolicQR::creator, const Dictionary& dict = Dictionary());
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   * 
