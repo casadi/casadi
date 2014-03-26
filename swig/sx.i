@@ -62,6 +62,10 @@
 %template(IMatrix)           CasADi::Matrix<int>;
 %template(DMatrix)           CasADi::Matrix<double>;
 
+%extend CasADi::Matrix<double> {
+   %template(DMatrix) Matrix<int>;
+};
+
 %include "symbolic/sx/sx_element.hpp"
 
 
@@ -247,6 +251,11 @@ namespace CasADi {
 
 #endif // SWIGPYTHON
 
+
 %template(SX)             CasADi::Matrix<CasADi::SXElement>;
 
+%extend CasADi::Matrix<CasADi::SXElement> {
+   %template(SX) Matrix<int>;
+   %template(SX) Matrix<double>;
+};
 
