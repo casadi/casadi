@@ -367,7 +367,7 @@ namespace CasADi{
     
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      deps[k] = reshape(Ps[k],deps[k].sparsity());
+      deps[k] = MX(deps[k].sparsity(),Ps[k]);
     }
   
     return P;
@@ -388,7 +388,7 @@ namespace CasADi{
   
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      children[k] =  reshape(Ps[k],deps[k]);
+      children[k] =  MX(deps[k],Ps[k]);
     }
   
     return P;
