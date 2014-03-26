@@ -96,6 +96,7 @@ option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_DEPRECATED "Allow usage of deprecated syntax" ON)
+option(WITH_COVERAGE "Create coverage report" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
@@ -197,6 +198,12 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+
+if(WITH_COVERAGE)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
+set(CMAKE_EXE_LINKER_FLAGS  " -lgcov -fprofile-arcs --coverage ${CMAKE_EXE_LINKER_FLAGS}" )
+endif()
 
 if(MINGW)
   # Circumventing a bug in MinGW g++ v4.7.2, evoked by 752fa89355ffa
