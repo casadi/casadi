@@ -32,14 +32,14 @@
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
 
 #include "snopt_internal.hpp"
 #include "wsnopt.hpp"
 
 namespace CasADi {
 
-  SnoptInternal::SnoptInternal(const FX& nlp) : NLPSolverInternal(nlp) {
+  SnoptInternal::SnoptInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     addOption("detect_linear", OT_BOOLEAN, true,
               "Make an effort to treat linear constraints and linear variables specially.");
 

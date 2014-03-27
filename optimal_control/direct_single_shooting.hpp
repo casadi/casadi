@@ -23,8 +23,8 @@
 #ifndef DIRECT_SINGLE_SHOOTING_HPP
 #define DIRECT_SINGLE_SHOOTING_HPP
 
-#include "../symbolic/fx/ocp_solver.hpp"
-#include "../symbolic/fx/nlp_solver.hpp"
+#include "../symbolic/function/ocp_solver.hpp"
+#include "../symbolic/function/nlp_solver.hpp"
 
 namespace CasADi{
   class DirectSingleShootingInternal;
@@ -49,7 +49,7 @@ class DirectSingleShooting : public OCPSolver{
     DirectSingleShooting();
   
     /** \brief Create a multiple shooting OCP solver
-    * \param ffcn Continuous time dynamics, an CasADi::FX with the folowing mapping:
+    * \param ffcn Continuous time dynamics, an CasADi::Function with the folowing mapping:
     * \copydoc scheme_DAEInput
     * \copydoc scheme_DAEOutput
     * Important notes:
@@ -57,13 +57,13 @@ class DirectSingleShooting : public OCPSolver{
     *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters to be optimized but constant over the whole domain. The remainder are interpreted as controls. 
     *  - BEWARE: if the right hand side of ffcn is dependent on time, the results will be incorrect.
     *
-    * \param mfcn Mayer term, CasADi::FX mapping to cost (1 x 1)
+    * \param mfcn Mayer term, CasADi::Function mapping to cost (1 x 1)
     * @copydoc scheme_MayerInput
-    * \param cfcn Path constraints, CasADi::FX mapping to (nh x 1)
+    * \param cfcn Path constraints, CasADi::Function mapping to (nh x 1)
     * @copydoc scheme_DAEInput
     * \param rfcn Initial value constraints
     */
-    explicit DirectSingleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
+    explicit DirectSingleShooting(const Function& ffcn, const Function& mfcn, const Function& cfcn=Function(), const Function& rfcn=Function());
 
     /// Access functions of the node
     DirectSingleShootingInternal* operator->();

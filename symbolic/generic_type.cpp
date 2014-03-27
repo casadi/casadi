@@ -25,7 +25,7 @@
 #include "casadi_exception.hpp"
 #include <cmath>
 
-#include "fx/fx.hpp"
+#include "function/function.hpp"
 #include "functor.hpp"
 
 using namespace std;
@@ -41,7 +41,7 @@ namespace CasADi{
   typedef GenericTypeInternal<std::vector<int> > IntVectorType;
   typedef GenericTypeInternal<std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<SharedObject> SharedObjectType;
-  typedef GenericTypeInternal<FX> FXType;
+  typedef GenericTypeInternal<Function> FunctionType;
   typedef GenericTypeInternal<Dictionary> DictionaryType;
 /// \endcond
 
@@ -128,8 +128,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_IMPLICITFUNCTION";
       case OT_CALLBACK:
               return "OT_CALLBACK";
-      case OT_FX:
-              return "OT_FX";
+      case OT_Function:
+              return "OT_Function";
       case OT_VOIDPTR:
               return "OT_VOIDPTR";
       default:
@@ -175,8 +175,8 @@ bool GenericType::isSharedObject() const{
   return is_a<SharedObject>();
 }
   
-bool GenericType::isFX() const{
-  return is_a<FX>();
+bool GenericType::isFunction() const{
+  return is_a<Function>();
 }
 
 bool GenericType::isDictionary() const{
@@ -244,8 +244,8 @@ GenericType::GenericType(const SharedObject& obj) : type_(OT_UNKNOWN) {
   assignNode(new SharedObjectType(obj));
 }
 
-GenericType::GenericType(const FX& f) : type_(OT_FX) {
-  assignNode(new FXType(f));
+GenericType::GenericType(const Function& f) : type_(OT_Function) {
+  assignNode(new FunctionType(f));
 }
 
   GenericType::GenericType(const DerivativeGenerator& f) : type_(OT_DERIVATIVEGENERATOR) {
@@ -334,9 +334,9 @@ Dictionary& GenericType::toDictionary() {
   return static_cast<DictionaryType*>(get())->d_;
 }
 
-const FX& GenericType::toFX() const{
-  casadi_assert_message(isFX(),"type mismatch");
-  return static_cast<const FXType*>(get())->d_;
+const Function& GenericType::toFunction() const{
+  casadi_assert_message(isFunction(),"type mismatch");
+  return static_cast<const FunctionType*>(get())->d_;
 }
 
 bool GenericType::operator==(const GenericType& op2) const{

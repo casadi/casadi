@@ -25,14 +25,14 @@
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
 #include <ctime>
 
 using namespace std;
 
 namespace CasADi{
 
-  WorhpInternal::WorhpInternal(const FX& nlp) : NLPSolverInternal(nlp){
+  WorhpInternal::WorhpInternal(const Function& nlp) : NLPSolverInternal(nlp){
 
     // Monitors
     addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
@@ -590,7 +590,7 @@ namespace CasADi{
       casadi_assert_warning(!hessLag_.isNull(),"Hessian function not pregenerated");
 
       // Get Hessian 
-      FX& hessLag = this->hessLag();
+      Function& hessLag = this->hessLag();
 
       // Pass input
       hessLag.setInput(x,HESSLAG_X);
@@ -663,7 +663,7 @@ namespace CasADi{
       casadi_assert(!jacG_.isNull());
  
       // Get Jacobian
-      FX& jacG = this->jacG();
+      Function& jacG = this->jacG();
 
       double time1 = clock();
 

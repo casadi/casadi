@@ -65,7 +65,7 @@ namespace CasADi{
     virtual void init();
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-    virtual FX getDerivative(int nfwd, int nadj);
+    virtual Function getDerivative(int nfwd, int nadj);
     
   private:
     /// Dimension of state-space

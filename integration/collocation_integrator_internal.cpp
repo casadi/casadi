@@ -26,13 +26,13 @@
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
 using namespace std;
 namespace CasADi{
 
-  CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const FX& g) : ImplicitFixedStepIntegratorInternal(f,g){
+  CollocationIntegratorInternal::CollocationIntegratorInternal(const Function& f, const Function& g) : ImplicitFixedStepIntegratorInternal(f,g){
     addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
     setOption("name","unnamed_collocation_integrator");

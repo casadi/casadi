@@ -101,7 +101,7 @@ class Simulatortests(casadiTestCase):
       f.setInput(0.3,"x0")
       f.setInput(0.7,"p")
     
-    self.checkfx(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
+    self.checkfunction(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
 
   def test_controlsim_full(self):
     self.message("ControlSimulator inputs")
@@ -153,7 +153,7 @@ class Simulatortests(casadiTestCase):
       f.setInput(2,"u")
       f.setInput(DMatrix(range(1,N)).T/10,"u")
     
-    self.checkfx(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
+    self.checkfunction(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
     
   def test_sim_inputs(self):
     self.message("Simulator inputs")

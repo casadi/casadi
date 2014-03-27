@@ -29,11 +29,11 @@ namespace CasADi{
   IpoptSolver::IpoptSolver(){
   }
   
-  IpoptSolver::IpoptSolver(const FX& F, const FX& G){
+  IpoptSolver::IpoptSolver(const Function& F, const Function& G){
     assignNode(new IpoptInternal(joinFG(F,G)));
   }
 
-  IpoptSolver::IpoptSolver(const FX& nlp){
+  IpoptSolver::IpoptSolver(const Function& nlp){
     assignNode(new IpoptInternal(nlp));
   }
 

@@ -2075,7 +2075,7 @@ class MXtests(casadiTestCase):
                     self.assertTrue(min(c)>=0,str([sp,sp2,v1,v2,name,a,b]))
                 
                 if sp.size()>0 and sp2.size()>0 and v1!=0 and v2!=0:
-                  self.checkfx(f,g,hessian=False,failmessage=str([sp,sp2,v1,v2,x1_,x2_,name]))
+                  self.checkfunction(f,g,hessian=False,failmessage=str([sp,sp2,v1,v2,x1_,x2_,name]))
 
   @memory_heavy()
   def test_MXConstant(self):
@@ -2636,7 +2636,7 @@ class MXtests(casadiTestCase):
     f.setInput(range(1,5))
     g.setInput(range(1,5))
     
-    self.checkfx(f,g)
+    self.checkfunction(f,g)
     
   def test_reshape_sp(self):
     x = MX.sym("x",4,1)
@@ -2652,7 +2652,7 @@ class MXtests(casadiTestCase):
     f.setInput(range(1,5))
     g.setInput(range(1,5))
     
-    self.checkfx(f,g)
+    self.checkfunction(f,g)
     
   def test_issue1041(self):
     x = MX.sym("x",2)
@@ -2672,21 +2672,21 @@ class MXtests(casadiTestCase):
     mf = MXFunction([x],[x*x[0,0]])
     mf.init()
     
-    mfx = mf.expand()
-    mfx.init()
+    mfunction = mf.expand()
+    mfunction.init()
     
     mfg = mf.derivative(0,1)
     mfg.init()
     
-    mfxg = mfx.derivative(0,1)
-    mfxg.init()
+    mfunctiong = mfunction.derivative(0,1)
+    mfunctiong.init()
     
-    for f in [mfg,mfxg]:
+    for f in [mfg,mfunctiong]:
       f.setInput([1,2],0)
       #f.setInput(0.1,)
       f.setInput([4,5],1)
     
-    self.checkfx(mfg,mfxg)
+    self.checkfunction(mfg,mfunctiong)
     
   def test_bug_1042bis(self):
     x = MX.sym('x',2,1)
@@ -2705,7 +2705,7 @@ class MXtests(casadiTestCase):
     dx.setInput([1,2],0)
     dx.setInput([3,4],1)
     
-    self.checkfx(d,dx)
+    self.checkfunction(d,dx)
     
   def test_bug_1042tris(self):
     x = MX.sym('x',2,1)
@@ -2720,7 +2720,7 @@ class MXtests(casadiTestCase):
     dx.setInput([1,2],0)
     dx.setInput([3,4],1)
     
-    self.checkfx(d,dx)
+    self.checkfunction(d,dx)
     
       
 if __name__ == '__main__':

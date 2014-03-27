@@ -24,7 +24,7 @@
 
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
 
 #include "symbolic/profiling.hpp"
 #include "symbolic/casadi_options.hpp"
@@ -32,7 +32,7 @@
 using namespace std;
 namespace CasADi {
 
-  NewtonImplicitInternal::NewtonImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
+  NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL,1e-12,"Stopping criterion tolerance on step size");
     addOption("max_iter",  OT_INTEGER, 1000, "Maximum number of Newton iterations to perform before returning.");

@@ -24,7 +24,7 @@
 #define SOLVE_HPP
 
 #include "mx_node.hpp"
-#include "../fx/linear_solver.hpp"
+#include "../function/linear_solver.hpp"
 /// \cond INTERNAL
 
 namespace CasADi{
@@ -75,7 +75,7 @@ namespace CasADi{
     virtual int numInplace() const{ return 1;}
 
     /** \brief  Get function reference */
-    virtual FX& getFunction(){ return linear_solver_;}
+    virtual Function& getFunction(){ return linear_solver_;}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

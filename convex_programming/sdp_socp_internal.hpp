@@ -23,8 +23,8 @@
 #ifndef SDP_SOCP_INTERNAL_HPP
 #define SDP_SOCP_INTERNAL_HPP
 
-#include "symbolic/fx/socp_solver_internal.hpp"
-#include "symbolic/fx/sdp_solver.hpp"
+#include "symbolic/function/socp_solver_internal.hpp"
+#include "symbolic/function/sdp_solver.hpp"
 
 /// \cond INTERNAL
 namespace CasADi{
@@ -55,7 +55,7 @@ public:
     SDPSolver sdpsolver_;
     
     /// Mapping from G, H, E, F to P, G
-    FX mapping_;
+    Function mapping_;
 
 };
 

@@ -23,8 +23,8 @@
 #ifndef SDP_SDQP_INTERNAL_HPP
 #define SDP_SDQP_INTERNAL_HPP
 
-#include "symbolic/fx/sdqp_solver_internal.hpp"
-#include "symbolic/fx/sdp_solver.hpp"
+#include "symbolic/function/sdqp_solver_internal.hpp"
+#include "symbolic/function/sdp_solver.hpp"
 #include "interfaces/csparse/csparse_cholesky.hpp"
 
 /// \cond INTERNAL
@@ -63,7 +63,7 @@ namespace CasADi{
     CSparseCholesky cholesky_;
     
     /// Mapping
-    FX mapping_;
+    Function mapping_;
   };
 
 } // namespace CasADi

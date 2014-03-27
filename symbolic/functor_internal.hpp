@@ -48,14 +48,14 @@ namespace CasADi{
   
   class DerivativeGeneratorInternal : public FunctorInternal {
     friend class DerivativeGenerator;
-    virtual FX call(FX& fcn, int nfwd, int nadj, void* user_data)=0;
+    virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data)=0;
   };
 
   class DerivativeGeneratorCInternal : public DerivativeGeneratorInternal, FunctorCInternal<DerivativeGeneratorCPtr> {
     friend class DerivativeGenerator;
     
     DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr);
-    virtual FX call(FX& fcn, int nfwd, int nadj, void* user_data);
+    virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data);
     virtual DerivativeGeneratorCInternal* clone() const;
   };
 
@@ -74,14 +74,14 @@ namespace CasADi{
   
   class CallbackInternal : public FunctorInternal {
     friend class Callback;
-    virtual int call(FX& fcn, void* user_data)=0;
+    virtual int call(Function& fcn, void* user_data)=0;
   };
 
   class CallbackCInternal : public CallbackInternal, FunctorCInternal<CallbackCPtr> {
     friend class Callback;
     
     CallbackCInternal(CallbackCPtr ptr);
-    virtual int call(FX& fcn, void* user_data);
+    virtual int call(Function& fcn, void* user_data);
     virtual CallbackCInternal* clone() const;
   };
 

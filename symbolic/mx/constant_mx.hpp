@@ -363,7 +363,7 @@ namespace CasADi{
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
     casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
     
-    if (ScX && !operation_checker<FX0Checker>(op)) {
+    if (ScX && !operation_checker<Function0Checker>(op)) {
       double ret;
       casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,0,ret);
       

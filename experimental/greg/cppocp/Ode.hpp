@@ -8,7 +8,7 @@
 #include <map>
 
 #include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
+#include <symbolic/function/sx_function.hpp>
 
 #define IDX_ODE_STEP_STATE  0
 #define IDX_ODE_STEP_ACTION 1

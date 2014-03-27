@@ -26,8 +26,8 @@
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
 #include "../symbolic/sx/sx_tools.hpp"
-#include "../symbolic/fx/mx_function.hpp"
-#include "../symbolic/fx/sx_function.hpp"
+#include "../symbolic/function/mx_function.hpp"
+#include "../symbolic/function/sx_function.hpp"
 
 INPUTSCHEME(DPLEInput)
 OUTPUTSCHEME(DPLEOutput)
@@ -123,12 +123,12 @@ namespace CasADi{
       }
     }
   
-    FXInternal::init();
+    FunctionInternal::init();
       
   }
 
   void DpleInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-    FXInternal::deepCopyMembers(already_copied);
+    FunctionInternal::deepCopyMembers(already_copied);
   }
 
 

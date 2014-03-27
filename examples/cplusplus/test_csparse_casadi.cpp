@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   cout << "solution (fd) = " << (F.output("X")-x_unpreturbed)/t << endl;
 
   // Jacobian
-  FX J = F.jacobian("B","X");  
+  Function J = F.jacobian("B","X");  
   J.init();
   J.setInput(val,"A");
   J.setInput(rhs,"B");

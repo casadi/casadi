@@ -25,10 +25,10 @@
 #include "interfaces/ipopt/ipopt_solver.hpp"
 #include "interfaces/sundials/cvodes_integrator.hpp"
 #include "optimal_control/ocp_tools.hpp"
-#include "symbolic/fx/simulator.hpp"
-#include "symbolic/fx/simulator_internal.hpp"
+#include "symbolic/function/simulator.hpp"
+#include "symbolic/function/simulator_internal.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 
 using namespace CasADi;
 using namespace CasADi::OptimalControl;

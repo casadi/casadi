@@ -25,7 +25,7 @@
 
 #include "knitro_solver.hpp"
 #include "knitro.h"
-#include "symbolic/fx/nlp_solver_internal.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
 namespace CasADi{
@@ -36,7 +36,7 @@ namespace CasADi{
   class KnitroInternal : public NLPSolverInternal{
 
   public:
-    explicit KnitroInternal(const FX& nlp);
+    explicit KnitroInternal(const Function& nlp);
     virtual ~KnitroInternal();
     virtual KnitroInternal* clone() const{ return new KnitroInternal(*this);}
 

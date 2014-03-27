@@ -23,8 +23,8 @@
 #include "functor_internal.hpp"
 
 #include "matrix/sparsity.hpp"
-#include "fx/fx.hpp"
-#include "fx/custom_function.hpp"
+#include "function/function.hpp"
+#include "function/custom_function.hpp"
 
 using namespace std;
 
@@ -35,7 +35,7 @@ namespace CasADi{
   DerivativeGeneratorCInternal::DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr)  : FunctorCInternal(ptr) {
   }
   
-  FX DerivativeGeneratorCInternal::call(FX& fcn, int nfwd, int nadj, void* user_data) {
+  Function DerivativeGeneratorCInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
     casadi_assert(ptr_!=0);
     return ptr_(fcn, nfwd, nadj, user_data);
   }
@@ -59,7 +59,7 @@ namespace CasADi{
   CallbackCInternal::CallbackCInternal(CallbackCPtr ptr)  : FunctorCInternal<CallbackCPtr>(ptr) {
   }
   
-  int CallbackCInternal::call(FX& fcn, void* user_data) {
+  int CallbackCInternal::call(Function& fcn, void* user_data) {
     casadi_assert(ptr_!=0);
     return ptr_(fcn, user_data);
   }

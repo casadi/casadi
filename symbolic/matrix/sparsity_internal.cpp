@@ -2323,17 +2323,17 @@ namespace CasADi{
     return ret;
   }
 
-  Sparsity SparsityInternal::patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const{
+  Sparsity SparsityInternal::patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const{
     static vector<unsigned char> mapping;
-    return patternCombineGen1<false>(y, f0x_is_zero, fx0_is_zero, mapping);
+    return patternCombineGen1<false>(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
-  Sparsity SparsityInternal::patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, vector<unsigned char>& mapping) const{
-    return patternCombineGen1<true>(y, f0x_is_zero, fx0_is_zero, mapping);    
+  Sparsity SparsityInternal::patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero, vector<unsigned char>& mapping) const{
+    return patternCombineGen1<true>(y, f0x_is_zero, function0_is_zero, mapping);    
   }
   
   template<bool with_mapping>
-  Sparsity SparsityInternal::patternCombineGen1(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const{
+  Sparsity SparsityInternal::patternCombineGen1(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero, std::vector<unsigned char>& mapping) const{
 
     // Quick return if identical
     if(isEqual(y)){
@@ -2345,19 +2345,19 @@ namespace CasADi{
     }
 
     if(f0x_is_zero){
-      if(fx0_is_zero){
+      if(function0_is_zero){
         return patternCombineGen<with_mapping,true,true>(y,mapping);
       } else {
         return patternCombineGen<with_mapping,true,false>(y,mapping);
       }      
-    } else if(fx0_is_zero){
+    } else if(function0_is_zero){
       return patternCombineGen<with_mapping,false,true>(y,mapping);
     } else {
       return patternCombineGen<with_mapping,false,false>(y,mapping);
     }
   }
   
-  template<bool with_mapping, bool f0x_is_zero, bool fx0_is_zero>
+  template<bool with_mapping, bool f0x_is_zero, bool function0_is_zero>
   Sparsity SparsityInternal::patternCombineGen(const Sparsity& y, vector<unsigned char>& mapping) const{
 
     // Assert dimensions
@@ -2396,7 +2396,7 @@ namespace CasADi{
           if(with_mapping) mapping.push_back( 1 | 2);
           el1++; el2++;
         } else if(row1<row2){ //  only first argument is nonzero
-          if(!fx0_is_zero){
+          if(!function0_is_zero){
             ret_row.push_back(row1);
             if(with_mapping) mapping.push_back(1);
           } else {

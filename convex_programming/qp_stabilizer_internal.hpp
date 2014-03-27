@@ -23,8 +23,8 @@
 #ifndef QP_STABILIZER_INTERNAL_HPP
 #define QP_STABILIZER_INTERNAL_HPP
 
-#include "symbolic/fx/stabilized_qp_solver_internal.hpp"
-#include "symbolic/fx/stabilized_qp_solver.hpp"
+#include "symbolic/function/stabilized_qp_solver_internal.hpp"
+#include "symbolic/function/stabilized_qp_solver.hpp"
 
 /// \cond INTERNAL
 namespace CasADi{

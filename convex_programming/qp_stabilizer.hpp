@@ -23,7 +23,7 @@
 #ifndef QP_STABILIZER_HPP
 #define QP_STABILIZER_HPP
 
-#include "symbolic/fx/stabilized_qp_solver.hpp"
+#include "symbolic/function/stabilized_qp_solver.hpp"
 
 namespace CasADi {
   

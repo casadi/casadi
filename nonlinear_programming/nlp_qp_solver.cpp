@@ -35,11 +35,11 @@ NLPQPSolver::NLPQPSolver(const QPStructure &st)  {
 }
 
 NLPQPInternal* NLPQPSolver::operator->(){
-  return (NLPQPInternal*)(FX::operator->());
+  return (NLPQPInternal*)(Function::operator->());
 }
 
 const NLPQPInternal* NLPQPSolver::operator->() const{
-  return (const NLPQPInternal*)(FX::operator->());
+  return (const NLPQPInternal*)(Function::operator->());
 
 }
 

@@ -23,7 +23,7 @@
 #ifndef DPLE_SOLVER_HPP
 #define DPLE_SOLVER_HPP
 
-#include "../symbolic/fx/fx.hpp"
+#include "../symbolic/function/function.hpp"
 
 /** \defgroup DPLE_doc Discrete periodic Lyapunov Equation solver
 
@@ -68,7 +68,7 @@ namespace CasADi{
       \date 2014
       
   */
-  class DpleSolver : public FX {
+  class DpleSolver : public Function {
   public:
     /// Default constructor
     DpleSolver();

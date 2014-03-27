@@ -29,11 +29,11 @@ namespace CasADi{
   KnitroSolver::KnitroSolver(){
   }
   
-  KnitroSolver::KnitroSolver(const FX& F, const FX& G){
+  KnitroSolver::KnitroSolver(const Function& F, const Function& G){
     assignNode(new KnitroInternal(joinFG(F,G)));
   }
 
-  KnitroSolver::KnitroSolver(const FX& nlp){
+  KnitroSolver::KnitroSolver(const Function& nlp){
     assignNode(new KnitroInternal(nlp));
   }
 

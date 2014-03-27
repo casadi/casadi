@@ -30,7 +30,7 @@ namespace CasADi{
   
   /** \brief  Forward declaration */
   class MXNode;
-  class FX;
+  class Function;
 
 
   /** \brief MX - Matrix expression
@@ -308,7 +308,7 @@ namespace CasADi{
     bool isRegular() const;
   
     /// Get function
-    FX getFunction();
+    Function getFunction();
 
     /// Is binary operation
     bool isBinary() const;

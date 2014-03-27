@@ -47,7 +47,7 @@ double getRealTime( );
 
 enum ProfilingData_Type { ProfilingData_Type_TIMELINE, ProfilingData_Type_SOURCE, ProfilingData_Type_NAME, ProfilingData_Type_ENTRY, ProfilingData_Type_EXIT, ProfilingData_Type_IO };
 
-enum ProfilingData_FXType { ProfilingData_FXType_MXFunction, ProfilingData_FXType_SXFunction, ProfilingData_FXType_Other };
+enum ProfilingData_FunctionType { ProfilingData_FunctionType_MXFunction, ProfilingData_FunctionType_SXFunction, ProfilingData_FunctionType_Other };
 
 struct ProfilingHeader {
   ProfilingData_Type type;
@@ -71,7 +71,7 @@ struct ProfilingData_SOURCE {
 struct ProfilingData_NAME {
   long thisp;
   int length;
-  ProfilingData_FXType type;
+  ProfilingData_FunctionType type;
   int algorithm_size;
   int numin;
   int numout;
@@ -130,7 +130,7 @@ long ptrToLong(T *a) {
 }
 
 template<typename T>
-void profileWriteName(std::ofstream &f,T *a,const std::string &name, ProfilingData_FXType type, int algorithm_size) {
+void profileWriteName(std::ofstream &f,T *a,const std::string &name, ProfilingData_FunctionType type, int algorithm_size) {
   ProfilingData_NAME s;
   s.thisp=ptrToLong(a);
   s.length=name.size();

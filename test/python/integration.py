@@ -90,7 +90,7 @@ class Integrationtests(casadiTestCase):
       f.setInput(0.3,"x0")
       f.setInput(0.7,"p")
     
-    self.checkfx(integrator,solution,digits=6)
+    self.checkfunction(integrator,solution,digits=6)
 
   def test_tools_trivial(self):
     num = self.num
@@ -118,7 +118,7 @@ class Integrationtests(casadiTestCase):
       integrator.evaluate()
       
 
-      self.checkfx(integrator,solution,digits=5)
+      self.checkfunction(integrator,solution,digits=5)
 
   @slow()
   def test_tools(self):
@@ -147,7 +147,7 @@ class Integrationtests(casadiTestCase):
         f.setInput(0.3,"x0")
         f.setInput(0.7,"p")
       
-      self.checkfx(integrator,solution,digits=4)
+      self.checkfunction(integrator,solution,digits=4)
     
   @memory_heavy()
   def test_jac(self):
@@ -214,7 +214,7 @@ class Integrationtests(casadiTestCase):
         for Integrator, features, options in integrators:
           self.message(Integrator.__name__)
           if p_features[0] in features:
-            g = FX()
+            g = Function()
             if len(rdin)>1:
               g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
               g.init()
@@ -325,7 +325,7 @@ class Integrationtests(casadiTestCase):
       for Integrator, features, options in integrators:
         self.message(Integrator.__name__)
         if p_features[0] in features:
-          g = FX()
+          g = Function()
           if len(rdin)>1:
             g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
             g.init()
@@ -374,7 +374,7 @@ class Integrationtests(casadiTestCase):
 
               integrator.evaluate()
               
-              self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+              self.checkfunction(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
               
               
 
@@ -490,7 +490,7 @@ class Integrationtests(casadiTestCase):
           if p_features[0] in features:
             message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
             print message
-            g = FX()
+            g = Function()
             if len(rdin)>1:
               g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
               g.init()
@@ -560,7 +560,7 @@ class Integrationtests(casadiTestCase):
                   ff.setInput(v,i)
             integrator.evaluate()
             
-            self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+            self.checkfunction(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
 
         
   def setUp(self):

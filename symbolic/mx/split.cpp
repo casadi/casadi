@@ -25,7 +25,7 @@
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
-#include "../fx/sx_function.hpp"
+#include "../function/sx_function.hpp"
 #include "../matrix/sparsity_tools.hpp"
 #include "../casadi_options.hpp"
 

@@ -29,11 +29,11 @@ namespace CasADi{
   StabilizedSQPMethod::StabilizedSQPMethod(){
   }
   
-  StabilizedSQPMethod::StabilizedSQPMethod(const FX& F, const FX& G){
+  StabilizedSQPMethod::StabilizedSQPMethod(const Function& F, const Function& G){
     assignNode(new StabilizedSQPInternal(joinFG(F,G)));
   }
 
-  StabilizedSQPMethod::StabilizedSQPMethod(const FX& nlp){
+  StabilizedSQPMethod::StabilizedSQPMethod(const Function& nlp){
     assignNode(new StabilizedSQPInternal(nlp));
   }
 

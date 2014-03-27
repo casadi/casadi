@@ -33,11 +33,11 @@ def update_types_table(p):
 
 def tohaskelltype(s,alias=False,level=0):
   """
-  std::vector<(CasADi::FX)>
+  std::vector<(CasADi::Function)>
 
   ->
 
-  StdVec (CasadiClass FX)
+  StdVec (CasadiClass Function)
   """
   if level==0:
     if s.startswith("r.q(const)."):

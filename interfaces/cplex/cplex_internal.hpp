@@ -23,7 +23,7 @@
 #define CPLEX_INTERNAL_HPP
 
 #include "ilcplex/cplex.h"
-#include "symbolic/fx/qp_solver_internal.hpp"
+#include "symbolic/function/qp_solver_internal.hpp"
 
 #include <string>
 

@@ -23,8 +23,8 @@
 #ifndef KINSOL_SOLVER_HPP
 #define KINSOL_SOLVER_HPP
 
-#include "symbolic/fx/implicit_function.hpp"
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/implicit_function.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
 namespace CasADi{
   
@@ -58,10 +58,10 @@ namespace CasADi{
   
     /** \brief  Create an KINSOL instance
      *  
-     * \param f FX mapping from (n+1) inputs to 1 output
+     * \param f Function mapping from (n+1) inputs to 1 output
      *
      */
-    explicit KinsolSolver(const FX& f, const FX& jac=FX(), const LinearSolver& linsol=LinearSolver());
+    explicit KinsolSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
   
     /** \brief  Access functions of the node */
     KinsolInternal* operator->();
@@ -76,7 +76,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static ImplicitFunction creator(const FX& f, const FX& jac, const LinearSolver& linsol){ return KinsolSolver(f,jac,linsol);}
+    static ImplicitFunction creator(const Function& f, const Function& jac, const LinearSolver& linsol){ return KinsolSolver(f,jac,linsol);}
 #ifdef SWIG
     %nocallback;
 #endif

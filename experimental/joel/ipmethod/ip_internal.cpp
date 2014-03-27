@@ -24,7 +24,7 @@
 #include "symbolic/std_vector_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/casadi_calculus.hpp"
 #include <ctime>
@@ -33,7 +33,7 @@
 using namespace std;
 namespace CasADi{
 
-IPInternal::IPInternal(const FX& F, const FX& G) : NLPSolverInternal(FX(),F,G){
+IPInternal::IPInternal(const Function& F, const Function& G) : NLPSolverInternal(Function(),F,G){
   casadi_warning("The IP method is experimental and incomplete. Can be used as the basis of an IP solver in CasADi.");
   addOption("linear_solver",         OT_LINEARSOLVER,   GenericType(), "The linear solver to be used by the IP method");
   addOption("linear_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");

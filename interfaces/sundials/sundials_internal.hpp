@@ -24,7 +24,7 @@
 #define SUNDIALS_INTERNAL_HPP
 
 #include "sundials_integrator.hpp"
-#include "symbolic/fx/integrator_internal.hpp"
+#include "symbolic/function/integrator_internal.hpp"
 
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_dense.h>
@@ -37,7 +37,7 @@ namespace CasADi{
 class SundialsInternal : public IntegratorInternal{
 public:
   /** \brief  Constructor */
-  SundialsInternal(const FX& f, const FX& g);
+  SundialsInternal(const Function& f, const Function& g);
 
   /** \brief  Destructor */
   virtual ~SundialsInternal()=0;
@@ -96,16 +96,16 @@ public:
   bool use_preconditioner_, use_preconditionerB_;
   
   // Jacobian of the DAE with respect to the state and state derivatives
-  FX jac_, jacB_;
+  Function jac_, jacB_;
 
   // Jacobian times vector functions
-  FX f_fwd_, g_fwd_;
+  Function f_fwd_, g_fwd_;
   
   /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual FX getJac()=0;
+  virtual Function getJac()=0;
   
   /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual FX getJacB()=0;
+  virtual Function getJacB()=0;
   
 };
   

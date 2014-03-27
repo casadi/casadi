@@ -23,7 +23,7 @@
 #ifndef GSL_INTEGRATOR_HPP
 #define GSL_INTEGRATOR_HPP
 
-#include "symbolic/fx/integrator.hpp"
+#include "symbolic/function/integrator.hpp"
 
 
 // http://www.network-theory.co.uk/docs/gslref/OrdinaryDifferentialEquations.html
@@ -52,9 +52,9 @@ public:
   GslIntegrator();
   
   /** \brief  Create an integrator for explicit ODEs
-  *   \param f CasADi::FX mapping from CasADi::ODEInput to CasADi::ODEOutput.
+  *   \param f CasADi::Function mapping from CasADi::ODEInput to CasADi::ODEOutput.
   */
-  explicit GslIntegrator(const FX& f, const FX& q=FX());
+  explicit GslIntegrator(const Function& f, const Function& q=Function());
   
   /** \brief  Access functions of the node */
   GslInternal* operator->();

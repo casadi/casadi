@@ -31,11 +31,11 @@ SundialsIntegrator::SundialsIntegrator(){
 }
 
 SundialsInternal* SundialsIntegrator::operator->(){
-  return (SundialsInternal*)(FX::operator->());
+  return (SundialsInternal*)(Function::operator->());
 }
 
 const SundialsInternal* SundialsIntegrator::operator->() const{
-   return (const SundialsInternal*)(FX::operator->()); 
+   return (const SundialsInternal*)(Function::operator->()); 
 }
   
 bool SundialsIntegrator::checkNode() const{

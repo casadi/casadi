@@ -279,7 +279,7 @@ class LinearSolverTests(casadiTestCase):
       self.checkarray(solver.output("X"),res)
       #   result' = A'\b'             Ax = b
 
-  def test_simple_fx_direct(self):
+  def test_simple_function_direct(self):
     A_ = DMatrix([[3,1],[7,2]])
     A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0.5])
@@ -307,9 +307,9 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
       
-      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
+      self.checkfunction(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
        
-  def test_simple_fx_indirect(self):
+  def test_simple_function_indirect(self):
     A_ = DMatrix([[3,1],[7,2]])
     A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0.5])
@@ -343,7 +343,7 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
       
-      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
+      self.checkfunction(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
 
   @slow()
   def test_simple_solve_node(self):
@@ -384,7 +384,7 @@ class LinearSolverTests(casadiTestCase):
         solution.setInput(A_,0)
         solution.setInput(b_,1)
         
-        self.checkfx(f,solution)
+        self.checkfunction(f,solution)
 
   @slow()
   def test_simple_solve_node_sparseA(self):
@@ -427,7 +427,7 @@ class LinearSolverTests(casadiTestCase):
         solution.setInput(A_,0)
         solution.setInput(b_,1)
         
-        self.checkfx(f,solution,sens_der=False,digits_sens=7)
+        self.checkfunction(f,solution,sens_der=False,digits_sens=7)
 
   @slow()
   def test_simple_solve_node_sparseB(self):
@@ -469,7 +469,7 @@ class LinearSolverTests(casadiTestCase):
         solution.setInput(A_,0)
         solution.setInput(b_,1)
         
-        self.checkfx(f,solution,digits_sens=7)
+        self.checkfunction(f,solution,digits_sens=7)
 
   @requires("CSparseCholesky")
   def test_cholesky(self):

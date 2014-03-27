@@ -40,7 +40,7 @@ using namespace std;
 
 namespace CasADi{
 
-  IpoptInternal::IpoptInternal(const FX& nlp) : NLPSolverInternal(nlp){
+  IpoptInternal::IpoptInternal(const Function& nlp) : NLPSolverInternal(nlp){
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true, "print information about execution time");
   
@@ -531,7 +531,7 @@ namespace CasADi{
       }
       
       // Get function
-      FX& jacG = this->jacG();
+      Function& jacG = this->jacG();
     
       double time1 = clock();
       if (values == NULL) {

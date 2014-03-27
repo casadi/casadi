@@ -25,7 +25,7 @@
 #include "../../symbolic/std_vector_tools.hpp"
 #include "../../symbolic/matrix/matrix_tools.hpp"
 #include "../../symbolic/mx/mx_tools.hpp"
-#include "../../symbolic/fx/mx_function.hpp"
+#include "../../symbolic/function/mx_function.hpp"
 /**
    Some implementation details
    "Multiple cones can be created for the same solver, but it is usually more efficient to group all blocks into the same conic structure." user manual   

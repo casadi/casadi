@@ -23,8 +23,8 @@
 #ifndef NLP_QP_INTERNAL_HPP
 #define NLP_QP_INTERNAL_HPP
 
-#include "symbolic/fx/qp_solver_internal.hpp"
-#include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/function/qp_solver_internal.hpp"
+#include "symbolic/function/nlp_solver.hpp"
 
 /// \cond INTERNAL
 namespace CasADi{

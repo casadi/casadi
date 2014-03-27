@@ -54,13 +54,13 @@ namespace CasADi{
       The copy constructor and the assignment operator perform shallow copies only, to make a deep copy you must use the
       clone method explictly. This will give a shared pointer instance.
   
-      In an inheritance hierarchy, you can cast down automatically, e.g. (SXFunction is a child class of FX):
+      In an inheritance hierarchy, you can cast down automatically, e.g. (SXFunction is a child class of Function):
       SXFunction derived(...);
-      FX base = derived;
+      Function base = derived;
   
       To cast up, use the shared_cast template function, which works analogously to dynamic_cast, static_cast, const_cast etc, e.g.:
       SXFunction derived(...);
-      FX base = derived;
+      Function base = derived;
       SXFunction derived_from_base = shared_cast<SXFunction>(base);
   
       A failed shared_cast will result in a null pointer (cf. dynamic_cast)

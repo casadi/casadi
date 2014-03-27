@@ -65,11 +65,11 @@ namespace CasADi{
     virtual void init();
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-    virtual FX getDerivative(int nfwd, int nadj);
+    virtual Function getDerivative(int nfwd, int nadj);
     
   private:
     /// Main implementation as MXFunction
-    FX f_;
+    Function f_;
     
     /// State space dimension
     int n_;

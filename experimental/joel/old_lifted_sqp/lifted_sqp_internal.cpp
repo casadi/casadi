@@ -24,7 +24,7 @@
 #include "symbolic/std_vector_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/casadi_calculus.hpp"
 #include <ctime>
@@ -33,7 +33,7 @@
 using namespace std;
 namespace CasADi{
 
-LiftedSQPInternal::LiftedSQPInternal(const FX& F, const FX& G) : NLPSolverInternal(FX(),F,G){
+LiftedSQPInternal::LiftedSQPInternal(const Function& F, const Function& G) : NLPSolverInternal(Function(),F,G){
   casadi_warning("CasADi::LiftedSQP has been replaced by CasADi::SCPgen. This class will be deleted.");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");

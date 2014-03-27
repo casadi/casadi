@@ -26,7 +26,7 @@
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
 #include "symbolic/profiling.hpp"
@@ -35,7 +35,7 @@
 using namespace std;
 namespace CasADi{
 
-  OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
+  OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
     addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
@@ -331,7 +331,7 @@ namespace CasADi{
     ifcn_out[1+INTEGRATOR_QF] = QF;
     ifcn_out[1+INTEGRATOR_RXF] = RX[0][0];
     ifcn_out[1+INTEGRATOR_RQF] = RQF;
-    FX ifcn = MXFunction(ifcn_in,ifcn_out);
+    Function ifcn = MXFunction(ifcn_in,ifcn_out);
     std::stringstream ss_ifcn;
     ss_ifcn << "collocation_implicit_residual_" << getOption("name");
     ifcn.setOption("name",ss_ifcn.str());
@@ -346,7 +346,7 @@ namespace CasADi{
     implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
   
     // Allocate a root-finding solver
-    implicit_solver_ = implicit_function_creator(ifcn,FX(),LinearSolver());
+    implicit_solver_ = implicit_function_creator(ifcn,Function(),LinearSolver());
     std::stringstream ss_implicit_solver;
     ss_implicit_solver << "collocation_implicitsolver_" << getOption("name");
     implicit_solver_.setOption("name",ss_implicit_solver.str());

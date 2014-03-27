@@ -23,7 +23,7 @@
 #ifndef WORHP_INTERNAL_HPP
 #define WORHP_INTERNAL_HPP
 
-#include "symbolic/fx/nlp_solver_internal.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
 
 // GCC_VERSION is defined in worhp.h
 #ifdef GCC_VERSION
@@ -45,7 +45,7 @@ namespace CasADi{
 
   public:
     // Constructor
-    explicit WorhpInternal(const FX& nlp);
+    explicit WorhpInternal(const Function& nlp);
 
     // Destructor
     virtual ~WorhpInternal();

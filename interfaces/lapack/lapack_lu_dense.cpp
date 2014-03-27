@@ -37,11 +37,11 @@ namespace CasADi{
   }
  
   LapackLUDenseInternal* LapackLUDense::operator->(){
-    return static_cast<LapackLUDenseInternal*>(FX::operator->());
+    return static_cast<LapackLUDenseInternal*>(Function::operator->());
   }
 
   const LapackLUDenseInternal* LapackLUDense::operator->() const{
-    return static_cast<const LapackLUDenseInternal*>(FX::operator->());
+    return static_cast<const LapackLUDenseInternal*>(Function::operator->());
   }
 
   LapackLUDenseInternal::LapackLUDenseInternal(const Sparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){
@@ -80,7 +80,7 @@ namespace CasADi{
     allow_equilibration_failure_ = getOption("allow_equilibration_failure").toInt();
     
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) { 
-      profileWriteName(CasadiOptions::profilingLog,this,"LapackLUDense",ProfilingData_FXType_Other,2);
+      profileWriteName(CasadiOptions::profilingLog,this,"LapackLUDense",ProfilingData_FunctionType_Other,2);
       
       profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"prepare",-1);
       profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"solve",-1);

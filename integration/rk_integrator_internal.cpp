@@ -26,7 +26,7 @@
 using namespace std;
 namespace CasADi{
 
-  RKIntegratorInternal::RKIntegratorInternal(const FX& f, const FX& g) : FixedStepIntegratorInternal(f,g){
+  RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) : FixedStepIntegratorInternal(f,g){
   }
 
   void RKIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){

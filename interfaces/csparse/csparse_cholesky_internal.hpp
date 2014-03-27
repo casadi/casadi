@@ -30,7 +30,7 @@ extern "C"{
 }
 
 #include "csparse_cholesky.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
 
 namespace CasADi{
 

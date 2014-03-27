@@ -64,7 +64,7 @@ namespace CasADi{
     called_once_ = false;
     
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) { 
-      profileWriteName(CasadiOptions::profilingLog,this,"CSparse",ProfilingData_FXType_Other,2);
+      profileWriteName(CasadiOptions::profilingLog,this,"CSparse",ProfilingData_FunctionType_Other,2);
       
       profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"prepare",-1);
       profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"solve",-1);

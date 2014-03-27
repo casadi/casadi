@@ -30,7 +30,7 @@ def attach_return_type(f,t):
   return f
 
 def pyderivativegenerator(f):
-  return attach_return_type(f,FX)
+  return attach_return_type(f,Function)
 
 def pyevaluate(f):
   return attach_return_type(f,None)
@@ -148,7 +148,7 @@ PyObject * getCasadiObject(const std::string &s) {
 }
 
 #include "symbolic/functor_internal.hpp"
-#include "symbolic/fx/custom_function.hpp"
+#include "symbolic/function/custom_function.hpp"
 
 namespace CasADi {
   //using namespace CasADi;
@@ -165,7 +165,7 @@ namespace CasADi {
     friend class DerivativeGeneratorPython;
     
   DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-    virtual FX call(FX& fcn, int nfwd, int nadj, void* user_data);
+    virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data);
     virtual DerivativeGeneratorPythonInternal* clone() const { return new DerivativeGeneratorPythonInternal(p_); }
   };
    
@@ -186,7 +186,7 @@ namespace CasADi {
     friend class CallbackPython;
     
     CallbackPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-    virtual int call(FX& fcn, void* user_data);
+    virtual int call(Function& fcn, void* user_data);
     virtual CallbackPythonInternal* clone() const { return new CallbackPythonInternal(p_); }
   };
   
@@ -207,15 +207,15 @@ namespace CasADi {
 
 namespace CasADi {
 
-  FX DerivativeGeneratorPythonInternal::call(FX& fcn, int nfwd, int nadj, void* user_data) {
+  Function DerivativeGeneratorPythonInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
     casadi_assert(p_!=0);
     PyObject * nfwd_py = PyInt_FromLong(nfwd);
     PyObject * nadj_py = PyInt_FromLong(nadj);
-    PyObject * fcn_py = SWIG_NewPointerObj((new FX(static_cast< const FX& >(fcn))), SWIGTYPE_p_CasADi__FX, SWIG_POINTER_OWN |  0 );
+    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_CasADi__Function, SWIG_POINTER_OWN |  0 );
     if(!fcn_py) {
       Py_DECREF(nfwd_py);
       Py_DECREF(nadj_py);
-      throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert FX to python");
+      throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert Function to python");
     }
     
     PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, nfwd_py, nadj_py, NULL);
@@ -224,9 +224,9 @@ namespace CasADi {
     Py_DECREF(fcn_py);
     
     if (r) {
-      FX ret;  
-      int result = meta< FX >::as(r,ret);
-      if(!result) { Py_DECREF(r); throw CasadiException("DerivativeGeneratorPythonInternal: return type was not FX."); }
+      Function ret;  
+      int result = meta< Function >::as(r,ret);
+      if(!result) { Py_DECREF(r); throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function."); }
       Py_DECREF(r);
       return ret;
     } else {
@@ -253,10 +253,10 @@ namespace CasADi {
 
   }
   
-  int CallbackPythonInternal::call(FX& fcn, void* user_data) {
+  int CallbackPythonInternal::call(Function& fcn, void* user_data) {
     casadi_assert(p_!=0);
 
-    PyObject * fcn_py = SWIG_NewPointerObj((new FX(static_cast< const FX& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
+    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
     if(!fcn_py) {
       throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
     }
@@ -477,10 +477,10 @@ template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::
    NATIVERETURN(CasADi::DerivativeGenerator, s)
    PyObject* return_type = getReturnType(p);
    if (!return_type) return false;
-   PyObject* fx = getCasadiObject("FX");
-   if (!fx) { Py_DECREF(return_type); return false; }
-   bool res = PyClass_IsSubclass(return_type,fx);
-   Py_DECREF(return_type);Py_DECREF(fx);
+   PyObject* function = getCasadiObject("Function");
+   if (!function) { Py_DECREF(return_type); return false; }
+   bool res = PyClass_IsSubclass(return_type,function);
+   Py_DECREF(return_type);Py_DECREF(function);
    if (res) {
      s = CasADi::DerivativeGeneratorPython(p);
      return true;
@@ -575,9 +575,9 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     }
     if (!g) { PyErr_Clear();  return false;}
     
-  } else if (meta< CasADi::FX >::couldbe(p)) {
-    CasADi::FX temp;
-    int ret = meta< CasADi::FX >::as(p,temp); 
+  } else if (meta< CasADi::Function >::couldbe(p)) {
+    CasADi::Function temp;
+    int ret = meta< CasADi::Function >::as(p,temp); 
     if (!ret) return false;
     s = CasADi::GenericType(temp);
   } else if (meta< CasADi::GenericType::Dictionary >::couldbe(p) || meta< CasADi::DerivativeGenerator >::couldbe(p) || meta< CasADi::Callback >::couldbe(p)) {

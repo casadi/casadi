@@ -24,7 +24,7 @@
 #define VARIABLE_HPP
 
 #include <iostream>
-#include "../symbolic/fx/sx_function.hpp"
+#include "../symbolic/function/sx_function.hpp"
 #include "../symbolic/mx/mx.hpp"
 
 namespace CasADi{

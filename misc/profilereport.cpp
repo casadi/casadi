@@ -34,7 +34,7 @@ struct functionstat {
   double overhead_time; // Part of time not spent in evaluating lines or external calls
   int count;
   int algorithm_size;
-  ProfilingData_FXType type;
+  ProfilingData_FunctionType type;
   std::vector<iostat> inputs;
   std::vector<iostat> outputs;
 };
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
     if (f.count ==0 ) continue;
-    std::cout << f.name << ":" << f.count << ":" << f.algorithm_size << ":" << bool(f.type==ProfilingData_FXType_MXFunction) << std::endl;
+    std::cout << f.name << ":" << f.count << ":" << f.algorithm_size << ":" << bool(f.type==ProfilingData_FunctionType_MXFunction) << std::endl;
     /**
     for (int i=0;i<f.lines.size();++i) {
      const linestat &L = f.lines[i];
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
   // Calculate external_time and overhead_time
   for (Stats::iterator it = data.begin();it!=data.end();++it) {
     functionstat & f = it->second;
-    if (f.type==ProfilingData_FXType_MXFunction) {
+    if (f.type==ProfilingData_FunctionType_MXFunction) {
       f.overhead_time = f.total_time;
       for (std::vector<linestat>::const_iterator it2 = f.lines.begin();it2!=f.lines.end();++it2) {
         const linestat & l = *it2;
@@ -241,7 +241,7 @@ int main(int argc, char* argv[])
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
     
-    if (f.type== ProfilingData_FXType_Other ) continue;
+    if (f.type== ProfilingData_FunctionType_Other ) continue;
 
     report << it->first  << ": {name:" << '"' << f.name << '"' << "}," << std::endl;
   }
@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
   report << "var functioncalls=[";
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
-    if (f.type== ProfilingData_FXType_Other ) continue;
+    if (f.type== ProfilingData_FunctionType_Other ) continue;
     
     std::map<long,int> callmap;
     for (int i=0;i<f.lines.size();++i) {
@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
       
         Stats::iterator itd = data.find(f.lines[i].dependency);
         
-        if (itd->second.type== ProfilingData_FXType_Other ) continue;
+        if (itd->second.type== ProfilingData_FunctionType_Other ) continue;
         
         std::map<long,int>::iterator it = callmap.find(f.lines[i].dependency);
         if (it==callmap.end()) {
@@ -285,7 +285,7 @@ int main(int argc, char* argv[])
   
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
-    if (f.type==ProfilingData_FXType_MXFunction) {
+    if (f.type==ProfilingData_FunctionType_MXFunction) {
       for (int i=0;i<f.lines.size();++i) {
         const linestat &L = f.lines[i];
         type_binning_ncalls[L.opcode]+=1;
@@ -343,7 +343,7 @@ int main(int argc, char* argv[])
     
     report << "</dl>\n";
 
-    if (f.type==ProfilingData_FXType_MXFunction || f.type==ProfilingData_FXType_Other) {
+    if (f.type==ProfilingData_FunctionType_MXFunction || f.type==ProfilingData_FunctionType_Other) {
       report << "<table><thead><tr><th>Codeline</th><th>total (ms)</th><th>ncalls</th><th>souce</th></tr></thead>\n";
       int total = f.lines.size();
       if (total>10000) total = 10000;

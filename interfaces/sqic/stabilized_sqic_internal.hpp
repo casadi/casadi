@@ -23,7 +23,7 @@
 #ifndef STABILIZED_SQIC_INTERNAL_HPP
 #define STABILIZED_SQIC_INTERNAL_HPP
 
-#include "symbolic/fx/stabilized_qp_solver_internal.hpp"
+#include "symbolic/function/stabilized_qp_solver_internal.hpp"
 
 /// \cond INTERNAL
 namespace CasADi{
@@ -97,7 +97,7 @@ public:
     std::vector<double> piE_;
     
     /// Helper function to bring A into correct format
-    FX formatA_;
+    Function formatA_;
     
     /// SQIC inf
     double inf_;

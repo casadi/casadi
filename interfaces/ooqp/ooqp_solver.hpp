@@ -23,7 +23,7 @@
 #ifndef OOQP_SOLVER_HPP
 #define OOQP_SOLVER_HPP
 
-#include "symbolic/fx/qp_solver.hpp"
+#include "symbolic/function/qp_solver.hpp"
 
 namespace CasADi {
   

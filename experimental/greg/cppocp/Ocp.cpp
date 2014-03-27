@@ -5,7 +5,7 @@
 #include "Ocp.hpp"
 #include <cstdlib>
 
-#include <symbolic/fx/sx_function.hpp>
+#include <symbolic/function/sx_function.hpp>
 
 using namespace std;
 using namespace CasADi;

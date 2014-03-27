@@ -25,13 +25,13 @@
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
 using namespace std;
 namespace CasADi{
 
-  FixedStepIntegratorInternal::FixedStepIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
+  FixedStepIntegratorInternal::FixedStepIntegratorInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
@@ -76,7 +76,7 @@ namespace CasADi{
     casadi_assert(k_out>=0);
 
     // Explicit discrete time dynamics
-    FX& F = getExplicit();
+    Function& F = getExplicit();
 
     // Take time steps until end time has been reached
     while(k_<k_out){
@@ -109,7 +109,7 @@ namespace CasADi{
     casadi_assert(k_out<=nk_);
 
     // Explicit discrete time dynamics
-    FX& G = getExplicitB();
+    Function& G = getExplicitB();
 
     // Take time steps until end time has been reached
     while(k_>k_out){

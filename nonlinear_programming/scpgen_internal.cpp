@@ -35,7 +35,7 @@
 using namespace std;
 namespace CasADi{
 
-  SCPgenInternal::SCPgenInternal(const FX& nlp) : NLPSolverInternal(nlp){
+  SCPgenInternal::SCPgenInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("SCPgen is under development");
     addOption("qp_solver",         OT_QPSOLVER,   GenericType(),    "The QP solver to be used by the SQP method");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");

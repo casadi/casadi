@@ -249,15 +249,15 @@ class casadiTestCase(unittest.TestCase):
         name - a descriptor that will be included in error messages
     """
     self.message(":"+ name)
-    fx=None
+    function=None
     frx=None
     try:
-      fx=ft(x)
+      function=ft(x)
       frx=fr(x0)
     except Exception as e:
       print "Error calling functions in %s" % name
       raise e
-    self.evaluationCheck([fx],frx,x,x0,name,failmessage,fmod=fmod,setx0=setx0)
+    self.evaluationCheck([function],frx,x,x0,name,failmessage,fmod=fmod,setx0=setx0)
 
   
   def numpyEvaluationCheckPool(self,pool,x,x0,name="",fmod=None,setx0=None,excludeflags=set()):
@@ -267,7 +267,7 @@ class casadiTestCase(unittest.TestCase):
         continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
-  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True):
+  def checkfunction(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True):
 
     if indirect:
       ins = trial.symbolicInput()
@@ -275,7 +275,7 @@ class casadiTestCase(unittest.TestCase):
       extra_trial.init()
       for i in range(trial.getNumInputs()):
         extra_trial.setInput(trial.input(i),i)
-      self.checkfx(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
+      self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
       for i in range(trial.getNumInputs()):
         trial.setInput(extra_trial.input(i),i)
 
@@ -348,7 +348,7 @@ class casadiTestCase(unittest.TestCase):
           self.assertEqual(solutionjac.getNumOutputs(),solution.getNumOutputs()+1)
           for k in range(solution.getNumInputs()): solutionjac.setInput(solution_inputs[k],k)
           
-          self.checkfx(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+          self.checkfunction(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if gradient:
       for i in range(trial.getNumInputs()):
@@ -365,7 +365,7 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutiongrad.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutiongrad.getNumOutputs(),solution.getNumOutputs()+1)
             for k in range(solution.getNumInputs()): solutiongrad.setInput(solution_inputs[k],k)
-            self.checkfx(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+            self.checkfunction(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if hessian:
       for i in range(trial.getNumInputs()):
@@ -382,7 +382,7 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutionhess.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutionhess.getNumOutputs(),solution.getNumOutputs()+2)
             for k in range(solution.getNumInputs()): solutionhess.setInput(solution_inputs[k],k)
-            self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
+            self.checkfunction(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
 
     for k in range(trial.getNumInputs()):
       trial.setInput(trial_inputs[k],k)

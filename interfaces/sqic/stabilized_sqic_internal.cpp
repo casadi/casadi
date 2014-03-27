@@ -21,12 +21,12 @@
  */
 
 #include "stabilized_sqic_internal.hpp"
-#include "../../symbolic/fx/stabilized_qp_solver.hpp"
+#include "../../symbolic/function/stabilized_qp_solver.hpp"
 
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
 
 #include "symbolic/std_vector_tools.hpp"
 

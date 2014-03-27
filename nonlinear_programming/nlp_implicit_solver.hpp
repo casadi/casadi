@@ -23,7 +23,7 @@
 #ifndef NLP_IMPLICIT_SOLVER_HPP
 #define NLP_IMPLICIT_SOLVER_HPP
 
-#include "symbolic/fx/implicit_function.hpp"
+#include "symbolic/function/implicit_function.hpp"
 
 namespace CasADi {
   
@@ -45,7 +45,7 @@ public:
   NLPImplicitSolver();
 
   /** \brief Create a new solver instance */  
-  explicit NLPImplicitSolver(const FX& f, const FX& jac=FX(), const LinearSolver& linsol=LinearSolver());
+  explicit NLPImplicitSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
   
   /** \brief  Access functions of the node */
   NLPImplicitInternal* operator->();
@@ -61,7 +61,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static ImplicitFunction creator(const FX& f, const FX& jac, const LinearSolver& linsol){ return NLPImplicitSolver(f,jac,linsol);}
+  static ImplicitFunction creator(const Function& f, const Function& jac, const LinearSolver& linsol){ return NLPImplicitSolver(f,jac,linsol);}
   #ifdef SWIG
   %nocallback;
   #endif

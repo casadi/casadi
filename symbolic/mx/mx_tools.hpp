@@ -27,8 +27,8 @@
 
 #include "../matrix/generic_matrix_tools.hpp"
 #include "../matrix/generic_expression_tools.hpp"
-#include "../fx/linear_solver.hpp"
-#include "../fx/symbolic_qr.hpp"
+#include "../function/linear_solver.hpp"
+#include "../function/symbolic_qr.hpp"
 
 namespace CasADi{
 

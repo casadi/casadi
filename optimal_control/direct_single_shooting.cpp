@@ -27,16 +27,16 @@ namespace CasADi{
 DirectSingleShooting::DirectSingleShooting(){
 }
     
-DirectSingleShooting::DirectSingleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
+DirectSingleShooting::DirectSingleShooting(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn){
   assignNode(new DirectSingleShootingInternal(ffcn,mfcn,cfcn,rfcn));
 }
 
 const DirectSingleShootingInternal* DirectSingleShooting::operator->() const{
-  return (const DirectSingleShootingInternal*)FX::operator->();
+  return (const DirectSingleShootingInternal*)Function::operator->();
 }
 
 DirectSingleShootingInternal* DirectSingleShooting::operator->(){
-  return (DirectSingleShootingInternal*)FX::operator->();
+  return (DirectSingleShootingInternal*)Function::operator->();
 }
 
 void DirectSingleShooting::getGuess(std::vector<double>& V_init) const{

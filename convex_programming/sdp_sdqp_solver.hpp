@@ -23,7 +23,7 @@
 #ifndef SDP_SDQP_SOLVER_HPP
 #define SDP_SDQP_SOLVER_HPP
 
-#include "symbolic/fx/sdqp_solver.hpp"
+#include "symbolic/function/sdqp_solver.hpp"
 
 namespace CasADi {
   

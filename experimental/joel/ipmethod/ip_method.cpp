@@ -29,7 +29,7 @@ namespace CasADi{
 IPMethod::IPMethod(){
 }
   
-IPMethod::IPMethod(const FX& F, const FX& G){
+IPMethod::IPMethod(const Function& F, const Function& G){
   assignNode(new IPInternal(F,G));
 }
 

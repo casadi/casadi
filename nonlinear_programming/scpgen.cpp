@@ -29,11 +29,11 @@ namespace CasADi{
   SCPgen::SCPgen(){
   }
   
-  SCPgen::SCPgen(const FX& F, const FX& G){
+  SCPgen::SCPgen(const Function& F, const Function& G){
     assignNode(new SCPgenInternal(joinFG(F,G)));
   }
 
-  SCPgen::SCPgen(const FX& nlp){
+  SCPgen::SCPgen(const Function& nlp){
     assignNode(new SCPgenInternal(nlp));
   }
 

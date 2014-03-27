@@ -325,12 +325,12 @@ namespace CasADi{
     return (*this)->transpose();
   }
 
-  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const{
-    return (*this)->patternCombine(y, f0x_is_zero, fx0_is_zero, mapping);
+  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero, std::vector<unsigned char>& mapping) const{
+    return (*this)->patternCombine(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
-  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const{
-    return (*this)->patternCombine(y, f0x_is_zero, fx0_is_zero);
+  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const{
+    return (*this)->patternCombine(y, f0x_is_zero, function0_is_zero);
   }
 
   Sparsity Sparsity::patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const{

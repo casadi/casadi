@@ -23,7 +23,7 @@
 #ifndef IPOPT_SOLVER_HPP
 #define IPOPT_SOLVER_HPP
 
-#include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/function/nlp_solver.hpp"
 
 namespace CasADi{
   
@@ -54,12 +54,12 @@ namespace CasADi{
     IpoptSolver();
 
     /// \brief Create an NLP solver instance (legacy syntax)
-    explicit IpoptSolver(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
-                         const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
+    explicit IpoptSolver(const Function& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                         const Function& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
                          );
 
     /// \brief Create an NLP solver instance
-    explicit IpoptSolver(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+    explicit IpoptSolver(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                          );
       
     /** \brief Get the reduced Hessian. 
@@ -77,7 +77,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static NLPSolver creator(const FX& nlp){ return IpoptSolver(nlp);}
+    static NLPSolver creator(const Function& nlp){ return IpoptSolver(nlp);}
 #ifdef SWIG
     %nocallback;
 #endif

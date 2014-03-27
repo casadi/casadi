@@ -35,7 +35,7 @@ from qpsolver import *
 from sdp import *
 from misc import *
 from qcqpsolver import *
-from fx import *
+from function import *
 from lpsolver import *
 from tools import *
 from simulator import *

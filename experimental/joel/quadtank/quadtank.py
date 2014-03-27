@@ -130,7 +130,7 @@ mfcn = SXFunction(acado_in,[ocp.mterm])
 rfcn = SXFunction(acado_in,[ocp.initeq])
 
 # Create ACADO solver
-ocp_solver = AcadoInterface(ffcn,mfcn,FX(),rfcn)
+ocp_solver = AcadoInterface(ffcn,mfcn,Function(),rfcn)
 
 # Set options
 ocp_solver.setOption("start_time",ocp.t0)

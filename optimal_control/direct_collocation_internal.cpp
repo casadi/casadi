@@ -25,12 +25,12 @@
 #include "../symbolic/sx/sx_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
 #include "../symbolic/std_vector_tools.hpp"
-#include "../symbolic/fx/integrator.hpp"
+#include "../symbolic/function/integrator.hpp"
 
 using namespace std;
 namespace CasADi{
     
-DirectCollocationInternal::DirectCollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
+DirectCollocationInternal::DirectCollocationInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("nlp_solver",                       OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("interpolation_order",          OT_INTEGER,  3,  "Order of the interpolating polynomials");
@@ -92,7 +92,7 @@ void DirectCollocationInternal::init(){
     D_num(j) = lfcn.output();
 
     // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-    FX tfcn = lfcn.tangent();
+    Function tfcn = lfcn.tangent();
     tfcn.init();
     for(int j2=0; j2<deg_+1; ++j2){
       tfcn.setInput(tau_root[j2]);
@@ -382,9 +382,9 @@ void DirectCollocationInternal::evaluate(){
 void DirectCollocationInternal::reportConstraints(std::ostream &stream) { 
   stream << "Reporting Collocation constraints" << endl;
  
-  FXInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
-  FXInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
-  FXInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
+  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
+  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
+  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
  
 }
 

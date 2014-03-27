@@ -23,7 +23,7 @@
 #ifndef QP_LP_SOLVER_HPP
 #define QP_LP_SOLVER_HPP
 
-#include "symbolic/fx/lp_solver.hpp"
+#include "symbolic/function/lp_solver.hpp"
 
 namespace CasADi {
   

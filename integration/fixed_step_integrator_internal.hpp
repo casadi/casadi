@@ -24,8 +24,8 @@
 #define FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
 #include "fixed_step_integrator.hpp"
-#include "symbolic/fx/integrator_internal.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/integrator_internal.hpp"
+#include "symbolic/function/mx_function.hpp"
 
 /// \cond INTERNAL
 namespace CasADi{
@@ -34,7 +34,7 @@ namespace CasADi{
   public:
   
     /// Constructor
-    explicit FixedStepIntegratorInternal(const FX& f, const FX& g);
+    explicit FixedStepIntegratorInternal(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -43,7 +43,7 @@ namespace CasADi{
     virtual FixedStepIntegratorInternal* clone() const = 0;
 
     /// Create a new integrator
-    virtual FixedStepIntegratorInternal* create(const FX& f, const FX& g) const = 0;
+    virtual FixedStepIntegratorInternal* create(const Function& f, const Function& g) const = 0;
   
     /// Destructor
     virtual ~FixedStepIntegratorInternal();
@@ -73,13 +73,13 @@ namespace CasADi{
     virtual void calculateInitialConditionsB();
 
     /// Get explicit dynamics
-    virtual FX& getExplicit(){ return F_;}
+    virtual Function& getExplicit(){ return F_;}
 
     /// Get explicit dynamics (backward problem)
-    virtual FX& getExplicitB(){ return G_;}
+    virtual Function& getExplicitB(){ return G_;}
 
     // Discrete time dynamics
-    FX F_, G_;
+    Function F_, G_;
 
     // Number of finite elements 
     int nk_;

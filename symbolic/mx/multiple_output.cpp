@@ -21,7 +21,7 @@
  */
 
 #include "multiple_output.hpp"
-#include "../fx/fx_internal.hpp"
+#include "../function/function_internal.hpp"
 #include "../std_vector_tools.hpp"
 
 using namespace std;

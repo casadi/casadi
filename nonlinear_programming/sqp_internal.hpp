@@ -24,8 +24,8 @@
 #define SQP_INTERNAL_HPP
 
 #include "sqp_method.hpp"
-#include "symbolic/fx/nlp_solver_internal.hpp"
-#include "symbolic/fx/qp_solver.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
+#include "symbolic/function/qp_solver.hpp"
 #include <deque>
 
 /// \cond INTERNAL
@@ -34,7 +34,7 @@ namespace CasADi{
 class SQPInternal : public NLPSolverInternal{
 
 public:
-  explicit SQPInternal(const FX& nlp);
+  explicit SQPInternal(const Function& nlp);
   virtual ~SQPInternal();
   virtual SQPInternal* clone() const{ return new SQPInternal(*this);}
   
@@ -95,7 +95,7 @@ public:
 
   /// BFGS update function
   enum BFGSMdoe{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
-  FX bfgs_;
+  Function bfgs_;
   
   /// Initial Hessian approximation (BFGS)
   DMatrix B_init_;

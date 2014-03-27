@@ -48,7 +48,7 @@ tend=10
 integrator.setOption("t0",0)
 integrator.setOption("tf",tend)
 integrator.init()
-#$ The integrator is really just a special kind of FX. Assume that we have an ODE/DAE in either explicit form:
+#$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
 #$   der(x) = fx(x,z,p,t)
 #$ \end{verbatim}
@@ -86,7 +86,7 @@ integrator.init()
 #$   [x(tf),q(tf),rx(t0),rq(t0)]  = F(x(t0),p,rx(0),rp)
 #$ \end{verbatim}
 #$ 
-print isinstance(integrator,FX)
+print isinstance(integrator,Function)
 print "%d -> %d" % (integrator.getNumInputs(),integrator.getNumOutputs())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
 #! The output of Integrator is the state at the end of integration.
@@ -203,7 +203,7 @@ show()
 
 #! Symbolic intergator results
 #! ---------------------------
-#! Since CVodesIntegrator is just another FX, 
+#! Since CVodesIntegrator is just another Function, 
 #! the usual CasADi rules for symbolic evaluation are active.
 #!
 #! We create an MX 'w' that contains the result of a time integration with:

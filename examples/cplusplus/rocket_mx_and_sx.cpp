@@ -23,13 +23,13 @@
 #include <iostream>
 #include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/fx/external_function.hpp>
+#include <symbolic/function/external_function.hpp>
 
 using namespace CasADi;
 using namespace std;
 
 // CONSTRUCT THE INTEGRATOR
-FX create_integrator(int nj, int nu){
+Function create_integrator(int nj, int nu){
   SX u = SX::sym("u"); // control for one segment
 
   // Initial position
@@ -79,7 +79,7 @@ int main(){
   int nu = 1000; // Number of control segments
 
   // Create an integrator
-  FX integrator = create_integrator(nj,nu);
+  Function integrator = create_integrator(nj,nu);
 
   // PART 2: CONSTRUCT THE NLP
   MX U = MX::sym("U",nu); // control for all segments

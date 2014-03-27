@@ -22,7 +22,7 @@
 
 #include <interfaces/liftopt/liftopt_solver.hpp>
 #include <interfaces/liftopt/liftopt_internal.hpp>
-#include <symbolic/fx/sx_function.hpp>
+#include <symbolic/function/sx_function.hpp>
 #include <symbolic/mx/mx_tools.hpp>
 #include <symbolic/std_vector_tools.hpp>
 

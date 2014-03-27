@@ -25,13 +25,13 @@
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
 using namespace std;
 namespace CasADi{
 
-  ImplicitFixedStepIntegratorInternal::ImplicitFixedStepIntegratorInternal(const FX& f, const FX& g) : FixedStepIntegratorInternal(f,g){
+  ImplicitFixedStepIntegratorInternal::ImplicitFixedStepIntegratorInternal(const Function& f, const Function& g) : FixedStepIntegratorInternal(f,g){
     addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   }
@@ -53,7 +53,7 @@ namespace CasADi{
     implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
   
     // Allocate an NLP solver
-    implicit_solver_ = implicit_function_creator(F_,FX(),LinearSolver());
+    implicit_solver_ = implicit_function_creator(F_,Function(),LinearSolver());
     implicit_solver_.setOption("name",string(getOption("name")) + "_implicit_solver");
     implicit_solver_.setOption("implicit_input",DAE_Z);
     implicit_solver_.setOption("implicit_output",DAE_ALG);
@@ -74,7 +74,7 @@ namespace CasADi{
       implicitFunctionCreator backward_implicit_function_creator = getOption("implicit_solver");
   
       // Allocate an NLP solver
-      backward_implicit_solver_ = backward_implicit_function_creator(G_,FX(),LinearSolver());
+      backward_implicit_solver_ = backward_implicit_function_creator(G_,Function(),LinearSolver());
       backward_implicit_solver_.setOption("name",string(getOption("name")) + "_backward_implicit_solver");
       backward_implicit_solver_.setOption("implicit_input",RDAE_RZ);
       backward_implicit_solver_.setOption("implicit_output",RDAE_ALG);

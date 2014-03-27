@@ -35,11 +35,11 @@ SOCPQCQPSolver::SOCPQCQPSolver(const QCQPStructure & st)  {
 }
 
 SOCPQCQPInternal* SOCPQCQPSolver::operator->(){
-  return (SOCPQCQPInternal*)(FX::operator->());
+  return (SOCPQCQPInternal*)(Function::operator->());
 }
 
 const SOCPQCQPInternal* SOCPQCQPSolver::operator->() const{
-  return (const SOCPQCQPInternal*)(FX::operator->());
+  return (const SOCPQCQPInternal*)(Function::operator->());
 
 }
 

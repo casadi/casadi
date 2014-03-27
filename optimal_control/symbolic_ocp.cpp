@@ -35,7 +35,7 @@
 #include "../symbolic/std_vector_tools.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/sx/sx_tools.hpp"
-#include "../symbolic/fx/integrator.hpp"
+#include "../symbolic/function/integrator.hpp"
 #include "../symbolic/casadi_calculus.hpp"
 
 using namespace std;

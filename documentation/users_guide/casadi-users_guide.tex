@@ -19,7 +19,7 @@
 \newcommand{\n}{\\n}
 \newcommand{\CasADi}{\texttt{CasADi}\xspace}
 \begin{latexonly}
-%\ifx\currentversion\undefined \newcommand{\currentversion}{1.9.0\xspace} \fi
+%\ifunction\currentversion\undefined \newcommand{\currentversion}{1.9.0\xspace} \fi
 \end{latexonly}
 \begin{htmlonly}
 \newcommand{\currentversion}{currentversionplaceholder}
@@ -211,7 +211,7 @@ Remember to pass two arguments if you wish to access a matrix entry. You can als
 
 There is a growing set of operations that can be performed with the \texttt{SX}, including:
 \begin{itemize}
- \item Calculus: E.g. \verb|Jx = jacobian(f,x)|: Jacobian of expression \texttt{f} with respect to expression \texttt{x}, see also the \texttt{FX} member \emph{function} \texttt{jacobian} below.
+ \item Calculus: E.g. \verb|Jx = jacobian(f,x)|: Jacobian of expression \texttt{f} with respect to expression \texttt{x}, see also the \texttt{Function} member \emph{function} \texttt{jacobian} below.
  \item Algebra: E.g. \verb|x = solve(A,b)|: Can be used to give a symbolic expression for $x = A^{-1} \, b$.
 \end{itemize}
 It is typically uncomplicated to add new such functions whenever they appear in applications.
@@ -255,7 +255,7 @@ print "f.shape = ", f.shape
 
 As you can see, the output of this operaton is a 2-by-2 matrix. Note how the multiplication and the addition were performed elementwise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
 
-We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$. %In particular, we allow \emph{calls} to functions of type \texttt{FX} (including calls to ODE integrators and \texttt{SXFunction} instances).
+We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$. %In particular, we allow \emph{calls} to functions of type \texttt{Function} (including calls to ODE integrators and \texttt{SXFunction} instances).
 
 The syntax of \texttt{MX} is intended to mirror that of \texttt{SX}:
 \begin{pytex}
@@ -316,7 +316,7 @@ Element access and assignment, of the type you have just seen, are examples of o
 %%  \item \texttt{SX} -- \emph{scalar symbolic type}
 %%  \item \texttt{SX} -- \emph{sparse matrix with elements of type \texttt{SX}}
 %%  \item \texttt{DMatrix}  -- \emph{same as \texttt{SX} but with elements of floating point type}
-%%  \item \texttt{FX} and derived classes -- \emph{functions}
+%%  \item \texttt{Function} and derived classes -- \emph{functions}
 %%  \item \texttt{MX} -- \emph{matrix symbolic type}
 %% \end{itemize}
 
@@ -331,15 +331,15 @@ Element access and assignment, of the type you have just seen, are examples of o
 
 %% \pytexStart{empty}
 
-%% The following is a listing of available subclasses of FX:
+%% The following is a listing of available subclasses of Function:
 %% \begin{pytex}
 %% import casadi
 %% import casadi.tools
-%% casadi.tools.print_subclasses(casadi.FX)
+%% casadi.tools.print_subclasses(casadi.Function)
 %% \end{pytex}
 
-\section{\texttt{FX} and derived classes} \label{sec:fx}
-\CasADi allows the user to create function objects, also knowns as \emph{functors}, that all derive the \texttt{FX} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
+\section{\texttt{Function} and derived classes} \label{sec:function}
+\CasADi allows the user to create function objects, also knowns as \emph{functors}, that all derive the \texttt{Function} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
 
 The basic usage skeleton of all these function objects are\footnote{In C++, \texttt{getOutput} is return-by-reference}:
 \begin{verbatim}
@@ -353,7 +353,7 @@ f.evaluate()                             # Evaluate numerically
 
 Note that all functions are multiple (sparse, matrix-valued) input, multiple (sparse, matrix-valued) output.
 
-One important member of the \texttt{FX} derived classes is \texttt{SXFunction}, which is constructed with the syntax \verb|SXFunction(list_of_inputs,list_of_outputs)|:
+One important member of the \texttt{Function} derived classes is \texttt{SXFunction}, which is constructed with the syntax \verb|SXFunction(list_of_inputs,list_of_outputs)|:
 \begin{pytex}
 x = SX.sym("x",2,2)
 y = SX.sym("y")
@@ -368,15 +368,15 @@ y = MX.sym("y")
 f = MXFunction([x,y],[x,sin(y)*x])
 \end{pytex}
 
-%% We can get a list of other supported function objects deriving from \texttt{FX}:
+%% We can get a list of other supported function objects deriving from \texttt{Function}:
 %% \begin{pytex}
 %% import casadi
 %% import casadi.tools
-%% casadi.tools.print_subclasses(casadi.FX)
+%% casadi.tools.print_subclasses(casadi.Function)
 %% \end{pytex}
 
 
-%% There is no mechanism to distinguish the nature of \texttt{FX} functions. For example, any \texttt{FX} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be considered to represent a dae function. The \CasADi used to generate this documentation has:
+%% There is no mechanism to distinguish the nature of \texttt{Function} functions. For example, any \texttt{Function} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be considered to represent a dae function. The \CasADi used to generate this documentation has:
 %% \begin{pytexoutput}
 %% print "DAE_NUM_IN = ", DAE_NUM_IN
 %% print "DAE_NUM_OUT = ", DAE_NUM_OUT
@@ -394,8 +394,8 @@ f = MXFunction([x,y],[x,sin(y)*x])
 
 %% \begin{pytex}
 %% print daeOut()
-%% print daeOut(ode=SX.sym("fx"))
-%% print daeOut(alg=SX.sym("fz"),ode=SX.sym("fx"))
+%% print daeOut(ode=SX.sym("function"))
+%% print daeOut(alg=SX.sym("fz"),ode=SX.sym("function"))
 %% \end{pytex}
 
 %% Consult the python docstrings for more information of how to use these helper functions:
@@ -403,7 +403,7 @@ f = MXFunction([x,y],[x,sin(y)*x])
 %% print daeOut.__doc__
 %% \end{pytexoutput}
 
-All derived classes of \texttt{FX} come with a range of options that can be set. The API documentation shows the list of available options for each class, along with their default values and descriptions.
+All derived classes of \texttt{Function} come with a range of options that can be set. The API documentation shows the list of available options for each class, along with their default values and descriptions.
 
 %% For example, here is an excerpt from the documentation for \texttt{IpoptSolver}:
 %% \begin{pytexoutput}
@@ -418,7 +418,7 @@ All derived classes of \texttt{FX} come with a range of options that can be set.
 %% solver.setOption("monitor",["eval_f","eval_g"])
 %% \end{verbatim}
 
-\texttt{MX} expressions may contain calls to \texttt{FX}-derived functions. To embed a call to function (e.g. \texttt{SXFunction} or \texttt{CVodesIntegrator}, see Section \ref{chapter:integrators}), you use the syntax:
+\texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. To embed a call to function (e.g. \texttt{SXFunction} or \texttt{CVodesIntegrator}, see Section \ref{chapter:integrators}), you use the syntax:
 \begin{verbatim}
 [y1,y2,...,yn] = f([x1,x2,...,xn])
 \end{verbatim}
@@ -702,7 +702,7 @@ Similarily, \emph{reverse mode} (or \emph{adjoint mode}) directional derivatives
 
 Both forward and adjoint directional derivatives are calculated at a cost proportinal to evaluating $f(x)$, \emph{regardless of the dimension of $x$}.
 
-CasADi is also able to generate complete, \emph{sparse} Jacobians efficiently. Internally, the algorithm it will use for this depends on the particular \texttt{FX} class but in most cases consists of the following steps:
+CasADi is also able to generate complete, \emph{sparse} Jacobians efficiently. Internally, the algorithm it will use for this depends on the particular \texttt{Function} class but in most cases consists of the following steps:
 \begin{itemize}
  \item Automatically detect the sparsity pattern of the Jacobian
  \item Use graph coloring techniques to find a small number of forward and/or directional derivatives needed to construct the complete Jacobian
@@ -714,21 +714,21 @@ Hessians are calculated by first calcuating the gradient and then performing the
 
 
 \section{Calculating complete Jacobians and Hessians numerically}
-You can generate a new function for calculating the Jacobian by calling the \texttt{FX::jacobian} member function:
+You can generate a new function for calculating the Jacobian by calling the \texttt{Function::jacobian} member function:
 \begin{verbatim}
  J = f.jacobian(iind,oind) # function corresponding to the jacobian
                            # of the oind-th output w.r.t. the iind-th input
 \end{verbatim}
 This will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Jacobian as well as all the original function outputs as outputs.
 
-Similarily, the gradient of a scalar output can be called by calling the \texttt{FX::gradient} member function:
+Similarily, the gradient of a scalar output can be called by calling the \texttt{Function::gradient} member function:
 \begin{verbatim}
  G = f.gradient(iind,oind) # function corresponding to the gradient
                           # of the oind-th output w.r.t. the iind-th input
 \end{verbatim}
 which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) gradient and all the original function outputs as outputs.
 
-Lastly, Hessians of a scalar output can be called by calling the \texttt{FX::hessian} member function:
+Lastly, Hessians of a scalar output can be called by calling the \texttt{Function::hessian} member function:
 \begin{verbatim}
  H = f.hessian(iind,oind) # function corresponding to the Hessian
                           # of the oind-th output w.r.t. the iind-th input
@@ -737,7 +737,7 @@ which will generate a function with the same input scheme as the function \textt
 
 \section{Calculating derivatives symbolically}
 Directional derivatives can also be calculated symbolically, i.e. you can generate new expressions corresponding to directional derivatives for further manipulation. This is only possible for the \texttt{SXFunction} and \texttt{MXFunction} classes.
-This is achieved by passing additional arguments to the \texttt{FX::eval} member function.
+This is achieved by passing additional arguments to the \texttt{Function::eval} member function.
 
 Similarily, expressions corresponding to complete Jacobians and Hessians can be obtained by calling the \texttt{SXFunction::jac} and \texttt{MXFunction::jac} functions.
 

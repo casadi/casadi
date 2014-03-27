@@ -23,14 +23,14 @@
 #include "functor_internal.hpp"
 
 #include "matrix/sparsity.hpp"
-#include "fx/fx.hpp"
-#include "fx/custom_function.hpp"
+#include "function/function.hpp"
+#include "function/custom_function.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-  FX DerivativeGenerator::operator()(FX& fcn, int nfwd, int nadj, void* user_data) {
+  Function DerivativeGenerator::operator()(Function& fcn, int nfwd, int nadj, void* user_data) {
     checkNode();
     return static_cast<DerivativeGeneratorInternal*>(SharedObject::operator->())->call(fcn, nfwd, nadj, user_data);
   }
@@ -40,7 +40,7 @@ void CustomEvaluate::operator()(CustomFunction& fcn, void* user_data) {
   static_cast<CustomEvaluateInternal*>(SharedObject::operator->())->call(fcn, user_data);
 }
   
-int Callback::operator()(FX& fcn, void* user_data) {
+int Callback::operator()(Function& fcn, void* user_data) {
   checkNode();
   return static_cast<CallbackInternal*>(SharedObject::operator->())->call(fcn, user_data);
 }

@@ -24,7 +24,7 @@
 #define MULTIPLE_OUTPUT_HPP
 
 #include "mx_node.hpp"
-#include "../fx/fx.hpp"
+#include "../function/function.hpp"
 #include <set>
 
 /// \cond INTERNAL

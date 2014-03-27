@@ -42,11 +42,11 @@ namespace CasADi{
   }
   
   DpleInternal* DpleSolver::operator->(){
-    return static_cast<DpleInternal*>(FX::operator->());
+    return static_cast<DpleInternal*>(Function::operator->());
   }
 
   const DpleInternal* DpleSolver::operator->() const{
-    return static_cast<const DpleInternal*>(FX::operator->()); 
+    return static_cast<const DpleInternal*>(Function::operator->()); 
   }
   
   bool DpleSolver::checkNode() const{

@@ -25,8 +25,8 @@
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 
 INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)
@@ -34,7 +34,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace CasADi{
   
-SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
+SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
   addOption("max_num_steps",               OT_INTEGER,          10000,          "Maximum number of integrator steps");
   addOption("reltol",                      OT_REAL,             1e-6,           "Relative tolerence for the IVP solution");
   addOption("abstol",                      OT_REAL,             1e-8,           "Absolute tolerence  for the IVP solution");

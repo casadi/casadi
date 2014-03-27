@@ -23,8 +23,8 @@
 #include "mx.hpp"
 #include "mx_node.hpp"
 #include "mx_tools.hpp"
-#include "../fx/sx_function.hpp"
-#include "call_fx.hpp"
+#include "../function/sx_function.hpp"
+#include "call_function.hpp"
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "mx_tools.hpp"
@@ -859,7 +859,7 @@ namespace CasADi{
 
   bool         MX::isNorm () const { return dynamic_cast<const Norm*>(get())!=0; }
 
-  FX MX::getFunction () {  return (*this)->getFunction(); }
+  Function MX::getFunction () {  return (*this)->getFunction(); }
          
   double MX::getValue() const{
     return (*this)->getValue();

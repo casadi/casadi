@@ -208,13 +208,13 @@ namespace CasADi{
     
     //@{
     /// Union of two sparsity patterns
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const;
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero, std::vector<unsigned char>& mapping) const;
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
 
     template<bool with_mapping>
-    Sparsity patternCombineGen1(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const;
+    Sparsity patternCombineGen1(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero, std::vector<unsigned char>& mapping) const;
 
-    template<bool with_mapping, bool f0x_is_zero, bool fx0_is_zero>
+    template<bool with_mapping, bool f0x_is_zero, bool function0_is_zero>
     Sparsity patternCombineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
     //@}
     

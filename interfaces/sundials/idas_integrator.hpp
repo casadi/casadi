@@ -63,7 +63,7 @@ public:
   * \copydoc scheme_RDAEInput
   * \copydoc scheme_RDAEOutput
   */
-  explicit IdasIntegrator(const FX& f, const FX& g=FX());
+  explicit IdasIntegrator(const Function& f, const Function& g=Function());
 
   /// Access functions of the node
   IdasInternal* operator->();
@@ -81,7 +81,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const FX& f, const FX& g){ return IdasIntegrator(f,g);}
+  static Integrator creator(const Function& f, const Function& g){ return IdasIntegrator(f,g);}
   #ifdef SWIG
   %nocallback;
   #endif

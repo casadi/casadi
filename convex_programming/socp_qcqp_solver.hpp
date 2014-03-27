@@ -23,7 +23,7 @@
 #ifndef SOCP_QCQP_SOLVER_HPP
 #define SOCP_QCQP_SOLVER_HPP
 
-#include "symbolic/fx/qcqp_solver.hpp"
+#include "symbolic/function/qcqp_solver.hpp"
 
 namespace CasADi {
   
