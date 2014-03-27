@@ -59,7 +59,14 @@ except:
 try:
   qp_solver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
   solvers.append((StabilizedSQPMethod,{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": QPStabilizer, "stabilized_qp_solver_options": {"qp_solver": NLPQPSolver, "qp_solver_options": qp_solver_options}}))
-  print "Will test SQPMethod"
+  print "Will test Stabilized SQPMethod"
+except:
+  pass
+  
+try:
+  qp_solver_options = {}
+  solvers.append((StabilizedSQPMethod,{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": QPStabilizer, "stabilized_qp_solver_options": {"qp_solver": SQICSolver}}))
+  print "Will test Stabilized SQPMethod"
 except:
   pass
 
@@ -841,7 +848,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0, 3],"lbg")
       solver.setInput([0, 3],"ubg")
       solver.solve()
-      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],10,"IPOPT")
+      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],4 if "SQIC" in str(solver_options) else 10,"IPOPT")
 
   def testIPOPTdegc(self):
     self.message("degenerate optimization IPOPT, overconstrained")
@@ -864,7 +871,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0, 3, 10],"ubg")
       solver.solve()
       # todo: catch error when set([0, 3 , 5]) two times
-      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],10,"IPOPT")
+      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],4 if "SQIC" in str(solver_options) else 10,"IPOPT")
       
   def testXfreeChange(self):
     self.message("Change in X settings")
