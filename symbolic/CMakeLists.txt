@@ -56,7 +56,7 @@ SET(CASADI_SRCS
   mx/binary_mx.hpp           mx/binary_mx_impl.hpp      # Binary operation
   mx/multiplication.hpp      mx/multiplication_impl.hpp # Matrix multiplication
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
-  mx/call_function.hpp             mx/call_function.cpp             # Function function evaluation
+  mx/call_function.hpp       mx/call_function.cpp       # Function evaluation node
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
   mx/concat.hpp              mx/concat.cpp              # Concatenation
