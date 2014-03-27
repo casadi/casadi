@@ -22,18 +22,18 @@
 
 % Exit if the style file is already loaded
 % (suggested by Lee Shombert <las@potomac.wash.inmet.com>
-\ifunction \htmlstyloaded\relax \endinput\else\let\htmlstyloaded\relax\fi
+\ifx \htmlstyloaded\relax \endinput\else\let\htmlstyloaded\relax\fi
 \makeatletter
 
 % allow for the hyperref package to be cleanly loaded
 % either before or after this package,
 % and ensure it is already loaded, when using pdf-TeX
 
-\ifunction\undefined\hyperref
- \ifunction\pdfoutput\undefined \let\pdfunknown\relax
+\ifx\undefined\hyperref
+ \ifx\pdfoutput\undefined \let\pdfunknown\relax
   \let\html@new=\newcommand
  \else
-  \ifunction\pdfoutput\relax \let\pdfunknown\relax
+  \ifx\pdfoutput\relax \let\pdfunknown\relax
    \RequirePackage{hyperref}\let\html@new=\renewcommand
   \else
    \RequirePackage{hyperref}\let\html@new=\newcommand
@@ -53,7 +53,7 @@
 % The hyperlink will appear as a hyperlink in the HTML 
 % document and as a footnote in the dvi or ps files.
 %
-\ifunction\pdfunknown\relax
+\ifx\pdfunknown\relax
  \html@new{\htmladdnormallinkfoot}[2]{#1\footnote{#2}} 
 \else
  \def\htmladdnormallinkfoot#1#2{\footnote{\href{#2}{#1}}}
@@ -61,7 +61,7 @@
 
 % This is an alternative definition of the command above which
 % will ignore the URL in the dvi or ps files.
-\ifunction\pdfunknown\relax
+\ifx\pdfunknown\relax
  \html@new{\htmladdnormallink}[2]{#1}
 \else
  \def\htmladdnormallink#1#2{\href{#2}{#1}}
@@ -71,7 +71,7 @@
 % The image will be embedded in the HTML document but will
 % be ignored in the dvi and ps files.
 %
-\ifunction\pdfunknown\relax
+\ifx\pdfunknown\relax
  \html@new{\htmladdimg}[1]{}
 \else
  \def\htmladdimg#1{\hyperimage{#1}}
@@ -117,7 +117,7 @@
 % and <path_to_labels> is the path to find a  labels.pl  file,
 % so that external cross-referencing may work, as with \externallabels
 %
-%\ifunction\pdfunknown\relax
+%\ifx\pdfunknown\relax
  \newcommand{\htmladdTOClink}[4][]{}
 %
 % can do something here, using the \pdfoutline primitive
@@ -157,7 +157,7 @@
 % where there is a corresponding \label{trace}
 %
 % avoid possible confict with  hyperref  package
-\ifunction\undefined\hyperref
+\ifx\undefined\hyperref
  \newcommand{\hyperrefhyper}[4]{#4}%
  \def\next{\newcommand}%
 \else
@@ -167,14 +167,14 @@
 \next{\hyperref}{\hyperrefi[]}\let\next=\relax
 
 \def\hyperrefi[#1]{{\def\next{#1}\def\tmp{}%
- \ifunction\next\tmp\aftergroup\hyperrefdef
- \else\def\tmp{ref}\ifunction\next\tmp\aftergroup\hyperrefref
- \else\def\tmp{pageref}\ifunction\next\tmp\aftergroup\hyperrefpageref
- \else\def\tmp{page}\ifunction\next\tmp\aftergroup\hyperrefpage
- \else\def\tmp{noref}\ifunction\next\tmp\aftergroup\hyperrefnoref
- \else\def\tmp{no}\ifunction\next\tmp\aftergroup\hyperrefno
- \else\def\tmp{hyper}\ifunction\next\tmp\aftergroup\hyperrefhyper
- \else\def\tmp{html}\ifunction\next\tmp\aftergroup\hyperrefhtml
+ \ifx\next\tmp\aftergroup\hyperrefdef
+ \else\def\tmp{ref}\ifx\next\tmp\aftergroup\hyperrefref
+ \else\def\tmp{pageref}\ifx\next\tmp\aftergroup\hyperrefpageref
+ \else\def\tmp{page}\ifx\next\tmp\aftergroup\hyperrefpage
+ \else\def\tmp{noref}\ifx\next\tmp\aftergroup\hyperrefnoref
+ \else\def\tmp{no}\ifx\next\tmp\aftergroup\hyperrefno
+ \else\def\tmp{hyper}\ifx\next\tmp\aftergroup\hyperrefhyper
+ \else\def\tmp{html}\ifx\next\tmp\aftergroup\hyperrefhtml
  \else\typeout{*** unknown option \next\space to  hyperref ***}%
  \fi\fi\fi\fi\fi\fi\fi\fi}}
 \newcommand{\hyperrefdef}[4]{#2\ref{#4}#3}
@@ -183,7 +183,7 @@
 \let\hyperrefref=\hyperrefdef
 \let\hyperrefpage=\hyperrefpageref
 \let\hyperrefno=\hyperrefnoref
-\ifunction\undefined\hyperrefhyper\newcommand{\hyperrefhyper}[4]{#4}\fi
+\ifx\undefined\hyperrefhyper\newcommand{\hyperrefhyper}[4]{#4}\fi
 \let\hyperrefhtml=\hyperrefdef
 
 %%% HYPERCITE --- added by RRM
@@ -203,16 +203,16 @@
 %
 \newcommand{\hypercite}{\hypercitei[]}
 \def\hypercitei[#1]{{\def\next{#1}\def\tmp{}%
- \ifunction\next\tmp\aftergroup\hypercitedef
- \else\def\tmp{int}\ifunction\next\tmp\aftergroup\hyperciteint
- \else\def\tmp{cite}\ifunction\next\tmp\aftergroup\hypercitecite
- \else\def\tmp{ext}\ifunction\next\tmp\aftergroup\hyperciteext
- \else\def\tmp{nocite}\ifunction\next\tmp\aftergroup\hypercitenocite
- \else\def\tmp{no}\ifunction\next\tmp\aftergroup\hyperciteno
+ \ifx\next\tmp\aftergroup\hypercitedef
+ \else\def\tmp{int}\ifx\next\tmp\aftergroup\hyperciteint
+ \else\def\tmp{cite}\ifx\next\tmp\aftergroup\hypercitecite
+ \else\def\tmp{ext}\ifx\next\tmp\aftergroup\hyperciteext
+ \else\def\tmp{nocite}\ifx\next\tmp\aftergroup\hypercitenocite
+ \else\def\tmp{no}\ifx\next\tmp\aftergroup\hyperciteno
  \else\typeout{*** unknown option \next\space to  hypercite ***}%
  \fi\fi\fi\fi\fi\fi}}
 \newcommand{\hypercitedef}[4]{#2{\def\tmp{#3}\def\emptyopt{}%
- \ifunction\tmp\emptyopt\cite{#4}\else\cite[#3]{#4}\fi}}
+ \ifx\tmp\emptyopt\cite{#4}\else\cite[#3]{#4}\fi}}
 \newcommand{\hypercitenocite}[2]{#2\hypercitenocitex[]}
 \def\hypercitenocitex[#1]#2{\nocite{#2}}
 \let\hypercitecite=\hypercitedef
@@ -225,7 +225,7 @@
 % Mix between \htmladdnormallink and \hyperref.
 % First arg is text for in both versions, second is label for use in HTML
 % version.
-\ifunction\pdfunknown\relax
+\ifx\pdfunknown\relax
  \html@new{\htmlref}[2]{#1}
 \else
  \def\htmlref#1#2{\hyperefhyper[#2]{#1}}
@@ -357,11 +357,11 @@
     \endlinechar`\^^M \catcode`\^^M=12 \xhtmlComment}
 {\catcode`\^^M=12 \endlinechar=-1 %
  \gdef\xhtmlComment#1^^M{\def\test{#1}\edef\test{\meaning\test}
-      \csarg\ifunction{PlainEnd\CurrentComment Test}\test
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
           \let\html@next\endgroup
-      \else \csarg\ifunction{LaLaEnd\CurrentComment Test}\test
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
             \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
-      \else \csarg\ifunction{LaInnEnd\CurrentComment Test}\test
+      \else \csarg\ifx{LaInnEnd\CurrentComment Test}\test
             \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
       \else \let\html@next\xhtmlComment
       \fi \fi \fi \html@next}
@@ -412,7 +412,7 @@
 \long\gdef\@gobble@nv#1\end#2{\@gobble@nv@i}
 %\long\def\@gobble@nv#1\end#2{\def\reserved@b{#2}%
 \def\@gobble@nv@ii{%
- \ifunction\reserved@a\reserved@b
+ \ifx\reserved@a\reserved@b
   \edef\reserved@a{\egroup\noexpand\end{\reserved@a}}%
   \expandafter\reserved@a
  \else
@@ -482,14 +482,14 @@
 %  let \htmlurl#1  be equivalent to it 
 %
 \def\htmlurlx#1{\begin{small}\texttt{#1}\end{small}}%
-\expandafter\ifunction\csname url\endcsname\relax
+\expandafter\ifx\csname url\endcsname\relax
  \let\htmlurl=\htmlurlx \else \let\htmlurl=\url \fi
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% JCL - stop input here if LaTeX2e is not present
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\ifunction\if@compatibility\undefined
+\ifx\if@compatibility\undefined
   %LaTeX209
   \makeatother\relax\expandafter\endinput
 \fi
@@ -523,7 +523,7 @@
 
 %%%  bind \htmlurl to \url if that is later loaded
 %
-\expandafter\ifunction\csname url\endcsname\relax
+\expandafter\ifx\csname url\endcsname\relax
  \AtBeginDocument{\@ifundefined{url}{}{\let\htmlurl=\url}}\fi
 
 %%%%MG
@@ -535,7 +535,7 @@
 %
 % Example:  \htmladdimg[ALT="portrait" ALIGN=CENTER]{portrait.gif}
 %
-\ifunction\pdfunknown\relax
+\ifx\pdfunknown\relax
  \renewcommand{\htmladdimg}[2][]{}
 \else
  \renewcommand{\htmladdimg}[2][]{\hyperimage{#2}}
@@ -566,19 +566,19 @@
 % The description of the options is missing, as yet.
 %
 \renewcommand{\latextohtml}{\textup{\LaTeX2\texttt{HTML}}}
-\ifunction\pdfunknown\relax
+\ifx\pdfunknown\relax
  \renewcommand{\htmladdnormallinkfoot}[3][]{#2\footnote{#3}} 
  \renewcommand{\htmladdnormallink}[3][]{#2}
 \else
  \renewcommand{\htmladdnormallinkfoot}[1][]{\def\next{#1}%
-   \ifunction\next\@empty\def\next{\htmladdnonamedlinkfoot}%
+   \ifx\next\@empty\def\next{\htmladdnonamedlinkfoot}%
    \else\def\next{\htmladdnamedlinkfoot{#1}}\fi \next}
  \newcommand{\htmladdnonamedlinkfoot}[2]{%
    #1\footnote{\href{#2}{#2}}}
  \newcommand{\htmladdnamedlinkfoot}[3]{%
    \hypertarget{#1}{#2}\footnote{\href{#3}{#3}}}
  \renewcommand{\htmladdnormallink}[1][]{\def\next{#1}%
-  \ifunction\next\@empty\def\next{\htmladdnonamedlink}%
+  \ifx\next\@empty\def\next{\htmladdnonamedlink}%
   \else\def\next{\htmladdnamedlink{#1}}\fi \next}
  \newcommand{\htmladdnonamedlink}[2]{\href{#2}{#1}}
  \newcommand{\htmladdnamedlink}[3]{%
@@ -597,23 +597,23 @@
 \let\hyperciteno=\hypercitenocite
 \let\hyperciteext=\hypercitenocite
 
-\ifunction\pdfunknown\relax
+\ifx\pdfunknown\relax
  \renewcommand{\htmlimage}[2][]{}
- \renewcommand{\htmlref}[2][]{#2{\def\tmp{#1}\ifunction\tmp\@empty
+ \renewcommand{\htmlref}[2][]{#2{\def\tmp{#1}\ifx\tmp\@empty
   \aftergroup\htmlrefdef\else\aftergroup\htmlrefext\fi}}
  \newcommand{\htmlrefdef}[1]{}
  \newcommand{\htmlrefext}[2][]{}
- \renewcommand{\htmlcite}[2][]{#2{\def\tmp{#1}\ifunction\tmp\@empty
+ \renewcommand{\htmlcite}[2][]{#2{\def\tmp{#1}\ifx\tmp\@empty
   \aftergroup\htmlcitedef\else\aftergroup\htmlciteext\fi}}
  \newcommand{\htmlciteext}[2][]{}
 \else
  \renewcommand{\htmlimage}[2][]{\hyperimage{#2}}
- \renewcommand{\htmlref}[1][]{\def\htmp@{#1}\ifunction\htmp@\@empty
+ \renewcommand{\htmlref}[1][]{\def\htmp@{#1}\ifx\htmp@\@empty
   \def\htmp@{\htmlrefdef}\else\def\htmp@{\htmlrefext{#1}}\fi\htmp@}
  \newcommand{\htmlrefdef}[2]{\hyperref[hyper][#2]{#1}}
  \newcommand{\htmlrefext}[3]{%
   \hypertarget{#1}{\hskip2bp}\hyperref[hyper][#3]{#2}}
- \renewcommand{\htmlcite}[2][]{#2{\def\htmp@{#1}\ifunction\htmp@\@empty
+ \renewcommand{\htmlcite}[2][]{#2{\def\htmp@{#1}\ifx\htmp@\@empty
   \aftergroup\htmlcitedef\else\aftergroup\htmlciteext\fi}}
  \newcommand{\htmlciteext}[1][]{\cite}
 \fi
@@ -628,7 +628,7 @@
 %  They are intended for expert use only.
 
 \newcommand{\HTMLcode}[2][]{}
-\ifunction\undefined\HTML\newcommand{\HTML}[2][]{}\else
+\ifx\undefined\HTML\newcommand{\HTML}[2][]{}\else
 \typeout{*** Warning: \string\HTML\space had an incompatible definition ***}%
 \typeout{*** instead use \string\HTMLcode\space for raw HTML code ***}%
 \fi 
@@ -666,7 +666,7 @@
 %  In the LaTeX2HTML version this put a URL into a <BASE> tag
 %  within the <HEAD>...</HEAD> portion of a document.
 %
-\ifunction\pdfunknown\relax
+\ifx\pdfunknown\relax
  \newcommand{\htmlbase}[1]{}
 \else
  \let\htmlbase=\hyperbaseurl
@@ -754,7 +754,7 @@
 \let\Hsubparagraph=\subparagraph
 \let\Hsubsubparagraph=\subsubparagraph
 
-\ifunction\c@subparagraph\undefined
+\ifx\c@subparagraph\undefined
  \newcounter{lsubsubparagraph}[lsubparagraph]
 \else
  \newcounter{lsubsubparagraph}[subparagraph]
@@ -764,13 +764,13 @@
 %  The following definitions are specific to LaTeX2e:
 %  (They must be commented out for LaTeX 2.09)
 %
-\expandafter\ifunction\csname part\endcsname\relax\else
+\expandafter\ifx\csname part\endcsname\relax\else
 \renewcommand{\part}{\@ifstar{\stepcounter{lpart}%
   \bgroup\def\tmp{*}\H@part}{\bgroup\def\tmp{}\H@part}}\fi
 \newcommand{\H@part}[1][]{\def\tmp@a{#1}\check@align
  \expandafter\egroup\expandafter\Hpart\tmp}
 
-\ifunction\Hchapter\relax\else
+\ifx\Hchapter\relax\else
  \def\chapter{\resetsections \@ifstar{\stepcounter{lchapter}%
    \bgroup\def\tmp{*}\H@chapter}{\bgroup\def\tmp{}\H@chapter}}\fi
 \newcommand{\H@chapter}[1][]{\def\tmp@a{#1}\check@align
@@ -800,26 +800,26 @@
 \newcommand\H@paragraph[1][]{\def\tmp@a{#1}\check@align
  \expandafter\egroup\expandafter\Hparagraph\tmp}
 
-\ifunction\Hsubparagraph\relax\else\@ifundefined{subparagraph}{}{%
+\ifx\Hsubparagraph\relax\else\@ifundefined{subparagraph}{}{%
 \renewcommand{\subparagraph}{\resetsubsubparagraphs
  \@ifstar{\stepcounter{lsubparagraph}\bgroup\def\tmp{*}%
    \H@subparagraph}{\bgroup\def\tmp{}\H@subparagraph}}}\fi
 \newcommand\H@subparagraph[1][]{\def\tmp@a{#1}\check@align
  \expandafter\egroup\expandafter\Hsubparagraph\tmp}
 
-\ifunction\Hsubsubparagraph\relax\else\@ifundefined{subsubparagraph}{}{%
+\ifx\Hsubsubparagraph\relax\else\@ifundefined{subsubparagraph}{}{%
 \def\subsubparagraph{%
  \@ifstar{\stepcounter{lsubsubparagraph}\bgroup\def\tmp{*}%
    \H@subsubparagraph}{\bgroup\def\tmp{}\H@subsubparagraph}}}\fi
 \newcommand\H@subsubparagraph[1][]{\def\tmp@a{#1}\check@align
  \expandafter\egroup\expandafter\Hsubsubparagraph\tmp}
 
-\def\check@align{\def\empty{}\ifunction\tmp@a\empty
- \else\def\tmp@b{center}\ifunction\tmp@a\tmp@b\let\tmp@a\empty
- \else\def\tmp@b{left}\ifunction\tmp@a\tmp@b\let\tmp@a\empty
- \else\def\tmp@b{right}\ifunction\tmp@a\tmp@b\let\tmp@a\empty
+\def\check@align{\def\empty{}\ifx\tmp@a\empty
+ \else\def\tmp@b{center}\ifx\tmp@a\tmp@b\let\tmp@a\empty
+ \else\def\tmp@b{left}\ifx\tmp@a\tmp@b\let\tmp@a\empty
+ \else\def\tmp@b{right}\ifx\tmp@a\tmp@b\let\tmp@a\empty
  \else\expandafter\def\expandafter\tmp@a\expandafter{\expandafter[\tmp@a]}%
- \fi\fi\fi \def\empty{}\ifunction\tmp\empty\let\tmp=\tmp@a \else 
+ \fi\fi\fi \def\empty{}\ifx\tmp\empty\let\tmp=\tmp@a \else 
   \expandafter\def\expandafter\tmp\expandafter{\expandafter*\tmp@a}%
  \fi\fi}
 %
@@ -832,10 +832,10 @@
 %
 \def\resetparagraphs{\setcounter{lparagraph}{0}\setcounter{lparagraph}{0}%
  \reset@dependents{paragraph}\resetsubparagraphs }
-\def\resetsubparagraphs{\ifunction\c@subparagraph\undefined\else
+\def\resetsubparagraphs{\ifx\c@subparagraph\undefined\else
   \setcounter{subparagraph}{0}\fi \setcounter{lsubparagraph}{0}%
  \reset@dependents{subparagraph}\resetsubsubparagraphs }
-\def\resetsubsubparagraphs{\ifunction\c@subsubparagraph\undefined\else
+\def\resetsubsubparagraphs{\ifx\c@subsubparagraph\undefined\else
   \setcounter{subsubparagraph}{0}\fi \setcounter{lsubsubparagraph}{0}}
 %
 \def\reset@dependents#1{\begingroup\let \@elt \@stpelt
@@ -851,7 +851,7 @@
 %
 \newcommand{\DumpPtr}[2]{%
 \count255=\csname c@#1\endcsname\relax\def\dummy{dummy}\def\tmp{#2}%
-\ifunction\tmp\dummy\def\ctr{#1}\else
+\ifx\tmp\dummy\def\ctr{#1}\else
  \def\ctr{#2}\advance\count255 by \csname c@#2\endcsname\relax\fi
 \immediate\write\ptrfile{%
 \noexpand\setcounter{\ctr}{\number\count255}}}
@@ -869,7 +869,7 @@
 \begingroup\let\protect=\noexpand
 \immediate\openout\ptrfile = #1.ptr
 \DumpPtr{part}{lpart}%
-\ifunction\Hchapter\relax\else\DumpPtr{chapter}{lchapter}\fi
+\ifx\Hchapter\relax\else\DumpPtr{chapter}{lchapter}\fi
 \DumpPtr{section}{lsection}%
 \DumpPtr{subsection}{lsubsection}%
 \DumpPtr{subsubsection}{lsubsubsection}%
@@ -877,7 +877,7 @@
 \DumpPtr{subparagraph}{lsubparagraph}%
 \DumpPtr{equation}{dummy}%
 \DumpPtr{footnote}{dummy}%
-\def\tmp{#4}\ifunction\tmp\@empty
+\def\tmp{#4}\ifx\tmp\@empty
 \immediate\write\ptrfile{\noexpand\htmlhead{#2}{#3}}\else
 \immediate\write\ptrfile{\noexpand\htmlhead[#4]{#2}{#3}}\fi
 \dumpcitestatus \dumpcurrentcolor
@@ -903,13 +903,13 @@
  \let\real@pagecolor=\pagecolor
  \let\pagecolor\segmentpagecolor
  \let\segmentcolor\color
- \ifunction\current@page@color\undefined \def\current@page@color{{}}\fi
+ \ifx\current@page@color\undefined \def\current@page@color{{}}\fi
  \def\dumpcurrentcolor{\bgroup\def\@empty@{{}}%
    \expandafter\def\expandafter\tmp\space####1@{\def\thiscol{####1}}%
-  \ifunction\current@color\@empty@\def\thiscol{}\else
+  \ifx\current@color\@empty@\def\thiscol{}\else
    \expandafter\tmp\current@color @\fi
   \immediate\write\ptrfile{\noexpand\segmentcolor{\thiscol}}%
-  \ifunction\current@page@color\@empty@\def\thiscol{}\else
+  \ifx\current@page@color\@empty@\def\thiscol{}\else
    \expandafter\tmp\current@page@color @\fi
   \immediate\write\ptrfile{\noexpand\segmentpagecolor{\thiscol}}%
  \egroup}%
@@ -922,16 +922,16 @@
 %
 \newcommand{\segmentpagecolor}[1][]{%
  \@ifpackageloaded{color}{\loadsegmentcolors\bgroup
-  \def\tmp{#1}\ifunction\@empty\tmp\def\next{[]}\else\def\next{[#1]}\fi
+  \def\tmp{#1}\ifx\@empty\tmp\def\next{[]}\else\def\next{[#1]}\fi
   \expandafter\segmentpagecolor@\next}%
  {\@gobble}}
 \def\segmentpagecolor@[#1]#2{\def\tmp{#1}\def\tmpB{#2}%
- \ifunction\tmpB\@empty\let\next=\egroup
+ \ifx\tmpB\@empty\let\next=\egroup
  \else
   \let\realendgroup=\endgroup
   \def\endgroup{\edef\next{\noexpand\realendgroup
    \def\noexpand\current@page@color{\current@color}}\next}%
-  \ifunction\tmp\@empty\real@pagecolor{#2}\def\model{}%
+  \ifx\tmp\@empty\real@pagecolor{#2}\def\model{}%
   \else\real@pagecolor[#1]{#2}\def\model{[#1]}%
   \fi
   \edef\next{\egroup\def\noexpand\current@page@color{\current@page@color}%
