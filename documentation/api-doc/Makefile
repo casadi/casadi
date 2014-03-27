@@ -25,6 +25,8 @@ doxlocal:
 	
 doxpublish:
 	patch -u Doxyfile.in publish.patch -o - | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' |    sed 's/PROJECT_BRIEF          = /PROJECT_BRIEF          = $(READABLEREVISION)/' | doxygen -
+	sed -i.bak "s/q:query/q:query,db:dbLocation/g" html/search/search.js 
+	doxyindexer searchdata.xml -o html
 	cp style/casadi.png html/casadi.png
 	find -name *-example.html | xargs perl -n -i~ -w -e 'print unless /<div class="line"><span class="comment">#[^\!].*?\/span>\n?/;'
 	find -name *-example.html | xargs perl -p -i~ -w -e 's/<span class="comment">#[^\!].*?\/span>\n?//g;'
