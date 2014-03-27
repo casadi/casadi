@@ -25,6 +25,7 @@
 
 #include "mx_node.hpp"
 #include "../fx/linear_solver.hpp"
+/// \cond INTERNAL
 
 namespace CasADi{
   /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T

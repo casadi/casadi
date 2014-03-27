@@ -28,6 +28,7 @@
 #include "symbolic/fx/stabilized_qp_solver.hpp"
 #include <deque>
 
+/// \cond INTERNAL
 namespace CasADi{
     
 class StabilizedSQPInternal : public NLPSolverInternal{
@@ -202,7 +203,7 @@ public:
   double norm1matrix(const DMatrix& A);
   
 };
-
+/// \endcond
 } // namespace CasADi
 
 #endif //STABILIZED_SQP_INTERNAL_HPP

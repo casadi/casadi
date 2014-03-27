@@ -27,6 +27,8 @@
 #include "fx_internal.hpp"
 #include "symbolic/fx/linear_solver.hpp"
 
+
+/// \cond INTERNAL
 namespace CasADi{
   
   // Forward declaration of internal class
@@ -98,6 +100,7 @@ namespace CasADi{
 
 
 } // namespace CasADi
+/// \endcond
 
 #endif //IMPLICIT_FUNCTION_INTERNAL_HPP
 

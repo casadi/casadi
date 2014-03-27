@@ -38,9 +38,7 @@ namespace CasADi{
   /// Wrapper around callback
   typedef int (*CallbackCPtr)(FX &f, void* user_data);
   
-  class Functor;
-  
-  /** \brief Internal class for Functor
+  /** \brief  Functor
       \author Joris Gillis 
       \date 2013
   */

@@ -28,6 +28,8 @@
 #include "../functor.hpp"
 #include <string>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   
   /** \brief  Internal class for CustomFunction
@@ -64,6 +66,6 @@ class CustomFunctionInternal : public FXInternal{
 
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // CUSTOM_FUNCTION_INTERNAL_HPP

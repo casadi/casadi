@@ -26,6 +26,8 @@
 #include "stabilized_qp_solver.hpp"
 #include "fx_internal.hpp"
 
+
+/// \cond INTERNAL
 namespace CasADi{
 
 /// Internal class
@@ -71,5 +73,7 @@ class StabilizedQPSolverInternal : public FXInternal{
 
 } // namespace CasADi
 
+
+/// \endcond
 #endif //STABILIZED_QP_INTERNAL_HPP
 

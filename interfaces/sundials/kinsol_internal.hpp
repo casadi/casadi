@@ -37,6 +37,7 @@
 #include <kinsol/kinsol_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/// \cond INTERNAL
 namespace CasADi{
   
   typedef std::pair< std::string,std::string> Message;
@@ -126,5 +127,6 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //KINSOL_INTERNAL_HPP
 

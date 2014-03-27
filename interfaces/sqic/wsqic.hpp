@@ -1,3 +1,5 @@
+/// \cond INTERNAL
+
 extern "C" {
 
   extern void sqic(
@@ -33,3 +35,4 @@ extern "C" {
   
   extern void sqicDestroy();
 }
+/// \endcond

@@ -33,6 +33,7 @@
 #include <CL/cl.h>
 #endif
 #endif // WITH_OPENCL
+/// \cond INTERNAL
 
 namespace CasADi{
 #ifdef WITH_OPENCL
@@ -218,4 +219,5 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 
 } // namespace CasADi
 
+/// \endcond
 #endif // SX_FUNCTION_INTERNAL_HPP

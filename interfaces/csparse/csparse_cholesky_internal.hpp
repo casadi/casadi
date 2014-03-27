@@ -23,6 +23,8 @@
 #ifndef CSPARSE_CHOLESKY_INTERNAL_HPP
 #define CSPARSE_CHOLESKY_INTERNAL_HPP
 
+/// \cond INTERNAL
+
 extern "C"{
 #include "cs.h"
 }
@@ -83,6 +85,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //CSPARSE_CHOLESKY_INTERNAL_HPP
 

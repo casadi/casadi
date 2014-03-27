@@ -25,6 +25,8 @@
 
 #include "mx_node.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Represents any binary operation that involves two matrices 
       \author Joel Andersson 
@@ -100,6 +102,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // BINARY_MX_HPP

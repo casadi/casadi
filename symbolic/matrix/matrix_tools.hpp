@@ -362,7 +362,8 @@ namespace CasADi{
   /// same as: res += mul(A,v)
   template<typename DataType>
   void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A=false);
-
+  
+  /// \cond INTERNAL
   /// Get a pointer to the data contained in the vector
   template<typename DataType>
   DataType* getPtr(Matrix<DataType> &v);
@@ -370,7 +371,8 @@ namespace CasADi{
   /// Get a pointer to the data contained in the vector
   template<typename DataType>
   const DataType* getPtr(const Matrix<DataType> &v);
-
+  /// \endcond
+  
   /** \brief Create a new matrix with a given sparsity pattern but with the nonzeros taken from an existing matrix */
   template<typename DataType>
   Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sparsity);

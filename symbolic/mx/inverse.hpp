@@ -27,6 +27,8 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Matrix inverse
       \author Joel Andersson
@@ -56,5 +58,6 @@ namespace CasADi{
 
 
 } // namespace CasADi
+/// \endcond
 
 #endif // INVERSE_HPP

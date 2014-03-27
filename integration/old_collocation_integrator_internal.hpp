@@ -29,6 +29,7 @@
 #include "symbolic/fx/implicit_function.hpp"
 #include "integration_tools.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
     
   class OldCollocationIntegratorInternal : public IntegratorInternal{
@@ -83,5 +84,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP

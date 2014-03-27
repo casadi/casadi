@@ -26,6 +26,8 @@
 #include "nlp_solver.hpp"
 #include "fx_internal.hpp"
 
+
+/// \cond INTERNAL
 namespace CasADi{
     
 /** \brief NLP solver storage class
@@ -136,5 +138,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //NLP_SOLVER_INTERNAL_HPP

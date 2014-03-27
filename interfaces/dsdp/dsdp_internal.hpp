@@ -27,6 +27,7 @@
 
 #include <dsdp5.h>
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for DSDPSolver
@@ -77,5 +78,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+/// \endcond
 
 #endif //DSDP_INTERNAL_HPP

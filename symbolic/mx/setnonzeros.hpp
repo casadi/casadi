@@ -27,6 +27,8 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** \brief Assign or add entries to a matrix
@@ -202,5 +204,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+/// \endcond
 
 #endif // SETNONZEROS_HPP

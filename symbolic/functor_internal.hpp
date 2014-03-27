@@ -24,6 +24,7 @@
 #define FUNCTOR_INTERNAL_HPP
 
 #include "functor.hpp"
+/// \cond INTERNAL
 
 namespace CasADi{
 
@@ -85,6 +86,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // FUNCTOR_INTERNAL_HPP

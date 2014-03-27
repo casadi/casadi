@@ -25,6 +25,8 @@
 
 #include "mx_node.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Represents a symbolic MX
       \author Joel Andersson 

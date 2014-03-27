@@ -27,6 +27,7 @@
 #include "symbolic/fx/sdp_solver.hpp"
 #include "interfaces/csparse/csparse_cholesky.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for SDPSDQPInternal
@@ -66,6 +67,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //SDP_SDQP_INTERNAL_HPP
 

@@ -26,6 +26,8 @@
 #include "socp_solver.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
 /// Internal class
@@ -79,6 +81,8 @@ class SOCPSolverInternal : public FXInternal{
 
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //SOCP_SOLVER_INTERNAL_HPP
 

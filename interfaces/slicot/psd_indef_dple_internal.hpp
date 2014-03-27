@@ -26,6 +26,7 @@
 #include "psd_indef_dple_solver.hpp"
 #include "../../control/dple_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal storage for DpleSolver related data
@@ -120,4 +121,5 @@ namespace CasADi{
   
 } // namespace CasADi
 
+/// \endcond
 #endif // PSD_INDEF_DPLE_INTERNAL_HPP

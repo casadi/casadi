@@ -809,9 +809,11 @@ namespace CasADi{
   typedef std::vector<Matrix<double> > DMatrixVector;
   typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
 
+  /// \cond INTERNAL
   typedef DMatrix* DMatrixPtr;
   typedef std::vector<DMatrixPtr> DMatrixPtrV;
   typedef std::vector<DMatrixPtrV> DMatrixPtrVV;
+  /// \endcond
 } // namespace CasADi
 
 #include "matrix_impl.hpp"

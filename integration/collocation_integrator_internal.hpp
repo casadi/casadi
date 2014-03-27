@@ -29,6 +29,7 @@
 #include "symbolic/fx/implicit_function.hpp"
 #include "integration_tools.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
     
   class CollocationIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
@@ -69,5 +70,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //COLLOCATION_INTEGRATOR_INTERNAL_HPP

@@ -27,6 +27,8 @@
 
 #include <string>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** Internal class for CplexSolver
@@ -109,5 +111,5 @@ namespace CasADi{
 
   };
 } // end namespace CasADi
-
+/// \endcond
 #endif //CPLEX_INTERNAL_HPP

@@ -37,6 +37,8 @@
 #include <cmath>
 #include <vector>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** \brief  forward declaration of Node and Matrix */
@@ -399,6 +401,6 @@ namespace std{
 #include "sx_node.hpp"
 
 #endif // SWIG
-
+/// \endcond
 
 #endif // SX_ELEMENT_HPP

@@ -36,17 +36,19 @@ namespace CasADi{
   template<class T> class Matrix;
   class FX;
   class Sparsity;
+  /// \cond INTERNAL
   template<class T> class LPStructIOSchemeVector;
-  typedef LPStructIOSchemeVector<Sparsity> LPStructure;
   template<class T> class QPStructIOSchemeVector;
-  typedef QPStructIOSchemeVector<Sparsity> QPStructure;
   template<class T> class QCQPStructIOSchemeVector;
-  typedef QCQPStructIOSchemeVector<Sparsity> QCQPStructure;
   template<class T> class SDPStructIOSchemeVector;
-  typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
   template<class T> class SOCPStructIOSchemeVector;
-  typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
   template<class T> class SDQPStructIOSchemeVector;
+  /// \endcond
+  typedef LPStructIOSchemeVector<Sparsity> LPStructure;
+  typedef QPStructIOSchemeVector<Sparsity> QPStructure;
+  typedef QCQPStructIOSchemeVector<Sparsity> QCQPStructure
+  typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
+  typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
   typedef SDQPStructIOSchemeVector<Sparsity> SDQPStructure;
   class NLPSolver;
   class LinearSolver;

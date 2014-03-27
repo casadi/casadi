@@ -24,6 +24,7 @@
 #define SYMBOLIC_SXElement_HPP
 
 #include "sx_node.hpp"
+/// \cond INTERNAL
 
 namespace CasADi{
 
@@ -57,5 +58,5 @@ protected:
 };
 
 } // namespace CasADi
-
+/// \endcond
 #endif // SYMBOLIC_SXElement_HPP

@@ -26,6 +26,7 @@
 #include "symbolic/fx/socp_solver_internal.hpp"
 #include "symbolic/fx/sdp_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for SDPSOCPInternal
@@ -59,6 +60,6 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //SDP_SOCP_INTERNAL_HPP
 

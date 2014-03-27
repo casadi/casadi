@@ -27,6 +27,8 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Reshape an expression
       \author Joel Andersson
@@ -80,5 +82,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+/// \endcond
 
 #endif // RESHAPE_HPP

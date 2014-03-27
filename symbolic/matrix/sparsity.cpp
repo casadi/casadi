@@ -30,6 +30,7 @@ using namespace std;
 
 namespace CasADi{
 
+  /// \cond INTERNAL
   // Singletons
   class EmptySparsity : public Sparsity{  
   public:
@@ -56,6 +57,7 @@ namespace CasADi{
       assignNode(new SparsityInternal(1,1,colind,row));
     }
   };
+  /// \endcond
   
   Sparsity::Sparsity(int dummy){
     casadi_assert(dummy==0);

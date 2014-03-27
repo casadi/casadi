@@ -27,6 +27,8 @@
 #include "parallelizer.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
  
   /** \brief  Internal node class for Parallelizer
@@ -109,6 +111,6 @@ namespace CasADi{
 
 } // namespace CasADi
 
-
+/// \endcond
 #endif // PARALLELIZER_INTERNAL_HPP
 

@@ -32,6 +32,7 @@ using namespace std;
 
 namespace CasADi{
 
+/// \cond INTERNAL
   typedef GenericTypeInternal<std::string> StringType;
   typedef GenericTypeInternal<double> DoubleType;
   typedef GenericTypeInternal<int> IntType;
@@ -42,7 +43,8 @@ namespace CasADi{
   typedef GenericTypeInternal<SharedObject> SharedObjectType;
   typedef GenericTypeInternal<FX> FXType;
   typedef GenericTypeInternal<Dictionary> DictionaryType;
-  
+/// \endcond
+
 opt_type GenericType::getType() const {
   return type_;
 }

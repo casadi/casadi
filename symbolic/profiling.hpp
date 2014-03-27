@@ -27,6 +27,8 @@
 #include <cstring>
 #include <iostream>
 
+/// \cond INTERNAL
+
 /*
  * Author:  David Robert Nadeau
  * Site:    http://NadeauSoftware.com/
@@ -207,5 +209,6 @@ void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::str
   f << sourceline;
 }
 
+/// \endcond
 
 #endif //PROFILING_HPP

@@ -27,6 +27,8 @@
 #include <iomanip>
 #include <iostream>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
 /** \brief Represents an MX that is only composed of a constant.
@@ -502,6 +504,7 @@ namespace CasADi{
   }
 
 } // namespace CasADi
+/// \endcond
 
 
 #endif // CONSTANT_MX_HPP

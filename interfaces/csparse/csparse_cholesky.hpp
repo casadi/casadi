@@ -27,7 +27,8 @@
 
 namespace CasADi{
 
-  
+/// \cond INTERNAL
+
 /** \brief  Forward declaration of internal class */
 class CSparseCholeskyInternal;
 
@@ -92,6 +93,6 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //CSPARSE_CHOLESKY_HPP
 

@@ -26,6 +26,8 @@
 #include "lp_solver.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
 /// Internal class
@@ -64,6 +66,7 @@ class LPSolverInternal : public FXInternal{
 
 
 } // namespace CasADi
+/// \endcond
 
 #endif //LP_INTERNAL_HPP
 

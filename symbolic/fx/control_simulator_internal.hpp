@@ -27,6 +27,8 @@
 #include "simulator.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** \brief ControlSimulator data storage classs
@@ -103,5 +105,6 @@ namespace CasADi{
   };
   
 } // namespace CasADi
+/// \endcond
 
 #endif // CONTROLSIMULATOR_INTERNAL_HPP

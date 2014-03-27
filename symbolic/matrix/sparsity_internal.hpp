@@ -24,6 +24,7 @@
 #define SPARSITY_INTERNAL_HPP
 
 #include "sparsity.hpp"
+/// \cond INTERNAL
 
 namespace CasADi{
 
@@ -324,5 +325,6 @@ namespace CasADi{
 };
 
 } // namespace CasADi
+/// \endcond
 
 #endif // SPARSITY_INTERNAL_HPP

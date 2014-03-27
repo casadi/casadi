@@ -26,6 +26,8 @@
 #include "symbolic_qr.hpp"
 #include "linear_solver_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
   
   class SymbolicQRInternal : public LinearSolverInternal{
@@ -69,5 +71,6 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //SYMBOLIC_QR_INTERNAL_HPP
 

@@ -27,6 +27,7 @@
 #include "symbolic/fx/socp_solver.hpp"
 #include "interfaces/csparse/csparse_cholesky.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for SOCPQCQPInternal
@@ -55,7 +56,7 @@ public:
     SOCPSolver socpsolver_;
     std::vector<CSparseCholesky> cholesky_;
 };
-
+/// \endcond
 } // namespace CasADi
 
 #endif //SOCP_QCQP_INTERNAL_HPP

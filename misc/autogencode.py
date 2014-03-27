@@ -101,13 +101,14 @@ class Enum:
     return str(len(self.entries))
       
   def hppcode(self):
-    s= "/// Helper function for '" + self.enum + "'\n"
+    s= "/// \cond INTERNAL \n/// Helper function for '" + self.enum + "'\n"
     s+="""
 template<class M>
 class %sIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit %sIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_%s){} 
 };
+/// \endcond
 """ % (self.enum,self.enum,self.enum)
     #if self.enum.endswith("Struct"):
     #  s+="typedef %sIOSchemeVector<Sparsity> %sure;\n" % (self.enum,self.enum)

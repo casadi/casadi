@@ -25,6 +25,7 @@
 
 #include "symbolic/fx/nlp_solver_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /**
@@ -139,4 +140,5 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //SNOPT_INTERNAL_HPP

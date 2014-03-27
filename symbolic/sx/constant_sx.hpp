@@ -26,6 +26,8 @@
 #include "sx_node.hpp"
 #include <cassert>
 
+/// \cond INTERNAL
+
 // Cashing of constants requires a map (preferably a hash map)
 #ifdef USE_CXX11
 // Using C++11 unordered_map (hash map)
@@ -319,6 +321,6 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // CONSTANT_SXElement_HPP

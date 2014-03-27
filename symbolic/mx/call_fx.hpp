@@ -26,6 +26,8 @@
 #include "multiple_output.hpp"
 #include "../fx/fx.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** 
@@ -91,5 +93,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+/// \endcond
 
 #endif // CALL_FX_HPP

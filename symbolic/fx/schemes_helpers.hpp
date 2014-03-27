@@ -30,6 +30,7 @@
 #include "io_scheme_vector.hpp"
 namespace CasADi{ 
 
+/// \cond INTERNAL 
 /// Helper function for 'DPLEInput'
 
 template<class M>
@@ -37,6 +38,7 @@ class DPLEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DPLEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DPLEInput){} 
 };
+/// \endcond
 /// Input arguments of a dple solver
 /// 
 /// \copydoc scheme_DPLEInput
@@ -63,6 +65,7 @@ std::vector<M> dpleIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'DPLEOutput'
 
 template<class M>
@@ -70,6 +73,7 @@ class DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DPLEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DPLEOutput){} 
 };
+/// \endcond
 /// Output arguments of a dple solver
 /// 
 /// \copydoc scheme_DPLEOutput
@@ -94,6 +98,7 @@ std::vector<M> dpleOut(const std::vector<M>& args,const std::string &arg_s0=""){
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'ControlledDAEInput'
 
 template<class M>
@@ -101,6 +106,7 @@ class ControlledDAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit ControlledDAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ControlledDAEInput){} 
 };
+/// \endcond
 /// Input arguments of an ODE/DAE function
 /// 
 /// \copydoc scheme_ControlledDAEInput
@@ -141,6 +147,7 @@ std::vector<M> controldaeIn(const std::vector<M>& args,const std::string &arg_s0
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'ControlSimulatorInput'
 
 template<class M>
@@ -148,6 +155,7 @@ class ControlSimulatorInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit ControlSimulatorInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ControlSimulatorInput){} 
 };
+/// \endcond
 /// Input arguments of a control simulator
 /// 
 /// \copydoc scheme_ControlSimulatorInput
@@ -176,6 +184,44 @@ std::vector<M> controlsimulatorIn(const std::vector<M>& args,const std::string &
   return ret;
 
 }
+/// \cond INTERNAL 
+/// Helper function for 'HNLPInput'
+
+template<class M>
+class HNLPInputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit HNLPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HNLPInput){} 
+};
+/// \endcond
+/// Input arguments of an Homotopy NLP function
+/// 
+/// \copydoc scheme_HNLPInput
+template<class M>
+HNLPInputIOSchemeVector<M> hnlpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
+  std::vector<M> ret(3);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_HNLPInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in HNLPInput: '" << it->first << "' is not recognized. Available keywords are: x, p, tau");
+    ret[n] = it->second;
+  }
+  return HNLPInputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> hnlpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput,arg_s2)));
+  return ret;
+
+}
+/// \cond INTERNAL 
 /// Helper function for 'DAEInput'
 
 template<class M>
@@ -183,6 +229,7 @@ class DAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DAEInput){} 
 };
+/// \endcond
 /// Input arguments of an ODE/DAE function
 /// 
 /// \copydoc scheme_DAEInput
@@ -213,6 +260,7 @@ std::vector<M> daeIn(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'DAEOutput'
 
 template<class M>
@@ -220,6 +268,7 @@ class DAEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit DAEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DAEOutput){} 
 };
+/// \endcond
 /// Output arguments of an DAE function
 /// 
 /// \copydoc scheme_DAEOutput
@@ -248,6 +297,7 @@ std::vector<M> daeOut(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'RDAEInput'
 
 template<class M>
@@ -255,6 +305,7 @@ class RDAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit RDAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_RDAEInput){} 
 };
+/// \endcond
 /// Input arguments of an ODE/DAE backward integration function
 /// 
 /// \copydoc scheme_RDAEInput
@@ -291,6 +342,7 @@ std::vector<M> rdaeIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'RDAEOutput'
 
 template<class M>
@@ -298,6 +350,7 @@ class RDAEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit RDAEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_RDAEOutput){} 
 };
+/// \endcond
 /// Output arguments of an ODE/DAE backward integration function
 /// 
 /// \copydoc scheme_RDAEOutput
@@ -326,6 +379,7 @@ std::vector<M> rdaeOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'IntegratorInput'
 
 template<class M>
@@ -333,6 +387,7 @@ class IntegratorInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit IntegratorInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_IntegratorInput){} 
 };
+/// \endcond
 /// Input arguments of an integrator
 /// 
 /// \copydoc scheme_IntegratorInput
@@ -367,6 +422,7 @@ std::vector<M> integratorIn(const std::vector<M>& args,const std::string &arg_s0
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'IntegratorOutput'
 
 template<class M>
@@ -374,6 +430,7 @@ class IntegratorOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit IntegratorOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_IntegratorOutput){} 
 };
+/// \endcond
 /// Output arguments of an integrator
 /// 
 /// \copydoc scheme_IntegratorOutput
@@ -408,6 +465,7 @@ std::vector<M> integratorOut(const std::vector<M>& args,const std::string &arg_s
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'LinsolInput'
 
 template<class M>
@@ -415,6 +473,7 @@ class LinsolInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LinsolInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LinsolInput){} 
 };
+/// \endcond
 /// Input arguments of a linear solver
 /// 
 /// \copydoc scheme_LinsolInput
@@ -441,6 +500,7 @@ std::vector<M> linsolIn(const std::vector<M>& args,const std::string &arg_s0="",
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'LinsolOutput'
 
 template<class M>
@@ -448,6 +508,7 @@ class LinsolOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LinsolOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LinsolOutput){} 
 };
+/// \endcond
 /// Output arguments of a linear solver
 /// 
 /// \copydoc scheme_LinsolOutput
@@ -472,6 +533,7 @@ std::vector<M> linsolOut(const std::vector<M>& args,const std::string &arg_s0=""
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'LPSolverInput'
 
 template<class M>
@@ -479,6 +541,7 @@ class LPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPSolverInput){} 
 };
+/// \endcond
 /// Input arguments of a LP problem
 /// 
 /// \copydoc scheme_LPSolverInput
@@ -513,6 +576,7 @@ std::vector<M> lpIn(const std::vector<M>& args,const std::string &arg_s0="",cons
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'LPSolverOutput'
 
 template<class M>
@@ -520,6 +584,7 @@ class LPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPSolverOutput){} 
 };
+/// \endcond
 /// Output arguments of an LP Solver
 /// 
 /// \copydoc scheme_LPSolverOutput
@@ -550,6 +615,7 @@ std::vector<M> lpOut(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'LPStruct'
 
 template<class M>
@@ -557,6 +623,7 @@ class LPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit LPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPStruct){} 
 };
+/// \endcond
 /// Structure specification of an LP
 /// 
 /// \copydoc scheme_LPStruct
@@ -581,6 +648,7 @@ std::vector<M> lpStruct(const std::vector<M>& args,const std::string &arg_s0="")
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'NLPInput'
 
 template<class M>
@@ -588,6 +656,7 @@ class NLPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit NLPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPInput){} 
 };
+/// \endcond
 /// Input arguments of an NLP function
 /// 
 /// \copydoc scheme_NLPInput
@@ -614,6 +683,7 @@ std::vector<M> nlpIn(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'NLPOutput'
 
 template<class M>
@@ -621,6 +691,7 @@ class NLPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit NLPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPOutput){} 
 };
+/// \endcond
 /// Output arguments of an NLP function
 /// 
 /// \copydoc scheme_NLPOutput
@@ -647,6 +718,7 @@ std::vector<M> nlpOut(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'GradFInput'
 
 template<class M>
@@ -654,6 +726,7 @@ class GradFInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit GradFInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_GradFInput){} 
 };
+/// \endcond
 /// Input arguments of an NLP objective gradient function
 /// 
 /// \copydoc scheme_GradFInput
@@ -680,6 +753,7 @@ std::vector<M> gradFIn(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'GradFOutput'
 
 template<class M>
@@ -687,6 +761,7 @@ class GradFOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit GradFOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_GradFOutput){} 
 };
+/// \endcond
 /// Output arguments of an NLP objective gradient function
 /// 
 /// \copydoc scheme_GradFOutput
@@ -715,6 +790,7 @@ std::vector<M> gradFOut(const std::vector<M>& args,const std::string &arg_s0="",
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'JacGInput'
 
 template<class M>
@@ -722,6 +798,7 @@ class JacGInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit JacGInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_JacGInput){} 
 };
+/// \endcond
 /// Input arguments of an NLP Jacobian function
 /// 
 /// \copydoc scheme_JacGInput
@@ -748,6 +825,7 @@ std::vector<M> jacGIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'JacGOutput'
 
 template<class M>
@@ -755,6 +833,7 @@ class JacGOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit JacGOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_JacGOutput){} 
 };
+/// \endcond
 /// Output arguments of an NLP Jacobian function
 /// 
 /// \copydoc scheme_JacGOutput
@@ -783,6 +862,7 @@ std::vector<M> jacGOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'HessLagInput'
 
 template<class M>
@@ -790,6 +870,7 @@ class HessLagInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit HessLagInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HessLagInput){} 
 };
+/// \endcond
 /// Input arguments of an NLP Hessian function
 /// 
 /// \copydoc scheme_HessLagInput
@@ -820,6 +901,7 @@ std::vector<M> hessLagIn(const std::vector<M>& args,const std::string &arg_s0=""
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'HessLagOutput'
 
 template<class M>
@@ -827,6 +909,7 @@ class HessLagOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit HessLagOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HessLagOutput){} 
 };
+/// \endcond
 /// Output arguments of an NLP Hessian function
 /// 
 /// \copydoc scheme_HessLagOutput
@@ -859,6 +942,7 @@ std::vector<M> hessLagOut(const std::vector<M>& args,const std::string &arg_s0="
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'NLPSolverInput'
 
 template<class M>
@@ -866,6 +950,7 @@ class NLPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit NLPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPSolverInput){} 
 };
+/// \endcond
 /// Input arguments of an NLP Solver
 /// 
 /// \copydoc scheme_NLPSolverInput
@@ -904,6 +989,7 @@ std::vector<M> nlpSolverIn(const std::vector<M>& args,const std::string &arg_s0=
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'NLPSolverOutput'
 
 template<class M>
@@ -911,6 +997,7 @@ class NLPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit NLPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPSolverOutput){} 
 };
+/// \endcond
 /// Output arguments of an NLP Solver
 /// 
 /// \copydoc scheme_NLPSolverOutput
@@ -945,6 +1032,7 @@ std::vector<M> nlpSolverOut(const std::vector<M>& args,const std::string &arg_s0
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'MayerInput'
 
 template<class M>
@@ -952,6 +1040,7 @@ class MayerInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit MayerInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_MayerInput){} 
 };
+/// \endcond
 /// Input arguments of a Mayer Term \n
 /// nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
 /// np: Number of parameters: from option number_of_parameters\n
@@ -980,6 +1069,7 @@ std::vector<M> mayerIn(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'OCPInput'
 
 template<class M>
@@ -987,6 +1077,7 @@ class OCPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit OCPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_OCPInput){} 
 };
+/// \endcond
 /// Input arguments of an OCP Solver \n
 /// ns: Number of shooting nodes: from option number_of_grid_points\n
 /// nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
@@ -1041,6 +1132,7 @@ std::vector<M> ocpIn(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'OCPOutput'
 
 template<class M>
@@ -1048,6 +1140,7 @@ class OCPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit OCPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_OCPOutput){} 
 };
+/// \endcond
 /// Output arguments of an OCP Solver
 /// 
 /// \copydoc scheme_OCPOutput
@@ -1078,6 +1171,7 @@ std::vector<M> ocpOut(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'QCQPSolverInput'
 
 template<class M>
@@ -1085,6 +1179,7 @@ class QCQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QCQPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPSolverInput){} 
 };
+/// \endcond
 /// Input arguments of a QP problem
 /// 
 /// \copydoc scheme_QCQPSolverInput
@@ -1131,6 +1226,7 @@ std::vector<M> qcqpIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'QCQPSolverOutput'
 
 template<class M>
@@ -1138,6 +1234,7 @@ class QCQPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QCQPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPSolverOutput){} 
 };
+/// \endcond
 /// Output arguments of an QP Solver
 /// 
 /// \copydoc scheme_QCQPSolverOutput
@@ -1168,6 +1265,7 @@ std::vector<M> qcqpOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'QCQPStruct'
 
 template<class M>
@@ -1175,6 +1273,7 @@ class QCQPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QCQPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPStruct){} 
 };
+/// \endcond
 /// Structure specification of a QP
 /// 
 /// \copydoc scheme_QCQPStruct
@@ -1203,6 +1302,7 @@ std::vector<M> qcqpStruct(const std::vector<M>& args,const std::string &arg_s0="
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'QPSolverInput'
 
 template<class M>
@@ -1210,6 +1310,7 @@ class QPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPSolverInput){} 
 };
+/// \endcond
 /// Input arguments of a QP problem
 /// 
 /// \copydoc scheme_QPSolverInput
@@ -1250,6 +1351,7 @@ std::vector<M> qpIn(const std::vector<M>& args,const std::string &arg_s0="",cons
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'QPSolverOutput'
 
 template<class M>
@@ -1257,6 +1359,7 @@ class QPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPSolverOutput){} 
 };
+/// \endcond
 /// Output arguments of an QP Solver
 /// 
 /// \copydoc scheme_QPSolverOutput
@@ -1287,6 +1390,7 @@ std::vector<M> qpOut(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'QPStruct'
 
 template<class M>
@@ -1294,6 +1398,7 @@ class QPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit QPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPStruct){} 
 };
+/// \endcond
 /// Structure specification of a QP
 /// 
 /// \copydoc scheme_QPStruct
@@ -1320,6 +1425,7 @@ std::vector<M> qpStruct(const std::vector<M>& args,const std::string &arg_s0="",
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SDPInput'
 
 template<class M>
@@ -1327,6 +1433,7 @@ class SDPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPInput){} 
 };
+/// \endcond
 /// Input arguments of a SDP problem
 /// 
 /// \copydoc scheme_SDPInput
@@ -1365,6 +1472,7 @@ std::vector<M> sdpIn(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SDPOutput'
 
 template<class M>
@@ -1372,6 +1480,7 @@ class SDPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPOutput){} 
 };
+/// \endcond
 /// Output arguments of an SDP Solver
 /// 
 /// \copydoc scheme_SDPOutput
@@ -1408,6 +1517,7 @@ std::vector<M> sdpOut(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SDPStruct'
 
 template<class M>
@@ -1415,6 +1525,7 @@ class SDPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPStruct){} 
 };
+/// \endcond
 /// Structure specification of an SDP
 /// 
 /// \copydoc scheme_SDPStruct
@@ -1443,6 +1554,7 @@ std::vector<M> sdpStruct(const std::vector<M>& args,const std::string &arg_s0=""
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SDQPInput'
 
 template<class M>
@@ -1450,6 +1562,7 @@ class SDQPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDQPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPInput){} 
 };
+/// \endcond
 /// Input arguments of a SDQP problem
 /// 
 /// \copydoc scheme_SDQPInput
@@ -1490,6 +1603,7 @@ std::vector<M> sdqpIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SDQPOutput'
 
 template<class M>
@@ -1497,6 +1611,7 @@ class SDQPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDQPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPOutput){} 
 };
+/// \endcond
 /// Output arguments of an SDQP Solver
 /// 
 /// \copydoc scheme_SDQPOutput
@@ -1533,6 +1648,7 @@ std::vector<M> sdqpOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SDQPStruct'
 
 template<class M>
@@ -1540,6 +1656,7 @@ class SDQPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SDQPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPStruct){} 
 };
+/// \endcond
 /// Structure specification of an SDQP
 /// 
 /// \copydoc scheme_SDQPStruct
@@ -1570,6 +1687,7 @@ std::vector<M> sdqpStruct(const std::vector<M>& args,const std::string &arg_s0="
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SOCPInput'
 
 template<class M>
@@ -1577,6 +1695,7 @@ class SOCPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SOCPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPInput){} 
 };
+/// \endcond
 /// Input arguments of a SOCP problem
 /// 
 /// \copydoc scheme_SOCPInput
@@ -1619,6 +1738,7 @@ std::vector<M> socpIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SOCPOutput'
 
 template<class M>
@@ -1626,6 +1746,7 @@ class SOCPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SOCPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPOutput){} 
 };
+/// \endcond
 /// Output arguments of an SOCP Solver
 /// 
 /// \copydoc scheme_SOCPOutput
@@ -1656,6 +1777,7 @@ std::vector<M> socpOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'SOCPStruct'
 
 template<class M>
@@ -1663,6 +1785,7 @@ class SOCPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit SOCPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPStruct){} 
 };
+/// \endcond
 /// Structure specification of an SOCP
 /// 
 /// \copydoc scheme_SOCPStruct
@@ -1689,6 +1812,7 @@ std::vector<M> socpStruct(const std::vector<M>& args,const std::string &arg_s0="
   return ret;
 
 }
+/// \cond INTERNAL 
 /// Helper function for 'StabilizedQPSolverInput'
 
 template<class M>
@@ -1696,6 +1820,7 @@ class StabilizedQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit StabilizedQPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_StabilizedQPSolverInput){} 
 };
+/// \endcond
 /// Input arguments of a QP problem
 /// 
 /// \copydoc scheme_StabilizedQPSolverInput

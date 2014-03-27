@@ -136,6 +136,7 @@ class OptionsFunctionality : public SharedObject{
 
 };
 
+/// \cond INTERNAL
 #ifndef SWIG
 
 /** \brief Internal class
@@ -289,6 +290,8 @@ private:
 };
 
 #endif // SWIG
+
+/// \endcond
 
 } // namespace CasADi
 

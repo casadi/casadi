@@ -76,6 +76,7 @@ namespace CasADi{
 
   };
 
+/// \cond INTERNAL
 #ifndef SWIG
 
   /// QR-factorize dense matrix (lapack)
@@ -127,6 +128,8 @@ namespace CasADi{
 #endif // SWIG
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //LAPACK_QR_DENSE_HPP
 

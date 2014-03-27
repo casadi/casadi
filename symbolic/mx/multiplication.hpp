@@ -25,6 +25,8 @@
 
 #include "mx_node.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief An MX atomic for matrix-matrix product, note that the first factor must be provided transposed
       \author Joel Andersson 
@@ -103,6 +105,7 @@ namespace CasADi{
 
 
 } // namespace CasADi
+/// \endcond
 
 
 #endif // MULTIPLICATION_HPP

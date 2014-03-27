@@ -27,6 +27,7 @@
 
 #include <qpOASES.hpp>
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for QPOasesSolver
@@ -95,4 +96,5 @@ public:
 
 } // namespace CasADi
 
+/// \endcond
 #endif //QPOASES_INTERNAL_HPP

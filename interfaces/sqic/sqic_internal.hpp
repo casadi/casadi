@@ -25,6 +25,7 @@
 
 #include "symbolic/fx/qp_solver_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
 /** \brief Internal class for SQICSolver
@@ -103,5 +104,6 @@ public:
 
 } // namespace CasADi
 
+/// \endcond
 #endif //SQIC_INTERNAL_HPP
 

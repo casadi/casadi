@@ -27,6 +27,8 @@
 #include "dple_internal.hpp"
 #include "../symbolic/fx/fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** \brief Internal storage for DpleSolver related data
@@ -97,5 +99,5 @@ namespace CasADi{
   };
   
 } // namespace CasADi
-
+/// \endcond
 #endif // DPLE_INTERNAL_HPP

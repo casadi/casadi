@@ -76,6 +76,7 @@ namespace CasADi{
 
   };
 
+/// \cond INTERNAL
 #ifndef SWIG
 
   /// LU-Factorize dense matrix (lapack)
@@ -146,4 +147,5 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //LAPACK_LU_DENSE_HPP

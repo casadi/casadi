@@ -30,6 +30,7 @@
 #include "../symbolic/fx/mx_function.hpp"
 #include "../symbolic/fx/sx_function.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
   
 class DirectSingleShootingInternal : public OCPSolverInternal{
@@ -77,6 +78,6 @@ class DirectSingleShootingInternal : public OCPSolverInternal{
 };
                         
 } // namespace CasADi
-
+/// \endcond
 
 #endif // DIRECT_SINGLE_SHOOTING_INTERNAL_HPP

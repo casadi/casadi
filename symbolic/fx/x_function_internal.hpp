@@ -44,6 +44,8 @@
 #define SPARSITY_MAP std::map
 #endif // USE_CXX11
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** \brief  Internal node class for the base class of SXFunctionInternal and MXFunctionInternal (lacks a public counterpart)
@@ -1039,5 +1041,6 @@ namespace CasADi{
   
 
 } // namespace CasADi
+/// \endcond
 
 #endif // X_FUNCTION_INTERNAL_HPP

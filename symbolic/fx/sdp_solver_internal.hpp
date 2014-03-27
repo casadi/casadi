@@ -26,6 +26,8 @@
 #include "sdp_solver.hpp"
 #include "fx_internal.hpp"
 
+
+/// \cond INTERNAL
 namespace CasADi{
 
 /// Internal class
@@ -106,6 +108,7 @@ class SDPSolverInternal : public FXInternal{
 
 
 } // namespace CasADi
+/// \endcond
 
 #endif //SDP_SOLVER_INTERNAL_HPP
 

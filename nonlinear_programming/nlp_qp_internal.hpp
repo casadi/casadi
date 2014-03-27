@@ -26,6 +26,7 @@
 #include "symbolic/fx/qp_solver_internal.hpp"
 #include "symbolic/fx/nlp_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for NLPQPInternal
@@ -58,6 +59,6 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //NLP_QP_INTERNAL_HPP
 

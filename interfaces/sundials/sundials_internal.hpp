@@ -31,6 +31,7 @@
 #include <sundials/sundials_iterative.h>
 #include <sundials/sundials_types.h>
 
+/// \cond INTERNAL
 namespace CasADi{
 
 class SundialsInternal : public IntegratorInternal{
@@ -110,4 +111,5 @@ public:
   
 } // namespace CasADi
 
+/// \endcond
 #endif // SUNDIALS_INTERNAL_HPP

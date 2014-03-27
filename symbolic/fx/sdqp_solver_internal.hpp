@@ -26,6 +26,8 @@
 #include "sdqp_solver.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
 /// Internal class
@@ -75,5 +77,6 @@ class SDQPSolverInternal : public FXInternal{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //SDQP_SOLVER_INTERNAL_HPP
 

@@ -28,6 +28,7 @@
 #include "symbolic/fx/nlp_solver.hpp"
 #include "symbolic/fx/linear_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for NewtonImplicitInternal
@@ -67,6 +68,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //NEWTON_IMPLICIT_INTERNAL_HPP
 

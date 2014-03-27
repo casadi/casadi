@@ -35,6 +35,8 @@
 #define M_PI 3.14159265358979323846
 #endif // M_PI
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /// Enum for quick access to any node
@@ -930,5 +932,7 @@ namespace CasADi{
 #endif // SWIG
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //CASADI_CALCULUS_HPP

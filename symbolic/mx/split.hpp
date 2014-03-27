@@ -27,6 +27,8 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** \brief Split: Split into multiple expressions splitting the nonzeros

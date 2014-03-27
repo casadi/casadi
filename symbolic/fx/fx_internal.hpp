@@ -35,6 +35,8 @@
 // This macro is for documentation purposes
 #define OUTPUTSCHEME(name)
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   class MXFunction;
@@ -373,5 +375,6 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 
 #endif // FX_INTERNAL_HPP

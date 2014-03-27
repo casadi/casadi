@@ -35,6 +35,7 @@
 
 #include "worhp.h"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /**
@@ -117,4 +118,5 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //WORHP_INTERNAL_HPP

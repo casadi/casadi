@@ -35,6 +35,8 @@
 #include <idas/idas_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   
 /**
@@ -240,5 +242,6 @@ class IdasInternal : public SundialsInternal{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //IDAS_INTERNAL_HPP
 

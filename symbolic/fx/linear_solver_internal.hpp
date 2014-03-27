@@ -26,6 +26,8 @@
 #include "linear_solver.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
   
   /** Internal class
@@ -91,6 +93,7 @@ namespace CasADi{
 
 
 } // namespace CasADi
+/// \endcond
 
 #endif //LINEAR_SOLVER_INTERNAL_HPP
 

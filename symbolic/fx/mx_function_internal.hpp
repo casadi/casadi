@@ -32,6 +32,8 @@
 #include "x_function_internal.hpp"
 #include "../mx/mx_node.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** \brief  Internal node class for MXFunction
@@ -144,7 +146,7 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // MX_FUNCTION_INTERNAL_HPP
 

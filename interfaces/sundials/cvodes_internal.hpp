@@ -35,6 +35,7 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/// \cond INTERNAL
 namespace CasADi{
   
 /**
@@ -231,5 +232,6 @@ public:
 
 } // namespace CasADi
 
+/// \endcond
 #endif //CVODES_INTERNAL_HPP
 

@@ -26,6 +26,7 @@
 #include "symbolic/fx/lp_internal.hpp"
 #include "symbolic/fx/qp_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for QPLPInternal
@@ -56,6 +57,7 @@ public:
 };
 
 } // namespace CasADi
+/// \endcond
 
 #endif //QP_LP_INTERNAL_HPP
 

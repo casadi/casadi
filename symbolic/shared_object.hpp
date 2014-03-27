@@ -33,8 +33,10 @@ namespace CasADi{
   // Forward declaration of weak reference class
   class WeakRef;
 
+  /// \cond INTERNAL
   // Forward declaration of internal class
   class SharedObjectNode;
+  /// \endcond
 
   /** \brief SharedObject implements a reference counting framework simular for effient and easily-maintained memory management.
   
@@ -157,7 +159,7 @@ namespace CasADi{
   };
 
 #ifndef SWIG
-
+  /// \cond INTERNAL
   /// Internal class for the reference counting framework, see comments on the public class.
   class SharedObjectNode{
     friend class SharedObject;
@@ -232,6 +234,7 @@ namespace CasADi{
     /// Weak pointer (non-owning) object for the object
     WeakRef* weak_ref_;
   };
+  /// \endcond
 
   /// Typecast a shared object to a base class to a shared object to a derived class, cf. dynamic_cast
   template<class B>
@@ -327,7 +330,6 @@ namespace CasADi{
   
     return ret;
   }
-
 
 #endif // SWIG
 

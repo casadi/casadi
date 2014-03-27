@@ -26,6 +26,8 @@
 #include "nullspace.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** @copydoc Nullspace_doc
@@ -68,4 +70,5 @@ namespace CasADi{
   
 } // namespace CasADi
 
+/// \endcond
 #endif // NULLSPACE_INTERNAL_HPP

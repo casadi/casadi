@@ -26,6 +26,8 @@
 #include "sx_node.hpp"
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
 /** \brief Represents a basic unary operation on an SXElement node
@@ -99,5 +101,5 @@ class UnarySX : public SXNode{
 
 } // namespace CasADi
 
-
+/// \endcond
 #endif // UNARY_SXElement_HPP

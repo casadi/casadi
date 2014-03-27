@@ -28,6 +28,8 @@
 #include "symbolic/fx/qp_solver.hpp"
 #include <deque>
 
+/// \cond INTERNAL
+
 namespace CasADi{
     
 class SCPgenInternal : public NLPSolverInternal{
@@ -217,5 +219,7 @@ public:
 };
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //SCPGEN_INTERNAL_HPP

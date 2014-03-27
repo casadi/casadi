@@ -27,6 +27,8 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Concatenation: Join multiple expressions stacking the nonzeros
       \author Joel Andersson
@@ -118,5 +120,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+/// \endcond
 
 #endif // CONCAT_HPP

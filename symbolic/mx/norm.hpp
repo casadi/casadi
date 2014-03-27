@@ -25,6 +25,7 @@
 
 #include "mx_node.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Matrix and vector norms
@@ -151,5 +152,7 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif // NORM_HPP

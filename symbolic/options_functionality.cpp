@@ -71,11 +71,12 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::st
   return v1[nb];
 }
 
+/// \cond INTERNAL
 /// A helper class to use stl::sort in OptionsFunctionalityNode::getBestMatches
 struct mysortclass {
   bool operator () (std::pair<std::string,double> a,std::pair<std::string,double> b) { return (a.second<b.second);}
 } mysorter;
-
+/// \endcond
 
 double OptionsFunctionalityNode::getBestMatches(const std::string & word, const std::vector<std::string> &dictionary, std::vector<std::string> &suggestions, int amount) {
   // Make a list of (word,score) tuples

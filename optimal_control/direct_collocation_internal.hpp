@@ -30,6 +30,7 @@
 #include "../symbolic/fx/sx_function.hpp"
 #include "integration/integration_tools.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
   
 class DirectCollocationInternal : public OCPSolverInternal{
@@ -78,6 +79,6 @@ class DirectCollocationInternal : public OCPSolverInternal{
 };
                         
 } // namespace CasADi
-
+/// \endcond
 
 #endif // DIRECT_COLLOCATION_INTERNAL_HPP

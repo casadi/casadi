@@ -27,6 +27,8 @@
 #include "../fx/fx.hpp"
 #include <set>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /// Forward declaration
@@ -101,5 +103,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+/// \endcond
 
 #endif // MULTIPLE_OUTPUT_HPP

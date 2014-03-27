@@ -34,6 +34,8 @@
 #endif // _WIN32
 #endif // WITH_DL 
 
+/// \cond INTERNAL
+
 namespace CasADi{
   
 class ExternalFunctionInternal : public FXInternal{
@@ -88,6 +90,6 @@ class ExternalFunctionInternal : public FXInternal{
 };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // EXTERNAL_FUNCTION_INTERNAL_HPP

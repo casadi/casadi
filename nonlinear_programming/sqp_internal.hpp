@@ -28,6 +28,7 @@
 #include "symbolic/fx/qp_solver.hpp"
 #include <deque>
 
+/// \cond INTERNAL
 namespace CasADi{
     
 class SQPInternal : public NLPSolverInternal{
@@ -181,5 +182,5 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //SQP_INTERNAL_HPP

@@ -31,6 +31,8 @@
 /** \brief  Scalar expression (which also works as a smart pointer class to this class) */
 #include "sx_element.hpp"
 
+
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief  Interal node class for SX
@@ -123,5 +125,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif // SX_NODE_HPP

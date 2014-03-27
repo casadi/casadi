@@ -26,6 +26,7 @@
 #include "ipopt_solver.hpp"
 #include "symbolic/fx/nlp_solver_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
 /**
@@ -127,5 +128,6 @@ public:
 };
 
 } // namespace CasADi
+/// \endcond
 
 #endif //IPOPT_INTERNAL_HPP

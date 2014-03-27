@@ -27,6 +27,7 @@
 #include "symbolic/fx/integrator_internal.hpp"
 #include "symbolic/fx/mx_function.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
     
   class FixedStepIntegratorInternal : public IntegratorInternal{
@@ -100,5 +101,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //FIXED_STEP_INTEGRATOR_INTERNAL_HPP

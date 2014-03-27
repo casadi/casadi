@@ -25,6 +25,7 @@
 
 #include "solve.hpp"
 #include "../fx/linear_solver_internal.hpp"
+/// \cond INTERNAL
 
 using namespace std;
 

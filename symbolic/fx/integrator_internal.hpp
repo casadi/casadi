@@ -26,6 +26,8 @@
 #include "integrator.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /** \brief Internal storage for integrator related data
@@ -150,5 +152,6 @@ namespace CasADi{
   };
   
 } // namespace CasADi
+/// \endcond
 
 #endif // INTEGRATOR_INTERNAL_HPP

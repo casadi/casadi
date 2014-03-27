@@ -27,6 +27,7 @@
 #include "fixed_step_integrator_internal.hpp"
 #include "symbolic/fx/implicit_function.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
     
   class ImplicitFixedStepIntegratorInternal : public FixedStepIntegratorInternal{
@@ -61,5 +62,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP

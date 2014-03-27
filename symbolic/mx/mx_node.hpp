@@ -67,7 +67,7 @@ namespace CasADi{
   }
   //@}
 
-  
+  /// \cond INTERNAL
   /** \brief Node class for MX objects
       \author Joel Andersson 
       \date 2010
@@ -369,6 +369,7 @@ namespace CasADi{
     /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<std::vector<MX*> > v);
   };
+  
 
   // Implementations
 
@@ -391,8 +392,9 @@ namespace CasADi{
     }
     return ret;
   }
+  /// \endcond
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // MX_NODE_HPP

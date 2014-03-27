@@ -31,6 +31,8 @@
 #include "../fx/sx_function.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
+/// \cond INTERNAL
+
 using namespace std;
 
 namespace CasADi{

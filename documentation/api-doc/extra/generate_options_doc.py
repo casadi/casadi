@@ -295,10 +295,8 @@ for name,meta in metadata.items():
     continue
   myoptionskeys.sort()
   
-  targets = [name]
-  if 'InternalFor' in meta:
-    targets+=meta['InternalFor']
-  for t in targets:
+  for t in [name]:
+    f.write("/// \cond INTERNAL\n")
     f.write("/** \class %s\n\\n\n\\par\n" % t)
     f.write("<a name='options'></a><table>\n")
     f.write("<caption>List of available options</caption>\n")
@@ -307,11 +305,29 @@ for name,meta in metadata.items():
       f.write(optionsashtml(alloptions[k])+"\n")
     f.write( "</table>\n")
     f.write( "*/\n")
+    f.write("/// \endcond\n")
     
+    fdiagram.write("/// \cond INTERNAL\n")
     fdiagram.write("/** \class %s\n" % t)
     fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
     fdiagram.write( "*/\n")
-
+    fdiagram.write("/// \endcond\n")
+    
+  if 'InternalFor' in meta:
+    for t in meta['InternalFor']:
+      f.write("/** \class %s\n\\n\n\\par\n" % t)
+      f.write("<a name='options'></a><table>\n")
+      f.write("<caption>List of available options</caption>\n")
+      f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
+      for k in myoptionskeys :
+        f.write(optionsashtml(alloptions[k])+"\n")
+      f.write( "</table>\n")
+      f.write( "*/\n")
+      
+      fdiagram.write("/** \class %s\n" % t)
+      fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
+      fdiagram.write( "*/\n")
+    
 f.close()
 
 f = file(out+'d0_stats.hpp','w')
@@ -331,10 +347,8 @@ for name,meta in metadata.items():
   if len(mystatskeys)==0:
     continue
     
-  targets = [name]
-  if 'InternalFor' in meta:
-    targets+=meta['InternalFor']
-  for t in targets:
+  for t in [name]:
+    f.write("/// \cond INTERNAL\n")
     f.write("/** \class %s\n\\n\n\\par\n" % t)
     f.write("<a name='stats'></a><table>\n")
     f.write("<caption>List of available stats</caption>\n")
@@ -343,7 +357,19 @@ for name,meta in metadata.items():
       f.write(statsashtml(allstats[k])+"\n")
     f.write( "</table>\n")
     f.write( "*/\n")
+    f.write("/// \endcond\n")
 
+  if 'InternalFor' in meta:
+    for t in meta['InternalFor']:
+      f.write("/** \class %s\n\\n\n\\par\n" % t)
+      f.write("<a name='stats'></a><table>\n")
+      f.write("<caption>List of available stats</caption>\n")
+      f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
+      for k in mystatskeys :
+        f.write(statsashtml(allstats[k])+"\n")
+      f.write( "</table>\n")
+      f.write( "*/\n")
+    
 f.close()
 
 f = file(out+'c0_monitors.hpp','w')
@@ -364,10 +390,8 @@ for name,meta in metadata.items():
   if len(mymonitorskeys)==0:
     continue
     
-  targets = [name]
-  if 'InternalFor' in meta:
-    targets+=meta['InternalFor']
-  for t in targets:
+  for t in [name]:
+    f.write("/// \cond INTERNAL\n")
     f.write("/** \class %s\n\\n\n\\par\n" % t)
     f.write("<a name='monitors'></a><table>\n")
     f.write("<caption>List of available monitors</caption>\n")
@@ -376,6 +400,18 @@ for name,meta in metadata.items():
       f.write(monitorsashtml(allmonitors[k])+"\n")
     f.write( "</table>\n")
     f.write( "*/\n")
+    f.write("/// \endcond\n")
+  
+  if 'InternalFor' in meta: 
+    for t in meta['InternalFor']:
+      f.write("/** \class %s\n\\n\n\\par\n" % t)
+      f.write("<a name='monitors'></a><table>\n")
+      f.write("<caption>List of available monitors</caption>\n")
+      f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
+      for k in mymonitorskeys :
+        f.write(monitorsashtml(allmonitors[k])+"\n")
+      f.write( "</table>\n")
+      f.write( "*/\n")
 
 f.close()
 
@@ -448,8 +484,9 @@ for name,meta in metadata.items():
   if 'InternalFor' in meta:
     targets+=meta['InternalFor']
     
-  for t in targets:
+  for t in [name]:
     if not(inputscheme is None) or not(outputscheme is None):
+      f.write("/// \cond INTERNAL\n")
       f.write("/** \class %s\n\\n\n\\par\n" % t)
       if not(inputscheme is None) and not(outputscheme is None):
         f.write("@copydoc scheme_%s\n" % inputscheme)
@@ -460,5 +497,20 @@ for name,meta in metadata.items():
       elif inputscheme is None:
         f.write("@copydoc scheme_%s\n" % outputscheme)
       f.write( "*/\n")
-
+      f.write("/// \endcond\n")
+      
+  if 'InternalFor' in meta:
+    for t in meta['InternalFor']:
+      if not(inputscheme is None) or not(outputscheme is None):
+        f.write("/** \class %s\n\\n\n\\par\n" % t)
+        if not(inputscheme is None) and not(outputscheme is None):
+          f.write("@copydoc scheme_%s\n" % inputscheme)
+          f.write("<br/>\n")
+          f.write("@copydoc scheme_%s\n" % outputscheme)
+        elif outputscheme is None:
+          f.write("@copydoc scheme_%s\n" % inputscheme)
+        elif inputscheme is None:
+          f.write("@copydoc scheme_%s\n" % outputscheme)
+        f.write( "*/\n")
+   
 f.close()

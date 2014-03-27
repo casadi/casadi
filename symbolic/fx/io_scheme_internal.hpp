@@ -27,6 +27,8 @@
 #include "../casadi_exception.hpp"
 #include <map>
 
+
+/// \cond INTERNAL
 class SharedObjectNode;
 
 namespace CasADi{
@@ -149,5 +151,6 @@ class IOSchemeCustomInternal : public IOSchemeInternal {
 
 
 } // namespace CasADi
+/// \endcond
 
 #endif // IO_SCHEME_INTERNAL_HPP

@@ -27,6 +27,8 @@
 #include "ocp_solver.hpp"
 #include "fx_internal.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
  
 /** \brief  Internal node class for OCPSolver
@@ -102,6 +104,6 @@ class OCPSolverInternal : public FXInternal{
 
 } // namespace CasADi
 
-
+/// \endcond
 #endif // OCP_SOLVER_INTERNAL_HPP
 

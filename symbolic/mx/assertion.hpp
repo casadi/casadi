@@ -27,6 +27,7 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
 namespace CasADi{
   /** \brief Assertion
       \author Joris Gillis
@@ -68,5 +69,7 @@ namespace CasADi{
 
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif // ASSERTION_HPP

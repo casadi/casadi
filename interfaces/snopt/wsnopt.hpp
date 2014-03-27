@@ -1,3 +1,4 @@
+/// \cond INTERNAL
 
 typedef void (*UserFun)(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac, double *x, double *fObj, double *gObj, double * fCon, double* gCon, int* nState, char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru);
 
@@ -66,3 +67,4 @@ extern "C" {
 
 
 }
+/// \endcond
