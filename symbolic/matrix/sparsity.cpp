@@ -1056,5 +1056,8 @@ namespace CasADi{
     return Sparsity(nrow, ncol, vector<int>(colind,colind+ncol+1),vector<int>(row,row+nnz));
   }
 
+  void Sparsity::printCompact(std::ostream &stream) const{
+    (*this)->printCompact(stream);
+  }
 
 } // namespace CasADi

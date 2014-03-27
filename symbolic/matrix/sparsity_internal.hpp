@@ -314,6 +314,9 @@ namespace CasADi{
     /** \brief Print a textual representation of sparsity */
     void spy(std::ostream &stream) const;
     
+    /** \brief Print a compact description of the sparsity pattern */
+    void printCompact(std::ostream &stream) const;
+
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spyMatlab(const std::string& mfile) const;
 

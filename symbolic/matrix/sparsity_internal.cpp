@@ -41,7 +41,24 @@ namespace CasADi{
   }
     
   void SparsityInternal::repr(ostream &stream) const{
-    stream << "Compressed Column Storage: " << nrow_ << "-by-" << ncol_ << " matrix, " << row_.size() << " structural non-zeros";
+    stream << "Compressed Column Storage: ";
+    printCompact(stream);
+  }
+
+  void SparsityInternal::printCompact(std::ostream &stream) const{
+    // Print dimensions
+    stream << nrow_ << "x" << ncol_;
+
+    // Print shape
+    if(isEmpty()){
+      // Print nothing, shape clear anyway
+    } else if(isDense()){
+      stream << ", dense";
+    } else if(isDiagonal()){
+      stream << ", diagonal";
+    } else {
+      stream << ", " << row_.size() << " nnz";
+    }
   }
 
   void SparsityInternal::sanityCheck(bool complete) const{
@@ -3613,7 +3630,7 @@ namespace CasADi{
     }
     return ret;
   }
-  
+ 
 } // namespace CasADi
 
 

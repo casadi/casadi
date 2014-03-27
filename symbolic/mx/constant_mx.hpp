@@ -485,20 +485,36 @@ namespace CasADi{
 
   template<typename Value>
   void Constant<Value>::printPart(std::ostream &stream, int part) const{
-    if(sparsity().isScalar(true)){
-      stream << v_.value;
-    } else {
-      stream << "Const<" << v_.value << ">(";
-      stream << size1() << "x" << size2() << ": ";
-      if(sparsity().isDense()){
-        stream << "dense";
-      } else if(sparsity().size()==0){
-        stream << "empty";          
-      } else if(sparsity().isDiagonal()){
-        stream << "diagonal";
+    if(sparsity().isScalar()){
+      // Print scalar
+      if(sparsity().size()==0){
+        stream << "00";
       } else {
-        stream << double(size())/sparsity().numel()*100 << " %";
-      }        
+        stream << v_.value;
+      }
+    } else if(sparsity().isEmpty()){
+      // Print empty
+      sparsity().printCompact(stream);
+    } else if(sparsity().size()==0){
+      stream << "sparse(" << sparsity().size1() << "x" << sparsity().size2() << ")";
+    } else {
+      // Print value
+      if(v_.value==0){
+        stream << "zeros(";
+      } else if(v_.value==1){
+        stream << "ones(";
+      } else if(v_.value!=v_.value){
+        stream << "nan(";
+      } else if(v_.value==std::numeric_limits<double>::infinity()){
+        stream << "inf(";
+      } else if(v_.value==-std::numeric_limits<double>::infinity()){
+        stream << "-inf(";
+      } else {
+        stream << "all_" << v_.value << "(";
+      }
+
+      // Print sparsity
+      sparsity().printCompact(stream);
       stream << ")";
     }
   }
