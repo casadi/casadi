@@ -3384,17 +3384,17 @@ namespace CasADi{
     if(ncol_!=y.nrow_ || nrow_!=y.ncol_ || size()!=y.size())
       return false;
   
-    // Quick return if empty or dense
+    // Quick return if empty interior or dense
     if(size()==0 || isDense())
       return true;
     
     // Run algorithm on the pattern with the least number of rows
     if(nrow_>ncol_) return y.isTranspose(*this);
 
-    // Index counter for col of the possible transpose
+    // Index counter for columns of the possible transpose
     vector<int> y_col_count(y.ncol_,0);
   
-    // Loop over the cols
+    // Loop over the columns
     for(int i=0; i<ncol_; ++i){
     
       // Loop over the nonzeros
@@ -3433,8 +3433,8 @@ namespace CasADi{
     if(ncol_*nrow_!=y.nrow_*y.ncol_ || size()!=y.size())
       return false;
   
-    // Quick return if dense
-    if(isDense()) return true;
+    // Quick return if empty interior or dense
+    if(size()==0 || isDense()) return true;
     
     // Loop over the elements
     for(int cc=0; cc<ncol_; ++cc){
