@@ -2722,6 +2722,13 @@ class MXtests(casadiTestCase):
     
     self.checkfunction(d,dx)
     
+  def test_bug_1046(self):
+    x = MX.sym('x',1,1)
+    y = MX.sym('y',1,1)
+    z = jacobian(x,y)
+    
+    self.assertTrue(z.size()==0)
+    
       
 if __name__ == '__main__':
     unittest.main()
