@@ -583,6 +583,11 @@ namespace CasADi{
     MatType ret = MatType(jacSparsity(iind,oind,compact,symmetric).transpose());
     if(verbose()) std::cout << "XFunctionInternal::jac allocated return value" << std::endl;
   
+    // Quick return if empty
+    if(ret.size()==0){
+      return ret.T();
+    }
+
     // Get a bidirectional partition
     Sparsity D1, D2;
     getPartition(iind,oind,D1,D2,true,symmetric);
