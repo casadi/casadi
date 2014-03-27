@@ -34,6 +34,7 @@
 
 namespace CasADi{
 
+/// \cond INTERNAL
   template<typename DataType>
   struct NonZero {
     int k; // Non-zero index into matrix
@@ -41,6 +42,7 @@ namespace CasADi{
     int j; // Col into matrix
     DataType el;  // Element
   };
+
 
   template<typename DataType>
   class NonZeroIterator : public std::iterator< std::forward_iterator_tag, NonZero<DataType> > {
@@ -61,7 +63,7 @@ namespace CasADi{
     Matrix<DataType> m_;
     NonZero<DataType> nz;
   };
-
+/// \endcond
     
   //@{
   /** \brief Get typename */

@@ -28,6 +28,8 @@
 #include <map>
 #include <set>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   
   class CodeGenerator{
@@ -147,6 +149,8 @@ namespace CasADi{
   
   
 } // namespace CasADi
+
+/// \endcond
 
 #endif // CODE_GENERATOR_HPP
 

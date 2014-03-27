@@ -144,8 +144,9 @@ namespace CasADi{
   };
 
 #endif // SWIG
+/// \endcond
 
 } // namespace CasADi
 
-/// \endcond
+
 #endif //LAPACK_LU_DENSE_HPP

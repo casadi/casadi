@@ -32,6 +32,7 @@
 #include <stack>
 
 namespace CasADi{
+  /// \cond INTERNAL
   //@{
   /** \brief Convenience function, convert vectors to vectors of pointers */
   template<class T>
@@ -67,7 +68,7 @@ namespace CasADi{
   }
   //@}
 
-  /// \cond INTERNAL
+  
   /** \brief Node class for MX objects
       \author Joel Andersson 
       \date 2010

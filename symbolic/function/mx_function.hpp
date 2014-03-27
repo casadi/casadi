@@ -29,6 +29,8 @@
 #include "../mx/mx.hpp"
 #include "sx_function.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
 /** \brief  An elemenent of the algorithm, namely an MX node */
@@ -52,6 +54,8 @@ struct MXAlgEl{
 // Template instantiation
 %template(MXAlgElVector) std::vector<CasADi::MXAlgEl>;
 #endif // SWIG
+
+/// \endcond
 
 namespace CasADi{
 

@@ -27,6 +27,7 @@
 
 namespace CasADi{
 
+/// \cond INTERNAL
 #ifndef SWIG
 
   /** \brief  An atomic operation for the SXElement virtual machine */
@@ -40,6 +41,8 @@ namespace CasADi{
   };
 
 #endif // SWIG
+
+/// \endcond
 
   /// Forward declaration of internal class
   class SXFunctionInternal;

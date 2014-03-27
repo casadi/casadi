@@ -6,9 +6,9 @@
 *
 * \sa
 * \code
-* CasADi::MXfunction::expand();
-* CasADi::MXfunction::outputExpr();
-* CasADi::SXfunction::outputExpr();
+* CasADi::MXFunction::expand();
+* CasADi::MXFunction::outputExpr();
+* CasADi::SXFunction::outputExpr();
 * \endcode
 *
 */
