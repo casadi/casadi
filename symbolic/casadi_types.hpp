@@ -46,7 +46,7 @@ namespace CasADi{
   /// \endcond
   typedef LPStructIOSchemeVector<Sparsity> LPStructure;
   typedef QPStructIOSchemeVector<Sparsity> QPStructure;
-  typedef QCQPStructIOSchemeVector<Sparsity> QCQPStructure
+  typedef QCQPStructIOSchemeVector<Sparsity> QCQPStructure;
   typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
   typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
   typedef SDQPStructIOSchemeVector<Sparsity> SDQPStructure;
