@@ -37,7 +37,7 @@ def tohaskelltype(s,alias=False,level=0):
 
   ->
 
-  StdVec (CasadiClass Function)
+  StdVec (CasadiClass CppFunction)
   """
   if level==0:
     if s.startswith("r.q(const)."):
@@ -389,10 +389,10 @@ for (name,pars,rettype,docs) in functions:
     counter[name]+=1
   else:
     counter[name]=0
-  target.append("""  Function (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
+  target.append("""  CppFunction (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
 
 ftree.write("""
-tools :: [Function]
+tools :: [CppFunction]
 tools =
   [
 %s
@@ -400,7 +400,7 @@ tools =
 \n""" % ",\n".join(tools))
 
 ftree.write("""
-ioschemehelpers :: [Function]
+ioschemehelpers :: [CppFunction]
 ioschemehelpers =
   [
 %s
