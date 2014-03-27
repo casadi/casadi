@@ -185,6 +185,43 @@ std::vector<M> controlsimulatorIn(const std::vector<M>& args,const std::string &
 
 }
 /// \cond INTERNAL 
+/// Helper function for 'HNLPInput'
+
+template<class M>
+class HNLPInputIOSchemeVector : public IOSchemeVector<M> {
+  public:
+    explicit HNLPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HNLPInput){} 
+};
+/// \endcond
+/// Input arguments of an Homotopy NLP function
+/// 
+/// \copydoc scheme_HNLPInput
+template<class M>
+HNLPInputIOSchemeVector<M> hnlpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
+  std::vector<M> ret(3);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_HNLPInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in HNLPInput: '" << it->first << "' is not recognized. Available keywords are: x, p, tau");
+    ret[n] = it->second;
+  }
+  return HNLPInputIOSchemeVector<M>(ret);
+}
+template<class M>
+std::vector<M> hnlpIn(const std::vector<M>& args,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2=""){
+  std::vector<M> ret;
+  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput,arg_s0)));
+  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput,arg_s1)));
+  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput,arg_s2)));
+  return ret;
+
+}
+/// \cond INTERNAL 
 /// Helper function for 'DAEInput'
 
 template<class M>

@@ -30,6 +30,7 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_DPLEOutput: return "DPLEOutput";
     case SCHEME_ControlledDAEInput: return "ControlledDAEInput";
     case SCHEME_ControlSimulatorInput: return "ControlSimulatorInput";
+    case SCHEME_HNLPInput: return "HNLPInput";
     case SCHEME_DAEInput: return "DAEInput";
     case SCHEME_DAEOutput: return "DAEOutput";
     case SCHEME_RDAEInput: return "RDAEInput";
@@ -78,6 +79,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_DPLEOutput: return "p";
     case SCHEME_ControlledDAEInput: return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput: return "x0, p, u";
+    case SCHEME_HNLPInput: return "x, p, tau";
     case SCHEME_DAEInput: return "x, z, p, t";
     case SCHEME_DAEOutput: return "ode, alg, quad";
     case SCHEME_RDAEInput: return "rx, rz, rp, x, z, p, t";
@@ -144,6 +146,11 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==0) return "x0";
       if(i==1) return "p";
       if(i==2) return "u";
+      break;
+    case SCHEME_HNLPInput: 
+      if(i==0) return "x";
+      if(i==1) return "p";
+      if(i==2) return "tau";
       break;
     case SCHEME_DAEInput: 
       if(i==0) return "x";
@@ -452,6 +459,11 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";
       if(i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";
       break;
+    case SCHEME_HNLPInput: 
+      if(i==0) return "Decision variable";
+      if(i==1) return "Fixed parameter";
+      if(i==2) return "Homotopy parameter";
+      break;
     case SCHEME_DAEInput: 
       if(i==0) return "Differential state";
       if(i==1) return "Algebraic state";
@@ -759,6 +771,11 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==1) return "CONTROLSIMULATOR_P";
       if(i==2) return "CONTROLSIMULATOR_U";
       break;
+    case SCHEME_HNLPInput: 
+      if(i==0) return "HNL_X";
+      if(i==1) return "HNL_P";
+      if(i==2) return "HNL_TAU";
+      break;
     case SCHEME_DAEInput: 
       if(i==0) return "DAE_X";
       if(i==1) return "DAE_Z";
@@ -1055,6 +1072,9 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_ControlSimulatorInput: 
       return 3;
       break;
+    case SCHEME_HNLPInput: 
+      return 3;
+      break;
     case SCHEME_DAEInput: 
       return 4;
       break;
@@ -1201,6 +1221,11 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="x0") return 0;
       if(name=="p") return 1;
       if(name=="u") return 2;
+      break;
+    case SCHEME_HNLPInput: 
+      if(name=="x") return 0;
+      if(name=="p") return 1;
+      if(name=="tau") return 2;
       break;
     case SCHEME_DAEInput: 
       if(name=="x") return 0;
