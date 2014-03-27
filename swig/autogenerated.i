@@ -259,6 +259,56 @@ namespace CasADi {
 }
 #ifdef SWIGPYTHON
 %pythoncode %{
+def hnlpIn(*dummy,**kwargs):
+  """
+  Helper function for 'HNLPInput'
+
+  Two use cases:
+     a) arg = hnlpIn(x=my_x, p=my_p, tau=my_tau) 
+          all arguments optional
+     b) x, p, tau = hnlpIn(arg,"x", "p", "tau") 
+          all arguments after the first optional
+  Input arguments of an Homotopy NLP function
+  
+  Keyword arguments:
+    x   -- Decision variable [HNL_X]
+    p   -- Fixed parameter [HNL_P]
+    tau -- Homotopy parameter [HNL_TAU]
+  """
+  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hnlpIn. Either use keywords or non-keywords ")
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HNLPInput,n)] for n in dummy[1:]]
+  x = []
+  if 'x' in kwargs:
+    x = kwargs['x']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  tau = []
+  if 'tau' in kwargs:
+    tau = kwargs['tau']
+  for k in kwargs.keys():
+    if not(k in ['x','p','tau']):
+      raise Exception("Keyword error in hnlpIn: '%s' is not recognized. Available keywords are: x, p, tau" % k )
+  return IOSchemeVector([x,p,tau], IOScheme(SCHEME_HNLPInput))
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(hnlpIn) hnlpIn<CasADi::SX>;
+%template(hnlpIn) hnlpIn<CasADi::MX>;
+%template(hnlpIn) hnlpIn<CasADi::Sparsity>;
+%template(IOSchemeVectorHNLPInputSX) HNLPInputIOSchemeVector<SX>;
+%template(IOSchemeVectorHNLPInputMX) HNLPInputIOSchemeVector<MX>;
+%template(IOSchemeVectorHNLPInputSparsity) HNLPInputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorHNLPInput) IOSchemeVectorHNLPInputSX;
+%rename(IOSchemeVectorHNLPInput) IOSchemeVectorHNLPInputMX;
+%rename(IOSchemeVectorHNLPInput) IOSchemeVectorHNLPInputSparsity;
+}
+#endif //SWIGPYTHON
+namespace CasADi {
+}
+#ifdef SWIGPYTHON
+%pythoncode %{
 def daeIn(*dummy,**kwargs):
   """
   Helper function for 'DAEInput'

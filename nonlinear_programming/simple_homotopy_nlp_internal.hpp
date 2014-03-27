@@ -20,22 +20,33 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/stabilized_sqp_method.hpp"
-#include "nonlinear_programming/scpgen.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-#include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
-%}
+#ifndef SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP
+#define SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/stabilized_sqp_method.hpp"
-%include "nonlinear_programming/scpgen.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
-%include "nonlinear_programming/newton_implicit_solver.hpp"
-%include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
+#include "simple_homotopy_nlp_solver.hpp"
+#include "symbolic/function/homotopy_nlp_internal.hpp"
+#include "symbolic/function/stabilized_qp_solver.hpp"
+
+/// \cond INTERNAL
+namespace CasADi{
+    
+class SimpleHomotopyNLPInternal : public HomotopyNLPInternal{
+
+public:
+  explicit SimpleHomotopyNLPInternal(const Function& hnlp);
+  virtual ~SimpleHomotopyNLPInternal();
+  virtual SimpleHomotopyNLPInternal* clone() const{ return new SimpleHomotopyNLPInternal(*this);}
+  
+  virtual void init();
+  virtual void evaluate();
+  
+  NLPSolver nlpsolver_;
+  
+  /// Take this many steps to go from tau=0 to tau=1
+  int num_steps_;
+  
+};
+/// \endcond
+} // namespace CasADi
+
+#endif //SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP

@@ -20,22 +20,45 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/stabilized_sqp_method.hpp"
-#include "nonlinear_programming/scpgen.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-#include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
-%}
+#ifndef NLP_QP_INTERNAL_HPP
+#define NLP_QP_INTERNAL_HPP
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/stabilized_sqp_method.hpp"
-%include "nonlinear_programming/scpgen.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
-%include "nonlinear_programming/newton_implicit_solver.hpp"
-%include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
+#include "symbolic/fx/qp_solver_internal.hpp"
+#include "symbolic/fx/nlp_solver.hpp"
+
+/// \cond INTERNAL
+namespace CasADi{
+
+  /** \brief Internal class for NLPQPInternal
+   * 
+      @copydoc QPSolver_doc
+   * */
+class NLPQPInternal : public QPSolverInternal {
+  friend class NLPQPSolver;
+public:
+  /** \brief  Constructor */
+  explicit NLPQPInternal();
+
+  /** \brief  Clone */
+  virtual NLPQPInternal* clone() const;
+  
+  /** \brief  Create a new Solver */
+  explicit NLPQPInternal(const std::vector<CRSSparsity> &st);
+
+  /** \brief  Destructor */
+  virtual ~NLPQPInternal();
+
+  /** \brief  Initialize */
+  virtual void init();
+  
+  virtual void evaluate(int nfdir, int nadir);
+  
+  protected:
+    NLPSolver nlpsolver_;
+
+};
+
+} // namespace CasADi
+/// \endcond
+#endif //NLP_QP_INTERNAL_HPP
+

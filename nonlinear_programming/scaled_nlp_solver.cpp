@@ -20,22 +20,31 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/stabilized_sqp_method.hpp"
-#include "nonlinear_programming/scpgen.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-#include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
-%}
+#include "nlp_qp_internal.hpp"
+#include "nlp_qp_solver.hpp"
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/stabilized_sqp_method.hpp"
-%include "nonlinear_programming/scpgen.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
-%include "nonlinear_programming/newton_implicit_solver.hpp"
-%include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
+using namespace std;
+namespace CasADi{
+
+NLPQPSolver::NLPQPSolver(){ 
+}
+
+
+NLPQPSolver::NLPQPSolver(const QPStructure &st)  {
+  assignNode(new NLPQPInternal(st));
+}
+
+NLPQPInternal* NLPQPSolver::operator->(){
+  return (NLPQPInternal*)(FX::operator->());
+}
+
+const NLPQPInternal* NLPQPSolver::operator->() const{
+  return (const NLPQPInternal*)(FX::operator->());
+
+}
+
+bool NLPQPSolver::checkNode() const{
+  return dynamic_cast<const NLPQPInternal*>(get());
+}
+
+} // namespace CasADi

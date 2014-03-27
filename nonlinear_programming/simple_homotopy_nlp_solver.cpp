@@ -20,22 +20,30 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/stabilized_sqp_method.hpp"
-#include "nonlinear_programming/scpgen.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-#include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
-%}
+#include "simple_homotopy_nlp_internal.hpp"
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/stabilized_sqp_method.hpp"
-%include "nonlinear_programming/scpgen.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
-%include "nonlinear_programming/newton_implicit_solver.hpp"
-%include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
+using namespace std;
+
+namespace CasADi{
+
+  SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver(){
+  }
+  
+  SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver(const Function& nlp){
+    assignNode(new SimpleHomotopyNLPInternal(nlp));
+  }
+
+  SimpleHomotopyNLPInternal* SimpleHomotopyNLPSolver::operator->(){
+    return static_cast<SimpleHomotopyNLPInternal*>(HomotopyNLPSolver::operator->());
+  }
+
+  const SimpleHomotopyNLPInternal* SimpleHomotopyNLPSolver::operator->() const{
+    return static_cast<const SimpleHomotopyNLPInternal*>(HomotopyNLPSolver::operator->());
+  }
+    
+  bool SimpleHomotopyNLPSolver::checkNode() const{
+    return dynamic_cast<const SimpleHomotopyNLPInternal*>(get())!=0;
+  }
+
+
+} // namespace CasADi

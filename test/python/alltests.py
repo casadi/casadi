@@ -26,6 +26,7 @@ from integration import *
 from ocp import *
 from socpsolver import *
 from nlp import *
+from homotopynlp import *
 from implicitfunction import *
 from ad import *
 from sparsity import *
