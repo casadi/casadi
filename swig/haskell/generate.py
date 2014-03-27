@@ -7,6 +7,7 @@ except:
 
 import sys
 import re
+import itertools
 
 # Parse the input XML
 e = etree.parse(sys.argv[1])
@@ -231,7 +232,7 @@ for c in r.findall('*//class'):
 
      data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal",docs))
 
-  for d in c.findall('constructor'):
+  for d in itertools.chain(c.findall('constructor'),c.findall('extend/constructor')):
      dname = symbol_table[name]
      if d.find('attributelist/parmlist') is None:
        params = []
