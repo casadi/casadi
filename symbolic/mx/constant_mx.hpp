@@ -495,8 +495,6 @@ namespace CasADi{
     } else if(sparsity().isEmpty()){
       // Print empty
       sparsity().printCompact(stream);
-    } else if(sparsity().size()==0){
-      stream << "sparse(" << sparsity().size1() << "x" << sparsity().size2() << ")";
     } else {
       // Print value
       if(v_.value==0){
