@@ -48,12 +48,12 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
   ! Initialize SQIC.
   call QP%begin ( iPrint, iSumm )
   
-  print *, 'Reading params.spc'
-  iSpecs = 4
-  open ( iSpecs, file='params.spc',   status='unknown'     )
+  !print *, 'Reading params.spc'
+  !iSpecs = 4
+  !open ( iSpecs, file='params.spc',   status='unknown'     )
 
   ! Read in options from a file.
-  call QP%specs ( iSpecs, INFO )
+  !call QP%specs ( iSpecs, INFO )
 
   ! Set options.
   call qp%set   ( 'Print level        1', iPrint, iSumm, Errors )

@@ -43,7 +43,7 @@ public:
   virtual SQICInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit SQICInternal(const std::vector<CRSSparsity>& st);
+  explicit SQICInternal(const std::vector<Sparsity>& st);
 
   /** \brief  Destructor */
   virtual ~SQICInternal();
