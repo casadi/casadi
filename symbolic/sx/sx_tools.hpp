@@ -318,6 +318,7 @@ namespace CasADi{
    */  
   SX eig_symbolic(const SX& m);
 
+/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
   /** \brief [DEPRECATED]
    */
@@ -343,6 +344,7 @@ namespace CasADi{
 
 
 #endif
+/// \endcond
 
 } // namespace CasADi
 

@@ -159,6 +159,7 @@ namespace CasADi{
 
   }
   
+  /// \cond INTERNAL
   inline int PsdIndefDpleInternal::partindex(int i, int j, int k, int r, int c) {
     return k*n_*n_+(partition_[i]+r)*n_ + partition_[j]+c;
   }
@@ -198,6 +199,8 @@ namespace CasADi{
       }
     }
   }
+  
+  /// \endcond
   
   
   void PsdIndefDpleInternal::evaluate(){

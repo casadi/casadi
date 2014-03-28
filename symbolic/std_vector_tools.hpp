@@ -118,6 +118,7 @@ namespace CasADi{
   std::vector<int> lookupvector(const std::vector<int> &v, int size);
     
     
+  /// \cond INTERNAL
   #ifndef SWIG
   /**
   Apply a function f to each element in a vector
@@ -131,6 +132,8 @@ namespace CasADi{
   template<class T>
   void applymap(void (*f)(T&), std::vector<T>&);
   #endif // SWIG
+  /// \endcond
+  
   
   /// Check if the vector is strictly increasing
   template<typename T>
@@ -187,6 +190,7 @@ namespace CasADi{
   template<typename T, typename F, typename L>
   void linspace(std::vector<T> &v, const F& first, const L& last);
 
+  /// \cond INTERNAL
   /// Get an pointer of sets of booleans from a double vector
   bvec_t* get_bvec_t(std::vector<double>& v);
 
@@ -212,6 +216,8 @@ namespace CasADi{
   /// Get a pointer to the data contained in the vector
   template<typename T>
   const T* getPtr(const std::vector<T> &v);
+  
+  /// \endcond
   
   /** \brief Sort the data in a vector
   * 

@@ -381,6 +381,7 @@ namespace CasADi{
   template<typename DataType>
   int sprank(const Matrix<DataType>& A);
 
+/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
   /** \brief [DEPRECATED]
    */
@@ -405,6 +406,7 @@ namespace CasADi{
   template<typename DataType>  Matrix<DataType> trans(const Matrix<DataType> &x){ return transpose(x);}
  //@}
 #endif
+/// \endcond
 
 } // namespace CasADi
 

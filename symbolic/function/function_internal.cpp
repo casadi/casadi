@@ -337,6 +337,7 @@ namespace CasADi{
     }
     return ret;
   }
+  /// \cond INTERNAL
 
   void bvec_toggle(bvec_t* s, int begin, int end,int j) {
     for(int i=begin; i<end; ++i){
@@ -355,7 +356,8 @@ namespace CasADi{
     r = 0;
     for(int i=begin; i<end; ++i) r |= s[i];
   }
-
+  /// \endcond
+  
   Sparsity FunctionInternal::getJacSparsityPlain(int iind, int oind){
     // Number of nonzero inputs
     int nz_in = input(iind).size();

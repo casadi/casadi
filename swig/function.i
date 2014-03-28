@@ -101,15 +101,6 @@
 %}
 }
 
-%extend CasADi::IOInterface<CasADi::Function> {
-
-  CasADi::Matrix<double> getInput(int iind=0) const             { static_cast<const CasADi::Function*>($self)->assertInit(); return $self->input(iind);}
-  CasADi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputSchemeEntry(iname)); }
-  CasADi::Matrix<double> getOutput(int oind=0) const            { static_cast<const CasADi::Function*>($self)->assertInit(); return $self->output(oind);}
-  CasADi::Matrix<double> getOutput(const std::string &oname) const            { return $self->output($self->outputSchemeEntry(oname)); }
-
-}
-
 #endif
 %include "symbolic/function/function.hpp"
 

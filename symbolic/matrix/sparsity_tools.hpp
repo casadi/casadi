@@ -27,7 +27,7 @@
 
 namespace CasADi{
 
-
+/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
     /** \brief [DEPRECATED] Replaced with static methods in the Sparsity class
      */
@@ -59,6 +59,7 @@ namespace CasADi{
   inline std::vector<int> getNZDense(const Sparsity& sp){ return sp.getElements();}
   //@}
 #endif  
+/// \endcond
     
   /** \ brief Reshape the sparsity pattern keeping the relative location of the nonzeros
    */

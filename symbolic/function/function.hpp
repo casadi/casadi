@@ -96,7 +96,7 @@ namespace CasADi{
     /** \brief  Create from node */
     static Function create(FunctionInternal* node);
 #endif // SWIG
-/// \end
+    /// \endcond
     
     //@{
     /** \brief Access input/output scheme */
@@ -250,6 +250,7 @@ namespace CasADi{
     //@}
 #endif // SWIG
   
+    /// \cond INTERNAL
     //@{
    /** \brief Evaluate the function symbolically or numerically with directional derivatives
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -273,6 +274,7 @@ namespace CasADi{
                         const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
                         bool always_inline=false, bool never_inline=false);
     //@}
+    /// \endcond
       
     /** \brief  Evaluate symbolically in parallel (matrix graph)
         paropt: Set of options to be passed to the Parallelizer
@@ -280,6 +282,7 @@ namespace CasADi{
     std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
   
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+     *
      *         Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
      *         and (1+nfwd)*n_out + nadj*n_in outputs.
      *         The first n_in inputs corresponds to nondifferentiated inputs. The next nfwd*n_in inputs
@@ -337,15 +340,18 @@ namespace CasADi{
     GenericType getStat(const std::string& name) const;
 
     /** \brief  Get a vector of symbolic variables with the same dimensions as the inputs
+     * 
      * There is no guarantee that consecutive calls return identical objects
      */
     std::vector<MX> symbolicInput() const;
   
     /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
+     *
      * There is no guarantee that consecutive calls return identical objects
      */
     std::vector<SX> symbolicInputSX() const;
 
+    /// \cond INTERNAL
     /** \brief Is the class able to propate seeds through the algorithm? (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);
 
@@ -354,6 +360,8 @@ namespace CasADi{
 
     /** \brief Propagate the sparsity pattern through a set of directional derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
     void spEvaluate(bool fwd);
+    
+    /// \endcond
 
     /** \brief Add modules to be monitored */
     void addMonitor(const std::string& mon);
@@ -361,10 +369,12 @@ namespace CasADi{
     /** \brief Remove modules to be monitored */
     void removeMonitor(const std::string& mon);
     
+    /// \cond INTERNAL
     /** \brief Check if the numerical values of the supplied bounds make sense */
     void checkInputs() const;
+    /// \endcond
 
-
+/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
     /** \brief [DEPRECATED]
      */
@@ -416,6 +426,7 @@ namespace CasADi{
 #endif // SWIG
     //@}
 #endif
+/// \endcond
   };
 
 } // namespace CasADi

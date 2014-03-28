@@ -62,17 +62,21 @@ enum LinsolOutput{
   class LinearSolver : public Function{
   public:
     
+    /// \cond INTERNAL
     /// Default (empty) constructor
     LinearSolver();
+    /// \endcond
   
     /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
     explicit LinearSolver(const Sparsity& sp, int nrhs=1);
 
+    /// \cond INTERNAL
     /// Access functions of the node
     LinearSolverInternal* operator->();
 
     /// Const access functions of the node
     const LinearSolverInternal* operator->() const;
+    /// \endcond
 
     /// Factorize the matrix
     void prepare();
@@ -80,6 +84,7 @@ enum LinsolOutput{
     /// Solve the system of equations, internal vector
     void solve(bool transpose=false);
 
+/// \cond INTERNAL
 #ifndef SWIG
     /// Solve the factorized system of equations
     void solve(double* x, int nrhs=1, bool transpose=false);
@@ -91,6 +96,7 @@ enum LinsolOutput{
     //@}
 
 #endif // SWIG
+/// \endcond
 
     /// Create a solve node
     MX solve(const MX& A, const MX& B, bool transpose=false);

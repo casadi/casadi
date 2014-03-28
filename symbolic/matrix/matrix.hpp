@@ -65,12 +65,14 @@ namespace CasADi{
   };
 /// \endcond
     
+/// \cond INTERNAL
   //@{
   /** \brief Get typename */
   template <typename DataType> inline std::string matrixName() { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
   template<> inline std::string matrixName<double>() { return "DMatrix"; }
   template<> inline std::string matrixName<int>() { return "IMatrix"; }
   //@}
+/// \endcond
 
   /** \brief General sparse matrix class
       General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
@@ -105,6 +107,8 @@ namespace CasADi{
     Matrix<DataType>& operator=(const Matrix<DataType>& m);
 #endif // SWIG
     
+
+/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
 /** \brief [DEPRECATED]
 */
@@ -114,6 +118,7 @@ namespace CasADi{
     Matrix(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row, const std::vector<DataType>& d=std::vector<DataType>());
 //@}
 #endif
+/// \endcond
 
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<DataType> >& m);

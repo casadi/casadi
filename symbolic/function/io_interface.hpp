@@ -39,6 +39,9 @@ namespace CasADi{
   class IOInterface {
   public:
     
+    /// \cond INTERNAL
+    /// \name Obtain references to inputs
+    ///
     //@{
     /// Access input argument
     inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind);}
@@ -50,6 +53,7 @@ namespace CasADi{
     inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
     //@}
     
+    /// \name Obtain references to outputs
     //@{
     /// Access output argument
     inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind);}
@@ -60,6 +64,7 @@ namespace CasADi{
     inline Matrix<double>& output(int oind=0){ return outputS<true>(oind);}
     inline Matrix<double>& output(const std::string &oname){ return output(outputSchemeEntry(oname));}
     //@}
+    /// \endcond
 
     /// Get the number of function inputs
     inline int getNumInputs() const{ return static_cast<const Derived*>(this)->input_struct().data.size();}
@@ -72,6 +77,8 @@ namespace CasADi{
     
     /// Set the number of function outputs
     inline void setNumOutputs(int num_out){ static_cast<Derived*>(this)->output_struct().data.resize(num_out); }
+    
+    /// \cond INTERNAL
 
     /** \brief  Access an input */
     template<bool check>
@@ -118,6 +125,8 @@ namespace CasADi{
     inline const DMatrix& outputS(int i) const{
       return const_cast<IOInterface<Derived>*>(this)->outputS<check>(i);
     }
+    
+    /// \endcond
 
     /** \brief Set input scheme */
     void setInputScheme(const CasADi::IOScheme &scheme){
@@ -138,16 +147,19 @@ namespace CasADi{
     CasADi::IOScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
 
     /** \brief Find the index for a string describing a particular entry of an input scheme
+     *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
      */
     int inputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->inputScheme(),name,true);}
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
+     *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
      */
     int outputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name,false);}
 
     /** \brief Find the index for a string describing a particular entry of a scheme
+     *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
      */
     int schemeEntry(const CasADi::IOScheme &scheme,const std::string &name,bool input) const{
@@ -157,30 +169,140 @@ namespace CasADi{
       if (n==-1) casadi_error("FunctionInternal::schemeEntry: could not find entry '" << name << "' in " << scheme.name() << ". Available names are: " << scheme.entryNames() << ".");
       return n;
     }
+    
+    /**
+    * \defgroup  iname
+    *   \param[in] iname input name. Only allowed when an input scheme is set.
+    */
+    
+    /**
+    * \defgroup  oname
+    *   \param[in] oname output name. Only allowed when an output scheme is set.
+    */
+    
+    /**
+    * \defgroup  iind
+    *   \param[in] iind index within the range [0..getNumInputs()-1]
+    */
+    
+    /**
+    * \defgroup  oind
+    *   \param[in] oind index within the range [0..getNumOutputs()-1]
+    */
+    
+    /**
+    * \defgroup  Tvalset
+    *   \param[in] val can be double, const std::vector<double>&, const Matrix<double>&, double *
+    */
+
+    /**
+    * \defgroup  Tvalget
+    *   \param[in] val can be double&, std::vector<double>&, Matrix<double>&, double *
+    */
+    
+    /// \name Simple Getters & Setters
+    ///
+    /// @{
+    /** \brief Get an input by index
+    *
+    *  @copydoc iind
+    */
+    Matrix<double> getInput(int iind=0) const { return input(iind); }
+    /** \brief Get an input by name
+    *
+    *  @copydoc iname
+    *
+     */
+    Matrix<double> getInput(const std::string &iname) const  { return input(iname); }
+    
+    /** \brief Get an output by index
+    *
+    *  @copydoc oind
+    */
+    Matrix<double> getOutput(int oind=0) const  { return output(oind); }
+    /** \brief Get an output by name
+    *
+    *  @copydoc oname
+    *
+     */
+    Matrix<double> getOutput(const std::string &oname) const  { return output(oname); }
 
 #ifdef DOXYGENPROC
-    /// \name Setters
-    /// Set/get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-    /// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-    /// Assumes a properly allocated val.\n
-    /// 
-    /// @{
-    /** 
-        \brief Reads in the input argument from val.
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
+    /** \brief Set an input by index
+    *
+    *  @copydoc Tvalset
+    *  @copydoc iind
     */
-    void setInput(T val, int iind=0) const;
-    /** 
-        \brief Reads in the output argument from val.
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void setOutput(T val, int oind=0) const;
-    /// @}
+    
+    void setInput(T val, int iind=0);
+    
+     /** \brief Set an output by index
+     *
+     * @copydoc Tvalset
+     * @copydoc oind
+     */
+    void setOutput(T val, int oind=0);
+    
+    /** \brief Set an input by name
+    *
+    *  @copydoc Tvalset
+    *  @copydoc iname
+    *
+     */
+    void setInput(T val, const std::string &iname);
 
+    /** \brief Set an output by name
+    *
+    *  @copydoc Tvalset
+    *  @copydoc oname
+    *
+     */
+    void setOutput(T val, const std::string &oname);
 #endif
+    
+    /// @}
+    
+/// \cond INTERNAL
+#ifdef DOXYGENPROC
+    /// \name Advanced Getters
+    ///
+    /// @{
+    
+    /** \brief Get an input by index
+    *
+    *  @copydoc Tvalget
+    *  @copydoc iind
+    */
+    
+    void getInput(T val, int iind=0);
+    
+     /** \brief Get an output by index
+     *
+     * @copydoc Tvalget
+     * @copydoc oind
+     */
+    void getOutput(T val, int oind=0);
+    
+    /** \brief Get an input by name
+    *
+    *  @copydoc Tvalget
+    *  @copydoc iname
+    *
+     */
+    void getInput(T val, const std::string &iname);
 
+    /** \brief Get an output by name
+    *
+    *  @copydoc Tvalget
+    *  @copydoc oname
+    *
+     */
+    void getOutput(T val, const std::string &oname);
+    /// @}
+#endif
+/// \endcond
+
+    
 #define SETTERS(T)                                                        \
     void setInput(T val, int iind=0)             { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
     void setOutput(T val, int oind=0)            { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
@@ -213,41 +335,6 @@ GETTERS(Matrix<double>&);
 #endif // SWIG
 #endif // DOXYGENPROC
 #undef GETTERS
-
-#ifdef DOXYGENPROC
-    /// \name Getters
-    /// A group of accessor for numerical data that operate on preallocated data.\n
-    /// get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-    //    T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-    //    Assumes a properly allocated val.\n
-    /// @{
-
-    /** \brief Writes out the input argument into val. \noswig
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void getInput(T val, int iind=0) const;
- 
-    /** 
-        \brief Writes out the output argument into val. \noswig
-        T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-        Assumes a properly allocated val.\n
-    */
-    void getOutput(T val, int oind=0) const;
-    /// @}
-    
- 
-  ///@{
-  /// Get the input as a new Matrix \nocpp
-  Matrix<double> getInput(int iind=0) const;
-  /// Get the input as a new Matrix \nocpp
-  Matrix<double> getInput(const std::string &iname) const ;
-  /// Get the output as a new Matrix \nocpp
-  Matrix<double> getOutput(int oind=0) const ;
-  /// Get the output as a new Matrix \nocpp
-  Matrix<double> getOutput(const std::string &oname) const ;
-  ///@}
-#endif
 
   };
 

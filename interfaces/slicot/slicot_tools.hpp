@@ -28,6 +28,7 @@
 
 namespace CasADi{
 
+/// \cond INTERNAL
 #ifndef SWIG
   void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau, int ldtau, double * dwork=0);
 
@@ -40,8 +41,8 @@ namespace CasADi{
   
  void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z, std::vector<double> &dwork, std::vector<double> &eig_real, std::vector<double> &eig_imag);
 #endif // SWIG
+/// \endcond
   
-#ifndef SWIG
 /** \ brief Obtain Periodic Schur Form of a set of matrices
 *
 *  Finds Z_i such that
@@ -57,10 +58,7 @@ namespace CasADi{
 *   and T_2..T_K  upper diagonal
 *
 */
-void slicot_periodic_schur(const std::vector< Matrix<double> > & A, std::vector< Matrix<double> > & T,  std::vector< Matrix<double> > & Z, std::vector<double> &eig_real, std::vector<double> &eig_imag);
-#else
-void slicot_periodic_schur(const std::vector< Matrix<double> > & a, std::vector< Matrix<double> > & OUTPUT,  std::vector< Matrix<double> > & OUTPUT, std::vector<double> &OUTPUT, std::vector<double> &OUTPUT);
-#endif // SWIGPYTHON
+void slicot_periodic_schur(const std::vector< Matrix<double> > & A, std::vector< Matrix<double> > & SWIG_OUTPUT(T),  std::vector< Matrix<double> > & SWIG_OUTPUT(Z), std::vector<double> &eig_real, std::vector<double> &SWIG_OUTPUT(eig_imag));
   
 } // namespace CasADi
 

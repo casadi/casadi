@@ -26,6 +26,7 @@
 
 #include <math.h>
 
+/// \cond INTERNAL
 namespace CasADi {
 
   /// COPY: y <-x
@@ -292,5 +293,6 @@ namespace CasADi {
   
 }
 
+/// \endcond
 
 #endif // CASADI_RUNTIME_HPP
