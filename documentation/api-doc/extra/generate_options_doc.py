@@ -166,7 +166,7 @@ parse_type = Word( srange("[A-Z]") + "_").setResultsName("type")
 
 comma = Suppress(Literal(","))
 
-parse_default = Or([parse_quoted_string_keep,Word(alphanums + ".:-_"), Word(alphanums+"_")+Literal("(") + Word(alphanums + "._") + Literal(")"),Literal("GenericType()"),Literal("FX()")]).setResultsName("default")
+parse_default = Or([parse_quoted_string_keep,Word(alphanums + ".:-_"), Word(alphanums+"_")+Literal("(") + Word(alphanums + "._") + Literal(")"),Literal("GenericType()"),Literal("Function()")]).setResultsName("default")
 
 parse_allowed = parse_quoted_string.setResultsName("allowed")
 parse_inherit = Word(alphanums).setResultsName("inherit").setParseAction(lambda x: x)
