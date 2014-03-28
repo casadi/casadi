@@ -84,6 +84,8 @@ namespace CasADi{
   class Function : public OptionsFunctionality, public IOInterface<Function>{
     
   public:
+  
+/// \cond INTERNAL
     /** \brief  default constructor */
     Function(); 
 
@@ -94,6 +96,7 @@ namespace CasADi{
     /** \brief  Create from node */
     static Function create(FunctionInternal* node);
 #endif // SWIG
+/// \end
     
     //@{
     /** \brief Access input/output scheme */
@@ -316,6 +319,7 @@ namespace CasADi{
     /** \brief Export / Generate C code for the function */
     void generateCode(const std::string& filename);
     
+    /// \cond INTERNAL
     /** \brief  Access functions of the node */
     FunctionInternal* operator->();
 
@@ -324,6 +328,7 @@ namespace CasADi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
+    /// \endcond
     
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary& getStats() const;
