@@ -37,17 +37,16 @@
 #include <cmath>
 #include <vector>
 
-/// \cond INTERNAL
+
 
 namespace CasADi{
 
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
 
-  /** \brief The basic scalar symbolic class of CasADi
-      \author Joel Andersson 
-      \date 2010
-  */ 
+ 
+  
+  /// \cond INTERNAL
 
 #ifdef SWIG
 #ifdef WITH_IMPLICITCONV
@@ -55,7 +54,10 @@ namespace CasADi{
 #endif // WITH_IMPLICITCONV
 #endif // SWIG
 
-
+  /** \brief The basic scalar symbolic class of CasADi
+      \author Joel Andersson 
+      \date 2010
+  */ 
   class SXElement : public GenericExpression<SXElement>{
     friend class SXNode;
     friend class BinarySXNode;
@@ -284,6 +286,7 @@ namespace CasADi{
 #endif // SWIG
 
   };
+  /// \endcond
 
 #ifdef SWIG
   %extend SXElement {
@@ -294,6 +297,7 @@ namespace CasADi{
   }
 #endif // SWIG
 
+/// \cond INTERNAL
 #ifndef SWIG
   // Template specializations
   template<>
@@ -322,6 +326,7 @@ namespace CasADi{
   };
 
 #endif // SWIG
+/// \endcond
 
   typedef std::vector<SXElement> SXElementVector;
   typedef std::vector<std::vector<SXElement> > SXElementVectorVector;
@@ -330,9 +335,11 @@ namespace CasADi{
   typedef std::vector<Matrix<SXElement> > SXVector;
   typedef std::vector< std::vector<Matrix<SXElement> > > SXVectorVector;
 
+  /// \cond INTERNAL
   typedef SX* SXPtr;
   typedef std::vector<SXPtr> SXPtrV;
   typedef std::vector<SXPtrV> SXPtrVV;
+  /// \endcond
 
   // Specialize functions in GenericMatrix<SX> and SX
   template<> SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp);
@@ -353,10 +360,12 @@ namespace CasADi{
 
 #ifndef SWIG
 
+/// \cond INTERNAL
 // Template specialization
 namespace CasADi{
   template<> inline std::string matrixName<SXElement>() { return "SX"; }
 } // namespace CasADi
+/// \endcond
 
 namespace std{
   template<>
@@ -401,6 +410,5 @@ namespace std{
 #include "sx_node.hpp"
 
 #endif // SWIG
-/// \endcond
 
 #endif // SX_ELEMENT_HPP

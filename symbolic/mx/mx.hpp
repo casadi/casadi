@@ -34,6 +34,7 @@ namespace CasADi{
 
 
   /** \brief MX - Matrix expression
+  
       The MX class is used to build up trees made up from MXNodes. It is a more general graph representation than the scalar expression,
       SX, and much less efficient for small objects. On the other hand, the class allows much more general operations than does SX,
       in particular matrix valued operations and calls to arbitrary differentiable functions.

@@ -146,6 +146,7 @@ namespace CasADi{
     /** \brief Get output scheme */
     CasADi::IOScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
 
+    /// \cond INTERNAL
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
@@ -157,7 +158,7 @@ namespace CasADi{
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
      */
     int outputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name,false);}
-
+    
     /** \brief Find the index for a string describing a particular entry of a scheme
      *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
@@ -169,6 +170,7 @@ namespace CasADi{
       if (n==-1) casadi_error("FunctionInternal::schemeEntry: could not find entry '" << name << "' in " << scheme.name() << ". Available names are: " << scheme.entryNames() << ".");
       return n;
     }
+    /// \endcond
     
     /**
     * \defgroup  iname

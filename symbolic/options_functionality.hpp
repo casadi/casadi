@@ -36,6 +36,7 @@ namespace CasADi{
   class OptionsFunctionalityNode;
   
 /** \brief Provides options setting/getting functionality
+
   Gives a derived class the ability to set and retrieve options in a convenient way.
   It also contains error checking, making sure that the option exists and that the value type is correct.
   

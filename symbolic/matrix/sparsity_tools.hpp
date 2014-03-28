@@ -27,6 +27,11 @@
 
 namespace CasADi{
 
+/**
+\ingroup expression_tools
+@{ 
+*/
+
 /// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
     /** \brief [DEPRECATED] Replaced with static methods in the Sparsity class
@@ -61,14 +66,14 @@ namespace CasADi{
 #endif  
 /// \endcond
     
-  /** \ brief Reshape the sparsity pattern keeping the relative location of the nonzeros
+  /** \brief Reshape the sparsity pattern keeping the relative location of the nonzeros
    */
   Sparsity reshape(const Sparsity& a, int nrow, int ncol);
 
-  /** \ brief Transpose the pattern */
+  /** \brief Transpose the pattern */
   inline Sparsity transpose(const Sparsity& a){ return a.transpose();}
 
-  /** \ brief Vectorize the pattern */
+  /** \brief Vectorize the pattern */
   Sparsity vec(const Sparsity& a);
   
   /** \brief Get the sparsity resulting from a matrix multiplication
@@ -110,6 +115,10 @@ namespace CasADi{
 
   /// Get lower triangular part
   inline Sparsity tril(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTril(includeDiagonal);}
+  
+  /*
+  @}
+  */
 }
 
 #endif // SPARSITY_TOOLS_HPP

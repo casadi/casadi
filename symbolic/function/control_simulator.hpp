@@ -66,6 +66,7 @@ namespace CasADi{
   class ControlSimulatorInternal;
 
   /** \brief Piecewise Simulation class
+  
       A ControlSimulator can be seen as a chain of Simulators whereby some parameters change from one Simulator to the next.
   
       These changing parameters can typically be interpreted as "controls" in the context of dynamic optimization.

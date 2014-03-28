@@ -36,6 +36,7 @@ namespace CasADi{
   enum SparsityType{SPARSE,SPARSESYM,DENSE,DENSESYM,DENSETRANS};
 
   /** \brief Matrix base class
+  
       This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
       common functionality using the curiously recurring template pattern (CRTP) idiom.\n
   

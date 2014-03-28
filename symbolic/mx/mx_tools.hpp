@@ -32,6 +32,11 @@
 
 namespace CasADi{
 
+/**
+\ingroup expression_tools
+@{ 
+*/
+
   /** \brief  concatenate vertically
   *
   *  horzcat(horzsplit(x,...)) = x
@@ -383,6 +388,7 @@ namespace CasADi{
   */
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
 
+/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
 /** \brief [DEPRECATED]
 */
@@ -410,8 +416,10 @@ namespace CasADi{
   inline MX trans(const MX &x){ return transpose(x);}
 //@}
 #endif
+/// \endcond
 
-
+/** @}
+*/
 
 } // namespace CasADi
 

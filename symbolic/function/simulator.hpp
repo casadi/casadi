@@ -31,6 +31,7 @@ namespace CasADi{
 class SimulatorInternal;
 
 /** \brief Integrator class
+
   An "simulator" integrates an IVP, stopping at a (fixed) number of grid points and 
   evaluates a set of output functions at these points.
   The internal stepsizes of the integrator need not coincide with the gridpoints.

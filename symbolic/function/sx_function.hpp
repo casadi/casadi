@@ -100,11 +100,13 @@ namespace CasADi{
     SXFunction(const SX& arg, const std::vector< SX>& res);
 #endif // SWIG
 
+/// \cond INTERNAL
     /// Access functions of the node 
     SXFunctionInternal* operator->();
 
     /// Const access functions of the node 
     const SXFunctionInternal* operator->() const;
+/// \endcond
 
     //@{
     /** \brief Jacobian via source code transformation
@@ -158,10 +160,12 @@ namespace CasADi{
     /** \brief Get all function outputs */
     const std::vector<SX> & outputExpr() const;
     
+/// \cond INTERNAL
 #ifndef SWIG
     /** \brief Access the algorithm directly */
     const std::vector<ScalarAtomic>& algorithm() const;
 #endif // SWIG
+/// \endcond
   
     /** \brief Get the number of atomic operations */
     int getAlgorithmSize() const{ return algorithm().size();}
@@ -195,6 +199,7 @@ namespace CasADi{
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;  
   
+/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
     /** \brief [DEPRECATED]  */
     //@{
@@ -206,6 +211,7 @@ namespace CasADi{
     //@}
 #endif
   };
+/// \endcond
 
 } // namespace CasADi
 

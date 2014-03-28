@@ -23,6 +23,8 @@
 #include "slicot_tools.hpp"
 #include <cassert>
 
+/// \cond INTERNAL
+
 // Need an 8-byte integer since libslicot0 is compiled with  fdefault-integer-8
 typedef long long int f_int;
 
@@ -186,3 +188,4 @@ if (dwork==0) {
  
 } // namespace CasADi
 
+/// \endcond

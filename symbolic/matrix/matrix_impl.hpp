@@ -29,6 +29,8 @@
 #include "sparsity_tools.hpp"
 #include "../std_vector_tools.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
   // Implementations
 
@@ -2086,6 +2088,8 @@ namespace CasADi{
 
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif // MATRIX_IMPL_HPP
 

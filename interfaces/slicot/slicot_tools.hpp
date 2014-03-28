@@ -43,7 +43,7 @@ namespace CasADi{
 #endif // SWIG
 /// \endcond
   
-/** \ brief Obtain Periodic Schur Form of a set of matrices
+/** \brief Obtain Periodic Schur Form of a set of matrices
 *
 *  Finds Z_i such that
 

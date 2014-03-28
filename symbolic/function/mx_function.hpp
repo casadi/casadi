@@ -98,11 +98,13 @@ public:
   /** \brief  Multiple input, multiple output*/
   MXFunction(const IOSchemeVector< MX >& input, const IOSchemeVector< MX >& output);
   
+  /// \cond INTERNAL
   /** \brief  Access functions of the node */
   MXFunctionInternal* operator->();
 
   /** \brief  Const access functions of the node */
   const MXFunctionInternal* operator->() const;
+  /// \endcond
 
   /** \brief Get function input */
   const MX& inputExpr(int ind) const;
@@ -118,10 +120,12 @@ public:
   /** \brief Get all function outputs */
   const std::vector<MX> & outputExpr() const;
   
+/// \cond INTERNAL
 #ifndef SWIG
   /** \brief Access the algorithm directly */
   const std::vector<MXAlgEl>& algorithm() const;
 #endif // SWIG
+/// \endcond
   
   /** \brief Get the number of atomic operations */
   int getAlgorithmSize() const{ return algorithm().size();}
@@ -165,6 +169,7 @@ public:
   /** \brief Get all the free variables of the function */
   std::vector<MX> getFree() const;
   
+/// \cond INTERNAL
 #ifndef SWIG
   /** \brief Extract the functions needed for the Lifted Newton method */
   void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
@@ -172,6 +177,7 @@ public:
   /** \brief Extract the functions needed for the Lifted Newton method */
   void generateLiftingFunctions(MXFunction& OUTPUT, MXFunction& OUTPUT);
 #endif
+/// \endcond
 
   /** \brief Get the corresponding matrix type */
   typedef MX MatType;  

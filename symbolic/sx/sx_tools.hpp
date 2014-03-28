@@ -28,15 +28,27 @@
 #include "../matrix/generic_matrix_tools.hpp"
 #include "../casadi_options.hpp"
 
-/** Functions using SXElement */
+/** \defgroup expression_tools Expression tools
+* Functions for manipulating SX, MX or Sparsity
+*
+*/
+
 
 namespace CasADi{
 
-  /** \brief  Expand the expression as a weighted sum (with constant weights)  */
+/**
+\ingroup expression_tools
+@{ 
+*/
+
+  /** \brief  Expand the expression as a weighted sum (with constant weights)  
+  */
   void expand(const SX& ex, SX &weights, SX& terms);
 
+  /// \cond INTERNAL
   /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
   void simplify(SXElement& ex);
+  /// \endcond
 
   /** \brief Create a piecewise constant function 
       Create a piecewise constant function with n=val.size() intervals
@@ -346,6 +358,12 @@ namespace CasADi{
 #endif
 /// \endcond
 
+/*
+@}
+*/
+
 } // namespace CasADi
+
+
 
 #endif // SX_TOOLS_HPP
