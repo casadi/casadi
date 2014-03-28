@@ -307,7 +307,8 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
       
-      self.checkfunction(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
+      self.checkfunction(solver,solution,jacobian=False,evals=False)
+      
        
   def test_simple_function_indirect(self):
     A_ = DMatrix([[3,1],[7,2]])
@@ -343,133 +344,63 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
       
-      self.checkfunction(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
-
-  @slow()
+      self.checkfunction(relay,solution,jacobian=False,evals=False)
+      
   def test_simple_solve_node(self):
-    A_ = DMatrix([[3,1],[7,2]])
-    A = MX.sym("A",A_.sparsity())
-    b_ = DMatrix([1,0.5])
-    b = MX.sym("b",b_.sparsity())
-    for Solver, options in lsolvers:
-      print Solver
-      solver = Solver(A.sparsity())
-      solver.setOption(options)
-      solver.init()
-      for tr in [True, False]:
-        x = solver.solve(A,b,tr)
-        f = MXFunction([A,b],[x])
-        f.init()
-        f.setInput(A_,0)
-        f.setInput(b_,1)
-        f.evaluate()
+    for A_,b_ in [
+                     (DMatrix([[3,1],[7,2]]),DMatrix([[1,0.3],[0.5,0.7]])),    
+                     (sparse(DMatrix([[3,0],[7,2]])),DMatrix([[1,0.3],[0.5,0.7]])),
+                     (DMatrix([[3,1],[7,2]]),sparse(DMatrix([[1,0],[0,0.7]])))
+                 ]:
+                             
+      A = MX.sym("A",A_.sparsity())
+      b = MX.sym("b",b_.sparsity())
+      for Solver, options in lsolvers:
+        print Solver
+        solver = Solver(A.sparsity())
+        solver.setOption(options)
+        solver.init()
+        for tr in [True, False]:
+          x = solver.solve(A,b,tr)
+          f = MXFunction([A,b],[x])
+          f.init()
+          f.setInput(A_,0)
+          f.setInput(b_,1)
+          f.evaluate()
 
-        if tr:
-          A_0 = A[0,0]
-          A_1 = A[1,0]
-          A_2 = A[0,1]
-          A_3 = A[1,1]
-        else:
-          A_0 = A[0,0]
-          A_1 = A[0,1]
-          A_2 = A[1,0]
-          A_3 = A[1,1]
+          if tr:
+            A_0 = A[0,0]
+            A_1 = A[1,0]
+            A_2 = A[0,1]
+            A_3 = A[1,1]
+          else:
+            A_0 = A[0,0]
+            A_1 = A[0,1]
+            A_2 = A[1,0]
+            A_3 = A[1,1]
+            
+          b_0 = b[0,0]
+          b_1 = b[1,0]
           
-        b_0 = b[0]
-        b_1 = b[1]
-        
-        solution = MXFunction([A,b],[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
-        solution.init()
-        
-        solution.setInput(A_,0)
-        solution.setInput(b_,1)
-        
-        self.checkfunction(f,solution)
-
-  @slow()
-  def test_simple_solve_node_sparseA(self):
-    A_ = DMatrix([[3,0],[7,2]])
-    A_ = sparse(A_)
-    A = MX.sym("A",A_.sparsity())
-    print A.size(), A_.size()
-    b_ = DMatrix([1,0.5])
-    b = MX.sym("b",b_.sparsity())
-    for Solver, options in lsolvers:
-      print Solver
-      solver = Solver(A.sparsity())
-      solver.setOption(options)
-      solver.init()
-      for tr in [True, False]:
-        x = solver.solve(A,b,tr)
-        f = MXFunction([A,b],[x])
-        f.init()
-        f.setInput(A_,0)
-        f.setInput(b_,1)
-        f.evaluate()
-
-        if tr:
-          A_0 = A[0,0]
-          A_1 = A[1,0]
-          A_2 = A[0,1]
-          A_3 = A[1,1]
-        else:
-          A_0 = A[0,0]
-          A_1 = A[0,1]
-          A_2 = A[1,0]
-          A_3 = A[1,1]
+          c_0 = b[0,1]
+          c_1 = b[1,1]
           
-        b_0 = b[0]
-        b_1 = b[1]
-        
-        solution = MXFunction([A,b],[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
-        solution.init()
-        
-        solution.setInput(A_,0)
-        solution.setInput(b_,1)
-        
-        self.checkfunction(f,solution,sens_der=False,digits_sens=7)
-
-  @slow()
-  def test_simple_solve_node_sparseB(self):
-    A_ = DMatrix([[3,1],[7,2]])
-    A = MX.sym("A",A_.sparsity())
-    b_ = DMatrix([1,0])
-    b_ = sparse(b_)
-    b = MX.sym("b",b_.sparsity())
-    for Solver, options in lsolvers:
-      print Solver
-      solver = Solver(A.sparsity())
-      solver.setOption(options)
-      solver.init()
-      for tr in [True, False]:
-        x = solver.solve(A,b,tr)
-        f = MXFunction([A,b],[x])
-        f.init()
-        f.setInput(A_,0)
-        f.setInput(b_,1)
-        f.evaluate()
-
-        if tr:
-          A_0 = A[0,0]
-          A_1 = A[1,0]
-          A_2 = A[0,1]
-          A_3 = A[1,1]
-        else:
-          A_0 = A[0,0]
-          A_1 = A[0,1]
-          A_2 = A[1,0]
-          A_3 = A[1,1]
+          solution = MXFunction([A,b],[blockcat([[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),(((A_3/((A_0*A_3)-(A_2*A_1)))*c_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*c_1))],[((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*c_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*c_1))]])])
+          solution.init()
           
-        b_0 = b[0,0]
-        b_1 = b[1,0]
+          solution.setInput(A_,0)
+          solution.setInput(b_,1)
+          
+          self.checkfunction(f,solution)
+          
+          if "SymbolicQR" not in str(Solver) : continue
+          solversx = f.expand()
+          solversx.init()
+          solversx.setInput(A_,0)
+          solversx.setInput(b_,1)
+   
+          self.checkfunction(solversx,solution,digits_sens = 7)
         
-        solution = MXFunction([A,b],[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
-        solution.init()
-        
-        solution.setInput(A_,0)
-        solution.setInput(b_,1)
-        
-        self.checkfunction(f,solution,digits_sens=7)
 
   @requires("CSparseCholesky")
   def test_cholesky(self):
