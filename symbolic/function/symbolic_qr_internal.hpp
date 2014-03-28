@@ -59,6 +59,9 @@ namespace CasADi{
     /** \brief Generate code for the body of the C function */
     virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
 
+    /** \brief Evaluate symbolically (SX) */
+    virtual void evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr);
+
     // Factorization function
     Function fact_fcn_;
 

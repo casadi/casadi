@@ -195,6 +195,35 @@ namespace CasADi{
       x += solv.output().size();
     }
   }
+
+  void SymbolicQRInternal::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr){
+    // Get arguments
+    casadi_assert(input.at(0)!=0);
+    SX r = *input.at(0);
+    casadi_assert(input.at(1)!=0);
+    SX A = *input.at(1);
+    
+    // Number of right hand sides
+    int nrhs = r.size2();
+
+    // Factorize A
+    vector<SX> v = fact_fcn_(A);
+
+    // Select solve function
+    Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
+    
+    // Solve for every right hand side
+    vector<SX> resv;
+    v.resize(3);
+    for(int i=0; i<nrhs; ++i){
+      v[2] = r(Slice(),i);
+      resv.push_back(solv(v).at(0));
+    }
+
+    // Collect the right hand sides
+    casadi_assert(output[0]!=0);
+    *output.at(0) = horzcat(resv);
+  }
   
   void SymbolicQRInternal::generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
 

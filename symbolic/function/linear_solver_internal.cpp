@@ -360,6 +360,10 @@ namespace CasADi{
     solve(getPtr(output[0]->data()),output[0]->size2(),tr);
   }
 
+  void LinearSolverInternal::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr){
+    casadi_error("LinearSolverInternal::evaluateSXGen not defined for class " << typeid(*this).name());
+  }
+
   MX LinearSolverInternal::solve(const MX& A, const MX& B, bool transpose){
     return A->getSolve(B, transpose, shared_from_this<LinearSolver>());
   }

@@ -71,6 +71,11 @@ namespace CasADi{
   }
 
   template<bool Tr>
+  void Solve<Tr>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    linear_solver_->evaluateSXGen(input,output,Tr);
+  }
+
+  template<bool Tr>
   void Solve<Tr>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     linear_solver_->evaluateMXGen(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,Tr);
   }

@@ -63,10 +63,13 @@ namespace CasADi{
     MX solve(const MX& A, const MX& B, bool transpose);
 
     // Evaluate numerically, possibly transposed
-    void evaluateDGen(const DMatrixPtrV& input, DMatrixPtrV& output, bool tr);
+    virtual void evaluateDGen(const DMatrixPtrV& input, DMatrixPtrV& output, bool tr);
 
     // Evaluate MX, possibly transposed
-    void evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given, bool tr);
+    virtual void evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr);
+
+    // Evaluate MX, possibly transposed
+    virtual void evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given, bool tr);
 
     // Propagate sparsity, possibly transposed
     void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool transpose);
