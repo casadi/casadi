@@ -555,6 +555,22 @@
 @copydoc scheme_LPSolverOutput
 */
 /// \cond INTERNAL
+/** \class CasADi::QCQPQPInternal
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \endcond
+/** \class CasADi::QCQPQPSolver
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
 /** \class CasADi::SDPSDQPInternal
 \n
 \par
@@ -1051,22 +1067,6 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \cond INTERNAL
-/** \class CasADi::SOCPQCQPInternal
-\n
-\par
-@copydoc scheme_QCQPSolverInput
-<br/>
-@copydoc scheme_QCQPSolverOutput
-*/
-/// \endcond
-/** \class CasADi::SOCPQCQPSolver
-\n
-\par
-@copydoc scheme_QCQPSolverInput
-<br/>
-@copydoc scheme_QCQPSolverOutput
-*/
-/// \cond INTERNAL
 /** \class CasADi::DirectMultipleShootingInternal
 \n
 \par
@@ -1131,22 +1131,6 @@
 @copydoc scheme_SDQPOutput
 */
 /// \cond INTERNAL
-/** \class CasADi::QCQPQPInternal
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class CasADi::QCQPQPSolver
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
 /** \class CasADi::RKIntegratorInternal
 \n
 \par
@@ -1193,6 +1177,22 @@
 @copydoc scheme_QPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class CasADi::SOCPQCQPInternal
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
+*/
+/// \endcond
+/** \class CasADi::SOCPQCQPSolver
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
 */
 /// \cond INTERNAL
 /** \class CasADi::OCPSolverInternal
