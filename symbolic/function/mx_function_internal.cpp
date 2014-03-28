@@ -836,11 +836,20 @@ namespace CasADi{
         // Call the evaluation function
         if(!output_given || nfdir>0){
           if (it->data->getOp()==OP_CALL) {
-            // Purge the directions that have all-zero seeds
-            // We do this only for OP_CALL since some operations might have a substancial effect on the sensitivities even though all seeds are zero: the sparisty might be changed e.g. in OP_SETSPARSE
+            // Purge the directions that have all-zero seeds #905
+            // We do this only for OP_CALL since some operations might have a substancial effect on the sensitivities even though all seeds are zero: the sparsity might be changed e.g. in OP_SETSPARSE
             purgeSeeds(fseed_p,fsens_p,fseed_purged,fsens_purged, true);
-            // Call the evaluation function
-            it->data->evaluateMX(input_p,output_p,fseed_purged,fsens_purged,dummy_p,dummy_p,output_given);      
+            if (fsens_purged.size()==0 && fsens_purged.size()==0) {
+              it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,output_given); 
+            } else {
+              if (CasadiOptions::purgeSeeds) {
+                // Call the evaluation function
+                it->data->evaluateMX(input_p,output_p,fseed_purged,fsens_purged,dummy_p,dummy_p,output_given); 
+              } else {
+                // Do nothing special
+                it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
+              }     
+            }
           } else {
             // Call the evaluation function
             it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
@@ -943,11 +952,21 @@ namespace CasADi{
 
 
           if (it->data->getOp()==OP_CALL) {
-            // Purge the directions that have all-zero seeds
+            // Purge the directions that have all-zero seeds #905
             // We do this only for OP_CALL since some operations might have a substancial effect on the sensitivities even though all seeds are zero: the sparisty might be changed e.g. in OP_SETSPARSE
             purgeSeeds(aseed_p,asens_p,aseed_purged,asens_purged, false);
-            // Call the evaluation function
-            it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_purged,asens_purged,true);      
+            if (aseed_purged.size()==0 && asens_purged.size()==0) {  
+              // Call the evaluation function
+              it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,true);
+            } else { 
+              if (CasadiOptions::purgeSeeds) {
+                // Call the evaluation function
+                it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_purged,asens_purged,true);
+              } else {
+                // Do nothing special
+                it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
+              }   
+            }
           } else {
             // Call the evaluation function
             it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
