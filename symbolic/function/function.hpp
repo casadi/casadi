@@ -330,6 +330,12 @@ namespace CasADi{
     
     /** \brief Export / Generate C code for the function */
     void generateCode(const std::string& filename);
+
+    /** \brief Generate C code for the function */
+    std::string generateCode();
+
+    /** \brief Generate C code for the function */
+    void generateCode(std::ostream& filename);
     
     /// \cond INTERNAL
     /** \brief  Access functions of the node */

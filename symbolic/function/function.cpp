@@ -277,7 +277,20 @@ namespace CasADi{
   }
 
   void Function::generateCode(const string& filename){
-    (*this)->generateCode(filename);
+    std::ofstream cfile;
+    cfile.open (filename.c_str());
+    generateCode(cfile);
+    cfile.close();
+  }
+
+  std::string Function::generateCode(){
+    std::ostringstream cfile;
+    generateCode(cfile);
+    return cfile.str();
+  }
+
+  void Function::generateCode(std::ostream &stream){
+    (*this)->generateCode(stream);
   }
 
   const IOScheme& Function::inputScheme() const{

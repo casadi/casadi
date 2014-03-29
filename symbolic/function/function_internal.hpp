@@ -187,8 +187,8 @@ namespace CasADi{
     */
     MXFunction wrapMXFunction();
 
-    /** \brief  Print to a c file */
-    virtual void generateCode(const std::string& filename);
+    /** \brief  Print to a stream */
+    virtual void generateCode(std::ostream &cfile);
 
     /** \brief Generate code for function inputs and outputs */
     void generateIO(CodeGenerator& gen);

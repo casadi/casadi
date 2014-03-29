@@ -1996,12 +1996,10 @@ namespace CasADi{
 
   }
     
-  void FunctionInternal::generateCode(const string& src_name){
+  void FunctionInternal::generateCode(std::ostream &cfile){
     assertInit();
     
-    // Create the c source file
-    std::ofstream cfile;
-    cfile.open (src_name.c_str());
+    // set stream parameters
     cfile.precision(std::numeric_limits<double>::digits10+2);
     cfile << std::scientific; // This is really only to force a decimal dot, would be better if it can be avoided
 
@@ -2106,10 +2104,6 @@ namespace CasADi{
       cfile << "  return 0;" << std::endl;
       cfile << "}" << std::endl << std::endl;
     }
-
-
-    // Close the results file
-    cfile.close();
   }
 
   void FunctionInternal::generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const{
