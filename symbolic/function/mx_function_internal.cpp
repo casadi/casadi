@@ -1073,6 +1073,8 @@ namespace CasADi{
     SXFunction f(arg,res);
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
+    string name = getOption("name");
+    f.setOption("name","expand_" + name);
     return f;
   }
 
