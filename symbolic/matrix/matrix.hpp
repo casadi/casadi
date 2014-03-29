@@ -74,7 +74,7 @@ namespace CasADi{
   //@}
 /// \endcond
 
-  /** \brief General sparse matrix class
+  /** \brief Sparse matrix class. SX and DMatrix are specializations.
   
       General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
       This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n

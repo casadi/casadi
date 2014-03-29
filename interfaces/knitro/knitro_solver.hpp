@@ -29,7 +29,8 @@ namespace CasADi{
   
 class KnitroInternal;
   
-/**
+/** \brief Interface to the Knitro NLP solver
+ *
 @copydoc NLPSolver_doc
 */
 class KnitroSolver : public NLPSolver {

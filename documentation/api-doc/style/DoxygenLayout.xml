@@ -1,7 +1,11 @@
 <doxygenlayout version="1.0">
   <!-- Navigation index tabs for HTML output -->
   <navindex>
-    <tab type="mainpage" visible="yes" title=""/>
+    <tab type="mainpage" visible="yes" title="Function overview"/>
+    <tab type="user" url="@ref CasADi::Matrix" title="SX/DMatrix" intro=""/>
+    <tab type="user" url="@ref CasADi::MX" title="MX" intro=""/>
+    <tab type="user" url="@ref CasADi::Sparsity" title="Sparsity" intro=""/>
+    <tab type="user" url="@ref expression_tools" title="Expression tools" intro=""/>
     <tab type="pages" visible="no" title="" intro=""/>
     <tab type="classes" visible="yes" title="">
       <tab type="classes" visible="no" title="" intro=""/>
@@ -14,7 +18,7 @@
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
     <tab type="dirs" visible="yes" title="" intro=""/>
-    <tab type="user" url="@ref expression_tools" title="Expression tools" intro=""/>
+
     <tab type="namespaces" visible="yes" title="">
       <tab type="namespaces" visible="yes" title="" intro=""/>
       <tab type="namespacemembers" visible="yes" title="" intro=""/>

@@ -210,8 +210,9 @@ namespace CasADi{
     SXFunction indexed_zero_based(int k) const{ return operator[](k);}
     //@}
 #endif
-  };
 /// \endcond
+  };
+
 
 } // namespace CasADi
 

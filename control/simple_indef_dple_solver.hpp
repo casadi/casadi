@@ -30,7 +30,7 @@ namespace CasADi{
   /// Forward declaration of internal class
   class SimpleIndefDpleInternal;
 
-  /**  Solving the Discrete Periodic Lyapunov Equations with regular Linear Solvers
+  /** \brief Solving the Discrete Periodic Lyapunov Equations with regular Linear Solvers
   
        @copydoc DPLE_doc
   

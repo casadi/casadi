@@ -28,10 +28,16 @@ doxpublish:
 	sed -i.bak "s/q:query/q:query,db:dbLocation/g" html/search/search.js 
 	doxyindexer searchdata.xml -o html
 	cp style/casadi.png html/casadi.png
-	patch -u Doxyfile.in publish.patch -o - | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' |    sed 's/PROJECT_BRIEF          = /PROJECT_BRIEF          = $(READABLEREVISION)/' |    sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL/' |   sed 's/HTML_OUTPUT            = html/HTML_OUTPUT            = internal/' | sed 's/COLLABORATION_GRAPH    = NO/COLLABORATION_GRAPH    = YES/' | sed 's/INLINE_SOURCES         = NO/INLINE_SOURCES         = YES/' | sed 's/REFERENCED_BY_RELATION = NO/REFERENCED_BY_RELATION = YES/' | sed 's/REFERENCES_RELATION    = NO/REFERENCES_RELATION    = YES/'| sed 's/                         \*\.dox/                         *.dox *.cpp/' | doxygen -
+	python extra/generate_overview.py
+	perl -n -i~ -w -e 'if (/<div class="contents">/) { print qq|<div class="contents"> <img src="overview.png" border="0" alt="" usemap="#overview"/>|; open(IN, "<overview.map"); print while(<IN>); } else {print;}' html/index.html
+	cp overview.png html/overview.png
+	patch -u Doxyfile.in publish.patch -o - | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(REVISION)/' |    sed 's/PROJECT_BRIEF          = /PROJECT_BRIEF          = $(READABLEREVISION)/' |    sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL/' |   sed 's/HTML_OUTPUT            = html/HTML_OUTPUT            = internal/' | sed 's/COLLABORATION_GRAPH    = NO/COLLABORATION_GRAPH    = YES/' | sed 's/INLINE_SOURCES         = NO/INLINE_SOURCES         = YES/' | sed 's/REFERENCED_BY_RELATION = NO/REFERENCED_BY_RELATION = YES/' | sed 's/REFERENCES_RELATION    = NO/REFERENCES_RELATION    = YES/'| sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/style\/header.html/style\/header_internal.html/'| doxygen -
 	sed -i.bak "s/q:query/q:query,db:dbLocation/g" internal/search/search.js 
 	doxyindexer searchdata.xml -o internal
 	cp style/casadi.png internal/casadi.png
+	python extra/generate_overview.py
+	perl -n -i~ -w -e 'if (/<div class="contents">/) { print qq|<div class="contents"> <img src="overview.png" border="0" alt="" usemap="#overview"/>|; open(IN, "<overview.map"); print while(<IN>); } else {print;}' internal/index.html
+	cp overview.png internal/overview.png
 	find -name *-example.html | xargs perl -n -i~ -w -e 'print unless /<div class="line"><span class="comment">#[^\!].*?\/span>\n?/;'
 	find -name *-example.html | xargs perl -p -i~ -w -e 's/<span class="comment">#[^\!].*?\/span>\n?//g;'
 

@@ -26,7 +26,9 @@
 #include "function.hpp"
 #include "linear_solver.hpp"
 
-/** \defgroup DAE_doc
+/** \brief Base class for integrators
+ *
+ * \defgroup DAE_doc
     Solves an initial value problem (IVP) coupled to a terminal value problem
     with differential equation given as an implicit ODE coupled to an algebraic
     equation and a set of quadratures:

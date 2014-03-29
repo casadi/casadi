@@ -231,6 +231,7 @@ namespace CasADi{
 
     MX operator-() const;
   
+    /// \cond INTERNAL
     //@{
     /** \brief  Access a member of the node */
     MXNode* operator->();
@@ -238,6 +239,7 @@ namespace CasADi{
     /** \brief  Const access a member of the node */
     const MXNode* operator->() const;
     //@}
+    /// \endcond
   
     /** \brief Get the nth dependency as MX */
     MX getDep(int ch=0) const;
@@ -373,7 +375,9 @@ namespace CasADi{
 
     /** \brief  Identity matrix */  
     static MX eye(int ncol);
-  
+    
+    
+    /// \cond INTERNAL
     const MX sub(int rr, int cc) const;
     const MX sub(const std::vector<int>& rr, int cc) const;
     const MX sub(int rr, const std::vector<int>& cc) const;
@@ -408,13 +412,16 @@ namespace CasADi{
     void setNZ(const std::vector<int>& k, const MX& el);
     void setNZ(const Slice& k, const MX& m){ setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const MX& m);
-
+    /// \endcond
+    
+    
     /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
     void append(const MX& y);
 
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
   
+    /// \cond INTERNAL
     // all binary operations
     MX __add__(const MX& y) const;
     MX __sub__(const MX& y) const;
@@ -429,6 +436,8 @@ namespace CasADi{
     MX __constpow__(const MX& b) const;
     MX __mrdivide__  (const MX& b) const;
     MX __mpower__(const MX& b) const;
+    /// \endcond
+    
     MX mul(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX mul_full(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX inner_prod(const MX& y) const;
