@@ -36,6 +36,9 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
 
   iSumm    = 0;  iPrint = 6;
 
+  if ( allocated(cObj) )   deallocate ( cObj )
+  if ( allocated(Names) )  deallocate ( Names )
+  
   ! Allocate space for problem.
   allocate ( cObj(ncObj) )
   allocate ( Names(nNames) )
