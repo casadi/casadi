@@ -249,7 +249,7 @@ namespace CasADi{
     // Factorize if needed
     int fact_ind = gen.getDependency(fact_fcn_);
     stream << "  if(!prepared){" << endl;
-    stream << "    for(i=0; i<" << input(LINSOL_A).size() << "; ++i) A[i] == x0[i];" << endl;
+    stream << "    for(i=0; i<" << input(LINSOL_A).size() << "; ++i) A[i]=x0[i];" << endl;
     stream << "    f" << fact_ind << "(A,Q,R);" << endl;
     stream << "    prepared = 1;" << endl;
     stream << "  }" << endl;
