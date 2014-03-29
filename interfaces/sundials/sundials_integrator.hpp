@@ -30,6 +30,10 @@ namespace CasADi{
 /// Forward declaration of internal class
 class SundialsInternal;
 
+/** \brief Interface to the Sundials integrators
+
+  @copydoc DAE_doc
+*/
 class SundialsIntegrator : public Integrator{
 public:
   /// Default constructor

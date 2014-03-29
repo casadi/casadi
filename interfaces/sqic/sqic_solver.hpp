@@ -31,6 +31,13 @@ namespace CasADi {
 // Forward declaration of internal class 
 class SQICInternal;
 
+  /**  \brief Interface to the SQIC solver for quadratic programming
+     
+     @copydoc QPSolver_doc
+       \author Joris gillis
+      \date 2013
+      
+  */
 class SQICSolver : public QPSolver {
 public:
 

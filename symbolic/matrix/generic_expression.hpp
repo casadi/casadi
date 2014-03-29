@@ -28,6 +28,7 @@
 namespace CasADi{
 
   /** \brief Expression interface
+  *
   This is a common base class for SX, MX and Matrix<>, introducing a uniform syntax and implementing
   common functionality using the curiously recurring template pattern (CRTP) idiom.\n
   

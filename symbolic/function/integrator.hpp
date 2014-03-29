@@ -153,8 +153,11 @@ namespace CasADi{
 
   /// Forward declaration of internal class
   class IntegratorInternal;
-
+  
+  // grep "addOption" integrator_internal.cpp | perl -pe 's/addOption\((.*?),(.*?),(.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
+  
   /** Integrator abstract base class
+  
       @copydoc DAE_doc
   
       The Integrator class provides some additional functionality, such as getting the value of the state 
@@ -165,9 +168,6 @@ namespace CasADi{
       \author Joel Andersson
       \date 2010
   */
-
-  // grep "addOption" integrator_internal.cpp | perl -pe 's/addOption\((.*?),(.*?),(.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
-
   class Integrator : public Function{
   public:
     /// Default constructor

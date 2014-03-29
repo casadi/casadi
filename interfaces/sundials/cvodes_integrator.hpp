@@ -30,7 +30,7 @@ namespace CasADi{
 // Forward declaration of internal class 
 class CVodesInternal;
 
-/** Function that integrates the ODE:
+/** \brief Interface to CVodes from the Sundials suite.
 
   @copydoc DAE_doc
   

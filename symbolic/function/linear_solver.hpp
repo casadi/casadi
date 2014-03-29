@@ -54,7 +54,8 @@ enum LinsolOutput{
   // Forward declaration of internal class
   class LinearSolverInternal;
 
-  /** Base class for the linear solver classes
+  /** \brief Base class for the linear solver classes
+  
    *  @copydoc LinearSolver_doc
    \author Joel Andersson
    \date 2010-2013

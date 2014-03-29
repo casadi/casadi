@@ -29,6 +29,9 @@
 #include "../printable_object.hpp"
 namespace CasADi{
   
+/** \brief A vector container with associated IOScheme
+  A class 
+*/
   template<typename T>
   class IOSchemeVector : public PrintableObject {    
     // Data members (all public)

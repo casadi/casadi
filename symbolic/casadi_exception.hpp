@@ -82,6 +82,9 @@ class CasadiException : public std::exception{
 };
 
 
+/// \cond INTERNAL
+/** \brief A runtime Exception for Deprecation Warnings
+*/
 class CasadiDeprecationException : public CasadiException {
   public:
   //! \brief Default constructor
@@ -92,6 +95,7 @@ class CasadiDeprecationException : public CasadiException {
   explicit CasadiDeprecationException(const std::string& msg) : CasadiException("This syntax is deprecated. " + msg){}
   
 };
+/// \endcond
 
 // Assertion similar to the standard C assert statement, with the difference that it throws an exception with the same information
 #ifdef CASADI_NDEBUG

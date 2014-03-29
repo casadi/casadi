@@ -31,7 +31,7 @@ namespace CasADi {
 // Forward declaration of internal class 
 class OOQPInternal;
 
-/** OOQP Solver for quadratic programming:
+/** \brief Interface to the OOQP Solver for quadratic programming:
 
       @copydoc QPSolver_doc
 

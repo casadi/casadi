@@ -54,8 +54,7 @@ namespace CasADi{
   
 
   */
-  /**
-     Abstract base class for the implicit function classes
+  /** \brief  Abstract base class for the implicit function classes
 
      @copydoc ImplicitFunction_doc
 

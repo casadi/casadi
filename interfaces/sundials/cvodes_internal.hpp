@@ -38,7 +38,8 @@
 /// \cond INTERNAL
 namespace CasADi{
   
-/**
+/** \brief Interface to the Sundials CVodes integrators
+
   @copydoc DAE_doc
 */
 class CVodesInternal : public SundialsInternal{

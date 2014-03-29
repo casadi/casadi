@@ -87,7 +87,7 @@ namespace CasADi{
   static Slice ALL;
 #endif // SWIG
   
-  
+  /// \cond INTERNAL
   /**  Class representing a non-regular (and thus non-slice) index list 
    */
   class IndexList{
@@ -110,6 +110,7 @@ namespace CasADi{
     std::vector<int> iv;
     Type type;
   };
+  /// \endcond
   
 } // namespace CasADi
 

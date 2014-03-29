@@ -63,7 +63,13 @@ namespace CasADi{
   
   class HomotopyNLPInternal;
 
+  /** \brief Base class for Homotopy NLP Solvers
+  
+      @copydoc HomotopyNLPSolver_doc
 
+      \author Joris Gillis
+      \date 2014
+  */
   class HomotopyNLPSolver : public Function {
   public:
 

@@ -63,7 +63,9 @@ namespace CasADi{
   /// Forward declaration of internal class
   class DpleInternal;
 
-  /**  @copydoc DPLE_doc
+  /**  \brief Base class for Discrete Periodic Lyapunov Equation Solvers
+     
+     @copydoc DPLE_doc
        \author Joris gillis
       \date 2014
       

@@ -37,14 +37,13 @@ namespace CasADi{
 // Forward declaration of internal class
 class IdasInternal;
 
-/** Interface to IDAS from the Sundials suite.
+/** \brief Interface to IDAS from the Sundials suite.
 
    @copydoc IdasIntegrator_doc
   
    \author Joel Andersson
    \date 2010
 */
-
 class IdasIntegrator : public SundialsIntegrator{
 public:
 

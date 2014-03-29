@@ -43,7 +43,9 @@ namespace CasADi{
   // Forward declaration of internal class
   class NullspaceInternal;
 
-  /** @copydoc Nullspace_doc
+  /** \brief Base class for nullspace construction
+  
+      @copydoc Nullspace_doc
       \author Joris Gillis 
       \date 2014
   */
