@@ -27,6 +27,9 @@ import ipdb
 import texttable
 import re
 
+import lxml.etree as ET
+import pydot
+
 aliases = {}
 for line in file('../Doxyfile.in','r'):
   if line.startswith('ALIASES'):
@@ -60,6 +63,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
     self.docstringmap = {}
     self.active_docstring = None
     self.add_text_counter = 0
+    self.src = args[0]
 
 
   def generic_parse(self, node, pad=0):
@@ -273,12 +277,22 @@ class Doxy2SWIG_X(Doxy2SWIG):
       Doxy2SWIG.add_text(self,value)
       
   def generate(self):
+      try:
+        publicapi = ET.parse(self.src.replace("_internal",""))
+      except:
+        publicapi = None
       Doxy2SWIG.generate(self)
       for k, v in self.docstringmap.iteritems():
         # Group together
         grouped_list = []
         grouped_dict = {}
         for (origin,pieces) in v:
+          internal = True
+          if publicapi is not None:
+            if publicapi.xpath(".//memberdef[translate(concat(definition,argsstring),' ','')='%s']" % origin.replace(" ","")):
+              internal = False
+              
+          if internal: pieces = ["[INTERNAL] "] + pieces
           total = u"".join(pieces)
           totalnowrap = total.replace("\n"," ")
           if (aliases["noswig"] in totalnowrap) or (aliases["nopython"] in totalnowrap):

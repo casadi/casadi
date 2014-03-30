@@ -2,6 +2,7 @@ build*
 documentation/api-doc/html
 documentation/api-doc/internal
 documentation/api-doc/XML
+documentation/api-doc/XML_internal
 documentation/api-doc/latex
 documentation/tutorials/cpp/casadi-doc
 documentation/tutorials/cpp/casadi-doc.pdf
