@@ -339,7 +339,7 @@ Element access and assignment, of the type you have just seen, are examples of o
 %% \end{pytex}
 
 \section{\texttt{Function} and derived classes} \label{sec:function}
-\CasADi allows the user to create function objects, also knowns as \emph{functors}, that all derive the \texttt{Function} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
+\CasADi allows the user to create function objects, in C++ terminology often referred to as \emph{functors}, that all derive the \texttt{Function} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
 
 The basic usage skeleton of all these function objects are\footnote{In C++, \texttt{getOutput} is return-by-reference}:
 \begin{verbatim}
@@ -435,7 +435,7 @@ An \texttt{MXFunction} which only contains built-in operations (e.g. elementwise
 
 This might speed up the calculations significantly, but might also cause extra memory overhead.
 
-\section{The Sparsity class}
+\section{The \texttt{Sparsity} class} \label{sec:sparsity_class}
 As mentioned above, matrices in \CasADi are stored using the \emph{compressed column storage} (CCS) format. This is a standard format for sparse matrices that allows linear algebra operations such as elementwise operations, matrix multiplication and transposes to be performed efficiently. In the CCS, the sparsity pattern is decoded using the dimensions -- the number of rows and number of colums -- and two vectors. The first vector contains the index of the first structurally nonzero element of each column and the second vector contains the row for every nonzero. For more details on the CCS format, see e.g. \htmladdnormallink{Templates for the Solution of Linear Systems}{http://netlib.org/linalg/html_templates/node92.html} on Netlib.
 
 Sparsity patterns in CasADi are \emph{reference-counted} and \emph{cached}, meaning that multiple matrices can share the same sparsity pattern, including \texttt{MX} expression graphs and instances of \texttt{SX} and \texttt{DMatrix}.
@@ -455,25 +455,25 @@ In this chapter, we list the most central operations of \CasADi's symbolic frame
 \section{Creating matrices}
 The following functions can be used to create new matrices:
 \begin{description}
-  \item[\texttt{SX.sym}(\emph{name,nrow,ncol})]: Create a \emph{nrow}-by-\emph{ncol} symbolic primitive
-  \item[\texttt{SX.zeros(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} dense matrix with all zeros
-  \item[\texttt{SX.sparse(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} sparse matrix with all \emph{structural} zeros
-  \item[\texttt{SX.ones(\emph{nrow,ncol})}]: Create a \emph{nrow}-by-\emph{ncol} dense matrix with all ones
-  \item[\texttt{SX.repmat(\emph{v,nrow,ncol})}]: Repeat expression \emph{v} \emph{nrow} times vertically and \emph{ncol} times horizontally. \verb|SX.repmat(3,2,1)| will create a 2-by-1 matrix with all elements 3.
+  \item[\texttt{SX.sym}(\emph{name,n,m})]: Create a \emph{n}-by-\emph{m} symbolic primitive
+  \item[\texttt{SX.zeros(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} dense matrix with all zeros
+  \item[\texttt{SX.sparse(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} sparse matrix with all \emph{structural} zeros
+  \item[\texttt{SX.ones(\emph{n,m})}]: Create a \emph{n}-by-\emph{m} dense matrix with all ones
+  \item[\texttt{SX.repmat(\emph{v,n,m})}]: Repeat expression \emph{v} \emph{n} times vertically and \emph{m} times horizontally. \verb|SX.repmat(3,2,1)| will create a 2-by-1 matrix with all elements 3.
   \item[\texttt{SX.eye(\emph{n})}]: Create a \emph{n}-by-\emph{n} diagonal matrix with ones on the diagonal and structural zeros elsewhere.
   \item[\texttt{SX}(\emph{scalar})]: Create a scalar (1-by-1 matrix) with value \emph{scalar}. This method can be used explicitly, e.g. \verb|SX(9)|, or implicitly, e.g. \verb|9 * SX.ones(2,2)|.
   \item[\texttt{SX}(\emph{list})]: Create a column vector (n-by-1 matrix) with the elements in the list, e.g. \verb|SX([1,2,3])|
   \item[\texttt{SX}(\emph{list of lists})]: Create a dense matrix with the elemets in the lists, e.g. \verb|SX([[1,2],[3,4]])|.
 \end{description}
 
-To create matrices using the matrix expression graph type, replace \texttt{SX} with \texttt{MX} above. All the above functions have multiple overloads. E.g. to create an upper triangular matrix with all ones on and above the diagonal, the syntax would be \texttt{SX.ones}(\texttt{Sparsity.triu}(\emph{nrow,ncol})). Details can be found in the API documentation.
+To create matrices using the matrix expression graph type, replace \texttt{SX} with \texttt{MX} above. All the above functions have multiple overloads. E.g. to create an upper triangular matrix with all ones on and above the diagonal, the syntax would be \texttt{SX.ones}(\texttt{Sparsity.triu}(\emph{n,m})). Details can be found in the API documentation.
 
 \section{Getting and setting elements in matrices}
 \CasADi offers a variety of different ways to get or set specific elements or blocks of elements in matrix types. There are two different categories for this:
 
 \begin{description}
 \item[Element access and assignment] Access or set elements of a matrix -- which may well be structural zeros --  by their (row, col) pairs. This is done with the syntax \verb|A = B[i,j]|, \verb|A[i,j] = B| in Python, and \verb|A = B(i,j)|, \verb|A(i,j) = B| in C++ and Octave.
-\item[Nonzero access and assignment] Access or set a particular nonzero of the (sparse) matrices. Entries are ordered by columns using the compressed column storage (CCS) format. The syntax for this is \verb|A = B.el[k]|, \verb|A.el[k] = B| in Python, \verb|A = B[k]|, \verb|A[k] = B| in C++ and \verb|A = B{k}|, \verb|A{k} = B| in Octave.
+\item[Nonzero access and assignment] Access or set a particular nonzero of the (sparse) matrices. Entries are ordered by columns using the compressed column storage format, cf. Section~\ref{sec:sparsity_class}. The syntax for this is \verb|A = B.el[k]|, \verb|A.el[k] = B| in Python, \verb|A = B[k]|, \verb|A[k] = B| in C++ and \verb|A = B{k}|, \verb|A{k} = B| in Octave.
 \end{description}
 
 In Python and C++, indexing starts from zero, while in Octave indexing starts from one. In Python, negative indices to specify an index counted from the end of a list.
@@ -517,172 +517,207 @@ print M
 
 %\subsection{Flavours of slices}
 
-\paragraph{Single elements} are sets by providing scalar indices:
-\begin{pytexoutput}
-M = DMatrix([[3,7],[4,5]])
-
-def lprint(s):
-  print s,"=", eval(s)
- 
-def lprints(): 
-  lprint("M")
-  lprint("M.nz[3]")
-  lprint("M.nz[-2]")
-  lprint("M[0,0]")
-  lprint("M[1,0]")
-  lprint("M[-1,-1]")
-  
-lprints()
-\end{pytexoutput}
-
-An example with a sparse matrix:
-\begin{pytexoutput}
+\paragraph{Single element access} is getting or setting by providing a (\emph{row},\emph{column}) pair:
+\begin{pytex}
 M = diag([3,4,5,6])
+print M
+\end{pytex}
+\begin{pytex}
+print M[0,0]
+\end{pytex}
+\begin{pytex}
+print M[1,0]
+\end{pytex}
+\begin{pytex}
+print M[-1,-1]
+\end{pytex}
 
-lprints()
-\end{pytexoutput}
+Nonzero access works the same way:
+\begin{pytex}
+print M.nz[3]
+\end{pytex}
+\begin{pytex}
+print M.nz[-2]
+\end{pytex}
 
-\paragraph{Slice access} is the most common way to access a range of elements at once.
-The distinction between \emph{nonzero access} and \emph{full access} is given, again, by the use of either one or two items in the rectangular brackets.
-CasADi supports the full range of python slices.
+\paragraph{Slice access} means setting multiple elements at once. This is significantly more efficient than setting the elements one at a time. You get or set a slice by providing a (\emph{start},\emph{stop},\emph{step}) triple. In Python, \CasADi uses the standard syntax:
+\begin{pytex}
+print M[:,1]
+\end{pytex}
+which is equivalent to \verb|M(:,2)| in Octave and \verb|M(Slice(),1)| in C++.
 
-\begin{pytexoutput}
-M = DMatrix([[3,7,8,9],[4,5,6,1]])
-lprint("M")
-lprint("M.nz[:]")    # [3,4,7,5,8,6,9,1]
-lprint("M.nz[1:]")   # [  4,7,5,8,6,9,1]
-lprint("M.nz[:-1]")  # [3,4,7,5,8,6,9  ]
-lprint("M.nz[1:4]")  # [  4,7,5        ]
-lprint("M.nz[::3]")  # [3,    5,    9  ]
-lprint("M[1,:]")  # [[4,  5,  6,  1 ]]
-lprint("M[:,0]")  # [[3],[4]]
-lprint("M[0,1]")  # 7
-lprint("M[:,1:]") # [[7,8,9],[5,6,1]]
-\end{pytexoutput}
+\begin{pytex}
+print M[1:,1:4:2]
+\end{pytex}
+which is equivalent to \verb|M(1:end,2:2:5)| in Octave and \verb|M(Slice(1,-1),Slice(1,4,2))| in C++.
 
-\paragraph{List access} are similar to slices in effect, but more flexible.
-
-\begin{pytexoutput}
-M = DMatrix([[3,7,8,9],[4,5,6,1]])
-lprint("M")
-lprint("M.nz[[0,1,2]]")      # [3,4,7]
-lprint("M.nz[[6,1,3]]")      # [9,4,5]
-lprint("M[0,[0,3]]")      # [[3,  9]]
-lprint("M[[1,0],[0,3]]")  # [[4,  1],[3,  9]]
-\end{pytexoutput}
-
-\paragraph{Simple IMatrix access} does repeated scalar access with a custom result shape. The user specifies \texttt{IMatrix}'es as item(s) in the rectangular brackets.  The result takes over the shape/sparsity of the supplied \texttt{IMatrix}.
-
-In the \emph{nonzero access} style, each number of the \texttt{IMatrix} supplied is used as non-zero index into the left hand side matrix. In the \emph{full access} style, both \texttt{IMatrix}'es must have the same sparsity. Common non-zeros of the Imatrix'es form (row,col) pairs to access the left hand side.
-
+\paragraph{List access} are similar to (but not as efficient as) slice access:
 \begin{pytex}
 M = DMatrix([[3,7,8,9],[4,5,6,1]])
-k = IMatrix([[0],[1]])
-print M[k]    # [[3],[4]]
-k = IMatrix([[0,1],[3,6]])
-print M[k]    # [[3,  4 ],[5,  9 ]]
-k = diag(range(4))
-print M[k]    # diag([3,4,7,5])
-\end{pytex}
-
-\begin{pytex}
-M = DMatrix([[3,7,8,9],[4,5,6,1]])
-i = IMatrix([[0],[1]])
-j = IMatrix([[2],[3]])
-print M[i,j]    # [[8,1]]
-i = diag([0,0,1,1])
-j = diag([0,1,2,3])
-print M[i,j]    # diag([3,7,6,1])
-\end{pytex}
-
-\paragraph{Mixed \texttt{IMatrix} access} deals with \emph{nonzero access} in a row or column wise fashion. Given a slice in the rows place and an \texttt{IMatrix} in the columns place, this flavour lets act \emph{simple \texttt{IMatrix} access} on each row individually. The results of all these \emph{simple \texttt{IMatrix} access} are concatenated vertically.
-
-A similar definition holds for an IMatrix in the columns place, and a slice in the rows place of the double element rectangular bracket.
-
-\begin{pytex}
-M = DMatrix([[3,7,8,9],[4,5,6,1]])
-j = IMatrix([[0],[1]])
-print M[0,j]    # [[3],[7]]
-print M[1,j]    # [[4],[5]]
-print M[:,j]    # [[3],[7],[4],[5]]
+print M
 \end{pytex}
 \begin{pytex}
-j = diag([0,2])
-print M[:,j]    # [[3,  00 ],[00,  8 ],[4,  00 ],[00,  6 ]]
-i = IMatrix([[0,1],[1,0]])
-print M[i,:2]   # [[3,  4,  7,  5 ],[4,  3,  5,  7 ]]
+print M[0,[0,3]]
 \end{pytex}
-
-\paragraph{Sparsity access} involves slicing with a sparsity pattern o fthe same shape as the left hand side. For each non-zero in the slice item, the element of the left hand side with the same (row, col) pair is selected.
 \begin{pytex}
-M = DMatrix([[3,7,8],[4,5,6],[1,2,9]])
-print M[Sparsity.diag(3)]   # diag([3,5,9])
+print M[[1,0],[0,3]]
 \end{pytex}
-
-\section{Sparsity tools}
-
-Sparsities are easily visualised with the \texttt{spy} command:
-
 \begin{pytex}
-Sparsity.diag(3).spy()
+print M.nz[[6,1,3]]
 \end{pytex}
 
-\subsection{Sparsity constructors}
-There are several options to build sparse \CasADi matrix types:
+%% \paragraph{Simple \emph{IMatrix} access} does repeated scalar access with a custom result shape. The user specifies \texttt{IMatrix}'es as item(s) in the rectangular brackets.  The result takes over the shape/sparsity of the supplied \texttt{IMatrix}.
 
-\begin{itemize}
- \item Start from an empty matrix and add elements by using indexing/slicing in a setting mode.
- \item Use sparsity contructors
- \item Convert from scipy sparse matrices
-\end{itemize}
+%% In the \emph{nonzero access} style, each number of the \texttt{IMatrix} supplied is used as non-zero index into the left hand side matrix. In the \emph{full access} style, both \texttt{IMatrix}'es must have the same sparsity. Common non-zeros of the Imatrix'es form (row,col) pairs to access the left hand side.
 
+%% \begin{pytex}
+%% M = DMatrix([[3,7,8,9],[4,5,6,1]])
+%% k = IMatrix([[0],[1]])
+%% print M[k]    # [[3],[4]]
+%% k = IMatrix([[0,1],[3,6]])
+%% print M[k]    # [[3,  4 ],[5,  9 ]]
+%% k = diag(range(4))
+%% print M[k]    # diag([3,4,7,5])
+%% \end{pytex}
+
+%% \begin{pytex}
+%% M = DMatrix([[3,7,8,9],[4,5,6,1]])
+%% i = IMatrix([[0],[1]])
+%% j = IMatrix([[2],[3]])
+%% print M[i,j]    # [[8,1]]
+%% i = diag([0,0,1,1])
+%% j = diag([0,1,2,3])
+%% print M[i,j]    # diag([3,7,6,1])
+%% \end{pytex}
+
+%% \paragraph{Mixed \texttt{IMatrix} access} deals with \emph{nonzero access} in a row or column wise fashion. Given a slice in the rows place and an \texttt{IMatrix} in the columns place, this flavour lets act \emph{simple \texttt{IMatrix} access} on each row individually. The results of all these \emph{simple \texttt{IMatrix} access} are concatenated vertically.
+
+%% A similar definition holds for an IMatrix in the columns place, and a slice in the rows place of the double element rectangular bracket.
+
+%% \begin{pytex}
+%% M = DMatrix([[3,7,8,9],[4,5,6,1]])
+%% j = IMatrix([[0],[1]])
+%% print M[0,j]    # [[3],[7]]
+%% print M[1,j]    # [[4],[5]]
+%% print M[:,j]    # [[3],[7],[4],[5]]
+%% \end{pytex}
+%% \begin{pytex}
+%% j = diag([0,2])
+%% print M[:,j]    # [[3,  00 ],[00,  8 ],[4,  00 ],[00,  6 ]]
+%% i = IMatrix([[0,1],[1,0]])
+%% print M[i,:2]   # [[3,  4,  7,  5 ],[4,  3,  5,  7 ]]
+%% \end{pytex}
+
+%% \paragraph{Sparsity access} involves slicing with a sparsity pattern o fthe same shape as the left hand side. For each non-zero in the slice item, the element of the left hand side with the same (row, col) pair is selected.
+%% \begin{pytex}
+%% M = DMatrix([[3,7,8],[4,5,6],[1,2,9]])
+%% print M[Sparsity.diag(3)]   # diag([3,5,9])
+%% \end{pytex}
+
+
+\section{Arithmetic operations}
+\CasADi supports basic such as addition, multiplications, powers, trigonometric functions etc:
 \begin{pytex}
-print DMatrix.ones(Sparsity.tril(3))
-print DMatrix(Sparsity.tril(3),range(6))
+x = SX.sym("x")
+y = SX.sym("y",2,2)
+print sin(y)-x
 \end{pytex}
 
-\paragraph{diagonal}
+In C++ and Python, the standard multiplication operation (using \verb|*|) is reserved for elementwise multiplication. For \textbf{matrix multiplication}, use \verb|mul(A,B)|:
 \begin{pytex}
-Sparsity.diag(3).spy()
+print mul(y,y)
 \end{pytex}
 
-\paragraph{triangular}
-
+\textbf{Transposes} are formed using the syntax \verb|A.T| in Python or \verb|A.T()| in C++:
 \begin{pytex}
-Sparsity.tril(3).spy()
+print y.T
 \end{pytex}
 
-\paragraph{banded}
+For more operations, we invite to search the API documentation or look at the documented examples:
+
+\section{Linear algebra}
+\CasADi supports a limited number of linear algebra operations, e.g. for solution of linear systems of equations:
 \begin{pytex}
-Sparsity.band(3,1).spy()
-print ""
-Sparsity.band(3,-1).spy()
+A = MX.sym("A",3,3)
+b = MX.sym("b",3)
+print solve(A,b)
 \end{pytex}
 
-\paragraph{row and column slices}
+\section{Calculus}
+Basic calculus operations are also possibly and implemented very efficiently using \emph{algorithmic differentiation} (AD) as outlined in Chapter~\ref{ch:ad}.
 \begin{pytex}
-Sparsity.rowcol([0,3],[1,2],4,4).spy()
+A = SX.sym("A",3,3)
+x = SX.sym("x",3)
+print jacobian(mul(A,x),x)
 \end{pytex}
 
-\paragraph{(row,col) pairs}
-\begin{pytex}
-Sparsity.triplet(2,4,[0,1,0,0],[0,1,2,3]).spy()
-\end{pytex}
 
-\subsection{Sparsity operators}
+%% \section{Sparsity tools}
 
-The \texttt{+} operator is overloaded for sparsity patterns to perform an \emph{or} (pattern union) operation:
-\begin{pytex}
-(Sparsity.diag(3) + Sparsity.band(3,1)).spy()
-\end{pytex}
+%% Sparsities are easily visualised with the \texttt{spy} command:
 
-The \texttt{*} operator is overloaded for sparsity patterns to perform an \emph{and} (pattern intersection) operation:
-\begin{pytex}
-(Sparsity.tril(4)*Sparsity.rowcol([2,3],range(4),4,4)).spy()
-\end{pytex}
+%% \begin{pytex}
+%% Sparsity.diag(3).spy()
+%% \end{pytex}
 
-\chapter{Algorithmic differentiation\label{chapter:ad}}
-The most central functionality of \CasADi is \emph{algorithmic (or automatic) differentiation} (AD).
+%% \subsection{Sparsity constructors}
+%% There are several options to build sparse \CasADi matrix types:
+
+%% \begin{itemize}
+%%  \item Start from an empty matrix and add elements by using indexing/slicing in a setting mode.
+%%  \item Use sparsity contructors
+%%  \item Convert from scipy sparse matrices
+%% \end{itemize}
+
+%% \begin{pytex}
+%% print DMatrix.ones(Sparsity.tril(3))
+%% print DMatrix(Sparsity.tril(3),range(6))
+%% \end{pytex}
+
+%% \paragraph{diagonal}
+%% \begin{pytex}
+%% Sparsity.diag(3).spy()
+%% \end{pytex}
+
+%% \paragraph{triangular}
+
+%% \begin{pytex}
+%% Sparsity.tril(3).spy()
+%% \end{pytex}
+
+%% \paragraph{banded}
+%% \begin{pytex}
+%% Sparsity.band(3,1).spy()
+%% print ""
+%% Sparsity.band(3,-1).spy()
+%% \end{pytex}
+
+%% \paragraph{row and column slices}
+%% \begin{pytex}
+%% Sparsity.rowcol([0,3],[1,2],4,4).spy()
+%% \end{pytex}
+
+%% \paragraph{(row,col) pairs}
+%% \begin{pytex}
+%% Sparsity.triplet(2,4,[0,1,0,0],[0,1,2,3]).spy()
+%% \end{pytex}
+
+%% \subsection{Sparsity operators}
+
+%% The \texttt{+} operator is overloaded for sparsity patterns to perform an \emph{or} (pattern union) operation:
+%% \begin{pytex}
+%% (Sparsity.diag(3) + Sparsity.band(3,1)).spy()
+%% \end{pytex}
+
+%% The \texttt{*} operator is overloaded for sparsity patterns to perform an \emph{and} (pattern intersection) operation:
+%% \begin{pytex}
+%% (Sparsity.tril(4)*Sparsity.rowcol([2,3],range(4),4,4)).spy()
+%% \end{pytex}
+
+
+
+\chapter{Algorithmic differentiation} \label{ch:ad}
+The single most central functionality of \CasADi is \emph{algorithmic (or automatic) differentiation} (AD).
 
 Assume a function $\mathbf{R}^N \rightarrow \mathbf{R}^M$:
 \begin{equation}
@@ -712,8 +747,7 @@ CasADi is also able to generate complete, \emph{sparse} Jacobians efficiently. I
 
 Hessians are calculated by first calcuating the gradient and then performing the same steps as above to calculate the Jacobian of the gradient in the same way as above, while exploiting symmetry.
 
-
-\section{Calculating complete Jacobians and Hessians numerically}
+\section{Generating Jacobian and Hessian function objects}
 You can generate a new function for calculating the Jacobian by calling the \texttt{Function::jacobian} member function:
 \begin{verbatim}
  J = f.jacobian(iind,oind) # function corresponding to the jacobian
@@ -735,15 +769,15 @@ Lastly, Hessians of a scalar output can be called by calling the \texttt{Functio
 \end{verbatim}
 which will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Hessian, the gradient and all the original function outputs as outputs.
 
-\section{Calculating derivatives symbolically}
-Directional derivatives can also be calculated symbolically, i.e. you can generate new expressions corresponding to directional derivatives for further manipulation. This is only possible for the \texttt{SXFunction} and \texttt{MXFunction} classes.
-This is achieved by passing additional arguments to the \texttt{Function::eval} member function.
+%% \section{Calculating derivatives symbolically}
+%% Directional derivatives can also be calculated symbolically, i.e. you can generate new expressions corresponding to directional derivatives for further manipulation. This is only possible for the \texttt{SXFunction} and \texttt{MXFunction} classes.
+%% This is achieved by passing additional arguments to the \texttt{Function::eval} member function.
 
-Similarily, expressions corresponding to complete Jacobians and Hessians can be obtained by calling the \texttt{SXFunction::jac} and \texttt{MXFunction::jac} functions.
+%% Similarily, expressions corresponding to complete Jacobians and Hessians can be obtained by calling the \texttt{SXFunction::jac} and \texttt{MXFunction::jac} functions.
 
-We refer to the API documentation for details.
+%% We refer to the API documentation for details.
 
-\chapter{ODE/DAE integration and sensitivity analysis} \label{chapter:integrators}
+\chapter{ODE/DAE integration and sensitivity analysis} \label{ch:integrators}
 \section{ODE/DAE formulation}
 The integrators interfaced with \CasADi assumes a DAE residual function of semi-implicit form with quadratures:
 \begin{subequations}
