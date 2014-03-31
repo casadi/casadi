@@ -353,7 +353,7 @@ f.evaluate()                             # Evaluate numerically
 
 Note that all functions are multiple (sparse, matrix-valued) input, multiple (sparse, matrix-valued) output.
 
-One important member of the \texttt{Function} derived classes is \texttt{SXFunction}, which is constructed with the syntax \verb|SXFunction(list_of_inputs,list_of_outputs)|:
+One important member of the \texttt{Function} derived classes is \texttt{SXFunction}, which is constructed with the syntax \texttt{SXFunction}(\emph{list of inputs},\emph{list of outputs}):
 \begin{pytex}
 x = SX.sym("x",2,2)
 y = SX.sym("y")
@@ -651,6 +651,20 @@ x = SX.sym("x",3)
 print jacobian(mul(A,x),x)
 \end{pytex}
 
+\section{Calling function objects}
+Function objects, created as described in Section~\ref{sec:function}, can be \emph{called} in an expression graph:
+\begin{verbatim}
+A = SX.sym("A",3,3)
+x = SX.sym("x",3)
+y = mul(A,x)
+f = SXFunction([A,x],[y])
+f.init()
+
+A2 = MX.sym("A",3,3)
+x2 = MX.sym("x",3)
+[y2] = f([A2,x2]) # Call f with argument (A2,x2)
+\end{verbatim}
+The user provides a \emph{list} of argument expressions (which may consist of a single element) and gets back a list of expressions corresponding to the result of the call.
 
 %% \section{Sparsity tools}
 
