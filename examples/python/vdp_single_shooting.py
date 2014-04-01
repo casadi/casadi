@@ -53,7 +53,7 @@ X  = MX([0,1,0])
 
 # Build a graph of integrator calls
 for k in range(nk):
-  X, = integratorOut(integrator.call(integratorIn(x0=X,p=U[k])),"xf")
+  X, = integratorOut(integrator(integratorIn(x0=X,p=U[k])),"xf")
   
 # Objective function: x_2(T)
 f=X[2]

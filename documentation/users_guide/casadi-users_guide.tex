@@ -142,7 +142,7 @@ Finally, \CasADi is not an ``optimal control problem solver'', that allows the u
 \section{Reading this document}
 The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software. Our explaination is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of either Python or C++, theory of differential equations and optimization theory. 
 
-We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, even if the intention is to use another language later. We try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{sec:syntax_differences}.
+We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, even if the intention is to use another language later. We try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
 
 \chapter{Obtaining and installing \CasADi}
 \CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its alternative front-ends, to Python and Octave, are full-featured and auto-generated via the SWIG tool and can be used with little to no loss of efficiency. \CasADi has been compiled and used successfully on Linux, OS X and Windows.
@@ -972,10 +972,10 @@ dae = SXFunction(daeIn(x=x,z=z),daeOut(ode=f,alg=g))
 print dae
 \end{pytex}
 
-This particular problem is actually troublesome. During integration, the rootfinding problem $C(z) = 0$ will be solved, and the initial guess is $z=0$. Since $\frac{dC}{dz}(z=0)=0$, the rootfinding will fail. You cannot force a different inital guess directly, but you can transform the $z$ variable:
-$z \rightarrow z + 1$ -- $C=z^2+2z-1$, which will work fine.
+%This particular problem is actually troublesome. During integration, the rootfinding problem $C(z) = 0$ will be solved, and the initial guess is $z=0$. Since $\frac{dC}{dz}(z=0)=0$, the rootfinding will fail. You cannot force a different inital guess directly, but you can transform the $z$ variable:
+%$z \rightarrow z + 1$ -- $C=z^2+2z-1$, which will work fine.
 
-An integrator in \CasADi is a function that take the state at the initial time, guesses for the algebraic states and state derivatives (only important for DAEs) and evaluates the state vector at the final time. The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
+An integrator in \CasADi is a function that take the state at the initial time, a set of parameters, the state vector at the initial time and a guess for the algebraic variables (only for DAEs) and returns the state vector and algebraic variables at the final time. The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
 \begin{verbatim}
  integrator.setOption("tf",integration_end_time)
 \end{verbatim}
@@ -1017,8 +1017,8 @@ A \texttt{Simulator} can be created using the syntax:
 
 A \texttt{Simulator} can be used just like an integrator, and its input scheme is the same. Its output is now matrix valued, with the the columns corresponding to different time points. The class can also be used to evaluate a particular function of the state at a set of time points. See the API documentation for more information.
 
-\chapter{Nonlinear Programming} \ref{ch:nlp}
-The NLP solvers interfaced with \CasADi solves parametric NLPs of the following form:
+\chapter{Nonlinear Programming} \label{ch:nlp}
+The NLP solvers contained in or interfaced with \CasADi solves parametric NLPs of the following form:
 \begin{equation}
 \begin{array}{cc}
 \begin{array}{c}
@@ -1048,21 +1048,11 @@ The interface will then automatically generate the information that it might nee
 
 NLP solvers, like ODE/DAE integrators are functions in \CasADi (though taking derivatives of them is currently not supported). You will find the input and output schemes in the \CasADi API documentation on the website or by using the question mark in Python.
 
-\chapter{Optimal control}
-
-\section{Optimal control with \CasADi}
-CasADi can be used to solve optimal control problem using a variety of methods. As a user, there are two ways to attack the problem:
-\begin{itemize}
-  \item Use an existing OCP solver
-  \item Write your own OCP solver
-\end{itemize}
-
-Using an existing OCP solver is attractive for the user who has a relatively simple problem that he wants to test using different methods. In the next exercise, you will get some experience on using such solvers within the JModelica.org framework. Some of these solvers use \CasADi.
-
-The option to using an existing solver is to write your own OCP solver. While definitely more involved than using JModelica.org's solver, it is a viable alternative especially when adressing a challenging problem, or a problem using a nonstandard problem formulation. Doing this,   \CasADi will take care of things like Jacobian and Hessian generation, sparsity exploitation and all that is left to the user is to perform the reformulation from the infinite dimensional optimal control problem to a finite dimensional NLP.
+\chapter{Optimal control with \CasADi}
+\CasADi can be used to solve \emph{optimal control problems} (OCP) using a variety of methods, including direct (a.k.a. \emph{discretize-then-optimize}) and indirect (a.k.a. \emph{optimize-then-discretize}) methods, all-at-once (e.g. collocation) methods and shooting-methods requiring embedded solvers of initial value problems in ODE or DAE. As a user, you are in general expected to \emph{write your own OCP solver} and \CasADi aims as making this as easy as possible by providing powerful high-level building blocks. Since you are writing the solver yourself (rather than calling an existing ``black-box'' solver), a basic understanding how how to solve OCPs is indispensable. Good, self-contained introductions to numerical optimal can be found in the recent textbooks by Biegler\footnote{Lorenz T. Biegler, \emph{\htmladdnormallink{Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes}{http://books.google.es/books/about/Nonlinear_Programming.html?id=VdB1wJQu0sgC&redir_esc=y}}, SIAM 2010} or Betts\footnote{John T. Betts, \emph{\htmladdnormallink{Practical Methods for Optimal Control Using Nonlinear Programming}{http://books.google.es/books/about/Practical_Methods_for_Optimal_Control_Us.html?id=Yn53JcYAeaoC&redir_esc=y}}, SIAM 2001} or Moritz Diehl's lecture notes on \htmladdnormallink{numerical optimal control}{http://homes.esat.kuleuven.be/~mdiehl/NUMOPT/numopt.pdf}.
 
 \section{Optimization of a Van der Pol oscillator}
-In \CasADi's examples collection, you find codes which all try to solve a simple optimal control problem, a problem borrowed from JModelica.org's examples collection, namely that of driving a \emph{Van der Pol} oscillator to the origin, while trying to minimize a quadratic cost:
+In \CasADi's examples collection, you find codes for solving simple optimal control problem\footnote{The OCP was taken from \texttt{JModelica.org}} using a variety of different methods. The problem is driving a \emph{Van der Pol} oscillator to the origin, while trying to minimize a quadratic cost:
 \begin{equation}
 \begin{array}{lc}
 \begin{array}{l}
@@ -1093,7 +1083,7 @@ The simplest OCP method to implement in \CasADi is single-shooting. In fact, it 
 \begin{verbatim}
 # Build a graph of integrator calls
 for k in range(nk):
-  [X,Xp] = f_d.call([X,U[k],Xp])
+  X, = integratorOut(integrator(integratorIn(x0=X,p=U[k])),"xf")
 \end{verbatim}
 
 Here, we recursively construct a symbolic expression for the state at the final time. This expression is then used in the formulation of the NLP objective and constraint functions.
@@ -1118,7 +1108,7 @@ for k in range(nk):
   Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
   
   # Call the integrator
-  [Xk_end,Xp] = f_d.call([Xk,U[k],Xp])
+  Xk_end, = integratorOut(integrator(integratorIn(x0=Xk,p=U[k])),"xf")
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)
@@ -1127,9 +1117,7 @@ for k in range(nk):
 \end{verbatim}
 
 \section{Direct collocation}
-When we went from direct single shooting to direct multiple shooting we essentially traded nonlinearity for problem size. The NLP in single shooting is small, but often highly nonlinear, whereas the NLP for multiple-shooting is larger, but less nonlinear.
-
-Direct collocation is to take one more step in the same direction: we achieve an even less nonlinear NLP, at the cost of an even larger NLP.
+When we went from direct single shooting to direct multiple shooting we essentially traded nonlinearity for problem size. The NLP in single shooting is small, but often highly nonlinear, whereas the NLP for multiple-shooting is larger, but less nonlinear and with a sparsity structure that can be exploited efficiently. Direct collocation is to take one more step in the same direction, adding even more degrees of freedom. The resulting NLP is even larger, but has even more structure that can be exploited.
 
 While multiple shooting only includes the state at the beginning of each control interval as a degree of freedom in the NLP (in addition to the discretized control and the parameters), in direct collocation the state at a set of \emph{collocation points} (in addition to the beginning of the interval) enters in the NLP as variables. An example of a choice of time points are the \emph{Legendre points} of order $d=3$ :
 \begin{equation}
@@ -1190,10 +1178,12 @@ x_{k+1,0} - \sum_{r=0}^{d}{D_r \, x_{k,r}} = 0, \qquad k=0,\ldots,n_k-1,
 
 These two sets of equations take the place of the continuity equation (represented by the integrator call) in direct multiple shooting. The above equations have been implemented in the script \texttt{vdp\_collocation.py}.
 
-\chapter{Model import from Modelica}\label{sec:modelica}
-\CasADi contains a facility to import dynamic system models formulated in the Modelica modelling language as well as in the Optimica extension of Modelica to optimal control. The import facility currently works with the open-source \htmladdnormallink{JModelica.org}{http://www.jmodelica.org/} compiler.
+\chapter{Import and reformulation of OCPs from Modelica} \label{ch:modelica}
+\CasADi supports importing OCPs formulated in the Modelica modeling language as well as in the Optimica extension of Modelica to optimal control. The import facility currently works with the open-source \htmladdnormallink{JModelica.org}{http://www.jmodelica.org/} compiler.
 
 For instructions on how to install and use JModelica.org, we refer to their \htmladdnormallink{website}{http://www.jmodelica.org/}. \CasADi currently comes bundled with JModelica.org and the JModelica.org trunk is synchronized with \CasADi's trunk, simplifying the installation procedure. Pre-built JModelica.org binaries that include \CasADi are available for Windows users.
+
+\emph{NOTE: The functionality to import and reformulation of OCPs from Modelica is still under development and to be considered unstable.}
 
 \section{Compiling the Modelica code} \label{sec:modelica_compilation}
 To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in \CasADi's example collection. 
@@ -1219,14 +1209,24 @@ The symbolic optimal control problem representation (or just model description) 
 ocp = SymbolicOCP()
 \end{verbatim}
 
-The SymbolicOCP class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is to call the member function \texttt{parseFMI} with the XML file name and a set of options\footnote{In C++, the dictionary with options corresponds to a \texttt{CasADi::Dictionary} object}:
+The \texttt{SymbolicOCP} class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is to call the member function \texttt{parseFMI} with the XML file name:
 \begin{verbatim}
-ocp.parseFMI('modelDescription.xml',{'scale_variables':True})
+ocp.parseFMI('modelDescription.xml')
 \end{verbatim}
 
-For a more detailed description of this class and its functionalities, we refer to the API documentation.
+Symbolic expressions corresponding to the states, controls parameters etc. are directly accessible as member variables of the \texttt{SymbolicOCP} object. E.g. the free controls can be accessed as \verb|ocp.u|. Symbolic expressions for the OCP are either accessible in the same way (e.g. \verb|ocp.dae| will return the equations for the fully-implicit differential-algebraic equation formulation used by Modelica. Other equations are tied to a particular variable. E.g. the \emph{binding equations} corresponding to the set of \emph{independent parameters} can be retrieved as \verb|ocp.beq(ocp.pi)|. 
 
-\chapter{Syntax differences between \CasADi in Python, C++ and Octave}\label{sec:syntax_differences}
+Other useful commands available for an instance \texttt{ocp} of \texttt{SymbolicOCP} include:
+\begin{description}
+\item[print \texttt{ocp}] Print the optimal optimal control problem to screen
+\item[\texttt{ocp}.makeExplicit()] Reformulate the OCP in fully-explicit form
+\item[\texttt{ocp}.scaleVariable()] Scale all variables using the \emph{nominal} attribute for each variable
+\item[\texttt{ocp}.eliminateIndependentParameters()] Eliminate all independent parameters from the symbolic expressions
+\end{description}
+
+For a more detailed description of this class and its functionalities, we refer to the API documentation. We also recommend potential users to have a look at the {\texttt{modelica\_ms.py}} tutorial example.
+
+\chapter{Syntax differences between \CasADi in Python, C++ and Octave} \label{ch:syntax_differences}
 \scriptsize
 \begin{center}
   \begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.5cm} | }
