@@ -425,11 +425,11 @@ int internal(const std::string & c) {
 #ifdef SWIGOCTAVE
 %wrapper %{
 int deprecated(const std::string & c,const std::string & a) {
-  warning(("This function (" + c+") is deprecated. "  + a).c_str());
+  warning("deprecated",("This function (" + c+") is deprecated. "  + a).c_str());
   return 0;
 }
 int internal(const std::string & c) {
-  warning(("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str());
+  warning("internalAPI",("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str());
   return 0;
 }
 %}
