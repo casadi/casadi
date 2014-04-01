@@ -71,6 +71,7 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_SOCPOutput: return "SOCPOutput";
     case SCHEME_SOCPStruct: return "SOCPStruct";
     case SCHEME_StabilizedQPSolverInput: return "StabilizedQPSolverInput";
+  default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
@@ -120,6 +121,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_SOCPOutput: return "x, cost, lam_a, lam_x";
     case SCHEME_SOCPStruct: return "g, a";
     case SCHEME_StabilizedQPSolverInput: return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu";
+  default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
@@ -1195,6 +1197,7 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_StabilizedQPSolverInput: 
       return 12;
       break;
+  default: casadi_error("getSchemeSize: Scheme '" << scheme <<  "' does not exist.");
   }
 }
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
