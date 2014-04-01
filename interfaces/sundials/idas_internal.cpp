@@ -1768,7 +1768,7 @@ namespace CasADi{
       IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
-      IDABMem IDAB_mem;
+      //IDABMem IDAB_mem;
       int flag;
 
       // Current time
@@ -1779,7 +1779,7 @@ namespace CasADi{
       IDA_mem = (IDAMem) IDA_mem->ida_user_data;
 
       IDAADJ_mem = IDA_mem->ida_adj_mem;
-      IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+      //IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
     
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {
@@ -1815,7 +1815,7 @@ namespace CasADi{
       IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
-      IDABMem IDAB_mem;
+      //IDABMem IDAB_mem;
       int flag;
 
       // Current time
@@ -1827,7 +1827,7 @@ namespace CasADi{
       IDA_mem = (IDAMem) IDA_mem->ida_user_data;
 
       IDAADJ_mem = IDA_mem->ida_adj_mem;
-      IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+      //IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {

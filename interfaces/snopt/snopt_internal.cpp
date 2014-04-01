@@ -345,7 +345,7 @@ namespace CasADi {
     for (OptionsMap::const_iterator it = optionsmap_.begin(); it != optionsmap_.end(); it++) {
       int Error = 0;
       const std::string & snopt_name = it->second.second;
-      int bufferlen = snopt_name.size();
+      //int bufferlen = snopt_name.size();
       if (hasSetOption(it->first)) {
         switch (it->second.first) {
           case OT_INTEGER: {
@@ -609,7 +609,7 @@ namespace CasADi {
       double* x, double* fObj, double*gObj, double* fCon, double* gCon,
       int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) {
     try {
-      double time1 = clock();
+      //double time1 = clock();
 
       casadi_assert_message(nnCon_ == nnCon, "Con " << nnCon_ << " <-> " << nnCon);
       casadi_assert_message(nnObj_ == nnObj, "Obj " << nnObj_ << " <-> " << nnObj);

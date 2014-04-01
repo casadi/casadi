@@ -798,10 +798,10 @@ namespace CasADi{
 
           // Get the input nonzero
           int c = D1.row(el);
-          int f2_out;
-          if(symmetric){
-            f2_out = nzmap2[c];
-          }
+          //int f2_out;
+          //if(symmetric){
+          //  f2_out = nzmap2[c];
+          //}
         
           // Loop over the output nonzeros corresponding to this input nonzero
           for(int el_out = jsp_trans.colind(c); el_out<jsp_trans.colind(c+1); ++el_out){

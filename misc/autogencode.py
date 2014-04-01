@@ -337,11 +337,13 @@ for p in schemes:
 autogencpp.write("std::string getSchemeName(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("""    case SCHEME_%s: return "%s";\n""" % (p.enum,p.enum))
+autogencpp.write("""  default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");\n""")
 autogencpp.write("  }\n}\n")
 
 autogencpp.write("std::string getSchemeEntryNames(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("""    case SCHEME_%s: return "%s";\n""" % (p.enum,", ".join([name for name, doc, enum in p.entries])))
+autogencpp.write("""  default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");\n""")
 autogencpp.write("  }\n}\n")
 
 autogencpp.write("std::string getSchemeEntryName(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
@@ -379,6 +381,7 @@ for p in schemes:
   autogencpp.write("    case SCHEME_%s: \n" % p.enum)
   autogencpp.write("""      return %d;\n""" % len(p.entries))
   autogencpp.write("      break;\n")
+autogencpp.write("""  default: casadi_error("getSchemeSize: Scheme '" << scheme <<  "' does not exist.");\n""")
 autogencpp.write("  }\n")
 autogencpp.write("}\n")
 

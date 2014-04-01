@@ -68,6 +68,8 @@ namespace CasADi{
           WorhpGetIntParam(&worhp_p_, name, &default_int);
           addOption(WorhpGetParamName(i+1),OT_INTEGER,default_int,WorhpGetParamDescription(i+1));
           break;
+        default:
+          break;// do nothing
       }
     } 
     
@@ -321,6 +323,8 @@ namespace CasADi{
         case WORHP_INT_T:
           if (hasSetOption(name)) WorhpSetIntParam(&worhp_p_, name, getOption(name));
           break;
+        default:
+          break;// do nothing
       }
     } 
   
@@ -844,6 +848,8 @@ namespace CasADi{
           WorhpGetIntParam(&worhp_p_, name, &default_int);
           setOption(WorhpGetParamName(i+1),default_int);
           break;
+        default:
+          break; // do nothing
       }
     } 
 

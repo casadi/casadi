@@ -1522,7 +1522,7 @@ namespace CasADi{
       CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
       casadi_assert(this_);
       CVadjMem ca_mem;
-      CVodeBMem cvB_mem; 
+      //CVodeBMem cvB_mem; 
   
       int flag;
 
@@ -1533,7 +1533,7 @@ namespace CasADi{
       cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
 
       ca_mem = cv_mem->cv_adj_mem;
-      cvB_mem = ca_mem->ca_bckpbCrt;
+      //cvB_mem = ca_mem->ca_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
       flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
@@ -1599,7 +1599,7 @@ namespace CasADi{
       CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
       casadi_assert(this_);
       CVadjMem ca_mem;
-      CVodeBMem cvB_mem; 
+      //CVodeBMem cvB_mem; 
   
       int flag;
 
@@ -1610,7 +1610,7 @@ namespace CasADi{
       cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
 
       ca_mem = cv_mem->cv_adj_mem;
-      cvB_mem = ca_mem->ca_bckpbCrt;
+      //cvB_mem = ca_mem->ca_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
       flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);

@@ -166,7 +166,7 @@ namespace CasADi{
     FunctionInternal::reportConstraints(stream,output(NLP_SOLVER_X),input(NLP_SOLVER_LBX),input(NLP_SOLVER_UBX), "decision bounds");
     double tol = 1e-8;
     if (hasOption("constr_viol_tol")) tol = getOption("constr_viol_tol");
-    FunctionInternal::reportConstraints(stream,output(NLP_SOLVER_G),input(NLP_SOLVER_LBG),input(NLP_SOLVER_UBG), "constraints",getOption("constr_viol_tol"));
+    FunctionInternal::reportConstraints(stream,output(NLP_SOLVER_G),input(NLP_SOLVER_LBG),input(NLP_SOLVER_UBG), "constraints",tol);
   }
 
   Function& NLPSolverInternal::gradF(){

@@ -200,7 +200,7 @@ namespace CasADi {
     }
     
     // Loop over constraints
-    int nA=0, nC=0, mz=0, nnzA=0, nnzC=0;
+    int nA=0, nC=0, /*mz=0,*/ nnzA=0, nnzC=0;
     for(int j=0; j<nc_; ++j){
       if(lba[j]==-numeric_limits<double>::infinity() && uba[j]==numeric_limits<double>::infinity()){
         // Redundant constraint
@@ -318,7 +318,7 @@ namespace CasADi {
       std::vector<int> krowA(nA+1); 
       std::vector<int> krowC(nC+1); 
 
-      int status_code = 0;
+      //int status_code = 0;
       makehb( getPtr(irowQ_), nnzQ, getPtr(krowQ), nx, &ierr );
       if( ierr == 0 ) makehb( getPtr(irowA_), nnzA, getPtr(krowA), nA, &ierr );
       if( ierr == 0 ) makehb( getPtr(irowC_), nnzC, getPtr(krowC), nC, &ierr );
@@ -406,7 +406,7 @@ namespace CasADi {
 
   const char* OOQPInternal::errFlag(int flag){
     // Find the error
-    const char* msg;
+    //const char* msg;
     switch(flag){
     case SUCCESSFUL_TERMINATION: return  "SUCCESSFUL_TERMINATION";
     case NOT_FINISHED:           return  "NOT_FINISHED";

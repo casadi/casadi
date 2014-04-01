@@ -1120,7 +1120,7 @@ namespace CasADi{
     int *Cp, *Ci, *last, *len, *nv, *next, *head, *elen, *degree, *w;
     int *hhead, d, dk, dext, lemax = 0, e, elenk, eln, i, j, k, k1;
     int k2, k3, jlast, ln, nzmax, mindeg = 0, nvi, nvj, nvk, mark, wnvi;
-    int ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q, t;
+    int ok, cnz, nel = 0, p, p1, p2, p3, p4, pj, pk, pk1, pk2, pn, q , t;
 
     unsigned int h;
 
