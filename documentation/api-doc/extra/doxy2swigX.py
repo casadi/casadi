@@ -59,6 +59,10 @@ def astext(node,whitespace=False,escape=True):
 class Doxy2SWIG_X(Doxy2SWIG):
 
   def __init__(self, *args, **kwargs):
+    self.internal = kwargs["internal"]
+    del kwargs["internal"]
+    self.deprecated = kwargs["deprecated"]
+    del kwargs["deprecated"]
     Doxy2SWIG.__init__(self,*args, **kwargs)
     self.docstringmap = {}
     self.active_docstring = None
@@ -144,12 +148,13 @@ class Doxy2SWIG_X(Doxy2SWIG):
       comps = node.getElementsByTagName('compound')
       for c in comps:
           refid = c.attributes['refid'].value
+          if "Internal" in refid: continue
           fname = refid + '.xml'
           if not os.path.exists(fname):
               fname = os.path.join(self.my_dir,  fname)
           if not self.quiet:
               print "parsing file: %s"%fname
-          p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet)
+          p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated)
           p.generate()
           self.pieces.extend(self.clean_pieces(p.pieces))
             
@@ -278,21 +283,65 @@ class Doxy2SWIG_X(Doxy2SWIG):
       
   def generate(self):
       try:
-        publicapi = ET.parse(self.src.replace("_internal",""))
-      except:
+        publicapi = ET.parse(self.src.replace("_internal","_cluttered"))
+      except Exception as e:
         publicapi = None
       Doxy2SWIG.generate(self)
       for k, v in self.docstringmap.iteritems():
         # Group together
         grouped_list = []
         grouped_dict = {}
+        
         for (origin,pieces) in v:
+          origin_nostatic = origin.replace("static ","")
+          m = list(re.finditer("\[DEPRECATED(:(.*?))?\]","".join(pieces)))
+          deprecated = ("" if m[-1].group(2) is None else m[-1].group(2)) if len(m)>0 else None
+          
           internal = True
           if publicapi is not None:
-            if publicapi.xpath(".//memberdef[translate(concat(definition,argsstring),' ','')='%s']" % origin.replace(" ","")):
+            if publicapi.xpath(".//memberdef[translate(concat(definition,argsstring),' ','')='%s' or translate(concat(definition,argsstring),' ','')='%s']" % (origin_nostatic.replace(" ",""),'static'+origin_nostatic.replace(" ",""))):
               internal = False
+          if deprecated is not None: internal = False
+          
+          if not re.search(r"\b_\w+\(",origin_nostatic) and "(" in origin_nostatic and "~" not in origin_nostatic:
+            if origin_nostatic.endswith("=0"):
+              swigname = origin_nostatic[:-2]
+            else:
+              swigname = origin_nostatic
+            # Remove return type
+            
+            nest=0
+            sep = 0
+            for i,c in enumerate(swigname):
+              if c=="<" : nest+=1
+              if c==">" : nest-=1
+              if c == " " and nest==0: sep = i
+              if c=="(" : break
+            
+            swigname= swigname[sep:]
+          else:
+            swigname = ""
+            
+            
+          #"INTERNAL": "mark_internal(\"$decl\");"
+          #"DEPRECATED": "deprecated(\"%s\");"
+          #"UNSAFE": "unsafe(\"%s\");"
+                            
+          if internal:
+            pieces = ["[INTERNAL] "] + pieces
+            if "*" not in swigname and swigname not in self.internal:
+            # self.internal.add("%rename(\"_internal_%s\") " + swigname + ";")
+            #  print swigname
+              #self.internal.add("%pythonprepend " + swigname + " %{\n _mark_internal() \n%}")
+              self.internal[swigname] = "%exception " + swigname + " {\n  START INTERNAL_MSG() $action STOP { $action } \n}"
+          else:
+            self.internal[swigname] = ""
+            
+          if deprecated is not None:
+            self.deprecated[swigname] = "%exception " + swigname + " {\n START DEPRECATED_MSG(\"%s\") $action STOP { $action } \n}" % deprecated
+          else:
+            self.deprecated[swigname] = ""
               
-          if internal: pieces = ["[INTERNAL] "] + pieces
           total = u"".join(pieces)
           totalnowrap = total.replace("\n"," ")
           if (aliases["noswig"] in totalnowrap) or (aliases["nopython"] in totalnowrap):
@@ -312,8 +361,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
               self.add_text_original(["\n"]+["\n>  " + o + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
           self.add_text_original(["\";\n","\n"])
       
-def convert(input, output, include_function_definition=True, quiet=False):
-    p = Doxy2SWIG_X(input, include_function_definition, quiet)
+def convert(input, output,  include_function_definition=True, quiet=False,internal=None,deprecated=None):
+    p = Doxy2SWIG_X(input, include_function_definition, quiet,internal=internal,deprecated=deprecated)
     p.generate()
     p.write(output)
 
@@ -332,11 +381,14 @@ def main():
                       help='be quiet and minimize output')
     
     options, args = parser.parse_args()
-    if len(args) != 2:
+    if len(args) != 4:
         parser.error("error: no input and output specified")
-
-    convert(args[0], args[1], False, options.quiet)
     
+    internal = dict()
+    deprecated = dict()
+    convert(args[0], args[1], False, options.quiet,internal=internal,deprecated=deprecated)
+    file(args[2],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, internal.values()))))
+    file(args[3],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, deprecated.values()))))
 
 if __name__ == '__main__':
     main()

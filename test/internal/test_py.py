@@ -47,7 +47,7 @@ t = TestSuite(dirname=src,
   suffix="py",
   preRun=setdummybackend,
   postRun=removedummybackend,
-  command = lambda dir,fn, opt:  ["python", fn] + opt,
+  command = lambda dir,fn, opt:  ["python","-W","error::SyntaxWarning","-W","error::DeprecationWarning", fn] + opt,
   skipdirs=[".svn","ctemplate"],
     args=sys.argv[2:]
   )

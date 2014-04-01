@@ -85,17 +85,20 @@ namespace CasADi{
     
     /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
-    
+ 
+/// \cond INTERNAL   
     /** \brief  Destructor */
     virtual ~MX();
-    
+/// \endcond
 
 #ifndef SWIG
+/// \cond INTERNAL
     /** \brief  Create from node */
     static MX create(MXNode* node);
 
     /** \brief  Create from node (multiple-outputs) */
     static std::vector<MX> createMultipleOutput(MXNode* node);
+/// \endcond
 
     /// Get a non-zero element, with bounds checking
     const MX at(int k) const;
@@ -108,6 +111,7 @@ namespace CasADi{
     /// Returns the truth value of an MX expression
     bool __nonzero__() const;
     
+    /// \cond CLUTTER
     //@{
     /// Indexing for interfaced languages
     
@@ -210,12 +214,17 @@ namespace CasADi{
     }
     
     void indexed_assignment(const Slice &rr, const MX &m){
-      (*this)(rr.getAll(size1())) = m;
+      (*this
+      )(rr.getAll(size1())) = m;
     }
     
+    /// \endcond
+    
+    /// \cond INTERNAL
     /// Scalar type
     typedef MX ScalarType;
-
+    /// \endcond
+    
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 
@@ -340,11 +349,13 @@ namespace CasADi{
      */
     long __hash__() const;
     
+    /// \cond INTERNAL
     /// Get the temporary variable
     int getTemp() const;
   
     /// Set the temporary variable
     void setTemp(int t);
+    /// \endcond
   
     //@{
     /** \brief  Create nodes by their ID */
@@ -421,7 +432,7 @@ namespace CasADi{
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
   
-    /// \cond INTERNAL
+    /// \cond SWIGINTERNAL
     // all binary operations
     MX __add__(const MX& y) const;
     MX __sub__(const MX& y) const;

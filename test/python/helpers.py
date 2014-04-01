@@ -228,13 +228,13 @@ class casadiTestCase(unittest.TestCase):
       
     for i in range(len(x0)):
       try:
-        f.input(i).set(setx0[i])
+        f.setInput(setx0[i],i)
       except Exception as e:
-         print f.input(i).shape
+         print f.getInput(i).shape
          raise e
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
     f.evaluate()
-    zt = f.output(0).toArray()
+    zt = f.getOutput(0).toArray()
     self.checkarray(yr,zt,name,failmessage)
     
   def numpyEvaluationCheck(self,ft,fr,x,x0,name="",failmessage="",fmod=None,setx0=None):
@@ -274,16 +274,16 @@ class casadiTestCase(unittest.TestCase):
       extra_trial = MXFunction(ins,trial.call(ins))
       extra_trial.init()
       for i in range(trial.getNumInputs()):
-        extra_trial.setInput(trial.input(i),i)
+        extra_trial.setInput(trial.getInput(i),i)
       self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
       for i in range(trial.getNumInputs()):
-        trial.setInput(extra_trial.input(i),i)
+        trial.setInput(extra_trial.getInput(i),i)
 
     if digits_sens is None:
       digits_sens = digits
      
     for i in range(trial.getNumInputs()):
-      if (allow_empty and (trial.input(i).isEmpty() or solution.input(i).isEmpty() )): continue
+      if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
       message = "input(%d)" % i
       self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
@@ -306,7 +306,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.getNumOutputs()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.output(i).isEmpty() or solution.output(i).isEmpty() )): continue
+      if (allow_empty and (trial.getOutput(i).isEmpty() or solution.getOutput(i).isEmpty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
     try:
@@ -325,7 +325,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.getNumOutputs()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.output(i).isEmpty() or solution.output(i).isEmpty() )): continue
+      if (allow_empty and (trial.getOutput(i).isEmpty() or solution.getOutput(i).isEmpty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
     for i in range(trial.getNumInputs()):
@@ -335,7 +335,7 @@ class casadiTestCase(unittest.TestCase):
     
     if jacobian:
       for i in range(trial.getNumInputs()):
-        if (allow_empty and (trial.input(i).isEmpty() or solution.input(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
         for j in range(trial.getNumOutputs()):
           trialjac = trial.jacobian(i,j)
           trialjac.init()
@@ -352,9 +352,9 @@ class casadiTestCase(unittest.TestCase):
 
     if gradient:
       for i in range(trial.getNumInputs()):
-        if (allow_empty and (trial.input(i).isEmpty() or solution.input(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
         for j in range(trial.getNumOutputs()):
-          if trial.output(j).isScalar() and solution.output(j).isScalar():
+          if trial.getOutput(j).isScalar() and solution.getOutput(j).isScalar():
             trialgrad = trial.gradient(i,j)
             trialgrad.init()
             self.assertEqual(trialgrad.getNumInputs(),trial.getNumInputs())
@@ -369,9 +369,9 @@ class casadiTestCase(unittest.TestCase):
 
     if hessian:
       for i in range(trial.getNumInputs()):
-        if (allow_empty and (trial.input(i).isEmpty() or solution.input(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
         for j in range(trial.getNumOutputs()):
-          if trial.output(j).isScalar() and solution.output(j).isScalar():
+          if trial.getOutput(j).isScalar() and solution.getOutput(j).isScalar():
             trialhess = trial.hessian(i,j)
             trialhess.init()
             self.assertEqual(trialhess.getNumInputs(),trial.getNumInputs())
@@ -435,9 +435,9 @@ class casadiTestCase(unittest.TestCase):
         for spmod,spmod2 in itertools.product(spmods,repeat=2):
           fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
           aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
-          inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs())]
-      
-          res,fwdsens,adjsens = f.callDerivative(inputss,fseeds,aseeds,True)
+          inputss = [sym("i",f.getInput(i).sparsity()) for i in range(f.getNumInputs())]
+          with internalAPI():
+            res,fwdsens,adjsens = f.callDerivative(inputss,fseeds,aseeds,True)
           
           vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
           
@@ -449,7 +449,7 @@ class casadiTestCase(unittest.TestCase):
           # Complete random seeding
           random.seed(1)
           for i in range(f.getNumInputs(),vf.getNumInputs()):
-            vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())),i)
+            vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).size())),i)
           
           vf.evaluate()
           storagekey = (spmod,spmod2)
@@ -464,11 +464,12 @@ class casadiTestCase(unittest.TestCase):
 
             # Second order sensitivities
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-              fseeds2 = [[sym("f",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
-              aseeds2 = [[sym("a",vf_reference.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
-              inputss2 = [sym("i",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())]
-           
-              res2,fwdsens2,adjsens2 = vf.callDerivative(inputss2,fseeds2,aseeds2,True)
+              fseeds2 = [[sym("f",vf_reference.getInput(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
+              aseeds2 = [[sym("a",vf_reference.getOutput(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
+              inputss2 = [sym("i",vf_reference.getInput(i).sparsity()) for i in range(vf.getNumInputs())]
+              
+              with internalAPI():
+                res2,fwdsens2,adjsens2 = vf.callDerivative(inputss2,fseeds2,aseeds2,True)
 
               vf2 = Function(inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
@@ -478,7 +479,7 @@ class casadiTestCase(unittest.TestCase):
             
               random.seed(1)
               for i in range(f.getNumInputs(),vf2.getNumInputs()):
-                vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())),i)
+                vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).size())),i)
               
               vf2.evaluate()
               storagekey = (spmod,spmod2)

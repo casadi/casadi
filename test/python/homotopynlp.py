@@ -62,9 +62,9 @@ class NLPtests(casadiTestCase):
 
       hnlpsolver.evaluate()
 
-      self.checkarray(hnlpsolver.output("x"),DMatrix([1.9635508794099052e-01,3.8009070491114780e-02]))
-      self.checkarray(hnlpsolver.output("lam_x"),DMatrix([0,0]))
-      self.checkarray(hnlpsolver.output("lam_g"),DMatrix([1.4371571368129470e+00]))
+      self.checkarray(hnlpsolver.getOutput("x"),DMatrix([1.9635508794099052e-01,3.8009070491114780e-02]))
+      self.checkarray(hnlpsolver.getOutput("lam_x"),DMatrix([0,0]))
+      self.checkarray(hnlpsolver.getOutput("lam_g"),DMatrix([1.4371571368129470e+00]))
       
 if __name__ == '__main__':
     unittest.main()

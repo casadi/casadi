@@ -1327,6 +1327,17 @@ class SXtests(casadiTestCase):
     self.assertTrue(dependsOn(vertcat([b,0]),vertcat([a,b])))
     self.assertFalse(dependsOn(vertcat([0,0]),vertcat([a,b])))
     
+  @requires("isSmooth")
+  def test_isSmooth(self):
+    x = SX.sym("a",2,2)
+    import warnings
+    with warnings.catch_warnings():
+      warnings.simplefilter("error",DeprecationWarning)
+      with self.assertRaises(Exception):
+        isSmooth(x)
+      warnings.simplefilter("ignore")
+      isSmooth(x)
+    
 if __name__ == '__main__':
     unittest.main()
 

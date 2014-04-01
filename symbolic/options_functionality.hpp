@@ -104,7 +104,7 @@ class OptionsFunctionality : public SharedObject{
     /// \cond INTERNAL
     /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
-    
+    /// \endcond INTERNAL
     
     /** \brief Get a list of all option names */
     std::vector<std::string> getOptionNames() const;
@@ -121,6 +121,7 @@ class OptionsFunctionality : public SharedObject{
     /** \brief Get the allowed values of a certain option */
     std::vector<GenericType> getOptionAllowed(const std::string &str) const;
     
+    /// \cond INTERNAL
     /** \brief Get the index into allowed options of a certain option */
     int getOptionAllowedIndex(const std::string &name) const;
 
@@ -132,11 +133,10 @@ class OptionsFunctionality : public SharedObject{
 
     /** \brief Set a certain option by giving an enum value */
     void setOptionByEnumValue(const std::string &name, int v);
+    /// \endcond INTERNAL
   
     /** \brief Get the default of a certain option */
     GenericType getOptionDefault(const std::string &str) const;
-    
-    /// \endcond INTERNAL
 
 };
 

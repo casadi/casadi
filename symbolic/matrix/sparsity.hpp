@@ -184,11 +184,13 @@ namespace CasADi{
 #endif // SWIG  
     //@}
 
+    /// \cond INTERNAL
     /** \brief Check if there is an identical copy of the sparsity pattern in the cache, and if so, make a shallow copy of that one */
     void reCache();
 
     /** \brief Clear the cache */
     static void clearCache();
+    /// \endcond
 
     /** \brief Check if the dimensions and colind, row vectors are compatible.
      * \param complete  set to true to also check elementwise
@@ -200,11 +202,7 @@ namespace CasADi{
         When the input is square, the diagonal elements are returned.
         If the input is vector-like, a diagonal matrix is constructed with it.
     */
-#ifndef SWIG
-    Sparsity getDiag(std::vector<int>& mapping) const;
-#else // SWIG
-    Sparsity getDiag(std::vector<int>& OUTPUT) const;
-#endif // SWIG
+    Sparsity getDiag(std::vector<int>& SWIG_OUTPUT(mapping)) const;
     
     /// Compress a sparsity pattern
     std::vector<int> compress() const;
@@ -473,6 +471,7 @@ namespace CasADi{
     /// Remove duplicate entries: The same indices will be removed from the mapping vector, which must have the same length as the number of nonzeros
     void removeDuplicates(std::vector<int>& mapping);
     
+/// \cond INTERNAL
 #ifndef SWIG
     typedef CACHING_MULTIMAP<std::size_t,WeakRef> CachingMap;
 
@@ -489,6 +488,7 @@ namespace CasADi{
     static const Sparsity& getEmpty();
 
 #endif //SWIG
+/// \endcond
     
     /** \brief Calculate the elimination tree
         See Direct Methods for Sparse Linear Systems by Davis (2006).
@@ -531,11 +531,8 @@ namespace CasADi{
         \sa stronglyConnectedComponents
 
     */
-#ifndef SWIG
-    int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed=0) const;
-#else // SWIG
-    int dulmageMendelsohn(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, std::vector<int>& OUTPUT, int seed=0) const;
-#endif // SWIG
+
+    int dulmageMendelsohn(std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm), std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock), std::vector<int>& SWIG_OUTPUT(coarse_rowblock), std::vector<int>& SWIG_OUTPUT(coarse_colblock), int seed=0) const;
 
     /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix  
         A : DenseMatrix  4 x 3
@@ -599,15 +596,9 @@ namespace CasADi{
     static Sparsity createDiagonal(int nrow, int ncol){ return diag(nrow,ncol);}
     std::vector<int> lowerNZ() const{ return getLowerNZ();}
     std::vector<int> upperNZ() const{ return getUpperNZ();}
-#ifndef SWIG
-    void getSparsityCCS(std::vector<int>& colind, std::vector<int>& row) const;
-    void getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const;
-    void getSparsity(std::vector<int>& row, std::vector<int>& col) const;
-#else // SWIG
-    void getSparsityCCS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
-    void getSparsityCRS(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
-    void getSparsity(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
-#endif // SWIG
+    void getSparsityCCS(std::vector<int>& SWIG_OUTPUT(colind), std::vector<int>& SWIG_OUTPUT(row)) const;
+    void getSparsityCRS(std::vector<int>& SWIG_OUTPUT(rowind), std::vector<int>& SWIG_OUTPUT(col)) const;
+    void getSparsity(std::vector<int>& SWIG_OUTPUT(row), std::vector<int>& SWIG_OUTPUT(col)) const;
     //@}
 #endif
   
@@ -630,8 +621,10 @@ namespace CasADi{
     void assignCached(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
 
 #endif //SWIG
+
   };
 
+  /// \cond INTERNAL
   /** \brief Hash value of an integer */
   template<typename T>
   inline size_t hash_value(T v){ return size_t(v);}
@@ -649,6 +642,7 @@ namespace CasADi{
 
   /** \brief Hash a sparsity pattern */
   std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
+  /// \endcond
 
   // Template instantiations
 #ifndef SWIG

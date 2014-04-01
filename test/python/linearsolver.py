@@ -80,8 +80,8 @@ class LinearSolverTests(casadiTestCase):
 
         solver.evaluate()
         
-        self.checkarray(mul(A.T,solver.output()),DMatrix.zeros(m,n-m))
-        self.checkarray(mul(solver.output().T,solver.output()),DMatrix.eye(n-m))
+        self.checkarray(mul(A.T,solver.getOutput()),DMatrix.zeros(m,n-m))
+        self.checkarray(mul(solver.getOutput().T,solver.getOutput()),DMatrix.eye(n-m))
         
         solver.setOption("ad_mode","forward")
         solver.init()
@@ -101,8 +101,8 @@ class LinearSolverTests(casadiTestCase):
         Jf.evaluate()
         Jb.evaluate()
 
-        self.checkarray(Jf.output(),Jb.output())
-        self.checkarray(Jf.output(1),Jb.output(1))
+        self.checkarray(Jf.getOutput(),Jb.getOutput())
+        self.checkarray(Jf.getOutput(1),Jb.getOutput(1))
         
         d = solver.derivative(1,0)
         d.init()
@@ -172,8 +172,8 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(b_,1)
       f.evaluate()
       
-      self.checkarray(f.output(),DMatrix([1.5,-0.5]))
-      self.checkarray(mul(A_,f.output()),b_)
+      self.checkarray(f.getOutput(),DMatrix([1.5,-0.5]))
+      self.checkarray(mul(A_,f.getOutput()),b_)
 
   def test_pseudo_inverse(self):
     numpy.random.seed(0)
@@ -191,14 +191,14 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.output()),DMatrix.eye(4))
+      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(4))
       
       f = SXFunction([As],[pinv(As)])
       f.init()
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.output()),DMatrix.eye(4))
+      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(4))
       
       solve(mul(A,A.T),A,Solver,options)
       pinv(A_,Solver,options)
@@ -219,14 +219,14 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.output()),DMatrix.eye(3)) 
+      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(3)) 
       
       f = SXFunction([As],[pinv(As)])
       f.init()
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.output()),DMatrix.eye(3))
+      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(3))
       
       #self.checkarray(mul(pinv(A_,Solver,options),A_),DMatrix.eye(3))
       
@@ -256,7 +256,7 @@ class LinearSolverTests(casadiTestCase):
       solver.solve(True)
       
       res = DMatrix([1.5,-0.5])
-      self.checkarray(solver.output("X"),res)
+      self.checkarray(solver.getOutput("X"),res)
       #   result' = A\b'               Ax = b
 
   def test_simple(self):
@@ -276,7 +276,7 @@ class LinearSolverTests(casadiTestCase):
       solver.solve()
       
       res = DMatrix([-1.5,5.5])
-      self.checkarray(solver.output("X"),res)
+      self.checkarray(solver.getOutput("X"),res)
       #   result' = A'\b'             Ax = b
 
   def test_simple_function_direct(self):
@@ -472,7 +472,7 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(b,1)
       f.evaluate()
       
-      self.checkarray(mul(A,f.output()),b)
+      self.checkarray(mul(A,f.getOutput()),b)
       
   def test_large_sparse(self):
     numpy.random.seed(1)
@@ -495,7 +495,7 @@ class LinearSolverTests(casadiTestCase):
         f.setInput(b,1)
         f.evaluate()
 
-        self.checkarray(mul(A_,f.output()),b)
+        self.checkarray(mul(A_,f.getOutput()),b)
       
 if __name__ == '__main__':
     unittest.main()

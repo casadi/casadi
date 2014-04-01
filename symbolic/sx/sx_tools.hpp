@@ -330,7 +330,6 @@ namespace CasADi{
    */  
   SX eig_symbolic(const SX& m);
 
-/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
   /** \brief [DEPRECATED]
    */
@@ -346,7 +345,8 @@ namespace CasADi{
   inline bool isRegular(const SXElement& ex){ return ex.isRegular();}
   inline bool isRegular(const SX& ex) { return ex.isRegular();}
 
-  inline bool isSmooth(const SX& ex){ deprecation_warning("use ex.isSmooth()"); return ex.isSmooth();}
+  /// [DEPRECATED:use ex.isSmooth()]
+  inline bool isSmooth(const SX& ex){ return ex.isSmooth();}
   inline bool isSymbolic(const SX& ex){ return ex.isSymbolic();}
   inline bool isSymbolicSparse(const SX& ex){ return ex.isSymbolicSparse();}
   inline double getValue(const SX& ex) { return ex.elem(0,0).getValue(); }
@@ -356,7 +356,6 @@ namespace CasADi{
 
 
 #endif
-/// \endcond
 
 /*
 @}

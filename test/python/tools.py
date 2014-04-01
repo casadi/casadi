@@ -287,9 +287,9 @@ class Toolstests(casadiTestCase):
       ft = MXFunction([x,m],[a-b])
       ft.init()
       for i in range(ft.getNumInputs()):
-        ft.setInput(numpy.random.rand(*ft.input(i).shape),i)
+        ft.setInput(numpy.random.rand(*ft.getInput(i).shape),i)
       ft.evaluate()
-      self.checkarray(ft.output(),DMatrix.zeros(*ft.output().shape))
+      self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.getOutput().shape))
     
     isEqualV(V["x"],x)
     isEqualV(V["y",0],y0)
@@ -305,9 +305,9 @@ class Toolstests(casadiTestCase):
       ft = MXFunction([x,m,abc],[a-b])
       ft.init()
       for i in range(ft.getNumInputs()):
-        ft.setInput(numpy.random.rand(*ft.input(i).shape),i)
+        ft.setInput(numpy.random.rand(*ft.getInput(i).shape),i)
       ft.evaluate()
-      self.checkarray(ft.output(),DMatrix.zeros(*ft.output().shape))
+      self.checkarray(ft.getOutput(),DMatrix.zeros(*ft.getOutput().shape))
       
     isEqualV(V["y",0],abc)
 
@@ -752,9 +752,9 @@ class Toolstests(casadiTestCase):
     f.setInput(s_)
     f.evaluate()
     
-    self.checkarray(f.output(0),s_["a"])
-    self.checkarray(f.output(1),s_["b"])
-    self.checkarray(f.output(2),s_["c"])
+    self.checkarray(f.getOutput(0),s_["a"])
+    self.checkarray(f.getOutput(1),s_["b"])
+    self.checkarray(f.getOutput(2),s_["c"])
 
     
 if __name__ == '__main__':

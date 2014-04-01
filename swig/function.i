@@ -62,9 +62,9 @@
 %include "symbolic/function/io_scheme.hpp"
 #ifdef SWIGPYTHON
 %extend CasADi::IOScheme {
-%template(__call__) operator()< CasADi::Sparsity >;
-%template(__call__) operator()< CasADi::MX> ;
-%template(__call__) operator()< CasADi::Matrix<CasADi::SXElement> >;
+%template(__call__original__) operator()< CasADi::Sparsity >;
+%template(__call__original__) operator()< CasADi::MX> ;
+%template(__call__original__) operator()< CasADi::Matrix<CasADi::SXElement> >;
 
 %pythoncode %{
   def __call__(self,*dummy,**kwargs):

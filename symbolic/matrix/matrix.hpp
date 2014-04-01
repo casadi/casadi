@@ -65,7 +65,7 @@ namespace CasADi{
   };
 /// \endcond
     
-/// \cond INTERNAL
+/// \cond CLUTTER
   //@{
   /** \brief Get typename */
   template <typename DataType> inline std::string matrixName() { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
@@ -108,8 +108,6 @@ namespace CasADi{
     Matrix<DataType>& operator=(const Matrix<DataType>& m);
 #endif // SWIG
     
-
-/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
 /** \brief [DEPRECATED]
 */
@@ -119,7 +117,6 @@ namespace CasADi{
     Matrix(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row, const std::vector<DataType>& d=std::vector<DataType>());
 //@}
 #endif
-/// \endcond
 
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<DataType> >& m);
@@ -501,7 +498,6 @@ namespace CasADi{
     Matrix<DataType> __mpower__(const Matrix<DataType> &y) const;
     Matrix<DataType> __mrdivide__  (const Matrix<DataType> &y) const;
     //@}
-    /// \endcond
     
     /// Matrix-matrix product
     Matrix<DataType> mul_full(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
@@ -509,7 +505,6 @@ namespace CasADi{
     /// Matrix-matrix product
     Matrix<DataType> mul(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
     
-    /// \cond INTERNAL
     /// Matrix-matrix product, no memory allocation: z += mul(x,y)
     static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y, Matrix<DataType>& z);
     
@@ -524,7 +519,6 @@ namespace CasADi{
 
     /// vector-matrix product, no memory allocation: z += mul(x,y)
     static void mul_no_alloc_nn(const Matrix<DataType>& x, const std::vector<DataType> &y, std::vector<DataType>& z);
-    /// \endcond
   
     /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(trans(x),y)
     template<bool Fwd>
@@ -532,6 +526,7 @@ namespace CasADi{
   
     /// Calculates inner_prod(x,mul(A,x)) without memory allocation
     static DataType quad_form(const Matrix<DataType>& A, const std::vector<DataType>& x);
+    /// \endcond
   
     /// Transpose the matrix
     Matrix<DataType> trans() const;

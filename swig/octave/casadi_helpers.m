@@ -107,6 +107,3 @@ global op_matrix_el_mul_any = @(a,b) b.__rel_mul__(a)
 global op_matrix_el_div_any = @(a,b) b.__rel_div__(a)
 global op_matrix_pow_any = @(a,b) b.__rpow__(a)
 global op_matrix_el_pow_any = @(a,b) b.__rel_pow__(a)
-
-CasadiOptions.setDeprecatedWarningAsException(true)
-

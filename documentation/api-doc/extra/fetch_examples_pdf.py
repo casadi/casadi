@@ -24,7 +24,7 @@ Grabs the pdf-compiled examples and puts them in the API tree.
 """
 
 src = '../examples/'
-xml = 'XML/index.xml'
+xml = 'XML_internal/index.xml'
 
 import re
 import shutil

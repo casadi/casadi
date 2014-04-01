@@ -91,9 +91,9 @@ class ControlTests(casadiTestCase):
           refsol.setInput(horzcat(V_),DPLE_V)
           
           solver.evaluate()
-          X = list(horzsplit(solver.output(),n))
+          X = list(horzsplit(solver.getOutput(),n))
           refsol.evaluate()
-          Xref = list(horzsplit(refsol.output(),n))
+          Xref = list(horzsplit(refsol.getOutput(),n))
           
           a0 = (mul([blkdiag(A_),blkdiag(X),blkdiag(A_).T])+blkdiag(V_))
           a0ref = (mul([blkdiag(A_),blkdiag(Xref),blkdiag(A_).T])+blkdiag(V_))
@@ -131,7 +131,7 @@ class ControlTests(casadiTestCase):
           t0 = time.time()
           solver.evaluate()
           print "eval [ms]: ", (time.time()-t0)*1000
-          X = list(horzsplit(solver.output(),n))
+          X = list(horzsplit(solver.getOutput(),n))
 
           def sigma(a):
             return a[1:] + [a[0]]

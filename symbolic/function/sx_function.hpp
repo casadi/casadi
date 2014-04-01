@@ -199,7 +199,6 @@ namespace CasADi{
     /** \brief Get the corresponding matrix type */
     typedef SX MatType;  
   
-/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
     /** \brief [DEPRECATED]  */
     //@{
@@ -210,7 +209,6 @@ namespace CasADi{
     SXFunction indexed_zero_based(int k) const{ return operator[](k);}
     //@}
 #endif
-/// \endcond
   };
 
 

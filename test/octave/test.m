@@ -338,7 +338,7 @@ size(x)
 disp("sparsity ref #147") 
 
 
-X = DMatrix(sp_tril(4),5)
+X = DMatrix(Sparsity.tril(4),5)
 Y = (X*X)
 s = Y.sparsity()
 

@@ -26,7 +26,7 @@ This script generates a header file with option information that doxygen can use
 """
 
 
-xml = 'XML/'
+xml = 'XML_internal/'
 out = 'extra/'
 
 import re

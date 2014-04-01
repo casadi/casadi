@@ -100,26 +100,16 @@ NLP_NUM_OUT = deprecated["NLP_NUM_OUT"]
 
 
 import warnings
+warnings.filterwarnings("default",".*This function.*",DeprecationWarning)
 
-def deprecatedfun(func,message):
+import contextlib
 
-    def depfun(*args, **kwargs):
-        if not func._fired:
-          warnings.warn(message,SyntaxWarning,stacklevel=2)
-          func._fired = True
-        return func(*args, **kwargs)
-    func._fired = False
-    depfun.__dict__.update(func.__dict__)
-    depfun.__name__ = func.__name__
-    depfun.__doc__ = func.__doc__
-    return depfun
-
-
-ssym = deprecatedfun(SX.sym,"ssym will soon be replaced by SX.sym")
-msym = deprecatedfun(MX.sym,"ssym will soon be replaced by MX.sym")
-
-full = deprecatedfun(dense,"full will soon be replaced by dense")
-
+@contextlib.contextmanager
+def internalAPI():
+  backup = CasadiOptions.getAllowedInternalAPI()
+  CasadiOptions.setAllowedInternalAPI(True)
+  yield
+  CasadiOptions.setAllowedInternalAPI(backup)
 
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':

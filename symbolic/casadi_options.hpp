@@ -71,8 +71,7 @@ namespace CasADi {
       
       static bool purgeSeeds;
       
-      /** \brief Flag to indicate if run-time use of deprecated function constitutes an error */
-      static bool deprecation_warning_as_exception;
+      static bool allowed_internal_api;
       
 #endif //SWIG
       // Setter and getter for catch_errors_python
@@ -95,12 +94,11 @@ namespace CasADi {
       static void setProfilingBinary(bool flag) {  profilingBinary = flag; }
       static bool getProfilingBinary() { return  profilingBinary; }
       
-      static void setDeprecatedWarningAsException(bool flag) { deprecation_warning_as_exception = flag; } 
-      static bool getDeprecatedWarningAsException() { return deprecation_warning_as_exception; } 
-
       static void setPurgeSeeds(bool flag) { purgeSeeds = flag; } 
       static bool setPurgeSeeds() { return purgeSeeds; } 
-      
+ 
+      static void setAllowedInternalAPI(bool flag) { allowed_internal_api= flag; }
+      static bool getAllowedInternalAPI() { return allowed_internal_api; }
   };
 
 }

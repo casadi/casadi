@@ -45,8 +45,6 @@ namespace CasADi{
   class SXNode; // include will follow in the end
 
  
-  
-  /// \cond INTERNAL
 
 #ifdef SWIG
 #ifdef WITH_IMPLICITCONV
@@ -64,10 +62,12 @@ namespace CasADi{
     friend class Matrix<SXElement>;
   public:
     
+    /// \cond CLUTTER
     /** \brief Default constructor (not-a-number)
         Object is initialised as not-a-number.
     */
     SXElement();
+    /// \endcond
 
     /** \brief Numerical constant constructor
         \param val Numerical value
@@ -89,8 +89,10 @@ namespace CasADi{
 
 #ifndef SWIG
 
+    /// \cond INTERNAL
     /// Create an expression from a node: extra dummy argument to avoid ambigousity for 0/NULL
     SXElement(SXNode* node, bool dummy);
+    /// \endcond
     
     /** \brief Copy constructor */
     SXElement(const SXElement& scalar); // copy constructor
@@ -98,8 +100,10 @@ namespace CasADi{
     /// Destructor
     ~SXElement();
 
+    /// \cond INTERNAL
     /// Create an object given a node
     static SXElement create(SXNode* node);
+    /// \endcond
     
     // Assignment
     SXElement& operator=(const SXElement& scalar);
@@ -112,19 +116,20 @@ namespace CasADi{
     friend std::ostream& operator<<(std::ostream &stream, const SXElement &scalar);
 
     /** \brief  print to stream, limited */
-#ifndef SWIG
     void print(std::ostream &stream, long& remaining_calls) const;
-#endif // SWIG
     
     /** \brief  string representation (SWIG workaround) */
     std::string toString() const;
     
+    /// \cond INTERNAL
     /** \brief  Get a pointer to the node */
     SXNode* get() const; // note: constant pointer, not pointer to constant object! (to allow access to the counter)
-
+    
     /** \brief  Access functions of the node */
     const SXNode* operator->() const;
     SXNode* operator->();
+    /// \endcond
+    
 #endif // SWIG
     
     /** \brief  Perform operations by ID */
@@ -255,6 +260,7 @@ namespace CasADi{
     Matrix<SXElement> __copysign__(const Matrix<SXElement>& n) const;
     Matrix<SXElement> arctan2(const Matrix<SXElement>& b) const;
         
+    /// \cond INTERNAL
     // Get the temporary variable
     int getTemp() const;
     
@@ -272,6 +278,7 @@ namespace CasADi{
         
     /** \brief Assign the node to something, without invoking the deletion of the node, if the count reaches 0 */
     SXNode* assignNoDelete(const SXElement& scalar);
+    /// \endcond
     
     /** \brief SXElement nodes are not allowed to be null */
     inline bool isNull(){return false;}
@@ -286,7 +293,6 @@ namespace CasADi{
 #endif // SWIG
 
   };
-  /// \endcond
 
 #ifdef SWIG
   %extend SXElement {

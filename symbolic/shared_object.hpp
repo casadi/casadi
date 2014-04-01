@@ -152,26 +152,31 @@ namespace CasADi{
     virtual bool checkNode() const;
     /// \endcond
     
-    /// \cond INTERNAL
+
     //@{
+    /// \cond SWIGINTERNAL
     /// If there are other references to the object, then make a deep copy of it and point to this new object
     void makeUnique(bool clone_members=true);
+    /// \endcond SWIGINTERNAL
+    /// \cond INTERNAL
 #ifndef SWIG
     void makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied, bool clone_members=true);
+#endif
+    /// \endcond
     //@}
 
+/// \cond INTERNAL
+#ifndef SWIG
     /** \brief Get a weak reference to the object */
     WeakRef* weak();
-    /// \endcond
+#endif // SWIG
+/// \endcond
  
-  /// \cond INTERNAL
   private:
     SharedObjectNode *node;
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
     
-  /// \endcond
-#endif // SWIG
   };
 
 #ifndef SWIG

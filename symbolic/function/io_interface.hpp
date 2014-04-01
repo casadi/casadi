@@ -39,9 +39,9 @@ namespace CasADi{
   class IOInterface {
   public:
     
-    /// \cond INTERNAL
-    /// \name Obtain references to inputs
-    ///
+    /// \cond UNSAFE
+    /// \brief [UNSAFE] Obtain reference to inputs
+    // \seealso getInput, setInput
     //@{
     /// Access input argument
     inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind);}
@@ -53,7 +53,8 @@ namespace CasADi{
     inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
     //@}
     
-    /// \name Obtain references to outputs
+    /// \brief [UNSAFE] Obtain reference to outputs
+    // \seealso getOutput, getOutput
     //@{
     /// Access output argument
     inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind);}

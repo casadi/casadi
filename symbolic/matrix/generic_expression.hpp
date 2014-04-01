@@ -96,6 +96,8 @@ class GenericExpression{
     inline friend ExType operator||(const ExType &x, const ExType &y){ return x.logic_or(y); }
     
     #endif // SWIG
+    
+    // \cond SWIGINTERNAL
 
     /// Matrix division from left
     inline ExType __mldivide__(const ExType& y) const{ return y.__mrdivide__(static_cast<const ExType&>(*this));}
@@ -108,7 +110,7 @@ class GenericExpression{
 
     /// Division (with __future__.division in effect)
     inline ExType __truediv__(const ExType& y) const {return static_cast<const ExType&>(*this)/y;};
-
+    
     /** @name Operations from the left
      *  For Python
      */
@@ -125,6 +127,7 @@ class GenericExpression{
     inline ExType __rne__(const ExType& y) const{ return y.__ne__(static_cast<const ExType&>(*this));}
     inline ExType __rtruediv__(const ExType& y) const {return y.__truediv__(static_cast<const ExType&>(*this));}
     //@}
+    /// \endcond
     
 };
 

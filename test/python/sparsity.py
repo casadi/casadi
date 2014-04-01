@@ -291,9 +291,9 @@ class Sparsitytests(casadiTestCase):
     f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
-    self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    self.checkarray(DMatrix(f.getOutput().data()),DMatrix([1,0,0,7,0]),"sparsity index")
     
-    self.assertTrue(f.output().data()[1]==0)
+    self.assertTrue(f.getOutput().data()[1]==0)
     
   def test_sparsityindex(self):
     self.message("sparsity indexing")
@@ -324,7 +324,7 @@ class Sparsitytests(casadiTestCase):
     f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
-    self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    self.checkarray(DMatrix(f.getOutput().data()),DMatrix([1,0,0,7,0]),"sparsity index")
     
   def test_getCCS(self):
     self.message("CCS format")
@@ -503,7 +503,7 @@ class Sparsitytests(casadiTestCase):
     J.setOption("verbose",True)
     J.init()
     
-    self.assertTrue(J.output()[:,:X.size()].sparsity()==Sparsity.diag(100))
+    self.assertTrue(J.getOutput()[:,:X.size()].sparsity()==Sparsity.diag(100))
 
     X = SX.sym("X",100)
     P = SX.sym("P",1000)
@@ -518,7 +518,7 @@ class Sparsitytests(casadiTestCase):
     J.setOption("verbose",True)
     J.init()
     
-    self.assertTrue(J.output()[:X.size(),:].sparsity()==Sparsity.diag(100))
+    self.assertTrue(J.getOutput()[:X.size(),:].sparsity()==Sparsity.diag(100))
     
   def test_rowcol(self):
     n = 3
@@ -546,8 +546,17 @@ class Sparsitytests(casadiTestCase):
       trial.printDense()
       
       self.checkarray(trial,dt)
+      
+  def test_internalapi(self):
+    s = Sparsity.dense(2,2)
+    with warnings.catch_warnings():
+      warnings.simplefilter("error",SyntaxWarning)
+      with self.assertRaises(Exception):
+        s.reCache()
+      
+      with internalAPI():
+        s.reCache()
     
-
 if __name__ == '__main__':
     unittest.main()
 

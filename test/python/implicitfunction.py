@@ -133,17 +133,17 @@ class NLPtests(casadiTestCase):
       trial.setInput([abs(cos(i)) for i in range(x.size())])
       trial.evaluate()
 
-      f.setInput(trial.output(),0)
-      f.setInput(vecNZ(trial.input()),1)
+      f.setInput(trial.getOutput(),0)
+      f.setInput(vecNZ(trial.getInput()),1)
       f.evaluate()
 
-      f.setInput(vecNZ(trial.input()),0)
-      f.setInput(vecNZ(trial.input()),1)
+      f.setInput(vecNZ(trial.getInput()),0)
+      f.setInput(vecNZ(trial.getInput()),1)
       f.evaluate()
       
       refsol = MXFunction([X],[vecNZ(X)])
       refsol.init()
-      refsol.setInput(trial.input())
+      refsol.setInput(trial.getInput())
 
       self.checkfunction(trial,refsol,digits=6,sens_der=False,evals=1,failmessage=message)
       
@@ -198,7 +198,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.evaluate()
       
-      self.checkarray(solver.output(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
+      self.checkarray(solver.getOutput(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
       f=SXFunction([x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       f.init()
@@ -209,7 +209,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.evaluate()
       
-      self.checkarray(solver.output(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
+      self.checkarray(solver.getOutput(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
 
   def test_implicitbug(self):
     # Total number of variables for one finite element
@@ -251,18 +251,18 @@ class NLPtests(casadiTestCase):
     G.init()
     G.setInput(x0_val)
     G.evaluate()
-    print G.output()
+    print G.getOutput()
     print G
 
     J = F.jacobian(0,0)
     J.init()
     J.setInput(x0_val)
     J.evaluate()
-    print J.output()
+    print J.getOutput()
     print J
     
-    self.checkarray(G.output(),DMatrix([2]))
-    self.checkarray(J.output(),DMatrix([2]))
+    self.checkarray(G.getOutput(),DMatrix([2]))
+    self.checkarray(J.getOutput(),DMatrix([2]))
     
 if __name__ == '__main__':
     unittest.main()

@@ -87,13 +87,15 @@ namespace CasADi{
     
   public:
   
-/// \cond INTERNAL
+    /// \cond CLUTTER
     /** \brief  default constructor */
     Function(); 
 
     /** \brief  Destructor */
     ~Function();
+    /// \endcond
     
+    /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node */
     static Function create(FunctionInternal* node);
@@ -310,7 +312,6 @@ namespace CasADi{
      NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
     void setDerivative(const Function& fcn, int nfwd, int nadj);
 
-    /// \cond INTERNAL
     //@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
@@ -326,7 +327,6 @@ namespace CasADi{
     void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
     void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
     //@}
-    /// \endcond
     
     /** \brief Export / Generate C code for the function */
     void generateCode(const std::string& filename);
@@ -389,7 +389,6 @@ namespace CasADi{
     void checkInputs() const;
     /// \endcond
 
-/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
     /** \brief [DEPRECATED]
      */
@@ -441,7 +440,6 @@ namespace CasADi{
 #endif // SWIG
     //@}
 #endif
-/// \endcond
   };
 
 } // namespace CasADi

@@ -58,6 +58,7 @@ _object = _copyableObject
 
 %include "doc.i"
 
+
 %feature("autodoc", "1");
 
 %naturalvar;
@@ -67,7 +68,7 @@ _object = _copyableObject
 
 #ifndef SWIGXML
 %feature("compactdefaultargs","1");
-%feature("compactdefaultargs","0") CasADi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
+//%feature("compactdefaultargs","0") CasADi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
 %feature("compactdefaultargs","0") CasADi::solve; // buggy
 #endif //SWIGXML
 
@@ -399,13 +400,40 @@ namespace std {
 %include "symbolic/casadi_options.hpp"
 %include "symbolic/casadi_meta.hpp"
 
+#ifdef CASADI_MODULE
+
+%define DEPRECATED_MSG(MSG)
+if (deprecated("$decl",MSG)) SWIG_fail;
+%enddef
+
+%define INTERNAL_MSG()
+if (internal("$decl")) SWIG_fail;
+%enddef
+
 #ifdef SWIGPYTHON
-%pythoncode %{
-  CasadiOptions.setDeprecatedWarningAsException(True)
+%wrapper %{
+int deprecated(const std::string & c,const std::string & a) {
+  return PyErr_WarnEx(PyExc_DeprecationWarning,("This function (" + c+") is deprecated. "  + a).c_str(),2);
+}
+int internal(const std::string & c) {
+  if (CasadiOptions::allowed_internal_api) return 0;
+  return PyErr_WarnEx(PyExc_SyntaxWarning,("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str(),2);
+}
 %}
 #endif
 
-#ifdef CASADI_MODULE
+#ifdef SWIGOCTAVE
+%wrapper %{
+int deprecated(const std::string & c,const std::string & a) {
+  warning(("This function (" + c+") is deprecated. "  + a).c_str());
+  return 0;
+}
+int internal(const std::string & c) {
+  warning(("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str());
+  return 0;
+}
+%}
+#endif
 
 #ifdef SWIGPYTHON
 %{
@@ -414,8 +442,6 @@ namespace std {
   try {
   
 #define STOP \
-  } catch (const CasADi::CasadiDeprecationException& e) { \
-    PyErr_WarnEx(PyExc_SyntaxWarning,e.what(),2); \
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_RuntimeError, e.what()); \
   } catch (const char* e) { \
@@ -432,8 +458,6 @@ namespace std {
   try {
   
 #define STOP \
-  } catch (const CasADi::CasadiDeprecationException& e) { \
-    warning(e.what()); \
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_RuntimeError, e.what()); \
   } catch (const char* e) { \
@@ -473,7 +497,10 @@ namespace std {
     SWIG_exception(SWIG_TypeError, e); \
   }
 }
+%include "internal.i"
+%include "deprecated.i"
 #endif // CASADI_MODULE
+
 
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
@@ -676,6 +703,8 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 #include "control/dple_solver.hpp"
 #include "control/simple_indef_dple_solver.hpp"
+
+using namespace CasADi;
 
 %}
 

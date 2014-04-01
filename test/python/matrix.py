@@ -1048,9 +1048,9 @@ class Matrixtests(casadiTestCase):
 
     J.evaluate()
 
-    res =  J.output()
+    res =  J.getOutput()
 
-    ref =  kron(J.input(1),J.input(2).T)
+    ref =  kron(J.getInput(1),J.getInput(2).T)
 
     self.checkarray(res,ref)
     
