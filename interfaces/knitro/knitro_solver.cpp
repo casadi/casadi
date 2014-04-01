@@ -29,9 +29,11 @@ namespace CasADi{
   KnitroSolver::KnitroSolver(){
   }
   
+#ifndef WITHOUT_PRE_1_9_X
   KnitroSolver::KnitroSolver(const Function& F, const Function& G){
     assignNode(new KnitroInternal(joinFG(F,G)));
   }
+#endif
 
   KnitroSolver::KnitroSolver(const Function& nlp){
     assignNode(new KnitroInternal(nlp));

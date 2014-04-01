@@ -30,9 +30,11 @@ namespace CasADi{
   SnoptSolver::SnoptSolver(){
   }
 
+#ifndef WITHOUT_PRE_1_9_X
   SnoptSolver::SnoptSolver(const Function& F, const Function& G){
     assignNode(new SnoptInternal(joinFG(F,G)));
   }
+#endif
 
   SnoptSolver::SnoptSolver(const Function& nlp){
     assignNode(new SnoptInternal(nlp));

@@ -30,9 +30,11 @@ namespace CasADi{
   WorhpSolver::WorhpSolver(){
   }
   
+#ifndef WITHOUT_PRE_1_9_X
   WorhpSolver::WorhpSolver(const Function& F, const Function& G){
     assignNode(new WorhpInternal(joinFG(F,G)));
   }
+#endif
 
   WorhpSolver::WorhpSolver(const Function& nlp){
     assignNode(new WorhpInternal(nlp));

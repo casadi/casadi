@@ -29,9 +29,11 @@ namespace CasADi{
   SQPMethod::SQPMethod(){
   }
   
+#ifndef WITHOUT_PRE_1_9_X
   SQPMethod::SQPMethod(const Function& F, const Function& G){
     assignNode(new SQPInternal(joinFG(F,G)));
   }
+#endif
 
   SQPMethod::SQPMethod(const Function& nlp){
     assignNode(new SQPInternal(nlp));

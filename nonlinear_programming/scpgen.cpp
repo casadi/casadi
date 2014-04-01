@@ -29,9 +29,11 @@ namespace CasADi{
   SCPgen::SCPgen(){
   }
   
+#ifndef WITHOUT_PRE_1_9_X
   SCPgen::SCPgen(const Function& F, const Function& G){
     assignNode(new SCPgenInternal(joinFG(F,G)));
   }
+#endif
 
   SCPgen::SCPgen(const Function& nlp){
     assignNode(new SCPgenInternal(nlp));

@@ -29,9 +29,11 @@ namespace CasADi{
   IpoptSolver::IpoptSolver(){
   }
   
+#ifndef WITHOUT_PRE_1_9_X
   IpoptSolver::IpoptSolver(const Function& F, const Function& G){
     assignNode(new IpoptInternal(joinFG(F,G)));
   }
+#endif
 
   IpoptSolver::IpoptSolver(const Function& nlp){
     assignNode(new IpoptInternal(nlp));
