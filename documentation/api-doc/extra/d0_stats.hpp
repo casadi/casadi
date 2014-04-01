@@ -39,26 +39,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class CasADi::QCQPQPInternal
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class CasADi::QCQPQPSolver
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class CasADi::SDPSDQPInternal
 \n
 \par
@@ -427,26 +407,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class CasADi::NLPQPInternal
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlp_solver_stats</td><td>CasADi::NLPQPInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class CasADi::NLPQPSolver
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlp_solver_stats</td><td>CasADi::NLPQPInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class CasADi::SOCPQCQPInternal
 \n
 \par
@@ -464,6 +424,46 @@
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>socp_solver_stats</td><td>CasADi::SOCPQCQPInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class CasADi::QCQPQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \class CasADi::QCQPQPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
+</table>
+*/
+/// \cond INTERNAL
+/** \class CasADi::NLPQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>nlp_solver_stats</td><td>CasADi::NLPQPInternal</td></tr>
+</table>
+*/
+/// \endcond
+/** \class CasADi::NLPQPSolver
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>nlp_solver_stats</td><td>CasADi::NLPQPInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL

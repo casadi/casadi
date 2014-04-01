@@ -555,22 +555,6 @@
 @copydoc scheme_LPSolverOutput
 */
 /// \cond INTERNAL
-/** \class CasADi::QCQPQPInternal
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class CasADi::QCQPQPSolver
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
 /** \class CasADi::SDPSDQPInternal
 \n
 \par
@@ -1019,6 +1003,22 @@
 @copydoc scheme_NLPSolverOutput
 */
 /// \cond INTERNAL
+/** \class CasADi::IntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/** \class CasADi::Integrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \cond INTERNAL
 /** \class CasADi::StabilizedSQICInternal
 \n
 \par
@@ -1051,20 +1051,20 @@
 @copydoc scheme_NLPSolverOutput
 */
 /// \cond INTERNAL
-/** \class CasADi::IntegratorInternal
+/** \class CasADi::SOCPQCQPInternal
 \n
 \par
-@copydoc scheme_IntegratorInput
+@copydoc scheme_QCQPSolverInput
 <br/>
-@copydoc scheme_IntegratorOutput
+@copydoc scheme_QCQPSolverOutput
 */
 /// \endcond
-/** \class CasADi::Integrator
+/** \class CasADi::SOCPQCQPSolver
 \n
 \par
-@copydoc scheme_IntegratorInput
+@copydoc scheme_QCQPSolverInput
 <br/>
-@copydoc scheme_IntegratorOutput
+@copydoc scheme_QCQPSolverOutput
 */
 /// \cond INTERNAL
 /** \class CasADi::DirectMultipleShootingInternal
@@ -1131,6 +1131,22 @@
 @copydoc scheme_SDQPOutput
 */
 /// \cond INTERNAL
+/** \class CasADi::QCQPQPInternal
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \endcond
+/** \class CasADi::QCQPQPSolver
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
 /** \class CasADi::RKIntegratorInternal
 \n
 \par
@@ -1177,22 +1193,6 @@
 @copydoc scheme_QPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class CasADi::SOCPQCQPInternal
-\n
-\par
-@copydoc scheme_QCQPSolverInput
-<br/>
-@copydoc scheme_QCQPSolverOutput
-*/
-/// \endcond
-/** \class CasADi::SOCPQCQPSolver
-\n
-\par
-@copydoc scheme_QCQPSolverInput
-<br/>
-@copydoc scheme_QCQPSolverOutput
 */
 /// \cond INTERNAL
 /** \class CasADi::OCPSolverInternal
