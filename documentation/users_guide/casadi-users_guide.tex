@@ -621,10 +621,7 @@ x = SX.sym("x",2,2)
 print inner_prod(x,x)
 \end{pytex}
 
-
-
-
-Many of the above operations are also defined for the \texttt{Sparsity} class (Section~\ref{sec:sparsity_class}), e.g. \texttt{vertcat}, \texttt{horzsplit}, \emph{transposing}, addition -- returning the \emph{union} of two sparsity patterns -- and multiplication -- returning the \emph{intersection} of two sparsity patterns.
+Many of the above operations are also defined for the \texttt{Sparsity} class (Section~\ref{sec:sparsity_class}), e.g. \texttt{vertcat}, \texttt{horzsplit}, transposing, addition (which returns the \emph{union} of two sparsity patterns) and multiplication (which returns the \emph{intersection} of two sparsity patterns).
 
 \section{Querying properties}
 You can check if a matrix or sparsity pattern has a certain property by calling an appropriate member function. e.g. 
@@ -814,6 +811,22 @@ All derived classes of \texttt{Function} come with a range of options that can b
 %% solver.setOption("monitor",["eval_f","eval_g"])
 %% \end{verbatim}
 
+\section{Input-output schemes for function objects}
+Most \texttt{Function}-derived classes have a particular input/output signature with them and/or take as arguments in the constructor other function objects (callback functions) with a particular input/output signature. For example, as we shall see in Chapter~\ref{ch:nlp}, a \emph{nonlinear program} (NLP) is defined by two inputs (the decision variable and a set of parameters) and two outputs (the objective and constraint functions). To make it easier to remember the number and order of the input/output arguments, \CasADi provides helper functions of the form:
+\begin{pytex}
+x = SX.sym("x")
+p = SX.sym("p")
+f = x*x
+g = log(x)-p
+nlp = SXFunction(nlpIn(x=x,p=p),nlpOut(f=f,g=g))
+\end{pytex}
+
+The last line is essentially equivalent to \verb|nlp = SXFunction([x,p],[f,g])|, but is preferred for a number of reasons:
+\begin{itemize}
+\item No need to remember the number or order of arguments
+\item Inputs or outputs that are absent can be left unset
+\item The helper functions provide meta-information that allows inputs to be referred to by their names instead of their index. E.g. \verb|nlp.jacobian("x","g")| instead of \verb|nlp.jacobian(0,1)|.
+\end{itemize}
 
 \section{Calling function objects}
 \texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. To embed a call to function (e.g. \texttt{SXFunction} or \texttt{CVodesIntegrator}, see Chapter~\ref{ch:integrators}), you use the syntax:
@@ -832,8 +845,6 @@ A2 = MX.sym("A",3,3)
 x2 = MX.sym("x",3)
 [y2] = f([A2,x2]) # Call f with argument (A2,x2)
 \end{pytex}
-
-
 
 Remember to put the brackets around the output even if the function only has a single output.
 
@@ -1006,7 +1017,7 @@ A \texttt{Simulator} can be created using the syntax:
 
 A \texttt{Simulator} can be used just like an integrator, and its input scheme is the same. Its output is now matrix valued, with the the columns corresponding to different time points. The class can also be used to evaluate a particular function of the state at a set of time points. See the API documentation for more information.
 
-\chapter{Nonlinear Programming}
+\chapter{Nonlinear Programming} \ref{ch:nlp}
 The NLP solvers interfaced with \CasADi solves parametric NLPs of the following form:
 \begin{equation}
 \begin{array}{cc}
