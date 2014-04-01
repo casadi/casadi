@@ -1261,15 +1261,15 @@ For a more detailed description of this class and its functionalities, we refer 
     Reference to a class (e.g. passed to a function as an option) & \verb|ClassName| or \verb|ClassName.creator| & \verb|ClassName::creator| & \verb|ClassName.creator|\\ \hline
     Element access & \verb|A[i,j]|, \emph{0-based} & \verb|A(i,j)| and \verb|A(i)|, \emph{0-based} & \verb|A(i,j)|, \emph{1-based} \\ \hline
     Element assignment & \verb|A[i,j] = b|, \emph{0-based} & \verb|A(i,j) = b| and \verb|A(i) = b|, \linebreak \emph{0-based} & \verb|A(i,j) = b|, \emph{1-based} \\ \hline
-    Nonzero access & \verb|A[k]|, \emph{0-based} & \verb|A[k]|, \emph{0-based} & \verb|A(k)|, \emph{1-based} \\ \hline
-    Nonzero assignment & \verb|A[k] = b|, \emph{0-based} & \verb|A[k] = b|, \emph{0-based} & \verb|A(k) = b|, \emph{1-based} \\ \hline
+    Nonzero access & \verb|A.el[k]|, \emph{0-based} & \verb|A[k]|, \emph{0-based} & \verb|A{k}|, \emph{1-based} \\ \hline
+    Nonzero assignment & \verb|A.el[k] = b|, \emph{0-based} & \verb|A[k] = b|, \emph{0-based} & \verb|A{k} = b|, \emph{1-based} \\ \hline
     Matrix multiplication & \verb|mul(x,y)| & \verb|mul(x,y)| & \verb|mul(x,y)| or \verb|x*y| \\ \hline
     Elementwise multiplication & \verb|x*y| & \verb|x*y| & \verb|x.*y| \\ \hline
     Elementwise division & \verb|x/y| & \verb|x/y| & \verb|x./y| \\ \hline
     Power & \verb|x**y| & \verb|pow(x,y)| & \verb|x^y| or \verb|x.^y| \\ \hline
-    Transpose & \verb|trans(A)| or \verb|A.T| & \verb|trans(A)| & \verb|trans(A)| or \verb|A'| or \verb|A.'| \\ \hline
-    Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dictionary();| \verb|a['opt1'] = opt1;| & \verb|a = Dictionary();| \verb|a('opt1') = opt1;| (?) \\ \hline
-    Getting function output by value & \verb|out = f.getOutput()| & \verb|DMatrix out; f.getOutput(out) | & \verb|out = f.getOutput()| \\ \hline
+    Transpose & \verb|transpose(A)| or \verb|A.T| & \verb|transpose(A)| or \verb|A.T()|& \verb|transpose(A)| or \verb|A'| or \verb|A.'| \\ \hline
+    Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dictionary();| \verb|a['opt1'] = opt1;| & \verb|a = Dictionary();| \verb|a('opt1') = opt1;| \\ \hline
+    Getting function output by value & \verb|out = f.getOutput()| & \verb|DMatrix out;| \verb|f.getOutput(out);| & \verb|out = f.getOutput()| \\ \hline
   \end{tabular}
 \end{center}
 
