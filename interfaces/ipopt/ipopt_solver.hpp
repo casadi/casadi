@@ -53,10 +53,13 @@ namespace CasADi{
     /// Default constructor
     IpoptSolver();
 
-    /// \brief Create an NLP solver instance (legacy syntax)
+#ifndef WITHOUT_PRE_1_9_X
+    /// \brief  [DEPRECATED] Create an NLP solver instance (legacy syntax)
     explicit IpoptSolver(const Function& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
                          const Function& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
                          );
+#endif
+                         
 
     /// \brief Create an NLP solver instance
     explicit IpoptSolver(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
