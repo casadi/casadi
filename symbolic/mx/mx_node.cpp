@@ -591,7 +591,7 @@ namespace CasADi{
       // Handle structural zeros giving rise to nonzero result, e.g. cos(0) == 1
       if(!rr.isDense() && !operation_checker<F00Checker>(op)){
         // Get the value for the structural zeros
-        double fcn_0;
+        double fcn_0(0);
         casadi_math<double>::fun(op,0,0,fcn_0);
         rr.densify(fcn_0);
       }

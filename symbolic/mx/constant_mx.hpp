@@ -341,7 +341,7 @@ namespace CasADi{
   template<typename Value>
   MX Constant<Value>::getUnary(int op) const{
     // Constant folding
-    double ret;
+    double ret(0);
     casadi_math<double>::fun(op,v_.value,0.0,ret);
     if (operation_checker<F0XChecker>(op) || sparsity().isDense()) {
       return MX(sparsity(),ret);
