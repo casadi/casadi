@@ -312,7 +312,7 @@ int meta< int >::as(PyObject * p, int &m) {
     Py_DECREF(mm);
     return result;
   } else if (meta< CasADi::Matrix<int> >::isa(p)) {
-    CasADi::Matrix<int> *temp;
+    CasADi::Matrix<int> *temp = 0;
     meta< CasADi::Matrix<int> >::get_ptr(p,temp);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
@@ -431,7 +431,7 @@ int meta< double >::as(PyObject * p, double &m) {
     Py_DECREF(mm);
     return result;
   } else if (meta< CasADi::Matrix<double> >::isa(p)) {
-    CasADi::Matrix<double> *temp;
+    CasADi::Matrix<double> *temp = 0;
     meta< CasADi::Matrix<double> >::get_ptr(p,temp);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
@@ -439,7 +439,7 @@ int meta< double >::as(PyObject * p, double &m) {
     }
     return false;
   } else if (meta< CasADi::Matrix<int> >::isa(p)) {
-    CasADi::Matrix<int> *temp;
+    CasADi::Matrix<int> *temp = 0;
     meta< CasADi::Matrix<int> >::get_ptr(p,temp);
     if (temp->numel()==1 && temp->size()==1) {
       m = temp->data()[0];
