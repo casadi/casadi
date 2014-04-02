@@ -64,16 +64,6 @@ namespace CasADi{
     std::map<int,std::string> status_;
     std::map<std::string,opt_type> ops_;
 
-    // Accummulated time since last reset:
-    double t_eval_f_; // time spent in eval_f
-    double t_eval_grad_f_; // time spent in eval_grad_f
-    double t_eval_g_; // time spent in eval_g
-    double t_eval_jac_g_; // time spent in eval_jac_g
-    double t_eval_h_; // time spent in eval_h
-    double t_callback_fun_;  // time spent in callback function
-    double t_callback_prepare_; // time spent in callback preparation
-    double t_mainloop_; // time spent in the main loop of the solver
-
     std::string formatStatus(int status) const;
 
     /// Pass the supplied options to Snopt
@@ -136,6 +126,17 @@ namespace CasADi{
       void snSeti(const std::string &snopt_name, int value);
       void snSetr(const std::string &snopt_name, double value);
       void snSet(const std::string &snopt_name, const std::string &value);
+
+      // Accummulated time in last evaluate():
+      double t_eval_grad_f_; // time spent in eval_grad_f
+      double t_eval_jac_g_; // time spent in eval_jac_g
+      double t_callback_fun_;  // time spent in callback function
+      double t_mainloop_; // time spent in the main loop of the solver
+
+      // Accummulated counts in last evaluate():
+      int n_eval_grad_f_; // number of calls to eval_grad_f
+      int n_eval_jac_g_; // number of calls to eval_jac_g
+      int n_callback_fun_; // number of calls to callback function
   };
 
 } // namespace CasADi
