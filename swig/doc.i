@@ -23065,6 +23065,8 @@ Joel Andersson
 | outputs | CasADi::FunctionInternal |
 +---------+--------------------------+
 
+Diagrams
+
 C++ includes: function.hpp ";
 
 %feature("docstring") CasADi::Function::setJacobian "
@@ -23858,12 +23860,6 @@ Is initialized?
 %feature("docstring") CasADi::Functor::clone "[INTERNAL]  Deep copy.
 
 ";
-
-
-// File: classCasADi_1_1FX.xml
-%feature("docstring") CasADi::FX "[INTERNAL]  Diagrams
-
-C++ includes: e0_diagram.hpp ";
 
 
 // File: classCasADi_1_1GenericExpression.xml
@@ -26654,6 +26650,8 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
 
 C++ includes: homotopy_nlp_solver.hpp ";
 
@@ -85367,6 +85365,8 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+Diagrams
 
 C++ includes: simple_homotopy_nlp_solver.hpp ";
 
