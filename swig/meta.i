@@ -36,7 +36,7 @@
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx.hpp"
 #include "symbolic/mx/mx_tools.hpp"
-#include "symbolic/fx/fx.hpp"
+#include "symbolic/function/function.hpp"
 %}
 
 %define %my_genericmatrix_const_typemap(Precedence,Type...) 

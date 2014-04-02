@@ -23,8 +23,9 @@
 #ifndef SNOPT_INTERNAL_HPP
 #define SNOPT_INTERNAL_HPP
 
-#include "symbolic/fx/nlp_solver_internal.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /**
@@ -34,7 +35,7 @@ namespace CasADi{
 
   public:
     // Constructor
-    explicit SnoptInternal(const FX& nlp);
+    explicit SnoptInternal(const Function& nlp);
 
     // Destructor
     virtual ~SnoptInternal();
@@ -139,4 +140,5 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //SNOPT_INTERNAL_HPP

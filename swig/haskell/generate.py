@@ -7,6 +7,7 @@ except:
 
 import sys
 import re
+import itertools
 
 # Parse the input XML
 e = etree.parse(sys.argv[1])
@@ -32,11 +33,11 @@ def update_types_table(p):
 
 def tohaskelltype(s,alias=False,level=0):
   """
-  std::vector<(CasADi::FX)>
+  std::vector<(CasADi::Function)>
 
   ->
 
-  StdVec (CasadiClass FX)
+  StdVec (CasadiClass CppFunction)
   """
   if level==0:
     if s.startswith("r.q(const)."):
@@ -231,7 +232,7 @@ for c in r.findall('*//class'):
 
      data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal",docs))
 
-  for d in c.findall('constructor'):
+  for d in itertools.chain(c.findall('constructor'),c.findall('extend/constructor')):
      dname = symbol_table[name]
      if d.find('attributelist/parmlist') is None:
        params = []
@@ -388,10 +389,10 @@ for (name,pars,rettype,docs) in functions:
     counter[name]+=1
   else:
     counter[name]=0
-  target.append("""  Function (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
+  target.append("""  CppFunction (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
 
 ftree.write("""
-tools :: [Function]
+tools :: [CppFunction]
 tools =
   [
 %s
@@ -399,7 +400,7 @@ tools =
 \n""" % ",\n".join(tools))
 
 ftree.write("""
-ioschemehelpers :: [Function]
+ioschemehelpers :: [CppFunction]
 ioschemehelpers =
   [
 %s

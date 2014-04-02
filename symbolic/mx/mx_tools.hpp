@@ -27,9 +27,15 @@
 
 #include "../matrix/generic_matrix_tools.hpp"
 #include "../matrix/generic_expression_tools.hpp"
-#include "../fx/linear_solver.hpp"
+#include "../function/linear_solver.hpp"
+#include "../function/symbolic_qr.hpp"
 
 namespace CasADi{
+
+/**
+\ingroup expression_tools
+@{ 
+*/
 
   /** \brief  concatenate vertically
   *
@@ -214,7 +220,7 @@ namespace CasADi{
   
 #ifndef SWIGOCTAVE
   /** \brief  Make the matrix dense if not already */
-  MX full(const MX& x);
+  MX dense(const MX& x);
 #endif // SWIGOCTAVE
 
   /** \brief  Create a parent MX on which all given MX's will depend.
@@ -372,7 +378,7 @@ namespace CasADi{
 
   /** \brief Solve a system of equations: A*x = b 
   */
-  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver = SymbolicQR::creator, const Dictionary& dict = Dictionary());
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   * 
@@ -382,6 +388,7 @@ namespace CasADi{
   */
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
 
+/// \cond INTERNAL
 #ifndef WITHOUT_PRE_1_9_X
 /** \brief [DEPRECATED]
 */
@@ -409,8 +416,10 @@ namespace CasADi{
   inline MX trans(const MX &x){ return transpose(x);}
 //@}
 #endif
+/// \endcond
 
-
+/** @}
+*/
 
 } // namespace CasADi
 

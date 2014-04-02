@@ -23,10 +23,11 @@
 #ifndef DSDP_INTERNAL_HPP
 #define DSDP_INTERNAL_HPP
 
-#include "symbolic/fx/sdp_solver_internal.hpp"
+#include "symbolic/function/sdp_solver_internal.hpp"
 
 #include <dsdp5.h>
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for DSDPSolver
@@ -73,9 +74,10 @@ namespace CasADi{
     std::vector< std::vector<double> > store_P_;
     
     /// Mapping to get [A LBA]'
-    FX mappingA_;
+    Function mappingA_;
   };
 
 } // namespace CasADi
+/// \endcond
 
 #endif //DSDP_INTERNAL_HPP

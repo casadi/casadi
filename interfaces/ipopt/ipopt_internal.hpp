@@ -24,8 +24,9 @@
 #define IPOPT_INTERNAL_HPP
 
 #include "ipopt_solver.hpp"
-#include "symbolic/fx/nlp_solver_internal.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
 /**
@@ -35,7 +36,7 @@ class IpoptInternal : public NLPSolverInternal{
 friend class IpoptUserClass;
 
 public:
-  explicit IpoptInternal(const FX& nlp);
+  explicit IpoptInternal(const Function& nlp);
   virtual ~IpoptInternal();
   virtual IpoptInternal* clone() const{ return new IpoptInternal(*this);}
     
@@ -127,5 +128,6 @@ public:
 };
 
 } // namespace CasADi
+/// \endcond
 
 #endif //IPOPT_INTERNAL_HPP

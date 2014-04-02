@@ -23,8 +23,9 @@
 #ifndef SQIC_INTERNAL_HPP
 #define SQIC_INTERNAL_HPP
 
-#include "symbolic/fx/qp_solver_internal.hpp"
+#include "symbolic/function/qp_solver_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
 /** \brief Internal class for SQICSolver
@@ -42,7 +43,7 @@ public:
   virtual SQICInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit SQICInternal(const std::vector<CRSSparsity>& st);
+  explicit SQICInternal(const std::vector<Sparsity>& st);
 
   /** \brief  Destructor */
   virtual ~SQICInternal();
@@ -92,7 +93,7 @@ public:
     std::vector<double> pi_;
     
     /// Helper function to bring A into correct format
-    FX formatA_;
+    Function formatA_;
     
     /// SQIC inf
     double inf_;
@@ -103,5 +104,6 @@ public:
 
 } // namespace CasADi
 
+/// \endcond
 #endif //SQIC_INTERNAL_HPP
 

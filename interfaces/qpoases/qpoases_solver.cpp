@@ -35,11 +35,11 @@ QPOasesSolver::QPOasesSolver(const QPStructure& st)  {
 }
 
 QPOasesInternal* QPOasesSolver::operator->(){
-  return (QPOasesInternal*)(FX::operator->());
+  return (QPOasesInternal*)(Function::operator->());
 }
 
 const QPOasesInternal* QPOasesSolver::operator->() const{
-  return (const QPOasesInternal*)(FX::operator->());
+  return (const QPOasesInternal*)(Function::operator->());
 
 }
 

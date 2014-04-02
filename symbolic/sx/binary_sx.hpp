@@ -26,6 +26,8 @@
 #include "sx_node.hpp"
 #include <stack>
 
+
+/// \cond INTERNAL
 namespace CasADi{
 
 /** \brief Represents a basic binary operation on two SXElement nodes
@@ -174,6 +176,6 @@ class BinarySX : public SXNode{
 };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // BINARY_SXElement_HPP

@@ -23,6 +23,8 @@
 #include "csparse_cholesky_internal.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 
+/// \cond INTERNAL
+
 using namespace std;
 namespace CasADi{
 
@@ -207,3 +209,5 @@ namespace CasADi{
   }
 
 } // namespace CasADi
+
+/// \endcond

@@ -26,6 +26,7 @@
 #include "mx_node.hpp"
 #include <map>
 #include <stack>
+/// \cond INTERNAL
 
 namespace CasADi{
   /** \brief Reference to a submatrix

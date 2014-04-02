@@ -32,14 +32,14 @@
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
 
 #include "snopt_internal.hpp"
 #include "wsnopt.hpp"
 
 namespace CasADi {
 
-  SnoptInternal::SnoptInternal(const FX& nlp) : NLPSolverInternal(nlp) {
+  SnoptInternal::SnoptInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     addOption("detect_linear", OT_BOOLEAN, true,
               "Make an effort to treat linear constraints and linear variables specially.");
 
@@ -133,7 +133,7 @@ namespace CasADi {
         // Perform a single dependency sweep
         jacG_.spEvaluate(true);
 
-        DMatrix out_trans = trans(jacG_.output());
+        DMatrix out_trans = jacG_.output().T();
         bvec_t* output_v_trans = get_bvec_t(out_trans.data());
 
         for (int j = 0; j < nx_; ++j) {  // Harvest the results
@@ -246,7 +246,7 @@ namespace CasADi {
     //  entries of jacG are encoded "1+i"
     //  "0" is to be interpreted not as an index but as a literal zero
 
-    IMatrix mapping_jacG  = IMatrix(0, nx_);
+    IMatrix mapping_jacG  = IMatrix::sparse(0, nx_);
     IMatrix mapping_gradF = IMatrix(jacF_.output().sparsity(),
                                     range(-1, -1-jacF_.output().size(), -1));
 
@@ -286,7 +286,7 @@ namespace CasADi {
     // Is the A matrix completely empty?
     dummyrow_ = A_structure_.size() == 0;  // Then we need a dummy row
     if (dummyrow_) {
-      IMatrix dummyrow(1, nx_);
+      IMatrix dummyrow = IMatrix::sparse(1, nx_);
       dummyrow(0, 0) = 0;
       A_structure_ = vertcat(A_structure_, dummyrow);
       m_+=1;
@@ -345,7 +345,7 @@ namespace CasADi {
     for (OptionsMap::const_iterator it = optionsmap_.begin(); it != optionsmap_.end(); it++) {
       int Error = 0;
       const std::string & snopt_name = it->second.second;
-      int bufferlen = snopt_name.size();
+      //int bufferlen = snopt_name.size();
       if (hasSetOption(it->first)) {
         switch (it->second.first) {
           case OT_INTEGER: {
@@ -609,7 +609,7 @@ namespace CasADi {
       double* x, double* fObj, double*gObj, double* fCon, double* gCon,
       int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) {
     try {
-      double time1 = clock();
+      //double time1 = clock();
 
       casadi_assert_message(nnCon_ == nnCon, "Con " << nnCon_ << " <-> " << nnCon);
       casadi_assert_message(nnObj_ == nnObj, "Obj " << nnObj_ << " <-> " << nnObj);

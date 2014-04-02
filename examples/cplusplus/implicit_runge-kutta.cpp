@@ -180,13 +180,13 @@ int main(){
 
   // Make sure that both integrators give consistent results
   for(int integ=0; integ<2; ++integ){
-    FX integrator = integ==0 ? FX(irk_integrator) : FX(ref_integrator);
+    Function integrator = integ==0 ? Function(irk_integrator) : Function(ref_integrator);
     cout << "-------" << endl;
     cout << "Testing " << integrator.getOption("name") << endl;
     cout << "-------" << endl;
 
     // Generate a new function that calculates two forward directions and one adjoint direction
-    FX dintegrator = integrator.derivative(2,1);
+    Function dintegrator = integrator.derivative(2,1);
 
     // Pass arguments
     dintegrator.setInput(x0_val,"der_x0");

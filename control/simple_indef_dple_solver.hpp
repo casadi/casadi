@@ -30,7 +30,9 @@ namespace CasADi{
   /// Forward declaration of internal class
   class SimpleIndefDpleInternal;
 
-  /**  @copydoc DPLE_doc
+  /** \brief Solving the Discrete Periodic Lyapunov Equations with regular Linear Solvers
+  
+       @copydoc DPLE_doc
   
        Uses Periodic Schur Decomposition (simple) and does not assume positive definiteness.
        Based on Periodic Lyapunov equations: some applications and new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997. 

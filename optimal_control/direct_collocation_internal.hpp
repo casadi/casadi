@@ -24,12 +24,13 @@
 #define DIRECT_COLLOCATION_INTERNAL_HPP
 
 #include "direct_collocation.hpp"
-#include "../symbolic/fx/ocp_solver_internal.hpp"
-#include "../symbolic/fx/parallelizer.hpp"
-#include "../symbolic/fx/mx_function.hpp"
-#include "../symbolic/fx/sx_function.hpp"
+#include "../symbolic/function/ocp_solver_internal.hpp"
+#include "../symbolic/function/parallelizer.hpp"
+#include "../symbolic/function/mx_function.hpp"
+#include "../symbolic/function/sx_function.hpp"
 #include "integration/integration_tools.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
   
 class DirectCollocationInternal : public OCPSolverInternal{
@@ -37,7 +38,7 @@ class DirectCollocationInternal : public OCPSolverInternal{
   
   public:
     // Constructor
-    DirectCollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
+    DirectCollocationInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn);
 
     // clone
     virtual DirectCollocationInternal* clone() const{ return new DirectCollocationInternal(*this);}
@@ -78,6 +79,6 @@ class DirectCollocationInternal : public OCPSolverInternal{
 };
                         
 } // namespace CasADi
-
+/// \endcond
 
 #endif // DIRECT_COLLOCATION_INTERNAL_HPP

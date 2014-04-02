@@ -23,8 +23,8 @@
 #include "mx.hpp"
 #include "mx_node.hpp"
 #include "mx_tools.hpp"
-#include "../fx/sx_function.hpp"
-#include "call_fx.hpp"
+#include "../function/sx_function.hpp"
+#include "call_function.hpp"
 #include "symbolic_mx.hpp"
 #include "constant_mx.hpp"
 #include "mx_tools.hpp"
@@ -96,7 +96,9 @@ namespace CasADi{
 #endif
 
   MX::MX(const Sparsity& sp, const MX& val){
-    if(val.isScalar()){
+    if(sp.isReshape(val.sparsity())){
+      *this = reshape(val,sp);
+    } else if(val.isScalar()){
       // Dense matrix if val dense
       if(val.isDense()){
         if(val.isConstant()){
@@ -110,7 +112,7 @@ namespace CasADi{
       }
     } else {
       casadi_assert(val.isVector() && sp.size()==val.size1());
-      *this = full(val)->getGetNonzeros(sp,range(size1()));
+      *this = dense(val)->getGetNonzeros(sp,range(sp.size()));
     }
   }
 
@@ -857,7 +859,7 @@ namespace CasADi{
 
   bool         MX::isNorm () const { return dynamic_cast<const Norm*>(get())!=0; }
 
-  FX MX::getFunction () {  return (*this)->getFunction(); }
+  Function MX::getFunction () {  return (*this)->getFunction(); }
          
   double MX::getValue() const{
     return (*this)->getValue();

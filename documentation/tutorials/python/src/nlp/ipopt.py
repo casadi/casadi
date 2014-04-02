@@ -53,13 +53,13 @@ A = n.diag([2.0,1,4,10,-2])
 q = [1,0,0,0,0]
 b = [1,1,1,1,1]
 
-X = MX("x",5,1)
+X = MX.sym("x",5,1)
 P = MX(DMatrix(P))
 q = MX(DMatrix(q))
 A = MX(DMatrix(A))
 
 #! Objective
-F = 0.5*mul(mul(trans(X),P),X) + mul(trans(q),X)
+F = 0.5*mul([X.T,P,X]) + mul(q.T,X)
 
 #! Constraint
 G = X+X

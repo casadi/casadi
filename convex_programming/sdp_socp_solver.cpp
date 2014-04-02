@@ -35,11 +35,11 @@ SDPSOCPSolver::SDPSOCPSolver(const SOCPStructure & st)  {
 }
 
 SDPSOCPInternal* SDPSOCPSolver::operator->(){
-  return (SDPSOCPInternal*)(FX::operator->());
+  return (SDPSOCPInternal*)(Function::operator->());
 }
 
 const SDPSOCPInternal* SDPSOCPSolver::operator->() const{
-  return (const SDPSOCPInternal*)(FX::operator->());
+  return (const SDPSOCPInternal*)(Function::operator->());
 
 }
 

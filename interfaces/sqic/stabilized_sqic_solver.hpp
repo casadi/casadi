@@ -23,7 +23,7 @@
 #ifndef STABILIZED_SQIC_SOLVER_HPP
 #define STABILIZED_SQIC_SOLVER_HPP
 
-#include "symbolic/fx/stabilized_qp_solver.hpp"
+#include "symbolic/function/stabilized_qp_solver.hpp"
 
 namespace CasADi {
   

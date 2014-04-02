@@ -23,9 +23,11 @@
 #define CPLEX_INTERNAL_HPP
 
 #include "ilcplex/cplex.h"
-#include "symbolic/fx/qp_solver_internal.hpp"
+#include "symbolic/function/qp_solver_internal.hpp"
 
 #include <string>
+
+/// \cond INTERNAL
 
 namespace CasADi{
 
@@ -109,5 +111,5 @@ namespace CasADi{
 
   };
 } // end namespace CasADi
-
+/// \endcond
 #endif //CPLEX_INTERNAL_HPP

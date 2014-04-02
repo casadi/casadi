@@ -25,17 +25,18 @@
 
 #include "collocation_integrator.hpp"
 #include "implicit_fixed_step_integrator_internal.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/implicit_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/implicit_function.hpp"
 #include "integration_tools.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
     
   class CollocationIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
   public:
   
     /// Constructor
-    explicit CollocationIntegratorInternal(const FX& f, const FX& g);
+    explicit CollocationIntegratorInternal(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -44,7 +45,7 @@ namespace CasADi{
     virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
 
     /// Create a new integrator
-    virtual CollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new CollocationIntegratorInternal(f,g);}
+    virtual CollocationIntegratorInternal* create(const Function& f, const Function& g) const{ return new CollocationIntegratorInternal(f,g);}
   
     /// Destructor
     virtual ~CollocationIntegratorInternal();
@@ -69,5 +70,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //COLLOCATION_INTEGRATOR_INTERNAL_HPP

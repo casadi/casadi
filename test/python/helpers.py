@@ -36,6 +36,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--known_bugs', help='Run with known bugs', action='store_true')
 parser.add_argument('--ignore_memory_heavy', help='Skip those tests that have a high memory footprint', action='store_true')
 parser.add_argument('--ignore_memory_light', help='Skip those tests that have a lightweight memory footprint', action='store_true')
+parser.add_argument('--run_slow', help='Skip those tests that take a long time to run', action='store_true')
 parser.add_argument('unittest_args', nargs='*')
 
 args = parser.parse_args()
@@ -97,7 +98,8 @@ class casadiTestCase(unittest.TestCase):
     fun = getattr(getattr(self,margs[0]),'im_func')
     if not hasattr(fun,'tag_memory_heavy'):
       fun.tag_memory_heavy = False
-    
+    if not hasattr(fun,'tag_slow'):
+      fun.tag_slow = False
     
     if args.ignore_memory_heavy and fun.tag_memory_heavy:
       fun.__unittest_skip__ = True
@@ -105,6 +107,10 @@ class casadiTestCase(unittest.TestCase):
     if args.ignore_memory_light and not(fun.tag_memory_heavy):
       fun.__unittest_skip__ = True
       fun.__unittest_skip_why__ = "Ignoring memory_light tests (--ignore_memory_light)"
+
+    if not(args.run_slow) and fun.tag_slow:
+      fun.__unittest_skip__ = True
+      fun.__unittest_skip_why__ = "Ignoring slow tests (--run_slow)"
       
     unittest.TestCase.__init__(self,*margs,**kwargs)
 
@@ -222,13 +228,13 @@ class casadiTestCase(unittest.TestCase):
       
     for i in range(len(x0)):
       try:
-        f.input(i).set(setx0[i])
+        f.setInput(setx0[i],i)
       except Exception as e:
-         print f.input(i).shape
+         print f.getInput(i).shape
          raise e
          raise Exception("ERROR! Tried to set input with %s which is of type  %s \n%s" %(str(x0[i]), str(type(x0[i])),name))
     f.evaluate()
-    zt = f.output(0).toArray()
+    zt = f.getOutput(0).toArray()
     self.checkarray(yr,zt,name,failmessage)
     
   def numpyEvaluationCheck(self,ft,fr,x,x0,name="",failmessage="",fmod=None,setx0=None):
@@ -243,15 +249,15 @@ class casadiTestCase(unittest.TestCase):
         name - a descriptor that will be included in error messages
     """
     self.message(":"+ name)
-    fx=None
+    function=None
     frx=None
     try:
-      fx=ft(x)
+      function=ft(x)
       frx=fr(x0)
     except Exception as e:
       print "Error calling functions in %s" % name
       raise e
-    self.evaluationCheck([fx],frx,x,x0,name,failmessage,fmod=fmod,setx0=setx0)
+    self.evaluationCheck([function],frx,x,x0,name,failmessage,fmod=fmod,setx0=setx0)
 
   
   def numpyEvaluationCheckPool(self,pool,x,x0,name="",fmod=None,setx0=None,excludeflags=set()):
@@ -261,23 +267,23 @@ class casadiTestCase(unittest.TestCase):
         continue
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
-  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False):
+  def checkfunction(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,evals=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True,indirect=False,sparsity_mod=True):
 
     if indirect:
       ins = trial.symbolicInput()
       extra_trial = MXFunction(ins,trial.call(ins))
       extra_trial.init()
       for i in range(trial.getNumInputs()):
-        extra_trial.setInput(trial.input(i),i)
-      self.checkfx(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
+        extra_trial.setInput(trial.getInput(i),i)
+      self.checkfunction(extra_trial,solution,fwd,adj,jacobian,gradient,hessian,sens_der,evals,digits=digits,digits_sens=digits_sens,failmessage=failmessage,allow_empty=allow_empty,verbose=verbose,indirect=False)
       for i in range(trial.getNumInputs()):
-        trial.setInput(extra_trial.input(i),i)
+        trial.setInput(extra_trial.getInput(i),i)
 
     if digits_sens is None:
       digits_sens = digits
      
     for i in range(trial.getNumInputs()):
-      if (allow_empty and (trial.input(i).isEmpty() or solution.input(i).isEmpty() )): continue
+      if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
       message = "input(%d)" % i
       self.checkarray(trial.getInput(i),solution.getInput(i),"",digits=digits,failmessage=failmessage+": "+ message)
 
@@ -300,7 +306,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.getNumOutputs()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.output(i).isEmpty() or solution.output(i).isEmpty() )): continue
+      if (allow_empty and (trial.getOutput(i).isEmpty() or solution.getOutput(i).isEmpty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
       
     try:
@@ -319,7 +325,7 @@ class casadiTestCase(unittest.TestCase):
 
     for i in range(trial.getNumOutputs()):
       message = "output(%d)" % i
-      if (allow_empty and (trial.output(i).isEmpty() or solution.output(i).isEmpty() )): continue
+      if (allow_empty and (trial.getOutput(i).isEmpty() or solution.getOutput(i).isEmpty() )): continue
       self.checkarray(trial.getOutput(i),solution.getOutput(i),"",digits=digits,failmessage=failmessage+": "+message)
     
     for i in range(trial.getNumInputs()):
@@ -329,7 +335,7 @@ class casadiTestCase(unittest.TestCase):
     
     if jacobian:
       for i in range(trial.getNumInputs()):
-        if (allow_empty and (trial.input(i).isEmpty() or solution.input(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
         for j in range(trial.getNumOutputs()):
           trialjac = trial.jacobian(i,j)
           trialjac.init()
@@ -342,13 +348,13 @@ class casadiTestCase(unittest.TestCase):
           self.assertEqual(solutionjac.getNumOutputs(),solution.getNumOutputs()+1)
           for k in range(solution.getNumInputs()): solutionjac.setInput(solution_inputs[k],k)
           
-          self.checkfx(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+          self.checkfunction(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if gradient:
       for i in range(trial.getNumInputs()):
-        if (allow_empty and (trial.input(i).isEmpty() or solution.input(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
         for j in range(trial.getNumOutputs()):
-          if trial.output(j).isScalar() and solution.output(j).isScalar():
+          if trial.getOutput(j).isScalar() and solution.getOutput(j).isScalar():
             trialgrad = trial.gradient(i,j)
             trialgrad.init()
             self.assertEqual(trialgrad.getNumInputs(),trial.getNumInputs())
@@ -359,13 +365,13 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutiongrad.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutiongrad.getNumOutputs(),solution.getNumOutputs()+1)
             for k in range(solution.getNumInputs()): solutiongrad.setInput(solution_inputs[k],k)
-            self.checkfx(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+            self.checkfunction(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if hessian:
       for i in range(trial.getNumInputs()):
-        if (allow_empty and (trial.input(i).isEmpty() or solution.input(i).isEmpty() )): continue
+        if (allow_empty and (trial.getInput(i).isEmpty() or solution.getInput(i).isEmpty() )): continue
         for j in range(trial.getNumOutputs()):
-          if trial.output(j).isScalar() and solution.output(j).isScalar():
+          if trial.getOutput(j).isScalar() and solution.getOutput(j).isScalar():
             trialhess = trial.hessian(i,j)
             trialhess.init()
             self.assertEqual(trialhess.getNumInputs(),trial.getNumInputs())
@@ -376,7 +382,7 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutionhess.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutionhess.getNumOutputs(),solution.getNumOutputs()+2)
             for k in range(solution.getNumInputs()): solutionhess.setInput(solution_inputs[k],k)
-            self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
+            self.checkfunction(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,evals=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
 
     for k in range(trial.getNumInputs()):
       trial.setInput(trial_inputs[k],k)
@@ -387,13 +393,25 @@ class casadiTestCase(unittest.TestCase):
 
     if evals:
 
-      def remove00(x):
+      def remove_first(x):
         ret = DMatrix(x)
-        ret[0,0] = DMatrix.sparse(1,1)
-        return ret
+        if ret.numel()>0:
+          ret[0,0] = DMatrix.sparse(1,1)
+          return ret
+        else:
+          return ret
+
+      def remove_last(x):
+        ret = DMatrix(x)
+        if ret.size()>0:
+          ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix.sparse(1,1)
+          return ret
+        else:
+          return x
         
-      spmods = [lambda x: x , remove00]
+      #spmods = [lambda x: x , remove_first, remove_last]
       spmods = [lambda x: x]
+      #spmods = [lambda x: x , remove_first]
       
       sym = MX.sym
       Function = MXFunction
@@ -417,9 +435,9 @@ class casadiTestCase(unittest.TestCase):
         for spmod,spmod2 in itertools.product(spmods,repeat=2):
           fseeds = [[sym("f",spmod(f.getInput(i)).sparsity()) for i in range(f.getNumInputs())]  for d in range(ndir)]
           aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
-          inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs())]
-      
-          res,fwdsens,adjsens = f.callDerivative(inputss,fseeds,aseeds,True)
+          inputss = [sym("i",f.getInput(i).sparsity()) for i in range(f.getNumInputs())]
+          with internalAPI():
+            res,fwdsens,adjsens = f.callDerivative(inputss,fseeds,aseeds,True)
           
           vf = Function(inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
           
@@ -431,7 +449,7 @@ class casadiTestCase(unittest.TestCase):
           # Complete random seeding
           random.seed(1)
           for i in range(f.getNumInputs(),vf.getNumInputs()):
-            vf.setInput(DMatrix(vf.input(i).sparsity(),random.random(vf.input(i).size())),i)
+            vf.setInput(DMatrix(vf.getInput(i).sparsity(),random.random(vf.getInput(i).size())),i)
           
           vf.evaluate()
           storagekey = (spmod,spmod2)
@@ -446,11 +464,12 @@ class casadiTestCase(unittest.TestCase):
 
             # Second order sensitivities
             for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-              fseeds2 = [[sym("f",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
-              aseeds2 = [[sym("a",vf_reference.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
-              inputss2 = [sym("i",vf_reference.input(i).sparsity()) for i in range(vf.getNumInputs())]
-           
-              res2,fwdsens2,adjsens2 = vf.callDerivative(inputss2,fseeds2,aseeds2,True)
+              fseeds2 = [[sym("f",vf_reference.getInput(i).sparsity()) for i in range(vf.getNumInputs())] for d in range(ndir)]
+              aseeds2 = [[sym("a",vf_reference.getOutput(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
+              inputss2 = [sym("i",vf_reference.getInput(i).sparsity()) for i in range(vf.getNumInputs())]
+              
+              with internalAPI():
+                res2,fwdsens2,adjsens2 = vf.callDerivative(inputss2,fseeds2,aseeds2,True)
 
               vf2 = Function(inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
@@ -460,7 +479,7 @@ class casadiTestCase(unittest.TestCase):
             
               random.seed(1)
               for i in range(f.getNumInputs(),vf2.getNumInputs()):
-                vf2.setInput(DMatrix(vf2.input(i).sparsity(),random.random(vf2.input(i).size())),i)
+                vf2.setInput(DMatrix(vf2.getInput(i).sparsity(),random.random(vf2.getInput(i).size())),i)
               
               vf2.evaluate()
               storagekey = (spmod,spmod2)
@@ -539,4 +558,13 @@ class memory_heavy(object):
   def __call__(self, c):
     print c
     c.tag_memory_heavy = True
+    return c
+    
+class slow(object):
+  def __init__(self):
+    pass
+    
+  def __call__(self, c):
+    print "slow", c
+    c.tag_slow = True
     return c

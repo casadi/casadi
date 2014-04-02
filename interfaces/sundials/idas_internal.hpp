@@ -25,7 +25,7 @@
 
 #include "idas_integrator.hpp"
 #include "sundials_internal.hpp"
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
 #include <idas/idas_band.h> 
@@ -34,6 +34,8 @@
 #include <idas/idas_sptfqmr.h>
 #include <idas/idas_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
+
+/// \cond INTERNAL
 
 namespace CasADi{
   
@@ -46,7 +48,7 @@ class IdasInternal : public SundialsInternal{
   public:
   
   /** \brief  Constructor */
-  explicit IdasInternal(const FX& f, const FX& g);
+  explicit IdasInternal(const Function& f, const Function& g);
 
   /** \brief  Copy constructor */
 //  IdasInternal(const IdasInternal& integrator);
@@ -55,7 +57,7 @@ class IdasInternal : public SundialsInternal{
   virtual IdasInternal* clone() const;
   
   /** \brief  Create a new integrator */
-  virtual IdasInternal* create(const FX& f, const FX& g) const{ return new IdasInternal(f,g);}
+  virtual IdasInternal* create(const Function& f, const Function& g) const{ return new IdasInternal(f,g);}
 
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -108,10 +110,10 @@ class IdasInternal : public SundialsInternal{
   FunctionType getJacGenB();
 
   /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual FX getJac();
+  virtual Function getJac();
   
   /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual FX getJacB();
+  virtual Function getJacB();
   
   /// Correct the initial conditions, i.e. calculate
   void correctInitialConditions();
@@ -240,5 +242,6 @@ class IdasInternal : public SundialsInternal{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //IDAS_INTERNAL_HPP
 

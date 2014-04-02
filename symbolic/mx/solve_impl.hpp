@@ -24,7 +24,8 @@
 #define SOLVE_IMPL_HPP
 
 #include "solve.hpp"
-#include "../fx/linear_solver_internal.hpp"
+#include "../function/linear_solver_internal.hpp"
+/// \cond INTERNAL
 
 using namespace std;
 
@@ -67,6 +68,11 @@ namespace CasADi{
   template<bool Tr>
   void Solve<Tr>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
     linear_solver_->evaluateDGen(input,output,Tr);
+  }
+
+  template<bool Tr>
+  void Solve<Tr>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    linear_solver_->evaluateSXGen(input,output,Tr);
   }
 
   template<bool Tr>

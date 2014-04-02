@@ -27,6 +27,8 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Matrix transpose
       \author Joel Andersson

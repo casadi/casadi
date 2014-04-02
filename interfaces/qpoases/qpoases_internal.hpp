@@ -23,10 +23,11 @@
 #ifndef QPOASES_INTERNAL_HPP
 #define QPOASES_INTERNAL_HPP
 
-#include "symbolic/fx/qp_solver_internal.hpp"
+#include "symbolic/function/qp_solver_internal.hpp"
 
 #include <qpOASES.hpp>
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for QPOasesSolver
@@ -95,4 +96,5 @@ public:
 
 } // namespace CasADi
 
+/// \endcond
 #endif //QPOASES_INTERNAL_HPP

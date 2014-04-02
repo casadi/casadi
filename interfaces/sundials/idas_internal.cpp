@@ -22,8 +22,8 @@
 
 #include "idas_internal.hpp"
 #include "symbolic/std_vector_tools.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
+#include "symbolic/function/mx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
@@ -43,7 +43,7 @@ namespace CasADi{
     SundialsInternal::deepCopyMembers(already_copied);
   }
 
-  IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
+  IdasInternal::IdasInternal(const Function& f, const Function& g) : SundialsInternal(f,g){
     addOption("suppress_algebraic",          OT_BOOLEAN,          false,          "Supress algebraic variables in the error testing");
     addOption("calc_ic",                     OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions.");
     addOption("calc_icB",                    OT_BOOLEAN,          GenericType(),  "Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].");
@@ -1768,7 +1768,7 @@ namespace CasADi{
       IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
-      IDABMem IDAB_mem;
+      //IDABMem IDAB_mem;
       int flag;
 
       // Current time
@@ -1779,7 +1779,7 @@ namespace CasADi{
       IDA_mem = (IDAMem) IDA_mem->ida_user_data;
 
       IDAADJ_mem = IDA_mem->ida_adj_mem;
-      IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+      //IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
     
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {
@@ -1815,7 +1815,7 @@ namespace CasADi{
       IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
-      IDABMem IDAB_mem;
+      //IDABMem IDAB_mem;
       int flag;
 
       // Current time
@@ -1827,7 +1827,7 @@ namespace CasADi{
       IDA_mem = (IDAMem) IDA_mem->ida_user_data;
 
       IDAADJ_mem = IDA_mem->ida_adj_mem;
-      IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+      //IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {
@@ -2114,7 +2114,7 @@ namespace CasADi{
     return FunctionType(jac_in,jac);
   }
 
-  FX IdasInternal::getJacB(){
+  Function IdasInternal::getJacB(){
     if(is_a<SXFunction>(g_)){
       return getJacGenB<SXFunction>();
     } else if(is_a<MXFunction>(g_)){
@@ -2124,7 +2124,7 @@ namespace CasADi{
     }
   }
 
-  FX IdasInternal::getJac(){
+  Function IdasInternal::getJac(){
     if(is_a<SXFunction>(f_)){
       return getJacGen<SXFunction>();
     } else if(is_a<MXFunction>(f_)){

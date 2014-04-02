@@ -24,15 +24,15 @@
 #define LIFTED_SQP_INTERNAL_HPP
 
 #include "lifted_sqp.hpp"
-#include "symbolic/fx/nlp_solver_internal.hpp"
-#include "symbolic/fx/qp_solver.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
+#include "symbolic/function/qp_solver.hpp"
 
 namespace CasADi{
     
 class LiftedSQPInternal : public NLPSolverInternal{
 
 public:
-  explicit LiftedSQPInternal(const FX& F, const FX& G);
+  explicit LiftedSQPInternal(const Function& F, const Function& G);
   virtual ~LiftedSQPInternal();
   virtual LiftedSQPInternal* clone() const{ return new LiftedSQPInternal(*this);}
   
@@ -81,13 +81,13 @@ public:
    enum ExpOut{EXP_E,EXP_NUM_OUT};
 
    /// Residual function
-   FX rfcn_;
+   Function rfcn_;
    
    /// Quadratic approximation
-   FX lfcn_;
+   Function lfcn_;
    
    /// Step expansion
-   FX efcn_;
+   Function efcn_;
    
    /// Dimensions
    int nu, nv;

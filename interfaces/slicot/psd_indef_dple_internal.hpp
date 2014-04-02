@@ -26,6 +26,7 @@
 #include "psd_indef_dple_solver.hpp"
 #include "../../control/dple_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal storage for DpleSolver related data
@@ -64,7 +65,7 @@ namespace CasADi{
     virtual void init();
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-    virtual FX getDerivative(int nfwd, int nadj);
+    virtual Function getDerivative(int nfwd, int nadj);
     
   private:
     /// Dimension of state-space
@@ -120,4 +121,5 @@ namespace CasADi{
   
 } // namespace CasADi
 
+/// \endcond
 #endif // PSD_INDEF_DPLE_INTERNAL_HPP

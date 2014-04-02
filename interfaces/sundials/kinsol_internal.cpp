@@ -21,15 +21,15 @@
  */
 
 #include "kinsol_internal.hpp"
-#include "symbolic/fx/sx_function_internal.hpp"
+#include "symbolic/function/sx_function_internal.hpp"
 #include "symbolic/std_vector_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
 
 using namespace std;
 namespace CasADi{
 
-  KinsolInternal::KinsolInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
+  KinsolInternal::KinsolInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
     addOption("max_iter",                 OT_INTEGER, 0, "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
     addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
     addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");

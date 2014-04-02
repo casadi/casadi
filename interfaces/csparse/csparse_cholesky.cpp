@@ -33,11 +33,11 @@ namespace CasADi{
   }
  
   CSparseCholeskyInternal* CSparseCholesky::operator->(){
-    return static_cast<CSparseCholeskyInternal*>(FX::operator->());
+    return static_cast<CSparseCholeskyInternal*>(Function::operator->());
   }
 
   const CSparseCholeskyInternal* CSparseCholesky::operator->() const{
-    return static_cast<const CSparseCholeskyInternal*>(FX::operator->());
+    return static_cast<const CSparseCholeskyInternal*>(Function::operator->());
   }
   
   bool CSparseCholesky::checkNode() const{

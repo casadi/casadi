@@ -214,7 +214,7 @@ namespace CasADi{
     stream << ",";
   }
 
-  FX& MXNode::getFunction(){
+  Function& MXNode::getFunction(){
     throw CasadiException(string("MXNode::getFunction() not defined for class ") + typeid(*this).name());
   }
 
@@ -350,9 +350,9 @@ namespace CasADi{
     
   MX MXNode::getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const{
     if(tr){
-      return MX::create(new Solve<true>(full(r),shared_from_this<MX>(),linear_solver));
+      return MX::create(new Solve<true>(dense(r),shared_from_this<MX>(),linear_solver));
     } else {
-      return MX::create(new Solve<false>(full(r),shared_from_this<MX>(),linear_solver));
+      return MX::create(new Solve<false>(dense(r),shared_from_this<MX>(),linear_solver));
     }
   }
 
@@ -471,7 +471,7 @@ namespace CasADi{
         // Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
         const Sparsity& x_sp = sparsity();
         const Sparsity& y_sp = y.sparsity();
-        Sparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<FX0Checker>(op));
+        Sparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<Function0Checker>(op));
 
         // Project the arguments to this sparsity
         MX xx = shared_from_this<MX>().setSparse(r_sp);
@@ -487,7 +487,7 @@ namespace CasADi{
     if (CasadiOptions::simplification_on_the_fly) {
     
       // If identically zero due to one argumebt being zero
-      if((operation_checker<F0XChecker>(op) && isZero()) ||(operation_checker<FX0Checker>(op) && y->isZero())){
+      if((operation_checker<F0XChecker>(op) && isZero()) ||(operation_checker<Function0Checker>(op) && y->isZero())){
         return MX::zeros(sparsity());
       }
 
@@ -568,12 +568,12 @@ namespace CasADi{
 
     if(scX){
       // Check if it is ok to loop over nonzeros only
-      if(y.isDense() || operation_checker<FX0Checker>(op)){
+      if(y.isDense() || operation_checker<Function0Checker>(op)){
         // Loop over nonzeros
         return MX::create(new BinaryMX<true,false>(Operation(op),shared_from_this<MX>(),y));
       } else {
         // Put a densification node in between
-        return getBinary(op,full(y),true,false);
+        return getBinary(op,dense(y),true,false);
       }
     } else if(scY){
       // Check if it is ok to loop over nonzeros only
@@ -582,7 +582,7 @@ namespace CasADi{
         return MX::create(new BinaryMX<false,true>(Operation(op),shared_from_this<MX>(),y));
       } else {
         // Put a densification node in between
-        return full(shared_from_this<MX>())->getBinary(op,y,false,true);
+        return dense(shared_from_this<MX>())->getBinary(op,y,false,true);
       }
     } else {
       // Loop over nonzeros only

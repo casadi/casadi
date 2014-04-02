@@ -21,12 +21,12 @@
  */
 
 #include "sqic_internal.hpp"
-#include "../../symbolic/fx/qp_solver.hpp"
+#include "../../symbolic/function/qp_solver.hpp"
 
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
 
 #include "symbolic/std_vector_tools.hpp"
 
@@ -44,7 +44,7 @@ SQICInternal* SQICInternal::clone() const{
   return node;
 }
   
-SQICInternal::SQICInternal(const std::vector<CRSSparsity>& st) : QPSolverInternal(st){
+SQICInternal::SQICInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
   is_init_ = false;
 }
 
@@ -102,17 +102,17 @@ void SQICInternal::init(){
   pi_.resize(nc_+1,0);
   rc_.resize(n_+nc_+1,0);
   
-  locH_ = st_[QP_STRUCT_H].rowind();
-  indH_ = st_[QP_STRUCT_H].col();
+  locH_ = st_[QP_STRUCT_H].colind();
+  indH_ = st_[QP_STRUCT_H].row();
   
   // Fortran indices are one-based
   for (int i=0;i<indH_.size();++i) indH_[i]+=1;
   for (int i=0;i<locH_.size();++i) locH_[i]+=1;
   
   // Sparsity of augmented linear constraint matrix
-  CRSSparsity A_ = trans(vertcat(st_[QP_STRUCT_A],Sparsity::dense(1,n_)));
-  locA_ = A_.rowind();
-  indA_ = A_.col();
+  Sparsity A_ = vertcat(st_[QP_STRUCT_A],Sparsity::dense(1,n_));
+  locA_ = A_.colind();
+  indA_ = A_.row();
   
   // Fortran indices are one-based
   for (int i=0;i<indA_.size();++i) indA_[i]+=1;
@@ -124,7 +124,7 @@ void SQICInternal::init(){
   std::vector<MX> ins;
   ins.push_back(a);
   ins.push_back(g);
-  formatA_ = MXFunction(ins,trans(vertcat(a,trans(g))));
+  formatA_ = MXFunction(ins,vertcat(a,trans(g)));
   formatA_.init();
   
   // Set objective row of augmented linear constraints

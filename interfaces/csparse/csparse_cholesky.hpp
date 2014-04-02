@@ -23,11 +23,11 @@
 #ifndef CSPARSE_CHOLESKY_HPP
 #define CSPARSE_CHOLESKY_HPP
 
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
 namespace CasADi{
 
-  
+
 /** \brief  Forward declaration of internal class */
 class CSparseCholeskyInternal;
 
@@ -35,7 +35,7 @@ class CSparseCholeskyInternal;
 *
  @copydoc LinearSolver_doc
 *  
-* CSparseCholesky is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+* CSparseCholesky is an CasADi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
 *
 *  A = LL'
 *    Ax = b

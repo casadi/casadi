@@ -30,6 +30,8 @@ namespace CasADi {
   bool CasadiOptions::profiling = false;
   std::ofstream CasadiOptions::profilingLog;
   bool CasadiOptions::profilingBinary = true;
+  bool CasadiOptions::purgeSeeds = false;
+  bool CasadiOptions::allowed_internal_api = false;
   
   void CasadiOptions::startProfiling(const std::string &filename) {
     profilingLog.open (filename.c_str(),std::ofstream::out);

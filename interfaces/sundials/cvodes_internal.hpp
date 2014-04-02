@@ -25,7 +25,7 @@
 
 #include "cvodes_integrator.hpp"
 #include "sundials_internal.hpp"
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 #include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
 #include <cvodes/cvodes_dense.h>
 #include <cvodes/cvodes_band.h> 
@@ -35,16 +35,18 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/// \cond INTERNAL
 namespace CasADi{
   
-/**
+/** \brief Interface to the Sundials CVodes integrators
+
   @copydoc DAE_doc
 */
 class CVodesInternal : public SundialsInternal{
   friend class CVodesIntegrator;
 public:
   /** \brief  Constructor */
-  explicit CVodesInternal(const FX& f, const FX& g);
+  explicit CVodesInternal(const Function& f, const Function& g);
 
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -53,7 +55,7 @@ public:
   virtual CVodesInternal* clone() const;
   
   /** \brief  Create a new integrator */
-  virtual CVodesInternal* create(const FX& f, const FX& g) const{ return new CVodesInternal(f,g);}
+  virtual CVodesInternal* create(const Function& f, const Function& g) const{ return new CVodesInternal(f,g);}
 
   /** \brief  Destructor */
   virtual ~CVodesInternal();
@@ -94,10 +96,10 @@ public:
   FunctionType getJacGenB();
   
   /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual FX getJac();
+  virtual Function getJac();
   
   /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual FX getJacB();
+  virtual Function getJacB();
   
   protected:
 
@@ -231,5 +233,6 @@ public:
 
 } // namespace CasADi
 
+/// \endcond
 #endif //CVODES_INTERNAL_HPP
 

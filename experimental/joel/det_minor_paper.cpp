@@ -21,9 +21,9 @@
  */
 
 #include "symbolic/std_vector_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/external_function.hpp"
+#include "symbolic/function/sx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/external_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include <ctime>
@@ -33,7 +33,7 @@ using namespace std;
 using namespace CasADi;
 
 // Function to be called if the size reaches k
-FX det_n_min; 
+Function det_n_min; 
 int n_min;
 
 // Forward declaration

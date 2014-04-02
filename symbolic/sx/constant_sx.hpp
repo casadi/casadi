@@ -26,6 +26,8 @@
 #include "sx_node.hpp"
 #include <cassert>
 
+/// \cond INTERNAL
+
 // Cashing of constants requires a map (preferably a hash map)
 #ifdef USE_CXX11
 // Using C++11 unordered_map (hash map)
@@ -95,6 +97,7 @@ class RealtypeSX : public ConstantSX{
     virtual ~RealtypeSX(){
       size_t num_erased = cached_constants_.erase(value); 
       assert(num_erased==1);
+      (void)num_erased;
     }
     
     /// Static creator function (use instead of constructor)
@@ -149,6 +152,7 @@ class IntegerSX : public ConstantSX{
     virtual ~IntegerSX(){
       size_t num_erased = cached_constants_.erase(value); 
       assert(num_erased==1);
+      (void)num_erased;
     }
     
     /// Static creator function (use instead of constructor)
@@ -317,6 +321,6 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // CONSTANT_SXElement_HPP

@@ -11,7 +11,7 @@
 #include <fstream>
 
 #include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
+#include <symbolic/function/sx_function.hpp>
 
 // #define EVAL_DYNAMICS_FUNCTION
 // #define EVAL_Q_FUNCTION
@@ -90,7 +90,7 @@ public:
      std::vector<CasADi::DMatrix> QuuTrajectory;
 
      std::vector<CasADi::DMatrix> f0Trajectory;
-     std::vector<CasADi::DMatrix> fxTrajectory;
+     std::vector<CasADi::DMatrix> functionTrajectory;
      std::vector<CasADi::DMatrix> fuTrajectory;
 
      // set actions bounds

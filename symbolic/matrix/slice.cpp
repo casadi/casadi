@@ -58,17 +58,6 @@ namespace CasADi{
     return range(start,stop,step_,len);
   }
 
-  IndexSet::IndexSet(int i) : v_(1,i){
-  }
-  
-  IndexSet::IndexSet(const std::vector<int>& v) : v_(v){
-  }
-      
-  const std::vector<int>& IndexSet::getAll(int len) const{
-    return v_;
-  }
-
-
   IndexList::IndexList() : type(NILL) {}
   IndexList::IndexList(int i_) : i(i_), type(INT) {}
   IndexList::IndexList(const std::vector<int> &i_) : iv(i_) ,type(IVECTOR) {}

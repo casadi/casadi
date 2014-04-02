@@ -24,8 +24,8 @@
 
 #include <symbolic/std_vector_tools.hpp>
 #include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
-#include <symbolic/fx/jacobian.hpp>
+#include <symbolic/function/sx_function.hpp>
+#include <symbolic/function/jacobian.hpp>
 
 #include <interfaces/ipopt/ipopt_solver.hpp>
 
@@ -119,8 +119,8 @@ main()
 	gfcn.setOption("symbolic_jacobian",false);
 
 	//IpoptSolver solver(ffcn,gfcn);
-	//IpoptSolver solver(ffcn,gfcn,FX(),Jacobian(gfcn));
-	IpoptSolver solver( ffcn, gfcn, hfcn,  FX());
+	//IpoptSolver solver(ffcn,gfcn,Function(),Jacobian(gfcn));
+	IpoptSolver solver( ffcn, gfcn, hfcn,  Function());
 
 	// Set options
 	solver.setOption("tol",1e-8);

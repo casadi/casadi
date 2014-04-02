@@ -29,16 +29,16 @@ namespace CasADi{
   NLPImplicitSolver::NLPImplicitSolver(){ 
   }
 
-  NLPImplicitSolver::NLPImplicitSolver(const FX& f, const FX& jac, const LinearSolver& linsol)  {
+  NLPImplicitSolver::NLPImplicitSolver(const Function& f, const Function& jac, const LinearSolver& linsol)  {
     assignNode(new NLPImplicitInternal(f,jac,linsol));
   }
 
   NLPImplicitInternal* NLPImplicitSolver::operator->(){
-    return (NLPImplicitInternal*)(FX::operator->());
+    return (NLPImplicitInternal*)(Function::operator->());
   }
 
   const NLPImplicitInternal* NLPImplicitSolver::operator->() const{
-    return (const NLPImplicitInternal*)(FX::operator->());
+    return (const NLPImplicitInternal*)(Function::operator->());
   }
 
   bool NLPImplicitSolver::checkNode() const{

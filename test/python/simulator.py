@@ -101,7 +101,7 @@ class Simulatortests(casadiTestCase):
       f.setInput(0.3,"x0")
       f.setInput(0.7,"p")
     
-    self.checkfx(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
+    self.checkfunction(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
 
   def test_controlsim_full(self):
     self.message("ControlSimulator inputs")
@@ -153,7 +153,7 @@ class Simulatortests(casadiTestCase):
       f.setInput(2,"u")
       f.setInput(DMatrix(range(1,N)).T/10,"u")
     
-    self.checkfx(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
+    self.checkfunction(sim,solution,adj=False,jacobian=False,sens_der=False,evals=False,digits=6)
     
   def test_sim_inputs(self):
     self.message("Simulator inputs")
@@ -245,7 +245,7 @@ class Simulatortests(casadiTestCase):
 
     self.checkarray(sim.getOutput().T,num['q0']*exp(-tc),"Evaluation output mismatch",digits=9)
     self.checkarray(sim.getOutput(1).T,tc,"Evaluation output mismatch",digits=9)
-    self.assertTrue(sim.output().sparsity()==sim.output(1).sparsity())
+    self.assertTrue(sim.getOutput().sparsity()==sim.getOutput(1).sparsity())
     
   def test_sim_outputs(self):
     self.message("Simulator: outputs")
@@ -285,7 +285,7 @@ class Simulatortests(casadiTestCase):
     sim.evaluate()
 
     
-    self.checkarray(sim.getOutput(),DMatrix.ones(sim.output().shape)*p,"Evaluation output mismatch")
+    self.checkarray(sim.getOutput(),DMatrix.ones(sim.getOutput().shape)*p,"Evaluation output mismatch")
 
     #yv = SXElement.sym("y")
     #out = SXFunction(daeIn(),[yv])
@@ -325,7 +325,7 @@ class Simulatortests(casadiTestCase):
     sim.init()
     sim.setInput([num['q0']],"x0")
     sim.setInput([num['p']],"p")
-    self.assertTrue(sim.input("u").isEmpty())
+    self.assertTrue(sim.getInput("u").isEmpty())
     sim.evaluate()
     
     tf = DMatrix(sim.getMinorT())

@@ -33,11 +33,11 @@ namespace CasADi{
   }
  
   CSparseInternal* CSparse::operator->(){
-    return static_cast<CSparseInternal*>(FX::operator->());
+    return static_cast<CSparseInternal*>(Function::operator->());
   }
 
   const CSparseInternal* CSparse::operator->() const{
-    return static_cast<const CSparseInternal*>(FX::operator->());
+    return static_cast<const CSparseInternal*>(Function::operator->());
   }
   
   bool CSparse::checkNode() const{

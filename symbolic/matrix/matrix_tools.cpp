@@ -22,7 +22,7 @@
 
 #include "matrix_tools.hpp"
 #include "../std_vector_tools.hpp"
-#include "../fx/linear_solver.hpp"
+#include "../function/linear_solver.hpp"
 
 using namespace std;
 

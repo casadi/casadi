@@ -25,7 +25,7 @@
 #include "../matrix/matrix_tools.hpp"
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
-#include "../fx/sx_function.hpp"
+#include "../function/sx_function.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
 using namespace std;
@@ -187,7 +187,7 @@ namespace CasADi{
     
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
-    const vector<int>& irow = isp.row();
+    //const vector<int>& irow = isp.row();
     vector<int> icol = isp.getCol();
 
     // Get all input elements

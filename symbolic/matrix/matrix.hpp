@@ -34,6 +34,7 @@
 
 namespace CasADi{
 
+/// \cond INTERNAL
   template<typename DataType>
   struct NonZero {
     int k; // Non-zero index into matrix
@@ -41,6 +42,7 @@ namespace CasADi{
     int j; // Col into matrix
     DataType el;  // Element
   };
+
 
   template<typename DataType>
   class NonZeroIterator : public std::iterator< std::forward_iterator_tag, NonZero<DataType> > {
@@ -61,16 +63,19 @@ namespace CasADi{
     Matrix<DataType> m_;
     NonZero<DataType> nz;
   };
-
+/// \endcond
     
+/// \cond CLUTTER
   //@{
   /** \brief Get typename */
   template <typename DataType> inline std::string matrixName() { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
   template<> inline std::string matrixName<double>() { return "DMatrix"; }
   template<> inline std::string matrixName<int>() { return "IMatrix"; }
   //@}
+/// \endcond
 
-  /** \brief General sparse matrix class
+  /** \brief Sparse matrix class. SX and DMatrix are specializations.
+  
       General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
       This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
   
@@ -175,6 +180,7 @@ namespace CasADi{
     using B::operator[];
     using B::operator();
 
+    /// \cond INTERNAL
     /// Expose iterators
     typedef typename std::vector<DataType>::iterator iterator;
     typedef typename std::vector<DataType>::const_iterator const_iterator;
@@ -200,6 +206,8 @@ namespace CasADi{
     const_reference front() const { return data().front();}
     reference back(){ return data().back();}
     const_reference back() const { return data().back();}
+    /// \endcond
+#endif // SWIG
 
     /** \brief  Create a matrix from a matrix with a different type of matrix entries (assuming that the scalar conversion is valid) */
     template<typename A>
@@ -219,8 +227,6 @@ namespace CasADi{
       if(x.size() != nrow*ncol) throw CasadiException("Matrix::Matrix(const std::vector<DataType>& x,  int n, int m): dimension mismatch");
       copy(x.begin(),x.end(),begin());
     }
-    
-#endif // SWIG
 
 
 #ifndef SWIG
@@ -274,6 +280,7 @@ namespace CasADi{
     /// Returns the truth value of a Matrix
     bool __nonzero__() const;
 
+    /// \cond INTERNAL
     //@{
     /// Get a submatrix
     const Matrix<DataType> sub(int rr, int cc) const;
@@ -304,11 +311,16 @@ namespace CasADi{
     void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc){ setSub(m,rr.getAll(size1()),cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const std::vector<int>& cc);
     void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc) {return setSub(m,rr,cc.getAll(size2()));}
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc) {return setSub(m,rr.getAll(size1()),cc);}
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc) {setSub(m,rr,cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc) {setSub(m,rr.getAll(size1()),cc);}
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc);
+    void setSub(const Matrix<DataType>& m, const Slice& rr, int cc){setSub(m,rr.getAll(size1()),std::vector<int>(1,cc));}
+    void setSub(const Matrix<DataType>& m, const int rr, const Slice& cc){setSub(m,std::vector<int>(1,rr),cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy);
+
     //@}
+    
+    
 
     //@{
     /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
@@ -321,6 +333,7 @@ namespace CasADi{
     template<typename RR, typename CC>
     void getSub(Matrix<DataType>& m, RR rr, CC cc){ m = sub(rr,cc);}
     //@}
+    /// \endcond
 
     //@{
     /// Get a set of nonzeros
@@ -337,13 +350,16 @@ namespace CasADi{
     void setNZ(const Slice& k, const Matrix<DataType>& m){ setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const Matrix<DataType>& m);
     //@}
-
+    
+    /// \cond INTERNAL
     /// Append a matrix vertically (NOTE: only efficient if vector)
     void append(const Matrix<DataType>& y);
 
     /// Append a matrix horizontally
     void appendColumns(const Matrix<DataType>& y);
-
+    /// \endcond
+    
+    /// \cond INTERNAL
     //@{
     /// Indexing for interfaced languages
     /// get a non-zero
@@ -434,6 +450,7 @@ namespace CasADi{
     void indexed_assignment(const IndexList &rr, const Matrix<DataType>& m){
       (*this)(rr.getAll(size1()),0) = m;
     }
+    /// \endcond
     
     /// Set all elements to zero
     void setZero();
@@ -453,6 +470,7 @@ namespace CasADi{
     Matrix<DataType> operator+() const;
     Matrix<DataType> operator-() const;
 
+    /// \cond INTERNAL
     //@{
     /** \brief  Create nodes by their ID */
     static Matrix<DataType> binary(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
@@ -461,7 +479,9 @@ namespace CasADi{
     static Matrix<DataType> matrix_scalar(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
     static Matrix<DataType> matrix_matrix(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
     //@}
-  
+    /// \endcond
+    
+    /// \cond INTERNAL
     //@{
     /// Elementwise operations -- Octave/Python naming
     Matrix<DataType> __add__(const Matrix<DataType> &y) const;
@@ -506,6 +526,7 @@ namespace CasADi{
   
     /// Calculates inner_prod(x,mul(A,x)) without memory allocation
     static DataType quad_form(const Matrix<DataType>& A, const std::vector<DataType>& x);
+    /// \endcond
   
     /// Transpose the matrix
     Matrix<DataType> trans() const;
@@ -605,11 +626,13 @@ namespace CasADi{
     /// Const access the non-zero elements
     const std::vector<DataType>& data() const;
     
+    /// \cond INTERNAL
     /// Get a pointer to the data
     DataType* ptr(){ return isEmpty() ? static_cast<DataType*>(0) : &front();}
     
     /// Get a const pointer to the data
     const DataType* ptr() const{ return isEmpty() ? static_cast<const DataType*>(0) : &front();}
+    /// \endcond
         
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const{ return sparsity_; }
@@ -617,6 +640,7 @@ namespace CasADi{
     /// Access the sparsity, make a copy if there are multiple references to it
     Sparsity& sparsityRef();
     
+    /// \cond INTERNAL
     /** \brief  Set the non-zero elements, scalar */
     void set(DataType val, SparsityType sp=SPARSE);
     
@@ -684,6 +708,7 @@ namespace CasADi{
     void borArrayBV(const bvec_t* val, int len);
 
 #endif
+/// \endcond
 
     /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
         kl:    The number of subdiagonals in res 
@@ -806,9 +831,11 @@ namespace CasADi{
   typedef std::vector<Matrix<double> > DMatrixVector;
   typedef std::vector< std::vector<Matrix<double> > > DMatrixVectorVector;
 
+  /// \cond INTERNAL
   typedef DMatrix* DMatrixPtr;
   typedef std::vector<DMatrixPtr> DMatrixPtrV;
   typedef std::vector<DMatrixPtrV> DMatrixPtrVV;
+  /// \endcond
 } // namespace CasADi
 
 #include "matrix_impl.hpp"

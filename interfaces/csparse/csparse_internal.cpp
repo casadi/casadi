@@ -64,7 +64,7 @@ namespace CasADi{
     called_once_ = false;
     
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) { 
-      profileWriteName(CasadiOptions::profilingLog,this,"CSparse",ProfilingData_FXType_Other,2);
+      profileWriteName(CasadiOptions::profilingLog,this,"CSparse",ProfilingData_FunctionType_Other,2);
       
       profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"prepare",-1);
       profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"solve",-1);
@@ -72,7 +72,7 @@ namespace CasADi{
   }
 
   void CSparseInternal::prepare(){
-    double time_start;
+    double time_start=0;
     if(CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
       profileWriteEntry(CasadiOptions::profilingLog,this);
@@ -143,7 +143,7 @@ namespace CasADi{
   }
   
   void CSparseInternal::solve(double* x, int nrhs, bool transpose){
-    double time_start;
+    double time_start=0;
     if(CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
       profileWriteEntry(CasadiOptions::profilingLog,this);

@@ -7,6 +7,7 @@ SET(NONLINEAR_PROGRAMMING_SRCS
   nlp_qp_solver.hpp       nlp_qp_solver.cpp       nlp_qp_internal.hpp       nlp_qp_internal.cpp
   nlp_implicit_solver.hpp nlp_implicit_solver.cpp nlp_implicit_internal.hpp nlp_implicit_internal.cpp
   newton_implicit_solver.hpp newton_implicit_solver.cpp newton_implicit_internal.hpp newton_implicit_internal.cpp
+  simple_homotopy_nlp_solver.hpp simple_homotopy_nlp_solver.cpp simple_homotopy_nlp_internal.hpp simple_homotopy_nlp_internal.cpp
 )
 
 if(ENABLE_STATIC)

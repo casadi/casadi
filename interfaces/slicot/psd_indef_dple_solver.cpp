@@ -36,11 +36,11 @@ namespace CasADi{
   }
 
   PsdIndefDpleInternal* PsdIndefDpleSolver::operator->(){
-    return static_cast<PsdIndefDpleInternal*>(FX::operator->());
+    return static_cast<PsdIndefDpleInternal*>(Function::operator->());
   }
 
   const PsdIndefDpleInternal* PsdIndefDpleSolver::operator->() const{
-    return static_cast<const PsdIndefDpleInternal*>(FX::operator->()); 
+    return static_cast<const PsdIndefDpleInternal*>(Function::operator->()); 
   }
   
   bool PsdIndefDpleSolver::checkNode() const{

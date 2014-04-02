@@ -47,7 +47,7 @@ ocp.makeExplicit()
 #! Let us extract variables for the states, the control and equations
 x = ocp.x
 u = ocp.u
-f = ocp.ode
+f = ocp.ode(ocp.x)
 L = ocp.lterm
 I = ocp.initial
 #$ These are expressions that can be visualized or manipulated using CasADi's 
@@ -65,12 +65,12 @@ print hessian(L,x)
 #$ We can also retrieve other information from the model such as the end time,
 #$ variable bounds and initial guess:
 tf = ocp.tf
-ubx = ocp.max(x)
-lbx = ocp.min(x)
-ubu = ocp.max(u)
-lbu = ocp.min(u)
-x0 = ocp.initialGuess(x)
-u0 = ocp.initialGuess(u)
+ubx = evalf(ocp.max(x))
+lbx = evalf(ocp.min(x))
+ubu = evalf(ocp.max(u))
+lbu = evalf(ocp.min(u))
+x0 = evalf(ocp.initialGuess(x))
+u0 = evalf(ocp.initialGuess(u))
 #$ We now proceeed to solve the optimal control problem, which can be written more compactly as:
 #$  $$ \begin{array}{cl}   \textbf{minimize}    &  \displaystyle\int_{t=0}^{\texttt{tf}}{\texttt{L} \, dt} \\ \\
 #$                         \textbf{subject to}  &  \texttt{I}(t) = 0, \quad \text{for} \quad t=0 \\
@@ -164,9 +164,9 @@ uk = [i[2]  for i in vk]
 #$ We are now ready to construct the NLP. We begin by getting numerical values for the initial guess as well as
 #$ upper and lower bounds on the decision variable. For simplicity, we shall only impose the state bounds
 #$ at the beginning of each interval:
-lbv = (lbx + lbu) * nk
-ubv = (ubx + ubu) * nk
-v0 = (x0 + u0) * nk
+lbv = repmat(vertcat((lbx,lbu)),nk,1)
+ubv = repmat(vertcat((ubx,ubu)),nk,1)
+v0 = repmat(vertcat((x0,u0)),nk,1)
 #$ Next, let us build up expressions for the objective (cost) function and the nonlinear constraints,
 #$ starting with zero cost and and empty list of constraints:
 J = 0;  eq = []

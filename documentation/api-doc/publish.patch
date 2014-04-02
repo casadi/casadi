@@ -1,11 +1,14 @@
 --- default	2011-11-17 21:38:39.967143499 +0100
 +++ Doxyfile.in	2011-11-17 21:39:17.795573169 +0100
-@@ -1083,7 +1083,7 @@
+@@ -1083,7 +1083,10 @@
  # full text search. The disadvances is that it is more difficult to setup 
  # and does not have live searching capabilities.
  
 -SERVER_BASED_SEARCH    = NO
 +SERVER_BASED_SEARCH    = YES
++EXTERNAL_SEARCH    = YES
++SEARCHENGINE_URL = http://casadi.sourceforge.net/cgi-bin/doxysearch.cgi
++PROJECT_LOGO = casadi.png
  
  # configuration options related to the LaTeX output
  #---------------------------------------------------------------------------

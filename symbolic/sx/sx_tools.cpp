@@ -21,7 +21,7 @@
  */
 
 #include "sx_tools.hpp"
-#include "../fx/sx_function_internal.hpp"
+#include "../function/sx_function_internal.hpp"
 #include "../casadi_math.hpp"
 #include "../casadi_exception.hpp"
 #include "../matrix/matrix_tools.hpp"

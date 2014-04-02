@@ -62,7 +62,7 @@ public:
   DMatrix h0_;
 
   // Discrete time dynamics
-  FX f_;
+  Function f_;
   
   // Generated measurements
   vector<DMatrix> H_meas_;
@@ -176,7 +176,7 @@ void Tester::model(){
 
 
   // Expand the discrete dynamics?
-  FX f_step = f_step_mx;
+  Function f_step = f_step_mx;
   if(false){
     SXFunction f_step_sx(f_step_mx);
     f_step_sx.init();

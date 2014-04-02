@@ -23,7 +23,7 @@
 #ifndef DSDP_SOLVER_HPP
 #define DSDP_SOLVER_HPP
 
-#include "symbolic/fx/sdp_solver.hpp"
+#include "symbolic/function/sdp_solver.hpp"
 
 
 namespace CasADi {

@@ -24,6 +24,8 @@
 #define CASADI_MATH_HPP
 
 #include "casadi_calculus.hpp"
+
+/// \cond INTERNAL
 namespace CasADi{
 
 template<template<int> class F>
@@ -506,5 +508,7 @@ inline void casadi_math<T>::printPost(unsigned char op, std::ostream &stream){
 }
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //CASADI_MATH_HPP

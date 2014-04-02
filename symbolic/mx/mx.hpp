@@ -30,10 +30,11 @@ namespace CasADi{
   
   /** \brief  Forward declaration */
   class MXNode;
-  class FX;
+  class Function;
 
 
   /** \brief MX - Matrix expression
+  
       The MX class is used to build up trees made up from MXNodes. It is a more general graph representation than the scalar expression,
       SX, and much less efficient for small objects. On the other hand, the class allows much more general operations than does SX,
       in particular matrix valued operations and calls to arbitrary differentiable functions.
@@ -84,17 +85,20 @@ namespace CasADi{
     
     /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
-    
+ 
+/// \cond INTERNAL   
     /** \brief  Destructor */
     virtual ~MX();
-    
+/// \endcond
 
 #ifndef SWIG
+/// \cond INTERNAL
     /** \brief  Create from node */
     static MX create(MXNode* node);
 
     /** \brief  Create from node (multiple-outputs) */
     static std::vector<MX> createMultipleOutput(MXNode* node);
+/// \endcond
 
     /// Get a non-zero element, with bounds checking
     const MX at(int k) const;
@@ -107,6 +111,7 @@ namespace CasADi{
     /// Returns the truth value of an MX expression
     bool __nonzero__() const;
     
+    /// \cond CLUTTER
     //@{
     /// Indexing for interfaced languages
     
@@ -209,12 +214,17 @@ namespace CasADi{
     }
     
     void indexed_assignment(const Slice &rr, const MX &m){
-      (*this)(rr.getAll(size1())) = m;
+      (*this
+      )(rr.getAll(size1())) = m;
     }
     
+    /// \endcond
+    
+    /// \cond INTERNAL
     /// Scalar type
     typedef MX ScalarType;
-
+    /// \endcond
+    
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 
@@ -230,6 +240,7 @@ namespace CasADi{
 
     MX operator-() const;
   
+    /// \cond INTERNAL
     //@{
     /** \brief  Access a member of the node */
     MXNode* operator->();
@@ -237,6 +248,7 @@ namespace CasADi{
     /** \brief  Const access a member of the node */
     const MXNode* operator->() const;
     //@}
+    /// \endcond
   
     /** \brief Get the nth dependency as MX */
     MX getDep(int ch=0) const;
@@ -308,7 +320,7 @@ namespace CasADi{
     bool isRegular() const;
   
     /// Get function
-    FX getFunction();
+    Function getFunction();
 
     /// Is binary operation
     bool isBinary() const;
@@ -337,11 +349,13 @@ namespace CasADi{
      */
     long __hash__() const;
     
+    /// \cond INTERNAL
     /// Get the temporary variable
     int getTemp() const;
   
     /// Set the temporary variable
     void setTemp(int t);
+    /// \endcond
   
     //@{
     /** \brief  Create nodes by their ID */
@@ -372,7 +386,9 @@ namespace CasADi{
 
     /** \brief  Identity matrix */  
     static MX eye(int ncol);
-  
+    
+    
+    /// \cond INTERNAL
     const MX sub(int rr, int cc) const;
     const MX sub(const std::vector<int>& rr, int cc) const;
     const MX sub(int rr, const std::vector<int>& cc) const;
@@ -407,13 +423,16 @@ namespace CasADi{
     void setNZ(const std::vector<int>& k, const MX& el);
     void setNZ(const Slice& k, const MX& m){ setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const MX& m);
-
+    /// \endcond
+    
+    
     /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
     void append(const MX& y);
 
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
   
+    /// \cond SWIGINTERNAL
     // all binary operations
     MX __add__(const MX& y) const;
     MX __sub__(const MX& y) const;
@@ -428,6 +447,8 @@ namespace CasADi{
     MX __constpow__(const MX& b) const;
     MX __mrdivide__  (const MX& b) const;
     MX __mpower__(const MX& b) const;
+    /// \endcond
+    
     MX mul(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX mul_full(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX inner_prod(const MX& y) const;
@@ -531,9 +552,11 @@ namespace CasADi{
   /// Some typedefs
   typedef std::vector<MX> MXVector;
   typedef std::vector< std::vector<MX> > MXVectorVector;
+  /// \cond INTERNAL
   typedef MX* MXPtr;
   typedef std::vector<MXPtr> MXPtrV;
   typedef std::vector<MXPtrV> MXPtrVV;
+  /// \endcond
   //@}
 
 } // namespace CasADi

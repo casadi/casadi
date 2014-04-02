@@ -69,6 +69,10 @@ namespace CasADi {
       
       static bool profilingBinary;
       
+      static bool purgeSeeds;
+      
+      static bool allowed_internal_api;
+      
 #endif //SWIG
       // Setter and getter for catch_errors_python
       static void setCatchErrorsPython(bool flag) { catch_errors_python = flag; }
@@ -82,7 +86,7 @@ namespace CasADi {
       *
       *  When profiling is active, each primitive of an MX algorithm is profiling and dumped into the supplied file _filename_
       *  After the profiling is done, convert the supplied file to a viewable webpage with:
-      * `python -mcasadi.tools.profilereport -o profiling.html _filename_`
+      * `casadi-build-dir/bin/profilereport _filename_`
       */
       static void startProfiling(const std::string &filename);
       static void stopProfiling();
@@ -90,6 +94,11 @@ namespace CasADi {
       static void setProfilingBinary(bool flag) {  profilingBinary = flag; }
       static bool getProfilingBinary() { return  profilingBinary; }
       
+      static void setPurgeSeeds(bool flag) { purgeSeeds = flag; } 
+      static bool setPurgeSeeds() { return purgeSeeds; } 
+ 
+      static void setAllowedInternalAPI(bool flag) { allowed_internal_api= flag; }
+      static bool getAllowedInternalAPI() { return allowed_internal_api; }
   };
 
 }

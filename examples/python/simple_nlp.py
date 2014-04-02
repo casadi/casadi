@@ -25,11 +25,12 @@ from casadi import *
 # Declare variables
 x = SX.sym("x",2)
 
-# Form the NLP objective
-f = SXFunction([x],[x[0]**2 + x[1]**2])
+# Form the NLP
+nlp = SXFunction([x,[]],[
+        x[0]**2 + x[1]**2, # objective
+        x[0]+x[1]-10      # constraint
+      ])
 
-# Form the NLP constraints
-g = SXFunction([x],[x[0]+x[1]-10])
 
 # Pick an NLP solver
 MySolver = IpoptSolver
@@ -37,7 +38,7 @@ MySolver = IpoptSolver
 #MySolver = SQPMethod
 
 # Allocate a solver
-solver = MySolver(f,g)
+solver = MySolver(nlp)
 if MySolver==SQPMethod:
   solver.setOption("qp_solver",QPOasesSolver)
   solver.setOption("qp_solver_options",{"printLevel":"none"})

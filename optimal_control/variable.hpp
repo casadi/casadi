@@ -24,7 +24,7 @@
 #define VARIABLE_HPP
 
 #include <iostream>
-#include "../symbolic/fx/sx_function.hpp"
+#include "../symbolic/function/sx_function.hpp"
 #include "../symbolic/mx/mx.hpp"
 
 namespace CasADi{
@@ -73,14 +73,20 @@ namespace CasADi{
     /// Variable name
     std::string name() const;
 
+    /// Set the variable name (and corresponding expressions)
+    void setName(const std::string& name);
+
     /// Variable expression
-    SX v; 
+    SXElement v;
 
     /// Derivative expression
-    SX d;            
+    SXElement d;
 
-    /// (Current) value of the variable
-    double value;
+    /// Binding equation. Equal to "v" if unknown
+    SXElement beq;
+
+    /// Derivative binding equation, i.e. ordinary differential equation (ODE). Equal do "d" if unknown
+    SXElement ode;
 
     /// Nominal value
     double nominal;
@@ -89,16 +95,16 @@ namespace CasADi{
     double start;
 
     /// Lower bound
-    double min;
+    SXElement min;
 
     /// Upper bound
-    double max;
+    SXElement max;
+
+    /// Initial guess
+    SXElement initialGuess;
 
     /// Derivative at time 0
     double derivativeStart;
-
-    /// Initial guess
-    double initialGuess;
 
     /// Variability (see Fritzon)
     Variability variability;
@@ -131,15 +137,15 @@ namespace CasADi{
     bool free;
 
     /// Timed variable (never allocate)
-    SX atTime(double t, bool allocate=false) const;
+    SXElement atTime(double t, bool allocate=false) const;
 
     /// Timed variable (allocate if necessary)
-    SX atTime(double t, bool allocate=false);
+    SXElement atTime(double t, bool allocate=false);
         
   private:
 #ifndef SWIG
     // Timed variables
-    std::map<double,SX> timed_;
+    std::map<double,SXElement> timed_;
 
     // Print
     virtual void repr(std::ostream &stream) const;

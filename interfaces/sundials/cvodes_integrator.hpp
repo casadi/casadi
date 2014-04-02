@@ -30,7 +30,7 @@ namespace CasADi{
 // Forward declaration of internal class 
 class CVodesInternal;
 
-/** Function that integrates the ODE:
+/** \brief Interface to CVodes from the Sundials suite.
 
   @copydoc DAE_doc
   
@@ -55,7 +55,7 @@ public:
   * \copydoc scheme_RDAEInput
   * \copydoc scheme_RDAEOutput
   */
-  explicit CVodesIntegrator(const FX& f, const FX& g=FX());
+  explicit CVodesIntegrator(const Function& f, const Function& g=Function());
   
   /** \brief  Access functions of the node */
   CVodesInternal* operator->();
@@ -68,7 +68,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const FX& f, const FX& g){ return CVodesIntegrator(f,g);}
+  static Integrator creator(const Function& f, const Function& g){ return CVodesIntegrator(f,g);}
   #ifdef SWIG
   %nocallback;
   #endif

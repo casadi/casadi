@@ -544,8 +544,8 @@ class Matrixtests(casadiTestCase):
     
     I_ = DMatrix(inv(x).sparsity(),1)
     
-    s_ = full(s_)
-    T_ = full(I_)
+    s_ = dense(s_)
+    T_ = dense(I_)
     # An irreducible matrix does not have to be dense per se
     self.checkarray(s_,I_,"inv")
 
@@ -847,6 +847,18 @@ class Matrixtests(casadiTestCase):
     
     with self.assertRaises(Exception):
       tril2symm(DMatrix.ones(5,5))
+
+  def test_not_null(self):
+    x = MX.sym('x',3,1)
+    sp = Sparsity.triu(2)
+    MX(sp,x)
+
+  def test_segfault(self):
+    x = MX.sym('x',10,1)
+    sp = Sparsity.triu(2)
+    y = triu2symm(MX(sp,x[1:4]))
+    f = MXFunction([x],[y])
+    f.init()
       
   def test_append_empty(self):
     a = DMatrix.sparse(0,0)
@@ -1036,9 +1048,9 @@ class Matrixtests(casadiTestCase):
 
     J.evaluate()
 
-    res =  J.output()
+    res =  J.getOutput()
 
-    ref =  kron(J.input(1),J.input(2).T)
+    ref =  kron(J.getInput(1),J.getInput(2).T)
 
     self.checkarray(res,ref)
     

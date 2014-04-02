@@ -22,8 +22,8 @@
 
 #include "cvodes_internal.hpp"
 #include "symbolic/std_vector_tools.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
+#include "symbolic/function/mx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
@@ -39,7 +39,7 @@ namespace CasADi{
     return node;
   }
 
-  CVodesInternal::CVodesInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
+  CVodesInternal::CVodesInternal(const Function& f, const Function& g) : SundialsInternal(f,g){
     addOption("linear_multistep_method",          OT_STRING,              "bdf",          "Integrator scheme","bdf|adams");
     addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",       "","newton|functional");
     addOption("fsens_all_at_once",                OT_BOOLEAN,             true,           "Calculate all right hand sides of the sensitivity equations at once");
@@ -1522,7 +1522,7 @@ namespace CasADi{
       CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
       casadi_assert(this_);
       CVadjMem ca_mem;
-      CVodeBMem cvB_mem; 
+      //CVodeBMem cvB_mem; 
   
       int flag;
 
@@ -1533,7 +1533,7 @@ namespace CasADi{
       cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
 
       ca_mem = cv_mem->cv_adj_mem;
-      cvB_mem = ca_mem->ca_bckpbCrt;
+      //cvB_mem = ca_mem->ca_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
       flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
@@ -1599,7 +1599,7 @@ namespace CasADi{
       CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
       casadi_assert(this_);
       CVadjMem ca_mem;
-      CVodeBMem cvB_mem; 
+      //CVodeBMem cvB_mem; 
   
       int flag;
 
@@ -1610,7 +1610,7 @@ namespace CasADi{
       cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
 
       ca_mem = cv_mem->cv_adj_mem;
-      cvB_mem = ca_mem->ca_bckpbCrt;
+      //cvB_mem = ca_mem->ca_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
       flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, NULL);
@@ -1823,7 +1823,7 @@ namespace CasADi{
     return FunctionType(jac_in,jac);
   }
 
-  FX CVodesInternal::getJacB(){
+  Function CVodesInternal::getJacB(){
     if(is_a<SXFunction>(g_)){
       return getJacGenB<SXFunction>();
     } else if(is_a<MXFunction>(g_)){
@@ -1834,7 +1834,7 @@ namespace CasADi{
   }
 
 
-  FX CVodesInternal::getJac(){
+  Function CVodesInternal::getJac(){
     if(is_a<SXFunction>(f_)){
       return getJacGen<SXFunction>();
     } else if(is_a<MXFunction>(f_)){

@@ -1,3 +1,4 @@
+/// \cond INTERNAL
 /** \class CasADi::QPLPInternal
 \n
 \par
@@ -7,6 +8,7 @@
 <tr><td>qp_solver_stats</td><td>CasADi::QPLPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::QPLPSolver
 \n
 \par
@@ -16,6 +18,7 @@
 <tr><td>qp_solver_stats</td><td>CasADi::QPLPInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::NLPImplicitInternal
 \n
 \par
@@ -25,6 +28,7 @@
 <tr><td>nlp_solver_stats</td><td>CasADi::NLPImplicitInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::NLPImplicitSolver
 \n
 \par
@@ -34,6 +38,7 @@
 <tr><td>nlp_solver_stats</td><td>CasADi::NLPImplicitInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::SDPSDQPInternal
 \n
 \par
@@ -43,6 +48,7 @@
 <tr><td>sdp_solver_stats</td><td>CasADi::SDPSDQPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::SDPSDQPSolver
 \n
 \par
@@ -52,6 +58,7 @@
 <tr><td>sdp_solver_stats</td><td>CasADi::SDPSDQPInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::CVodesInternal
 \n
 \par
@@ -64,6 +71,7 @@
 <tr><td>nstepsB</td><td>CasADi::CVodesInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::CVodesIntegrator
 \n
 \par
@@ -76,6 +84,7 @@
 <tr><td>nstepsB</td><td>CasADi::CVodesInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::DSDPInternal
 \n
 \par
@@ -86,6 +95,7 @@
 <tr><td>termination_reason</td><td>CasADi::DSDPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::DSDPSolver
 \n
 \par
@@ -96,6 +106,7 @@
 <tr><td>termination_reason</td><td>CasADi::DSDPInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::SCPgenInternal
 \n
 \par
@@ -105,6 +116,7 @@
 <tr><td>iter_count</td><td>CasADi::SCPgenInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::SCPgen
 \n
 \par
@@ -114,6 +126,7 @@
 <tr><td>iter_count</td><td>CasADi::SCPgenInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::SnoptInternal
 \n
 \par
@@ -123,6 +136,7 @@
 <tr><td>return_status</td><td>CasADi::SnoptInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::SnoptSolver
 \n
 \par
@@ -132,6 +146,7 @@
 <tr><td>return_status</td><td>CasADi::SnoptInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::IpoptInternal
 \n
 \par
@@ -163,6 +178,7 @@
 <tr><td>var_string_md</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::IpoptSolver
 \n
 \par
@@ -194,6 +210,7 @@
 <tr><td>var_string_md</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::QPStabilizerInternal
 \n
 \par
@@ -203,6 +220,7 @@
 <tr><td>qp_solver_stats</td><td>CasADi::QPStabilizerInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::QPStabilizer
 \n
 \par
@@ -212,6 +230,7 @@
 <tr><td>qp_solver_stats</td><td>CasADi::QPStabilizerInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::IdasInternal
 \n
 \par
@@ -224,6 +243,7 @@
 <tr><td>nstepsB</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::IdasIntegrator
 \n
 \par
@@ -236,6 +256,7 @@
 <tr><td>nstepsB</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::NewtonImplicitInternal
 \n
 \par
@@ -246,6 +267,7 @@
 <tr><td>return_status</td><td>CasADi::NewtonImplicitInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::NewtonImplicitSolver
 \n
 \par
@@ -256,6 +278,7 @@
 <tr><td>return_status</td><td>CasADi::NewtonImplicitInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::StabilizedSQPInternal
 \n
 \par
@@ -266,6 +289,7 @@
 <tr><td>return_status</td><td>CasADi::StabilizedSQPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::StabilizedSQPMethod
 \n
 \par
@@ -276,6 +300,7 @@
 <tr><td>return_status</td><td>CasADi::StabilizedSQPInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::WorhpInternal
 \n
 \par
@@ -302,6 +327,7 @@
 <tr><td>t_mainloop</td><td>CasADi::WorhpInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::WorhpSolver
 \n
 \par
@@ -328,6 +354,7 @@
 <tr><td>t_mainloop</td><td>CasADi::WorhpInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::SQPInternal
 \n
 \par
@@ -353,6 +380,7 @@
 <tr><td>t_mainloop</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::SQPMethod
 \n
 \par
@@ -378,6 +406,7 @@
 <tr><td>t_mainloop</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::SOCPQCQPInternal
 \n
 \par
@@ -387,6 +416,7 @@
 <tr><td>socp_solver_stats</td><td>CasADi::SOCPQCQPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::SOCPQCQPSolver
 \n
 \par
@@ -396,6 +426,7 @@
 <tr><td>socp_solver_stats</td><td>CasADi::SOCPQCQPInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::QCQPQPInternal
 \n
 \par
@@ -405,6 +436,7 @@
 <tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::QCQPQPSolver
 \n
 \par
@@ -414,6 +446,7 @@
 <tr><td>qcqp_solver_stats</td><td>CasADi::QCQPQPInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::NLPQPInternal
 \n
 \par
@@ -423,6 +456,7 @@
 <tr><td>nlp_solver_stats</td><td>CasADi::NLPQPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::NLPQPSolver
 \n
 \par
@@ -432,6 +466,7 @@
 <tr><td>nlp_solver_stats</td><td>CasADi::NLPQPInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::ParallelizerInternal
 \n
 \par
@@ -447,6 +482,7 @@
 <tr><td>task_starttime</td><td>CasADi::ParallelizerInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::Parallelizer
 \n
 \par
@@ -462,6 +498,7 @@
 <tr><td>task_starttime</td><td>CasADi::ParallelizerInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
 /** \class CasADi::SDPSOCPInternal
 \n
 \par
@@ -471,6 +508,7 @@
 <tr><td>sdp_solver_stats</td><td>CasADi::SDPSOCPInternal</td></tr>
 </table>
 */
+/// \endcond
 /** \class CasADi::SDPSOCPSolver
 \n
 \par

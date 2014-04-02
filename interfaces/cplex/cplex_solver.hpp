@@ -22,7 +22,7 @@
 #ifndef CPLEX_SOLVER_HPP
 #define CPLEX_SOLVER_HPP
 
-#include "symbolic/fx/qp_solver.hpp"
+#include "symbolic/function/qp_solver.hpp"
 
 namespace CasADi{
 

@@ -27,6 +27,8 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Matrix inner_prod
       \author Joel Andersson
@@ -72,5 +74,6 @@ namespace CasADi{
 
 
 } // namespace CasADi
+/// \endcond
 
 #endif // INNER_PROD_HPP

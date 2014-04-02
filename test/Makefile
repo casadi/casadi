@@ -32,8 +32,8 @@ unittests_knownbugs: unittests_py_knownbugs unittests_oct
 
 unittests_py:
 ifdef MEMCHECK
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light"
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="--ignore_memory_heavy"
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--ignore_memory_light --run_slow"
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="--ignore_memory_heavy --run_slow"
 else
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
 endif

@@ -658,7 +658,7 @@ Accepts: 2D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte 
          1D numpy.ndarray, numpy.matrix (any setting of contiguous, native byte order, datatype double) - SPARSE
          2D scipy.csc_matrix (any setting of contiguous, native byte order, datatype double) 
 */
-%typemap(in,numinputs=1) (const double *val,int len,SparsityType sp) (PyArrayObject* array, int array_is_new_object=0)  {
+%typemap(in,numinputs=1) (const double *val,int len,SparsityType sp) (PyArrayObject* array=NULL, int array_is_new_object=0)  {
 	PyObject* p = $input;
 	if (is_array(p)) {
 			array = obj_to_array_contiguous_allow_conversion(p,NPY_DOUBLE,&array_is_new_object);

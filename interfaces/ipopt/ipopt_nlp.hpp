@@ -41,6 +41,7 @@
 
 #include <iostream>
 
+/// \cond INTERNAL
 using namespace Ipopt;
 namespace CasADi{
 
@@ -147,5 +148,6 @@ private:
 };
 
 } // namespace CasADi
+/// \endcond
 
 #endif //IPOPT_NLP

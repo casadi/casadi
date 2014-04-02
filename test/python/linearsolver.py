@@ -80,8 +80,8 @@ class LinearSolverTests(casadiTestCase):
 
         solver.evaluate()
         
-        self.checkarray(mul(A.T,solver.output()),DMatrix.zeros(m,n-m))
-        self.checkarray(mul(solver.output().T,solver.output()),DMatrix.eye(n-m))
+        self.checkarray(mul(A.T,solver.getOutput()),DMatrix.zeros(m,n-m))
+        self.checkarray(mul(solver.getOutput().T,solver.getOutput()),DMatrix.eye(n-m))
         
         solver.setOption("ad_mode","forward")
         solver.init()
@@ -101,8 +101,8 @@ class LinearSolverTests(casadiTestCase):
         Jf.evaluate()
         Jb.evaluate()
 
-        self.checkarray(Jf.output(),Jb.output())
-        self.checkarray(Jf.output(1),Jb.output(1))
+        self.checkarray(Jf.getOutput(),Jb.getOutput())
+        self.checkarray(Jf.getOutput(1),Jb.getOutput(1))
         
         d = solver.derivative(1,0)
         d.init()
@@ -172,8 +172,8 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(b_,1)
       f.evaluate()
       
-      self.checkarray(f.output(),DMatrix([1.5,-0.5]))
-      self.checkarray(mul(A_,f.output()),b_)
+      self.checkarray(f.getOutput(),DMatrix([1.5,-0.5]))
+      self.checkarray(mul(A_,f.getOutput()),b_)
 
   def test_pseudo_inverse(self):
     numpy.random.seed(0)
@@ -191,14 +191,14 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.output()),DMatrix.eye(4))
+      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(4))
       
       f = SXFunction([As],[pinv(As)])
       f.init()
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.output()),DMatrix.eye(4))
+      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(4))
       
       solve(mul(A,A.T),A,Solver,options)
       pinv(A_,Solver,options)
@@ -219,14 +219,14 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.output()),DMatrix.eye(3)) 
+      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(3)) 
       
       f = SXFunction([As],[pinv(As)])
       f.init()
       f.setInput(A_,0)
       f.evaluate()
       
-      self.checkarray(mul(A_,f.output()),DMatrix.eye(3))
+      self.checkarray(mul(A_,f.getOutput()),DMatrix.eye(3))
       
       #self.checkarray(mul(pinv(A_,Solver,options),A_),DMatrix.eye(3))
       
@@ -256,7 +256,7 @@ class LinearSolverTests(casadiTestCase):
       solver.solve(True)
       
       res = DMatrix([1.5,-0.5])
-      self.checkarray(solver.output("X"),res)
+      self.checkarray(solver.getOutput("X"),res)
       #   result' = A\b'               Ax = b
 
   def test_simple(self):
@@ -276,10 +276,10 @@ class LinearSolverTests(casadiTestCase):
       solver.solve()
       
       res = DMatrix([-1.5,5.5])
-      self.checkarray(solver.output("X"),res)
+      self.checkarray(solver.getOutput("X"),res)
       #   result' = A'\b'             Ax = b
 
-  def test_simple_fx_direct(self):
+  def test_simple_function_direct(self):
     A_ = DMatrix([[3,1],[7,2]])
     A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0.5])
@@ -307,9 +307,10 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
       
-      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
+      self.checkfunction(solver,solution,jacobian=False,evals=False)
+      
        
-  def test_simple_fx_indirect(self):
+  def test_simple_function_indirect(self):
     A_ = DMatrix([[3,1],[7,2]])
     A = MX.sym("A",A_.sparsity())
     b_ = DMatrix([1,0.5])
@@ -343,131 +344,63 @@ class LinearSolverTests(casadiTestCase):
       solution.setInput(A_,"A")
       solution.setInput(b_,"B")
       
-      self.checkfx(solver,solution,fwd=False,adj=False,jacobian=False,evals=False)
-
+      self.checkfunction(relay,solution,jacobian=False,evals=False)
+      
   def test_simple_solve_node(self):
-    A_ = DMatrix([[3,1],[7,2]])
-    A = MX.sym("A",A_.sparsity())
-    b_ = DMatrix([1,0.5])
-    b = MX.sym("b",b_.sparsity())
-    for Solver, options in lsolvers:
-      print Solver
-      solver = Solver(A.sparsity())
-      solver.setOption(options)
-      solver.init()
-      for tr in [True, False]:
-        x = solver.solve(A,b,tr)
-        f = MXFunction([A,b],[x])
-        f.init()
-        f.setInput(A_,0)
-        f.setInput(b_,1)
-        f.evaluate()
+    for A_,b_ in [
+                     (DMatrix([[3,1],[7,2]]),DMatrix([[1,0.3],[0.5,0.7]])),    
+                     (sparse(DMatrix([[3,0],[7,2]])),DMatrix([[1,0.3],[0.5,0.7]])),
+                     (DMatrix([[3,1],[7,2]]),sparse(DMatrix([[1,0],[0,0.7]])))
+                 ]:
+                             
+      A = MX.sym("A",A_.sparsity())
+      b = MX.sym("b",b_.sparsity())
+      for Solver, options in lsolvers:
+        print Solver
+        solver = Solver(A.sparsity())
+        solver.setOption(options)
+        solver.init()
+        for tr in [True, False]:
+          x = solver.solve(A,b,tr)
+          f = MXFunction([A,b],[x])
+          f.init()
+          f.setInput(A_,0)
+          f.setInput(b_,1)
+          f.evaluate()
 
-        if tr:
-          A_0 = A[0,0]
-          A_1 = A[1,0]
-          A_2 = A[0,1]
-          A_3 = A[1,1]
-        else:
-          A_0 = A[0,0]
-          A_1 = A[0,1]
-          A_2 = A[1,0]
-          A_3 = A[1,1]
+          if tr:
+            A_0 = A[0,0]
+            A_1 = A[1,0]
+            A_2 = A[0,1]
+            A_3 = A[1,1]
+          else:
+            A_0 = A[0,0]
+            A_1 = A[0,1]
+            A_2 = A[1,0]
+            A_3 = A[1,1]
+            
+          b_0 = b[0,0]
+          b_1 = b[1,0]
           
-        b_0 = b[0]
-        b_1 = b[1]
-        
-        solution = MXFunction([A,b],[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
-        solution.init()
-        
-        solution.setInput(A_,0)
-        solution.setInput(b_,1)
-        
-        self.checkfx(f,solution)
-
-
-  def test_simple_solve_node_sparseA(self):
-    A_ = DMatrix([[3,0],[7,2]])
-    A_ = sparse(A_)
-    A = MX.sym("A",A_.sparsity())
-    print A.size(), A_.size()
-    b_ = DMatrix([1,0.5])
-    b = MX.sym("b",b_.sparsity())
-    for Solver, options in lsolvers:
-      print Solver
-      solver = Solver(A.sparsity())
-      solver.setOption(options)
-      solver.init()
-      for tr in [True, False]:
-        x = solver.solve(A,b,tr)
-        f = MXFunction([A,b],[x])
-        f.init()
-        f.setInput(A_,0)
-        f.setInput(b_,1)
-        f.evaluate()
-
-        if tr:
-          A_0 = A[0,0]
-          A_1 = A[1,0]
-          A_2 = A[0,1]
-          A_3 = A[1,1]
-        else:
-          A_0 = A[0,0]
-          A_1 = A[0,1]
-          A_2 = A[1,0]
-          A_3 = A[1,1]
+          c_0 = b[0,1]
+          c_1 = b[1,1]
           
-        b_0 = b[0]
-        b_1 = b[1]
-        
-        solution = MXFunction([A,b],[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
-        solution.init()
-        
-        solution.setInput(A_,0)
-        solution.setInput(b_,1)
-        
-        self.checkfx(f,solution,sens_der=False,digits_sens=7)
-
-  def test_simple_solve_node_sparseB(self):
-    A_ = DMatrix([[3,1],[7,2]])
-    A = MX.sym("A",A_.sparsity())
-    b_ = DMatrix([1,0])
-    b_ = sparse(b_)
-    b = MX.sym("b",b_.sparsity())
-    for Solver, options in lsolvers:
-      print Solver
-      solver = Solver(A.sparsity())
-      solver.setOption(options)
-      solver.init()
-      for tr in [True, False]:
-        x = solver.solve(A,b,tr)
-        f = MXFunction([A,b],[x])
-        f.init()
-        f.setInput(A_,0)
-        f.setInput(b_,1)
-        f.evaluate()
-
-        if tr:
-          A_0 = A[0,0]
-          A_1 = A[1,0]
-          A_2 = A[0,1]
-          A_3 = A[1,1]
-        else:
-          A_0 = A[0,0]
-          A_1 = A[0,1]
-          A_2 = A[1,0]
-          A_3 = A[1,1]
+          solution = MXFunction([A,b],[blockcat([[(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),(((A_3/((A_0*A_3)-(A_2*A_1)))*c_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*c_1))],[((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*c_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*c_1))]])])
+          solution.init()
           
-        b_0 = b[0,0]
-        b_1 = b[1,0]
+          solution.setInput(A_,0)
+          solution.setInput(b_,1)
+          
+          self.checkfunction(f,solution)
+          
+          if "SymbolicQR" not in str(Solver) : continue
+          solversx = f.expand()
+          solversx.init()
+          solversx.setInput(A_,0)
+          solversx.setInput(b_,1)
+   
+          self.checkfunction(solversx,solution,digits_sens = 7)
         
-        solution = MXFunction([A,b],[vertcat([(((A_3/((A_0*A_3)-(A_2*A_1)))*b_0)+(((-A_1)/((A_0*A_3)-(A_2*A_1)))*b_1)),((((-A_2)/((A_0*A_3)-(A_2*A_1)))*b_0)+((A_0/((A_0*A_3)-(A_2*A_1)))*b_1))])])
-        solution.init()
-        
-        solution.setInput(A_,0)
-        solution.setInput(b_,1)
-        
-        self.checkfx(f,solution,digits_sens=7)
 
   @requires("CSparseCholesky")
   def test_cholesky(self):
@@ -539,7 +472,7 @@ class LinearSolverTests(casadiTestCase):
       f.setInput(b,1)
       f.evaluate()
       
-      self.checkarray(mul(A,f.output()),b)
+      self.checkarray(mul(A,f.getOutput()),b)
       
   def test_large_sparse(self):
     numpy.random.seed(1)
@@ -555,14 +488,14 @@ class LinearSolverTests(casadiTestCase):
       
       self.checkarray(mul(A,C),b)
       
-      for As_,A_ in [(As,A),(full(As),full(A)),(full(As).T,full(A).T),(full(As.T),full(A.T)),(As.T,A.T)]:
+      for As_,A_ in [(As,A),(dense(As),dense(A)),(dense(As).T,dense(A).T),(dense(As.T),dense(A.T)),(As.T,A.T)]:
         f = MXFunction([As,bs],[solve(As_,bs,Solver,options)])
         f.init()
         f.setInput(A,0)
         f.setInput(b,1)
         f.evaluate()
 
-        self.checkarray(mul(A_,f.output()),b)
+        self.checkarray(mul(A_,f.getOutput()),b)
       
 if __name__ == '__main__':
     unittest.main()

@@ -23,12 +23,14 @@
 #ifndef CSPARSE_INTERNAL_HPP
 #define CSPARSE_INTERNAL_HPP
 
+/// \cond INTERNAL
+
 extern "C"{
 #include "cs.h"
 }
 
 #include "csparse.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
 
 namespace CasADi{
 
@@ -78,6 +80,8 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //CSPARSE_INTERNAL_HPP
 

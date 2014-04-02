@@ -24,10 +24,11 @@
 #define NLP_IMPLICIT_INTERNAL_HPP
 
 #include "nlp_implicit_solver.hpp"
-#include "symbolic/fx/implicit_function_internal.hpp"
-#include "symbolic/fx/nlp_solver.hpp"
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/implicit_function_internal.hpp"
+#include "symbolic/function/nlp_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for NLPImplicitInternal
@@ -38,7 +39,7 @@ namespace CasADi{
     friend class NLPImplicitSolver;
   public:
     /** \brief  Constructor */
-    explicit NLPImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol);
+    explicit NLPImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol);
 
     /** \brief  Destructor */
     virtual ~NLPImplicitInternal();
@@ -50,7 +51,7 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual NLPImplicitInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const { return new NLPImplicitInternal(f,jac,linsol);}
+    virtual NLPImplicitInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const { return new NLPImplicitInternal(f,jac,linsol);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -64,6 +65,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //NLP_IMPLICIT_INTERNAL_HPP
 

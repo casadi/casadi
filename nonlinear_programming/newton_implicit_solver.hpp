@@ -23,7 +23,7 @@
 #ifndef NEWTON_IMPLICIT_SOLVER_HPP
 #define NEWTON_IMPLICIT_SOLVER_HPP
 
-#include "symbolic/fx/implicit_function.hpp"
+#include "symbolic/function/implicit_function.hpp"
 
 namespace CasADi {
   
@@ -45,7 +45,7 @@ public:
   NewtonImplicitSolver();
   
   /** \brief Create a solver instance */
-  explicit NewtonImplicitSolver(const FX& f, const FX& jac=FX(), const LinearSolver& linsol=LinearSolver());
+  explicit NewtonImplicitSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
   
   /** \brief  Access functions of the node */
   NewtonImplicitInternal* operator->();
@@ -58,7 +58,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static ImplicitFunction creator(const FX& f, const FX& jac, const LinearSolver& linsol){ return NewtonImplicitSolver(f,jac,linsol);}
+  static ImplicitFunction creator(const Function& f, const Function& jac, const LinearSolver& linsol){ return NewtonImplicitSolver(f,jac,linsol);}
   #ifdef SWIG
   %nocallback;
   #endif

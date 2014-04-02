@@ -26,16 +26,29 @@
 #include "sx_element.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/generic_matrix_tools.hpp"
+#include "../casadi_options.hpp"
 
-/** Functions using SXElement */
+/** \defgroup expression_tools Expression tools
+* Functions for manipulating SX, MX or Sparsity
+*
+*/
+
 
 namespace CasADi{
 
-  /** \brief  Expand the expression as a weighted sum (with constant weights)  */
+/**
+\ingroup expression_tools
+@{ 
+*/
+
+  /** \brief  Expand the expression as a weighted sum (with constant weights)  
+  */
   void expand(const SX& ex, SX &weights, SX& terms);
 
+  /// \cond INTERNAL
   /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
   void simplify(SXElement& ex);
+  /// \endcond
 
   /** \brief Create a piecewise constant function 
       Create a piecewise constant function with n=val.size() intervals
@@ -330,7 +343,9 @@ namespace CasADi{
   inline SX ssym(const std::string& name, const Sparsity& sp){ return SX::sym(name,sp);}
   inline SX ssym(const Matrix<double>& x){ return SX(x);}
   inline bool isRegular(const SXElement& ex){ return ex.isRegular();}
-  inline bool isRegular(const SX& ex){ return ex.isRegular();}
+  inline bool isRegular(const SX& ex) { return ex.isRegular();}
+
+  /// [DEPRECATED:use ex.isSmooth()]
   inline bool isSmooth(const SX& ex){ return ex.isSmooth();}
   inline bool isSymbolic(const SX& ex){ return ex.isSymbolic();}
   inline bool isSymbolicSparse(const SX& ex){ return ex.isSymbolicSparse();}
@@ -338,8 +353,16 @@ namespace CasADi{
   inline int getIntValue(const SX& ex) { return ex.elem(0,0).getIntValue(); }
   inline std::string getName(const SX &ex){ return ex.toScalar().getName();}
   //@}
+
+
 #endif
 
+/*
+@}
+*/
+
 } // namespace CasADi
+
+
 
 #endif // SX_TOOLS_HPP

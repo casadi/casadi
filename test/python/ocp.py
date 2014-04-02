@@ -211,7 +211,7 @@ class OCPtests(casadiTestCase):
     m = ocp.mterm
     self.assertTrue(isinstance(m,SX))
     self.assertTrue(isinstance(ocp.t,SX))
-    self.assertEquals(str(m),'cost.atTime(150)')
+    self.assertEquals(str(m),'cost')
     print dir(ocp)
     self.assertEquals(ocp.dae.size(),3)
     print type(ocp.s)

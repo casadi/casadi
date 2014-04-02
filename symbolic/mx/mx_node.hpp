@@ -26,12 +26,13 @@
 #include "mx.hpp"
 #include "../sx/sx_element.hpp"
 #include "../casadi_math.hpp"
-#include "../fx/code_generator.hpp"
-#include "../fx/linear_solver.hpp"
+#include "../function/code_generator.hpp"
+#include "../function/linear_solver.hpp"
 #include <vector>
 #include <stack>
 
 namespace CasADi{
+  /// \cond INTERNAL
   //@{
   /** \brief Convenience function, convert vectors to vectors of pointers */
   template<class T>
@@ -153,10 +154,10 @@ namespace CasADi{
     virtual bool isMultipleOutput() const{return false;}
 
     /** \brief  Get function reference */
-    virtual FX& getFunction();
+    virtual Function& getFunction();
 
     /** \brief  Get function reference */
-    virtual const FX& getFunction() const{ return const_cast<MXNode*>(this)->getFunction();}
+    virtual const Function& getFunction() const{ return const_cast<MXNode*>(this)->getFunction();}
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const;
@@ -369,6 +370,7 @@ namespace CasADi{
     /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<std::vector<MX*> > v);
   };
+  
 
   // Implementations
 
@@ -391,8 +393,9 @@ namespace CasADi{
     }
     return ret;
   }
+  /// \endcond
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // MX_NODE_HPP

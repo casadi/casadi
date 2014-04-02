@@ -30,7 +30,7 @@
 using namespace std;
 namespace CasADi{
 
-  KnitroInternal::KnitroInternal(const FX& nlp) : NLPSolverInternal(nlp){
+  KnitroInternal::KnitroInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("KnitroInternal: the KNITRO interface is still experimental, more tests are needed");
 
     // Monitors

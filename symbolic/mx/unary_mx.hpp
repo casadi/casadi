@@ -24,6 +24,7 @@
 #define UNARY_MX_HPP
 
 #include "mx_node.hpp"
+/// \cond INTERNAL
 
 namespace CasADi{
   /** \brief Represents a general unary operation on an MX

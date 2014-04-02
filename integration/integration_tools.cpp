@@ -21,11 +21,11 @@
  */
 
 #include "integration_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/implicit_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/implicit_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/integrator.hpp"
+#include "symbolic/function/integrator.hpp"
 
 #include <vector>
 
@@ -79,7 +79,7 @@ namespace CasADi{
     return collocationPointsGen<long double>(order,scheme);
   }
   
-  FX explicitRK(FX& f, const MX& tf, int order, int ne) {
+  Function explicitRK(Function& f, const MX& tf, int order, int ne) {
     casadi_assert_message(ne>=1,"Parameter ne (number of elements must be at least 1), but got " << ne << ".");
     casadi_assert_message(order==4,"Only RK order 4 is supported now.");
     casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,"Supplied function must adhere to dae scheme.");
@@ -162,7 +162,7 @@ namespace CasADi{
       D[j] = lfcn.output().at(0);
 
       // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-      FX tfcn = lfcn.tangent();
+      Function tfcn = lfcn.tangent();
       tfcn.init();
       for(int j2=0; j2<deg+1; ++j2){
         tfcn.setInput(tau_root[j2]);        
@@ -173,7 +173,7 @@ namespace CasADi{
 
   }
   
-  FX implicitRK(FX& f, implicitFunctionCreator impl, const Dictionary& impl_options, const MX& tf, int order, const std::string& scheme, int ne) {
+  Function implicitRK(Function& f, implicitFunctionCreator impl, const Dictionary& impl_options, const MX& tf, int order, const std::string& scheme, int ne) {
     casadi_assert_message(ne>=1,"Parameter ne (number of elements must be at least 1), but got " << ne << ".");
     casadi_assert_message(order==4,"Only RK order 4 is supported now.");
     casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,"Supplied function must adhere to dae scheme.");
@@ -260,7 +260,7 @@ namespace CasADi{
     vfcn_inputs.push_back(t0_l);
     vfcn_inputs.push_back(h);
     
-    FX vfcn = MXFunction(vfcn_inputs,vertcat(V_eq));
+    Function vfcn = MXFunction(vfcn_inputs,vertcat(V_eq));
     vfcn.init();
     
     try {
@@ -272,7 +272,7 @@ namespace CasADi{
     }
     
     // Create a implicit function instance to solve the system of equations
-    ImplicitFunction ifcn = impl(vfcn,FX(),LinearSolver());
+    ImplicitFunction ifcn = impl(vfcn,Function(),LinearSolver());
     ifcn.setOption(impl_options);
     ifcn.init();
     

@@ -24,7 +24,7 @@
 #include "symbolic/std_vector_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/casadi_calculus.hpp"
 #include <ctime>
@@ -36,7 +36,7 @@
 using namespace std;
 namespace CasADi{
 
-  StabilizedSQPInternal::StabilizedSQPInternal(const FX& nlp) : NLPSolverInternal(nlp){
+  StabilizedSQPInternal::StabilizedSQPInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("The SQP method is under development");
     addOption("stabilized_qp_solver",         OT_STABILIZEDQPSOLVER,   GenericType(),    "The Stabilized QP solver to be used by the SQP method");
     addOption("stabilized_qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the Stabilized QP solver");
@@ -852,7 +852,7 @@ namespace CasADi{
   void StabilizedSQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
     try{
       // Get function
-      FX& hessLag = this->hessLag();
+      Function& hessLag = this->hessLag();
 
       // Pass the argument to the function
       hessLag.setInput(x,HESSLAG_X);
@@ -919,7 +919,7 @@ namespace CasADi{
       if(ng_==0) return;
     
       // Get function
-      FX& jacG = this->jacG();
+      Function& jacG = this->jacG();
 
       // Pass the argument to the function
       jacG.setInput(x,NL_X);
@@ -947,7 +947,7 @@ namespace CasADi{
   void StabilizedSQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f){
     try {
       // Get function
-      FX& gradF = this->gradF();
+      Function& gradF = this->gradF();
 
       // Pass the argument to the function
       gradF.setInput(x,NL_X);

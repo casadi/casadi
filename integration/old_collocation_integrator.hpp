@@ -23,7 +23,7 @@
 #ifndef OLD_COLLOCATION_INTEGRATOR_HPP
 #define OLD_COLLOCATION_INTEGRATOR_HPP
 
-#include "symbolic/fx/integrator.hpp"
+#include "symbolic/function/integrator.hpp"
 
 namespace CasADi{
   
@@ -53,7 +53,7 @@ namespace CasADi{
      * \copydoc scheme_RDAEInput
      * \copydoc scheme_RDAEOutput
      */
-    explicit OldCollocationIntegrator(const FX& f, const FX& g=FX());
+    explicit OldCollocationIntegrator(const Function& f, const Function& g=Function());
 
     //@{
     /// Access functions of the node
@@ -68,7 +68,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static Integrator creator(const FX& f, const FX& g){ return OldCollocationIntegrator(f,g);}
+    static Integrator creator(const Function& f, const Function& g){ return OldCollocationIntegrator(f,g);}
 #ifdef SWIG
     %nocallback;
 #endif

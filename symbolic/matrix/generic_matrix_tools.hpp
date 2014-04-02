@@ -32,6 +32,11 @@
 
 namespace CasADi{
 
+/**
+\ingroup expression_tools
+@{ 
+*/
+
   /** \brief Matlab's linspace command
    */
   template<typename MatType>
@@ -148,6 +153,9 @@ namespace CasADi{
   }
 #endif // SWIG
 
+/**
+* @}
+*/
 
 } // namespace CasADi
 

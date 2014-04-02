@@ -34,11 +34,11 @@ namespace CasADi{
   }
  
   LapackQRDenseInternal* LapackQRDense::operator->(){
-    return static_cast<LapackQRDenseInternal*>(FX::operator->());
+    return static_cast<LapackQRDenseInternal*>(Function::operator->());
   }
 
   const LapackQRDenseInternal* LapackQRDense::operator->() const{
-    return static_cast<const LapackQRDenseInternal*>(FX::operator->());
+    return static_cast<const LapackQRDenseInternal*>(Function::operator->());
   }
 
   LapackQRDenseInternal::LapackQRDenseInternal(const Sparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){

@@ -23,7 +23,7 @@
 #ifndef OOQP_SOLVER_HPP
 #define OOQP_SOLVER_HPP
 
-#include "symbolic/fx/qp_solver.hpp"
+#include "symbolic/function/qp_solver.hpp"
 
 namespace CasADi {
   
@@ -31,7 +31,7 @@ namespace CasADi {
 // Forward declaration of internal class 
 class OOQPInternal;
 
-/** OOQP Solver for quadratic programming:
+/** \brief Interface to the OOQP Solver for quadratic programming:
 
       @copydoc QPSolver_doc
 

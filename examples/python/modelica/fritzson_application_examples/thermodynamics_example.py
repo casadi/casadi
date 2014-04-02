@@ -76,11 +76,11 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-output_fcn_out = [ocp.binding("m"),ocp.binding("P")]
+output_fcn_out = [ocp.beq("m"),ocp.beq("P")]
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -138,11 +138,11 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-output_fcn_out = [ocp.binding("T")]
+output_fcn_out = [ocp.beq("T")]
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,
@@ -193,11 +193,11 @@ dae_fcn_in = daeIn(
 )
 
 # Create an integrator
-dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode))
+dae = SXFunction(dae_fcn_in,daeOut(ode=ocp.ode(ocp.x)))
 integrator = CVodesIntegrator(dae)
 
 # Output function
-output_fcn_out = [ocp.binding("T"),ocp.binding("U"),ocp.binding("V")]
+output_fcn_out = [ocp.beq("T"),ocp.beq("U"),ocp.beq("V")]
 output_fcn_in = daeIn(
   t=ocp.t,
   x = ocp.x,

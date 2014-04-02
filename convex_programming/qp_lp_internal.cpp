@@ -23,7 +23,7 @@
 #include "qp_lp_internal.hpp"
 
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 
 using namespace std;
 namespace CasADi {

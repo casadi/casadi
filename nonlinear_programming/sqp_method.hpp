@@ -23,7 +23,7 @@
 #ifndef SQP_METHOD_HPP
 #define SQP_METHOD_HPP
 
-#include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/function/nlp_solver.hpp"
 
 namespace CasADi{
   
@@ -31,11 +31,12 @@ namespace CasADi{
   
   /**
      \brief Sequential Quadratic Programming method.
+     
      The algorithm is a classical SQP method with either exact (may be also provided) or 
      damped BFGS Lagrange Hessian approximation.
      Two different line-search algorithms are available.
      First, Armijo (Wolfe) condition with backtracking (suffers from Maratos effect).
-     Second, a line-search method that checks if the merit function is lower
+     Seco#ifndef WITHOUT_PRE_1_9_Xnd, a line-search method that checks if the merit function is lower
      than the last k values (no Maratos effect).
      Both methods employ the L1 merit function.
   
@@ -61,13 +62,15 @@ namespace CasADi{
     /// Default constructor
     SQPMethod();
 
-    /// \brief Create an NLP solver instance (legacy syntax)
-    explicit SQPMethod(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
-                       const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
+#ifndef WITHOUT_PRE_1_9_X
+    /// \brief [DEPRECATED] Create an NLP solver instance (legacy syntax)
+    explicit SQPMethod(const Function& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                       const Function& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
                     );
+#endif
 
     /// \brief Create an NLP solver instance
-    explicit SQPMethod(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+    explicit SQPMethod(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                     );
 
     /// Access functions of the node
@@ -81,7 +84,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static NLPSolver creator(const FX& nlp){ return SQPMethod(nlp);}
+    static NLPSolver creator(const Function& nlp){ return SQPMethod(nlp);}
 #ifdef SWIG
     %nocallback;
 #endif

@@ -21,12 +21,12 @@
  */
 
 #include "gsl_internal.hpp"
-#include "symbolic/fx/sx_function_internal.hpp"
+#include "symbolic/function/sx_function_internal.hpp"
 #include "symbolic/std_vector_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/jacobian.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/jacobian.hpp"
 
 using namespace std;
 namespace CasADi {
@@ -34,8 +34,8 @@ namespace GSL {
 
 GslInternal* GslInternal::clone() const{
   // Return a deep copy
-  FX f = deepcopy(f_);
-  FX q = deepcopy(q_);
+  Function f = deepcopy(f_);
+  Function q = deepcopy(q_);
   GslInternal* node = new GslInternal(f,q);
   node->setOption(dictionary());
   node->jac_f_ = deepcopy(jac_f_);
@@ -45,7 +45,7 @@ GslInternal* GslInternal::clone() const{
   return node;
 }
   
-GslInternal::GslInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
+GslInternal::GslInternal(const Function& f, const Function& q) : IntegratorInternal(f,q){
   is_init = false;
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "reset", true);
   std::cout << "Warning: GslIntegrator is highly experimental" << std::endl;
@@ -62,11 +62,11 @@ void GslInternal::resetAdj() { return;}
 
 void GslInternal::integrateAdj(double t_out) {return;}
 
-FX GslInternal::getJacobian() {return FX();}
+Function GslInternal::getJacobian() {return Function();}
   
 LinearSolver GslInternal::getLinearSolver() { return LinearSolver();}
 
-void GslInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac) {
+void GslInternal::setLinearSolver(const LinearSolver& linsol, const Function& jac) {
   return;
 }
   

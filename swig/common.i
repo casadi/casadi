@@ -58,6 +58,7 @@ _object = _copyableObject
 
 %include "doc.i"
 
+
 %feature("autodoc", "1");
 
 %naturalvar;
@@ -67,7 +68,8 @@ _object = _copyableObject
 
 #ifndef SWIGXML
 %feature("compactdefaultargs","1");
-%feature("compactdefaultargs","0") CasADi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
+//%feature("compactdefaultargs","0") CasADi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
+%feature("compactdefaultargs","0") CasADi::solve; // buggy
 #endif //SWIGXML
 
 // STL
@@ -399,6 +401,41 @@ namespace std {
 %include "symbolic/casadi_meta.hpp"
 
 #ifdef CASADI_MODULE
+
+%define DEPRECATED_MSG(MSG)
+if (deprecated("$decl",MSG)) SWIG_fail;
+%enddef
+
+%define INTERNAL_MSG()
+if (internal("$decl")) SWIG_fail;
+%enddef
+
+#ifdef SWIGPYTHON
+%wrapper %{
+int deprecated(const std::string & c,const std::string & a) {
+  return PyErr_WarnEx(PyExc_DeprecationWarning,("This function (" + c+") is deprecated. "  + a).c_str(),2);
+}
+int internal(const std::string & c) {
+  if (CasadiOptions::allowed_internal_api) return 0;
+  return PyErr_WarnEx(PyExc_SyntaxWarning,("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str(),2);
+}
+%}
+#endif
+
+#ifdef SWIGOCTAVE
+%wrapper %{
+int deprecated(const std::string & c,const std::string & a) {
+  warning("deprecated",("This function (" + c+") is deprecated. "  + a).c_str());
+  return 0;
+}
+int internal(const std::string & c) {
+  warning("internalAPI",("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str());
+  return 0;
+}
+%}
+#endif
+
+#ifdef SWIGPYTHON
 %{
 #define START \
   if (CasADi::CasadiOptions::catch_errors_python){ \
@@ -412,6 +449,23 @@ namespace std {
   } \
 } else
 %}
+#endif
+
+#ifdef SWIGOCTAVE
+%{
+#define START \
+  if (CasADi::CasadiOptions::catch_errors_python){ \
+  try {
+  
+#define STOP \
+  } catch (const std::exception& e) { \
+  SWIG_exception(SWIG_RuntimeError, e.what()); \
+  } catch (const char* e) { \
+    SWIG_exception(SWIG_RuntimeError, e); \
+  } \
+} else
+%}
+#endif
 
 // Exceptions handling
 %include "exception.i"
@@ -443,7 +497,10 @@ namespace std {
     SWIG_exception(SWIG_TypeError, e); \
   }
 }
+%include "internal.i"
+%include "deprecated.i"
 #endif // CASADI_MODULE
+
 
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
@@ -566,7 +623,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 // typemap meta implementations
 %include "meta.i"
 
-%include "symbolic/fx/schemes_metadata.hpp"
+%include "symbolic/function/schemes_metadata.hpp"
 
 // common typemaps
 %include "commontypemaps.i"
@@ -579,48 +636,48 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 // Scalar expressions 
 #include "symbolic/sx/sx_element.hpp" 
 #include "symbolic/sx/sx_tools.hpp" 
-#include "symbolic/fx/sx_function.hpp" 
+#include "symbolic/function/sx_function.hpp" 
 	 
 // Matrix expressions 
 #include "symbolic/mx/mx.hpp" 
 #include "symbolic/mx/mx_tools.hpp" 
 
-#include "symbolic/fx/mx_function.hpp" 
+#include "symbolic/function/mx_function.hpp" 
  	
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/custom_function.hpp"
-#include "symbolic/fx/ocp_solver.hpp"
-#include "symbolic/fx/simulator.hpp"
-#include "symbolic/fx/parallelizer.hpp"
-#include "symbolic/fx/external_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/custom_function.hpp"
+#include "symbolic/function/ocp_solver.hpp"
+#include "symbolic/function/simulator.hpp"
+#include "symbolic/function/parallelizer.hpp"
+#include "symbolic/function/external_function.hpp"
 
 
 #include "optimal_control/direct_multiple_shooting.hpp"
 #include "optimal_control/symbolic_ocp.hpp"
 
-#include "symbolic/fx/io_interface.hpp"
-#include "symbolic/fx/fx.hpp"
-#include "symbolic/fx/sx_function.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/linear_solver.hpp"
-#include "symbolic/fx/symbolic_qr.hpp"
-#include "symbolic/fx/implicit_function.hpp"
-#include "symbolic/fx/integrator.hpp"
-#include "symbolic/fx/simulator.hpp"
-#include "symbolic/fx/control_simulator.hpp"
-#include "symbolic/fx/nlp_solver.hpp"
-#include "symbolic/fx/qp_solver.hpp"
-#include "symbolic/fx/stabilized_qp_solver.hpp"
-#include "symbolic/fx/lp_solver.hpp"
-#include "symbolic/fx/ocp_solver.hpp"
-#include "symbolic/fx/sdp_solver.hpp"
-#include "symbolic/fx/socp_solver.hpp"
-#include "symbolic/fx/qcqp_solver.hpp"
-#include "symbolic/fx/sdqp_solver.hpp"
-#include "symbolic/fx/external_function.hpp"
-#include "symbolic/fx/parallelizer.hpp"
-#include "symbolic/fx/custom_function.hpp"
-#include "symbolic/fx/nullspace.hpp"
+#include "symbolic/function/io_interface.hpp"
+#include "symbolic/function/function.hpp"
+#include "symbolic/function/sx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/linear_solver.hpp"
+#include "symbolic/function/symbolic_qr.hpp"
+#include "symbolic/function/implicit_function.hpp"
+#include "symbolic/function/integrator.hpp"
+#include "symbolic/function/simulator.hpp"
+#include "symbolic/function/control_simulator.hpp"
+#include "symbolic/function/nlp_solver.hpp"
+#include "symbolic/function/qp_solver.hpp"
+#include "symbolic/function/stabilized_qp_solver.hpp"
+#include "symbolic/function/lp_solver.hpp"
+#include "symbolic/function/ocp_solver.hpp"
+#include "symbolic/function/sdp_solver.hpp"
+#include "symbolic/function/socp_solver.hpp"
+#include "symbolic/function/qcqp_solver.hpp"
+#include "symbolic/function/sdqp_solver.hpp"
+#include "symbolic/function/external_function.hpp"
+#include "symbolic/function/parallelizer.hpp"
+#include "symbolic/function/custom_function.hpp"
+#include "symbolic/function/nullspace.hpp"
 
 #include "nonlinear_programming/symbolic_nlp.hpp"
 #include "nonlinear_programming/sqp_method.hpp"
@@ -647,6 +704,8 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "control/dple_solver.hpp"
 #include "control/simple_indef_dple_solver.hpp"
 
+using namespace CasADi;
+
 %}
 
 #ifndef SWIGXML
@@ -661,8 +720,8 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
 %template(Dictionary) std::map<std::string,CasADi::GenericType>;
 
-%traits_swigtype(CasADi::FX);
-%fragment(SWIG_Traits_frag(CasADi::FX));
+%traits_swigtype(CasADi::Function);
+%fragment(SWIG_Traits_frag(CasADi::Function));
 
 #endif
 
@@ -695,7 +754,7 @@ void dummy(CasADi::SXElement foo,
   std::string& foo19,
   CasADi::Matrix<int> foo20,
   CasADi::CustomFunction foo24,
-  CasADi::FX foo25,
+  CasADi::Function foo25,
 	int &bar,
 	double &baz) {}
 
@@ -747,7 +806,7 @@ void dummy(CasADi::SXElement foo,
   std::string& foo19,
   CasADi::Matrix<int> foo20,
   CasADi::CustomFunction foo24,
-  CasADi::FX foo25,
+  CasADi::Function foo25,
 	int &bar,
 	double &baz);
 

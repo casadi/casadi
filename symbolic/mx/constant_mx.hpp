@@ -27,6 +27,8 @@
 #include <iomanip>
 #include <iostream>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
 /** \brief Represents an MX that is only composed of a constant.
@@ -361,7 +363,7 @@ namespace CasADi{
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
     casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
     
-    if (ScX && !operation_checker<FX0Checker>(op)) {
+    if (ScX && !operation_checker<Function0Checker>(op)) {
       double ret;
       casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,0,ret);
       
@@ -483,25 +485,40 @@ namespace CasADi{
 
   template<typename Value>
   void Constant<Value>::printPart(std::ostream &stream, int part) const{
-    if(sparsity().isScalar(true)){
-      stream << v_.value;
-    } else {
-      stream << "Const<" << v_.value << ">(";
-      stream << size1() << "x" << size2() << ": ";
-      if(sparsity().isDense()){
-        stream << "dense";
-      } else if(sparsity().size()==0){
-        stream << "empty";          
-      } else if(sparsity().isDiagonal()){
-        stream << "diagonal";
+    if(sparsity().isScalar()){
+      // Print scalar
+      if(sparsity().size()==0){
+        stream << "00";
       } else {
-        stream << double(size())/sparsity().numel()*100 << " %";
-      }        
+        stream << v_.value;
+      }
+    } else if(sparsity().isEmpty()){
+      // Print empty
+      sparsity().printCompact(stream);
+    } else {
+      // Print value
+      if(v_.value==0){
+        stream << "zeros(";
+      } else if(v_.value==1){
+        stream << "ones(";
+      } else if(v_.value!=v_.value){
+        stream << "nan(";
+      } else if(v_.value==std::numeric_limits<double>::infinity()){
+        stream << "inf(";
+      } else if(v_.value==-std::numeric_limits<double>::infinity()){
+        stream << "-inf(";
+      } else {
+        stream << "all_" << v_.value << "(";
+      }
+
+      // Print sparsity
+      sparsity().printCompact(stream);
       stream << ")";
     }
   }
 
 } // namespace CasADi
+/// \endcond
 
 
 #endif // CONSTANT_MX_HPP

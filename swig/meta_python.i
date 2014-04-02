@@ -30,7 +30,7 @@ def attach_return_type(f,t):
   return f
 
 def pyderivativegenerator(f):
-  return attach_return_type(f,FX)
+  return attach_return_type(f,Function)
 
 def pyevaluate(f):
   return attach_return_type(f,None)
@@ -148,7 +148,7 @@ PyObject * getCasadiObject(const std::string &s) {
 }
 
 #include "symbolic/functor_internal.hpp"
-#include "symbolic/fx/custom_function.hpp"
+#include "symbolic/function/custom_function.hpp"
 
 namespace CasADi {
   //using namespace CasADi;
@@ -165,7 +165,7 @@ namespace CasADi {
     friend class DerivativeGeneratorPython;
     
   DerivativeGeneratorPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-    virtual FX call(FX& fcn, int nfwd, int nadj, void* user_data);
+    virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data);
     virtual DerivativeGeneratorPythonInternal* clone() const { return new DerivativeGeneratorPythonInternal(p_); }
   };
    
@@ -186,7 +186,7 @@ namespace CasADi {
     friend class CallbackPython;
     
     CallbackPythonInternal(PyObject *p) : FunctorPythonInternal(p) {}
-    virtual int call(FX& fcn, void* user_data);
+    virtual int call(Function& fcn, void* user_data);
     virtual CallbackPythonInternal* clone() const { return new CallbackPythonInternal(p_); }
   };
   
@@ -207,15 +207,15 @@ namespace CasADi {
 
 namespace CasADi {
 
-  FX DerivativeGeneratorPythonInternal::call(FX& fcn, int nfwd, int nadj, void* user_data) {
+  Function DerivativeGeneratorPythonInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
     casadi_assert(p_!=0);
     PyObject * nfwd_py = PyInt_FromLong(nfwd);
     PyObject * nadj_py = PyInt_FromLong(nadj);
-    PyObject * fcn_py = SWIG_NewPointerObj((new FX(static_cast< const FX& >(fcn))), SWIGTYPE_p_CasADi__FX, SWIG_POINTER_OWN |  0 );
+    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_CasADi__Function, SWIG_POINTER_OWN |  0 );
     if(!fcn_py) {
       Py_DECREF(nfwd_py);
       Py_DECREF(nadj_py);
-      throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert FX to python");
+      throw CasadiException("DerivativeGeneratorPythonInternal: failed to convert Function to python");
     }
     
     PyObject *r = PyObject_CallFunctionObjArgs(p_, fcn_py, nfwd_py, nadj_py, NULL);
@@ -224,9 +224,9 @@ namespace CasADi {
     Py_DECREF(fcn_py);
     
     if (r) {
-      FX ret;  
-      int result = meta< FX >::as(r,ret);
-      if(!result) { Py_DECREF(r); throw CasadiException("DerivativeGeneratorPythonInternal: return type was not FX."); }
+      Function ret;  
+      int result = meta< Function >::as(r,ret);
+      if(!result) { Py_DECREF(r); throw CasadiException("DerivativeGeneratorPythonInternal: return type was not Function."); }
       Py_DECREF(r);
       return ret;
     } else {
@@ -253,10 +253,10 @@ namespace CasADi {
 
   }
   
-  int CallbackPythonInternal::call(FX& fcn, void* user_data) {
+  int CallbackPythonInternal::call(Function& fcn, void* user_data) {
     casadi_assert(p_!=0);
 
-    PyObject * fcn_py = SWIG_NewPointerObj((new FX(static_cast< const FX& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
+    PyObject * fcn_py = SWIG_NewPointerObj((new Function(static_cast< const Function& >(fcn))), SWIGTYPE_p_CasADi__CustomFunction, SWIG_POINTER_OWN |  0 );
     if(!fcn_py) {
       throw CasadiException("CallbackPythonInternal: failed to convert CustomFunction to python");
     }
@@ -270,7 +270,7 @@ namespace CasADi {
     }
     int ret = 0;
     if ( meta< int >::couldbe(r)) {
-      int res = meta< int >::as(r,ret);    
+      /*int res = */ meta< int >::as(r,ret);    
     }
     
     Py_DECREF(r);
@@ -477,10 +477,10 @@ template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::
    NATIVERETURN(CasADi::DerivativeGenerator, s)
    PyObject* return_type = getReturnType(p);
    if (!return_type) return false;
-   PyObject* fx = getCasadiObject("FX");
-   if (!fx) { Py_DECREF(return_type); return false; }
-   bool res = PyClass_IsSubclass(return_type,fx);
-   Py_DECREF(return_type);Py_DECREF(fx);
+   PyObject* function = getCasadiObject("Function");
+   if (!function) { Py_DECREF(return_type); return false; }
+   bool res = PyClass_IsSubclass(return_type,function);
+   Py_DECREF(return_type);Py_DECREF(function);
    if (res) {
      s = CasADi::DerivativeGeneratorPython(p);
      return true;
@@ -575,9 +575,9 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     }
     if (!g) { PyErr_Clear();  return false;}
     
-  } else if (meta< CasADi::FX >::couldbe(p)) {
-    CasADi::FX temp;
-    int ret = meta< CasADi::FX >::as(p,temp); 
+  } else if (meta< CasADi::Function >::couldbe(p)) {
+    CasADi::Function temp;
+    int ret = meta< CasADi::Function >::as(p,temp); 
     if (!ret) return false;
     s = CasADi::GenericType(temp);
   } else if (meta< CasADi::GenericType::Dictionary >::couldbe(p) || meta< CasADi::DerivativeGenerator >::couldbe(p) || meta< CasADi::Callback >::couldbe(p)) {
@@ -790,51 +790,83 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     if (array_is_new_object)
       Py_DECREF(array); 
   } else if(PyObjectHasClassName(p,"csc_matrix")) { // scipy's csc_matrix will be cast to sparse Matrix<double>
-    PyObject * narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
-    if (!(is_array(narray) && array_numdims(narray)==1)) {
-      return false;
-      //SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
-    }
-    int array_is_new_object;
-    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
-    if (!array) { 
-      return false;
-      //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
-    }
-    int size=array_size(array,0); // number on non-zeros
-    double* d=(double*) array_data(array);
-    std::vector<double> v(d,d+size);
-
+    
     // Get the dimensions of the csc_matrix
     PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
+    if (!shape) {
+     return false;
+    }
+    if(!PyTuple_Check(shape) || PyTuple_Size(shape)!=2) {
+      Py_DECREF(shape);
+      return false;
+    }
     int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
     int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
-		
-    // Construct the 'row' vector needed for initialising the correct sparsity
-    PyObject * row = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
-    if (!(is_array(row) && array_numdims(row)==1 && array_type(row)==NPY_INT)) {
-      return false;
-      //PyErr_Print(); SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");
-    }
+		Py_DECREF(shape);
+  
+
     
-    int* rowd=(int*) array_data(row);
-    std::vector<int> rowv(rowd,rowd+size);
+    
+    bool ret= false;
+    
+    PyObject * narray=NULL;
+    PyObject * row=NULL;
+    PyObject * colind=NULL;
+    PyArrayObject* array=NULL;
+    PyArrayObject* array_row=NULL;
+    PyArrayObject* array_colind=NULL;
+    
+    int array_is_new_object=0;
+    int row_is_new_object=0;
+    int colind_is_new_object=0;
+    
+    // Fetch data
+    narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
+    if (!narray || !is_array(narray) || array_numdims(narray)!=1) goto cleanup;
+    array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
+    if (!array) goto cleanup;
+		    
+    // Construct the 'row' vector needed for initialising the correct sparsity
+    row = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
+    if (!row || !is_array(row) || array_numdims(row)!=1) goto cleanup;
+    array_row = obj_to_array_contiguous_allow_conversion(row,NPY_INT,&row_is_new_object);
+    if (!array_row) goto cleanup;
     
     // Construct the 'colind' vector needed for initialising the correct sparsity
-    PyObject * colind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
-    if (!(is_array(colind) && array_numdims(colind)==1 && array_type(colind)==NPY_INT)) {
-      //PyErr_Print();   SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");
-      return false;
+    colind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
+    if (!colind || !is_array(colind) || array_numdims(colind)!=1) goto cleanup;
+    array_colind = obj_to_array_contiguous_allow_conversion(colind,NPY_INT,&colind_is_new_object);
+    if (!array_colind) goto cleanup;
+    
+
+    {
+      int size=array_size(array,0); // number on non-zeros
+      double* d=(double*) array_data(array);
+      std::vector<double> v(d,d+size);
+      
+      int* rowd=(int*) array_data(array_row);
+      std::vector<int> rowv(rowd,rowd+size);
+      
+      int* colindd=(int*) array_data(array_colind);
+      std::vector<int> colindv(colindd,colindd+(ncols+1));
+      
+      m = CasADi::Matrix<double>(CasADi::Sparsity(nrows,ncols,colindv,rowv), v);
+      
+      ret = true;
     }
-    int* colindd=(int*) array_data(colind);
-    std::vector<int> colindv(colindd,colindd+(ncols+1));
     
-    m = CasADi::Matrix<double>(CasADi::Sparsity(nrows,ncols,colindv,rowv), v);
     
-    Py_DECREF(narray);Py_DECREF(shape);Py_DECREF(colind);Py_DECREF(row);
-    
-    if (array_is_new_object)
-      Py_DECREF(array);
+    cleanup: // yes that's right; goto.
+      // Rather that than a pyramid of conditional memory-deallocation 
+      if (array_is_new_object && array) Py_DECREF(array);
+      if (narray) Py_DECREF(narray);
+      if (row_is_new_object && array_row) Py_DECREF(array_row);
+      if (row) Py_DECREF(row);
+      if (colind_is_new_object && array_colind) Py_DECREF(array_colind);
+      if (colind) Py_DECREF(colind);
+      
+    return ret;
+
   } else if(PyObject_HasAttrString(p,"tocsc")) {
     char name[] = "tocsc";
     PyObject *cr = PyObject_CallMethod(p, name,0);

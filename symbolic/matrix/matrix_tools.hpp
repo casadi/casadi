@@ -352,7 +352,7 @@ namespace CasADi{
 #ifndef SWIGOCTAVE
   /** \brief  Make a matrix dense */
   template<typename DataType>
-  Matrix<DataType> full(const Matrix<DataType>& A);
+  Matrix<DataType> dense(const Matrix<DataType>& A);
 
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<typename DataType>
@@ -362,7 +362,8 @@ namespace CasADi{
   /// same as: res += mul(A,v)
   template<typename DataType>
   void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A=false);
-
+  
+  /// \cond INTERNAL
   /// Get a pointer to the data contained in the vector
   template<typename DataType>
   DataType* getPtr(Matrix<DataType> &v);
@@ -370,7 +371,8 @@ namespace CasADi{
   /// Get a pointer to the data contained in the vector
   template<typename DataType>
   const DataType* getPtr(const Matrix<DataType> &v);
-
+  /// \endcond
+  
   /** \brief Create a new matrix with a given sparsity pattern but with the nonzeros taken from an existing matrix */
   template<typename DataType>
   Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sparsity);
@@ -582,8 +584,8 @@ namespace CasADi{
     if(sp==x.sparsity())
       return x;
   
-    // make sure that the number of zeros agree
-    casadi_assert(x.size()==sp.size());
+    // make sure that the patterns match
+    casadi_assert(sp.isReshape(x.sparsity()));
   
     return Matrix<DataType>(sp,x.data());
   }
@@ -1076,7 +1078,7 @@ namespace CasADi{
   }
 
   template<typename DataType>
-  Matrix<DataType> full(const Matrix<DataType>& A){    
+  Matrix<DataType> dense(const Matrix<DataType>& A){    
     Matrix<DataType> ret = A;
     ret.densify();
     return ret;
@@ -1270,7 +1272,7 @@ namespace CasADi{
 #define MATRIX_TOOLS_TEMPLATES(DataType)               \
   MATRIX_TOOLS_TEMPLATES_COMMON(DataType)              \
   MTT_INST(DataType,sparse)                            \
-  MTT_INST(DataType,full)
+  MTT_INST(DataType,dense)
 #endif //SWIGOCTAVE
 
 #endif // MATRIX_TOOLS_HPP

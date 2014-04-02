@@ -26,6 +26,8 @@
 #include "generic_type.hpp"
 #include "std_vector_tools.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
   
   template<typename T>
@@ -47,6 +49,6 @@ namespace CasADi{
   }
   
 } // namespace CasADi
-
+/// \endcond
 
 #endif // GENERIC_TYPE_INTERNAL_HPP

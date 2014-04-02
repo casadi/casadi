@@ -24,8 +24,10 @@
 #define MULTIPLE_OUTPUT_HPP
 
 #include "mx_node.hpp"
-#include "../fx/fx.hpp"
+#include "../function/function.hpp"
 #include <set>
+
+/// \cond INTERNAL
 
 namespace CasADi{
 
@@ -101,5 +103,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+/// \endcond
 
 #endif // MULTIPLE_OUTPUT_HPP

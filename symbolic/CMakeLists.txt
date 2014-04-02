@@ -56,7 +56,7 @@ SET(CASADI_SRCS
   mx/binary_mx.hpp           mx/binary_mx_impl.hpp      # Binary operation
   mx/multiplication.hpp      mx/multiplication_impl.hpp # Matrix multiplication
   mx/solve.hpp               mx/solve_impl.hpp          # Solve linear system of equations
-  mx/call_fx.hpp             mx/call_fx.cpp             # FX function evaluation
+  mx/call_function.hpp       mx/call_function.cpp       # Function evaluation node
   mx/norm.hpp                mx/norm.cpp                # 1-norm, 2-norm and infinity-norm
   mx/transpose.hpp           mx/transpose.cpp           # Transpose
   mx/concat.hpp              mx/concat.cpp              # Concatenation
@@ -75,37 +75,38 @@ SET(CASADI_SRCS
   mx/mx_tools.hpp            mx/mx_tools.cpp
 
   # A dynamically created function with AD capabilities
-  fx/io_interface.hpp                                   # Input/output interface for FX and FXInternal
-  fx/io_scheme.hpp           fx/io_scheme.cpp           fx/io_scheme_internal.hpp           fx/io_scheme_internal.cpp 
-  fx/fx.hpp                  fx/fx.cpp                  fx/fx_internal.hpp                  fx/fx_internal.cpp
-  fx/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
-  fx/sx_function.hpp         fx/sx_function.cpp         fx/sx_function_internal.hpp         fx/sx_function_internal.cpp
-  fx/mx_function.hpp         fx/mx_function.cpp         fx/mx_function_internal.hpp         fx/mx_function_internal.cpp
-  fx/custom_function.hpp     fx/custom_function.cpp     fx/custom_function_internal.hpp     fx/custom_function_internal.cpp
-  fx/external_function.hpp   fx/external_function.cpp   fx/external_function_internal.hpp   fx/external_function_internal.cpp
-  fx/linear_solver.hpp       fx/linear_solver.cpp       fx/linear_solver_internal.hpp       fx/linear_solver_internal.cpp
-  fx/symbolic_qr.hpp         fx/symbolic_qr.cpp         fx/symbolic_qr_internal.hpp         fx/symbolic_qr_internal.cpp
-  fx/implicit_function.hpp   fx/implicit_function.cpp   fx/implicit_function_internal.hpp   fx/implicit_function_internal.cpp
-  fx/integrator.hpp          fx/integrator.cpp          fx/integrator_internal.hpp          fx/integrator_internal.cpp
-  fx/nlp_solver.hpp          fx/nlp_solver.cpp          fx/nlp_solver_internal.hpp          fx/nlp_solver_internal.cpp
-  fx/simulator.hpp           fx/simulator.cpp           fx/simulator_internal.hpp           fx/simulator_internal.cpp
-  fx/control_simulator.hpp   fx/control_simulator.cpp   fx/control_simulator_internal.hpp   fx/control_simulator_internal.cpp
-  fx/parallelizer.hpp        fx/parallelizer.cpp        fx/parallelizer_internal.hpp        fx/parallelizer_internal.cpp
-  fx/ocp_solver.hpp          fx/ocp_solver.cpp          fx/ocp_solver_internal.hpp          fx/ocp_solver_internal.cpp
-  fx/qp_solver.hpp           fx/qp_solver.cpp           fx/qp_solver_internal.hpp           fx/qp_solver_internal.cpp
-  fx/stabilized_qp_solver.hpp    fx/stabilized_qp_solver.cpp    fx/stabilized_qp_solver_internal.hpp fx/stabilized_qp_solver_internal.cpp
-  fx/sdp_solver.hpp          fx/sdp_solver.cpp          fx/sdp_solver_internal.hpp          fx/sdp_solver_internal.cpp
-  fx/sdqp_solver.hpp         fx/sdqp_solver.cpp         fx/sdqp_solver_internal.hpp         fx/sdqp_solver_internal.cpp
-  fx/socp_solver.hpp         fx/socp_solver.cpp         fx/socp_solver_internal.hpp         fx/socp_solver_internal.cpp
-  fx/qcqp_solver.hpp         fx/qcqp_solver.cpp         fx/qcqp_solver_internal.hpp         fx/qcqp_solver_internal.cpp
-  fx/lp_solver.hpp           fx/lp_solver.cpp           fx/lp_internal.hpp                  fx/lp_internal.cpp
-  fx/code_generator.hpp      fx/code_generator.cpp
-  fx/nullspace.hpp           fx/nullspace.cpp           fx/nullspace_internal.hpp           fx/nullspace_internal.cpp
+  function/io_interface.hpp                                   # Input/output interface for Function and FunctionInternal
+  function/io_scheme.hpp           function/io_scheme.cpp           function/io_scheme_internal.hpp           function/io_scheme_internal.cpp 
+  function/function.hpp                  function/function.cpp                  function/function_internal.hpp                  function/function_internal.cpp
+  function/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
+  function/sx_function.hpp         function/sx_function.cpp         function/sx_function_internal.hpp         function/sx_function_internal.cpp
+  function/mx_function.hpp         function/mx_function.cpp         function/mx_function_internal.hpp         function/mx_function_internal.cpp
+  function/custom_function.hpp     function/custom_function.cpp     function/custom_function_internal.hpp     function/custom_function_internal.cpp
+  function/external_function.hpp   function/external_function.cpp   function/external_function_internal.hpp   function/external_function_internal.cpp
+  function/linear_solver.hpp       function/linear_solver.cpp       function/linear_solver_internal.hpp       function/linear_solver_internal.cpp
+  function/symbolic_qr.hpp         function/symbolic_qr.cpp         function/symbolic_qr_internal.hpp         function/symbolic_qr_internal.cpp
+  function/implicit_function.hpp   function/implicit_function.cpp   function/implicit_function_internal.hpp   function/implicit_function_internal.cpp
+  function/integrator.hpp          function/integrator.cpp          function/integrator_internal.hpp          function/integrator_internal.cpp
+  function/nlp_solver.hpp          function/nlp_solver.cpp          function/nlp_solver_internal.hpp          function/nlp_solver_internal.cpp
+  function/homotopy_nlp_solver.hpp function/homotopy_nlp_solver.cpp function/homotopy_nlp_internal.hpp function/homotopy_nlp_internal.cpp
+  function/simulator.hpp           function/simulator.cpp           function/simulator_internal.hpp           function/simulator_internal.cpp
+  function/control_simulator.hpp   function/control_simulator.cpp   function/control_simulator_internal.hpp   function/control_simulator_internal.cpp
+  function/parallelizer.hpp        function/parallelizer.cpp        function/parallelizer_internal.hpp        function/parallelizer_internal.cpp
+  function/ocp_solver.hpp          function/ocp_solver.cpp          function/ocp_solver_internal.hpp          function/ocp_solver_internal.cpp
+  function/qp_solver.hpp           function/qp_solver.cpp           function/qp_solver_internal.hpp           function/qp_solver_internal.cpp
+  function/stabilized_qp_solver.hpp    function/stabilized_qp_solver.cpp    function/stabilized_qp_solver_internal.hpp function/stabilized_qp_solver_internal.cpp
+  function/sdp_solver.hpp          function/sdp_solver.cpp          function/sdp_solver_internal.hpp          function/sdp_solver_internal.cpp
+  function/sdqp_solver.hpp         function/sdqp_solver.cpp         function/sdqp_solver_internal.hpp         function/sdqp_solver_internal.cpp
+  function/socp_solver.hpp         function/socp_solver.cpp         function/socp_solver_internal.hpp         function/socp_solver_internal.cpp
+  function/qcqp_solver.hpp         function/qcqp_solver.cpp         function/qcqp_solver_internal.hpp         function/qcqp_solver_internal.cpp
+  function/lp_solver.hpp           function/lp_solver.cpp           function/lp_internal.hpp                  function/lp_internal.cpp
+  function/code_generator.hpp      function/code_generator.cpp
+  function/nullspace.hpp           function/nullspace.cpp           function/nullspace_internal.hpp           function/nullspace_internal.cpp
 
   # User include class with the most essential includes
   casadi.hpp
   
-  fx/schemes_metadata.hpp fx/schemes_metadata.cpp fx/schemes_helpers.hpp
+  function/schemes_metadata.hpp function/schemes_metadata.cpp function/schemes_helpers.hpp
   
 )
 

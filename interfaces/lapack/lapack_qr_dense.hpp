@@ -23,7 +23,7 @@
 #ifndef LAPACK_QR_DENSE_HPP
 #define LAPACK_QR_DENSE_HPP
 
-#include "symbolic/fx/linear_solver_internal.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
 
 namespace CasADi{
   
@@ -39,7 +39,7 @@ namespace CasADi{
    * This class solves the linear system A.x=b by making an QR factorization of A: \n
    * A = Q.R, with Q orthogonal and R upper triangular
    * 
-   * LapackQRDense is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   * LapackQRDense is an CasADi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use LapackQRDense is: \n
    *  -# init()
@@ -76,6 +76,7 @@ namespace CasADi{
 
   };
 
+/// \cond INTERNAL
 #ifndef SWIG
 
   /// QR-factorize dense matrix (lapack)
@@ -125,8 +126,11 @@ namespace CasADi{
   };
 
 #endif // SWIG
+/// \endcond
 
 } // namespace CasADi
+
+
 
 #endif //LAPACK_QR_DENSE_HPP
 

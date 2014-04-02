@@ -23,7 +23,7 @@
 #ifndef SDP_SOCP_SOLVER_HPP
 #define SDP_SOCP_SOLVER_HPP
 
-#include "symbolic/fx/socp_solver.hpp"
+#include "symbolic/function/socp_solver.hpp"
 
 namespace CasADi {
   

@@ -48,7 +48,7 @@ Lqr::Lqr(Ode & _ode, double t0_, double tf_, int N_, SX (*cost_)(map<string,SX> 
 	  QuuTrajectory.push_back( DMatrix( ode.nu(), ode.nu(), 0.0) );
 		
 	  f0Trajectory.push_back(  DMatrix( ode.nx(),        1, 0.0) );
-	  fxTrajectory.push_back(  DMatrix( ode.nx(), ode.nx(), 0.0) );
+	  functionTrajectory.push_back(  DMatrix( ode.nx(), ode.nx(), 0.0) );
 	  fuTrajectory.push_back(  DMatrix( ode.nx(), ode.nu(), 0.0) );
 
 	  // initialize action bounds
@@ -293,7 +293,7 @@ void Lqr::runBackwardSweep()
 
      // 	cout << "---------- dynamics: --------\n";
      // 	cout << "f0Trajectory.at(" << k << "): "  <<  f0Trajectory.at(k) << endl;
-     // 	cout << "fxTrajectory.at(" << k << "):\n" <<  fxTrajectory.at(k);
+     // 	cout << "functionTrajectory.at(" << k << "):\n" <<  functionTrajectory.at(k);
      // 	cout << "fuTrajectory.at(" << k << "): "  <<  fuTrajectory.at(k) << endl;
      // 	cout << endl;
 
@@ -356,7 +356,7 @@ void Lqr::takeBackwardStep(int timestep)
 
 	  // get outputs
 	  dynamicsFcn.getOutput( f0Trajectory.at(timestep), 0 );
-	  dynamicsFcn.getOutput( fxTrajectory.at(timestep), 1 );
+	  dynamicsFcn.getOutput( functionTrajectory.at(timestep), 1 );
 	  dynamicsFcn.getOutput( fuTrajectory.at(timestep), 2 );
      }
 #endif

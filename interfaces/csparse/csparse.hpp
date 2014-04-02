@@ -23,7 +23,7 @@
 #ifndef CSPARSE_HPP
 #define CSPARSE_HPP
 
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
 namespace CasADi{
 
@@ -35,7 +35,7 @@ namespace CasADi{
    *
    @copydoc LinearSolver_doc
    *  
-   * CSparse is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   * CSparse is an CasADi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use CSparse is: \n
    *  -# init()

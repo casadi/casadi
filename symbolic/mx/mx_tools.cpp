@@ -22,10 +22,10 @@
 
 #include "mx_tools.hpp"
 #include "../sx/sx_tools.hpp"
-#include "../fx/mx_function.hpp"
+#include "../function/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../std_vector_tools.hpp"
-#include "../fx/mx_function_internal.hpp"
+#include "../function/mx_function_internal.hpp"
 
 using namespace std;
 
@@ -165,12 +165,11 @@ namespace CasADi{
   }
   
   MX veccat(const vector<MX>& comp) {
-        MX (&f)(const MX&) = vec;
+    MX (&f)(const MX&) = vec;
     return vertcat(applymap(f,comp));
   }
 
   MX vecNZcat(const vector<MX>& comp) {
-    MX (&f)(const MX&) = vecNZ;
     return vertcat(applymap(vecNZ,comp));
   }
 
@@ -238,8 +237,8 @@ namespace CasADi{
     if(sp==x.sparsity())
       return x;
   
-    // make sure that the number of zeros agree
-    casadi_assert(x.size()==sp.size());
+    // make sure that the patterns match
+    casadi_assert(sp.isReshape(x.sparsity()));
   
     // Create a reshape node
     return x->getReshape(sp);
@@ -342,7 +341,7 @@ namespace CasADi{
      }
   */
 
-  MX full(const MX& x){
+  MX dense(const MX& x){
     MX ret = x;
     ret.densify();
     return ret;
@@ -367,7 +366,7 @@ namespace CasADi{
     
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      deps[k] = reshape(Ps[k],deps[k].sparsity());
+      deps[k] = MX(deps[k].sparsity(),Ps[k]);
     }
   
     return P;
@@ -388,7 +387,7 @@ namespace CasADi{
   
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      children[k] =  reshape(Ps[k],deps[k]);
+      children[k] =  MX(deps[k],Ps[k]);
     }
   
     return P;

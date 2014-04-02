@@ -24,7 +24,8 @@
 #define SOLVE_HPP
 
 #include "mx_node.hpp"
-#include "../fx/linear_solver.hpp"
+#include "../function/linear_solver.hpp"
+/// \cond INTERNAL
 
 namespace CasADi{
   /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T
@@ -64,6 +65,9 @@ namespace CasADi{
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
 
@@ -74,7 +78,7 @@ namespace CasADi{
     virtual int numInplace() const{ return 1;}
 
     /** \brief  Get function reference */
-    virtual FX& getFunction(){ return linear_solver_;}
+    virtual Function& getFunction(){ return linear_solver_;}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

@@ -15,5 +15,5 @@
 
 Learn all about CasADi at the [homepage](http://casadi.org)...
 
-![Class diagram](http://casadi.sourceforge.net/api/html/d7/dd8/classCasADi_1_1FX__inherit__graph.png)
+![Class diagram](http://casadi.sourceforge.net/api/html/d7/dd8/classCasADi_1_1Function__inherit__graph.png)
 

@@ -23,9 +23,10 @@
 #ifndef QCQP_QP_INTERNAL_HPP
 #define QCQP_QP_INTERNAL_HPP
 
-#include "symbolic/fx/qp_solver_internal.hpp"
-#include "symbolic/fx/qcqp_solver.hpp"
+#include "symbolic/function/qp_solver_internal.hpp"
+#include "symbolic/function/qcqp_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for QCQPQPInternal
@@ -56,6 +57,6 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //QCQP_QP_INTERNAL_HPP
 

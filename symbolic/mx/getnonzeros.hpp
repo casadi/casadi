@@ -27,6 +27,8 @@
 #include <map>
 #include <stack>
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Get nonzeros of a matrix
       \author Joel Andersson
@@ -189,5 +191,6 @@ namespace CasADi{
 
 
 } // namespace CasADi
+/// \endcond
 
 #endif // GETNONZEROS_HPP

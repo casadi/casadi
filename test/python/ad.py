@@ -157,7 +157,8 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
-            res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
+            with internalAPI():
+              res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -203,7 +204,8 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
-            res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds),True)
+            with internalAPI():
+              res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds),True)
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -250,7 +252,8 @@ class ADtests(casadiTestCase):
             
             fseeds = map(lambda x: DMatrix(f.input().sparsity(),x), seeds)
             aseeds = map(lambda x: DMatrix(f.output().sparsity(),x), seeds)
-            res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
+            with internalAPI():
+              res,fwdsens,adjsens = f.callDerivative([y],map(lambda x: [x],fseeds),map(lambda x: [x],aseeds))
             fwdsens = map(lambda x: x[0],fwdsens)
             adjsens = map(lambda x: x[0],adjsens)
             
@@ -291,8 +294,8 @@ class ADtests(casadiTestCase):
   
             y = SX.sym("y",f.input().sparsity())
             
-      
-            res,fwdsens,adjsens = f.callDerivative([y],[],[])
+            with internalAPI():
+              res,fwdsens,adjsens = f.callDerivative([y],[],[])
             
             fe = SXFunction([y],res)
             fe.init()
@@ -462,13 +465,11 @@ class ADtests(casadiTestCase):
     
     
   def test_MX(self):
-    # commented out, uses directional derivatives #884
-    return
 
     x = MX.sym("x",2)
     y = MX.sym("y",2,2)
     
-    f1 = MXFunction([x,y],[x+y[0],mul(y,x)])
+    f1 = MXFunction([x,y],[x+y[0,0],mul(y,x)])
     f1.init()
     
     f2 = MXFunction([x,y],[mul(MX.zeros(0,2),x)])
@@ -517,13 +518,23 @@ class ADtests(casadiTestCase):
     yyy2[[1,0],0] = x**2
     
 
-    def remove00(x):
+    def remove_first(x):
       ret = DMatrix(x)
       if ret.numel()>0:
         ret[0,0] = DMatrix.sparse(1,1)
-      return ret
+        return ret
+      else:
+        return ret
+
+    def remove_last(x):
+      ret = DMatrix(x)
+      if ret.size()>0:
+        ret[ret.sparsity().row()[-1],ret.sparsity().getCol()[-1]] = DMatrix.sparse(1,1)
+        return ret
+      else:
+        return x
       
-    spmods = [lambda x: x , remove00]
+    spmods = [lambda x: x , remove_first, remove_last]
     
     # TODO: sparse seeding
     
@@ -535,29 +546,32 @@ class ADtests(casadiTestCase):
           (in1,v1,(x**2).T,2*c.diag(x)),
           (in1,v1,c.reshape(x,(1,2)),DMatrix.eye(2)),
           (in1,v1,c.reshape(x**2,(1,2)),2*c.diag(x)),
-          (in1,v1,x+y[0],DMatrix.eye(2)),
+          (in1,v1,x+y.nz[0],DMatrix.eye(2)),
+          (in1,v1,x+y[0,0],DMatrix.eye(2)),
           (in1,v1,x+x,2*DMatrix.eye(2)),
           (in1,v1,x**2+x,2*c.diag(x)+DMatrix.eye(2)),
           (in1,v1,x*x,2*c.diag(x)),
-          (in1,v1,x*y[0],DMatrix.eye(2)*y[0]),
+          (in1,v1,x*y.nz[0],DMatrix.eye(2)*y.nz[0]),
+          (in1,v1,x*y[0,0],DMatrix.eye(2)*y[0,0]),
           (in1,v1,x[0],DMatrix.eye(2)[0,:]),
-          (in1,v1,(x**2)[0],horzcat([2*x[0],MX(1,1)])),
+          (in1,v1,(x**2)[0],horzcat([2*x[0],MX.sparse(1,1)])),
           (in1,v1,x[0]+x[1],DMatrix.ones(1,2)),
           (in1,v1,vertcat([x[1],x[0]]),sparse(DMatrix([[0,1],[1,0]]))),
-          #(in1,v1,vertsplit(x,[0,1,2])[1],sparse(DMatrix([[0,1]]))),
-          (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
-          #(in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX(1,1),2*x[1]]])),
+          (in1,v1,vertsplit(x,[0,1,2])[1],sparse(DMatrix([[0,1]]))),
+          (in1,v1,vertcat([x[1]**2,x[0]**2]),blockcat([[MX.sparse(1,1),2*x[1]],[2*x[0],MX.sparse(1,1)]])),
+          (in1,v1,vertsplit(x**2,[0,1,2])[1],blockcat([[MX.sparse(1,1),2*x[1]]])),
+          (in1,v1,vertsplit(x**2,[0,1,2])[1]**3,blockcat([[MX.sparse(1,1),6*x[1]**5]])),
           (in1,v1,horzcat([x[1],x[0]]).T,sparse(DMatrix([[0,1],[1,0]]))),
-          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX(1,1),2*x[1]],[2*x[0],MX(1,1)]])),
+          (in1,v1,horzcat([x[1]**2,x[0]**2]).T,blockcat([[MX.sparse(1,1),2*x[1]],[2*x[0],MX.sparse(1,1)]])),
           (in1,v1,x[[0,1]],sparse(DMatrix([[1,0],[0,1]]))),
           (in1,v1,(x**2)[[0,1]],2*c.diag(x)),
           (in1,v1,x[[0,0,1,1]],sparse(DMatrix([[1,0],[1,0],[0,1],[0,1]]))),
-          (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX(1,1)],[2*x[0],MX(1,1)],[MX(1,1),2*x[1]],[MX(1,1),2*x[1]]])),
+          (in1,v1,(x**2)[[0,0,1,1]],blockcat([[2*x[0],MX.sparse(1,1)],[2*x[0],MX.sparse(1,1)],[MX.sparse(1,1),2*x[1]],[MX.sparse(1,1),2*x[1]]])),
           (in1,v1,wwr,sparse(DMatrix([[2,0],[0,2]]))),
           (in1,v1,x[[1,0]],sparse(DMatrix([[0,1],[1,0]]))), 
           (in1,v1,x[[1,0],0],sparse(DMatrix([[0,1],[1,0]]))),
           (in1,v1,w,sparse(DMatrix([[1,0],[0,2]]))),
-          (in1,v1,w2,blockcat([[1,MX(1,1)],[x[1],x[0]]])),
+          (in1,v1,w2,blockcat([[1,MX.sparse(1,1)],[x[1],x[0]]])),
           (in1,v1,ww,2*c.diag(x)),
           (in1,v1,wwf,vertcat([x[[1,0]].T,x[[1,0]].T])),
           (in1,v1,yy[:,0],DMatrix.eye(2)),
@@ -573,9 +587,10 @@ class ADtests(casadiTestCase):
           (in1,v1,sin(x),c.diag(cos(x))),
           (in1,v1,sin(x**2),c.diag(cos(x**2)*2*x)),
           (in1,v1,x*y[:,0],c.diag(y[:,0])),
-          (in1,v1,x*y[[0,1]],c.diag(y[[0,1]])),
-          (in1,v1,x*y[[1,0]],c.diag(y[[1,0]])),
+          (in1,v1,x*y.nz[[0,1]],c.diag(y.nz[[0,1]])),
+          (in1,v1,x*y.nz[[1,0]],c.diag(y.nz[[1,0]])),
           (in1,v1,x*y[[0,1],0],c.diag(y[[0,1],0])),
+          (in1,v1,x*y[[1,0],0],c.diag(y[[1,0],0])),
           (in1,v1,inner_prod(x,x),(2*x).T),
           (in1,v1,inner_prod(x**2,x),(3*x**2).T),
           #(in1,v1,c.det(horzcat([x,DMatrix([1,2])])),DMatrix([-1,2])), not implemented
@@ -589,8 +604,9 @@ class ADtests(casadiTestCase):
           (in1,v1,f4.call([x**2,y])[0],DMatrix.zeros(0,2)),
           #(in1,v1,f1.call([x**2,[]])[1],DMatrix.zeros(2,2)),
           #(in1,v1,f1.call([[],y])[1],DMatrix.zeros(2,2)),
-          (in1,v1,vertcat([x,DMatrix(0,1)]),DMatrix.eye(2)),
-          (in1,v1,(x**2).setSparse(sparse(DMatrix([0,1])).sparsity()),blockcat([[MX(1,1),MX(1,1)],[MX(1,1),2*x[1]]])),
+          (in1,v1,vertcat([x,DMatrix.sparse(0,1)]),DMatrix.eye(2)),
+          (in1,v1,(x**2).setSparse(sparse(DMatrix([0,1])).sparsity()),blockcat([[MX.sparse(1,1),MX.sparse(1,1)],[MX.sparse(1,1),2*x[1]]])),
+          (in1,v1,c.inner_prod(x,y[:,0]),y[:,0].T),
      ]:
       print out
       fun = MXFunction(inputs,[out,jac])
@@ -622,22 +638,25 @@ class ADtests(casadiTestCase):
       vf_mx = None
               
       for f in [fun,fun.expand()]:
-        f.setOption("number_of_adj_dir",ndir)
-        f.setOption("number_of_fwd_dir",ndir)
         f.init()
+        d = f.derivative(ndir,ndir)
+        d.init()
+        
+        num_in = f.getNumInputs()
+        num_out = f.getNumOutputs()
 
-        # Fwd and Adjoint AD
+        """# Fwd and Adjoint AD
         for i,v in enumerate(values):
           f.setInput(v,i)
-        
+          d.setInput(v,i)
         
         for d in range(ndir):
-          f.setFwdSeed(DMatrix(inputs[0].sparsity(),random.random(inputs[0].size())),0,d)
-          f.setAdjSeed(DMatrix(out.sparsity(),random.random(out.size())),0,d)
+          f.setInput(DMatrix(inputs[0].sparsity(),random.random(inputs[0].size())),num_in+d*num_in + d)
+          f.setAdjSeed(DMatrix(out.sparsity(),random.random(out.size())),num_in+d*num_in + 0)
           f.setFwdSeed(0,1,d)
           f.setAdjSeed(0,1,d)
           
-        f.evaluate(ndir,ndir)
+        f.evaluate()
         for d in range(ndir):
           seed = array(f.getFwdSeed(0,d)).ravel()
           sens = array(f.getFwdSens(0,d)).ravel()
@@ -646,7 +665,7 @@ class ADtests(casadiTestCase):
           seed = array(f.getAdjSeed(0,d)).ravel()
           sens = array(f.getAdjSens(0,d)).ravel()
           self.checkarray(sens,mul(J_.T,seed),"Adj %d" %d)
-          
+        """
         
         # evalThings
         for sym, Function in [(MX.sym,MXFunction),(SX.sym,SXFunction)]:
@@ -661,7 +680,8 @@ class ADtests(casadiTestCase):
             aseeds = [[sym("a",spmod2(f.getOutput(i)).sparsity())  for i in range(f.getNumOutputs())] for d in range(ndir)]
             inputss = [sym("i",f.input(i).sparsity()) for i in range(f.getNumInputs())]
         
-            res,fwdsens,adjsens = f.eval(inputss,fseeds,aseeds)
+            with internalAPI():
+              res,fwdsens,adjsens = f.callDerivative(inputss,fseeds,aseeds,True)
             
             fseed = [DMatrix(fseeds[d][0].sparsity(),random.random(fseeds[d][0].size())) for d in range(ndir) ]
             aseed = [DMatrix(aseeds[d][0].sparsity(),random.random(aseeds[d][0].size())) for d in range(ndir) ]
@@ -731,7 +751,8 @@ class ADtests(casadiTestCase):
               aseeds2 = [[sym2("a",vf_mx.output(i).sparsity())  for i in range(vf.getNumOutputs()) ] for d in range(ndir)]
               inputss2 = [sym2("i",vf_mx.input(i).sparsity()) for i in range(vf.getNumInputs())]
            
-              res2,fwdsens2,adjsens2 = vf.eval(inputss2,fseeds2,aseeds2)
+              with internalAPI():
+                res2,fwdsens2,adjsens2 = vf.callDerivative(inputss2,fseeds2,aseeds2,True)
 
               vf2 = Function2(inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
               vf2.init()
@@ -771,8 +792,8 @@ class ADtests(casadiTestCase):
                 
       # Scalarized
       if out.isEmpty(): continue
-      s_i  = out.sparsity().getRow()[0]
-      s_j  = out.sparsity().col()[0]
+      s_i  = out.sparsity().row()[0]
+      s_j  = out.sparsity().getCol()[0]
       s_k = s_i*out.size2()+s_j
       fun = MXFunction(inputs,[out[s_i,s_j],jac[s_k,:].T])
       fun.init()

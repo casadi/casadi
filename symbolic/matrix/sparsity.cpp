@@ -30,6 +30,7 @@ using namespace std;
 
 namespace CasADi{
 
+  /// \cond INTERNAL
   // Singletons
   class EmptySparsity : public Sparsity{  
   public:
@@ -56,6 +57,7 @@ namespace CasADi{
       assignNode(new SparsityInternal(1,1,colind,row));
     }
   };
+  /// \endcond
   
   Sparsity::Sparsity(int dummy){
     casadi_assert(dummy==0);
@@ -323,12 +325,12 @@ namespace CasADi{
     return (*this)->transpose();
   }
 
-  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero, std::vector<unsigned char>& mapping) const{
-    return (*this)->patternCombine(y, f0x_is_zero, fx0_is_zero, mapping);
+  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero, std::vector<unsigned char>& mapping) const{
+    return (*this)->patternCombine(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
-  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero, bool fx0_is_zero) const{
-    return (*this)->patternCombine(y, f0x_is_zero, fx0_is_zero);
+  Sparsity Sparsity::patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const{
+    return (*this)->patternCombine(y, f0x_is_zero, function0_is_zero);
   }
 
   Sparsity Sparsity::patternUnion(const Sparsity& y, std::vector<unsigned char>& mapping) const{
@@ -565,6 +567,10 @@ namespace CasADi{
 
   bool Sparsity::isTranspose(const Sparsity& y) const{
     return (*this)->isTranspose(*y);
+  }
+
+  bool Sparsity::isReshape(const Sparsity& y) const{
+    return (*this)->isReshape(*y);
   }
 
   std::size_t Sparsity::hash() const{
@@ -1050,5 +1056,8 @@ namespace CasADi{
     return Sparsity(nrow, ncol, vector<int>(colind,colind+ncol+1),vector<int>(row,row+nnz));
   }
 
+  void Sparsity::printCompact(std::ostream &stream) const{
+    (*this)->printCompact(stream);
+  }
 
 } // namespace CasADi

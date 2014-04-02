@@ -24,6 +24,7 @@
 #define SET_SPARSE_HPP
 
 #include "mx_node.hpp"
+/// \cond INTERNAL
 
 namespace CasADi{
   /** \brief Change the sparsity of an expression

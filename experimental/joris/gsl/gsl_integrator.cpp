@@ -30,16 +30,16 @@ namespace GSL {
 GslIntegrator::GslIntegrator(){ 
 }
 
-GslIntegrator::GslIntegrator(const FX& f,const FX& q){
+GslIntegrator::GslIntegrator(const Function& f,const Function& q){
   assignNode(new GslInternal(f,q));
 }
 
 GslInternal* GslIntegrator::operator->(){
-  return (GslInternal*)(FX::operator->());
+  return (GslInternal*)(Function::operator->());
 }
 
 const GslInternal* GslIntegrator::operator->() const{
-  return (const GslInternal*)(FX::operator->());
+  return (const GslInternal*)(Function::operator->());
 
 }
 

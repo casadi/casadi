@@ -47,9 +47,11 @@ try:
 except:
   pass
 
+integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18}))
+
 integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":CVodesIntegrator}))
 #integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": IpoptSolver,"linear_solver_creator": CSparse}}))
-#integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
+integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
 
 print "Will test these integrators:"
 for cl, t, options in integrators:
@@ -57,7 +59,7 @@ for cl, t, options in integrators:
 
 class Integrationtests(casadiTestCase):
 
-
+  @slow()
   def test_full(self):
     num = self.num
     tc = DMatrix(n.linspace(0,num['tend'],100))
@@ -88,7 +90,7 @@ class Integrationtests(casadiTestCase):
       f.setInput(0.3,"x0")
       f.setInput(0.7,"p")
     
-    self.checkfx(integrator,solution,digits=6)
+    self.checkfunction(integrator,solution,digits=6)
 
   def test_tools_trivial(self):
     num = self.num
@@ -116,9 +118,9 @@ class Integrationtests(casadiTestCase):
       integrator.evaluate()
       
 
-      self.checkfx(integrator,solution,digits=5)
+      self.checkfunction(integrator,solution,digits=5)
 
- 
+  @slow()
   def test_tools(self):
     num = self.num
 
@@ -145,7 +147,7 @@ class Integrationtests(casadiTestCase):
         f.setInput(0.3,"x0")
         f.setInput(0.7,"p")
       
-      self.checkfx(integrator,solution,digits=4)
+      self.checkfunction(integrator,solution,digits=4)
     
   @memory_heavy()
   def test_jac(self):
@@ -212,7 +214,7 @@ class Integrationtests(casadiTestCase):
         for Integrator, features, options in integrators:
           self.message(Integrator.__name__)
           if p_features[0] in features:
-            g = FX()
+            g = Function()
             if len(rdin)>1:
               g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
               g.init()
@@ -248,7 +250,7 @@ class Integrationtests(casadiTestCase):
                 integrator = Integrator(f,g)
                 integrator.setOption("exact_jacobianB",True)
                 integrator.setOption("gather_stats",True)
-                integrator.setOption("verbose",True)
+                #integrator.setOption("verbose",True)
                 #integrator.setOption("monitor",["djacB","resB","djac","res"])
                 integrator.setOption("t0",tstart_)
                 integrator.setOption("tf",tend_)
@@ -259,7 +261,7 @@ class Integrationtests(casadiTestCase):
                 for ff in [fs,integrator]:
                   for k,v in point.items():
                     i = getattr(casadi,('integrator_'+k).upper())
-                    if not ff.input(i).isEmpty():
+                    if not ff.getInput(i).isEmpty():
                       ff.setInput(v,i)
 
                 integrator.evaluate()
@@ -301,6 +303,7 @@ class Integrationtests(casadiTestCase):
       pointA = {'x0':7.1,'p': 2, 'rx0': 0.13, 'rp': 0.127}
       ti = (0.2,2.3)
       yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},{'x': x, 'z': z, 'rx': rx, 'rz': rz},{'alg': x-rz, 'ode': rz},solutionin,{'rxf': rx+x*(exp(tend-tstart)-1), 'xf':x*exp(tend-tstart)},pointA,ti)
+      if not(args.run_slow): return
       yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},{'x': x, 'z': z, 'rx': rx, 'rz': rz},{'alg': rx-rz, 'ode': rz},solutionin,{'rxf': rx*exp(tend-tstart), 'xf':x*exp(tend-tstart)},pointA,ti)
       yield (["ode"],{'x': x},{'ode': x},{'x': x,'rx': rx},{'ode': x},solutionin,{'rxf': rx+x*(exp(tend-tstart)-1), 'xf':x*exp(tend-tstart)},pointA,ti)
       yield (["ode"],{'x': x},{'ode': x},{'x': x,'rx': rx},{'ode': rx},solutionin,{'rxf': rx*exp(tend-tstart), 'xf':x*exp(tend-tstart)},pointA,ti)
@@ -322,7 +325,7 @@ class Integrationtests(casadiTestCase):
       for Integrator, features, options in integrators:
         self.message(Integrator.__name__)
         if p_features[0] in features:
-          g = FX()
+          g = Function()
           if len(rdin)>1:
             g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
             g.init()
@@ -371,7 +374,7 @@ class Integrationtests(casadiTestCase):
 
               integrator.evaluate()
               
-              self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+              self.checkfunction(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
               
               
 
@@ -437,6 +440,7 @@ class Integrationtests(casadiTestCase):
         yield (["ode"],{'x':x,'t':t},{'ode': t},{},{},si,{'xf':x+(tend**2/2-tstart**2/2)},pointA,ti)
         yield (["ode"],{'x':x,'t':t},{'ode': x*t},{},{},si,{'xf':x*exp(tend**2/2-tstart**2/2)},pointA,ti)
         yield (["ode"],{'x':x,'p':p},{'ode': x/p},{},{},si,{'xf':x*exp((tend-tstart)/p)},pointA,ti)
+        if not(args.run_slow): return
         yield (["ode"],{'x':x},{'ode': x,'quad':0},{},{},si,{'qf':0},pointA,ti)
         yield (["ode"],{'x':x},{'ode': x,'quad':1},{},{},si,{'qf':(tend-tstart)},pointA,ti)
         yield (["ode"],{'x':x},{'ode': 0,'quad':x},{},{},si,{'qf':x*(tend-tstart)},pointA,ti)
@@ -486,7 +490,7 @@ class Integrationtests(casadiTestCase):
           if p_features[0] in features:
             message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
             print message
-            g = FX()
+            g = Function()
             if len(rdin)>1:
               g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
               g.init()
@@ -556,7 +560,7 @@ class Integrationtests(casadiTestCase):
                   ff.setInput(v,i)
             integrator.evaluate()
             
-            self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+            self.checkfunction(integrator,fs,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
 
         
   def setUp(self):
@@ -774,7 +778,7 @@ class Integrationtests(casadiTestCase):
     J.setInput(A,0)
     J.setInput(p0,1)
     J.evaluate()
-    outA=J.output().toArray()
+    outA=J.getOutput().toArray()
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],(1+1e-9)*dh])))
     f.init()
     
@@ -1236,11 +1240,11 @@ class Integrationtests(casadiTestCase):
     integrator.init()
 
     integrator.setInput(7.1,"x0")
-    if not integrator.input("p").isEmpty():
+    if not integrator.getInput("p").isEmpty():
       integrator.setInput(2,"p")
-    if not integrator.input("rx0").isEmpty():
+    if not integrator.getInput("rx0").isEmpty():
       integrator.setInput(0.13,"rx0")
-    if not integrator.input("rp").isEmpty():
+    if not integrator.getInput("rp").isEmpty():
       integrator.setInput(0.127,"rp")
 
     integrator.evaluate()

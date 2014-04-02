@@ -21,9 +21,9 @@
  */
 
 #include "symbolic/std_vector_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/external_function.hpp"
+#include "symbolic/function/sx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/external_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/matrix/crs_sparsity_internal.hpp"

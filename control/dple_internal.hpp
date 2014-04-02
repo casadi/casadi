@@ -25,7 +25,9 @@
 
 #include "dple_solver.hpp"
 #include "dple_internal.hpp"
-#include "../symbolic/fx/fx_internal.hpp"
+#include "../symbolic/function/function_internal.hpp"
+
+/// \cond INTERNAL
 
 namespace CasADi{
 
@@ -35,7 +37,7 @@ namespace CasADi{
      \author Joris gillis
       \date 2014
   */
-  class DpleInternal : public FXInternal{
+  class DpleInternal : public FunctionInternal{
   public:
     /** \brief  Constructor
      *  \param[in] A  List of sparsities of A_i 
@@ -65,7 +67,7 @@ namespace CasADi{
     virtual void init();
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-    virtual FX getDerivative(int nfwd, int nadj)=0;
+    virtual Function getDerivative(int nfwd, int nadj)=0;
 
     /// List of sparsities of A_i 
     std::vector< Sparsity > A_;
@@ -97,5 +99,5 @@ namespace CasADi{
   };
   
 } // namespace CasADi
-
+/// \endcond
 #endif // DPLE_INTERNAL_HPP

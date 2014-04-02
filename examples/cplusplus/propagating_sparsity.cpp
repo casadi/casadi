@@ -53,7 +53,7 @@ int main(){
   for(int test=0; test<2; ++test){
 
     // Create a simple function
-    FX f;
+    Function f;
     if(test==0){
       cout << "SXFunction:" << endl;
       SX x = SX::sym("x",3);

@@ -29,16 +29,16 @@ namespace CasADi{
   NewtonImplicitSolver::NewtonImplicitSolver(){ 
   }
 
-  NewtonImplicitSolver::NewtonImplicitSolver(const FX& f, const FX& jac, const LinearSolver& linsol)  {
+  NewtonImplicitSolver::NewtonImplicitSolver(const Function& f, const Function& jac, const LinearSolver& linsol)  {
     assignNode(new NewtonImplicitInternal(f,jac,linsol));
   }
 
   NewtonImplicitInternal* NewtonImplicitSolver::operator->(){
-    return (NewtonImplicitInternal*)(FX::operator->());
+    return (NewtonImplicitInternal*)(Function::operator->());
   }
 
   const NewtonImplicitInternal* NewtonImplicitSolver::operator->() const{
-    return (const NewtonImplicitInternal*)(FX::operator->());
+    return (const NewtonImplicitInternal*)(Function::operator->());
 
   }
 
