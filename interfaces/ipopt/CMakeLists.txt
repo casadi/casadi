@@ -28,8 +28,10 @@ add_library(casadi_ipopt_interface STATIC ${IPOPT_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_ipopt_interface SHARED ${IPOPT_INTERFACE_SRCS})
-target_link_libraries(casadi_ipopt_interface casadi ${IPOPT_LIBRARIES})
 endif(ENABLE_SHARED)
+
+target_link_libraries(casadi_ipopt_interface casadi ${IPOPT_LIBRARIES})
+
 install(TARGETS casadi_ipopt_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

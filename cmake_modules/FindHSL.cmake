@@ -1,0 +1,14 @@
+# TRY TO FIND THE HSL LIBRARY
+
+FIND_LIBRARY(HSL_LIB
+    names coinhsl hsl
+    HINTS $ENV{HSL})
+
+IF(HSL_LIB)
+  MESSAGE(STATUS "Found HSL: ${HSL_LIB}")
+  SET(HSL_LIBRARIES ${HSL_LIB})
+  SET(HSL_FOUND TRUE)
+ELSE(HSL_LIB)
+  SET(HSL_FOUND FALSE)
+  MESSAGE(STATUS "Could not find HSL; looking in environmental variable HSL ($ENV{HSL})")
+ENDIF(HSL_LIB)

@@ -18,8 +18,9 @@ endif()
 
 if(ENABLE_SHARED)
   add_library(casadi_csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
-  target_link_libraries(casadi_csparse_interface casadi casadi_csparse)
 endif()
+
+target_link_libraries(casadi_csparse_interface casadi ${CSPARSE_LIBRARIES})
 
 install(TARGETS casadi_csparse_interface
   LIBRARY DESTINATION lib

@@ -14,6 +14,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_qpoases_interface SHARED ${QPOASES_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+target_link_libraries(casadi_qpoases_interface casadi ${QPOASES_LIBRARIES})
 install(TARGETS casadi_qpoases_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

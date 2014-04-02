@@ -19,8 +19,6 @@ set(SQIC_INTERFACE_SRCS
   ${resource_file}
 )
 
-set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})
-
 if(ENABLE_STATIC)
 add_library(casadi_sqic_interface STATIC ${SQIC_INTERFACE_SRCS})
 add_library(sqic_fortran_c_bridge STATIC wsqic.f90)
@@ -29,6 +27,8 @@ if(ENABLE_SHARED)
 add_library(casadi_sqic_interface SHARED ${SQIC_INTERFACE_SRCS})
 add_library(sqic_fortran_c_bridge SHARED wsqic.f90)
 endif(ENABLE_SHARED)
+target_link_libraries(casadi_sqic_interface casadi sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
+target_link_libraries(sqic_fortran_c_bridge casadi ${SQIC_LIBRARIES})
 install(TARGETS casadi_sqic_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

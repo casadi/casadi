@@ -53,6 +53,14 @@ class _copyableObject(_object):
     return shallow
 
 _object = _copyableObject
+
+_swig_repr_default = _swig_repr
+def _swig_repr(self):
+  if hasattr(self,'getRepresentation'):
+    return self.getRepresentation()
+  else:
+    return _swig_repr_default(self)
+
 %}
 #endif // WITH_SWIGPYTHON
 
@@ -666,6 +674,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "symbolic/function/simulator.hpp"
 #include "symbolic/function/control_simulator.hpp"
 #include "symbolic/function/nlp_solver.hpp"
+#include "symbolic/function/homotopy_nlp_solver.hpp"
 #include "symbolic/function/qp_solver.hpp"
 #include "symbolic/function/stabilized_qp_solver.hpp"
 #include "symbolic/function/lp_solver.hpp"
@@ -686,6 +695,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "nonlinear_programming/nlp_qp_solver.hpp"
 #include "nonlinear_programming/nlp_implicit_solver.hpp"
 #include "nonlinear_programming/newton_implicit_solver.hpp"
+#include "nonlinear_programming/simple_homotopy_nlp_solver.hpp"
 
 #include "integration/fixed_step_integrator.hpp"
 #include "integration/implicit_fixed_step_integrator.hpp"

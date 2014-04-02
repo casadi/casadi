@@ -525,3 +525,15 @@
    fun:malloc
    obj:/usr/lib/pyshared/python2.7/numpy/lib/_compiled_base.so
 }
+
+{
+   memory leak in swig multiple modules
+   Memcheck:Leak
+   fun:malloc
+   fun:SwigPyClientData_New*
+   fun:*_swigregister*
+   fun:PyEval_EvalFrameEx*
+   fun:PyEval_EvalCode*
+   fun:PyImport_ExecCodeModuleEx*
+}
+

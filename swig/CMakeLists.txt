@@ -40,43 +40,36 @@ if(IPOPT_FOUND)
   if(WITH_IPOPT_CALLBACK)
     set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT_CALLBACK")
   endif()
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_ipopt_interface ${IPOPT_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} ipopt)
 endif()
 
 if(WITH_SUNDIALS)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SUNDIALS")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_sundials_interface ${SUNDIALS_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} sundials)
 endif()
 
 if(QPOASES_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_QPOASES")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_qpoases_interface ${QPOASES_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} qpoases)
 endif()
 
 if(DSDP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DSDP")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_dsdp_interface ${DSDP_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} dsdp)
 endif()
 
 if(WITH_CSPARSE)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_CSPARSE")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_csparse_interface ${CSPARSE_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} csparse)
 endif()
 
 if(KNITRO_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_KNITRO")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_knitro_interface ${KNITRO_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} knitro)
 endif()
 
 if(CPLEX_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_CPLEX")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_cplex_interface ${CPLEX_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} cplex)
 endif()
 
@@ -87,37 +80,31 @@ endif()
 
 if(OOQP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_OOQP")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_ooqp_interface ${OOQP_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} ooqp)
 endif()
 
 if(SQIC_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SQIC")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_sqic_interface sqic_fortran_c_bridge ${SQIC_LIBRARIES})
-  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} ooqp)
+  set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} sqic)
 endif()
 
 if(SLICOT_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SLICOT")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_slicot_interface  ${SLICOT_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} slicot)
 endif()
 
 if(WORHP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_WORHP")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_worhp_interface ${WORHP_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} worhp)
 endif()
 
 if(SNOPT_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SNOPT")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_snopt_interface snopt_fortran_c_bridge ${SNOPT_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} snopt)
 endif()
 
 if(LAPACK_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_LAPACK")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} casadi_lapack_interface ${LAPACK_LIBRARIES})
   set(CASADI_SWIG_INTERFACES ${CASADI_SWIG_INTERFACES} lapack)
 endif()
 
@@ -204,10 +191,16 @@ endif(WITH_SWIG_SPLIT)
 
 if(WITH_SWIG_SPLIT)
   foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-    SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming  casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+    SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control casadi_integration casadi_convex_programming  casadi_nonlinear_programming)
+  endforeach()
+  foreach(my_interface ${CASADI_SWIG_INTERFACES})
+    SWIG_LINK_LIBRARIES (casadi_interface_${my_interface} casadi_${my_interface}_interface)
   endforeach()
   else()
-    SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+    foreach(my_interface ${CASADI_SWIG_INTERFACES})
+      SWIG_LINK_LIBRARIES (casadi casadi_${my_interface}_interface)
+    endforeach()
+    SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control casadi_integration casadi_convex_programming casadi_nonlinear_programming)
 endif()
 
 # the name used for the shared module for the python interface is determined
@@ -240,11 +233,19 @@ make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 if(WITH_SWIG_SPLIT)
   set(modules_python)
   foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-    set(modules_python _${my_module})
+    list(APPEND modules_python _${my_module})
   endforeach()
   add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
-  add_custom_target(_octave_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave) # the octave interface is created with the command "make octave"
-  add_custom_target(_haskell_modules DEPENDS casadi_main_octave casadi_primitive_octave casadi_primitive_tools_octave casadi_noncore_octave casadiTree.hs) # the haskell interface is created with the command "make octave"
+  set(modules_octave)
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+    list(APPEND modules_octave ${my_module}_octave)
+  endforeach()
+  add_custom_target(_octave_modules DEPENDS ${modules_octave}) # the octave interface is created with the command "make octave"
+  set(modules_haskell)
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+    list(APPEND modules_haskell ${my_module}_tree.hs)
+  endforeach()
+  add_custom_target(_haskell_modules DEPENDS ${modules_haskell}) # the haskell interface is created with the command "make octave"
 else(WITH_SWIG_SPLIT)
   add_custom_target(_python_modules DEPENDS _casadi ) # the python interface is created with the command "make python"
   add_custom_target(_octave_modules DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
@@ -256,7 +257,7 @@ foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 add_custom_command(
   TARGET _python_modules
   COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PROJECT_BINARY_DIR}/${my_module}.py ${PROJECT_BINARY_DIR}/python/casadi/${my_module}.py
+  ARGS -E copy ${PROJECT_BINARY_DIR}/swig/${my_module}.py ${PROJECT_BINARY_DIR}/python/casadi/${my_module}.py
 )
 endforeach()
 add_custom_command(
@@ -418,14 +419,20 @@ endif()
 if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
   SWIG_ADD_MODULE (${my_module}_octave octave ${my_module}.i octrun.swg)
-  SWIG_LINK_LIBRARIES (${my_module}_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+  SWIG_LINK_LIBRARIES (${my_module}_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control  casadi_integration casadi_convex_programming casadi_nonlinear_programming)
   set_target_properties(${my_module}_octave PROPERTIES PREFIX "")
   set_target_properties(${my_module}_octave PROPERTIES SUFFIX ".oct")
   set_target_properties(${my_module}_octave PROPERTIES OUTPUT_NAME "${my_module}")
 endforeach()
+foreach(my_interface ${CASADI_SWIG_INTERFACES})
+  SWIG_LINK_LIBRARIES (casadi_interface_${my_interface}_octave casadi_${my_interface}_interface)
+endforeach()
 else()
   SWIG_ADD_MODULE (casadi_octave octave casadi.i octrun.swg)
-  SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+  foreach(my_interface ${CASADI_SWIG_INTERFACES})
+    SWIG_LINK_LIBRARIES (casadi_octave casadi_${my_interface}_interface)
+  endforeach()
+  SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control  casadi_integration casadi_convex_programming casadi_nonlinear_programming)
   set_target_properties(casadi_octave PROPERTIES PREFIX "")
   set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
   set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi_interface")
@@ -434,23 +441,28 @@ endif()
 # haskell interface
 if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-  SWIG_ADD_MODULE_XML (${my_module}_haskell casadi.i)
+  SWIG_ADD_MODULE_XML (${my_module}_haskell ${my_module}.i)
 endforeach()
 else()
   SWIG_ADD_MODULE_XML (casadi_haskell casadi.i) # -xmllang python)
   #SET_SOURCE_FILES_PROPERTIES( ${swig_generated_file_fullname}   PROPERTIES COMPILE_FLAGS "-bla")
 endif()
 
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 ADD_CUSTOM_COMMAND(
-   OUTPUT casadiTree.hs 
-   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml
-   DEPENDS ${PROJECT_BINARY_DIR}/swig/casadiXML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
+   OUTPUT ${my_module}_tree.hs 
+   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
+   DEPENDS ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
 )
+endforeach()
 
-install(FILES ${PROJECT_BINARY_DIR}/swig/CasadiTree.hs ${PROJECT_BINARY_DIR}/swig/CasadiClasses.hs ${PROJECT_BINARY_DIR}/swig/swiginclude.hpp
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}_tree.hs ${PROJECT_BINARY_DIR}/swig/${my_module}_classes.hs ${PROJECT_BINARY_DIR}/swig/${my_module}_swiginclude.hpp
   DESTINATION share/casadi
   COMPONENT componenthaskell
 )
+endforeach()
+
 
 #SET(CPACK_MONOLITHIC_INSTALL FALSE)
 SET(CPACK_TGZ_COMPONENT_INSTALL TRUE)
@@ -464,7 +476,7 @@ set(CPACK_COMPONENTS_ALL Unspecified componenthaskell)
 # This will not actually work since we are in a EXCLUDE_FROM_ALL
 # http://cmake.3232098.n2.nabble.com/Yet-another-install-vs-exclude-from-all-thread-td4967491.html
 
-set(LINK_LIBRARIES_ALL ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control ${TINYXML_LIBRARIES} casadi_integration casadi_convex_programming casadi_nonlinear_programming casadi ${CASADI_DEPENDENCIES})
+set(LINK_LIBRARIES_ALL ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control casadi_integration casadi_convex_programming casadi_nonlinear_programming)
 
 # Pass meta information
 CONFIGURE_FILE(

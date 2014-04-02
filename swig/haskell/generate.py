@@ -9,6 +9,8 @@ import sys
 import re
 import itertools
 
+my_module = sys.argv[2]
+
 # Parse the input XML
 e = etree.parse(sys.argv[1])
 r = e.getroot()
@@ -283,15 +285,15 @@ for d in r.findall('*//namespace/cdecl'):
 
 
 
-ftree  = file('CasadiTree.hs','w')
+ftree  = file(my_module+'_tree.hs','w')
 ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteBindings.Buildbot.CasadiTree ( classes, ioschemeclasses, tools, ioschemehelpers, enums ) where\n\n\nimport WriteBindings.Types\n\n\n")
 
 
-fclasses  = file('CasadiClasses.hs','w')
+fclasses  = file(my_module+'_classes.hs','w')
 fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteBindings.Buildbot.CasadiClasses ( CasadiEnum(..), CasadiClass(..), cppTypeCasadiPrimClass,cppTypeCasadiPrimEnum,inheritance ) where\n\n")
 
 
-finclude  = file('swiginclude.hpp','w')
+finclude  = file(my_module+'_swiginclude.hpp','w')
 code = sum([filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n")) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
 finclude.write("\n".join(sorted(set(map(lambda x: x.rstrip(), filter(lambda y: re.search("^\s*#include ",y),code))))))
 

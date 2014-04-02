@@ -121,6 +121,17 @@ endif(ENABLE_SHARED)
 
 add_dependencies(casadi casadi_runtime_embedded)
 
+if(WITH_DL)
+  # Core needs support for dynamic linking
+  target_link_libraries(casadi ${CMAKE_DL_LIBS})
+endif(WITH_DL)
+
+if(WITH_OPENCL)
+  # Core depends on OpenCL for GPU calculations
+  target_link_libraries(casadi ${OPENCL_LIBRARIES})
+endif(WITH_OPENCL)
+
+
 install(TARGETS casadi
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

@@ -80,11 +80,11 @@ option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SQIC "Enable SQIC interface" OFF)
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
-option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF)
 option(WITH_WORHP "Compile the WORHP interface" OFF)
 option(WITH_SNOPT "Compile the SNOPT interface" OFF)
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF)
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
+option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" ON) 
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
@@ -248,19 +248,10 @@ endif()
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
-if(WITH_DL)
-  # Core needs support for dynamic linking
-  set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})
-else(WITH_DL)
-  # No dependencies
-  set(CASADI_DEPENDENCIES)
-endif(WITH_DL)
-
 # OpenCL
 if(WITH_OPENCL)
   # Core depends on OpenCL for GPU calculations
   find_package(OpenCL REQUIRED)
-  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${OPENCL_LIBRARIES})
   add_definitions(-DWITH_OPENCL)
   include_directories(${OPENCL_INCLUDE_DIRS})
 endif(WITH_OPENCL)
@@ -268,7 +259,10 @@ add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
-find_package(LibXml2)
+find_package(HSL QUIET)
+find_package(WSMP QUIET)
+find_package(METIS QUIET)
+find_package(LibXml2 QUIET)
 if(WITH_LAPACK)
   find_package(LAPACK)
 endif()
@@ -306,28 +300,26 @@ if(WITH_QPOASES AND BLAS_FOUND AND LAPACK_FOUND)
 endif()
 add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
 
-if(WITH_OOQP AND BLAS_FOUND)
+if(WITH_OOQP AND BLAS_FOUND AND HSL_FOUND)
   find_package (OOQP)
 endif()
-add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS).")
+add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS and HSL libraries).")
 
 if(Fortran_language_works AND WITH_SQIC)
   find_package (SQIC)
-  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${SQIC_LIBRARIES})
 endif()
 add_feature_info(sqic-interface SQIC_FOUND "Interface to the QP solver SQIC.")
 
 if(Fortran_language_works AND WITH_SLICOT)
   find_package (SLICOT)
-  set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${SLICOT_LIBRARIES})
 endif()
 add_feature_info(slicot-interface SLICOT_FOUND "Interface to the controls library SLICOT.")
 
 
-if(WITH_WORHP AND LIBXML2_FOUND)
+if(WITH_WORHP AND LIBXML2_FOUND  AND WSMP_FOUND AND METIS_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
   find_package (WORHP)
 endif()
-add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2 headers).")
+add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2, wsmp, metis, blas, lapack).")
 
 # Use the included dsdp
 if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)

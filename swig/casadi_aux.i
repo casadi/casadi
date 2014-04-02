@@ -31,17 +31,6 @@
 #include "symbolic/casadi_calculus.hpp"
 %}
 
-#ifdef SWIGPYTHON
-%pythoncode %{
-_swig_repr_default = _swig_repr
-def _swig_repr(self):
-  if hasattr(self,'getRepresentation'):
-    return self.getRepresentation()
-  else:
-    return _swig_repr_default(self)
-%}
-#endif // SWIGPYTHON
-
 %include "symbolic/std_vector_tools.hpp"
 VECTOR_TOOLS_TEMPLATES(int)
 VECTOR_TOOLS_TEMPLATES(double)

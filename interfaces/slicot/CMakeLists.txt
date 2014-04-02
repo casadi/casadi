@@ -15,6 +15,7 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_slicot_interface SHARED ${SLICOT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
+target_link_libraries(casadi_slicot_interface casadi ${SLICOT_LIBRARIES})
 install(TARGETS casadi_slicot_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
