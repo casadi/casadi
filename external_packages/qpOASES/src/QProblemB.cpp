@@ -2383,7 +2383,7 @@ returnValue QProblemB::solveQP(	const real_t* const g_new,
 	/* I) PREPARATIONS */
 	/* 1) Allocate delta vectors of gradient and bounds,
 	 *    index arrays and step direction arrays. */
-	int nFR, nFX;
+	// int nFR, nFX; // commented out, but left here because QPOases is an external package
 
 	real_t* delta_xFR = new real_t[nV];
 	real_t* delta_xFX = new real_t[nV];
@@ -2434,8 +2434,8 @@ returnValue QProblemB::solveQP(	const real_t* const g_new,
 		#endif
 
 		/* some more definitions */
-		nFR = getNFR( );
-		nFX = getNFX( );
+		// nFR = getNFR( ); // commented out, but left here because QPOases is an external package
+		// nFX = getNFX( ); // commented out, but left here because QPOases is an external package
 
 		/* 2) Initialise shift direction of the gradient and the bounds. */
 		returnvalue = determineDataShift(	g_new,lb_new,ub_new,
