@@ -388,9 +388,9 @@ namespace CasADi{
   void MXFunctionInternal::evaluate(){    
     casadi_log("MXFunctionInternal::evaluate():begin "  << getOption("name"));
     // Set up timers for profiling
-    double time_zero;
-    double time_start;
-    double time_stop;
+    double time_zero=0;
+    double time_start=0;
+    double time_stop=0;
     if (CasadiOptions::profiling) {
       time_zero = getRealTime();
       if (CasadiOptions::profilingBinary) {

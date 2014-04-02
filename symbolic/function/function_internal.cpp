@@ -2569,9 +2569,9 @@ namespace CasADi{
   void FunctionInternal::evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp) {
                              
     // Set up timers for profiling
-    double time_zero;
-    double time_start;
-    double time_stop;
+    double time_zero=0;
+    double time_start=0;
+    double time_stop=0;
     double time_offset=0;
     
     if (CasadiOptions::profiling) {

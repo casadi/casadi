@@ -72,7 +72,7 @@ namespace CasADi{
   }
 
   void CSparseInternal::prepare(){
-    double time_start;
+    double time_start=0;
     if(CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
       profileWriteEntry(CasadiOptions::profilingLog,this);
@@ -143,7 +143,7 @@ namespace CasADi{
   }
   
   void CSparseInternal::solve(double* x, int nrhs, bool transpose){
-    double time_start;
+    double time_start=0;
     if(CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
       profileWriteEntry(CasadiOptions::profilingLog,this);

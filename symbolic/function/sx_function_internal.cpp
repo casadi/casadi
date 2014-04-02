@@ -96,8 +96,8 @@ namespace CasADi{
   }
 
   void SXFunctionInternal::evaluate(){
-    double time_start;
-    double time_stop;
+    double time_start=0;
+    double time_stop=0;
     if (CasadiOptions::profiling) {
       time_start = getRealTime();
       if (CasadiOptions::profilingBinary) {

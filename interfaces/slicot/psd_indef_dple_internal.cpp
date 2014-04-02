@@ -207,9 +207,9 @@ namespace CasADi{
     // Obtain a periodic Schur form
     
     // Set up timers for profiling
-    double time_zero;
-    double time_start;
-    double time_stop;
+    double time_zero=0;
+    double time_start=0;
+    double time_stop=0;
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_zero = getRealTime();
       profileWriteEntry(CasadiOptions::profilingLog,this);

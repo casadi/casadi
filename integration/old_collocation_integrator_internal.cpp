@@ -391,10 +391,10 @@ namespace CasADi{
   
   void OldCollocationIntegratorInternal::reset(){
     // Set up timers for profiling
-    double time_zero;
-    double time_start;
-    double time_stop;
-    if (CasadiOptions::profiling) {
+    double time_zero=0;
+    double time_start=0;
+    double time_stop=0;
+    if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
       time_zero = getRealTime();
       CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
     }
@@ -484,7 +484,7 @@ namespace CasADi{
     implicit_solver_.output().set(implicit_solver_.input());
     
     // Write out profiling information
-    if (CasadiOptions::profiling) {
+    if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
       time_stop = getRealTime(); // Stop timer
       CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << implicit_solver_.get() << ":" << implicit_solver_.getOption("name") << "|solve system" << std::endl;
     }
