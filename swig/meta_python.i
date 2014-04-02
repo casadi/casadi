@@ -790,51 +790,83 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
     if (array_is_new_object)
       Py_DECREF(array); 
   } else if(PyObjectHasClassName(p,"csc_matrix")) { // scipy's csc_matrix will be cast to sparse Matrix<double>
-    PyObject * narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
-    if (!(is_array(narray) && array_numdims(narray)==1)) {
-      return false;
-      //SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data should be numpy array");
-    }
-    int array_is_new_object;
-    PyArrayObject* array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
-    if (!array) { 
-      return false;
-      //PyErr_Print() ; SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: no luck converting numpy array to double");
-    }
-    int size=array_size(array,0); // number on non-zeros
-    double* d=(double*) array_data(array);
-    std::vector<double> v(d,d+size);
-
+    
     // Get the dimensions of the csc_matrix
     PyObject * shape = PyObject_GetAttrString( p, "shape"); // need's to be decref'ed
+    if (!shape) {
+     return false;
+    }
+    if(!PyTuple_Check(shape) || PyTuple_Size(shape)!=2) {
+      Py_DECREF(shape);
+      return false;
+    }
     int nrows=PyInt_AsLong(PyTuple_GetItem(shape,0));
     int ncols=PyInt_AsLong(PyTuple_GetItem(shape,1));
-		
-    // Construct the 'row' vector needed for initialising the correct sparsity
-    PyObject * row = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
-    if (!(is_array(row) && array_numdims(row)==1 && array_type(row)==NPY_INT)) {
-      return false;
-      //PyErr_Print(); SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indices should be numpy array");
-    }
+		Py_DECREF(shape);
+  
+
     
-    int* rowd=(int*) array_data(row);
-    std::vector<int> rowv(rowd,rowd+size);
+    
+    bool ret= false;
+    
+    PyObject * narray=NULL;
+    PyObject * row=NULL;
+    PyObject * colind=NULL;
+    PyArrayObject* array=NULL;
+    PyArrayObject* array_row=NULL;
+    PyArrayObject* array_colind=NULL;
+    
+    int array_is_new_object=0;
+    int row_is_new_object=0;
+    int colind_is_new_object=0;
+    
+    // Fetch data
+    narray=PyObject_GetAttrString( p, "data"); // need's to be decref'ed
+    if (!narray || !is_array(narray) || array_numdims(narray)!=1) goto cleanup;
+    array = obj_to_array_contiguous_allow_conversion(narray,NPY_DOUBLE,&array_is_new_object);
+    if (!array) goto cleanup;
+		    
+    // Construct the 'row' vector needed for initialising the correct sparsity
+    row = PyObject_GetAttrString(p,"indices"); // need's to be decref'ed
+    if (!row || !is_array(row) || array_numdims(row)!=1) goto cleanup;
+    array_row = obj_to_array_contiguous_allow_conversion(row,NPY_INT,&row_is_new_object);
+    if (!array_row) goto cleanup;
     
     // Construct the 'colind' vector needed for initialising the correct sparsity
-    PyObject * colind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
-    if (!(is_array(colind) && array_numdims(colind)==1 && array_type(colind)==NPY_INT)) {
-      //PyErr_Print();   SWIG_Error_return(SWIG_TypeError, "asMatrixDouble: data.indptr should be numpy array");
-      return false;
+    colind = PyObject_GetAttrString(p,"indptr"); // need's to be decref'ed
+    if (!colind || !is_array(colind) || array_numdims(colind)!=1) goto cleanup;
+    array_colind = obj_to_array_contiguous_allow_conversion(colind,NPY_INT,&colind_is_new_object);
+    if (!array_colind) goto cleanup;
+    
+
+    {
+      int size=array_size(array,0); // number on non-zeros
+      double* d=(double*) array_data(array);
+      std::vector<double> v(d,d+size);
+      
+      int* rowd=(int*) array_data(array_row);
+      std::vector<int> rowv(rowd,rowd+size);
+      
+      int* colindd=(int*) array_data(array_colind);
+      std::vector<int> colindv(colindd,colindd+(ncols+1));
+      
+      m = CasADi::Matrix<double>(CasADi::Sparsity(nrows,ncols,colindv,rowv), v);
+      
+      ret = true;
     }
-    int* colindd=(int*) array_data(colind);
-    std::vector<int> colindv(colindd,colindd+(ncols+1));
     
-    m = CasADi::Matrix<double>(CasADi::Sparsity(nrows,ncols,colindv,rowv), v);
     
-    Py_DECREF(narray);Py_DECREF(shape);Py_DECREF(colind);Py_DECREF(row);
-    
-    if (array_is_new_object)
-      Py_DECREF(array);
+    cleanup: // yes that's right; goto.
+      // Rather that than a pyramid of conditional memory-deallocation 
+      if (array_is_new_object && array) Py_DECREF(array);
+      if (narray) Py_DECREF(narray);
+      if (row_is_new_object && array_row) Py_DECREF(array_row);
+      if (row) Py_DECREF(row);
+      if (colind_is_new_object && array_colind) Py_DECREF(array_colind);
+      if (colind) Py_DECREF(colind);
+      
+    return ret;
+
   } else if(PyObject_HasAttrString(p,"tocsc")) {
     char name[] = "tocsc";
     PyObject *cr = PyObject_CallMethod(p, name,0);
