@@ -1173,6 +1173,12 @@ namespace CasADi{
       if(codegen_class){
         if(it->data.get()!=0){
           stream << " : " << typeid(*it->data.get()).name();
+
+          // if this is a call node, also write the name of the Function
+          MX algElem = it->data;
+          if (algElem.getOp() == OP_CALL){
+            stream << " (" << algElem.getFunction().getSanitizedName() << ")";
+          }
         }
       }
       stream << " */" << endl;

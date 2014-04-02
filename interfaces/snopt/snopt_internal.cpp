@@ -27,6 +27,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <iomanip>
 
 #include "symbolic/std_vector_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
@@ -46,6 +47,7 @@ namespace CasADi {
     // Monitors
     addOption("monitor", OT_STRINGVECTOR, GenericType(),  "", "eval_nlp|setup_nlp", true);
 
+    addOption("print_time", OT_BOOLEAN, true, "print information about execution time");
     addOption("_start",  OT_STRING, "Cold",  "", "Cold|Warm");
     addOption("_iprint",  OT_INTEGER, 0);
     addOption("_isumm",   OT_INTEGER, 6);
@@ -406,6 +408,10 @@ namespace CasADi {
     pi_.resize(m_);
     rc_.resize(nx_+m_);
     A_data_.resize(A_structure_.size());
+
+    // Reset the counters
+    t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
+    n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = 0;
   }
 
   void SnoptInternal::reset() {
@@ -563,6 +569,7 @@ namespace CasADi {
     }
 
     // Run SNOPT
+    double time0 = clock();
     snopt_c(
       start.c_str(), &lenstart, &m_, &n, &nea, &nNames,
       &nnCon_, &nnObj_, &nnJac_, &iObj_, &ObjAdd,
@@ -581,6 +588,7 @@ namespace CasADi {
       getPtr(snopt_cw_), &clen,
       getPtr(snopt_iw_), &ilen,
       getPtr(snopt_rw_), &rlen);
+    t_mainloop_ = double(clock()-time0)/CLOCKS_PER_SEC;
 
     stats_["return_status"] = info;
 
@@ -599,6 +607,66 @@ namespace CasADi {
       output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];  // TODO(Joris): this is not quite right
       // mul_no_alloc
     }
+
+
+    // print timing information
+    // save state
+    std::ios state(NULL);
+    state.copyfmt(std::cout);
+    const int w_time = 7;
+    const int p_time = 3;
+    const int w_ms = 7;
+    const int p_ms = 2;
+    const int w_n = 5;
+    if (hasOption("print_time") && bool(getOption("print_time"))) {
+      std::cout << std::endl;
+
+      std::cout << "time spent in eval_grad_f       "
+                << std::fixed << std::setw(w_time) << std::setprecision(p_time)
+                << t_eval_grad_f_ << " s.";
+      if (n_eval_grad_f_>0)
+        std::cout << " (" << std::setw(w_n) << n_eval_grad_f_ << " calls, "
+                  << std::setw(w_ms) << std::setprecision(p_ms)
+                  << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms average)";
+      std::cout << std::endl;
+
+      std::cout << "time spent in eval_jac_g        "
+                << std::fixed << std::setw(w_time) << std::setprecision(p_time)
+                << t_eval_jac_g_ << " s.";
+      if (n_eval_jac_g_>0)
+        std::cout << " (" << std::setw(w_n) << n_eval_jac_g_ << " calls, "
+                  << std::setw(w_ms) << std::setprecision(p_ms)
+                  << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms average)";
+      std::cout << std::endl;
+
+      std::cout << "time spent in callback function "
+                << std::fixed << std::setw(w_time) << std::setprecision(p_time)
+                << t_callback_fun_ << " s.";
+      if (n_callback_fun_>0)
+        std::cout << " (" << std::setw(w_n) << n_callback_fun_ << " calls, "
+                  << std::setw(w_ms) << std::setprecision(p_ms)
+                  << (t_callback_fun_/n_callback_fun_)*1000 << " ms average)";
+      std::cout << std::endl;
+
+      std::cout << "time spent in main loop         "
+                << std::setw(w_time) << std::setprecision(p_time)
+                << t_mainloop_ << " s." << std::endl;
+    }
+    // restore state
+    std::cout.copyfmt(state);
+
+    // set timing information
+    stats_["t_eval_grad_f"] = t_eval_grad_f_;
+    stats_["t_eval_jac_g"] = t_eval_jac_g_;
+    stats_["t_mainloop"] = t_mainloop_;
+    stats_["t_callback_fun"] = t_callback_fun_;
+    stats_["n_eval_grad_f"] = n_eval_grad_f_;
+    stats_["n_eval_jac_g"] = n_eval_jac_g_;
+    stats_["n_callback_fun"] = n_callback_fun_;
+
+    // Reset the counters
+    t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
+    n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = 0;
   }
 
   void SnoptInternal::setOptionsFromFile(const std::string & file) {
@@ -609,7 +677,7 @@ namespace CasADi {
       double* x, double* fObj, double*gObj, double* fCon, double* gCon,
       int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru) {
     try {
-      //double time1 = clock();
+      double time0 = clock();
 
       casadi_assert_message(nnCon_ == nnCon, "Con " << nnCon_ << " <-> " << nnCon);
       casadi_assert_message(nnObj_ == nnObj, "Obj " << nnObj_ << " <-> " << nnObj);
@@ -657,12 +725,18 @@ namespace CasADi {
       jacF_.output().sparsity().sanityCheck(true);
       jacF_.output().sparsity().sanityCheck(false);
 
+      // timing and counters
+      t_eval_grad_f_ += double(clock()-time0)/CLOCKS_PER_SEC;
+      n_eval_grad_f_ += 1;
+
+
       if (monitored("eval_nlp")) {
         std::cout << "fObj:" << *fObj << std::endl;
         std::cout << "gradF:" << jacF_.output() << std::endl;
         std::cout << "gObj:" << std::vector<double>(gObj, gObj+nnObj) << std::endl;
       }
 
+      time0 = clock();
       if (!jacG_.isNull()) {
         // Evaluate jacG with the linear variabes put to zero
         jacG_.setInput(0.0, JACG_X);
@@ -704,6 +778,10 @@ namespace CasADi {
           fCon[k] = jacG_.output(GRADF_G).data()[g_order_[k]];
         }
 
+        // timing and counters
+        t_eval_jac_g_ += double(clock()-time0)/CLOCKS_PER_SEC;
+        n_eval_jac_g_ += 1;
+
         if (monitored("eval_nlp")) {
           std::cout << "fCon:" << std::vector<double>(fCon, fCon+nnCon) << std::endl;
           std::cout << "gCon:" << std::vector<double>(gCon, gCon+neJac) << std::endl;
@@ -711,6 +789,7 @@ namespace CasADi {
       }
 
       if (!callback_.isNull()) {
+        time0 = clock();
         for (int k = 0; k < nx_; ++k) {
           int kk = x_order_[k];
           output(NLP_SOLVER_X).data()[kk] = x_[k];
@@ -725,6 +804,8 @@ namespace CasADi {
         }
 
         *mode = callback_(ref_, user_data_);
+        t_callback_fun_ += double(clock()-time0)/CLOCKS_PER_SEC;
+        n_callback_fun_ += 1;
       }
     } catch (std::exception& ex) {
       std::cerr << "eval_nlp failed: " << ex.what() << std::endl;

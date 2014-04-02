@@ -352,5 +352,8 @@ namespace CasADi{
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 
+  std::string Function::getSanitizedName() const{
+    return (*this)->getSanitizedName();
+  }
 } // namespace CasADi
 
