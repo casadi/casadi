@@ -23,12 +23,12 @@
 #ifndef SNOPT_SOLVER_HPP
 #define SNOPT_SOLVER_HPP
 
-#include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/function/nlp_solver.hpp"
 
 namespace CasADi{
-  
+
   class SnoptInternal;
-  
+
   // List from worhp_internal.cpp
   /**
    *
@@ -41,13 +41,15 @@ namespace CasADi{
     /// Default constructor
     SnoptSolver();
 
-    /// \brief Create an NLP solver instance (legacy syntax)
-    explicit SnoptSolver(const FX& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
-                         const FX& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
+#ifndef WITHOUT_PRE_1_9_X
+    /// \brief [DEPRECATED] Create an NLP solver instance (legacy syntax)
+    explicit SnoptSolver(const Function& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
+                         const Function& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
                          );
+#endif
 
     /// \brief Create an NLP solver instance
-    explicit SnoptSolver(const FX& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+    explicit SnoptSolver(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                          );
 
     /// Access functions of the node
@@ -60,11 +62,11 @@ namespace CasADi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Static creator function 
+    /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static NLPSolver creator(const FX& nlp){ return SnoptSolver(nlp);}
+    static NLPSolver creator(const Function& nlp){ return SnoptSolver(nlp);}
 #ifdef SWIG
     %nocallback;
 #endif

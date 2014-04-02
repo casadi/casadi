@@ -23,9 +23,9 @@ from casadi import *
 from casadi.tools import *
 
 #! Let's revisit briefly the difference between SX and MX
-a = msym("a",2,2)
-b = msym("b",2,2)
-c = msym("c",2,2)
+a = MX.sym("a",2,2)
+b = MX.sym("b",2,2)
+c = MX.sym("c",2,2)
 
 d = a+b
 e = d*c

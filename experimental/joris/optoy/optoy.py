@@ -151,8 +151,8 @@ def minimize(f,gl=[],verbose=False):
       raise Exception("Cannot happen")
   
   # Create structures
-  X = struct_msym([entry(str(hash(i)),shape=i.sparsity()) for i in x])
-  P = struct_msym([entry(str(hash(i)),shape=i.sparsity()) for i in p])
+  X = struct_symMX([entry(str(hash(i)),shape=i.sparsity()) for i in x])
+  P = struct_symMX([entry(str(hash(i)),shape=i.sparsity()) for i in p])
   G = struct_MX([entry(str(i),expr=g) for i,g in enumerate(gl_pure)])
 
   # Subsitute the casadi symbols for the structured variants

@@ -24,8 +24,8 @@
 from casadi import *
 
 #! Let's build a trivial symbolic SX graph
-x = SX("x")
-y = SX("y")
+x = SX.sym("x")
+y = SX.sym("y")
 z = x*y+2*y
 z += 4*z
 

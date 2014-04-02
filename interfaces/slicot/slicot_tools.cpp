@@ -23,6 +23,8 @@
 #include "slicot_tools.hpp"
 #include <cassert>
 
+/// \cond INTERNAL
+
 // Need an 8-byte integer since libslicot0 is compiled with  fdefault-integer-8
 typedef long long int f_int;
 
@@ -114,7 +116,7 @@ if (dwork==0) {
   }
   
    void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t,  std::vector< double > & z,std::vector<double> &eig_real, std::vector<double> &eig_imag) {
-     std::vector<double> dwork(std::max(n+K-2,4*n));
+     std::vector<double> dwork(std::max(n+K-2,4*n)+(n-1)*K);
      slicot_periodic_schur(n,K,a,t,z,dwork,eig_real,eig_imag);
    }
 
@@ -157,9 +159,9 @@ if (dwork==0) {
     int K = a.size();
     int n = a[0].size1();
     for (int k=0;k<K;++k) {
-      casadi_assert_message(a[k].size1()==a[k].size2(), "a must be square");
+      casadi_assert_message(a[k].isSquare(), "a must be square");
       casadi_assert_message(a[k].size1()==n, "a must be n-by-n");
-      casadi_assert_message(a[k].dense(), "a must be dense");
+      casadi_assert_message(a[k].isDense(), "a must be dense");
     }
     
 
@@ -179,12 +181,11 @@ if (dwork==0) {
     for (int k=0;k<K;++k) {
       t[k] = DMatrix::zeros(n,n);
       std::copy(t_data.begin()+k*n*n,t_data.begin()+(k+1)*n*n,t[k].begin());
-      t[k] = trans(t[k]);
       z[k] = DMatrix::zeros(n,n);
       std::copy(z_data.begin()+k*n*n,z_data.begin()+(k+1)*n*n,z[k].begin());
-      z[k] = trans(z[k]);
     }
   }
  
 } // namespace CasADi
 
+/// \endcond

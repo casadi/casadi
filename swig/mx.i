@@ -30,7 +30,7 @@
 
 
 
-%template(SparsityVector) std::vector<CasADi::CRSSparsity>;
+%template(SparsityVector) std::vector<CasADi::Sparsity>;
 
 
 

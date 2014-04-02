@@ -24,12 +24,13 @@
 #define DIRECT_SINGLE_SHOOTING_INTERNAL_HPP
 
 #include "direct_single_shooting.hpp"
-#include "../symbolic/fx/ocp_solver_internal.hpp"
+#include "../symbolic/function/ocp_solver_internal.hpp"
 
-#include "../symbolic/fx/parallelizer.hpp"
-#include "../symbolic/fx/mx_function.hpp"
-#include "../symbolic/fx/sx_function.hpp"
+#include "../symbolic/function/parallelizer.hpp"
+#include "../symbolic/function/mx_function.hpp"
+#include "../symbolic/function/sx_function.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
   
 class DirectSingleShootingInternal : public OCPSolverInternal{
@@ -37,7 +38,7 @@ class DirectSingleShootingInternal : public OCPSolverInternal{
   
   public:
     // Constructor
-    DirectSingleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
+    DirectSingleShootingInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn);
 
     // clone
     virtual DirectSingleShootingInternal* clone() const{ return new DirectSingleShootingInternal(*this);}
@@ -67,7 +68,7 @@ class DirectSingleShootingInternal : public OCPSolverInternal{
     void reportConstraints(std::ostream &stream=std::cout);
     
     // ODE/DAE integrator
-    FX integrator_;
+    Function integrator_;
     
     // NLP
     MXFunction nlp_;
@@ -77,6 +78,6 @@ class DirectSingleShootingInternal : public OCPSolverInternal{
 };
                         
 } // namespace CasADi
-
+/// \endcond
 
 #endif // DIRECT_SINGLE_SHOOTING_INTERNAL_HPP

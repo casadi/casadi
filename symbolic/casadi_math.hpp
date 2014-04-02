@@ -24,6 +24,8 @@
 #define CASADI_MATH_HPP
 
 #include "casadi_calculus.hpp"
+
+/// \cond INTERNAL
 namespace CasADi{
 
 template<template<int> class F>
@@ -131,7 +133,7 @@ struct casadi_math<int>{
 
   static inline void fun(unsigned char op, const int* x, const int* y, int* f, int n){     
     for(int i=0; i<n; ++i){
-      double ff;
+      double ff(0);
       casadi_math<double>::fun(op,double(*x++),double(*y++),ff);
       *f++ = int(ff);
     }
@@ -506,5 +508,7 @@ inline void casadi_math<T>::printPost(unsigned char op, std::ostream &stream){
 }
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //CASADI_MATH_HPP

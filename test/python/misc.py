@@ -38,16 +38,16 @@ class Misctests(casadiTestCase):
     
   def test_issue179A(self):
     self.message('Regression test #179 (A)')
-    x = SX("x")
+    x = SXElement.sym("x")
     f = SXFunction([x], [2 * x])
     f.init()
-    y = f.eval([x])[0].data()
+    y = f.call([x])[0].data()
     print y
     
   def test_issue179B(self):
     self.message('Regression test #179 (B)')
     def calc_sparsity():
-      x = casadi.SX("x")
+      x = casadi.SXElement.sym("x")
       f = casadi.SXFunction([x], [x ** 2])
       f.init()
       return f.jacSparsity()
@@ -59,18 +59,18 @@ class Misctests(casadiTestCase):
     print_sparsity()
     
   def test_sanity(self):
-    DMatrix(3,4,[1,2,1],[0,2,2,3],[0.738,0.39,0.99])
-    self.assertRaises(RuntimeError,lambda : DMatrix(4,4,[1,2,1],[0,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1],[0,2,2,12],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1],[-10,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[8,2,1],[0,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[-3,2,1],[0,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1,2],[0,2,2,3],[0.738,0.39,0.99]))
-    self.assertRaises(RuntimeError,lambda : DMatrix(3,4,[1,2,1],[0,2,0,3],[0.738,0.39,0.99]))
+    DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99])
+    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,4,[0,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,12],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[-10,2,2,3],[1,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[8,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[-3,2,1]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,2,3],[1,2,1,2]),[0.738,0.39,0.99]))
+    self.assertRaises(RuntimeError,lambda : DMatrix(Sparsity(4,3,[0,2,0,3],[1,2,1]),[0.738,0.39,0.99]))
   
   def test_setoptionerrors(self):
     self.message("option errors")
-    x = SX("x")
+    x = SXElement.sym("x")
     f = SXFunction([x],[x])
     
     f.setOption("name","foobar")
@@ -80,7 +80,7 @@ class Misctests(casadiTestCase):
     
     self.assertRaises(RuntimeError,lambda : f.setOption("ad_mode","foo"))
     
-    x = ssym("x")
+    x = SX.sym("x")
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x))
 
     try:
@@ -90,12 +90,13 @@ class Misctests(casadiTestCase):
         return
     
     self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["abc"]))
+    self.assertRaises(RuntimeError,lambda : g.setOption("monitor",["eval_f","abc"]))
     g.setOption("monitor",["eval_f"])
     
     
   def test_copyconstr_norefcount(self):
     self.message("Copy constructor for non-refcounted classes")
-    x = DMatrix(2,3,1)
+    x = DMatrix.ones(2,3)
 
     y = DMatrix(x)
     x[0,0] = 5
@@ -106,9 +107,9 @@ class Misctests(casadiTestCase):
     
   def test_copyconstr_refcount(self):
     self.message("Copy constructor for refcounted classes")
-    x = sp_diag(4)
+    x = Sparsity.diag(4)
 
-    y = CRSSparsity(x)
+    y = Sparsity(x)
         
     x.resize(2,8)
     
@@ -120,7 +121,7 @@ class Misctests(casadiTestCase):
 
   def test_copyconstr_refcount_lazy(self):
     self.message("Copy constructor for refcounted classes - lazy")
-    x = SX("x")
+    x = SXElement.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()
@@ -138,7 +139,7 @@ class Misctests(casadiTestCase):
     self.message("Shallow copy for non-refcounted classes")
     import copy
     
-    x = DMatrix(2,3,1)
+    x = DMatrix.ones(2,3)
 
     y = copy.copy(x)
     x[0,0] = 5
@@ -150,7 +151,7 @@ class Misctests(casadiTestCase):
   def test_copy_refcount(self):
     self.message("Shallow copy for refcounted classes")
     import copy
-    x = sp_diag(4)
+    x = Sparsity.diag(4)
 
     y = copy.copy(x)
         
@@ -164,7 +165,7 @@ class Misctests(casadiTestCase):
   def test_copy_refcount_lazy(self):
     self.message("Shallow copy for refcounted classes - lazy")
     import copy
-    x = SX("x")
+    x = SXElement.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()
@@ -181,7 +182,7 @@ class Misctests(casadiTestCase):
     self.message("Deep copy for non-refcounted classes")
     import copy
     
-    x = DMatrix(2,3,1)
+    x = DMatrix.ones(2,3)
 
     y = copy.deepcopy(x)
     x[0,0] = 5
@@ -193,7 +194,7 @@ class Misctests(casadiTestCase):
   def test_deepcopy_refcount(self):
     self.message("Deep copy for refcounted classes")
     import copy
-    x = sp_diag(4)
+    x = Sparsity.diag(4)
 
     y = copy.deepcopy(x)
         
@@ -207,7 +208,7 @@ class Misctests(casadiTestCase):
   def test_deepcopy_refcount_lazy(self):
     self.message("Deep copy for refcounted classes - lazy")
     import copy
-    x = SX("x")
+    x = SXElement.sym("x")
 
     f = SXFunction([x],[2*x])
     f.init()
@@ -223,12 +224,12 @@ class Misctests(casadiTestCase):
   @requires("IpoptSolver")
   def test_options_introspection(self):
     self.message("options introspection")
-    x=ssym("x")
+    x=SX.sym("x")
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
     i = IpoptSolver(nlp)
     
     opts = i.getOptionNames()
-    self.assertTrue(isinstance(opts,tuple))
+    self.assertTrue(isinstance(opts,list))
     
     n = opts[0]
     self.assertTrue(type(n)==type(""))
@@ -299,7 +300,7 @@ class Misctests(casadiTestCase):
   
   def test_regression448(self):
     self.message("regression test for segfaukt when printing")
-    x = ssym("x")
+    x = SX.sym("x")
 
     f = SXFunction(controldaeIn(x=x),daeOut(ode=x))
     f.init()
@@ -334,30 +335,30 @@ class Misctests(casadiTestCase):
     
   def test_pickling(self):
 
-    a = sp_tril(4)
+    a = Sparsity.tril(4)
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.assertTrue(a==b)
 
-    a = CRSSparsity()
+    a = Sparsity()
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.assertTrue(a.isNull())
     
-    a = IMatrix(sp_tril(4),range(10))
+    a = IMatrix(Sparsity.tril(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
 
 
-    a = DMatrix(sp_tril(4),range(10))
+    a = DMatrix(Sparsity.tril(4),range(10))
     s = pickle.dumps(a)
     b = pickle.loads(s)
     self.checkarray(a,b)
 
   def test_assertions(self):
     
-    x = msym("x") 
+    x = MX.sym("x") 
     
     z = x**2
     
@@ -383,7 +384,7 @@ class Misctests(casadiTestCase):
     
 
     
-pickle.dump(CRSSparsity(),file("temp.txt","w"))
+pickle.dump(Sparsity(),file("temp.txt","w"))
     
 if __name__ == '__main__':
     unittest.main()

@@ -62,7 +62,7 @@ xdef = ifcn.outputExpr(0)
 x = ssym("x",xdef.size())
 
 # Substitute in the lifted variables x into the expressions for xdef and F
-ex = SXMatrixVector([f])
+ex = SXVector([f])
 substituteInPlace(x, xdef, ex, True)
 [f] = ex
 
@@ -75,7 +75,7 @@ d = ssym("d",xdef.size())
 
 # Substitute out the x from the zdef
 z = xdef-d
-ex = SXMatrixVector([f])
+ex = SXVector([f])
 substituteInPlace(x, z, ex, False)
 [f] = ex
 

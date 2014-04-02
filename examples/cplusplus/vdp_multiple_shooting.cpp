@@ -48,19 +48,19 @@ int main(){
   double inf = numeric_limits<double>::infinity();
 
   // Declare variables (use simple, efficient DAG)
-  SXMatrix x = ssym("x");
-  SXMatrix y = ssym("y");
-  SXMatrix u = ssym("u");
-  SXMatrix L = ssym("cost");
+  SX x = SX::sym("x");
+  SX y = SX::sym("y");
+  SX u = SX::sym("u");
+  SX L = SX::sym("cost");
   
   // All states
-  SXMatrix states = SXMatrix::zeros(3);
+  SX states = SX::zeros(3);
   states(0) = x;
   states(1) = y;
   states(2) = L;
 
   //ODE right hand side
-  SXMatrix f = SXMatrix::zeros(3);
+  SX f = SX::zeros(3);
   f(0) = (1 - y*y)*x - y + u;
   f(1) = x;
   f(2) = x*x + y*y + u*u;
@@ -92,7 +92,7 @@ int main(){
   int nu = 1;
   
   // Mayer objective function
-  Matrix<SX> xf = ssym("xf",nx,1);
+  SX xf = SX::sym("xf",nx,1);
   SXFunction mterm(xf, xf[nx-1]);
 
   // Create a multiple shooting discretization

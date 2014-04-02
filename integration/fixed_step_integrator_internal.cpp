@@ -21,17 +21,17 @@
  */
 
 #include "fixed_step_integrator_internal.hpp"
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
 using namespace std;
 namespace CasADi{
 
-  FixedStepIntegratorInternal::FixedStepIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
+  FixedStepIntegratorInternal::FixedStepIntegratorInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
@@ -76,7 +76,7 @@ namespace CasADi{
     casadi_assert(k_out>=0);
 
     // Explicit discrete time dynamics
-    FX& F = getExplicit();
+    Function& F = getExplicit();
 
     // Take time steps until end time has been reached
     while(k_<k_out){
@@ -109,7 +109,7 @@ namespace CasADi{
     casadi_assert(k_out<=nk_);
 
     // Explicit discrete time dynamics
-    FX& G = getExplicitB();
+    Function& G = getExplicitB();
 
     // Take time steps until end time has been reached
     while(k_>k_out){
@@ -122,7 +122,7 @@ namespace CasADi{
       G.input(RDAE_X).set(x_tape_.at(k_));
       G.input(RDAE_Z).set(Z_tape_.at(k_));
       G.input(RDAE_P).set(input(INTEGRATOR_P));
-      G.input(RDAE_RX).set(output(INTEGRATOR_RX0));
+      G.input(RDAE_RX).set(output(INTEGRATOR_RXF));
       G.input(RDAE_RZ).set(RZ_);
       G.input(RDAE_RP).set(input(INTEGRATOR_RP));
       G.evaluate();

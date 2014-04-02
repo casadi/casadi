@@ -35,11 +35,11 @@ SDPSDQPSolver::SDPSDQPSolver(const SDQPStructure & st)  {
 }
 
 SDPSDQPInternal* SDPSDQPSolver::operator->(){
-  return (SDPSDQPInternal*)(FX::operator->());
+  return (SDPSDQPInternal*)(Function::operator->());
 }
 
 const SDPSDQPInternal* SDPSDQPSolver::operator->() const{
-  return (const SDPSDQPInternal*)(FX::operator->());
+  return (const SDPSDQPInternal*)(Function::operator->());
 
 }
 

@@ -25,6 +25,8 @@
 
 #include "mx_node.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
   /** \brief Represents any binary operation that involves two matrices 
       \author Joel Andersson 
@@ -61,7 +63,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV> 
@@ -100,6 +102,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // BINARY_MX_HPP

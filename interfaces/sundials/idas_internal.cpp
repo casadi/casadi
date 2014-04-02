@@ -21,9 +21,9 @@
  */
 
 #include "idas_internal.hpp"
-#include "symbolic/stl_vector_tools.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/std_vector_tools.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
+#include "symbolic/function/mx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 
@@ -43,7 +43,7 @@ namespace CasADi{
     SundialsInternal::deepCopyMembers(already_copied);
   }
 
-  IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
+  IdasInternal::IdasInternal(const Function& f, const Function& g) : SundialsInternal(f,g){
     addOption("suppress_algebraic",          OT_BOOLEAN,          false,          "Supress algebraic variables in the error testing");
     addOption("calc_ic",                     OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions.");
     addOption("calc_icB",                    OT_BOOLEAN,          GenericType(),  "Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].");
@@ -1284,20 +1284,20 @@ namespace CasADi{
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac_.output().rowind();
-    const vector<int>& col = jac_.output().col();
+    const vector<int>& colind = jac_.output().colind();
+    const vector<int>& row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over columns
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
       
-        // Get column
-        int j = col[el];
+        // Get row
+        int rr = row[el];
       
         // Add to the element
-        DENSE_ELEM(Jac,i,j) = val[el];
+        DENSE_ELEM(Jac,rr,cc) = val[el];
       }
     }
   
@@ -1363,20 +1363,20 @@ namespace CasADi{
     }
   
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jacB_.output().rowind();
-    const vector<int>& col = jacB_.output().col();
+    const vector<int>& colind = jacB_.output().colind();
+    const vector<int>& row = jacB_.output().row();
     const vector<double>& val = jacB_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over columns
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
       
-        // Get column
-        int j = col[el];
+        // Get row
+        int rr = row[el];
       
         // Add to the element
-        DENSE_ELEM(JacB,i,j) = val[el];
+        DENSE_ELEM(JacB,rr,cc) = val[el];
       }
     }
   
@@ -1413,20 +1413,20 @@ namespace CasADi{
     jac_.evaluate();
 
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac_.output().rowind();
-    const vector<int>& col = jac_.output().col();
+    const vector<int>& colind = jac_.output().colind();
+    const vector<int>& row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over columns
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        // Get column
-        int j = col[el];
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        // Get row
+        int rr = row[el];
       
         // Set the element
-        if(i-j>=-mupper && i-j<=mlower)
-          BAND_ELEM(Jac,i,j) = val[el];
+        if(cc-rr<=mupper && rr-cc<=mlower)
+          BAND_ELEM(Jac,rr,cc) = val[el];
       }
     }
   
@@ -1492,20 +1492,20 @@ namespace CasADi{
     }
   
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jacB_.output().rowind();
-    const vector<int>& col = jacB_.output().col();
+    const vector<int>& colind = jacB_.output().colind();
+    const vector<int>& row = jacB_.output().row();
     const vector<double>& val = jacB_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over columns
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        // Get column
-        int j = col[el];
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        // Get row
+        int rr = row[el];
       
         // Set the element
-        if(i-j>=-mupperB && i-j<=mlowerB)
-          BAND_ELEM(JacB,i,j) = val[el];
+        if(cc-rr<=mupperB && rr-cc<=mlowerB)
+          BAND_ELEM(JacB,rr,cc) = val[el];
       }
     }
   
@@ -1593,7 +1593,7 @@ namespace CasADi{
   
     // Solve the (possibly factorized) system 
     casadi_assert_message(linsol_.output().size() == NV_LENGTH_S(zvec),"Assertion error: " << linsol_.output().size() << " == " << NV_LENGTH_S(zvec));
-    linsol_.solve(NV_DATA_S(zvec),1,true);
+    linsol_.solve(NV_DATA_S(zvec),1,false);
 
     // Log time duration
     time2 = clock();
@@ -1625,7 +1625,7 @@ namespace CasADi{
       cout << endl;
     }
   
-    linsolB_.solve(NV_DATA_S(zvecB),1,true);
+    linsolB_.solve(NV_DATA_S(zvecB),1,false);
   
     if (monitored("psolveB")) {
       cout << "zvecB sol = " << std::endl;
@@ -1768,7 +1768,7 @@ namespace CasADi{
       IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
-      IDABMem IDAB_mem;
+      //IDABMem IDAB_mem;
       int flag;
 
       // Current time
@@ -1779,7 +1779,7 @@ namespace CasADi{
       IDA_mem = (IDAMem) IDA_mem->ida_user_data;
 
       IDAADJ_mem = IDA_mem->ida_adj_mem;
-      IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+      //IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
     
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {
@@ -1815,7 +1815,7 @@ namespace CasADi{
       IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
-      IDABMem IDAB_mem;
+      //IDABMem IDAB_mem;
       int flag;
 
       // Current time
@@ -1827,7 +1827,7 @@ namespace CasADi{
       IDA_mem = (IDAMem) IDA_mem->ida_user_data;
 
       IDAADJ_mem = IDA_mem->ida_adj_mem;
-      IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+      //IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
 
       // Get FORWARD solution from interpolation.
       if (IDAADJ_mem->ia_noInterp==FALSE) {
@@ -1914,7 +1914,7 @@ namespace CasADi{
     if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
     if(exact_jacobian_){
       // Generate jacobians if not already provided
-      if(jac_.isNull()) jac_ = getJacobian();
+      if(jac_.isNull()) jac_ = getJac();
       if(!jac_.isInit()) jac_.init();
     
       // Pass to IDA
@@ -2075,7 +2075,7 @@ namespace CasADi{
   }
 
   template<typename FunctionType>
-  FunctionType IdasInternal::getJacobianGen(){
+  FunctionType IdasInternal::getJacGen(){
     FunctionType f = shared_cast<FunctionType>(f_);
     casadi_assert(!f.isNull());
   
@@ -2095,7 +2095,7 @@ namespace CasADi{
   }
 
   template<typename FunctionType>
-  FunctionType IdasInternal::getJacobianGenB(){
+  FunctionType IdasInternal::getJacGenB(){
     FunctionType g = shared_cast<FunctionType>(g_);
     casadi_assert(!g.isNull());
   
@@ -2114,23 +2114,23 @@ namespace CasADi{
     return FunctionType(jac_in,jac);
   }
 
-  FX IdasInternal::getJacobianB(){
+  Function IdasInternal::getJacB(){
     if(is_a<SXFunction>(g_)){
-      return getJacobianGenB<SXFunction>();
+      return getJacGenB<SXFunction>();
     } else if(is_a<MXFunction>(g_)){
-      return getJacobianGenB<MXFunction>();
+      return getJacGenB<MXFunction>();
     } else {
-      throw CasadiException("IdasInternal::getJacobianB(): Not an SXFunction or MXFunction");
+      throw CasadiException("IdasInternal::getJacB(): Not an SXFunction or MXFunction");
     }
   }
 
-  FX IdasInternal::getJacobian(){
+  Function IdasInternal::getJac(){
     if(is_a<SXFunction>(f_)){
-      return getJacobianGen<SXFunction>();
+      return getJacGen<SXFunction>();
     } else if(is_a<MXFunction>(f_)){
-      return getJacobianGen<MXFunction>();
+      return getJacGen<MXFunction>();
     } else {
-      throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
+      throw CasadiException("IdasInternal::getJac(): Not an SXFunction or MXFunction");
     }
   }
 

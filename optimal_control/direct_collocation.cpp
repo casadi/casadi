@@ -27,16 +27,16 @@ namespace CasADi{
 DirectCollocation::DirectCollocation(){
 }
     
-DirectCollocation::DirectCollocation(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
+DirectCollocation::DirectCollocation(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn){
   assignNode(new DirectCollocationInternal(ffcn,mfcn,cfcn,rfcn));
 }
 
 const DirectCollocationInternal* DirectCollocation::operator->() const{
-  return (const DirectCollocationInternal*)FX::operator->();
+  return (const DirectCollocationInternal*)Function::operator->();
 }
 
 DirectCollocationInternal* DirectCollocation::operator->(){
-  return (DirectCollocationInternal*)FX::operator->();
+  return (DirectCollocationInternal*)Function::operator->();
 }
 
 void DirectCollocation::getGuess(std::vector<double>& V_init) const{

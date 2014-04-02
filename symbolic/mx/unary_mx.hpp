@@ -24,6 +24,7 @@
 #define UNARY_MX_HPP
 
 #include "mx_node.hpp"
+/// \cond INTERNAL
 
 namespace CasADi{
   /** \brief Represents a general unary operation on an MX
@@ -49,7 +50,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);

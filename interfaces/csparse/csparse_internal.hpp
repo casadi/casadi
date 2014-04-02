@@ -23,12 +23,14 @@
 #ifndef CSPARSE_INTERNAL_HPP
 #define CSPARSE_INTERNAL_HPP
 
+/// \cond INTERNAL
+
 extern "C"{
 #include "cs.h"
 }
 
 #include "csparse.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
 
 namespace CasADi{
 
@@ -39,7 +41,7 @@ namespace CasADi{
   public:
     
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseInternal(const CRSSparsity& sp, int nrhs);
+    CSparseInternal(const Sparsity& sp, int nrhs);
 
     // Copy constructor
     CSparseInternal(const CSparseInternal& linsol);
@@ -62,8 +64,8 @@ namespace CasADi{
     // Has the solve function been called once
     bool called_once_;
     
-    // The tranpose of linear system in CSparse form (CCS)
-    cs AT_;
+    // The linear system CSparse form (CCS)
+    cs A_;
 
     // The symbolic factorization
     css *S_;
@@ -78,6 +80,8 @@ namespace CasADi{
   };
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //CSPARSE_INTERNAL_HPP
 

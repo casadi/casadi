@@ -33,7 +33,7 @@ namespace CasADi{
   InnerProd::InnerProd(const MX& x, const MX& y){
     casadi_assert(x.sparsity()==y.sparsity());
     setDependencies(x,y);
-    setSparsity(sp_dense(1,1));
+    setSparsity(Sparsity::scalar());
   }
   
   void InnerProd::printPart(std::ostream &stream, int part) const{
@@ -60,8 +60,8 @@ namespace CasADi{
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] += *adjSeed[d][0] * *input[1];
-      *adjSens[d][1] += *adjSeed[d][0] * *input[0];
+      adjSens[d][0]->addToSum(*adjSeed[d][0] * *input[1]);
+      adjSens[d][1]->addToSum(*adjSeed[d][0] * *input[0]);
       *adjSeed[d][0] = MX();
     }
   }
@@ -70,8 +70,8 @@ namespace CasADi{
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void InnerProd::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void InnerProd::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -94,7 +94,7 @@ namespace CasADi{
     if(fwd){
       res = 0;
       for(int i=0; i<n; ++i){
-        res |= *arg0++ & *arg1++;
+        res |= *arg0++ | *arg1++;
       }
     } else {
       for(int i=0; i<n; ++i){

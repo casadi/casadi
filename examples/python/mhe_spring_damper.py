@@ -48,25 +48,25 @@ m = 1 # The weight of the mass
 k = 1 # The spring constant
 c = 0.5 # The damping of the system
 # The state
-states = struct_ssym(["x","dx"]) # Full state vector of the system: position x and velocity dx
+states = struct_symSX(["x","dx"]) # Full state vector of the system: position x and velocity dx
 Nstates = states.size # Number of states
 # Set up some aliases
 x,dx = states[...]
 
 # The control input
-controls = struct_ssym(["F"]) # Full control vector of the system: Input force F
+controls = struct_symSX(["F"]) # Full control vector of the system: Input force F
 Ncontrols = controls.size # Number of control inputs
 # Set up some aliases
 F, = controls[...]
 
 # Disturbances
-disturbances = struct_ssym(["w"]) # Process noise vector
+disturbances = struct_symSX(["w"]) # Process noise vector
 Ndisturbances = disturbances.size # Number of disturbances
 # Set up some aliases
 w, = disturbances[...]
 
 # Measurements
-measurements = struct_ssym(["y"]) # Measurement vector
+measurements = struct_symSX(["y"]) # Measurement vector
 Nmeas = measurements.size # Number of measurements
 # Set up some aliases
 y, = measurements[...]
@@ -74,9 +74,9 @@ y, = measurements[...]
 # Create Structure for the entire horizon
 
 # Structure that will be degrees of freedom for the optimizer
-shooting = struct_ssym([(entry("X",repeat=N,struct=states),entry("W",repeat=N-1,struct=disturbances))])
+shooting = struct_symSX([(entry("X",repeat=N,struct=states),entry("W",repeat=N-1,struct=disturbances))])
 # Structure that will be fixed parameters for the optimizer
-parameters = struct_ssym([(entry("U",repeat=N-1,struct=controls),entry("Y",repeat=N,struct=measurements),entry("S",shape=(Nstates,Nstates)),entry("x0",shape=(Nstates,1)))])
+parameters = struct_symSX([(entry("U",repeat=N-1,struct=controls),entry("Y",repeat=N,struct=measurements),entry("S",shape=(Nstates,Nstates)),entry("x0",shape=(Nstates,1)))])
 S = parameters["S"]
 x0 = parameters["x0"]
 # Define the ODE right hand side
@@ -88,10 +88,10 @@ f = SXFunction([states,controls,disturbances],[rhs])
 f.init()
 
 # Build an integrator for this system: Runge Kutta 4 integrator
-k1 = f.eval([states,controls,disturbances])[0]
-k2 = f.eval([states+dt/2.0*k1,controls,disturbances])[0]
-k3 = f.eval([states+dt/2.0*k2,controls,disturbances])[0]
-k4 = f.eval([states+dt*k3,controls,disturbances])[0]
+k1 = f([states,controls,disturbances])[0]
+k2 = f([states+dt/2.0*k1,controls,disturbances])[0]
+k3 = f([states+dt/2.0*k2,controls,disturbances])[0]
+k4 = f([states+dt*k3,controls,disturbances])[0]
 
 states_1 = states+dt/6.0*(k1+2*k2+2*k3+k4)
 phi = SXFunction([states,controls,disturbances],[states_1])
@@ -109,7 +109,7 @@ obj = 0
 obj += mul([(shooting["X",0]-parameters["x0"]).T,S,(shooting["X",0]-parameters["x0"])])
 #Next the cost for the measurement noise
 for i in range(N):
-  vm = h.eval([shooting["X",i]])[0]-parameters["Y",i]
+  vm = h([shooting["X",i]])[0]-parameters["Y",i]
   obj += mul([vm.T,R,vm])
 #And also the cost for the process noise
 for i in range(N-1):
@@ -118,7 +118,7 @@ for i in range(N-1):
 # Build the multiple shooting constraints
 g = []
 for i in range(N-1):
-  g.append( shooting["X",i+1] - phi.eval([shooting["X",i],parameters["U",i],shooting["W",i]])[0] )
+  g.append( shooting["X",i+1] - phi([shooting["X",i],parameters["U",i],shooting["W",i]])[0] )
 
 # Formulate the NLP
 nlp = SXFunction(nlpIn(x=shooting,p=parameters),nlpOut(f=obj,g=vertcat(g)))
@@ -137,7 +137,7 @@ for i in range(Nsimulation-1):
   phi.evaluate()
   simulated_X[:,i+1] = phi.getOutput(0)
 #Create the measurements from these states
-simulated_Y = DMatrix(Nmeas,Nsimulation) # Holder for the measurements
+simulated_Y = DMatrix.zeros(Nmeas,Nsimulation) # Holder for the measurements
 for i in range(Nsimulation):
   h.setInput(simulated_X[:,i],0)
   h.evaluate()
@@ -160,8 +160,8 @@ nlp_solver.setInput(0,"lbg")
 nlp_solver.setInput(0,"ubg")
 
 # Create a holder for the estimated states and disturbances
-estimated_X= DMatrix(Nstates,Nsimulation)
-estimated_W = DMatrix(Ndisturbances,Nsimulation-1)
+estimated_X= DMatrix.zeros(Nstates,Nsimulation)
+estimated_W = DMatrix.zeros(Ndisturbances,Nsimulation-1)
 # For the first instance we run the filter, we need to initialize it.
 current_parameters = parameters(0)
 current_parameters["U",horzcat] = simulated_U[:,0:N-1]

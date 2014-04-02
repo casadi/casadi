@@ -23,7 +23,7 @@
 #include "nlp_qp_internal.hpp"
 
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 
 using namespace std;
 namespace CasADi {
@@ -36,7 +36,7 @@ NLPQPInternal* NLPQPInternal::clone() const{
   return node;
 }
   
-NLPQPInternal::NLPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInternal(st) {
+NLPQPInternal::NLPQPInternal(const std::vector<Sparsity> &st) : QPSolverInternal(st) {
 
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSOlver used to solve the QPs.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSOlver");
@@ -83,22 +83,22 @@ void NLPQPInternal::init(){
   QPSolverInternal::init();
 
   // Create a symbolic matrix for the decision variables
-  SXMatrix X = ssym("X",n_,1);
+  SX X = SX::sym("X",n_,1);
 
   // Parameters to the problem
-  SXMatrix H = ssym("H",input(QP_SOLVER_H).sparsity());
-  SXMatrix G = ssym("G",input(QP_SOLVER_G).sparsity());
-  SXMatrix A = ssym("A",input(QP_SOLVER_A).sparsity());
+  SX H = SX::sym("H",input(QP_SOLVER_H).sparsity());
+  SX G = SX::sym("G",input(QP_SOLVER_G).sparsity());
+  SX A = SX::sym("A",input(QP_SOLVER_A).sparsity());
 
   // Put parameters in a vector
-  std::vector< SXMatrix > par;
+  std::vector< SX > par;
   par.push_back(H.data());
   par.push_back(G.data());
   par.push_back(A.data());
 
   // The nlp looks exactly like a mathematical description of the NLP
   SXFunction QP_SOLVER_nlp(nlpIn("x",X,"p",vertcat(par)),
-		    nlpOut("f",mul(trans(G),X) + 0.5*mul(mul(trans(X),H),X),
+                           nlpOut("f",mul(G.T(),X) + 0.5*mul(mul(X.T(),H),X),
 			   "g",mul(A,X)));
 
   // Create an nlpsolver instance

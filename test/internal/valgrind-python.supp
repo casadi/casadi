@@ -157,31 +157,31 @@
 {
    ADDRESS_IN_RANGE/Invalid read of size 4
    Memcheck:Addr4
-   fun:PyObject_Realloc
+   fun:PyObject_Realloc*
 }
 
 {
    ADDRESS_IN_RANGE/Invalid read of size 4
    Memcheck:Value4
-   fun:PyObject_Realloc
+   fun:PyObject_Realloc*
 }
 
 {
    ADDRESS_IN_RANGE/Invalid read of size 8
    Memcheck:Addr8
-   fun:PyObject_Realloc
+   fun:PyObject_Realloc*
 }
 
 {
    ADDRESS_IN_RANGE/Invalid read of size 8
    Memcheck:Value8
-   fun:PyObject_Realloc
+   fun:PyObject_Realloc*
 }
 
 {
    ADDRESS_IN_RANGE/Conditional jump or move depends on uninitialised value
    Memcheck:Cond
-   fun:PyObject_Realloc
+   fun:PyObject_Realloc*
 }
 
 
@@ -517,14 +517,6 @@
    fun:initialize_builtin_datetime_metadata
    fun:initmultiarray
    fun:_PyImport_LoadDynamicModule
-   obj:/usr/bin/python2.7
-   obj:/usr/bin/python2.7
-   obj:/usr/bin/python2.7
-   obj:/usr/bin/python2.7
-   fun:PyEval_CallObjectWithKeywords
-   fun:PyEval_EvalFrameEx
-   fun:PyEval_EvalCode
-   fun:PyImport_ExecCodeModuleEx
 }
 
 {
@@ -532,15 +524,4 @@
    Memcheck:Leak
    fun:malloc
    obj:/usr/lib/pyshared/python2.7/numpy/lib/_compiled_base.so
-   fun:PyEval_EvalFrameEx
-   fun:PyEval_EvalCode
-   fun:PyImport_ExecCodeModuleEx
-   obj:/usr/bin/python2.7
-   obj:/usr/bin/python2.7
-   obj:/usr/bin/python2.7
-   obj:/usr/bin/python2.7
-   obj:/usr/bin/python2.7
-   fun:PyEval_CallObjectWithKeywords
-   fun:PyEval_EvalFrameEx
 }
-

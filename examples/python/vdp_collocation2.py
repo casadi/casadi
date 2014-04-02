@@ -30,10 +30,10 @@ nk = 20    # Control discretization
 tf = 10.0  # End time
 
 # Declare variables (use scalar graph)
-t  = ssym("t")    # time
-u  = ssym("u")    # control
+t  = SX.sym("t")    # time
+u  = SX.sym("u")    # control
 
-states = struct_ssym([
+states = struct_symSX([
             entry('x',shape=2),    #  vdp oscillator states
             entry('L')             #  helper state: Langrange integrand
          ])
@@ -92,7 +92,7 @@ C = NP.zeros((d+1,d+1))
 D = NP.zeros(d+1)
 
 # Dimensionless time inside one control interval
-tau = ssym("tau")
+tau = SX.sym("tau")
   
 # All collocation time points
 T = NP.zeros((nk,d+1))
@@ -124,7 +124,7 @@ for j in range(d+1):
     C[j,r] = tfcn.getOutput()
 
 # Structure holding NLP variables
-V = struct_msym([
+V = struct_symMX([
       (
        entry("X",repeat=[nk+1,d+1],struct=states),
        entry("U",repeat=[nk],shape=nu)

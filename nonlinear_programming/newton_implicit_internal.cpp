@@ -24,7 +24,7 @@
 
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
 
 #include "symbolic/profiling.hpp"
 #include "symbolic/casadi_options.hpp"
@@ -32,7 +32,7 @@
 using namespace std;
 namespace CasADi {
 
-  NewtonImplicitInternal::NewtonImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
+  NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL,1e-12,"Stopping criterion tolerance on step size");
     addOption("max_iter",  OT_INTEGER, 1000, "Maximum number of Newton iterations to perform before returning.");
@@ -46,10 +46,10 @@ namespace CasADi {
     casadi_log("NewtonImplicitInternal::solveNonLinear:begin");
     
     // Set up timers for profiling
-    double time_zero;
-    double time_start;
-    double time_stop;
-    if (CasadiOptions::profiling) {
+    double time_zero=0;
+    double time_start=0;
+    double time_stop=0;
+    if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
       time_zero = getRealTime();
       CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
     }
@@ -102,7 +102,7 @@ namespace CasADi {
       jac_.evaluate();
       
       // Write out profiling information
-      if (CasadiOptions::profiling) {
+      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
         CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << jac_.get() << ":" << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
       }
@@ -127,7 +127,7 @@ namespace CasADi {
       }
       linsol_.prepare();
       // Write out profiling information
-      if (CasadiOptions::profiling) {
+      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
         CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":1||prepare linear system" << std::endl;
       }
@@ -136,8 +136,8 @@ namespace CasADi {
         time_start = getRealTime(); // Start timer
       }
       // Solve against F
-      linsol_.solve(&F.front(),1,true);
-      if (CasadiOptions::profiling) {
+      linsol_.solve(&F.front(),1,false);
+      if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
         CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;
       }

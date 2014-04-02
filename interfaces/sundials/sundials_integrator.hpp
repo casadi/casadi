@@ -23,13 +23,17 @@
 #ifndef SUNDIALS_INTEGRATOR_HPP
 #define SUNDIALS_INTEGRATOR_HPP
 
-#include "symbolic/fx/integrator.hpp"
+#include "symbolic/function/integrator.hpp"
 
 namespace CasADi{
   
 /// Forward declaration of internal class
 class SundialsInternal;
 
+/** \brief Interface to the Sundials integrators
+
+  @copydoc DAE_doc
+*/
 class SundialsIntegrator : public Integrator{
 public:
   /// Default constructor

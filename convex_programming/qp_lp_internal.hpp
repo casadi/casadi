@@ -23,9 +23,10 @@
 #ifndef QP_LP_INTERNAL_HPP
 #define QP_LP_INTERNAL_HPP
 
-#include "symbolic/fx/lp_internal.hpp"
-#include "symbolic/fx/qp_solver.hpp"
+#include "symbolic/function/lp_internal.hpp"
+#include "symbolic/function/qp_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for QPLPInternal
@@ -40,7 +41,7 @@ public:
   virtual QPLPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit QPLPInternal(const std::vector<CRSSparsity> &st);
+  explicit QPLPInternal(const std::vector<Sparsity> &st);
 
   /** \brief  Destructor */
   virtual ~QPLPInternal();
@@ -56,6 +57,7 @@ public:
 };
 
 } // namespace CasADi
+/// \endcond
 
 #endif //QP_LP_INTERNAL_HPP
 

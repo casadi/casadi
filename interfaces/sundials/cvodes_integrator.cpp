@@ -29,16 +29,16 @@ namespace CasADi{
 CVodesIntegrator::CVodesIntegrator(){ 
 }
 
-CVodesIntegrator::CVodesIntegrator(const FX& f, const FX& g){
+CVodesIntegrator::CVodesIntegrator(const Function& f, const Function& g){
   assignNode(new CVodesInternal(f,g));
 }
 
 CVodesInternal* CVodesIntegrator::operator->(){
-  return (CVodesInternal*)(FX::operator->());
+  return (CVodesInternal*)(Function::operator->());
 }
 
 const CVodesInternal* CVodesIntegrator::operator->() const{
-  return (const CVodesInternal*)(FX::operator->());
+  return (const CVodesInternal*)(Function::operator->());
 
 }
 

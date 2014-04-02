@@ -28,9 +28,9 @@ tf = 10.0    # End time
 coll = False # Use collocation integrator
 
 # Declare variables (use scalar graph)
-t  = ssym("t")    # time
-u  = ssym("u")    # control
-x  = ssym("x",3)  # state
+t  = SX.sym("t")    # time
+u  = SX.sym("u")    # control
+x  = SX.sym("x",3)  # state
 
 # ODE rhs function
 ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
@@ -61,7 +61,7 @@ integrator.init()
 nv = 1*nk + 3*(nk+1)
 
 # Declare variable vector
-V = msym("V", nv)
+V = MX.sym("V", nv)
 
 # Get the expressions for local variables
 U = V[0:nk]
@@ -99,7 +99,7 @@ for k in range(nk):
   Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
   
   # Call the integrator
-  Xk_end, = integratorOut(integrator.call(integratorIn(x0=Xk,p=U[k])),"xf")
+  Xk_end, = integratorOut(integrator(integratorIn(x0=Xk,p=U[k])),"xf")
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)
@@ -135,9 +135,6 @@ u_opt = v_opt[0:nk]
 x0_opt = v_opt[nk+0::3]
 x1_opt = v_opt[nk+1::3]
 x2_opt = v_opt[nk+2::3]
-
-# Retrieve the solution
-v_opt = NP.array(solver.getOutput("x"))
 
 # Get values at the beginning of each finite element
 tgrid_x = NP.linspace(0,10,nk+1)

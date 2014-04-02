@@ -25,8 +25,8 @@ from casadi import *
 from numpy import *
 from pylab import *
 
-x=ssym("x") 
-dx=ssym("dx")
+x=SX.sym("x") 
+dx=SX.sym("dx")
 states = vertcat([x,dx])
 
 f=SXFunction(daeIn(x=states),daeOut(ode=vertcat([dx,-x])))

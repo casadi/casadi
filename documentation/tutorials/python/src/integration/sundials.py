@@ -28,9 +28,9 @@ from pylab import *
 #! ODE integration
 #! -----------------
 #! Let's construct a simple Van der Pol oscillator.
-u = ssym("u")
-x = ssym("x")
-y = ssym("y")
+u = SX.sym("u")
+x = SX.sym("x")
+y = SX.sym("y")
 f  = SXFunction([vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
@@ -48,7 +48,7 @@ tend=10
 integrator.setOption("t0",0)
 integrator.setOption("tf",tend)
 integrator.init()
-#$ The integrator is really just a special kind of FX. Assume that we have an ODE/DAE in either explicit form:
+#$ The integrator is really just a special kind of Function. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
 #$   der(x) = fx(x,z,p,t)
 #$ \end{verbatim}
@@ -86,7 +86,7 @@ integrator.init()
 #$   [x(tf),q(tf),rx(t0),rq(t0)]  = F(x(t0),p,rx(0),rp)
 #$ \end{verbatim}
 #$ 
-print isinstance(integrator,FX)
+print isinstance(integrator,Function)
 print "%d -> %d" % (integrator.getNumInputs(),integrator.getNumOutputs())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
 #! The output of Integrator is the state at the end of integration.
@@ -124,7 +124,7 @@ sim.setInput([x0,y0],"x0")
 sim.setInput(0,"p")
 sim.evaluate()
 
-sol2 = sim.output().toArray()
+sol2 = sim.output().toArray().T
 #! sol and sol2 are exactly the same
 print linalg.norm(sol-sol2)
 
@@ -203,7 +203,7 @@ show()
 
 #! Symbolic intergator results
 #! ---------------------------
-#! Since CVodesIntegrator is just another FX, 
+#! Since CVodesIntegrator is just another Function, 
 #! the usual CasADi rules for symbolic evaluation are active.
 #!
 #! We create an MX 'w' that contains the result of a time integration with:
@@ -211,7 +211,7 @@ show()
 #! - a fixed integration end time, t=10s
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
-u=msym("u")
+u=MX.sym("u")
 w, = integratorOut(integrator.call(integratorIn(x0=MX([1,0]),p=u)),"xf")
 
 #! We construct an MXfunction and a python help function 'out'

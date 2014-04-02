@@ -24,10 +24,11 @@
 #define NEWTON_IMPLICIT_INTERNAL_HPP
 
 #include "newton_implicit_solver.hpp"
-#include "symbolic/fx/implicit_function_internal.hpp"
-#include "symbolic/fx/nlp_solver.hpp"
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/implicit_function_internal.hpp"
+#include "symbolic/function/nlp_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for NewtonImplicitInternal
@@ -38,7 +39,7 @@ namespace CasADi{
     friend class NewtonImplicitSolver;
   public:
     /** \brief  Constructor */
-    explicit NewtonImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol);
+    explicit NewtonImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol);
 
     /** \brief  Destructor */
     virtual ~NewtonImplicitInternal();
@@ -47,7 +48,7 @@ namespace CasADi{
     virtual NewtonImplicitInternal* clone() const{ return new NewtonImplicitInternal(*this);}
   
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const { return new NewtonImplicitInternal(f,jac,linsol);}
+    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const { return new NewtonImplicitInternal(f,jac,linsol);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -67,6 +68,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //NEWTON_IMPLICIT_INTERNAL_HPP
 

@@ -65,35 +65,35 @@ Ddp::~Ddp() {}
 void Ddp::setupQFunctions()
 {
      /*************** inputs **************/
-     SXMatrix xk = ssym("xk", ode.nx());
-     SXMatrix uk = ssym("uk", ode.nu());
+     SX xk = ssym("xk", ode.nx());
+     SX uk = ssym("uk", ode.nu());
 
-     SXMatrix V_0_kp1(  ssym(  "V_0_kp1",        1,        1) );
-     SXMatrix V_x_kp1(  ssym(  "V_x_kp1", ode.nx(),        1) );
-     SXMatrix V_xx_kp1( ssym( "V_xx_kp1", ode.nx(), ode.nx()) );
+     SX V_0_kp1(  ssym(  "V_0_kp1",        1,        1) );
+     SX V_x_kp1(  ssym(  "V_x_kp1", ode.nx(),        1) );
+     SX V_xx_kp1( ssym( "V_xx_kp1", ode.nx(), ode.nx()) );
 
-     vector<SXMatrix> qInputs(NUM_Q_INPUTS);
+     vector<SX> qInputs(NUM_Q_INPUTS);
      qInputs.at(IDX_Q_INPUTS_X_K)      = xk;
      qInputs.at(IDX_Q_INPUTS_U_K)      = uk;
      qInputs.at(IDX_Q_INPUTS_V_0_KP1)  = V_0_kp1;
      qInputs.at(IDX_Q_INPUTS_V_X_KP1)  = V_x_kp1;
      qInputs.at(IDX_Q_INPUTS_V_XX_KP1) = V_xx_kp1;
 
-     SXMatrix dx = ssym("dx", ode.nx());
-     SXMatrix du = ssym("du", ode.nu());
+     SX dx = ssym("dx", ode.nx());
+     SX du = ssym("du", ode.nu());
 
      /**************** dynamics *********************/
      // dummy params for now
      map<string,SX> dummyParams;
      double dt = (tf - t0)/(N - 1);
-     SXMatrix f = ode.rk4Step( xk + dx, uk + du, uk + du, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
-     SXMatrix f0 = ode.rk4Step( xk, uk, uk, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
-     // SXMatrix f = ode.eulerStep( xk + dx, uk + du, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
-     // SXMatrix f0 = ode.eulerStep( xk, uk, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
+     SX f = ode.rk4Step( xk + dx, uk + du, uk + du, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
+     SX f0 = ode.rk4Step( xk, uk, uk, dummyParams, t0, dt); // timestep dependent: f(x,u,__t__) - same as cost
+     // SX f = ode.eulerStep( xk + dx, uk + du, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
+     // SX f0 = ode.eulerStep( xk, uk, dummyParams, SX(t0), SX(dt)); // timestep dependent:  f(x,u,__t__) - same as cost
 
      /**************** Q function *********************/
-     SXMatrix xk_p_dx( xk + dx );
-     SXMatrix uk_p_du( uk + du );
+     SX xk_p_dx( xk + dx );
+     SX uk_p_du( uk + du );
 
      map<string,SX> xkMap = ode.getStateMap(  xk_p_dx );
      map<string,SX> ukMap = ode.getActionMap( uk_p_du );
@@ -101,10 +101,10 @@ void Ddp::setupQFunctions()
      // map<string,SX> xkMap = ode.getStateMap(  xk );
      // map<string,SX> ukMap = ode.getActionMap( uk );
 
-     SXMatrix df = f - f0;
+     SX df = f - f0;
 
-     SXMatrix dxZeros( zerosSX( ode.nx(), 1 ) );
-     SXMatrix duZeros( zerosSX( ode.nu(), 1 ) );
+     SX dxZeros( zerosSX( ode.nx(), 1 ) );
+     SX duZeros( zerosSX( ode.nu(), 1 ) );
 
      makeDense( dxZeros );
      makeDense( duZeros );
@@ -112,17 +112,17 @@ void Ddp::setupQFunctions()
      for (int k=0; k<N; k++){
 
 	  // function
-	  SXMatrix Q_0_k(costFcnExt( xkMap, ukMap, k, N ) + V_0_kp1 + mul( V_x_kp1.trans(), df )
+	  SX Q_0_k(costFcnExt( xkMap, ukMap, k, N ) + V_0_kp1 + mul( V_x_kp1.trans(), df )
 			 + mul( df.trans(), mul( V_xx_kp1, df ) )/2 );
 
 	  // jacobian
-	  SXMatrix Q_x_k =  gradient( Q_0_k, dx );
-	  SXMatrix Q_u_k =  gradient( Q_0_k, du );
+	  SX Q_x_k =  gradient( Q_0_k, dx );
+	  SX Q_u_k =  gradient( Q_0_k, du );
 
 	  // hessian
-	  SXMatrix Q_xx_k = jacobian( Q_x_k, dx );
-	  SXMatrix Q_xu_k = jacobian( Q_x_k, du ); // == jacobian( Q_u, x ).trans()
-	  SXMatrix Q_uu_k = jacobian( Q_u_k, du );
+	  SX Q_xx_k = jacobian( Q_x_k, dx );
+	  SX Q_xu_k = jacobian( Q_x_k, du ); // == jacobian( Q_u, x ).trans()
+	  SX Q_uu_k = jacobian( Q_u_k, du );
 
 	  Q_0_k  = substitute(  Q_0_k, dx, dxZeros );
 	  Q_x_k  = substitute(  Q_x_k, dx, dxZeros );
@@ -154,7 +154,7 @@ void Ddp::setupQFunctions()
 	  makeDense(Q_uu_k);
 
 	  // outputs
-	  vector<SXMatrix> qOutputs(NUM_Q_OUTPUTS);
+	  vector<SX> qOutputs(NUM_Q_OUTPUTS);
 	  qOutputs.at(IDX_Q_OUTPUTS_Q_0_K)  = Q_0_k;
 	  qOutputs.at(IDX_Q_OUTPUTS_Q_X_K)  = Q_x_k;
 	  qOutputs.at(IDX_Q_OUTPUTS_Q_U_K)  = Q_u_k;
@@ -171,17 +171,17 @@ void Ddp::setupQFunctions()
 void Ddp::setupBackwardSweepFunction()
 {
      /************ inputs ************/
-     SXMatrix uk(   ssym(   "uk", ode.nu(),        1 ) );
+     SX uk(   ssym(   "uk", ode.nu(),        1 ) );
 
-     SXMatrix Q_0(  ssym(  "Q_0",        1,        1 ) );
-     SXMatrix Q_x(  ssym(  "Q_x", ode.nx(),        1 ) );
-     SXMatrix Q_u(  ssym(  "Q_u", ode.nu(),        1 ) );
-     SXMatrix Q_xx( ssym( "Q_xx", ode.nx(), ode.nx() ) );
-     SXMatrix Q_xu( ssym( "Q_xu", ode.nx(), ode.nu() ) );
-     SXMatrix Q_uu( ssym( "Q_uu", ode.nu(), ode.nu() ) );
+     SX Q_0(  ssym(  "Q_0",        1,        1 ) );
+     SX Q_x(  ssym(  "Q_x", ode.nx(),        1 ) );
+     SX Q_u(  ssym(  "Q_u", ode.nu(),        1 ) );
+     SX Q_xx( ssym( "Q_xx", ode.nx(), ode.nx() ) );
+     SX Q_xu( ssym( "Q_xu", ode.nx(), ode.nu() ) );
+     SX Q_uu( ssym( "Q_uu", ode.nu(), ode.nu() ) );
 
 
-     vector<SXMatrix> backwardSweepInputs(NUM_BACKWARD_SWEEP_INPUTS);
+     vector<SX> backwardSweepInputs(NUM_BACKWARD_SWEEP_INPUTS);
      backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_U_K)    = uk;
      backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_0_K)  = Q_0;
      backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_X_K)  = Q_x;
@@ -191,15 +191,15 @@ void Ddp::setupBackwardSweepFunction()
      backwardSweepInputs.at(IDX_BACKWARD_SWEEP_INPUTS_Q_UU_K) = Q_uu;
 
      /************** optimal control *******************/
-     SXMatrix Q_uu_inv = inv( Q_uu );
-     SXMatrix u_feedforward_k = -mul( Q_uu_inv, Q_u );
-     SXMatrix feedbackGain_k  = -mul( Q_uu_inv, Q_xu.trans() );
+     SX Q_uu_inv = inv( Q_uu );
+     SX u_feedforward_k = -mul( Q_uu_inv, Q_u );
+     SX feedbackGain_k  = -mul( Q_uu_inv, Q_xu.trans() );
 
 
      /************** value function propogation ********/
-     SXMatrix V_0_k  = Q_0  - mul( Q_u.trans(), mul( Q_uu_inv, Q_u ) );
-     SXMatrix V_x_k  = Q_x  - mul( Q_xu, mul( Q_uu_inv.trans(), Q_u ) );
-     SXMatrix V_xx_k = Q_xx - mul( Q_xu, mul( Q_uu_inv, Q_xu.trans() ) );
+     SX V_0_k  = Q_0  - mul( Q_u.trans(), mul( Q_uu_inv, Q_u ) );
+     SX V_x_k  = Q_x  - mul( Q_xu, mul( Q_uu_inv.trans(), Q_u ) );
+     SX V_xx_k = Q_xx - mul( Q_xu, mul( Q_uu_inv, Q_xu.trans() ) );
 
      /*************** backwardSweepFcn ****************/
      // workaround bug where size() != size1()*size2()
@@ -209,7 +209,7 @@ void Ddp::setupBackwardSweepFunction()
      makeDense( V_x_k );
      makeDense( V_xx_k );
 
-     vector<SXMatrix> backwardSweepOutputs(NUM_BACKWARD_SWEEP_OUTPUTS);
+     vector<SX> backwardSweepOutputs(NUM_BACKWARD_SWEEP_OUTPUTS);
      backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_U_OPEN_LOOP_K)   = u_feedforward_k + uk;
      backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_FEEDBACK_GAIN_K) = feedbackGain_k;
      backwardSweepOutputs.at(IDX_BACKWARD_SWEEP_OUTPUTS_V_0_K)           = V_0_k;

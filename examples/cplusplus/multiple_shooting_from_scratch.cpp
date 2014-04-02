@@ -53,9 +53,9 @@ double inf = numeric_limits<double>::infinity();
 int main(){
 
   // Declare variables
-  SXMatrix u = ssym("u"); // control
-  SXMatrix r = ssym("r"), s = ssym("s"); // states
-  SXMatrix x = vertcat(r,s);
+  SX u = SX::sym("u"); // control
+  SX r = SX::sym("r"), s = SX::sym("s"); // states
+  SX x = vertcat(r,s);
 
   // Number of differential states
   int nx = x.size1();
@@ -84,8 +84,8 @@ int main(){
   int ns = 50;
 
   // ODE right hand side and quadrature
-  SXMatrix ode = vertcat((1 - s*s)*r - s + u, r);
-  SXMatrix quad = r*r + s*s + u*u;
+  SX ode = vertcat((1 - s*s)*r - s + u, r);
+  SX quad = r*r + s*s + u*u;
   SXFunction rhs(daeIn("x",x,"p",u),daeOut("ode",ode,"quad",quad));
 
   // Create an integrator (CVodes)
@@ -98,7 +98,7 @@ int main(){
   int NV = nx*(ns+1) + nu*ns;
   
   // Declare variable vector for the NLP
-  MX V = msym("V",NV);
+  MX V = MX::sym("V",NV);
 
   // NLP variable bounds and initial guess
   vector<double> v_min,v_max,v_init;

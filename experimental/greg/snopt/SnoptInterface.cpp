@@ -64,7 +64,7 @@ SnoptInterface::SnoptInterface( Ocp& _ocp ) : designVariables(_ocp.designVariabl
 {
 	si = this;
 
-	ftotal = vertcat( SXMatrix(_ocp.objFun), _ocp.g );
+	ftotal = vertcat( SX(_ocp.objFun), _ocp.g );
 
 	init();
 
@@ -127,7 +127,7 @@ SnoptInterface::init()
 	Fupp[ objRow - FIRST_FORTRAN_INDEX ] = SNOPT_INFINITY;
 
 	/****************** jacobian *********************/
-	SXMatrix fnonlinear = ftotal;
+	SX fnonlinear = ftotal;
 
 	SXFunction gradF(Ftotal.jacobian());
 
@@ -151,7 +151,7 @@ SnoptInterface::init()
 				jAvar_.push_back( col[el] + FIRST_FORTRAN_INDEX );
 
 				// subtract out linear part
-				SXMatrix linearpart = gradF.outputExpr(0).getElement(r, col[el])*designVariables[col[el]];
+				SX linearpart = gradF.outputExpr(0).getElement(r, col[el])*designVariables[col[el]];
 				fnonlinear[r] -= linearpart.at(0);
 				simplify(fnonlinear.at(r));
 			} else {

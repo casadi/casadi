@@ -24,15 +24,15 @@
 #define IP_INTERNAL_HPP
 
 #include "ip_method.hpp"
-#include "symbolic/fx/nlp_solver_internal.hpp"
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
 namespace CasADi{
     
 class IPInternal : public NLPSolverInternal{
 
 public:
-  explicit IPInternal(const FX& F, const FX& G);
+  explicit IPInternal(const Function& F, const Function& G);
   virtual ~IPInternal();
   virtual IPInternal* clone() const{ return new IPInternal(*this);}
   
@@ -42,7 +42,7 @@ public:
   /// Function which forms the KKT system
   enum KIn{K_x,K_t,K_NUM_IN};
   enum KOut{K_K,K_k,K_NUM_OUT};
-  FX kfcn_;
+  Function kfcn_;
   
   /// Linear solver for the KKT system
   LinearSolver linear_solver_;

@@ -36,7 +36,7 @@ except:
 try:  
   DSDPSolver
   def SDPLPSolver(st):
-    return DSDPSolver(sdpStruct(a=st["a"],f=sp_sparse(0,0),g=sp_sparse(0,0)))
+    return DSDPSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
   lpsolvers.append((SDPLPSolver,{},False))
 except:
   pass
@@ -100,7 +100,7 @@ class LPSolverTests(casadiTestCase):
     #
     #  s.t.     bounds on x
 
-    A = DMatrix(0,2)
+    A = DMatrix.sparse(0,2)
     LBX = DMatrix([ -inf, 0 ])
     UBX = DMatrix([ inf, inf ])
     c = DMatrix([ 2.0, 1.0 ])

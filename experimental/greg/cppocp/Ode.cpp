@@ -50,12 +50,12 @@ void Ode::setupIntegrators(map<string,double> & params)
 {
      /*********** set up rk4Step and eulerStep SXFunctions **********/
      // inputs
-     SXMatrix xk = ssym("xk", nx());
-     SXMatrix uk = ssym("uk", nu());
-     SXMatrix t0 = ssym("t0",    1);
-     SXMatrix dt = ssym("dt",    1);
+     SX xk = ssym("xk", nx());
+     SX uk = ssym("uk", nu());
+     SX t0 = ssym("t0",    1);
+     SX dt = ssym("dt",    1);
 
-     vector<SXMatrix> stepInputs(NUM_ODE_STEP_INPUTS);
+     vector<SX> stepInputs(NUM_ODE_STEP_INPUTS);
      stepInputs.at(IDX_ODE_STEP_STATE)  = xk;
      stepInputs.at(IDX_ODE_STEP_ACTION) = uk;
      stepInputs.at(IDX_ODE_STEP_T0)     = t0;
@@ -69,8 +69,8 @@ void Ode::setupIntegrators(map<string,double> & params)
      }
 
      // call fcns
-     SXMatrix xNextRK4   = rk4Step(   xk, uk, uk, sxParams, t0.at(0), dt.at(0) );
-     SXMatrix xNextEuler = eulerStep( xk, uk,     sxParams, t0.at(0), dt.at(0) );
+     SX xNextRK4   = rk4Step(   xk, uk, uk, sxParams, t0.at(0), dt.at(0) );
+     SX xNextEuler = eulerStep( xk, uk,     sxParams, t0.at(0), dt.at(0) );
 
      // outputs
      rk4StepFcn   = SXFunction( stepInputs, xNextRK4 );
@@ -144,7 +144,7 @@ void Ode::addOutput(string _newOutput)
      outputs[_newOutput] = no() - 1;
 }
 
-map<string,SX> Ode::getStateMap( SXMatrix & x )
+map<string,SX> Ode::getStateMap( SX & x )
 {
      map<string,int>::const_iterator iter;
      map<string,SX> xMap;
@@ -154,7 +154,7 @@ map<string,SX> Ode::getStateMap( SXMatrix & x )
      return xMap;
 }
 
-map<string,SX> Ode::getActionMap( SXMatrix & u )
+map<string,SX> Ode::getActionMap( SX & u )
 {
      map<string,int>::const_iterator iter;
      map<string,SX> uMap;
@@ -164,7 +164,7 @@ map<string,SX> Ode::getActionMap( SXMatrix & u )
      return uMap;
 }
 
-map<string,SX> Ode::getOutputFromDxdt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
+map<string,SX> Ode::getOutputFromDxdt( SX x, SX u, map<string,SX> & p, SX t )
 {
      // state/action maps to wrap input SXMatrices
      map<string,SX> xMap = getStateMap(x);
@@ -183,7 +183,7 @@ map<string,SX> Ode::getOutputFromDxdt( SXMatrix x, SXMatrix u, map<string,SX> & 
 }
 
 
-SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
+SX Ode::dxVectorDt( SX x, SX u, map<string,SX> & p, SX t )
 {
      // state/action maps to wrap input SXMatrices
      map<string,SX> xMap = getStateMap(x);
@@ -198,8 +198,8 @@ SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
      // call dxdt
      dxdt( xDotMap, dummyOutputMap, xMap, uMap, p, t );
 
-     // make output SXMatrix
-     SXMatrix xDotMat = ssym("an_xDotMat", nx());
+     // make output SX
+     SX xDotMat = ssym("an_xDotMat", nx());
      map<string,int>::const_iterator iter;
      for (iter = states.begin(); iter != states.end(); iter++)
 	  xDotMat[iter->second] = xDotMap[iter->first];
@@ -207,30 +207,30 @@ SXMatrix Ode::dxVectorDt( SXMatrix x, SXMatrix u, map<string,SX> & p, SX t )
      return xDotMat;
 }
 
-SXMatrix Ode::rk4Step( SXMatrix x0Vec, SXMatrix u0Vec, SXMatrix u1Vec, map<string,SX> & p, SX t0, SX dt)
+SX Ode::rk4Step( SX x0Vec, SX u0Vec, SX u1Vec, map<string,SX> & p, SX t0, SX dt)
 {
-     SXMatrix k1 = dxVectorDt( x0Vec            ,             u0Vec, p, t0          );
-     SXMatrix k2 = dxVectorDt( x0Vec + 0.5*dt*k1, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );
-     SXMatrix k3 = dxVectorDt( x0Vec + 0.5*dt*k2, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );
-     SXMatrix k4 = dxVectorDt( x0Vec +     dt*k3,             u1Vec, p, t0 +     dt );
+     SX k1 = dxVectorDt( x0Vec            ,             u0Vec, p, t0          );
+     SX k2 = dxVectorDt( x0Vec + 0.5*dt*k1, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );
+     SX k3 = dxVectorDt( x0Vec + 0.5*dt*k2, 0.5*(u0Vec+u1Vec), p, t0 + 0.5*dt );
+     SX k4 = dxVectorDt( x0Vec +     dt*k3,             u1Vec, p, t0 +     dt );
 	
      return x0Vec + dt*(k1 + 2*k2 + 2*k3 + k4)/6; // rk4
 }
 
-SXMatrix Ode::eulerStep( SXMatrix x0Vec, SXMatrix u0Vec, map<string,SX> & p, SX t0, SX dt)
+SX Ode::eulerStep( SX x0Vec, SX u0Vec, map<string,SX> & p, SX t0, SX dt)
 {
      return x0Vec + dt*dxVectorDt( x0Vec, u0Vec, p, t0 );
 }
 
-SXMatrix Ode::simpsonsRuleError( SXMatrix x0Vec, SXMatrix x1Vec, SXMatrix u0Vec, SXMatrix u1Vec, map<string,SX> & p, SX t0, SX dt)
+SX Ode::simpsonsRuleError( SX x0Vec, SX x1Vec, SX u0Vec, SX u1Vec, map<string,SX> & p, SX t0, SX dt)
 {
-     SXMatrix f0 = dxVectorDt( x0Vec, u0Vec, p, t0          );
-     SXMatrix f1 = dxVectorDt( x1Vec, u1Vec, p, t0 +     dt );
+     SX f0 = dxVectorDt( x0Vec, u0Vec, p, t0          );
+     SX f1 = dxVectorDt( x1Vec, u1Vec, p, t0 +     dt );
 
-     SXMatrix um = 0.5*( u0Vec + u1Vec );
-     SXMatrix xm = 0.5*( x0Vec + x1Vec ) - 0.125*(f1-f0)*dt;
+     SX um = 0.5*( u0Vec + u1Vec );
+     SX xm = 0.5*( x0Vec + x1Vec ) - 0.125*(f1-f0)*dt;
 
-     SXMatrix fm = dxVectorDt( xm, um, p, t0 + 0.5*dt );
+     SX fm = dxVectorDt( xm, um, p, t0 + 0.5*dt );
 
      return x1Vec - x0Vec - dt/6.0*(f0 + 4*fm + f1);
 }

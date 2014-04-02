@@ -24,7 +24,7 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include "../casadi_options.hpp"
 
 using namespace std;
@@ -34,7 +34,7 @@ namespace CasADi{
   UnaryMX::UnaryMX(Operation op, MX x) : op_(op){
     // Put a densifying node in between if necessary
     if(!operation_checker<F00Checker>(op_)){
-      makeDense(x);
+      x.densify();
     }
   
     setDependencies(x);
@@ -63,13 +63,13 @@ namespace CasADi{
     }
   }
 
-  void UnaryMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+  void UnaryMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     // Do the operation on all non-zero elements
-    const vector<SX> &xd = input[0]->data();
-    vector<SX> &od = output[0]->data();
+    const vector<SXElement> &xd = input[0]->data();
+    vector<SXElement> &od = output[0]->data();
   
     for(int el=0; el<size(); ++el){
-      casadi_math<SX>::fun(op_,xd[el],0,od[el]);
+      casadi_math<SXElement>::fun(op_,xd[el],0,od[el]);
     }
   }
 
@@ -99,7 +99,7 @@ namespace CasADi{
       for(int d=0; d<nadj; ++d){
         MX s = *adjSeed[d][0];
         *adjSeed[d][0] = MX();
-        *adjSens[d][0] += pd[0]*s;
+        adjSens[d][0]->addToSum(pd[0]*s);
       }
     }
  

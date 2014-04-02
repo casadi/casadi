@@ -23,7 +23,7 @@ public:
 		      std::vector<double>&lb_,
 		      std::vector<double>&ub_,
 		      std::vector<double>&guess_,
-		      CasADi::SXMatrix & dv_,
+		      CasADi::SX & dv_,
 		      int idx0_,
 		      std::map<std::string,CasADi::SX>&params_);
      ~MultipleShooting();
@@ -40,10 +40,10 @@ public:
      CasADi::SX getState(std::string x, int timeStep);
      CasADi::SX getAction(std::string u, int timeStep);
      CasADi::SX getOutput(std::string o, int timeStep);
-     CasADi::SXMatrix getOutput(std::string o);
+     CasADi::SX getOutput(std::string o);
 
-     CasADi::SXMatrix getStateMat(int timeStep);
-     CasADi::SXMatrix getActionMat(int timeStep);
+     CasADi::SX getStateMat(int timeStep);
+     CasADi::SX getActionMat(int timeStep);
 
      CasADi::DMatrix getState(int timeStep, std::vector<double> & xopt);
      CasADi::DMatrix getAction(int timeStep, std::vector<double> & xopt);
@@ -51,7 +51,7 @@ public:
 
      int N;
 	
-     CasADi::SXMatrix getDynamicsConstraintError(int timeStep);
+     CasADi::SX getDynamicsConstraintError(int timeStep);
 
      Ode & ode;
      int getIdx(std::string xu, int timeStep);
@@ -59,7 +59,7 @@ public:
      std::string name;
 
 private:
-     CasADi::SXMatrix & dv;
+     CasADi::SX & dv;
      std::vector<double>&lb;
      std::vector<double>&ub;
      std::vector<double>&guess;

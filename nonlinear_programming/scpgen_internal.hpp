@@ -24,16 +24,18 @@
 #define SCPGEN_INTERNAL_HPP
 
 #include "scpgen.hpp"
-#include "symbolic/fx/nlp_solver_internal.hpp"
-#include "symbolic/fx/qp_solver.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
+#include "symbolic/function/qp_solver.hpp"
 #include <deque>
+
+/// \cond INTERNAL
 
 namespace CasADi{
     
 class SCPgenInternal : public NLPSolverInternal{
 
 public:
-  explicit SCPgenInternal(const FX& nlp);
+  explicit SCPgenInternal(const Function& nlp);
   virtual ~SCPgenInternal();
   virtual SCPgenInternal* clone() const{ return new SCPgenInternal(*this);}
   
@@ -131,21 +133,21 @@ public:
   bool print_time_;
 
   /// Generate initial guess for lifted variables
-  FX vinit_fcn_;
+  Function vinit_fcn_;
 
   /// Residual function
-  FX res_fcn_;
+  Function res_fcn_;
  
   // Function to calculate the matrices in the reduced QP
-  FX mat_fcn_;
+  Function mat_fcn_;
   int mat_jac_, mat_hes_;
 
   /// Quadratic approximation
-  FX vec_fcn_;
+  Function vec_fcn_;
   int vec_gf_, vec_g_;
 
   /// Step expansion
-  FX exp_fcn_;
+  Function exp_fcn_;
   
   // Objective value
   double f_;
@@ -217,5 +219,7 @@ public:
 };
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //SCPGEN_INTERNAL_HPP

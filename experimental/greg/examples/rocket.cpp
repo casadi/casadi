@@ -22,10 +22,10 @@
 
 #include <iostream>
 
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 #include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
-#include <symbolic/fx/jacobian.hpp>
+#include <symbolic/function/sx_function.hpp>
+#include <symbolic/function/jacobian.hpp>
 
 #include <interfaces/ipopt/ipopt_solver.hpp>
 
@@ -97,15 +97,15 @@ main()
 	ms.boundStateAction("v", 0, 0, ms.N-1);
 
 	// hessian
-	SXMatrix sigma = ssym("sigma");
-	SXMatrix lambda = ssym("lambda", ocp.g.size1());
+	SX sigma = ssym("sigma");
+	SX lambda = ssym("lambda", ocp.g.size1());
 	SX lagrangian = sigma.at(0)*ocp.objFun;
 	for (int k=0; k<ocp.g.size1(); k++)
 		lagrangian += lambda.at(k)*ocp.g.at(k);
 
-	SXMatrix h = hessian(lagrangian, ocp.designVariables);
+	SX h = hessian(lagrangian, ocp.designVariables);
 
-	vector<SXMatrix> inputs(3);
+	vector<SX> inputs(3);
 	inputs[0] = ocp.designVariables;
 	inputs[1] = lambda;
 	inputs[2] = sigma;
@@ -119,8 +119,8 @@ main()
 	gfcn.setOption("symbolic_jacobian",false);
 
 	//IpoptSolver solver(ffcn,gfcn);
-	//IpoptSolver solver(ffcn,gfcn,FX(),Jacobian(gfcn));
-	IpoptSolver solver( ffcn, gfcn, hfcn,  FX());
+	//IpoptSolver solver(ffcn,gfcn,Function(),Jacobian(gfcn));
+	IpoptSolver solver( ffcn, gfcn, hfcn,  Function());
 
 	// Set options
 	solver.setOption("tol",1e-8);

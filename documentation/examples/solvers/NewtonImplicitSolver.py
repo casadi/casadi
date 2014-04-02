@@ -36,16 +36,16 @@ from pylab import *
 #$ We seek the stationair solution to these modulation equations.
 
 #! Parameters
-eps   = ssym("eps")
-mu    = ssym("mu")
-alpha = ssym("alpha")
-k     = ssym("k")
-sigma = ssym("sigma")
+eps   = SX.sym("eps")
+mu    = SX.sym("mu")
+alpha = SX.sym("alpha")
+k     = SX.sym("k")
+sigma = SX.sym("sigma")
 params = [eps,mu,alpha,k,sigma]
 
 #! Variables
-a     = ssym("a")
-gamma = ssym("gamma")
+a     = SX.sym("a")
+gamma = SX.sym("gamma")
 
 #! Equations
 res0 = mu*a+1.0/2*k*a*sin(gamma)

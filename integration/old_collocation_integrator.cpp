@@ -29,7 +29,7 @@ namespace CasADi{
   OldCollocationIntegrator::OldCollocationIntegrator(){
   }
   
-  OldCollocationIntegrator::OldCollocationIntegrator(const FX& f, const FX& g){
+  OldCollocationIntegrator::OldCollocationIntegrator(const Function& f, const Function& g){
     assignNode(new OldCollocationIntegratorInternal(f,g));
   }
 

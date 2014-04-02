@@ -23,12 +23,12 @@
 #include "nlp_implicit_internal.hpp"
 
 #include "symbolic/mx/mx_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
 
 using namespace std;
 namespace CasADi {
   
-  NLPImplicitInternal::NLPImplicitInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
+  NLPImplicitInternal::NLPImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "The NLPSolver used to solve the implicit system.");
     addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
   }
@@ -60,7 +60,7 @@ namespace CasADi {
   
     // Add auxiliary inputs
     vector<double>::iterator nlp_p = nlp_solver_.input(NLP_SOLVER_P).begin();
-    for(int i=0, k=0; i<getNumInputs(); ++i){
+    for(int i=0; i<getNumInputs(); ++i){
       if(i!=iin_){
         std::copy(input(i).begin(),input(i).end(),nlp_p);
         nlp_p += input(i).size();
@@ -92,17 +92,16 @@ namespace CasADi {
     ImplicitFunctionInternal::init();
 
     // Free variable in the NLP
-    MX u = msym("u",input(iin_).sparsity());
+    MX u = MX::sym("u",input(iin_).sparsity());
     
     // So that we can pass it on to createParent
-    std::vector<CRSSparsity> sps;
+    std::vector<Sparsity> sps;
     for(int i=0; i<getNumInputs(); ++i)
       if(i!=iin_) sps.push_back(input(i).sparsity());
-    std::pair<MX,std::vector<MX> > mypair = createParent(sps);
-
+      
     // u groups all parameters in an MX
-    MX p = mypair.first;
-    std::vector< MX > inputs(mypair.second);
+    std::vector< MX > inputs;
+    MX p = createParent(sps,inputs);
     
     // Dummy NLP objective
     MX nlp_f = 0;
@@ -111,7 +110,7 @@ namespace CasADi {
     std::vector< MX > args_call(getNumInputs());
     args_call[iin_] = u;
     for(int i=0, i2=0; i<getNumInputs(); ++i)
-      if(i!=iin_) args_call[i] = mypair.second[i2++];
+      if(i!=iin_) args_call[i] = inputs[i2++];
     MX nlp_g = f_.call(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters

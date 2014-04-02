@@ -21,12 +21,12 @@
  */
 
 #include "sundials_internal.hpp"
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 
 INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)
@@ -34,7 +34,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace CasADi{
   
-SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
+SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
   addOption("max_num_steps",               OT_INTEGER,          10000,          "Maximum number of integrator steps");
   addOption("reltol",                      OT_REAL,             1e-6,           "Relative tolerence for the IVP solution");
   addOption("abstol",                      OT_REAL,             1e-8,           "Absolute tolerence  for the IVP solution");
@@ -169,25 +169,25 @@ void SundialsInternal::init(){
   }
   
   // Create a Jacobian if requested
-  if (exact_jacobian_) jac_ = getJacobian();
+  if (exact_jacobian_) jac_ = getJac();
   // Initialize Jacobian if availabe
   if(!jac_.isNull() && !jac_.isInit()) jac_.init();
   
   if (!jac_.isNull()) {
-    casadi_assert_message(jac_.output().size1()==jac_.output().size2(),"SundialsInternal::init: the jacobian of the forward problem must be square but got " << jac_.output().dimString());
+    casadi_assert_message(jac_.output().size2()==jac_.output().size1(),"SundialsInternal::init: the jacobian of the forward problem must be square but got " << jac_.output().dimString());
     
-    casadi_assert_message(!isSingular(jac_.output().sparsity()),"SundialsInternal::init: singularity - the jacobian of the forward problem is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (in stead of "<< jac_.output().size1() << ")");
+    casadi_assert_message(!jac_.output().sparsity().isSingular(),"SundialsInternal::init: singularity - the jacobian of the forward problem is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (in stead of "<< jac_.output().size2() << ")");
   }
 
   // Create a backwards Jacobian if requested
-  if(exact_jacobianB_ && !g_.isNull()) jacB_ = getJacobianB();
+  if(exact_jacobianB_ && !g_.isNull()) jacB_ = getJacB();
   // Initialize backwards  Jacobian if availabe
   if(!jacB_.isNull() && !jacB_.isInit()) jacB_.init();
   
   if (!jacB_.isNull()) {
-    casadi_assert_message(jacB_.output().size1()==jacB_.output().size2(),"SundialsInternal::init: the jacobian of the backward problem must be square but got " << jacB_.output().dimString());
+    casadi_assert_message(jacB_.output().size2()==jacB_.output().size1(),"SundialsInternal::init: the jacobian of the backward problem must be square but got " << jacB_.output().dimString());
     
-    casadi_assert_message(!isSingular(jacB_.output().sparsity()),"SundialsInternal::init: singularity - the jacobian of the backward problem is structurally rank-deficient. sprank(J)=" << sprank(jacB_.output()) << " (in stead of "<< jacB_.output().size1() << ")");
+    casadi_assert_message(!jacB_.output().sparsity().isSingular(),"SundialsInternal::init: singularity - the jacobian of the backward problem is structurally rank-deficient. sprank(J)=" << sprank(jacB_.output()) << " (in stead of "<< jacB_.output().size2() << ")");
   }
   
   if(hasSetOption("linear_solver") && !jac_.isNull()){

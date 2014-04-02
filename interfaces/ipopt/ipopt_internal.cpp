@@ -23,7 +23,7 @@
 
 #include "ipopt_internal.hpp"
 #include "ipopt_nlp.hpp"
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include <ctime>
 
 using namespace std;
@@ -40,12 +40,12 @@ using namespace std;
 
 namespace CasADi{
 
-  IpoptInternal::IpoptInternal(const FX& nlp) : NLPSolverInternal(nlp){
+  IpoptInternal::IpoptInternal(const Function& nlp) : NLPSolverInternal(nlp){
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true, "print information about execution time");
   
     // Monitors
-    addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f", true);
+    addOption("monitor",                  OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
 
     // For passing metadata to IPOPT
     addOption("var_string_md",            OT_DICTIONARY, GenericType(), "String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT");
@@ -295,7 +295,7 @@ namespace CasADi{
         casadi_assert(N*N==red_hess.size());
       
         // Store to statistics
-        red_hess_ = DMatrix(sp_dense(N,N),red_hess);
+        red_hess_ = DMatrix(Sparsity::dense(N,N),red_hess);
       }
 #endif // WITH_CASADI_PATCH
     }
@@ -398,14 +398,14 @@ namespace CasADi{
       double time1 = clock();
       if (!callback_.isNull()) {
         if(full_callback) {
-          if (!output(NLP_SOLVER_X).empty()) copy(x,x+nx_,output(NLP_SOLVER_X).begin());
+          if (!output(NLP_SOLVER_X).isEmpty()) copy(x,x+nx_,output(NLP_SOLVER_X).begin());
         
           vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
           for(int i=0; i<lambda_x.size(); ++i){
             lambda_x[i] = z_U[i]-z_L[i];
           }
-          if (!output(NLP_SOLVER_LAM_G).empty()) copy(lambda,lambda+ng_,output(NLP_SOLVER_LAM_G).begin());
-          if (!output(NLP_SOLVER_G).empty()) copy(g,g+ng_,output(NLP_SOLVER_G).begin());
+          if (!output(NLP_SOLVER_LAM_G).isEmpty()) copy(lambda,lambda+ng_,output(NLP_SOLVER_LAM_G).begin());
+          if (!output(NLP_SOLVER_G).isEmpty()) copy(g,g+ng_,output(NLP_SOLVER_G).begin());
         } else {
           if (iter==0) {
             cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it." << endl;
@@ -479,15 +479,13 @@ namespace CasADi{
       double time1 = clock();
       if (values == NULL) {
         int nz=0;
-        vector<int> rowind,col;
-        hessLag_.output().sparsity().getSparsityCRS(rowind,col);
-        for(int r=0; r<rowind.size()-1; ++r)
-          for(int el=rowind[r]; el<rowind[r+1]; ++el){
-            if(col[el]<=r){
-              iRow[nz] = r;
-              jCol[nz] = col[el];
-              nz++;
-            }
+        const vector<int>& colind = hessLag_.output().colind();
+        const vector<int>& row = hessLag_.output().row();
+        for(int cc=0; cc<colind.size()-1; ++cc)
+          for(int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el){
+            iRow[nz] = row[el];
+            jCol[nz] = cc;
+            nz++;
           }
       } else {
         // Pass the argument to the function
@@ -502,6 +500,12 @@ namespace CasADi{
         // Get results
         hessLag_.output().get(values,SPARSESYM);
       
+        if(monitored("eval_h")){
+          cout << "x = " << hessLag_.input(NL_X).data() << endl;
+          cout << "H = " << endl;
+          hessLag_.output().printSparse();
+        }
+        
         if (regularity_check_ && !isRegular(hessLag_.output().data())) casadi_error("IpoptInternal::h: NaN or Inf detected.");
       
       }
@@ -527,17 +531,18 @@ namespace CasADi{
       }
       
       // Get function
-      FX& jacG = this->jacG();
+      Function& jacG = this->jacG();
     
       double time1 = clock();
       if (values == NULL) {
         int nz=0;
-        vector<int> rowind,col;
-        jacG.output().sparsity().getSparsityCRS(rowind,col);
-        for(int r=0; r<rowind.size()-1; ++r)
-          for(int el=rowind[r]; el<rowind[r+1]; ++el){
-            iRow[nz] = r;
-            jCol[nz] = col[el];
+        const vector<int>& colind = jacG.output().colind();
+        const vector<int>& row = jacG.output().row();
+        for(int cc=0; cc<colind.size()-1; ++cc)
+          for(int el=colind[cc]; el<colind[cc+1]; ++el){
+            int rr = row[el];
+            iRow[nz] = rr;
+            jCol[nz] = cc;
             nz++;
           }
       } else {
@@ -750,7 +755,7 @@ namespace CasADi{
 
       // Get Hessian sparsity pattern
       if(exact_hessian_)
-        nnz_h_lag = hessLag().output().sparsity().sizeL();
+        nnz_h_lag = hessLag().output().sparsity().sizeU();
       else
         nnz_h_lag = 0;
     } catch (exception& ex){
@@ -767,12 +772,12 @@ namespace CasADi{
         // Number of variables that appear nonlinearily
         int nv = 0;
       
-        // Loop over the rows
-        const CRSSparsity& spHessLag = this->spHessLag();
-        const vector<int>& rowind = spHessLag.rowind();
-        for(int i=0; i<rowind.size()-1; ++i){
-          // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-          if(rowind[i]!=rowind[i+1])
+        // Loop over the cols
+        const Sparsity& spHessLag = this->spHessLag();
+        const vector<int>& colind = spHessLag.colind();
+        for(int i=0; i<colind.size()-1; ++i){
+          // If the col contains any non-zeros, the corresponding variable appears nonlinearily
+          if(colind[i]!=colind[i+1])
             nv++;
         }
       
@@ -790,12 +795,12 @@ namespace CasADi{
       // Running index
       int el = 0;
     
-      // Loop over the rows
-      const CRSSparsity& spHessLag = this->spHessLag();
-      const vector<int>& rowind = spHessLag.rowind();
-      for(int i=0; i<rowind.size()-1; ++i){
-        // If the row contains any non-zeros, the corresponding variable appears nonlinearily
-        if(rowind[i]!=rowind[i+1]){
+      // Loop over the cols
+      const Sparsity& spHessLag = this->spHessLag();
+      const vector<int>& colind = spHessLag.colind();
+      for(int i=0; i<colind.size()-1; ++i){
+        // If the col contains any non-zeros, the corresponding variable appears nonlinearily
+        if(colind[i]!=colind[i+1]){
           pos_nonlin_vars[el++] = i;
         }
       }

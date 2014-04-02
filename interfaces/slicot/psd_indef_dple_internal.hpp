@@ -26,6 +26,7 @@
 #include "psd_indef_dple_solver.hpp"
 #include "../../control/dple_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal storage for DpleSolver related data
@@ -40,7 +41,7 @@ namespace CasADi{
      *  \param[in] A  List of sparsities of A_i 
      *  \param[in] V  List of sparsities of V_i 
      */
-    PsdIndefDpleInternal(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V, int nwfd=0, int nadj=0);
+    PsdIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V, int nwfd=0, int nadj=0);
     
     /** \brief  Destructor */
     virtual ~PsdIndefDpleInternal();
@@ -52,7 +53,7 @@ namespace CasADi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
   
     /** \brief  Create a new solver */
-    virtual PsdIndefDpleInternal* create(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V) const{ return new PsdIndefDpleInternal(A,V);}
+    virtual PsdIndefDpleInternal* create(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) const{ return new PsdIndefDpleInternal(A,V);}
      
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}
@@ -64,7 +65,7 @@ namespace CasADi{
     virtual void init();
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-    virtual FX getDerivative(int nfwd, int nadj);
+    virtual Function getDerivative(int nfwd, int nadj);
     
   private:
     /// Dimension of state-space
@@ -120,4 +121,5 @@ namespace CasADi{
   
 } // namespace CasADi
 
+/// \endcond
 #endif // PSD_INDEF_DPLE_INTERNAL_HPP

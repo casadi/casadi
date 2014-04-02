@@ -45,7 +45,7 @@ _casadi_global = _casadi
 // Matrix typemaps class
 %include "matrix.i"
 
-// SX class
+// SXElement class
 %include "sx.i"
 
 // MX class

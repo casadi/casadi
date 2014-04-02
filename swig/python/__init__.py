@@ -99,7 +99,17 @@ NLP_NUM_IN = deprecated["NLP_NUM_IN"]
 NLP_NUM_OUT = deprecated["NLP_NUM_OUT"]
 
 
+import warnings
+warnings.filterwarnings("default",".*This function.*",DeprecationWarning)
 
+import contextlib
+
+@contextlib.contextmanager
+def internalAPI():
+  backup = CasadiOptions.getAllowedInternalAPI()
+  CasadiOptions.setAllowedInternalAPI(True)
+  yield
+  CasadiOptions.setAllowedInternalAPI(backup)
 
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':

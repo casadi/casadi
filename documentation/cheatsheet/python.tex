@@ -13,10 +13,10 @@
 \begin{tabular}{ll|lll}
  & & scalar & dense & sparse \\
 \hline
-\multirow{2}{*}{SX} & sym & \verb|SX("x")| & \verb|ssym("x",n,m)|  &  \\ 
-    & num & \verb|SX(d)|  & \verb|SXMatrix(d)|  & \verb|SXMatrix(sp,d)| \\
+\multirow{2}{*}{SX} & sym & \verb|SX("x")| & \verb|SX.sym("x",n,m)|  &  \\ 
+    & num & \verb|SX(d)|  & \verb|SX(d)|  & \verb|SX(sp,d)| \\
 \hline
-\multirow{2}{*}{MX} & sym & - & \verb|msym("x",n,m)|  & \verb|msym("x",sp)|\\
+\multirow{2}{*}{MX} & sym & - & \verb|MX.sym("x",n,m)|  & \verb|MX.sym("x",sp)|\\
     & num & - & \verb|MX(d)| &  \verb|MX(DMatrix(sp,d))| \\
 \hline
     & DMatrix & -  & \verb|DMatrix(d)|  & \verb|DMatrix(sp,d)| \\
@@ -35,17 +35,17 @@
 
 \paragraph{SX}
 \begin{verbatim}
-  x = ssym("x")
-  y = ssym("y",10,2)
-  a,b,c = ssym("[a,b,c]")
+  x = SX.sym("x")
+  y = SX.sym("y",10,2)
+  a,b,c = SX.sym("[a,b,c]")
 \end{verbatim}
 
 \paragraph{MX}
 \begin{verbatim}
-  x = msym("x")
-  y = msym("y",10,2)
+  x = MX.sym("x")
+  y = MX.sym("y",10,2)
 \end{verbatim}
-%   a,b,c = msym("[a,b,c]")
+%   a,b,c = MX.sym("[a,b,c]")
 
 \paragraph{Transpose}
 \begin{verbatim}

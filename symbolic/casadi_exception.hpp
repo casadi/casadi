@@ -81,7 +81,6 @@ class CasadiException : public std::exception{
   std::string msg_;
 };
 
-
 // Assertion similar to the standard C assert statement, with the difference that it throws an exception with the same information
 #ifdef CASADI_NDEBUG
 // Release mode
@@ -150,7 +149,7 @@ std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". 
     ) . str() )
 
 #endif // CASADI_NDEBUG
-  
+
 } // namespace CasADi
 
 #endif // CASADI_EXCEPTION_HPP

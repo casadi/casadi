@@ -31,37 +31,43 @@
 
 namespace CasADi{
 
-/** \brief Base class for objects that have a natural string representation
-  \author Joel Andersson 
-  \date 2010
-*/
-class PrintableObject{
+  /** \brief Base class for objects that have a natural string representation
+      \author Joel Andersson 
+      \date 2010
+  */
+  class PrintableObject{
   public:
     
 #ifndef SWIG
-    /// Print a destription of the object
+    /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const;
 
-    /// Print a representation of the object to a stream
-    friend std::ostream& operator<<(std::ostream &stream, const PrintableObject& obj);
-#endif // SWIG  
+    /// Print a representation of the object to a stream (shorthand)
+    friend std::ostream& operator<<(std::ostream &stream, const PrintableObject& obj);    
+
+    /// Return a string with a description of the object, cf. str(Object) in Python
+    friend std::string str(const PrintableObject& obj);
+
+    /// Return a string with a representation of the object, cf. repr(Object) in Python
+    friend std::string repr(const PrintableObject& obj);
+
+#endif // SWIG
 
     /// Return a string with a representation (for SWIG)
     std::string getRepresentation() const;
 
     /// Return a string with a destription (for SWIG)
     std::string getDescription() const;
-  
-};
+  };
 
 #ifdef SWIG
-%extend PrintableObject{
-  std::string __str__()  { return $self->getDescription(); }
-  std::string __repr__()  { return $self->getRepresentation(); }
-}
+  %extend PrintableObject{
+    std::string __str__()  { return $self->getDescription(); }
+    std::string __repr__()  { return $self->getRepresentation(); }
+  }
 #endif // SWIG    
 
 } // namespace CasADi

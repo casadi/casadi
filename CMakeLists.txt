@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "1.8.1")
+set(PACKAGE_VERSION "1.9.0")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson")
 set(PACKAGE_MAINTAINER "Joris Gillis")
@@ -80,22 +80,23 @@ option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_SQIC "Enable SQIC interface" OFF)
 option(WITH_SLICOT "Enable SLICOT interface" OFF)
-option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
-option(WITH_WORHP "Compile the WORHP interface" OFF) 
-option(WITH_SNOPT "Compile the SNOPT interface" OFF) 
-option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
-option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
+option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF)
+option(WITH_WORHP "Compile the WORHP interface" OFF)
+option(WITH_SNOPT "Compile the SNOPT interface" OFF)
+option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF)
+option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_DSDP "Compile the interface to DSDP (the source code for DSDP is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
-option(WITH_BUILD_IPOPT "Download and compile IPOPT" OFF)
 option(WITH_KNITRO "Compile the interface to KNITRO" ON)
 option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
+option(WITH_DEPRECATED "Allow usage of deprecated syntax" ON)
+option(WITH_COVERAGE "Create coverage report" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
@@ -108,6 +109,11 @@ string (TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+
+# Disallow Pre 1.9 syntax
+if(NOT WITH_DEPRECATED)
+  add_definitions(-DWITHOUT_PRE_1_9_X)
+endif()
 
 if(WITH_DL)
   add_definitions(-DWITH_DL)
@@ -126,11 +132,11 @@ foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
-      ${CMAKE_BINARY_DIR} 
+      ${CMAKE_BINARY_DIR}
       ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11.cpp
       CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
       OUTPUT_VARIABLE OUTPUT)
-    
+
     # Save flag, if successful
     if(USE_CXX11)
       set(CXX11FLAG ${CXX11FLAG_TEST} CACHE INTERNAL "C++11 compile flag")
@@ -152,7 +158,7 @@ add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficienc
 
 if(CXX11FLAG)
   try_compile(HAS_COPYSIGN
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_copysign.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -161,7 +167,7 @@ if(CXX11FLAG)
   endif()
 
   try_compile(HAS_ERF
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_erf.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -170,7 +176,7 @@ if(CXX11FLAG)
   endif()
 
   try_compile(HAS_ERFINV
-    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_erfinv.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
@@ -182,7 +188,15 @@ endif()
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi -pedantic -Wall -Wno-sign-compare")
+# add compiler warnings
+if(    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"
+  )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-delete-non-virtual-dtor")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  # I don't know the MSVC warnings, so do nothing for now
+endif()
 
 # the following commands are needed to fix a problem with the libraries
 # for linux 64 bits
@@ -192,6 +206,12 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+
+if(WITH_COVERAGE)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
+set(CMAKE_EXE_LINKER_FLAGS  " -lgcov -fprofile-arcs --coverage ${CMAKE_EXE_LINKER_FLAGS}" )
+endif()
 
 if(MINGW)
   # Circumventing a bug in MinGW g++ v4.7.2, evoked by 752fa89355ffa
@@ -248,27 +268,11 @@ add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
-find_package(LibXml2) 
+find_package(LibXml2)
 if(WITH_LAPACK)
   find_package(LAPACK)
 endif()
 add_feature_info(lapack-interface LAPACK_FOUND "Interface to LAPACK.")
-
-# download and build ipopt
-if(WITH_BUILD_IPOPT)
-  include(ExternalProject)
-  ExternalProject_Add(
-    build_ipopt
-    SVN_REPOSITORY https://projects.coin-or.org/svn/Ipopt/stable/3.10
-    UPDATE_COMMAND "" # svn update unneccesary
-    PREFIX ${CMAKE_BINARY_DIR}/CoinIpopt
-    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt/configure #--prefix=${CMAKE_CURRENT_SOURCE_DIR}/lib/libbuildipopt
-    BUILD_COMMAND make -j4
-  )
-  set(BUILD_IPOPT_LIB_DIR ${CMAKE_BINARY_DIR}/CoinIpopt/src/build_ipopt-build)
-  message(STATUS "BUILD_IPOPT_LIB_DIR: ${BUILD_IPOPT_LIB_DIR}")
-endif(WITH_BUILD_IPOPT)
-add_feature_info(get-ipopt WITH_BUILD_IPOPT "Download and build Ipopt.")
 
 if(WITH_IPOPT)
   find_package(IPOPT)
@@ -284,6 +288,11 @@ if(WITH_CPLEX)
   find_package(CPLEX)
 endif(WITH_CPLEX)
 add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX.")
+
+if(WITH_SNOPT)
+  find_package(SNOPT)
+endif(WITH_SNOPT)
+add_feature_info(snopt-interface SNOPT_FOUND "Interface to SNOPT.")
 
 # if(WITH_GSL)
 #   find_package (GSL)
@@ -351,6 +360,8 @@ add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 
 add_subdirectory(control)
 
+add_subdirectory(misc)
+
 find_package(SWIG)
   if(SWIG_FOUND)
     add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
@@ -387,4 +398,3 @@ CONFIGURE_FILE(
 if(EXTRA_CMAKE)
   include(${EXTRA_CMAKE})
 endif()
-

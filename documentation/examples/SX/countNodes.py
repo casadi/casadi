@@ -25,8 +25,8 @@ from casadi import *
 from casadi.tools import *
 
 #! Let's build a trivial symbolic SX graph
-x = SX("x")
-y = SX("y")
+x = SX.sym("x")
+y = SX.sym("y")
 z = x*y+2*y
 print countNodes(z), " nodes in ", z
 dotdraw(z)

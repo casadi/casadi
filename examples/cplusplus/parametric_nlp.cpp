@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 
 using namespace CasADi;
 using namespace std;
@@ -51,16 +51,16 @@ int main(){
    */
   
   // Optimization variables
-  SXMatrix x = ssym("x",3);
+  SX x = SX::sym("x",3);
   
   // Parameters
-  SXMatrix p = ssym("p",2);
+  SX p = SX::sym("p",2);
   
   // Objective
-  SXMatrix f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2];
+  SX f = x[0]*x[0] + x[1]*x[1] + x[2]*x[2];
   
   // Constraints
-  SXMatrix g = vertcat(
+  SX g = vertcat(
        6*x[0] + 3*x[1] + 2*x[2] - p[0],
     p[1]*x[0] +   x[1] -   x[2] -    1
   );
@@ -106,11 +106,11 @@ int main(){
   
   // Print the solution
   cout << "-----" << endl;
-  cout << "Optimal solution for p = " << solver.input("p").getDescription() << ":" << endl;
-  cout << setw(30) << "Objective: " << solver.output("f").getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output("x").getDescription() << endl;
-  cout << setw(30) << "Dual solution (x): " << solver.output("lam_x").getDescription() << endl;
-  cout << setw(30) << "Dual solution (g): " << solver.output("lam_g").getDescription() << endl;
+  cout << "Optimal solution for p = " << str(solver.input("p")) << ":" << endl;
+  cout << setw(30) << "Objective: " << str(solver.output("f")) << endl;
+  cout << setw(30) << "Primal solution: " << str(solver.output("x")) << endl;
+  cout << setw(30) << "Dual solution (x): " << str(solver.output("lam_x")) << endl;
+  cout << setw(30) << "Dual solution (g): " << str(solver.output("lam_g")) << endl;
   
   // Change the parameter and resolve
   p0[0] = 4.5;
@@ -119,11 +119,11 @@ int main(){
   
   // Print the new solution
   cout << "-----" << endl;
-  cout << "Optimal solution for p = " << solver.input("p").getDescription() << ":" << endl;
-  cout << setw(30) << "Objective: " << solver.output("f").getDescription() << endl;
-  cout << setw(30) << "Primal solution: " << solver.output("x").getDescription() << endl;
-  cout << setw(30) << "Dual solution (x): " << solver.output("lam_x").getDescription() << endl;
-  cout << setw(30) << "Dual solution (g): " << solver.output("lam_g").getDescription() << endl;
+  cout << "Optimal solution for p = " << str(solver.input("p")) << ":" << endl;
+  cout << setw(30) << "Objective: " << str(solver.output("f")) << endl;
+  cout << setw(30) << "Primal solution: " << str(solver.output("x")) << endl;
+  cout << setw(30) << "Dual solution (x): " << str(solver.output("lam_x")) << endl;
+  cout << setw(30) << "Dual solution (g): " << str(solver.output("lam_g")) << endl;
   
   return 0;
 }

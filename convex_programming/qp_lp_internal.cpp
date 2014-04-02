@@ -23,7 +23,7 @@
 #include "qp_lp_internal.hpp"
 
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 
 using namespace std;
 namespace CasADi {
@@ -36,7 +36,7 @@ QPLPInternal* QPLPInternal::clone() const{
   return node;
 }
   
-QPLPInternal::QPLPInternal(const std::vector<CRSSparsity> &st) : LPSolverInternal(st) {
+QPLPInternal::QPLPInternal(const std::vector<Sparsity> &st) : LPSolverInternal(st) {
 
   addOption("qp_solver",       OT_QPSOLVER, GenericType(), "The QPSOlver used to solve the LPs.");
   addOption("qp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the QPSOlver");
@@ -77,7 +77,7 @@ void QPLPInternal::init(){
 
   // Create an qpsolver instance
   QPSolverCreator qpsolver_creator = getOption("qp_solver");
-  qpsolver_ = qpsolver_creator(qpStruct("h",sp_sparse(n_,n_),"a",input(LP_SOLVER_A).sparsity()));
+  qpsolver_ = qpsolver_creator(qpStruct("h",Sparsity::sparse(n_,n_),"a",input(LP_SOLVER_A).sparsity()));
 
   qpsolver_.setLPOptions();
   if(hasSetOption("qp_solver_options")){

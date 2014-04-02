@@ -23,8 +23,8 @@
 #ifndef DIRECT_COLLOCATION_HPP
 #define DIRECT_COLLOCATION_HPP
 
-#include "../symbolic/fx/ocp_solver.hpp"
-#include "../symbolic/fx/nlp_solver.hpp"
+#include "../symbolic/function/ocp_solver.hpp"
+#include "../symbolic/function/nlp_solver.hpp"
 #include "integration/integration_tools.hpp"
 
 namespace CasADi{
@@ -41,7 +41,7 @@ class DirectCollocation : public OCPSolver{
     DirectCollocation();
   
     /// Constructor
-    explicit DirectCollocation(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
+    explicit DirectCollocation(const Function& ffcn, const Function& mfcn, const Function& cfcn=Function(), const Function& rfcn=Function());
 
     /// Access functions of the node
     DirectCollocationInternal* operator->();

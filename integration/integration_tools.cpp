@@ -21,11 +21,11 @@
  */
 
 #include "integration_tools.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/implicit_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/implicit_function.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/integrator.hpp"
+#include "symbolic/function/integrator.hpp"
 
 #include <vector>
 
@@ -79,15 +79,15 @@ namespace CasADi{
     return collocationPointsGen<long double>(order,scheme);
   }
   
-  FX explicitRK(FX& f, const MX& tf, int order, int ne) {
+  Function explicitRK(Function& f, const MX& tf, int order, int ne) {
     casadi_assert_message(ne>=1,"Parameter ne (number of elements must be at least 1), but got " << ne << ".");
     casadi_assert_message(order==4,"Only RK order 4 is supported now.");
     casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,"Supplied function must adhere to dae scheme.");
-    casadi_assert_message(f.output(DAE_ALG).empty() && f.input(DAE_Z).empty(),"Supplied function cannot have algebraic states.");
-    casadi_assert_message(f.output(DAE_QUAD).empty(),"Supplied function cannot have quadrature states.");
+    casadi_assert_message(f.output(DAE_ALG).isEmpty() && f.input(DAE_Z).isEmpty(),"Supplied function cannot have algebraic states.");
+    casadi_assert_message(f.output(DAE_QUAD).isEmpty(),"Supplied function cannot have quadrature states.");
 
-    MX X = msym("X",f.input(DAE_X).sparsity());
-    MX P = msym("P",f.input(DAE_P).sparsity());
+    MX X = MX::sym("X",f.input(DAE_X).sparsity());
+    MX P = MX::sym("P",f.input(DAE_P).sparsity());
     MX X0 = X;
     MX t = 0;
     MX dt = tf/ne;
@@ -141,12 +141,12 @@ namespace CasADi{
     D.resize(deg+1);
 
     // Collocation point
-    SXMatrix tau = ssym("tau");
+    SX tau = SX::sym("tau");
 
     // For all collocation points
     for(int j=0; j<deg+1; ++j){
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-      SXMatrix L = 1;
+      SX L = 1;
       for(int j2=0; j2<deg+1; ++j2){
         if(j2 != j){
           L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
@@ -162,7 +162,7 @@ namespace CasADi{
       D[j] = lfcn.output().at(0);
 
       // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-      FX tfcn = lfcn.tangent();
+      Function tfcn = lfcn.tangent();
       tfcn.init();
       for(int j2=0; j2<deg+1; ++j2){
         tfcn.setInput(tau_root[j2]);        
@@ -173,11 +173,11 @@ namespace CasADi{
 
   }
   
-  FX implicitRK(FX& f, implicitFunctionCreator impl, const Dictionary& impl_options, const MX& tf, int order, const std::string& scheme, int ne) {
+  Function implicitRK(Function& f, implicitFunctionCreator impl, const Dictionary& impl_options, const MX& tf, int order, const std::string& scheme, int ne) {
     casadi_assert_message(ne>=1,"Parameter ne (number of elements must be at least 1), but got " << ne << ".");
     casadi_assert_message(order==4,"Only RK order 4 is supported now.");
     casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,"Supplied function must adhere to dae scheme.");
-    casadi_assert_message(f.output(DAE_QUAD).empty(),"Supplied function cannot have quadrature states.");
+    casadi_assert_message(f.output(DAE_QUAD).isEmpty(),"Supplied function cannot have quadrature states.");
     
     // Obtain collocation points
     std::vector<double> tau_root = collocationPoints(order,"legendre");
@@ -193,9 +193,9 @@ namespace CasADi{
     int np = f.input(DAE_P).size();
     
     //Variables for one finite element
-    MX X = msym("X",nx);
-    MX P = msym("P",np);
-    MX V = msym("V",order*(nx+nz)); // Unknowns
+    MX X = MX::sym("X",nx);
+    MX P = MX::sym("P",np);
+    MX V = MX::sym("V",order*(nx+nz)); // Unknowns
     
     MX X0 = X;
     
@@ -230,8 +230,8 @@ namespace CasADi{
     std::vector<MX> V_eq;
     
     // Local start time
-    MX t0_l=msym("t0");
-    MX h = msym("h");
+    MX t0_l=MX::sym("t0");
+    MX h = MX::sym("h");
 
     for (int j=1;j<order+1;++j) {
       // Expression for the state derivative at the collocation point
@@ -260,7 +260,7 @@ namespace CasADi{
     vfcn_inputs.push_back(t0_l);
     vfcn_inputs.push_back(h);
     
-    FX vfcn = MXFunction(vfcn_inputs,vertcat(V_eq));
+    Function vfcn = MXFunction(vfcn_inputs,vertcat(V_eq));
     vfcn.init();
     
     try {
@@ -272,7 +272,7 @@ namespace CasADi{
     }
     
     // Create a implicit function instance to solve the system of equations
-    ImplicitFunction ifcn = impl(vfcn,FX(),LinearSolver());
+    ImplicitFunction ifcn = impl(vfcn,Function(),LinearSolver());
     ifcn.setOption(impl_options);
     ifcn.init();
     
@@ -280,7 +280,7 @@ namespace CasADi{
     std::vector<MX> ifcn_call_in(5);
     ifcn_call_in[0] = MX::zeros(V.sparsity()); 
     std::copy(vfcn_inputs.begin()+1,vfcn_inputs.end(),ifcn_call_in.begin()+1);
-    std::vector<MX> ifcn_call_out = ifcn.eval(ifcn_call_in);
+    std::vector<MX> ifcn_call_out = ifcn.call(ifcn_call_in,true);
     Vs = vertsplit(ifcn_call_out[0],splitPositions);
     
     MX XF = 0;

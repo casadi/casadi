@@ -22,12 +22,12 @@
 
 #include "dple_internal.hpp"
 #include <cassert>
-#include "../symbolic/stl_vector_tools.hpp"
+#include "../symbolic/std_vector_tools.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
 #include "../symbolic/sx/sx_tools.hpp"
-#include "../symbolic/fx/mx_function.hpp"
-#include "../symbolic/fx/sx_function.hpp"
+#include "../symbolic/function/mx_function.hpp"
+#include "../symbolic/function/sx_function.hpp"
 
 INPUTSCHEME(DPLEInput)
 OUTPUTSCHEME(DPLEOutput)
@@ -35,7 +35,7 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace CasADi{
 
-  DpleInternal::DpleInternal(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V,int nfwd, int nadj) : A_(A), V_(V), nfwd_(nfwd), nadj_(nadj) {
+  DpleInternal::DpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V,int nfwd, int nadj) : A_(A), V_(V), nfwd_(nfwd), nadj_(nadj) {
 
     // set default options
     setOption("name","unnamed_dple_solver"); // name of the function 
@@ -68,7 +68,7 @@ namespace CasADi{
     casadi_assert_message(A_.size()==V_.size(),"A and V arguments must be of same length, but got " << A_.size() << " and " << V_.size() << ".");
     K_ = A_.size();
     for (int k=0;k<K_;++k) {
-      casadi_assert_message(V_[k]==trans(V_[k]),"V_i must be symmetric but got " << V_[k].dimString() << " for i = " << k << ".");
+      casadi_assert_message(V_[k].isSymmetric(),"V_i must be symmetric but got " << V_[k].dimString() << " for i = " << k << ".");
 
       casadi_assert_message(A_[k].size1()==V_[k].size1(),"First dimension of A (" << A_[k].size1() << ") must match dimension of symmetric V_i (" << V_[k].size1() << ")" << " for i = " << k << ".");
     }
@@ -85,8 +85,8 @@ namespace CasADi{
     
     for (int i=0;i<nfwd_+1;++i) {
       if (const_dim_) {
-        input(DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(vertcat(A_));
-        input(DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(vertcat(V_));
+        input(DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(horzcat(A_));
+        input(DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(horzcat(V_));
       } else {
         input(DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(blkdiag(A_));
         input(DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(blkdiag(V_));
@@ -94,41 +94,41 @@ namespace CasADi{
     }
     for (int i=0;i<nadj_;++i) {
       if (const_dim_) {
-        input(DPLE_NUM_IN*(1+nfwd_)+DPLE_NUM_OUT*i+DPLE_P)  = DMatrix::zeros(vertcat(A_));
+        input(DPLE_NUM_IN*(1+nfwd_)+DPLE_NUM_OUT*i+DPLE_P)  = DMatrix::zeros(horzcat(A_));
       } else {
         input(DPLE_NUM_IN*(1+nfwd_)+DPLE_NUM_OUT*i+DPLE_P)  = DMatrix::zeros(blkdiag(A_));
       }
     }
     
     // Allocate outputs
-    std::vector<CRSSparsity> P; 
+    std::vector<Sparsity> P; 
     for (int k=0;k<K_;++k) {
-      P.push_back(sp_dense(V_[k].size1(),V_[k].size1()));
+      P.push_back(Sparsity::dense(V_[k].size1(),V_[k].size1()));
     }
     setNumOutputs(DPLE_NUM_OUT*(1+nfwd_) + DPLE_NUM_IN*nadj_);
     for (int i=0;i<nfwd_+1;++i) {
       if (const_dim_) {
-        output(DPLE_NUM_OUT*i+DPLE_P) = DMatrix::zeros(vertcat(P));
+        output(DPLE_NUM_OUT*i+DPLE_P) = DMatrix::zeros(horzcat(P));
       } else {
         output(DPLE_NUM_OUT*i+DPLE_P) = DMatrix::zeros(blkdiag(P));
       }
     }
     for (int i=0;i<nadj_;++i) {
       if (const_dim_) {
-        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(vertcat(A_));
-        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(vertcat(V_));
+        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(horzcat(A_));
+        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(horzcat(V_));
       } else {
         output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(blkdiag(A_));
         output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(blkdiag(V_));
       }
     }
   
-    FXInternal::init();
+    FunctionInternal::init();
       
   }
 
   void DpleInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-    FXInternal::deepCopyMembers(already_copied);
+    FunctionInternal::deepCopyMembers(already_copied);
   }
 
 

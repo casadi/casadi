@@ -29,32 +29,32 @@ from pylab import *
 #! We consider a very system, an excitated linear spring 
 #! m x'' + c x' + k x = u(t) 
 	 
-t = SX("t")
+t = SX.sym("t")
 
 #! states 
-x  = SX("x") 
-v  = SX("v") 
+x  = SX.sym("x") 
+v  = SX.sym("v") 
  
  
-x0 = SX("x0")
-v0 = SX("v0")
+x0 = SX.sym("x0")
+v0 = SX.sym("v0")
 
 #! parameters 
-k = SX("k") 
-c = SX("c") 
-m = SX("m") 
+k = SX.sym("k") 
+c = SX.sym("c") 
+m = SX.sym("m") 
  
 #! controls 
-u = SX("u") 
+u = SX.sym("u") 
 
 #! Create the dae
-rhs = vertcat([v, (u -  c*v - k*x)/m ])
+rhs = vertcat((v, (u -  c*v - k*x)/m ))
 fin = controldaeIn(
     t = t,
-    x = vertcat([x,v]),
-    p = vertcat([k,c,m]),
+    x = vertcat((x,v)),
+    p = vertcat((k,c,m)),
     u = u,
-    x_major = vertcat([x0,v0])
+    x_major = vertcat((x0,v0))
   )
 f=SXFunction(fin,daeOut(ode=rhs))
 f.init()
@@ -79,13 +79,13 @@ tsf = sim.getMinorT()
 
 figure(1)
 #! Plot the default output, i.e. the states
-plot(tsf,sim.getOutput()[:,0])
+plot(tsf,sim.getOutput()[0,:].T)
 xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts[:-1],sim.getInput("u")[:,0],'o') # Sampled on the coarse grid
-plot(tsf[:-1],array(sim.getMinorU())[:,0],'.')           # Sampled on the fine grid 
+plot(ts[:-1],sim.getInput("u")[0,:].T,'o') # Sampled on the coarse grid
+plot(tsf[:-1],sim.getMinorU()[0,:].T,'.')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 
 show()
@@ -118,8 +118,8 @@ sim.evaluate()
 
 figure(1)
 
-plot(tsf,sim.getOutput(1),'x') 
-plot(tsf,sim.getOutput(0),'*') 
+plot(tsf,sim.getOutput(1).T,'x') 
+plot(tsf,sim.getOutput(0).T,'*') 
 legend(('x','u (coarse)','u (fine)','u (output)','x0 (output)'),loc='lower left')
 show()
 
@@ -137,7 +137,7 @@ fin = controldaeIn(
 f=SXFunction(fin,[rhs])
 f.init()
 
-ui = ssym("ui")
+ui = SX.sym("ui")
 
 fin = controldaeIn(
     t = t,
@@ -169,13 +169,13 @@ tsf = sim.getMinorT()
 
 figure(2)
 #! Plot the default output, i.e. the states
-plot(tsf,sim.getOutput()[:,0])
+plot(tsf,sim.getOutput()[0,:].T)
 xlabel("t")
 ylabel("x")
 
 #! Plot the controls
-plot(ts,sim.getInput("u")[:,0],'o') # Sampled on the coarse grid
-plot(tsf,sim.getOutput(1),'-')           # Sampled on the fine grid 
+plot(ts,sim.getInput("u")[0,:].T,'o') # Sampled on the coarse grid
+plot(tsf,sim.getOutput(1).T,'-')           # Sampled on the fine grid 
 legend(('x','u (coarse)','u (fine)'))
 
 show()

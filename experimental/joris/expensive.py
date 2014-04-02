@@ -13,26 +13,26 @@ casadiTypes = set()
 try:
   import casadi as c
   casadiAvailable = True
-  casadiTypes = set([type(c.SX()),type(c.SXMatrix())])
+  casadiTypes = set([type(c.SX()),type(c.SX())])
 except ImportError:
   pass
   
 def TRx(a):
   constr = numpy.matrix
   if casadiAvailable and type(a) in casadiTypes:
-    constr = c.SXMatrix
+    constr = c.SX
   return  constr([[1,0,0,0],[0,cos(a),-sin(a),0],[0,sin(a),cos(a),0],[0,0,0,1]])
 
 def TRy(a):
   constr = numpy.matrix
   if casadiAvailable and type(a) in casadiTypes:
-    constr = c.SXMatrix
+    constr = c.SX
   return  constr([[cos(a),0,sin(a),0],[0,1,0,0],[-sin(a),0,cos(a),0],[0,0,0,1]])
 
 def TRz(a):
   constr = numpy.matrix
   if casadiAvailable and type(a) in casadiTypes:
-    constr = c.SXMatrix
+    constr = c.SX
   return  constr([[cos(a),-sin(a),0,0],[sin(a),cos(a),0,0],[0,0,1,0],[0,0,0,1]])
 
 def tr(x,y,z):
@@ -54,7 +54,7 @@ def quat(q0,q1,q2,q3):
   constr = numpy.matrix
   types =  set([type(q) for q in [q0,q1,q2,q3]])
   #if not(types.isdisjoint(casadiTypes)):
-  #  constr = c.SXMatrix
+  #  constr = c.SX
 
   rho = constr([[q0],[q1],[q2]])
   rho_skew = skew(rho)
@@ -90,7 +90,7 @@ def quat(q0,q1,q2,q3):
   A = constr([[a2+b2+cm2+dm2,  bc2 - ad2,  bd2  + ac2],[bc2 + ad2, a2+bm2+c2+dm2, cd2 - ab2], [ bd2 -ac2, cd2 + ab2, a2+bm2+cm2+d2]]).T
 
   if not(types.isdisjoint(casadiTypes)):
-    constr = c.SXMatrix
+    constr = c.SX
   
   return constr(A.T)
 
@@ -102,14 +102,14 @@ def quatOld(q0,q1,q2,q3):
   constr = numpy.matrix
   types =  set([type(q) for q in [q0,q1,q2,q3]])
   #if not(types.isdisjoint(casadiTypes)):
-  #  constr = c.SXMatrix
+  #  constr = c.SX
     
   E  = constr([[-q1, q0, -q3, q2],[-q2, q3, q0, -q1],[-q3,-q2,q1,q0]])
   Eb = constr([[-q1, q0, q3, -q2],[-q2, -q3, q0, q1],[-q3,q2,-q1,q0]])
   
   
   if not(types.isdisjoint(casadiTypes)):
-    constr = c.SXMatrix
+    constr = c.SX
     
   return constr(numpy.dot(E,Eb.T))
 
@@ -117,7 +117,7 @@ def fullR(R_0_0,R_1_0,R_2_0, R_0_1, R_1_1, R_2_1, R_0_2, R_1_2, R_2_2):
   constr = numpy.matrix
   types =  set([type(q) for q in [R_0_0,R_1_0,R_2_0, R_0_1, R_1_1, R_2_1, R_0_2, R_1_2, R_2_2]])
   if not(types.isdisjoint(casadiTypes)):
-    constr = c.SXMatrix
+    constr = c.SX
   return constr([[R_0_0,  R_0_1,  R_0_2],[R_1_0,  R_1_1,  R_1_2 ],[R_2_0,  R_2_1,  R_2_2 ]])
   
 def TfullR(R_0_0,R_1_0,R_2_0, R_0_1, R_1_1, R_2_1, R_0_2, R_1_2, R_2_2):
@@ -135,7 +135,7 @@ def kin_inv(T):
   R=numpy.matrix(T2R(T).T)
   constr = numpy.matrix
   if type(T) in casadiTypes:
-    constr = c.SXMatrix
+    constr = c.SX
   return constr(vstack((hstack((R,-numpy.dot(R,trp(T)))),numpy.matrix([0,0,0,1]))))
 
 
@@ -162,12 +162,12 @@ def skew(vec):
   constr = numpy.matrix
   types =  set([type(q) for q in [x,y,z]])
   if not(types.isdisjoint(casadiTypes)):
-    constr = c.SXMatrix
+    constr = c.SX
 
   return constr([[0,-z,y],[z,0,-x],[-y,x,0]])
   
 def invskew(S):
-  return c.SXMatrix([S[2,1],S[0,2],S[1,0]])
+  return c.SX([S[2,1],S[0,2],S[1,0]])
   
 def cross(a,b):
   return c.mul(skew(a),b)
@@ -186,7 +186,7 @@ def R2T(R):
   """
   constr = numpy.matrix
   if type(R) in casadiTypes:
-    constr = c.SXMatrix
+    constr = c.SX
   T  = constr([[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,1.0]])
   T[:3,:3] = R
   return T
@@ -245,12 +245,12 @@ class QuadcopterModel:
     """
 
     # ----------- system states and their derivatives ----
-    pos = struct_ssym(["x","y","z"])     # rigid body centre of mass position [m]   {0}   
-    v   = struct_ssym(["vx","vy","vz"])  # rigid body centre of mass position velocity [m/s] {0}
+    pos = struct_symSX(["x","y","z"])     # rigid body centre of mass position [m]   {0}   
+    v   = struct_symSX(["vx","vy","vz"])  # rigid body centre of mass position velocity [m/s] {0}
 
     NR = 4                               # Number of rotors
     
-    states = struct_ssym([
+    states = struct_symSX([
       entry("p",struct=pos),
       entry("v",struct=v),
       entry("q",shape=4),                # quaternions  {0} -> {1}
@@ -264,14 +264,14 @@ class QuadcopterModel:
 
     # ------------------------------------------------
 
-    dist = struct_ssym([
+    dist = struct_symSX([
       entry("Faer",shape=NR),             # Disturbance on aerodynamic forcing [N]
       entry("Caer",shape=NR)             # Disturbance on aerodynamic torques [Nm]
     ])
 
 
     # ----------------- Controls ---------------------
-    controls = struct_ssym([
+    controls = struct_symSX([
       entry("CR",shape=NR)              # [Nm]
           # Torques of the motors that drive the rotors, acting from platform on propeller
           # The torque signs are always positive when putting energy in the propellor,
@@ -296,7 +296,7 @@ class QuadcopterModel:
 
     # ----------------- Parameters ---------------------
     
-    rotor_model = struct_ssym([
+    rotor_model = struct_symSX([
          "c",        # c          Cord length [m]
          "R",        # R          Radius of propeller [m]
          "CL_alpha", # CL_alpha   Lift coefficient [-]
@@ -305,7 +305,7 @@ class QuadcopterModel:
          "CD_i",     # CD_i       Induced drag coefficient [-]  
     ])
     
-    p = struct_ssym([
+    p = struct_symSX([
       entry("rotors_model",repeat=NR,struct=rotor_model),    # Parameters that describe the rotor model
       entry("rotors_I",repeat=NR,shape=sp_diag(3)),  # Inertias of rotors [kg.m^2]
       entry("rotors_spin",repeat=NR),    # Direction of spin from each rotor. 1 means rotation around positive z.
@@ -377,7 +377,7 @@ class QuadcopterModel:
     R_01 = R_10.T
     # -------------------------------------
 
-    dstates = struct_ssym(states)
+    dstates = struct_symSX(states)
     
     dp,dv,dq,dw,dr = dstates[...]
     
@@ -415,7 +415,7 @@ class QuadcopterModel:
     Fg = mul(R_01,vertcat([0,0,-g*m]))
 
     F_total = Fg + sum(rotors_Faer)    # Total force acting on the platform
-    C_total = SXMatrix([0,0,0])                    # Total torque acting on the platform
+    C_total = SX([0,0,0])                    # Total torque acting on the platform
 
     for i in range(NR):
        C_total[:2] += rotors_Caer[i][:2] # The x and y components propagate
@@ -430,7 +430,7 @@ class QuadcopterModel:
     subs_after  = []
     
     v_global = mul(R_01,v)
-    u_z = SXMatrix([0,0,1])
+    u_z = SX([0,0,1])
     
     # Now fill in the aerodynamic forces
     for i in range(NR):
@@ -547,11 +547,11 @@ tau = SX("tau")
 
 #Lf = ssym("L",ns*(ns+1)/2)
 Lf = ssym("L",ns*ns)
-L = SXMatrix(sp_dense(ns,ns),Lf.data())
+L = SX(sp_dense(ns,ns),Lf.data())
 L2P = SXFunction([Lf],[L])
 L2P.init()
 
-optvar = struct_msym([
+optvar = struct_symMX([
   (
     entry("X",repeat=[N,d],struct=states),
     entry("U",repeat=N,struct=controls),
@@ -568,7 +568,7 @@ optvar = struct_msym([
 #print optvar["X",0,0,"p"]
 #raise Exception("0")
 
-par = struct_msym([
+par = struct_symMX([
   entry("Xref",shape=waypoints.shape),
   entry("model",struct=model.p)
 ])

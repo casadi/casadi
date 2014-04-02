@@ -24,7 +24,7 @@
 #define KINSOL_INTERNAL_HPP
 
 #include "kinsol_solver.hpp"
-#include "symbolic/fx/implicit_function_internal.hpp"
+#include "symbolic/function/implicit_function_internal.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
 #include <sundials/sundials_types.h>  /* definition of type double */
@@ -37,6 +37,7 @@
 #include <kinsol/kinsol_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/// \cond INTERNAL
 namespace CasADi{
   
   typedef std::pair< std::string,std::string> Message;
@@ -45,7 +46,7 @@ namespace CasADi{
     friend class KinsolSolver;
   public:
     /** \brief  Constructor */
-    explicit KinsolInternal(const FX& f, const FX& jac, const LinearSolver& linsol);
+    explicit KinsolInternal(const Function& f, const Function& jac, const LinearSolver& linsol);
 
     /** \brief  Destructor */
     virtual ~KinsolInternal();
@@ -54,7 +55,7 @@ namespace CasADi{
     virtual KinsolInternal* clone() const;
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const FX& f, const FX& jac, const LinearSolver& linsol) const { return new KinsolInternal(f,jac,linsol);}
+    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const { return new KinsolInternal(f,jac,linsol);}
 
     /** \brief  Initialize stage */
     virtual void init();
@@ -110,7 +111,7 @@ namespace CasADi{
     bool disable_internal_warnings_;
   
     // Jacobian times vector function
-    FX f_fwd_;
+    Function f_fwd_;
 
     // Calculate the error message map
     static std::map<int, Message > calc_flagmap();
@@ -126,5 +127,6 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //KINSOL_INTERNAL_HPP
 

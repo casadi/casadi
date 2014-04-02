@@ -22,10 +22,10 @@
 
 #include <iostream>
 
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 #include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
-//#include <symbolic/fx/jacobian.hpp>
+#include <symbolic/function/sx_function.hpp>
+//#include <symbolic/function/jacobian.hpp>
 
 #include <interfaces/ipopt/ipopt_solver.hpp>
 

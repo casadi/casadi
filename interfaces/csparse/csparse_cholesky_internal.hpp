@@ -23,12 +23,14 @@
 #ifndef CSPARSE_CHOLESKY_INTERNAL_HPP
 #define CSPARSE_CHOLESKY_INTERNAL_HPP
 
+/// \cond INTERNAL
+
 extern "C"{
 #include "cs.h"
 }
 
 #include "csparse_cholesky.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
 
 namespace CasADi{
 
@@ -38,7 +40,7 @@ namespace CasADi{
   class CSparseCholeskyInternal : public LinearSolverInternal{
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
-    CSparseCholeskyInternal(const CRSSparsity& sp, int nrhs);
+    CSparseCholeskyInternal(const Sparsity& sp, int nrhs);
 
     // Copy constructor
     CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol);
@@ -59,7 +61,7 @@ namespace CasADi{
     void solveL(double* x, int nrhs, bool transpose);
     
     /// Obtain a symbolic Cholesky factorization
-    CRSSparsity getFactorizationSparsity(bool transpose=false) const;
+    Sparsity getFactorizationSparsity(bool transpose=false) const;
     
     /// Obtain a numeric Cholesky factorization
     DMatrix getFactorization(bool transpose=false) const;
@@ -83,6 +85,6 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //CSPARSE_CHOLESKY_INTERNAL_HPP
 

@@ -25,8 +25,10 @@
 
 #include "mx_node.hpp"
 
+/// \cond INTERNAL
+
 namespace CasADi{
-  /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
+  /** \brief An MX atomic for matrix-matrix product, note that the first factor must be provided transposed
       \author Joel Andersson 
       \date 2010
   */
@@ -57,7 +59,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
@@ -76,7 +78,7 @@ namespace CasADi{
 
     /// Helper class
     template<bool Tr>
-    static MX tr(const MX& x){ return Tr ? trans(x) : x;}
+    static MX tr(const MX& x){ return Tr ? x.T() : x;}
   };
 
 
@@ -103,6 +105,7 @@ namespace CasADi{
 
 
 } // namespace CasADi
+/// \endcond
 
 
 #endif // MULTIPLICATION_HPP

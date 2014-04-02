@@ -21,38 +21,30 @@
  */
 
 #include "matrix_tools.hpp"
-#include "../stl_vector_tools.hpp"
-#include "../fx/linear_solver.hpp"
+#include "../std_vector_tools.hpp"
+#include "../function/linear_solver.hpp"
 
 using namespace std;
 
 namespace CasADi{
-    
-  bool isRegular(const Matrix<double>& ex) {
-    return isRegular(ex.data());
-  }
-  
-  bool isRegular(const Matrix<int>& ex) {
-    return isRegular(ex.data());
-  }
-  
+      
   Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict) {
     LinearSolver mysolver = lsolver(A.sparsity(),b.size2());
     mysolver.setOption(dict);
     mysolver.init();
     mysolver.setInput(A,LINSOL_A);
-    mysolver.setInput(trans(b),LINSOL_B);
+    mysolver.setInput(b,LINSOL_B);
     mysolver.prepare();
-    mysolver.solve(true);
-    return trans(mysolver.output(LINSOL_X));
+    mysolver.solve(false);
+    return mysolver.output(LINSOL_X);
   }
 
 
   Matrix<double> pinv(const Matrix<double>& A, linearSolverCreator lsolver, const Dictionary& dict) {
-    if (A.size2()>=A.size1()) {
-      return trans(solve(mul(A,trans(A)),A,lsolver,dict));
+    if (A.size1()>=A.size2()) {
+      return solve(mul(A.T(),A),A.T(),lsolver,dict);
     } else {
-      return solve(mul(trans(A),A),trans(A),lsolver,dict);
+      return solve(mul(A,A.T()),A,lsolver,dict).T();
     }
   }
     

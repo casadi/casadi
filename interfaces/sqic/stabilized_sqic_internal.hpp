@@ -23,8 +23,9 @@
 #ifndef STABILIZED_SQIC_INTERNAL_HPP
 #define STABILIZED_SQIC_INTERNAL_HPP
 
-#include "symbolic/fx/stabilized_qp_solver_internal.hpp"
+#include "symbolic/function/stabilized_qp_solver_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
 /** \brief Internal class for StabilizedSQICSolver
@@ -42,7 +43,7 @@ public:
   virtual StabilizedSQICInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit StabilizedSQICInternal(const std::vector<CRSSparsity>& st);
+  explicit StabilizedSQICInternal(const std::vector<Sparsity>& st);
 
   /** \brief  Destructor */
   virtual ~StabilizedSQICInternal();
@@ -96,7 +97,7 @@ public:
     std::vector<double> piE_;
     
     /// Helper function to bring A into correct format
-    FX formatA_;
+    Function formatA_;
     
     /// SQIC inf
     double inf_;
@@ -107,5 +108,6 @@ public:
 
 } // namespace CasADi
 
+/// \endcond
 #endif //STABILIZED_SQIC_INTERNAL_HPP
 

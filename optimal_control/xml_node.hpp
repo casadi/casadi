@@ -28,6 +28,8 @@
 #include <map>
 #include "symbolic/casadi_exception.hpp"
 
+/// \cond INTERNAL
+
 /** \brief  Forward declarations */
 class TiXmlElement;
 class TiXmlNode;
@@ -131,6 +133,6 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif //XML_NODE_HPP

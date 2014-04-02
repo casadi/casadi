@@ -22,6 +22,20 @@ if(IPOPT_FOUND)
   )
 endif()
 
+# basic snopt example
+if(SNOPT_FOUND)
+  add_executable(snopt_nl snopt_nl.cpp)
+  target_link_libraries(snopt_nl
+    casadi_snopt_interface snopt_fortran_c_bridge casadi_nonlinear_programming casadi
+    ${SNOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+
+  add_executable(rocket_snopt rocket_snopt.cpp)
+  target_link_libraries(rocket_snopt
+    casadi_snopt_interface snopt_fortran_c_bridge casadi_nonlinear_programming casadi
+    ${SNOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
 
 # Rocket solved with MX + SX
 if(IPOPT_FOUND)

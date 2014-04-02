@@ -23,12 +23,12 @@
 #! =======================
 from casadi import *
 
-x = SX("x") # A scalar symbolic
-y = ssym("y",2,1) # A matrix symbolic
+x = SX.sym("x")     # A scalar (1-by-1 matrix) symbolic primitive
+y = SX.sym("y",2)   # A vector (n-by-1 matrix) symbolic primitive
+z = SX.sym("z",2,3) # An n-by-m matrix symbolic primitive
 
-
-ins = [x,y] # function inputs
-outs = [x,y,SXMatrix([[x,x],[x,x]]),y*x,0]
+ins =  [x,y] # function inputs
+outs = [x,y,vertcat((x,y)),y*x,0]
 
 print outs
 
@@ -40,7 +40,7 @@ print f.getNumInputs()
 print f.getNumOutputs()
 
 #! The outputs has the following string representation.
-#! Note how all elements of out have been converted to SXMatrix by
+#! Note how all elements of out have been converted to SX by
 #! automatic typecasting functionality
 
 for i in range(3):

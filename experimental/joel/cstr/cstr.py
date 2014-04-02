@@ -182,7 +182,7 @@ nu = 1
 
 #ms.init()
   
-#solver = IpoptSolver(ms.F_,ms.G_,FX(),ms.J_)
+#solver = IpoptSolver(ms.F_,ms.G_,Function(),ms.J_)
 #solver.setOption("tol",1e-5)
 #solver.setOption("hessian_approximation", "limited-memory")
 #solver.setOption("max_iter",100)

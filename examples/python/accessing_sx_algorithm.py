@@ -27,8 +27,8 @@ Demonstration on how the algorithm of an SXFunction can be accessed and its oper
 from casadi import *
 import numpy
 
-a = ssym('a')
-b = ssym('b',2)
+a = SX.sym('a')
+b = SX.sym('b',2)
 
 # Input expressions
 input_ex = [a,b]

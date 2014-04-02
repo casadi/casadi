@@ -24,7 +24,9 @@
 #define GENERIC_TYPE_INTERNAL_HPP
 
 #include "generic_type.hpp"
-#include "stl_vector_tools.hpp"
+#include "std_vector_tools.hpp"
+
+/// \cond INTERNAL
 
 namespace CasADi{
   
@@ -47,6 +49,6 @@ namespace CasADi{
   }
   
 } // namespace CasADi
-
+/// \endcond
 
 #endif // GENERIC_TYPE_INTERNAL_HPP

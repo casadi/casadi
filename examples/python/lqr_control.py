@@ -25,7 +25,6 @@ from casadi import *
 from casadi.tools import *
 import scipy.linalg
 import numpy as np
-from casadi import flatten
 
 """
 This example how an Linear Quadratic Regulator (LQR) can be designed
@@ -72,14 +71,14 @@ assert(rank==ns)
 # Simulation of the open-loop system
 # -----------------------------------
 
-y  = ssym("y",ns)
-u  = ssym("u",nu)
+y  = SX.sym("y",ns)
+u  = SX.sym("u",nu)
 
 x0 = DMatrix([1,0,0])
 # no control
-u_ = DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))
+u_ = (DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))).T
 
-p = SX("p")
+p = SX.sym("p")
 
 tn = np.linspace(0,te,N)
 cdae = SXFunction(controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
@@ -98,7 +97,7 @@ sim.evaluate()
 tf = sim.getMinorT()
 
 figure(1)
-plot(tf,sim.getOutput())
+plot(tf,sim.getOutput().T)
 legend(('s1', 's2','s3'))
 title('reference simulation, open-loop, zero controls')
 out = sim.getOutput()
@@ -116,7 +115,7 @@ tf = list(sim.getMinorT())
 
 figure(2)
 title('Deviation from reference simulation, with perturbed initial condition')
-plot(tf,sim.getOutput()-out,linewidth=3)
+plot(tf,sim.getOutput().T-out.T,linewidth=3)
 
 # Not supported in current revision, cf. #929
 # jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
@@ -151,14 +150,14 @@ plot(tf,sim.getOutput()-out,linewidth=3)
 # What if we perturb the input?
 
 u_perturb = DMatrix(u_)
-u_perturb[N/5,0] = 1e-4
+u_perturb[0,N/5] = 1e-4
 sim.setInput(x0,"x0")
 sim.setInput(u_+u_perturb,"u")
 sim.evaluate()
 
 figure(3)
 title('Deviation from reference simulation, with perturbed controls')
-plot(tf,sim.getOutput()-out,linewidth=3)
+plot(tf,sim.getOutput().T-out.T,linewidth=3)
 
 
 # Not supported in current revision, cf. #929
@@ -171,7 +170,7 @@ plot(tf,sim.getOutput()-out,linewidth=3)
 
 # dev_est = []
 # for i in range(len(tf)):
-#   dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],flatten(u_perturb)))
+#   dev_est.append(mul(jacsim.getOutput()[i*ns:(i+1)*ns,:],vec(u_perturb)))
 
 # dev_est = horzcat(dev_est).T
 # plot(tf,dev_est,'+k')
@@ -191,7 +190,7 @@ plot(tf,sim.getOutput()-out,linewidth=3)
 x0 = vertcat([1,0,0])
 xref_e = vertcat([1,0,0])
 
-states = struct_ssym([
+states = struct_symSX([
            entry("eAt",shape=(ns,ns)),
            entry("Wt",shape=(ns,ns))
          ])
@@ -203,8 +202,7 @@ Wt  = states["Wt"]
 t1 = te
 
 # Initial conditions
-e = DMatrix.eye(ns)
-makeDense(e)
+e = dense(DMatrix.eye(ns))
 states_ = states(0)
 states_["eAt"] = e
 states_["Wt"] = 0
@@ -235,7 +233,7 @@ assert(e<1e-7)
 # Simulate with feedforward controls
 # -----------------------------------
 
-states = struct_ssym([
+states = struct_symSX([
           entry("y",shape=ns),      # The regular states of the LTI system
           entry("eAt",shape=(ns,ns))  # The matrix exponential exp(A*(t1-t))
          ])
@@ -268,9 +266,8 @@ sim.setOption("nf",20)
 sim.init()
 sim.setInput(states_,"x0")
 sim.evaluate()
-sim.getOutput()
 
-e = sim.getOutput()[-1,states.i["y"]] - xref_e
+e = sim.getOutput()[states.i["y"],-1] - xref_e
 assert(max(fabs(e))/max(fabs(xref_e))<1e-6)
 
 tf = sim.getMinorT()
@@ -279,12 +276,12 @@ tf = sim.getMinorT()
 figure(4)
 subplot(211)
 title("Feedforward control, states")
-plot(tf,sim.getOutput(0)[:,list(states.i["y"])])
+plot(tf,sim.getOutput(0)[list(states.i["y"]),:].T)
 for i,c in enumerate(['b','g','r']):
   plot(t1,xref_e[i],c+'o')
 subplot(212)
 title("Control action")
-plot(tf,sim.getOutput(1))
+plot(tf,sim.getOutput(1).T)
 
 # Design an infinite horizon LQR
 # -----------------------------------
@@ -294,11 +291,11 @@ Q = DMatrix.eye(ns)
 R = DMatrix.eye(nu)
 
 # Continuous Riccati equation
-P = ssym("P",ns,ns)
+P = SX.sym("P",ns,ns)
 
 ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
 
-dae = SXFunction(daeIn(x=flatten(P)),daeOut(ode=flatten(ric)))
+dae = SXFunction(daeIn(x=vec(P)),daeOut(ode=vec(ric)))
 dae.init()
 
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
@@ -307,10 +304,9 @@ integrator.setOption("reltol",1e-16)
 integrator.setOption("stop_at_end",False)
 integrator.init()
 # Start from P = identity matrix
-u = DMatrix.eye(ns)
-makeDense(u)
+u = dense(DMatrix.eye(ns))
 integrator.reset()
-integrator.setInput(flatten(u),"x0")
+integrator.setInput(vec(u),"x0")
 integrator.integrate(0)
 
 # Keep integrating until steady state is reached
@@ -348,14 +344,14 @@ print "feedback matrix= ", K
 print "Open-loop eigenvalues: ", D
 
 # Check what happens if we integrate the Riccati equation forward in time
-dae = SXFunction(daeIn(x = flatten(P)),daeOut(ode=flatten(-ric)))
+dae = SXFunction(daeIn(x = vec(P)),daeOut(ode=vec(-ric)))
 dae.init()
 
 integrator = CVodesIntegrator(dae)
 integrator.setOption("reltol",1e-16)
 integrator.setOption("stop_at_end",False)
 integrator.init()
-integrator.setInput(flatten(P_),"x0")
+integrator.setInput(vec(P_),"x0")
 integrator.input("x0")[0] += 1e-9 # Put a tiny perturbation
 integrator.reset()
 integrator.integrate(0)
@@ -387,7 +383,7 @@ print "Forward riccati eigenvalues = ", D
 
 x0 = DMatrix([1,0,0])
 
-y  = ssym("y",ns)
+y  = SX.sym("y",ns)
 
 C = DMatrix([[1,0,0],[0,1,0]])
 D = DMatrix([[0,0],[0,0]])
@@ -397,7 +393,7 @@ temp = inv(blockcat([[A,B],[C,D]]))
 F = temp[:ns,-ny:]
 Nm = temp[ns:,-ny:]
 
-t = SX("t")
+t = SX.sym("t")
 
 figure(6)
 
@@ -422,14 +418,14 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
   tf = sim.getMinorT()
 
   subplot(3,3,1+k*3)
-  plot(tf,sim.getOutput(0))
+  plot(tf,sim.getOutput(0).T)
   subplot(3,3,2+k*3)
   title('ref ' + str(yref))
   for i,c in enumerate(['b','g']):
-    plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
-    plot(tf,sim.getOutput(3)[:,i],c+'-')
+    plot(tf,sim.getOutput(1)[i,:].T,c,linewidth=2)
+    plot(tf,sim.getOutput(3)[i,:].T,c+'-')
   subplot(3,3,3+k*3)
-  plot(tf,sim.getOutput(2))
+  plot(tf,sim.getOutput(2).T)
 
 
 # Simulation of the closed-loop system:
@@ -441,7 +437,7 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
 x0 = vertcat([1,0,0])
 
 # Now simulate with open-loop controls
-states = struct_ssym([
+states = struct_symSX([
            entry("y",shape=ns), # The regular states of the LTI system
            entry("yref",shape=ns), # States that constitute a tracking reference for the LTI system
            entry("eAt",shape=(ns,ns)) # The matrix exponential exp(A*(t1-t))
@@ -457,7 +453,7 @@ states_["yref"] = x0
 states_["eAt"]  = eAt_
 
 
-param = struct_ssym([entry("K",shape=(nu,ns))])
+param = struct_symSX([entry("K",shape=(nu,ns))])
 
 param_ = param(0)
 
@@ -501,12 +497,12 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
   subplot(2,2,2*k+1)
   title('states (%s)' % caption)
   for i,c in enumerate(['b','g','r']):
-    plot(tf,sim.getOutput()[:,states.i["yref",i]],c+'--')
-    plot(tf,sim.getOutput()[:,states.i["y",i]],c,linewidth=2)
+    plot(tf,sim.getOutput()[states.i["yref",i],:].T,c+'--')
+    plot(tf,sim.getOutput()[states.i["y",i],:].T,c,linewidth=2)
   subplot(2,2,2*k+2)
   for i,c in enumerate(['b','g']):
-    plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
-    plot(tf,sim.getOutput(2)[:,i],c+'--')
+    plot(tf,sim.getOutput(1)[i,:].T,c,linewidth=2)
+    plot(tf,sim.getOutput(2)[i,:].T,c+'--')
   title('controls (%s)' % caption)
 
   # Not supported in current revision, cf. #929
@@ -533,21 +529,21 @@ print max(abs(D))
 
 # Get discrete reference from previous simulation
 mi = sim.getMajorIndex()
-controls_ = sim.getOutput(2)[mi[:-1],:]
-yref_     = sim.getOutput(3)[mi[:-1],:]
+controls_ = sim.getOutput(2)[:,mi[:-1]]
+yref_     = sim.getOutput(3)[:,mi[:-1]]
 
-u_ = horzcat([controls_,yref_])
+u_ = vertcat([controls_,yref_])
 
 x0 = DMatrix([1,0,0])
 
-controls = struct_ssym([
+controls = struct_symSX([
              entry("uref",shape=nu),
              entry("yref",shape=ns)
            ])
 
-yref  = ssym("yref",ns)
-y     = ssym("y",ns)
-dy    = ssym("dy",ns)
+yref  = SX.sym("yref",ns)
+y     = SX.sym("y",ns)
+dy    = SX.sym("dy",ns)
 u     = controls["uref"]-mul(param["K"],y-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)
 
@@ -573,12 +569,12 @@ figure(8)
 subplot(2,1,1)
 title('states (%s)' % caption)
 for i,c in enumerate(['b','g','r']):
-  plot(tf,sim.getOutput(3)[:,i],c+'--')
-  plot(tf,sim.getOutput()[:,i],c,linewidth=2)
+  plot(tf,sim.getOutput(3)[i,:].T,c+'--')
+  plot(tf,sim.getOutput()[i,:].T,c,linewidth=2)
 subplot(2,1,2)
 for i,c in enumerate(['b','g']):
-  plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
-  plot(tf,sim.getOutput(2)[:,i],c+'--')
+  plot(tf,sim.getOutput(1)[i,:].T,c,linewidth=2)
+  plot(tf,sim.getOutput(2)[i,:].T,c+'--')
 title('controls (%s)' % caption)
 
 # Not supported in current revision, cf. #929  
@@ -602,7 +598,7 @@ title('controls (%s)' % caption)
 # discrete reference, discrete control action
 # -----------------------------------------------------------
 
-y0     = ssym("y0",ns)
+y0     = SX.sym("y0",ns)
 
 u     = controls["uref"]-mul(param["K"],y0-controls["yref"])
 rhs   = mul(A,y)+mul(B,u)
@@ -629,12 +625,12 @@ figure(9)
 subplot(2,1,1)
 title('states (%s)' % caption)
 for i,c in enumerate(['b','g','r']):
-  plot(tf,sim.getOutput(3)[:,i],c+'--')
-  plot(tf,sim.getOutput()[:,i],c,linewidth=2)
+  plot(tf,sim.getOutput(3)[i,:].T,c+'--')
+  plot(tf,sim.getOutput()[i,:].T,c,linewidth=2)
 subplot(2,1,2)
 for i,c in enumerate(['b','g']):
-  plot(tf,sim.getOutput(1)[:,i],c,linewidth=2)
-  plot(tf,sim.getOutput(2)[:,i],c+'--')
+  plot(tf,sim.getOutput(1)[i,:].T,c,linewidth=2)
+  plot(tf,sim.getOutput(2)[i,:].T,c+'--')
 title('controls (%s)' % caption)
 
 # Not supported in current revision, cf. #929  

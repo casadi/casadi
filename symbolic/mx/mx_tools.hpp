@@ -27,51 +27,57 @@
 
 #include "../matrix/generic_matrix_tools.hpp"
 #include "../matrix/generic_expression_tools.hpp"
-#include "../fx/linear_solver.hpp"
+#include "../function/linear_solver.hpp"
+#include "../function/symbolic_qr.hpp"
 
 namespace CasADi{
 
+/**
+\ingroup expression_tools
+@{ 
+*/
+
   /** \brief  concatenate vertically
   *
-  *  vertcat(vertsplit(x,...)) = x
+  *  horzcat(horzsplit(x,...)) = x
   */
-  MX vertcat(const std::vector<MX>& x);
+  MX horzcat(const std::vector<MX>& x);
 
-  /** \brief  split vertically, retaining groups of rows
-  * \param output_offset List of all start rows for each group
-  *      the last row group will run to the end.
+  /** \brief  split vertically, retaining groups of cols
+  * \param output_offset List of all start cols for each group
+  *      the last col group will run to the end.
   * 
-  *   vertcat(vertsplit(x,...)) = x
-  */
-  std::vector<MX> vertsplit(const MX& x, const std::vector<int>& output_offset);
-
-  /** \brief  split vertically, retaining fixed-sized groups of rows
-  * \param incr Size of each group of rows
-  *
-  *  vertcat(vertsplit(x,...)) = x
-  */
-  std::vector<MX> vertsplit(const MX& x, int incr=1);
-  
-  /** \brief  concatenate horizontally 
-  *
-  *   horzcat(horzsplit(x,...)) = x
-  */
-  MX horzcat(const std::vector<MX>& comp);
-  
-  /** \brief  split horizontally, retaining groups of columns
-  * \param output_offset List of all start columns for each group
-  *      the last column group will run to the end.
-  *
   *   horzcat(horzsplit(x,...)) = x
   */
   std::vector<MX> horzsplit(const MX& x, const std::vector<int>& output_offset);
 
-  /** \brief  split horizontally, retaining fixed-sized groups of columns
-  * \param incr Size of each group of columns
+  /** \brief  split vertically, retaining fixed-sized groups of cols
+  * \param incr Size of each group of cols
   *
-  *   horzcat(horzsplit(x,...)) = x
+  *  horzcat(horzsplit(x,...)) = x
   */
   std::vector<MX> horzsplit(const MX& x, int incr=1);
+  
+  /** \brief  concatenate horizontally 
+  *
+  *   vertcat(vertsplit(x,...)) = x
+  */
+  MX vertcat(const std::vector<MX>& comp);
+  
+  /** \brief  split horizontally, retaining groups of rows
+  * \param output_offset List of all start rows for each group
+  *      the last row group will run to the end.
+  *
+  *   vertcat(vertsplit(x,...)) = x
+  */
+  std::vector<MX> vertsplit(const MX& x, const std::vector<int>& output_offset);
+
+  /** \brief  split horizontally, retaining fixed-sized groups of rows
+  * \param incr Size of each group of rows
+  *
+  *   vertcat(vertsplit(x,...)) = x
+  */
+  std::vector<MX> vertsplit(const MX& x, int incr=1);
   
   /** \brief Construct a matrix from a list of list of blocks.
   *
@@ -80,16 +86,16 @@ namespace CasADi{
   MX blockcat(const std::vector< std::vector<MX > > &v);
   
   /** \brief  chop up into blocks
-  * \brief vert_offset Defines the boundaries of the block rows
-  * \brief horz_offset Defines the boundaries of the block columns
+  * \brief vert_offset Defines the boundaries of the block cols
+  * \brief horz_offset Defines the boundaries of the block rows
   *
   *   blockcat(blocksplit(x,...,...)) = x
   */
   std::vector< std::vector<MX > > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
 
   /** \brief  chop up into blocks
-  * \brief vert_incr Defines the increment for block boundaries in row dimension
-  * \brief horz_incr Defines the increment for block boundaries in column dimension
+  * \brief vert_incr Defines the increment for block boundaries in col dimension
+  * \brief horz_incr Defines the increment for block boundaries in row dimension
   *
   *   blockcat(blocksplit(x,...,...)) = x
   */
@@ -100,24 +106,18 @@ namespace CasADi{
   MX blockcat(const MX &A,const MX &B,const MX &C,const MX &D);
 #endif // SWIG
 
-  /** \brief  concatenate vertically while vectorizing all arguments with vec */
+  /** \brief Concatenate vertically while vectorizing all arguments */
   MX veccat(const std::vector<MX>& comp);
-  
-  /** \brief  concatenate vertically while flattening all arguments with flatten */
-  MX flattencat(const std::vector<MX>& comp);
 
-  /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
+  /** \brief  concatenate vertically while vecing all arguments with vecNZ */
   MX vecNZcat(const std::vector<MX>& comp);
-  
-  /** \brief  concatenate vertically while flattening all arguments with flattenNZ */
-  MX flattenNZcat(const std::vector<MX>& comp);
 
 #ifndef SWIG
   /** \brief  concatenate vertically, two matrices */
-  MX vertcat(const MX& a, const MX& b);
+  MX horzcat(const MX& a, const MX& b);
 
   /** \brief  concatenate horizontally, two matrices */
-  MX horzcat(const MX& a, const MX& b);
+  MX vertcat(const MX& a, const MX& b);
 #endif // SWIG
 
   /** \brief  Frobenius norm  */
@@ -133,7 +133,7 @@ namespace CasADi{
   MX norm_inf(const MX &x);
 
   /** \brief Transpose an expression */
-  MX trans(const MX &x);
+  MX transpose(const MX &x);
 
   /** \brief  Take the matrix product of 2 MX objects
   *
@@ -142,7 +142,7 @@ namespace CasADi{
   * inspect the trace of it. sp_z diagonal will be more efficient then.
   *
   */
-  MX mul(const MX &x, const MX &y, const CRSSparsity& sp_z=CRSSparsity());
+  MX mul(const MX &x, const MX &y, const Sparsity& sp_z=Sparsity());
 
   /** \brief  Take the matrix product of n MX objects */
   MX mul(const std::vector< MX > &x);
@@ -172,93 +172,42 @@ namespace CasADi{
 
 #ifndef SWIG
   //! \brief Returns a reshaped version of the MX
-  MX reshape(const MX &x, int n, int m);
+  MX reshape(const MX &x, int nrow, int ncol);
 #endif // SWIG
 
   //! \brief Returns a reshaped version of the MX, dimensions as a vector
-  MX reshape(const MX &x, const std::vector<int> sz);
+  MX reshape(const MX &x, std::pair<int,int> rc);
 
   //! \brief Reshape the MX
-  MX reshape(const MX &x, const CRSSparsity& sp);
+  MX reshape(const MX &x, const Sparsity& sp);
 
   /** \brief Returns a vectorized version of the MX
-      Vectorizing is an expensive operation, unlike flatten
-      Same as reshape(trans(x), x.numel(),1)
+      Same as reshape(x, x.numel(),1)
     
-      a b
-      c d 
+      a c
+      b d 
     
       turns into
     
       a
-      c
       b
+      c
       d
     
   */
   MX vec(const MX &x);
-
-  /** \brief Returns a flattened version of the MX
-      Flattening is a cheap (non-copying) operation
-      Same as reshape(x, x.numel(),1)
-    
-      a b
-      c d 
-    
-      turns into
-    
-      a
-      b
-      c
-      d
-    
-  */
-  MX flatten(const MX &x);
-
-  /** \brief Returns a flattened version of the MX, preserving only nonzeros
-   */
-  MX vecNZ(const MX &x);
   
-  /** \brief Returns a flattened version of the MX, prseverving only nonzeros
+  /** \brief Returns a vectorized version of the MX, prseverving only nonzeros
   */
-  MX flattenNZ(const MX &x);
+  MX vecNZ(const MX &x);
 
   /** \brief  Unite two matrices no overlapping sparsity */
   MX unite(const MX& A, const MX& B);
 
-  /** \brief  check if symbolic */
-  bool isSymbolic(const MX& ex);
-
-  /** \brief  check if all nonzeros are symbolic (this function is currently identical to isSymbolic) */
-  bool isSymbolicSparse(const MX& ex);
-
-  /** \brief  check if identity */
-  bool isIdentity(const MX& ex);
-
-  /** \brief  check if zero (note that false negative answers are possible) */
-  bool isZero(const MX& ex);
-
-  /** \brief  check if zero (note that false negative answers are possible) */
-  bool isOne(const MX& ex);
-
   /** \brief  Simplify an expression */
   void simplify(MX& ex);
 
-  /** \brief  Is the expression a transpose? */
-  bool isTranspose(const MX& ex);
-
-  /** \brief  check if zero (note that false negative answers are possible) */
-  bool isMinusOne(const MX& ex);
-
-  /** \brief  check if vector */
-  bool isVector(const MX& ex);
-
-  /** \brief  check if vector */
-  bool isDense(const MX& ex);
-  
-  /// Checks if expression does not contain NaN or Inf
-  bool isRegular(const MX& ex);
-
+  /** \brief Matrix trace */
   MX trace(const MX& A);
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
@@ -267,17 +216,11 @@ namespace CasADi{
   /** \brief create a clipped view into a matrix
       Create a sparse matrix from a dense matrix A, with sparsity pattern sp
   **/
-  //MX clip(const MX& A, const CRSSparsity& sp);
-
-  /** \brief  Make the matrix dense if not already*/
-  void makeDense(MX& x);
-
-  /** \brief  Make the matrix dense if not already */
-  MX densify(const MX& x);
+  //MX clip(const MX& A, const Sparsity& sp);
   
 #ifndef SWIGOCTAVE
   /** \brief  Make the matrix dense if not already */
-  MX full(const MX& x);
+  MX dense(const MX& x);
 #endif // SWIGOCTAVE
 
   /** \brief  Create a parent MX on which all given MX's will depend.
@@ -290,12 +233,12 @@ namespace CasADi{
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
-  std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps);
+  MX createParent(const std::vector<MX> &deps, std::vector<MX>& SWIG_OUTPUT(children));
 
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
-  std::pair<MX, std::vector<MX> > createParent(const std::vector<CRSSparsity> &deps);
+  MX createParent(const std::vector<Sparsity> &deps, std::vector<MX>& SWIG_OUTPUT(children));
 
   /** Count number of nodes */
   int countNodes(const MX& A);
@@ -315,56 +258,17 @@ namespace CasADi{
   MX blkdiag(const MX &A, const MX& B);
 #endif // SWIG
 
+  /** \brief Return a col-wise summation of elements */
+  MX sumCols(const MX &x);
+
   /** \brief Return a row-wise summation of elements */
   MX sumRows(const MX &x);
-
-  /** \brief Return a column-wise summation of elements */
-  MX sumCols(const MX &x);
 
   /// Return summation of all elements
   MX sumAll(const MX &x); 
 
   /** \brief  Evaluate a polynomial with coefficeints p in x */
   MX polyval(const MX& p, const MX& x);
-
-  /** \brief  Construct symbolic arrays and variables using CasADi's MX expression graph representation
-      The "msym" function is intended to work in a similar way as "sym" used in the Symbolic Toolbox for Matlab but instead creating an MX object.
-      The MX expression graph is more general but also have considerably more overhead than the alternative SX expression graph.
-  */
-  //@{
-  /** \brief Create a matrix symbolic variable of given sparsity */
-  MX msym(const std::string& name, int n=1, int m=1);
-
-  /** \brief Create a matrix symbolic variable of given sparsity */
-  MX msym(const std::string& name, const std::pair<int,int> & nm);
-
-  /** \brief Create a matrix variable from a constant matrix */
-  MX msym(const Matrix<double>& x);
-
-  /** \brief Create a matrix symbolic variable of given sparsity */
-  MX msym(const std::string& name, const CRSSparsity& sp);
-
-  /** \brief Create a vector of length p with with matrix symbolic variables of given sparsity */
-  std::vector<MX> msym(const std::string& name, const CRSSparsity& sp, int p);
-
-  /** \brief Create a vector of length p with n-by-m matrix symbolic variables */
-  std::vector<MX> msym(const std::string& name, int n, int m, int p);
-
-  /** \brief Create a vector of length r of vectors of length p with matrix symbolic variables with given sparsity*/
-  std::vector<std::vector<MX> > msym(const std::string& name, const CRSSparsity& sp, int p, int r);
-
-  /** \brief Create a vector of length r of vectors of length p with n-by-m matrices with symbolic variables */
-  std::vector<std::vector<MX> > msym(const std::string& name, int n, int m, int p, int r);
-
-  //@}
-
-  /** \brief  Check if two expressions are equal
-  *
-  *  Might very well give false negatives
-  *
-  *   Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
-   */
-  bool isEqual(const MX& ex1,const MX &ex2);
 
   /** \brief Get a string representation for a binary MX, using custom arguments */
   std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args);
@@ -397,9 +301,6 @@ namespace CasADi{
 #else // SWIG
   void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, std::vector<MX>& INOUT, bool reverse=false);
 #endif // SWIG
-
-  template<> inline
-  MX GenericMatrix<MX>::sym(const std::string& name, const CRSSparsity& sp){ return msym(name,sp);}
 
   /** \brief Extract shared subexpressions from an set of expressions */
   void extractShared(std::vector<MX>& ex, 
@@ -448,6 +349,11 @@ namespace CasADi{
   */
   std::vector<MX> getSymbols(const std::vector<MX>& e);
   
+  /** \brief Check if expression depends on any of the arguments
+    The arguments must be symbolic
+  */
+  bool dependsOn(const MX& ex, const std::vector<MX> &arg);
+  
   /** \brief Expand MX graph to SXFunction call
   *
   *  Expand the given expression e, optionally
@@ -472,15 +378,48 @@ namespace CasADi{
 
   /** \brief Solve a system of equations: A*x = b 
   */
-  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver = SymbolicQR::creator, const Dictionary& dict = Dictionary());
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   * 
-  * If the matrix A is fat (size2>size1), mul(A,pinv(A)) is unity.
-  * If the matrix A is slender (size1<size2), mul(pinv(A),A) is unity.
+  * If the matrix A is fat (size1>size2), mul(A,pinv(A)) is unity.
+  * If the matrix A is slender (size2<size1), mul(pinv(A),A) is unity.
   *
   */
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+
+/// \cond INTERNAL
+#ifndef WITHOUT_PRE_1_9_X
+/** \brief [DEPRECATED]
+*/
+//@{
+  inline MX msym(const std::string& name, int nrow=1, int ncol=1){ return MX::sym(name,nrow,ncol); }
+  inline MX msym(const std::string& name, const std::pair<int,int> & rc){ return MX::sym(name,rc);}
+  inline std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p){ return MX::sym(name,sp,p);}
+  inline std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p){ return MX::sym(name,nrow,ncol,p);}
+  inline std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r){ return MX::sym(name,sp,p,r);}
+  inline std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r){ return MX::sym(name,nrow,ncol,p,r);}
+  inline MX msym(const std::string& name, const Sparsity& sp){ return MX::sym(name,sp);}
+  inline MX msym(const Matrix<double>& x){ return MX(x);}
+  inline bool isVector(const MX& ex){ return ex.isVector();}
+  inline bool isDense(const MX& ex){ return ex.isDense();}  
+  inline void makeDense(MX& x){ return x.densify();}
+  inline MX densify(const MX& x){ MX ret(x); ret.densify(); return ret;}
+  inline bool isSymbolic(const MX& ex){ return ex.isSymbolic();}
+  inline bool isSymbolicSparse(const MX& ex){ return ex.isSymbolicSparse();}
+  inline bool isIdentity(const MX& ex){ return ex.isIdentity();}
+  inline bool isZero(const MX& ex){ return ex.isZero();}
+  inline bool isOne(const MX& ex){ return ex.isOne();}
+  inline bool isMinusOne(const MX& ex){ return ex.isMinusOne();}
+  inline bool isTranspose(const MX& ex){ return ex.isTranspose();}
+  inline bool isRegular(const MX& ex){ return ex.isRegular();}
+  inline MX trans(const MX &x){ return transpose(x);}
+//@}
+#endif
+/// \endcond
+
+/** @}
+*/
 
 } // namespace CasADi
 

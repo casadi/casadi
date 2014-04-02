@@ -24,15 +24,15 @@
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-  SetSparse::SetSparse(const MX& x, const CRSSparsity& sp){
+  SetSparse::SetSparse(const MX& x, const Sparsity& sp){
     setDependencies(x);
-    setSparsity(CRSSparsity(sp));
+    setSparsity(Sparsity(sp));
   }
 
   SetSparse* SetSparse::clone() const{
@@ -41,7 +41,11 @@ namespace CasADi{
 
   void SetSparse::printPart(std::ostream &stream, int part) const{
     if(part==0){
-      stream << "dense(";
+      if(sparsity().isDense()){
+        stream << "dense(";
+      } else {
+        stream << "set_sparse(";
+      }
     } else {
       stream << ")";
     }
@@ -56,8 +60,8 @@ namespace CasADi{
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void SetSparse::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void SetSparse::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
@@ -75,7 +79,7 @@ namespace CasADi{
     // Propagate adjoint seeds
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] += adjSeed[d][0]->setSparse(dep().sparsity(),true);
+      adjSens[d][0]->addToSum(adjSeed[d][0]->setSparse(dep().sparsity(),true));
       *adjSeed[d][0] = MX();
     }
   }

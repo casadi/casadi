@@ -30,7 +30,7 @@ using namespace std;
 namespace CasADi{
 
   Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message): fail_message_(fail_message){
-    casadi_assert_message(y.scalar(),"Assertion:: assertion expression y must be scalar, but got " << y.dimString());
+    casadi_assert_message(y.isScalar(),"Assertion:: assertion expression y must be scalar, but got " << y.dimString());
     setDependencies(x,y);
     setSparsity(x.sparsity());
   }
@@ -61,12 +61,12 @@ namespace CasADi{
 
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
-      *adjSens[d][0] +=  *adjSeed[d][0];
+      adjSens[d][0]->addToSum(*adjSeed[d][0]);
       *adjSeed[d][0] = MX();
     }
   }
   
-  void Assertion::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+  void Assertion::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     *output[0] = *input[0];
   }
   
@@ -80,7 +80,7 @@ namespace CasADi{
   
   void Assertion::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     bvec_t *input0 = get_bvec_t(input[0]->data());
-    bvec_t *input1 = get_bvec_t(input[1]->data());
+    //    bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
     for(int el=0; el<output[0]->size(); ++el){
       if(fwd){

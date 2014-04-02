@@ -25,3 +25,91 @@ from casadi_main import *
 from casadi_primitive import *
 from casadi_primitive_tools import *
 from casadi_noncore import *
+
+interfaces = []
+failed_interfaces = {}
+
+try:
+  from casadi_interface_ipopt import *
+  interfaces.append("ipopt")
+except Exception as e:
+  failed_interfaces["ipopt"] = str(e)
+
+
+try:
+  from casadi_interface_sundials import *
+  interfaces.append("sundials")
+except Exception as e:
+  failed_interfaces["sundials"] = str(e)
+
+
+try:
+  from casadi_interface_qpoases import *
+  interfaces.append("qpoases")
+except Exception as e:
+  failed_interfaces["qpoases"] = str(e)
+
+
+try:
+  from casadi_interface_dsdp import *
+  interfaces.append("dsdp")
+except Exception as e:
+  failed_interfaces["dsdp"] = str(e)
+
+
+try:
+  from casadi_interface_csparse import *
+  interfaces.append("csparse")
+except Exception as e:
+  failed_interfaces["csparse"] = str(e)
+
+
+try:
+  from casadi_interface_knitro import *
+  interfaces.append("knitro")
+except Exception as e:
+  failed_interfaces["knitro"] = str(e)
+
+
+try:
+  from casadi_interface_cplex import *
+  interfaces.append("cplex")
+except Exception as e:
+  failed_interfaces["cplex"] = str(e)
+
+
+try:
+  from casadi_interface_ooqp import *
+  interfaces.append("ooqp")
+except Exception as e:
+  failed_interfaces["ooqp"] = str(e)
+
+
+try:
+  from casadi_interface_slicot import *
+  interfaces.append("slicot")
+except Exception as e:
+  failed_interfaces["slicot"] = str(e)
+
+
+try:
+  from casadi_interface_worhp import *
+  interfaces.append("worhp")
+except Exception as e:
+  failed_interfaces["worhp"] = str(e)
+
+
+try:
+  from casadi_interface_snopt import *
+  interfaces.append("snopt")
+except Exception as e:
+  failed_interfaces["snopt"] = str(e)
+
+
+try:
+  from casadi_interface_lapack import *
+  interfaces.append("lapack")
+except Exception as e:
+  failed_interfaces["lapack"] = str(e)
+
+

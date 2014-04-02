@@ -21,10 +21,10 @@
  */
 
 #include "stabilized_sqp_internal.hpp"
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/casadi_calculus.hpp"
 #include <ctime>
@@ -36,7 +36,7 @@
 using namespace std;
 namespace CasADi{
 
-  StabilizedSQPInternal::StabilizedSQPInternal(const FX& nlp) : NLPSolverInternal(nlp){
+  StabilizedSQPInternal::StabilizedSQPInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("The SQP method is under development");
     addOption("stabilized_qp_solver",         OT_STABILIZEDQPSOLVER,   GenericType(),    "The Stabilized QP solver to be used by the SQP method");
     addOption("stabilized_qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the Stabilized QP solver");
@@ -120,9 +120,9 @@ namespace CasADi{
     }
 
     // Allocate a QP solver
-    CRSSparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : sp_dense(nx_,nx_);
-    H_sparsity = H_sparsity + DMatrix::eye(nx_).sparsity();
-    CRSSparsity A_sparsity = jacG().isNull() ? CRSSparsity(0,nx_,false) : jacG().output().sparsity();
+    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : Sparsity::dense(nx_,nx_);
+    H_sparsity = H_sparsity + Sparsity::diag(nx_);
+    Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0,nx_) : jacG().output().sparsity();
 
     StabilizedQPSolverCreator stabilized_qp_solver_creator = getOption("stabilized_qp_solver");
     stabilized_qp_solver_ = stabilized_qp_solver_creator(qpStruct("h",H_sparsity,"a",A_sparsity));
@@ -197,28 +197,28 @@ namespace CasADi{
     // Create Hessian update function
     if(!exact_hessian_){
       // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
-      SXMatrix Bk = ssym("Bk",H_sparsity);
-      SXMatrix x = ssym("x",input(NLP_SOLVER_X0).sparsity());
-      SXMatrix x_old = ssym("x",x.sparsity());
-      SXMatrix gLag = ssym("gLag",x.sparsity());
-      SXMatrix gLag_old = ssym("gLag_old",x.sparsity());
+      SX Bk = SX::sym("Bk",H_sparsity);
+      SX x = SX::sym("x",input(NLP_SOLVER_X0).sparsity());
+      SX x_old = SX::sym("x",x.sparsity());
+      SX gLag = SX::sym("gLag",x.sparsity());
+      SX gLag_old = SX::sym("gLag_old",x.sparsity());
     
-      SXMatrix sk = x - x_old;
-      SXMatrix yk = gLag - gLag_old;
-      SXMatrix qk = mul(Bk, sk);
+      SX sk = x - x_old;
+      SX yk = gLag - gLag_old;
+      SX qk = mul(Bk, sk);
     
       // Calculating theta
-      SXMatrix skBksk = inner_prod(sk, qk);
-      SXMatrix omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
+      SX skBksk = inner_prod(sk, qk);
+      SX omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
                                0.8 * skBksk / (skBksk - inner_prod(sk, yk)),
                                1);
       yk = omega * yk + (1 - omega) * qk;
-      SXMatrix theta = 1. / inner_prod(sk, yk);
-      SXMatrix phi = 1. / inner_prod(qk, sk);
-      SXMatrix Bk_new = Bk + theta * mul(yk, trans(yk)) - phi * mul(qk, trans(qk));
+      SX theta = 1. / inner_prod(sk, yk);
+      SX phi = 1. / inner_prod(qk, sk);
+      SX Bk_new = Bk + theta * mul(yk, yk.T()) - phi * mul(qk, qk.T());
     
       // Inputs of the BFGS update function
-      vector<SXMatrix> bfgs_in(BFGS_NUM_IN);
+      vector<SX> bfgs_in(BFGS_NUM_IN);
       bfgs_in[BFGS_BK] = Bk;
       bfgs_in[BFGS_X] = x;
       bfgs_in[BFGS_X_OLD] = x_old;
@@ -332,7 +332,7 @@ namespace CasADi{
       char info = ' ';
       
       // 1-norm of lagrange gradient
-      double gLag_norm1 = norm_1(gLag_);
+      //double gLag_norm1 = norm_1(gLag_);
       
       // 1-norm of step
       double dx_norm1 = norm_1(dx_);
@@ -345,11 +345,11 @@ namespace CasADi{
     
       // Call callback function if present
       if (!callback_.isNull()) {
-        if (!output(NLP_SOLVER_F).empty()) output(NLP_SOLVER_F).set(fk_);
-        if (!output(NLP_SOLVER_X).empty()) output(NLP_SOLVER_X).set(x_);
-        if (!output(NLP_SOLVER_LAM_G).empty()) output(NLP_SOLVER_LAM_G).set(mu_);
-        if (!output(NLP_SOLVER_LAM_X).empty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
-        if (!output(NLP_SOLVER_G).empty()) output(NLP_SOLVER_G).set(gk_);
+        if (!output(NLP_SOLVER_F).isEmpty()) output(NLP_SOLVER_F).set(fk_);
+        if (!output(NLP_SOLVER_X).isEmpty()) output(NLP_SOLVER_X).set(x_);
+        if (!output(NLP_SOLVER_LAM_G).isEmpty()) output(NLP_SOLVER_LAM_G).set(mu_);
+        if (!output(NLP_SOLVER_LAM_X).isEmpty()) output(NLP_SOLVER_LAM_X).set(mu_x_);
+        if (!output(NLP_SOLVER_G).isEmpty()) output(NLP_SOLVER_G).set(gk_);
         int ret = callback_(ref_,user_data_);
       
         if (!ret) {
@@ -361,7 +361,7 @@ namespace CasADi{
       }
       normJ_ = norm1matrix(Jk_);
       // Default stepsize
-      double t = 0;
+      //double t = 0;
 
   
 
@@ -373,7 +373,7 @@ namespace CasADi{
    
       if (exact_hessian_ && iter==0) {
         Bk_.setAll(0);
-        Bk_(sp_diag(nx_)) = 0.01 *scaleglag_; 
+        Bk_(Sparsity::diag(nx_)) = 0.01 *scaleglag_; 
       }
    
       // Checking convergence criteria
@@ -692,12 +692,12 @@ namespace CasADi{
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0){
           // Reset Hessian approximation by dropping all off-diagonal entries
-          const vector<int>& rowind = Bk_.rowind();      // Access sparsity (row offset)
-          const vector<int>& col = Bk_.col();            // Access sparsity (column)
+          const vector<int>& colind = Bk_.colind();      // Access sparsity (column offset)
+          const vector<int>& row = Bk_.row();            // Access sparsity (row)
           vector<double>& data = Bk_.data();             // Access nonzero elements
-          for(int i=0; i<rowind.size()-1; ++i){          // Loop over the rows of the Hessian
-            for(int el=rowind[i]; el<rowind[i+1]; ++el){ // Loop over the nonzero elements of the row
-              if(i!=col[el]) data[el] = 0;               // Remove if off-diagonal entries
+          for(int cc=0; cc<colind.size()-1; ++cc){       // Loop over the columns of the Hessian
+            for(int el=colind[cc]; el<colind[cc+1]; ++el){ // Loop over the nonzero elements of the column
+              if(cc!=row[el]) data[el] = 0;               // Remove if off-diagonal entries
             }
           }
         }
@@ -778,22 +778,22 @@ namespace CasADi{
     casadi_assert(x.size()==A.size1() && x.size()==A.size2());
   
     // Access the internal data of A
-    const std::vector<int> &A_rowind = A.rowind();
-    const std::vector<int> &A_col = A.col();
+    const std::vector<int> &A_colind = A.colind();
+    const std::vector<int> &A_row = A.row();
     const std::vector<double> &A_data = A.data();
   
     // Return value
     double ret=0;
 
-    // Loop over the rows of A
-    for(int i=0; i<x.size(); ++i){
+    // Loop over the columns of A
+    for(int cc=0; cc<x.size(); ++cc){
       // Loop over the nonzeros of A
-      for(int el=A_rowind[i]; el<A_rowind[i+1]; ++el){
+      for(int el=A_colind[cc]; el<A_colind[cc+1]; ++el){
         // Get column
-        int j = A_col[el];
-      
+        int rr = A_row[el];
+        
         // Add contribution
-        ret += x[i]*A_data[el]*x[j];
+        ret += x[cc]*A_data[el]*x[rr];
       }
     }
   
@@ -814,15 +814,15 @@ namespace CasADi{
   }
 
   double StabilizedSQPInternal::getRegularization(const Matrix<double>& H){
-    const vector<int>& rowind = H.rowind();
-    const vector<int>& col = H.col();
+    const vector<int>& colind = H.colind();
+    const vector<int>& row = H.row();
     const vector<double>& data = H.data();
     double reg_param = 0;
-    for(int i=0; i<rowind.size()-1; ++i){
+    for(int cc=0; cc<colind.size()-1; ++cc){
       double mineig = 0;
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        int j = col[el];
-        if(i == j){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        int rr = row[el];
+        if(rr == cc){
           mineig += data[el];
         } else {
           mineig -= fabs(data[el]);
@@ -834,14 +834,14 @@ namespace CasADi{
   }
   
   void StabilizedSQPInternal::regularize(Matrix<double>& H, double reg){
-    const vector<int>& rowind = H.rowind();
-    const vector<int>& col = H.col();
+    const vector<int>& colind = H.colind();
+    const vector<int>& row = H.row();
     vector<double>& data = H.data();
     
-    for(int i=0; i<rowind.size()-1; ++i){
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        int j = col[el];
-        if(i==j){
+    for(int cc=0; cc<colind.size()-1; ++cc){
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        int rr = row[el];
+        if(rr==cc){
           data[el] += reg;
         }
       }
@@ -852,7 +852,7 @@ namespace CasADi{
   void StabilizedSQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
     try{
       // Get function
-      FX& hessLag = this->hessLag();
+      Function& hessLag = this->hessLag();
 
       // Pass the argument to the function
       hessLag.setInput(x,HESSLAG_X);
@@ -919,7 +919,7 @@ namespace CasADi{
       if(ng_==0) return;
     
       // Get function
-      FX& jacG = this->jacG();
+      Function& jacG = this->jacG();
 
       // Pass the argument to the function
       jacG.setInput(x,NL_X);
@@ -947,7 +947,7 @@ namespace CasADi{
   void StabilizedSQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f){
     try {
       // Get function
-      FX& gradF = this->gradF();
+      Function& gradF = this->gradF();
 
       // Pass the argument to the function
       gradF.setInput(x,NL_X);
@@ -1056,13 +1056,17 @@ namespace CasADi{
   double StabilizedSQPInternal::norm1matrix(const DMatrix& A) {
     // Access the arrays
     const std::vector<double>& v = A.data();
-    const std::vector<int>& col = A.col();
+    const std::vector<int>& colind = A.colind();
+    double ret = 0;
     std::vector<double> sums(A.size2(),0);
-    for (int i=0;i<A.size();i++)
-      sums[col[i]] += abs(v[i]);
-    
-    return norm_inf(sums);        
-    
+    for(int cc=0; cc<colind.size()-1; ++cc){
+      double colsum = 0;
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        colsum += abs(v[el]);
+      }
+      ret = max(ret,colsum);
+    }
+    return ret;
   }
   
   double StabilizedSQPInternal::primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
@@ -1090,22 +1094,22 @@ void StabilizedSQPInternal::mat_vectran(const std::vector<double>& x, const DMat
     casadi_assert(x.size()==A.size1() && y.size()==A.size2());
   
     // Access the internal data of A
-    const std::vector<int> &A_rowind = A.rowind();
-    const std::vector<int> &A_col = A.col();
+    const std::vector<int> &A_colind = A.colind();
+    const std::vector<int> &A_row = A.row();
     const std::vector<double> &A_data = A.data();
     
     
     for (int i=0;i<y.size();++i)
       y[i] = 0;
-    // Loop over the rows of A
-    for(int i=0; i<A.size1(); ++i){
+    // Loop over the columns of A
+    for(int cc=0; cc<A.size2(); ++cc){
       // Loop over the nonzeros of A
-      for(int el=A_rowind[i]; el<A_rowind[i+1]; el++){
-        // Get column
-        int j = A_col[el];
+      for(int el=A_colind[cc]; el<A_colind[cc+1]; el++){
+        // Get row
+        int rr = A_row[el];
       
         // Add contribution
-        y[j] += A_data[el]*x[i];
+        y[cc] += A_data[el]*x[rr];
       }
     }
 
@@ -1116,22 +1120,22 @@ void StabilizedSQPInternal::mat_vectran(const std::vector<double>& x, const DMat
     casadi_assert(x.size()==A.size2() && y.size()==A.size1());
   
     // Access the internal data of A
-    const std::vector<int> &A_rowind = A.rowind();
-    const std::vector<int> &A_col = A.col();
+    const std::vector<int> &A_colind = A.colind();
+    const std::vector<int> &A_row = A.row();
     const std::vector<double> &A_data = A.data();
     
     
     for (int i=0;i<y.size();++i)
       y[i] = 0;
     // Loop over the rows of A
-    for(int i=0; i<A.size1(); ++i){
+    for(int cc=0; cc<A.size2(); ++cc){
       // Loop over the nonzeros of A
-      for(int el=A_rowind[i]; el<A_rowind[i+1]; el++){
+      for(int el=A_colind[cc]; el<A_colind[cc+1]; el++){
         // Get column
-        int j = A_col[el];
+        int rr = A_row[el];
       
         // Add contribution
-        y[i] += A_data[el]*x[j];
+        y[rr] += A_data[el]*x[cc];
       }
     }
 

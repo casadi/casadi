@@ -29,16 +29,16 @@ namespace CasADi{
   KinsolSolver::KinsolSolver(){ 
   }
 
-  KinsolSolver::KinsolSolver(const FX& f, const FX& jac, const LinearSolver& linsol){
+  KinsolSolver::KinsolSolver(const Function& f, const Function& jac, const LinearSolver& linsol){
     assignNode(new KinsolInternal(f,jac,linsol));
   }
 
   KinsolInternal* KinsolSolver::operator->(){
-    return (KinsolInternal*)(FX::operator->());
+    return (KinsolInternal*)(Function::operator->());
   }
 
   const KinsolInternal* KinsolSolver::operator->() const{
-    return (const KinsolInternal*)(FX::operator->());
+    return (const KinsolInternal*)(Function::operator->());
   }
 
   bool KinsolSolver::checkNode() const{

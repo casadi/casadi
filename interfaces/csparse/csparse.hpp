@@ -23,7 +23,7 @@
 #ifndef CSPARSE_HPP
 #define CSPARSE_HPP
 
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
 namespace CasADi{
 
@@ -35,7 +35,7 @@ namespace CasADi{
    *
    @copydoc LinearSolver_doc
    *  
-   * CSparse is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   * CSparse is an CasADi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use CSparse is: \n
    *  -# init()
@@ -55,7 +55,7 @@ namespace CasADi{
     CSparse();
   
     /// Create a linear solver given a sparsity pattern
-    explicit CSparse(const CRSSparsity& sp, int nrhs=1);
+    explicit CSparse(const Sparsity& sp, int nrhs=1);
   
     /** \brief  Access internal functions and data members */
     CSparseInternal* operator->();
@@ -70,7 +70,7 @@ namespace CasADi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const CRSSparsity& sp, int nrhs){ return CSparse(sp,nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs){ return CSparse(sp,nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif

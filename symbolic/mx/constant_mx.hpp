@@ -27,6 +27,8 @@
 #include <iomanip>
 #include <iostream>
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
 /** \brief Represents an MX that is only composed of a constant.
@@ -40,16 +42,16 @@ namespace CasADi{
   class ConstantMX : public MXNode{
   public:
     /// Destructor
-    explicit ConstantMX(const CRSSparsity& sp);
+    explicit ConstantMX(const Sparsity& sp);
 
     /// Destructor
     virtual ~ConstantMX() = 0;
 
     // Creator (all values are the same integer)
-    static ConstantMX* create(const CRSSparsity& sp, int val);
+    static ConstantMX* create(const Sparsity& sp, int val);
 
     // Creator (all values are the same floating point value)
-    static ConstantMX* create(const CRSSparsity& sp, double val);
+    static ConstantMX* create(const Sparsity& sp, double val);
 
     // Creator (values may be different)
     static ConstantMX* create(const Matrix<double>& val);
@@ -61,7 +63,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
@@ -79,7 +81,7 @@ namespace CasADi{
     virtual Matrix<double> getMatrixValue() const = 0;
 
     /// Matrix multiplcation
-    virtual MX getMultiplication(const MX& y) const;
+    //    virtual MX getMultiplication(const MX& y) const;
 
     /// Inner product
     virtual MX getInnerProd(const MX& y) const;
@@ -88,6 +90,7 @@ namespace CasADi{
     virtual bool __nonzero__() const;
   };
 
+  /// A constant given as a DMatrix
   class ConstantDMatrix : public ConstantMX{
   public:
 
@@ -112,8 +115,8 @@ namespace CasADi{
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-      output[0]->set(SXMatrix(x_));
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+      output[0]->set(SX(x_));
       ConstantMX::evaluateSX(input,output,itmp,rtmp);
     }
 
@@ -139,66 +142,52 @@ namespace CasADi{
     Matrix<double> x_;
   };
 
-  /** \brief Constant known at runtime */
-  template<typename T>
-  struct RuntimeConst{
-    const T value;
-    RuntimeConst(){}
-    RuntimeConst(T v) : value(v){}
-  };
-  
-  /** \brief  Constant known at compiletime */
-  template<int v>
-  struct CompiletimeConst{
-    static const int value = v;
-  };
+  /// A zero-by-zero matrix
+  class ZeroByZero : public ConstantMX{
+  private:
+    /** \brief Private constructor (singleton design pattern) */
+    explicit ZeroByZero() : ConstantMX(Sparsity::sparse(0,0)){
+      initSingleton();
+    }
 
-  template<typename Value>
-  class Constant : public ConstantMX{
   public:
-    
-    /** \brief  Constructor */
-    explicit Constant(const CRSSparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v){}
+    /** \brief Get a pointer to the singleton */
+    static ZeroByZero* getInstance(){
+      static ZeroByZero instance;
+      return &instance;
+    }
 
     /// Destructor
-    virtual ~Constant(){}
+    virtual ~ZeroByZero(){
+      destroySingleton();
+    }
 
     /** \brief  Clone function */
-    virtual Constant* clone() const{ return new Constant<Value>(*this);}
+    virtual ZeroByZero* clone() const{ return getInstance();}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
     
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){}
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){}
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-
-    /** \brief  Check if a particular integer value */
-    virtual bool isZero() const{ return v_.value==0;}
-    virtual bool isOne() const{ return v_.value==1;}
-    virtual bool isIdentity() const{ return v_.value==1 && sparsity().diagonal();}
-    virtual bool isValue(double val) const{ return v_.value==val;}
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const{
-      return v_.value;
-    }
+    virtual double getValue() const{ return 0;}
 
     /// Get the value (only for constant nodes)
-    virtual Matrix<double> getMatrixValue() const{
-      return Matrix<double>(sparsity(),v_.value);
-    }
+    virtual DMatrix getMatrixValue() const{ return DMatrix(); }
 
     /// Get densification
-    virtual MX getSetSparse(const CRSSparsity& sp) const;
+    virtual MX getSetSparse(const Sparsity& sp) const;
 
     /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
     
     /// Assign the nonzeros of a matrix to another matrix
     virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
@@ -213,14 +202,134 @@ namespace CasADi{
     virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
     
     /// Reshape
-    virtual MX getReshape(const CRSSparsity& sp) const;
+    virtual MX getReshape(const Sparsity& sp) const;
+  };
+
+  /** \brief Constant known at runtime */
+  template<typename T>
+  struct RuntimeConst{
+    const T value;
+    RuntimeConst(){}
+    RuntimeConst(T v) : value(v){}
+  };
+  
+  /** \brief  Constant known at compiletime */
+  template<int v>
+  struct CompiletimeConst{
+    static const int value = v;
+  };
+
+  /// A constant with all entries identical
+  template<typename Value>
+  class Constant : public ConstantMX{
+  public:
+    
+    /** \brief  Constructor */
+    explicit Constant(const Sparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v){}
+
+    /// Destructor
+    virtual ~Constant(){}
+
+    /** \brief  Clone function */
+    virtual Constant* clone() const{ return new Constant<Value>(*this);}
+
+    /** \brief  Print a part of the expression */
+    virtual void printPart(std::ostream &stream, int part) const;
+    
+    /** \brief  Evaluate the function numerically */
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
+
+    /** \brief  Evaluate the function symbolically (SX) */
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+
+    /** \brief Generate code for the operation */
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+
+    /** \brief  Check if a particular integer value */
+    virtual bool isZero() const{ return v_.value==0;}
+    virtual bool isOne() const{ return v_.value==1;}
+    virtual bool isIdentity() const{ return v_.value==1 && sparsity().isDiagonal();}
+    virtual bool isValue(double val) const{ return v_.value==val;}
+
+    /// Get the value (only for scalar constant nodes)
+    virtual double getValue() const{
+      return v_.value;
+    }
+
+    /// Get the value (only for constant nodes)
+    virtual Matrix<double> getMatrixValue() const{
+      return Matrix<double>(sparsity(),v_.value);
+    }
+
+    /// Get densification
+    virtual MX getSetSparse(const Sparsity& sp) const;
+
+    /// Get the nonzeros of matrix
+    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
+    
+    /// Assign the nonzeros of a matrix to another matrix
+    virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
+
+    /// Transpose
+    virtual MX getTranspose() const;
+
+    /// Get a unary operation
+    virtual MX getUnary(int op) const;
+
+    /// Get a binary operation operation
+    virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
+    
+    /// Reshape
+    virtual MX getReshape(const Sparsity& sp) const;
+
+    /// Create a horizontal concatenation node
+    virtual MX getHorzcat(const std::vector<MX>& x) const;
+
+    /// Create a vertical concatenation node (vectors only)
+    virtual MX getVertcat(const std::vector<MX>& x) const;
 
     /** \brief The actual numerical value */
     Value v_;
   };
   
   template<typename Value>
-  MX Constant<Value>::getReshape(const CRSSparsity& sp) const{
+  MX Constant<Value>::getHorzcat(const std::vector<MX>& x) const{
+    // Check if all arguments have the same constant value
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      if(!(*i)->isValue(v_.value)){
+        // Not all the same value, fall back to base class
+        return ConstantMX::getHorzcat(x);
+      }
+    }
+
+    // Assemble the sparsity pattern
+    Sparsity sp = sparsity();
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      sp.appendColumns(i->sparsity());
+    }
+    return MX(sp,v_.value);
+  }
+
+  template<typename Value>
+  MX Constant<Value>::getVertcat(const std::vector<MX>& x) const{
+    // Check if all arguments have the same constant value
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      if(!(*i)->isValue(v_.value)){
+        // Not all the same value, fall back to base class
+        return ConstantMX::getVertcat(x);
+      }
+    }
+
+    // Assemble the sparsity pattern
+    Sparsity sp = sparsity();
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+      sp.append(i->sparsity());
+    }
+    return MX(sp,v_.value);
+  }
+
+  template<typename Value>
+  MX Constant<Value>::getReshape(const Sparsity& sp) const{
     return MX::create(new Constant<Value>(sp,v_)); 
   }
 
@@ -232,16 +341,16 @@ namespace CasADi{
   template<typename Value>
   MX Constant<Value>::getUnary(int op) const{
     // Constant folding
-    double ret;
+    double ret(0);
     casadi_math<double>::fun(op,v_.value,0.0,ret);
-    if (operation_checker<F0XChecker>(op) || sparsity().dense()) {
+    if (operation_checker<F0XChecker>(op) || sparsity().isDense()) {
       return MX(sparsity(),ret);
     } else {
       if (v_.value==0) {
         if (isZero() && operation_checker<F0XChecker>(op)) {
           return MX(sparsity(),ret);
         } else {
-          return MX(size1(),size2(),ret);
+          return MX::repmat(ret,size1(),size2());
         }
       }
       double ret2;
@@ -254,12 +363,12 @@ namespace CasADi{
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
     casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
     
-    if (ScX && !operation_checker<FX0Checker>(op)) {
+    if (ScX && !operation_checker<Function0Checker>(op)) {
       double ret;
       casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,0,ret);
       
       if (ret!=0) {
-        CRSSparsity f = sp_dense(y.size1(),y.size2());
+        Sparsity f = Sparsity::dense(y.size1(),y.size2());
         MX yy = y.setSparse(f);
         return MX(f,shared_from_this<MX>())->getBinary(op,yy,false,false);
       }
@@ -271,7 +380,7 @@ namespace CasADi{
         grow = ret!=0;
       }
       if (grow) {
-        CRSSparsity f = sp_dense(size1(),size2());
+        Sparsity f = Sparsity::dense(size1(),size2());
         MX xx = shared_from_this<MX>().setSparse(f);
         return xx->getBinary(op,MX(f,y),false,false);
       }
@@ -279,10 +388,10 @@ namespace CasADi{
     
     switch(op){
     case OP_ADD:
-      if(v_.value==0) return ScY && !y->isZero() ? MX(size1(),size2(),y) : y;
+      if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(y,size1(),size2()) : y;
       break;
     case OP_SUB:
-      if(v_.value==0) return ScY && !y->isZero() ? MX(size1(),size2(),-y) : -y;
+      if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(-y,size1(),size2()) : -y;
       break;
     case OP_MUL:
       if(v_.value==1) return y;
@@ -321,8 +430,8 @@ namespace CasADi{
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    output[0]->set(SX(v_.value));
+  void Constant<Value>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    output[0]->set(SXElement(v_.value));
     ConstantMX::evaluateSX(input,output,itmp,rtmp);
   }
 
@@ -338,7 +447,7 @@ namespace CasADi{
   }
   
   template<typename Value>
-  MX Constant<Value>::getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const{
+  MX Constant<Value>::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const{
     if(v_.value!=0){
       // Check if any "holes"
       for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k){
@@ -362,12 +471,12 @@ namespace CasADi{
   }
 
   template<typename Value>
-  MX Constant<Value>::getSetSparse(const CRSSparsity& sp) const{
+  MX Constant<Value>::getSetSparse(const Sparsity& sp) const{
     if(isZero()){
       return MX::create(new Constant<Value>(sp,v_));
-    } else if (sp.dense()) {
+    } else if (sp.isDense()) {
       DMatrix v = getMatrixValue();
-      makeDense(v);
+      v.densify();
       return v;
     } else {
       return MXNode::getSetSparse(sp);
@@ -376,25 +485,40 @@ namespace CasADi{
 
   template<typename Value>
   void Constant<Value>::printPart(std::ostream &stream, int part) const{
-    if(sparsity().scalar(true)){
-      stream << v_.value;
-    } else {
-      stream << "Const<" << v_.value << ">(";
-      stream << size1() << "x" << size2() << ": ";
-      if(sparsity().dense()){
-        stream << "dense";
-      } else if(sparsity().size()==0){
-        stream << "empty";          
-      } else if(sparsity().diagonal()){
-        stream << "diagonal";
+    if(sparsity().isScalar()){
+      // Print scalar
+      if(sparsity().size()==0){
+        stream << "00";
       } else {
-        stream << double(size())/sparsity().numel()*100 << " %";
-      }        
+        stream << v_.value;
+      }
+    } else if(sparsity().isEmpty()){
+      // Print empty
+      sparsity().printCompact(stream);
+    } else {
+      // Print value
+      if(v_.value==0){
+        stream << "zeros(";
+      } else if(v_.value==1){
+        stream << "ones(";
+      } else if(v_.value!=v_.value){
+        stream << "nan(";
+      } else if(v_.value==std::numeric_limits<double>::infinity()){
+        stream << "inf(";
+      } else if(v_.value==-std::numeric_limits<double>::infinity()){
+        stream << "-inf(";
+      } else {
+        stream << "all_" << v_.value << "(";
+      }
+
+      // Print sparsity
+      sparsity().printCompact(stream);
       stream << ")";
     }
   }
 
 } // namespace CasADi
+/// \endcond
 
 
 #endif // CONSTANT_MX_HPP

@@ -31,7 +31,7 @@
 #include "../matrix/sparsity_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include "../casadi_options.hpp"
 
 using namespace std;
@@ -95,13 +95,13 @@ namespace CasADi{
           MX t = pd[c]*s;
           
           // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
-          if(!t.scalar() && t.shape() != dep(c).shape()){
+          if(!t.isScalar() && t.shape() != dep(c).shape()){
             if(pd[c].shape()!=s.shape()) pd[c] = MX(s.sparsity(),pd[c]);
             t = inner_prod(pd[c],s);
           }
           
           // Propagate the seeds
-          *adjSens[d][c] += t;
+          adjSens[d][c]->addToSum(t);
         }
       }
     }
@@ -152,8 +152,8 @@ namespace CasADi{
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX,ScY>::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
-    evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,itmp,rtmp);
+  void BinaryMX<ScX,ScY>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool ScX, bool ScY>

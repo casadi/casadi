@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 #include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
-//#include <symbolic/fx/jacobian.hpp>
+#include <symbolic/function/sx_function.hpp>
+//#include <symbolic/function/jacobian.hpp>
 
 #include <SnoptInterface.hpp>
 
@@ -18,7 +18,7 @@ main()
 {
 	//Matrix<SX>x = ssym("x", 2);
 	vector<SX>x = ssym("x", 2).data();
-	//vector<SXMatrix>x = ssym("x",2,1,1);
+	//vector<SX>x = ssym("x",2,1,1);
 
 	SX f;
 	vector<SX>g(2);
@@ -34,7 +34,7 @@ main()
 
 
 	vector<SX>fg(3);
-	//vector<SXMatrix>fg(3);
+	//vector<SX>fg(3);
 	fg[0] = f;
 	fg[1] = g[0];
 	fg[2] = g[1];

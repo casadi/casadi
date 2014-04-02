@@ -23,7 +23,7 @@
 #ifndef WORHP_INTERNAL_HPP
 #define WORHP_INTERNAL_HPP
 
-#include "symbolic/fx/nlp_solver_internal.hpp"
+#include "symbolic/function/nlp_solver_internal.hpp"
 
 // GCC_VERSION is defined in worhp.h
 #ifdef GCC_VERSION
@@ -35,6 +35,7 @@
 
 #include "worhp.h"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /**
@@ -44,7 +45,7 @@ namespace CasADi{
 
   public:
     // Constructor
-    explicit WorhpInternal(const FX& nlp);
+    explicit WorhpInternal(const Function& nlp);
 
     // Destructor
     virtual ~WorhpInternal();
@@ -69,10 +70,6 @@ namespace CasADi{
   
     /// Exact Hessian?
     bool exact_hessian_;
-
-    // Sparsity pattern of the transpose of jacG
-    CRSSparsity spJacG_T_;
-    std::vector<int> jacG_tmp_;
 
     OptVar    worhp_o_;
     Workspace worhp_w_;
@@ -121,4 +118,5 @@ namespace CasADi{
 
 } // namespace CasADi
 
+/// \endcond
 #endif //WORHP_INTERNAL_HPP

@@ -28,35 +28,41 @@
 using namespace std;
 namespace CasADi{
 
-ostream& operator<<(ostream &stream, const PrintableObject& obj){
-  obj.repr(stream);
-  return stream;
-}
+  ostream& operator<<(ostream &stream, const PrintableObject& obj){
+    obj.repr(stream);
+    return stream;
+  }
 
-void PrintableObject::repr(std::ostream &stream) const{
-  // Print description by default
-  print(stream);
-}
+  void PrintableObject::repr(std::ostream &stream) const{
+    // Print description by default
+    print(stream);
+  }
 
-void PrintableObject::print(std::ostream &stream) const{
-  // Print name by default
-  stream << typeid(this).name();
-}
+  void PrintableObject::print(std::ostream &stream) const{
+    // Print name by default
+    stream << typeid(this).name();
+  }
 
-string PrintableObject::getRepresentation() const{
-  stringstream ss;
-  repr(ss);
-  return ss.str();
-}
+  string str(const PrintableObject& obj){
+    stringstream ss;
+    obj.print(ss);
+    return ss.str();  
+  }
 
-string PrintableObject::getDescription() const{
-  stringstream ss;
-  print(ss);
-  return ss.str();  
-}
-
+  string repr(const PrintableObject& obj){
+    stringstream ss;
+    obj.repr(ss);
+    return ss.str();
+  }
     
+  std::string PrintableObject::getDescription() const{ 
+    return CasADi::str(*this);
+  }
+
+  std::string PrintableObject::getRepresentation() const{ 
+    return CasADi::repr(*this);
+  }
+
+
 } // namespace CasADi
     
-
-

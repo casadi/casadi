@@ -20,10 +20,10 @@
  *
  */
 
-#include "symbolic/stl_vector_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/external_function.hpp"
+#include "symbolic/std_vector_tools.hpp"
+#include "symbolic/function/sx_function.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/external_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/mx/mx_tools.hpp"
 #include <ctime>
@@ -33,7 +33,7 @@ using namespace std;
 using namespace CasADi;
 
 // Function to be called if the size reaches k
-FX det_n_min; 
+Function det_n_min; 
 int n_min;
 
 // Forward declaration
@@ -135,9 +135,9 @@ void test_sx(){
   int n=8;
   cout << "Testing pure SX only, n = " << n << endl;
   
-  SXMatrix x = ssym("x",n,n);
+  SX x = ssym("x",n,n);
   time1 = clock();
-  SXMatrix detx = det(x);
+  SX detx = det(x);
   time2 = clock();
   double t = double(time2 - time1)/CLOCKS_PER_SEC;
   cout << "time to create graph: " << (t*1e3) << " ms, " << endl;
@@ -163,7 +163,7 @@ void test_sx(){
 
   // Differentiating symbolically
   time1 = clock();
-  SXMatrix grad = f_nolive.grad();
+  SX grad = f_nolive.grad();
   time2 = clock();
   t = double(time2 - time1)/CLOCKS_PER_SEC;
   cout << "time to create gradient: " << (t*1e3) << " ms, " << (t*1e9/nops) << " ns per elementary operation" << endl;
@@ -273,9 +273,9 @@ void test_sx_mx(){
   
   int n=9;
   
-  SXMatrix x = ssym("x",n,n);
+  SX x = ssym("x",n,n);
   time1 = clock();
-  SXMatrix detx = det(x);
+  SX detx = det(x);
   time2 = clock();
   double t = double(time2 - time1)/CLOCKS_PER_SEC;
   cout << "time to create graph: " << (t*1e3) << " ms, " << endl;

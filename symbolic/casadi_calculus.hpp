@@ -35,6 +35,8 @@
 #define M_PI 3.14159265358979323846
 #endif // M_PI
 
+/// \cond INTERNAL
+
 namespace CasADi{
 
   /// Enum for quick access to any node
@@ -86,10 +88,16 @@ namespace CasADi{
     // Inner product
     OP_INNER_PROD,
 
-    // Vertical concatenation
+    // Horizontal concatenation
+    OP_HORZCAT,
+
+    // Vertical concatenation of vectors
     OP_VERTCAT,
 
-    // Vertical split
+    // Horizontal split
+    OP_HORZSPLIT,
+
+    // Vertical split of vectors
     OP_VERTSPLIT,
 
     // Reshape an expression
@@ -508,10 +516,10 @@ namespace CasADi{
 
   //@{
   /// If evaluated with the second argument zero, is the result zero?
-  template<int I> struct FX0Checker{ static const bool check=false;};
-  template<>      struct FX0Checker<OP_MUL>{ static const bool check=true;};
-  template<>      struct FX0Checker<OP_AND>{ static const bool check=true;};
-  template<>      struct FX0Checker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<int I> struct Function0Checker{ static const bool check=false;};
+  template<>      struct Function0Checker<OP_MUL>{ static const bool check=true;};
+  template<>      struct Function0Checker<OP_AND>{ static const bool check=true;};
+  template<>      struct Function0Checker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
   //@}
 
   //@{
@@ -924,5 +932,7 @@ namespace CasADi{
 #endif // SWIG
 
 } // namespace CasADi
+
+/// \endcond
 
 #endif //CASADI_CALCULUS_HPP

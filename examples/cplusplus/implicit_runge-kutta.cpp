@@ -45,11 +45,11 @@ int main(){
   int np = 1;
 
   // Declare variables
-  SXMatrix x  = ssym("x",nx);  // state
-  SXMatrix p  = ssym("u",np);  // control
+  SX x  = SX::sym("x",nx);  // state
+  SX p  = SX::sym("u",np);  // control
 
   // ODE right hand side function
-  SXMatrix ode;
+  SX ode;
   ode.append( (1 - x[1]*x[1])*x[0] - x[1] + p );
   ode.append( x[0]                            );
   ode.append( x[0]*x[0] + x[1]*x[1] + p*p     );
@@ -96,9 +96,9 @@ int main(){
   }
 
   // Total number of variables for one finite element
-  MX X0 = msym("X0",nx);
-  MX P  = msym("P",np);
-  MX V = msym("V",d*nx);
+  MX X0 = MX::sym("X0",nx);
+  MX P  = MX::sym("P",np);
+  MX V = MX::sym("V",d*nx);
   
   // Get the state at each collocation point
   vector<MX> X(1,X0);
@@ -180,13 +180,13 @@ int main(){
 
   // Make sure that both integrators give consistent results
   for(int integ=0; integ<2; ++integ){
-    FX integrator = integ==0 ? FX(irk_integrator) : FX(ref_integrator);
+    Function integrator = integ==0 ? Function(irk_integrator) : Function(ref_integrator);
     cout << "-------" << endl;
     cout << "Testing " << integrator.getOption("name") << endl;
     cout << "-------" << endl;
 
     // Generate a new function that calculates two forward directions and one adjoint direction
-    FX dintegrator = integrator.derivative(2,1);
+    Function dintegrator = integrator.derivative(2,1);
 
     // Pass arguments
     dintegrator.setInput(x0_val,"der_x0");

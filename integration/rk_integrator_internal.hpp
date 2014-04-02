@@ -26,13 +26,14 @@
 #include "rk_integrator.hpp"
 #include "fixed_step_integrator_internal.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
     
   class RKIntegratorInternal : public FixedStepIntegratorInternal{
   public:
   
     /// Constructor
-    explicit RKIntegratorInternal(const FX& f, const FX& g);
+    explicit RKIntegratorInternal(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -41,7 +42,7 @@ namespace CasADi{
     virtual RKIntegratorInternal* clone() const{ return new RKIntegratorInternal(*this);}
 
     /// Create a new integrator
-    virtual RKIntegratorInternal* create(const FX& f, const FX& g) const{ return new RKIntegratorInternal(f,g);}
+    virtual RKIntegratorInternal* create(const Function& f, const Function& g) const{ return new RKIntegratorInternal(f,g);}
   
     /// Destructor
     virtual ~RKIntegratorInternal();
@@ -55,5 +56,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //RK_INTEGRATOR_INTERNAL_HPP

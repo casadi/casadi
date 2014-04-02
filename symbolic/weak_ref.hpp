@@ -25,6 +25,8 @@
 
 #include "shared_object.hpp"
 
+
+/// \cond INTERNAL
 namespace CasADi{
 
   // Forward declaration

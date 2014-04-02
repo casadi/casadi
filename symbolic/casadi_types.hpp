@@ -31,23 +31,25 @@
 namespace CasADi{
   
   /// Forward declarations
-  class SX;
+  class SXElement;
   class MX;
   template<class T> class Matrix;
-  class FX;
-  class CRSSparsity;
+  class Function;
+  class Sparsity;
+  /// \cond INTERNAL
   template<class T> class LPStructIOSchemeVector;
-  typedef LPStructIOSchemeVector<CRSSparsity> LPStructure;
   template<class T> class QPStructIOSchemeVector;
-  typedef QPStructIOSchemeVector<CRSSparsity> QPStructure;
   template<class T> class QCQPStructIOSchemeVector;
-  typedef QCQPStructIOSchemeVector<CRSSparsity> QCQPStructure;
   template<class T> class SDPStructIOSchemeVector;
-  typedef SDPStructIOSchemeVector<CRSSparsity> SDPStructure;
   template<class T> class SOCPStructIOSchemeVector;
-  typedef SOCPStructIOSchemeVector<CRSSparsity> SOCPStructure;
   template<class T> class SDQPStructIOSchemeVector;
-  typedef SDQPStructIOSchemeVector<CRSSparsity> SDQPStructure;
+  /// \endcond
+  typedef LPStructIOSchemeVector<Sparsity> LPStructure;
+  typedef QPStructIOSchemeVector<Sparsity> QPStructure;
+  typedef QCQPStructIOSchemeVector<Sparsity> QCQPStructure;
+  typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
+  typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
+  typedef SDQPStructIOSchemeVector<Sparsity> SDQPStructure;
   class NLPSolver;
   class LinearSolver;
   class Integrator;
@@ -66,16 +68,16 @@ namespace CasADi{
   class CustomFunction;
   
   /// Function pointer to a nonlinear solver creator function
-  typedef NLPSolver (*NLPSolverCreator)(const FX& nlp);
+  typedef NLPSolver (*NLPSolverCreator)(const Function& nlp);
 
   /// Function pointer to a linear solver creator function
-  typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity, int nrhs);
+  typedef LinearSolver (*linearSolverCreator)(const Sparsity& sparsity, int nrhs);
   
   /// Function pointer to a LP solver creator function
   typedef LPSolver (*LPSolverCreator)(const LPStructure& st);
 
   /// Function pointer to an integrator creator function
-  typedef Integrator (*integratorCreator)(const FX& f, const FX& g);
+  typedef Integrator (*integratorCreator)(const Function& f, const Function& g);
 
   /// Function pointer to a QP solver creator function
   typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
@@ -96,7 +98,7 @@ namespace CasADi{
   typedef SOCPSolver (*SOCPSolverCreator)(const SOCPStructure& st);
   
   /// Function pointer to an implicit function creator
-  typedef ImplicitFunction (*implicitFunctionCreator)(const FX& f, const FX& jac, const LinearSolver& linsol);
+  typedef ImplicitFunction (*implicitFunctionCreator)(const Function& f, const Function& jac, const LinearSolver& linsol);
   
   
 #ifndef SWIG

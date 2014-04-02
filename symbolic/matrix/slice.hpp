@@ -31,7 +31,10 @@
 
 namespace CasADi{
   
-  /** Class representing a slice
+  /** \brief Class representing a Slice
+   *
+   * Note that Python or Octave do not need to use this class.
+   * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
    */
   class Slice : public PrintableObject{
   public:
@@ -84,24 +87,7 @@ namespace CasADi{
   static Slice ALL;
 #endif // SWIG
   
-  /** Class representing a set of indices of arbitrary order */
-  class IndexSet{
-  public:
-    
-    /// A single element
-    IndexSet(int i);
-    
-    /// A set of indices
-    IndexSet(const std::vector<int>& v);
-    
-    /// Get a vector of indices
-    const std::vector<int>& getAll(int len) const;
-    
-    /// Data members (all public)
-    std::vector<int> v_;
-  };
-  
-  
+  /// \cond INTERNAL
   /**  Class representing a non-regular (and thus non-slice) index list 
    */
   class IndexList{
@@ -124,6 +110,7 @@ namespace CasADi{
     std::vector<int> iv;
     Type type;
   };
+  /// \endcond
   
 } // namespace CasADi
 

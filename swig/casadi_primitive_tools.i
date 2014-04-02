@@ -74,15 +74,15 @@ except:
 // Instantiate the functions
 MATRIX_TOOLS_TEMPLATES(int)
 MATRIX_TOOLS_TEMPLATES(double)
-MATRIX_TOOLS_TEMPLATES(CasADi::SX)
+MATRIX_TOOLS_TEMPLATES(CasADi::SXElement)
 
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<int>)
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<double>)
-GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<CasADi::SX>)
+GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<CasADi::SXElement>)
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::MX)
 
 GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(CasADi::Matrix<double>)
-GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(CasADi::Matrix<CasADi::SX>)
+GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(CasADi::Matrix<CasADi::SXElement>)
 GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(CasADi::MX)
 
 
@@ -90,9 +90,9 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(int)
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(double)
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::Matrix<int>)
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::Matrix<double>)
-GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::Matrix<CasADi::SX>)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::Matrix<CasADi::SXElement>)
 GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::MX)
-GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::SX)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::SXElement)
 
 // Sparsity tools
 %{
@@ -100,20 +100,8 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::SX)
 %}
 %include "symbolic/matrix/sparsity_tools.hpp"
 
-// SX tools
+// SXElement tools
 %include "symbolic/sx/sx_tools.hpp"
-
-#ifdef SWIGPYTHON
-%{
-template<> swig_type_info** meta< std::pair< CasADi::MX, std::vector< CasADi::MX> > >::name = &SWIGTYPE_p_std__pairT_CasADi__MX_std__vectorT_CasADi__MX_std__allocatorT_CasADi__MX_t_t_t;
-%}
-
-%meta_pair(CasADi::MX, std::vector< CasADi::MX >)
-%typemap(out) std::pair< CasADi::MX, std::vector< CasADi::MX >  > {
-    bool ret = meta< std::pair< CasADi::MX, std::vector< CasADi::MX >  > >::toPython($1,$result);
-    if (!ret) SWIG_exception_fail(SWIG_TypeError,"Could not convert to (MX,std::vector<MX>)");
-}
-#endif //SWIGPYTHON
 
 
 %include "symbolic/mx/mx_tools.hpp"

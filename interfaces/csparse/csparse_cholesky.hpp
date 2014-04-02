@@ -23,11 +23,11 @@
 #ifndef CSPARSE_CHOLESKY_HPP
 #define CSPARSE_CHOLESKY_HPP
 
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
 namespace CasADi{
 
-  
+
 /** \brief  Forward declaration of internal class */
 class CSparseCholeskyInternal;
 
@@ -35,7 +35,7 @@ class CSparseCholeskyInternal;
 *
  @copydoc LinearSolver_doc
 *  
-* CSparseCholesky is an CasADi::FX mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+* CSparseCholesky is an CasADi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
 *
 *  A = LL'
 *    Ax = b
@@ -60,7 +60,7 @@ public:
   CSparseCholesky();
   
   /// Create a linear solver given a sparsity pattern
-  CSparseCholesky(const CRSSparsity& sp, int nrhs=1);
+  CSparseCholesky(const Sparsity& sp, int nrhs=1);
   
   /** \brief  Access internal functions and data members */
   CSparseCholeskyInternal* operator->();
@@ -75,7 +75,7 @@ public:
   void solveL(double* x, int nrhs, bool transpose);
   
   /// Obtain a symbolic Cholesky factorization
-  CRSSparsity getFactorizationSparsity(bool transpose=false) const;
+  Sparsity getFactorizationSparsity(bool transpose=false) const;
   
   /// Obtain a numeric Cholesky factorization
   DMatrix getFactorization(bool transpose=false) const;
@@ -84,7 +84,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static LinearSolver creator(const CRSSparsity& sp){ return CSparseCholesky(sp);}
+  static LinearSolver creator(const Sparsity& sp, int rhs){ return CSparseCholesky(sp, rhs);}
   #ifdef SWIG
   %nocallback;
   #endif

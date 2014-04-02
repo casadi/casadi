@@ -21,16 +21,15 @@
  */
 
 #include "direct_single_shooting_internal.hpp"
-#include "../symbolic/fx/integrator.hpp"
+#include "../symbolic/function/integrator.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
-#include "../symbolic/stl_vector_tools.hpp"
-#include "../symbolic/fx/fx_tools.hpp"
+#include "../symbolic/std_vector_tools.hpp"
 
 using namespace std;
 namespace CasADi{
     
-DirectSingleShootingInternal::DirectSingleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
+DirectSingleShootingInternal::DirectSingleShootingInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to CasADi::Parallelizer");
   addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
@@ -47,7 +46,7 @@ void DirectSingleShootingInternal::init(){
 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
-  integrator_ = integrator_creator(ffcn_,FX());
+  integrator_ = integrator_creator(ffcn_,Function());
   if(hasSetOption("integrator_options")){
     integrator_.setOption(getOption("integrator_options"));
   }
@@ -75,7 +74,7 @@ void DirectSingleShootingInternal::init(){
   // .....
   // nx x 1  (controls in interval i=nk-1)
   
-  MX V = msym("V",NV);
+  MX V = MX::sym("V",NV);
   int offset = 0;
 
   // Global parameters
@@ -305,9 +304,9 @@ void DirectSingleShootingInternal::evaluate(){
 void DirectSingleShootingInternal::reportConstraints(std::ostream &stream) { 
   stream << "Reporting DirectSingleShooting constraints" << endl;
  
-  CasADi::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
-  CasADi::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
-  CasADi::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
+  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
+  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
+  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
  
 }
 

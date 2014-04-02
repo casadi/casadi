@@ -23,9 +23,10 @@
 #ifndef NLP_QP_INTERNAL_HPP
 #define NLP_QP_INTERNAL_HPP
 
-#include "symbolic/fx/qp_solver_internal.hpp"
-#include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/function/qp_solver_internal.hpp"
+#include "symbolic/function/nlp_solver.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for NLPQPInternal
@@ -42,7 +43,7 @@ public:
   virtual NLPQPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit NLPQPInternal(const std::vector<CRSSparsity> &st);
+  explicit NLPQPInternal(const std::vector<Sparsity> &st);
 
   /** \brief  Destructor */
   virtual ~NLPQPInternal();
@@ -58,6 +59,6 @@ public:
 };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //NLP_QP_INTERNAL_HPP
 

@@ -28,16 +28,16 @@ namespace CasADi{
   CSparse::CSparse(){
   }
 
-  CSparse::CSparse(const CRSSparsity& sp, int nrhs){
+  CSparse::CSparse(const Sparsity& sp, int nrhs){
     assignNode(new CSparseInternal(sp,nrhs));
   }
  
   CSparseInternal* CSparse::operator->(){
-    return static_cast<CSparseInternal*>(FX::operator->());
+    return static_cast<CSparseInternal*>(Function::operator->());
   }
 
   const CSparseInternal* CSparse::operator->() const{
-    return static_cast<const CSparseInternal*>(FX::operator->());
+    return static_cast<const CSparseInternal*>(Function::operator->());
   }
   
   bool CSparse::checkNode() const{

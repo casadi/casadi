@@ -24,14 +24,13 @@
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/sx/sx_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
-#include "../symbolic/fx/fx_tools.hpp"
-#include "../symbolic/stl_vector_tools.hpp"
-#include "../symbolic/fx/integrator.hpp"
+#include "../symbolic/std_vector_tools.hpp"
+#include "../symbolic/function/integrator.hpp"
 
 using namespace std;
 namespace CasADi{
     
-DirectCollocationInternal::DirectCollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
+DirectCollocationInternal::DirectCollocationInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("nlp_solver",                       OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("interpolation_order",          OT_INTEGER,  3,  "Order of the interpolating polynomials");
@@ -62,21 +61,21 @@ void DirectCollocationInternal::init(){
   vector<vector<MX> > C(deg_+1,vector<MX>(deg_+1));
 
   // Coefficients of the collocation equation as DMatrix
-  DMatrix C_num = DMatrix(deg_+1,deg_+1,0);
+  DMatrix C_num = DMatrix::zeros(deg_+1,deg_+1);
 
   // Coefficients of the continuity equation
   vector<MX> D(deg_+1);
 
   // Coefficients of the collocation equation as DMatrix
-  DMatrix D_num = DMatrix(deg_+1,1,0);
+  DMatrix D_num = DMatrix::zeros(deg_+1);
 
   // Collocation point
-  SXMatrix tau = ssym("tau");
+  SX tau = SX::sym("tau");
 
   // For all collocation points
   for(int j=0; j<deg_+1; ++j){
     // Construct Lagrange polynomials to get the polynomial basis at the collocation point
-    SXMatrix L = 1;
+    SX L = 1;
     for(int j2=0; j2<deg_+1; ++j2){
       if(j2 != j){
         L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
@@ -93,7 +92,7 @@ void DirectCollocationInternal::init(){
     D_num(j) = lfcn.output();
 
     // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
-    FX tfcn = lfcn.tangent();
+    Function tfcn = lfcn.tangent();
     tfcn.init();
     for(int j2=0; j2<deg_+1; ++j2){
       tfcn.setInput(tau_root[j2]);
@@ -122,7 +121,7 @@ void DirectCollocationInternal::init(){
   nlp_nx += nx_;                       // Final state
 
   // NLP variable vector
-  MX nlp_x = msym("x",nlp_nx);
+  MX nlp_x = MX::sym("x",nlp_nx);
   int offset = 0;
 
   // Get collocated states and parametrized control
@@ -383,9 +382,9 @@ void DirectCollocationInternal::evaluate(){
 void DirectCollocationInternal::reportConstraints(std::ostream &stream) { 
   stream << "Reporting Collocation constraints" << endl;
  
-  CasADi::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
-  CasADi::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
-  CasADi::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
+  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
+  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
+  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
  
 }
 

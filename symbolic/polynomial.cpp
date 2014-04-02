@@ -21,7 +21,7 @@
  */
 
 #include "polynomial.hpp"
-#include "stl_vector_tools.hpp"
+#include "std_vector_tools.hpp"
 #include <sstream>
 
 using namespace std;

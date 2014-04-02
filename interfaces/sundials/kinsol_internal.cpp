@@ -21,15 +21,15 @@
  */
 
 #include "kinsol_internal.hpp"
-#include "symbolic/fx/sx_function_internal.hpp"
-#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/function/sx_function_internal.hpp"
+#include "symbolic/std_vector_tools.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/linear_solver_internal.hpp"
+#include "symbolic/function/linear_solver_internal.hpp"
 
 using namespace std;
 namespace CasADi{
 
-  KinsolInternal::KinsolInternal(const FX& f, const FX& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
+  KinsolInternal::KinsolInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
     addOption("max_iter",                 OT_INTEGER, 0, "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
     addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
     addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");
@@ -311,7 +311,7 @@ namespace CasADi{
         if(verbose()){
           ss << "u = " << f_.input(iin_) << endl;
                 
-          // Print the expression for f[Jrow] if f is an SXFunction instance
+          // Print the expression for f[Jcol] if f is an SXFunction instance
           SXFunction f_sx = shared_cast<SXFunction>(f_);
           if(!f_sx.isNull()){
             f_sx.print(ss);
@@ -370,19 +370,19 @@ namespace CasADi{
     }
   
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac_.output().rowind();
-    const vector<int>& col = jac_.output().col();
+    const vector<int>& colind = jac_.output().colind();
+    const vector<int>& row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over columns
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        // Get column
-        int j = col[el];
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        // Get row
+        int rr = row[el];
       
         // Set the element
-        DENSE_ELEM(J,i,j) = val[el];
+        DENSE_ELEM(J,rr,cc) = val[el];
       }
     }
   
@@ -421,20 +421,20 @@ namespace CasADi{
     jac_.evaluate();
   
     // Get sparsity and non-zero elements
-    const vector<int>& rowind = jac_.output().rowind();
-    const vector<int>& col = jac_.output().col();
+    const vector<int>& colind = jac_.output().colind();
+    const vector<int>& row = jac_.output().row();
     const vector<double>& val = jac_.output().data();
 
-    // Loop over rows
-    for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over cols
+    for(int cc=0; cc<colind.size()-1; ++cc){
       // Loop over non-zero entries
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){
-        // Get column
-        int j = col[el];
+      for(int el=colind[cc]; el<colind[cc+1]; ++el){
+        // Get row
+        int rr = row[el];
       
         // Set the element
-        if(i-j>=-mupper && i-j<=mlower)
-          BAND_ELEM(J,i,j) = val[el];
+        if(rr-cc>=-mupper && rr-cc<=mlower)
+          BAND_ELEM(J,rr,cc) = val[el];
       }
     }
   
@@ -521,11 +521,11 @@ namespace CasADi{
           // Print inputs
           ss << "Input vector is " << jac_.input().data() << endl;
                 
-          // Get the row
-          int Jrow = jac_.output().sparsity().getRow().at(k);
-
           // Get the column
-          int Jcol = jac_.output().sparsity().col(k);
+          int Jcol = jac_.output().sparsity().getCol().at(k);
+
+          // Get the row
+          int Jrow = jac_.output().sparsity().row(k);
                 
           // Which equation
           ss << "This corresponds to the derivative of equation " << Jrow << " with respect to the variable " << Jcol << "." << endl;
@@ -580,7 +580,7 @@ namespace CasADi{
     time1_ = clock();
 
     // Solve the factorized system 
-    linsol_.solve(NV_DATA_S(v),1,true);
+    linsol_.solve(NV_DATA_S(v),1,false);
   
     // Log time duration
     time2_ = clock();

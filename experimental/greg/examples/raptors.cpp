@@ -23,10 +23,10 @@
 #include <iostream>
 #include <cstdlib>
 
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 #include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
-//#include <symbolic/fx/jacobian.hpp>
+#include <symbolic/function/sx_function.hpp>
+//#include <symbolic/function/jacobian.hpp>
 
 
 #include "Ode.hpp"
@@ -253,10 +253,10 @@ main()
 
 
 	// join stages
-	SXMatrix x0finish = r0.getStateMat ( r0.N - 1 );
-	SXMatrix u0finish = r0.getActionMat( r0.N - 1 );
-	SXMatrix x1start = r1.getStateMat ( 0 );
-	SXMatrix u1start = r1.getActionMat( 0 );
+	SX x0finish = r0.getStateMat ( r0.N - 1 );
+	SX u0finish = r0.getActionMat( r0.N - 1 );
+	SX x1start = r1.getStateMat ( 0 );
+	SX u1start = r1.getActionMat( 0 );
 
 	ocp.addNonlconEq( x0finish - x1start );
 	ocp.addNonlconEq( u0finish - u1start );

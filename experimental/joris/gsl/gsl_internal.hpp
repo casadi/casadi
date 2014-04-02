@@ -24,8 +24,8 @@
 #define GSL_INTERNAL_HPP
 
 #include "gsl_integrator.hpp"
-#include "symbolic/fx/integrator_internal.hpp"
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/integrator_internal.hpp"
+#include "symbolic/function/linear_solver.hpp"
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_odeiv.h>
@@ -42,13 +42,13 @@ class GslInternal : public IntegratorInternal{
   friend class GslIntegrator;
 public:
   /** \brief  Constructor */
-  explicit GslInternal(const FX& f, const FX& q);
+  explicit GslInternal(const Function& f, const Function& q);
 
   /** \brief  Clone */
   virtual GslInternal* clone() const;
   
   /** \brief  Create a new integrator */
-  virtual GslInternal* create(const FX& f, const FX& q) const{ return new GslInternal(f,q);}
+  virtual GslInternal* create(const Function& f, const Function& q) const{ return new GslInternal(f,q);}
 
   /** \brief  Destructor */
   virtual ~GslInternal();
@@ -72,13 +72,13 @@ public:
   virtual void integrateAdj(double t_out);
 
   /// Nothing to see here
-  virtual FX getJacobian();
+  virtual Function getJacobian();
   
   /// Get the Linear solver
   virtual LinearSolver getLinearSolver();
 
   // Set linear solver
-  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
+  virtual void setLinearSolver(const LinearSolver& linsol, const Function& jac);
   
   protected:
 
@@ -107,10 +107,10 @@ public:
   static std::map<int,std::string> flagmap;
   
   // The jacobian of the ODE rhs fcn
-  FX jac_f_;
+  Function jac_f_;
   
   // The time derivative of the rhs fcn
-  FX dt_f_;
+  Function dt_f_;
   
   // For timings
   clock_t time1, time2;

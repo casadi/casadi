@@ -33,8 +33,8 @@
 namespace CasADi{
 
   /// Transpose of a matrix
-  template<class T>
-  Matrix<T> trans(const Matrix<T> &x);
+  template<typename DataType>
+  Matrix<DataType> transpose(const Matrix<DataType> &x);
 
   /** \brief  Matrix product of two matrices
    *
@@ -42,99 +42,47 @@ namespace CasADi{
    * A typical use case might be where the product is only constructed to 
    * inspect the trace of it. sp_z diagonal will be more efficient then. 
    */
-  template<class T>
-  Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y, const CRSSparsity& sp_z=CRSSparsity());
+  template<typename DataType>
+  Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y, const Sparsity& sp_z=Sparsity());
 
   /// Matrix product of n matrices
-  template<class T>
-  Matrix<T> mul(const std::vector< Matrix<T> > &args);
+  template<typename DataType>
+  Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args);
 
-  /** \brief  check if the matrix is constant (note that false negative answers are possible)*/
-  template<class T>
-  bool isConstant(const Matrix<T>& ex);
+  template<typename DataType>
+  DataType det(const Matrix<DataType>& a);
 
-  template<class T>
-  bool isDense(const Matrix<T>& ex);
+  template<typename DataType>
+  DataType getMinor(const Matrix<DataType> &x, int i, int j);
 
-  template<class T>
-  bool isEmpty(const Matrix<T>& ex);
+  template<typename DataType>
+  DataType cofactor(const Matrix<DataType> &x, int i, int j);
 
-  template<class T>
-  bool isInteger(const Matrix<T>& ex);
+  template<typename DataType>
+  Matrix<DataType> adj(const Matrix<DataType>& a);
 
-  template<class T>
-  bool isScalar(const Matrix<T>& ex);
+  template<typename DataType>
+  Matrix<DataType> inv(const Matrix<DataType>& a);
 
-  //{@
-  /// Checks if vector does not contain NaN or Inf
-  bool isRegular(const Matrix<int>& ex);
-  bool isRegular(const Matrix<double>& ex);
-  //@}
+  template<typename DataType>
+  Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol);
 
-  template<class T>
-  bool isVector(const Matrix<T>& ex);
+  template<typename DataType>
+  Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int,int> rc);
 
-  /** \brief  Check if a matrix is lower triangular (complexity ~ A.size1()) */
-  template<class T>
-  bool isTril(const Matrix<T> &A);
+  template<typename DataType>
+  Matrix<DataType> reshape(const Matrix<DataType>& a, const Sparsity& sp);
 
-  /** \brief  Check if a matrix is upper triangular (complexity ~ A.size1()) */
-  template<class T>
-  bool isTriu(const Matrix<T> &A);
-
-  template<class T>
-  T det(const Matrix<T>& a);
-
-  template<class T>
-  T getMinor(const Matrix<T> &x, int i, int j);
-
-  template<class T>
-  T cofactor(const Matrix<T> &x, int i, int j);
-
-  template<class T>
-  Matrix<T> adj(const Matrix<T>& a);
-
-  template<class T>
-  Matrix<T> inv(const Matrix<T>& a);
-
-  template<class T>
-  Matrix<T> reshape(const Matrix<T>& a, int n, int m);
-
-  template<class T>
-  Matrix<T> reshape(const Matrix<T>& a, const std::vector<int> sz);
-
-  template<class T>
-  Matrix<T> reshape(const Matrix<T>& a, const CRSSparsity& sp);
-
-  template<class T>
-  T trace(const Matrix<T>& a);
+  template<typename DataType>
+  DataType trace(const Matrix<DataType>& a);
 
   /** \brief  make a vector
-      Reshapes/vectorizes the Matrix<T> such that the shape becomes (expr.numel(),1).
+      Reshapes/vectorizes the Matrix<DataType> such that the shape becomes (expr.numel(),1).
       Columns are stacked on top of each other.
-      Same as reshape(trans(expr), expr.numel(),1)
-  
-      a b \n
-      c d \n
-    
-      turns into
-    
-      a \n
-      c \n
-      b \n
-      d \n
-    
-  */
-  template<class T>
-  Matrix<T> vec(const Matrix<T>& a);
-
-  /** \brief  make a vector
-      Flattens the Matrix<T> such that the shape becomes (expr.numel(),1).
-      Transposed rows are stacked on top of each other.
       Same as reshape(expr, expr.numel(),1)
   
-      a b \n
-      c d \n
+      a c \n
+      b d \n
     
       turns into
     
@@ -144,80 +92,75 @@ namespace CasADi{
       d \n
     
   */
-  template<class T>
-  Matrix<T> flatten(const Matrix<T>& a);
+  template<typename DataType>
+  Matrix<DataType> vec(const Matrix<DataType>& a);
 
   /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
    */
-  template<class T>
-  Matrix<T> vecNZ(const Matrix<T>& a);
-
-  /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
-   */
-  template<class T>
-  Matrix<T> flattenNZ(const Matrix<T>& a);
+  template<typename DataType>
+  Matrix<DataType> vecNZ(const Matrix<DataType>& a);
 
   /** \brief Construct a matrix from a list of list of blocks.
    */
-  template<class T>
-  Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v);
+  template<typename DataType>
+  Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
 
 #ifndef SWIG
   /** \brief Construct a matrix from 4 blocks
    */
-  template<class T>
-  Matrix<T> blockcat(const Matrix<T> &A,const Matrix<T> &B,const Matrix<T> &C,const Matrix<T> &D);
+  template<typename DataType>
+  Matrix<DataType> blockcat(const Matrix<DataType> &A,const Matrix<DataType> &B,const Matrix<DataType> &C,const Matrix<DataType> &D);
 #endif // SWIG
 
   /** \brief Concatenate a list of matrices vertically
    * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
    *
-   *   vertcat(vertsplit(x,...)) = x
+   *   horzcat(horzsplit(x,...)) = x
    */
-  template<class T>
-  Matrix<T> vertcat(const std::vector<Matrix<T> > &v);
+  template<typename DataType>
+  Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
 
-  /** \brief  split vertically, retaining groups of rows
-   * \param offset List of all start rows for each group
-   *      the last row group will run to the end.
+  /** \brief  split vertically, retaining groups of cols
+   * \param offset List of all start cols for each group
+   *      the last col group will run to the end.
    *
-   *   vertcat(vertsplit(x,...)) = x
+   *   horzcat(horzsplit(x,...)) = x
    */
-  template<class T>
-  std::vector<Matrix<T> > vertsplit(const Matrix<T> &v, const std::vector<int>& offset);
+  template<typename DataType>
+  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset);
 
-  /** \brief  split vertically, retaining fixed-sized groups of rows
-   * \param incr Size of each group of rows
+  /** \brief  split vertically, retaining fixed-sized groups of cols
+   * \param incr Size of each group of cols
    *
-   *   vertcat(vertsplit(x,...)) = x
+   *   horzcat(horzsplit(x,...)) = x
    */
-  template<class T>
-  std::vector<Matrix<T> > vertsplit(const Matrix<T> &v, int incr=1);
+  template<typename DataType>
+  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1);
 
   /** \brief Concatenate a list of matrices horizontally
    * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
    *
-   *   horzcat(horzsplit(x,...)) = x
+   *   vertcat(vertsplit(x,...)) = x
    */
-  template<class T>
-  Matrix<T> horzcat(const std::vector<Matrix<T> > &v);
+  template<typename DataType>
+  Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
 
-  /** \brief  split horizontally, retaining groups of columns
-   * \param output_offset List of all start columns for each group
-   *      the last column group will run to the end.
+  /** \brief  split horizontally, retaining groups of rows
+   * \param output_offset List of all start rows for each group
+   *      the last row group will run to the end.
    *
-   *   horzcat(horzsplit(x,...)) = x
+   *   vertcat(vertsplit(x,...)) = x
    */
-  template<class T>
-  std::vector<Matrix<T> > horzsplit(const Matrix<T> &v, const std::vector<int>& offset);
+  template<typename DataType>
+  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, const std::vector<int>& offset);
 
-  /** \brief  split horizontally, retaining fixed-sized groups of columns
-   * \param incr Size of each group of columns
+  /** \brief  split horizontally, retaining fixed-sized groups of rows
+   * \param incr Size of each group of rows
    *
-   *   horzcat(horzsplit(x,...)) = x
+   *   vertcat(vertsplit(x,...)) = x
    */
-  template<class T>
-  std::vector<Matrix<T> > horzsplit(const Matrix<T> &v, int incr=1);
+  template<typename DataType>
+  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, int incr=1);
 
 
   /** \brief  chop up into blocks
@@ -226,8 +169,8 @@ namespace CasADi{
    *
    *   blockcat(blocksplit(x,...,...)) = x
    */
-  template<class T>
-  std::vector< std::vector< Matrix<T> > > blocksplit(const Matrix<T>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
+  template<typename DataType>
+  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
 
   /** \brief  chop up into blocks
    * \brief vert_incr Defines the increment for block boundaries in row dimension
@@ -235,33 +178,24 @@ namespace CasADi{
    *
    *   blockcat(blocksplit(x,...,...)) = x
    */
-  template<class T>
-  std::vector< std::vector< Matrix<T> > > blocksplit(const Matrix<T>& x, int vert_incr = 1, int horz_incr = 1);
+  template<typename DataType>
+  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, int vert_incr = 1, int horz_incr = 1);
 
 #ifndef SWIG
-  template<class T>
-  Matrix<T> vertcat(const Matrix<T> &x, const Matrix<T> &y);
+  template<typename DataType>
+  Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
 
-  template<class T>
-  Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y);
+  template<typename DataType>
+  Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
 #endif // SWIG
 
-  template<class T>
+  template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vec */
-  Matrix<T> veccat(const std::vector< Matrix<T> >& comp);
-  
+  Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp);
 
-  template<class T>
-  /** \brief  concatenate vertically while vectorizing all arguments with flatten */
-  Matrix<T> flattencat(const std::vector< Matrix<T> >& comp);
-
-  template<class T>
+  template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
-  Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp);
-  
-  template<class T>
-  /** \brief  concatenate vertically while vectorizing all arguments with flattenNZ */
-  Matrix<T> flattenNZcat(const std::vector< Matrix<T> >& comp);
+  Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp);
 
   /** \brief Inner product of two matrices
       Equals
@@ -270,28 +204,28 @@ namespace CasADi{
       \endcode
       with x and y matrices of the same dimension
   */
-  template<class T>
-  Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y); // inner product
+  template<typename DataType>
+  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y); // inner product
 
   /** \brief Outer product of two vectors
       Equals
       \code
-      x*trans(y)
+      x*transpose(y)
       \endcode
       with x and y vectors
   */
-  template<class T>
-  Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y);
+  template<typename DataType>
+  Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y);
 
   /** \brief  QR factorization using the modified Gram-Schmidt algorithm 
-   * More stable than the classical Gram-Schmidt, but may break down if the columns of A are nearly linearly dependent
+   * More stable than the classical Gram-Schmidt, but may break down if the rows of A are nearly linearly dependent
    * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.). 
    * Note that in SWIG, Q and R are returned by value. */
-  template<class T>
+  template<typename DataType>
 #ifndef SWIG
-  void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T>& R);
+  void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R);
 #else // SWIG
-  void qr(const Matrix<T>& A, Matrix<T>& OUTPUT, Matrix<T>& OUTPUT);
+  void qr(const Matrix<DataType>& A, Matrix<DataType>& OUTPUT, Matrix<DataType>& OUTPUT);
 #endif
 
   /** \brief Computes the nullspace of a matrix A
@@ -303,8 +237,8 @@ namespace CasADi{
   *
   * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
   */
-  template<class T>
-  Matrix<T> nullspace(const Matrix<T>& A);
+  template<typename DataType>
+  Matrix<DataType> nullspace(const Matrix<DataType>& A);
 
   /** \brief  Solve a system of equations: A*x = b 
       The solve routine works similar to Matlab's backslash when A is square and nonsingular. The algorithm
@@ -323,8 +257,8 @@ namespace CasADi{
       if there are multiple BLT blocks.
   
   */
-  template<class T>
-  Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b);
+  template<typename DataType>
+  Matrix<DataType> solve(const Matrix<DataType>& A, const Matrix<DataType>& b);
   
   /** \brief Computes the Moore-Penrose pseudo-inverse
   * 
@@ -332,8 +266,8 @@ namespace CasADi{
   * If the matrix A is slender (size1<size2), mul(pinv(A),A) is unity.
   *
   */
-  template<class T>
-  Matrix<T> pinv(const Matrix<T>& A);
+  template<typename DataType>
+  Matrix<DataType> pinv(const Matrix<DataType>& A);
   
   /** \brief Solve a system of equations: A*x = b 
   */
@@ -342,8 +276,8 @@ namespace CasADi{
   
   /** \brief Computes the Moore-Penrose pseudo-inverse
   * 
-  * If the matrix A is fat (size2>size1), mul(A,pinv(A)) is unity.
-  * If the matrix A is slender (size1<size2), mul(pinv(A),A) is unity.
+  * If the matrix A is fat (size1>size2), mul(A,pinv(A)) is unity.
+  * If the matrix A is slender (size2<size1), mul(pinv(A),A) is unity.
   *
   */
   Matrix<double> pinv(const Matrix<double>& A,linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
@@ -352,157 +286,125 @@ namespace CasADi{
   *
   * Creates a block matrix in which each element (i,j) is a_ij*b 
   */
-  template<class T>
-  Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b);
-
-  /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
-  template<class T>
-  bool isZero(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
-  template<class T>
-  bool isOne(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
-  template<class T>
-  bool isMinusOne(const Matrix<T>& ex);
-
-  /** \brief  check if the matrix is an identity matrix (note that false negative answers are possible)*/
-  template<class T>
-  bool isIdentity(const Matrix<T>& ex);
-
-  template<class T>
-  int nnz(const Matrix<T>& ex);
-
-  template<class T>
-  int nnz_sym(const Matrix<T>& ex);
-
-  /** \brief Check if two expressions are equal
-   *
-   *  Might very well give false negatives
-   *
-   *   Note: does not work when CasadiOptions.setSimplificationOnTheFly(False) was called
-   */
-  template<class T>
-  bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2);
+  template<typename DataType>
+  Matrix<DataType> kron(const Matrix<DataType>& a, const Matrix<DataType>& b);
 
   /** \brief  Frobenius norm  */
-  template<class T>
-  Matrix<T> norm_F(const Matrix<T> &x);
+  template<typename DataType>
+  Matrix<DataType> norm_F(const Matrix<DataType> &x);
 
   /** \brief  2-norm  */
-  template<class T>
-  Matrix<T> norm_2(const Matrix<T> &x);
+  template<typename DataType>
+  Matrix<DataType> norm_2(const Matrix<DataType> &x);
 
   /** \brief 1-norm  */
-  template<class T>
-  Matrix<T> norm_1(const Matrix<T> &x);
+  template<typename DataType>
+  Matrix<DataType> norm_1(const Matrix<DataType> &x);
 
   /** \brief Infinity-norm */
-  template<class T>
-  Matrix<T> norm_inf(const Matrix<T> &x);
+  template<typename DataType>
+  Matrix<DataType> norm_inf(const Matrix<DataType> &x);
 
   /// Return summation of all elements
-  template<class T>
-  Matrix<T> sumAll(const Matrix<T> &x); 
+  template<typename DataType>
+  Matrix<DataType> sumAll(const Matrix<DataType> &x); 
+
+  /** \brief Return a col-wise summation of elements */
+  template<typename DataType>
+  Matrix<DataType> sumCols(const Matrix<DataType> &x);
 
   /** \brief Return a row-wise summation of elements */
-  template<class T>
-  Matrix<T> sumRows(const Matrix<T> &x);
-
-  /** \brief Return a column-wise summation of elements */
-  template<class T>
-  Matrix<T> sumCols(const Matrix<T> &x);
+  template<typename DataType>
+  Matrix<DataType> sumRows(const Matrix<DataType> &x);
 
 #ifdef SWIG
   /// Returns true only if every element in the matrix is true
-  template<class T>
-  T all(const Matrix<T> &x); 
+  template<typename DataType>
+  DataType all(const Matrix<DataType> &x); 
 
   /// Returns true if any element in the matrix is true
-  template<class T>
-  T any(const Matrix<T> &x); 
+  template<typename DataType>
+  DataType any(const Matrix<DataType> &x); 
 #endif //SWIG
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
-  template<class T>
-  Matrix<T> repmat(const Matrix<T> &A, int n, int m);
+  template<typename DataType>
+  Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m);
 
   /** \brief  Evaluate a polynomial with coefficeints p in x */
-  template<class T>
-  Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x);
+  template<typename DataType>
+  Matrix<DataType> polyval(const Matrix<DataType>& p, const Matrix<DataType>& x);
 
   /** \brief   Get the diagonal of a matrix or construct a diagonal
       When the input is square, the diagonal elements are returned.
       If the input is vector-like, a diagonal matrix is constructed with it. */
-  template<class T>
-  Matrix<T> diag(const Matrix<T> &A);
+  template<typename DataType>
+  Matrix<DataType> diag(const Matrix<DataType> &A);
 
   /** \brief   Construct a matrix with given block on the diagonal */
-  template<class T>
-  Matrix<T> blkdiag(const std::vector< Matrix<T> > &A);
-
-#ifndef SWIG
-  /** \brief  Get the sparsity in sparse triplet format */
-  template<class T>
-  void getSparseTriplet(const Matrix<T>& A, std::vector<int>& row, std::vector<int>& col);
-#endif // SWIG
-
-  /** \brief  Get the sparsity in sparse triplet format - Python style: [row,col] =  getSparseTriplet(A) */
-  template<class T>
-  std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A);
+  template<typename DataType>
+  Matrix<DataType> blkdiag(const std::vector< Matrix<DataType> > &A);
 
   /** \brief  Unite two matrices no overlapping sparsity */
-  template<class T>
-  Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B);
-
-  /** \brief  Make a matrix dense */
-  template<class T>
-  void makeDense(Matrix<T>& A);
-
-  /** \brief  Make a matrix dense */
-  template<class T>
-  Matrix<T> densify(const Matrix<T>& A);
+  template<typename DataType>
+  Matrix<DataType> unite(const Matrix<DataType>& A, const Matrix<DataType>& B);
 
 #ifndef SWIGOCTAVE
   /** \brief  Make a matrix dense */
-  template<class T>
-  Matrix<T> full(const Matrix<T>& A);
-#endif // SWIGOCTAVE
+  template<typename DataType>
+  Matrix<DataType> dense(const Matrix<DataType>& A);
 
-  /** \brief  Make a matrix sparse by removing numerical zeros */
-  template<class T>
-  void makeSparse(Matrix<T>& A, double tol=0);
-
-#ifndef SWIGOCTAVE
   /** \brief  Make a matrix sparse by removing numerical zeros*/
-  template<class T>
-  Matrix<T> sparse(const Matrix<T>& A, double tol=0);
+  template<typename DataType>
+  Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0);
 #endif // SWIGOCTAVE
-
-  /** \brief  Check if the matrix has any zero entries which are not structural zeros */
-  template<class T>
-  bool hasNonStructuralZeros(const Matrix<T>& A);
 
   /// same as: res += mul(A,v)
-  template<typename T>
-  void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A=false);
-
+  template<typename DataType>
+  void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A=false);
+  
+  /// \cond INTERNAL
   /// Get a pointer to the data contained in the vector
-  template<typename T>
-  T* getPtr(Matrix<T> &v);
+  template<typename DataType>
+  DataType* getPtr(Matrix<DataType> &v);
   
   /// Get a pointer to the data contained in the vector
-  template<typename T>
-  const T* getPtr(const Matrix<T> &v);
-
+  template<typename DataType>
+  const DataType* getPtr(const Matrix<DataType> &v);
+  /// \endcond
+  
   /** \brief Create a new matrix with a given sparsity pattern but with the nonzeros taken from an existing matrix */
-  template<typename T>
-  Matrix<T> project(const Matrix<T>& A, const CRSSparsity& sparsity);
+  template<typename DataType>
+  Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sparsity);
 
   /// Obtain the structural rank of a sparsity-pattern
-  template<typename T>
-  int sprank(const Matrix<T>& A);
+  template<typename DataType>
+  int sprank(const Matrix<DataType>& A);
+
+#ifndef WITHOUT_PRE_1_9_X
+  /** \brief [DEPRECATED]
+   */
+  //@{
+  template<typename DataType> void makeDense(Matrix<DataType>& A){ A.densify();}
+  template<typename DataType> Matrix<DataType> densify(const Matrix<DataType>& A){ Matrix<DataType> ret(A); ret.densify(); return ret;}
+  template<typename DataType> void makeSparse(Matrix<DataType>& A, double tol=0){ A.sparsify(tol);}
+  template<typename DataType> bool isDense(const Matrix<DataType>& ex){ return ex.isDense();}
+  template<typename DataType> bool isEmpty(const Matrix<DataType>& ex){ return ex.isEmpty(); }
+  template<typename DataType> bool isTril(const Matrix<DataType> &A){ return A.isTril(); }
+  template<typename DataType> bool isTriu(const Matrix<DataType> &A){ return A.isTriu(); }
+  template<typename DataType> bool isScalar(const Matrix<DataType>& ex){ return ex.isScalar();}
+  template<typename DataType> bool isRegular(const Matrix<DataType>& ex){ return ex.isRegular();}
+  template<typename DataType> bool isConstant(const Matrix<DataType>& ex){ return ex.isConstant();}
+  template<typename DataType> bool isInteger(const Matrix<DataType>& ex){ return ex.isInteger();}
+  template<typename DataType> bool isZero(const Matrix<DataType>& ex){ return ex.isZero();}
+  template<typename DataType> bool isOne(const Matrix<DataType>& ex){ return ex.isOne();}
+  template<typename DataType> bool isMinusOne(const Matrix<DataType>& ex){ return ex.isMinusOne();}
+  template<typename DataType> bool isIdentity(const Matrix<DataType>& ex){ return ex.isIdentity();}
+  template<typename DataType> int nnz(const Matrix<DataType>& ex) { return ex.size();}
+  template<typename DataType> bool hasNonStructuralZeros(const Matrix<DataType>& A){ return A.hasNonStructuralZeros();}
+  template<typename DataType>  Matrix<DataType> trans(const Matrix<DataType> &x){ return transpose(x);}
+ //@}
+#endif
 
 } // namespace CasADi
 
@@ -514,184 +416,108 @@ namespace CasADi{
 namespace CasADi{
   // Implementations
 
-  template<class T>
-  Matrix<T> trans(const Matrix<T> &x){
-    return x.trans();
+  template<typename DataType>
+  Matrix<DataType> transpose(const Matrix<DataType> &x){
+    return x.T();
   }
 
-  template<class T>
-  Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y, const CRSSparsity &sp_z){
+  template<typename DataType>
+  Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y, const Sparsity &sp_z){
     return x.mul(y,sp_z);
   }
 
-  template<class T>
-  Matrix<T> mul(const std::vector< Matrix<T> > &args){
-    casadi_assert_message(args.size()>=1,"mul(std::vector< Matrix<T> > &args): supplied list must not be empty.");
+  template<typename DataType>
+  Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args){
+    casadi_assert_message(args.size()>=1,"mul(std::vector< Matrix<DataType> > &args): supplied list must not be empty.");
     if (args.size()==1) return args[0];
-    Matrix<T> ret = args[0].mul(args[1]);
+    Matrix<DataType> ret = args[0].mul(args[1]);
     for (int i=2;i<args.size();++i) {
       ret = ret.mul(args[i]);
     }
     return ret;
   }
 
-  template<class T>
-  bool isScalar(const Matrix<T>& ex){
-    return ex.size1()==1 && ex.size2()==1;
-  }
-
-  template<class T>
-  bool isVector(const Matrix<T>& ex){
-    return ex.size2()==1;
-  }
-
-  template<class T>
-  bool isInteger(const Matrix<T>& ex){
-    // loop over non-zero elements
-    for(int k=0; k<ex.size(); ++k) 
-      if(!casadi_limits<T>::isInteger(ex.data()[k])) // if an element is not integer
-        return false;
-    
-    // Integer if reached this point
-    return true;
-  }
-
-  template<class T>
-  bool isConstant(const Matrix<T>& ex){
-    // loop over non-zero elements
-    for(int k=0; k<ex.size(); ++k) 
-      if(!casadi_limits<T>::isConstant(ex.data()[k])) // if an element is not constant
-        return false;
-    
-    // Constant if we reach this point
-    return true;
-  }
-
-  template<class T>
-  bool isDense(const Matrix<T>& ex){
-    return ex.size() == ex.numel();
-  }
-
-  template<class T>
-  bool isEmpty(const Matrix<T>& ex){
-    return ex.empty();
-  }
-
-  template<class T>
-  bool isTril(const Matrix<T> &A){
-    // TODO: Move implementation to CRSSparsity as it does not depend on the matrix entries 
-    // loop over rows
-    for(int i=0; i<A.size1(); ++i){
-      if(A.rowind(i) != A.rowind(i+1)){ // if there are any elements of the row
-        // check column of the right-most element of the row
-        int col = A.col(A.rowind(i+1)-1);
-
-        // not lower triangular if col>i
-        if(col>i) return false;
-      }
-    }
-    // all rows ok
-    return true;
-  }
-
-  template<class T>
-  bool isTriu(const Matrix<T> &A){
-    // TODO: Move implementation to CRSSparsity as it does not depend on the matrix entries 
-    // loop over rows
-    for(int i=0; i<A.size1(); ++i){
-      if(A.rowind(i) != A.rowind(i+1)){ // if there are any elements of the row
-        // check column of the left-most element of the row
-        int col = A.col(A.rowind(i));
-
-        // not lower triangular if col>i
-        if(col<i) return false;
-      }
-    }
-    // all rows ok
-    return true;
-  }
-
-  template<class T>
-  T det(const Matrix<T>& a){
-    int n = a.size1();
-    casadi_assert_message(n == a.size2(),"matrix must be square");
+  template<typename DataType>
+  DataType det(const Matrix<DataType>& a){
+    int n = a.size2();
+    casadi_assert_message(n == a.size1(),"matrix must be square");
 
     // Trivial return if scalar
-    if(isScalar(a)) return a.toScalar();
+    if(a.isScalar()) return a.toScalar();
 
     // Trivial case 2 x 2
-    if(n==2) return a.elem(0,0) * a.elem(1,1) - a.elem(1,0) * a.elem(0,1);
+    if(n==2) return a.elem(0,0) * a.elem(1,1) - a.elem(0,1) * a.elem(1,0);
   
     // Return expression
-    Matrix<T> ret = 0;
+    Matrix<DataType> ret = 0;
   
     // Find out which is the best direction to expand along
 
     // Build up an IMatrix with ones on the non-zeros
     Matrix<int> sp = IMatrix(a.sparsity(),1);
   
-    // Have a count of the nonzeros for each column
-    Matrix<int> col_count = sumRows(sp);
-  
-    // A blank column? determinant is structurally zero
-    if (!col_count.dense()) return 0;
-
     // Have a count of the nonzeros for each row
-    Matrix<int> row_count = trans(sumCols(sp));
+    Matrix<int> row_count = sumCols(sp);
   
     // A blank row? determinant is structurally zero
-    if (!col_count.dense()) return 0;
+    if (!row_count.isDense()) return 0;
+
+    // Have a count of the nonzeros for each col
+    Matrix<int> col_count = sumRows(sp).T();
   
-    int min_col = std::distance(col_count.data().begin(), std::min_element(col_count.data().begin(),col_count.data().end()));
+    // A blank col? determinant is structurally zero
+    if (!row_count.isDense()) return 0;
+  
     int min_row = std::distance(row_count.data().begin(), std::min_element(row_count.data().begin(),row_count.data().end()));
+    int min_col = std::distance(col_count.data().begin(), std::min_element(col_count.data().begin(),col_count.data().end()));
   
-    if (min_col <= min_row) {
-      // Expand along column j
-      int j = col_count.sparsity().col(min_col);
+    if (min_row <= min_col) {
+      // Expand along row j
+      int j = row_count.sparsity().row(min_row);
     
-      Matrix<T> col = a(range(n),j);
+      Matrix<DataType> row = a(j,range(n));
 
-      std::vector< int > row_i = col.sparsity().getRow();
-
-      for(int k=0; k<col.size(); ++k) {
-        // Sum up the cofactors
-        ret += col.at(k)*cofactor(a,row_i.at(k),j);
-      }
-      return ret.toScalar();
-    } else {
-      // Expand along row i
-      int i = row_count.sparsity().col(min_row);
-
-      Matrix<T> row = a(i,range(n));
-    
-      const std::vector< int > &col_i = row.sparsity().col();
+      std::vector< int > col_i = row.sparsity().getCol();
 
       for(int k=0; k<row.size(); ++k) {
         // Sum up the cofactors
-        ret += row.at(k)*cofactor(a,i,col_i.at(k));
+        ret += row.at(k)*cofactor(a,col_i.at(k),j);
+      }
+      return ret.toScalar();
+    } else {
+      // Expand along col i
+      int i = col_count.sparsity().row(min_col);
+
+      Matrix<DataType> col = a(range(n),i);
+    
+      const std::vector< int > &row_i = col.sparsity().row();
+
+      for(int k=0; k<col.size(); ++k) {
+        // Sum up the cofactors
+        ret += col.at(k)*cofactor(a,i,row_i.at(k));
       }
       return ret.toScalar();
     }
  
   }
 
-  template<class T>
-  T getMinor(const Matrix<T> &x, int i, int j){
-    int n = x.size1();
-    casadi_assert_message(n == x.size2(), "getMinor: matrix must be square");
+  template<typename DataType>
+  DataType getMinor(const Matrix<DataType> &x, int i, int j){
+    int n = x.size2();
+    casadi_assert_message(n == x.size1(), "getMinor: matrix must be square");
 
     // Trivial return if scalar
     if(n==1) return 1;
 
-    // Remove row i and column j
-    Matrix<T> M(n-1,n-1);
+    // Remove col i and row j
+    Matrix<DataType> M = Matrix<DataType>::sparse(n-1,n-1);
   
-    std::vector<int> row = x.sparsity().getRow();
-    const std::vector<int> &col = x.sparsity().col();
+    std::vector<int> col = x.sparsity().getCol();
+    const std::vector<int> &row = x.sparsity().row();
 
     for(int k=0;k<x.size();++k) {
-      int i1 = row[k];
-      int j1 = col[k];
+      int i1 = col[k];
+      int j1 = row[k];
 
       if(i1 == i || j1 == j)
         continue;
@@ -699,295 +525,259 @@ namespace CasADi{
       int i2 = (i1<i)?i1:i1-1;
       int j2 = (j1<j)?j1:j1-1;
 
-      M(i2,j2) = x(i1,j1);
+      M(j2,i2) = x(j1,i1);
     }
     return det(M);
   }
 
-  template<class T>
-  T cofactor(const Matrix<T> &x, int i, int j){
+  template<typename DataType>
+  DataType cofactor(const Matrix<DataType> &x, int i, int j){
 
     // Calculate the i,j minor
-    T minor_ij = getMinor(x,i,j);
+    DataType minor_ij = getMinor(x,i,j);
     // Calculate the cofactor
     int sign_i = 1-2*((i+j) % 2);
 
     return sign_i * minor_ij;
   }
 
-  template<class T>
-  Matrix<T> adj(const Matrix<T>& a){
-    int n = a.size1();
-    casadi_assert_message(n == a.size2(),"adj: matrix must be square");
+  template<typename DataType>
+  Matrix<DataType> adj(const Matrix<DataType>& a){
+    int n = a.size2();
+    casadi_assert_message(n == a.size1(),"adj: matrix must be square");
 
     // Temporary placeholder
-    T temp;
+    DataType temp;
   
     // Cofactor matrix
-    Matrix<T> C(n,n);
+    Matrix<DataType> C = Matrix<DataType>::sparse(n,n);
     for(int i=0; i<n; ++i)
       for(int j=0; j<n; ++j) {
         temp = cofactor(a,i,j);
-        if (!casadi_limits<T>::isZero(temp))
-          C(i,j) = temp;
+        if (!casadi_limits<DataType>::isZero(temp))
+          C(j,i) = temp;
       }
   
-    return trans(C);
+    return C.T();
   }
 
-  template<class T>
-  Matrix<T> inv(const Matrix<T>& a){
+  template<typename DataType>
+  Matrix<DataType> inv(const Matrix<DataType>& a){
     // laplace formula
     return adj(a)/det(a);
   }
 
-  template<class T>
-  Matrix<T> reshape(const Matrix<T>& a, int n, int m){
-    CRSSparsity sp = a.sparsity().reshape(n,m);
-    return Matrix<T>(sp,a.data());
+  template<typename DataType>
+  Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol){
+    Sparsity sp = a.sparsity().reshape(nrow,ncol);
+    return Matrix<DataType>(sp,a.data());
   }
 
-  template<class T>
-  Matrix<T> reshape(const Matrix<T>& a, const std::vector<int> sz){
-    casadi_assert_message(sz.size() == 2, "reshape: must be two dimensional");
-    return reshape(a,sz[0],sz[1]);
+  template<typename DataType>
+  Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int,int> rc){
+    return reshape(a,rc.first,rc.second);
   }
 
-  template<class T>
-  Matrix<T> reshape(const Matrix<T>& x, const CRSSparsity& sp){
+  template<typename DataType>
+  Matrix<DataType> reshape(const Matrix<DataType>& x, const Sparsity& sp){
     // quick return if already the right shape
     if(sp==x.sparsity())
       return x;
   
-    // make sure that the number of zeros agree
-    casadi_assert(x.size()==sp.size());
+    // make sure that the patterns match
+    casadi_assert(sp.isReshape(x.sparsity()));
   
-    return Matrix<T>(sp,x.data());
+    return Matrix<DataType>(sp,x.data());
   }
 
-  template<class T>
-  T trace(const Matrix<T>& a){
-    casadi_assert_message(a.size1() == a.size2(), "trace: must be square");
-    T res=0;
-    for (int i=0; i< a.size1(); i ++) {
+  template<typename DataType>
+  DataType trace(const Matrix<DataType>& a){
+    casadi_assert_message(a.size2() == a.size1(), "trace: must be square");
+    DataType res=0;
+    for (int i=0; i< a.size2(); i ++) {
       res+=a.elem(i,i);
     }
     return res;
   }
 
-  template<class T>
-  Matrix<T> vec(const Matrix<T>& a){
-    Matrix<T> ret = reshape(trans(a),a.numel(),1);
+  template<typename DataType>
+  Matrix<DataType> vec(const Matrix<DataType>& a){
+    Matrix<DataType> ret = reshape(a,a.numel(),1);
     return ret;
   }
 
-  template<class T>
-  Matrix<T> flatten(const Matrix<T>& a){
-    Matrix<T> ret = reshape(a,a.numel(),1);
-    return ret;
-  }
-
-
-  template<class T>
-  Matrix<T> vecNZ(const Matrix<T>& a){
-    return Matrix<T>(vec(a).data());
+  template<typename DataType>
+  Matrix<DataType> vecNZ(const Matrix<DataType>& a){
+    return Matrix<DataType>(a.data());
   }
   
-  template<class T>
-  Matrix<T> flattenNZ(const Matrix<T>& a){
-    return Matrix<T>(a.data());
-  }
-
-  template<class T>
-  Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v) {
-    std::vector< Matrix<T> > ret;
+  template<typename DataType>
+  Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
+    std::vector< Matrix<DataType> > ret;
     for(int i=0; i<v.size(); ++i)
       ret.push_back(horzcat(v[i]));
     return vertcat(ret);
   }
 
-  template<class T>
-  Matrix<T> blockcat(const Matrix<T> &A,const Matrix<T> &B,const Matrix<T> &C,const Matrix<T> &D) {
+  template<typename DataType>
+  Matrix<DataType> blockcat(const Matrix<DataType> &A,const Matrix<DataType> &B,const Matrix<DataType> &C,const Matrix<DataType> &D) {
     return vertcat(horzcat(A,B),horzcat(C,D));
   }
 
-  template<class T>
-  Matrix<T> vertcat(const std::vector<Matrix<T> > &v){
-    Matrix<T> ret;
+  template<typename DataType>
+  Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v){
+    Matrix<DataType> ret;
     for(int i=0; i<v.size(); ++i)
-      ret.append(v[i]);
+      ret.appendColumns(v[i]);
     return ret;
   }
 
-  template<class T>
-  std::vector<Matrix<T> > vertsplit(const Matrix<T> &v, const std::vector<int>& offset) {
-    // Consistency check
-    casadi_assert(offset.size()>=1);
-    casadi_assert(offset.front()==0);
-    casadi_assert_message(offset.back()<=v.size1(),"vertsplit(const Matrix<T> &v, const std::vector<int>& offset): Last elements of offset (" << offset.back() << ") must be at maximum the number of rows in v (" << v.size1() << ")");
-    casadi_assert(isMonotone(offset));
-  
-    std::vector<Matrix<T> > ret;
-  
-    // Obtain sparsity pattern
-    const std::vector<int> & rowind = v.sparsity().rowind();
-    const std::vector<int> & col = v.sparsity().col();
-  
-    for(int i=0; i<offset.size(); ++i) {
-      int start = offset[i];
-      int stop = i+1 < offset.size() ? offset[i+1] : v.size1(); 
-  
-      // rowind for the submatrix: a portion of the original rowind, 
-      // but with a common offset substracted such that rowind_s[0]==0
-      std::vector<int> rowind_s(stop-start+1,-rowind[start]);
-      std::transform(rowind.begin()+start,rowind.begin()+stop+1,rowind_s.begin(),rowind_s.begin(),std::plus<int>());
+  template<typename DataType>
+  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset) {
+    // Split up the sparsity pattern
+    std::vector<Sparsity> sp = horzsplit(v.sparsity(),offset);
     
-      // col for the submatrix: a portion of the original col
-      std::vector<int> col_s(rowind[stop]-rowind[start]);
-      std::copy(col.begin()+rowind[start],col.begin()+rowind[stop],col_s.begin());
-    
-      CRSSparsity s(stop-start,v.size2(),col_s,rowind_s);
-      Matrix<T> r(s);
-    
-      // data for the submatrix: a portion of the original data
-      std::copy(v.begin()+rowind[start],v.begin()+rowind[stop],r.begin());
-    
-      // Append submatrix to list
-      ret.push_back(r);
+    // Return object
+    std::vector<Matrix<DataType> > ret;
+    ret.reserve(sp.size());
+
+    // Copy data
+    typename std::vector<DataType>::const_iterator data_start=v.begin(), data_stop;
+    for(std::vector<Sparsity>::const_iterator j=sp.begin(); j!=sp.end(); ++j){
+      data_stop = data_start + j->size();
+      ret.push_back(Matrix<DataType>(*j,std::vector<DataType>(data_start,data_stop)));
+      data_start = data_stop;
     }
+
+    // Return the assembled matrix
+    casadi_assert(data_stop==v.end());
     return ret;
   }
 
-  template<class T>
-  std::vector<Matrix<T> > vertsplit(const Matrix<T> &v, int incr) {
+  template<typename DataType>
+  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr) {
     casadi_assert(incr>=1);
-    return vertsplit(v,range(0,v.size1(),incr));
+    std::vector<int> offset2 = range(0,v.size2(),incr);
+    offset2.push_back(v.size2());
+    return horzsplit(v,offset2);
   }
 
-
-  template<class T>
-  Matrix<T> horzcat(const std::vector<Matrix<T> > &v){
-    Matrix<T> ret;
+  template<typename DataType>
+  Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v){
+    Matrix<DataType> ret;
     for(int i=0; i<v.size(); ++i)
-      ret.append(trans(v[i]));
-    return trans(ret);  
+      ret.appendColumns(v[i].T());
+    return ret.T();  
   }
 
-  template<class T>
-  std::vector< Matrix<T> > horzsplit(const Matrix<T>& x, const std::vector<int>& offset){
-    std::vector< Matrix<T> > ret = vertsplit(trans(x),offset);
-    Matrix<T> (*transT)(const Matrix<T>& x) = trans;
-    std::transform(ret.begin(),ret.end(),ret.begin(),transT);
+  template<typename DataType>
+  std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x, const std::vector<int>& offset){
+    std::vector< Matrix<DataType> > ret = horzsplit(x.T(),offset);
+    Matrix<DataType> (*transposeT)(const Matrix<DataType>& x) = transpose;
+    std::transform(ret.begin(),ret.end(),ret.begin(),transposeT);
     return ret;
   }
   
-  template<class T>
-  std::vector< Matrix<T> > horzsplit(const Matrix<T>& x, int incr){
+  template<typename DataType>
+  std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x, int incr){
     casadi_assert(incr>=1);
-    return horzsplit(x,range(0,x.size2(),incr));
+    std::vector<int> offset1 = range(0,x.size1(),incr);
+    offset1.push_back(x.size1());
+    return vertsplit(x,offset1);
   }
 
-  template<class T>
-  std::vector< std::vector< Matrix<T> > > blocksplit(const Matrix<T>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
-    std::vector< Matrix<T> > rows = vertsplit(x,vert_offset);
-    std::vector< std::vector< Matrix<T> > > ret;
+  template<typename DataType>
+  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
+    std::vector< Matrix<DataType> > rows = vertsplit(x,vert_offset);
+    std::vector< std::vector< Matrix<DataType> > > ret;
     for (int i=0;i<rows.size();++i) {
       ret.push_back(horzsplit(rows[i],horz_offset));
     }
     return ret;
   }
 
-  template<class T>
-  std::vector< std::vector< Matrix<T> > > blocksplit(const Matrix<T>& x, int vert_incr, int horz_incr) {
+  template<typename DataType>
+  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, int vert_incr, int horz_incr) {
     casadi_assert(horz_incr>=1);
     casadi_assert(vert_incr>=1);
-    return blocksplit(x,range(0,x.size1(),vert_incr),range(0,x.size2(),horz_incr));
+    std::vector<int> offset1 = range(0,x.size1(),vert_incr);
+    offset1.push_back(x.size1());
+    std::vector<int> offset2 = range(0,x.size2(),horz_incr);
+    offset2.push_back(x.size2());
+    return blocksplit(x,offset1,offset2);
   }
 
-  template<class T>
-  Matrix<T> vertcat(const Matrix<T> &x, const Matrix<T> &y){
-    Matrix<T> xy = x;
-    xy.append(y);
+  template<typename DataType>
+  Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y){
+    Matrix<DataType> xy = x;
+    xy.appendColumns(y);
     return xy;
   }
 
-  template<class T>
-  Matrix<T> horzcat(const Matrix<T> &x, const Matrix<T> &y){
-    return trans(vertcat(trans(x),trans(y)));
+  template<typename DataType>
+  Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y){
+    return horzcat(x.T(),y.T()).T();
   }
-
-  template<class T>
-  Matrix<T> veccat(const std::vector< Matrix<T> >& comp) {
-    Matrix<T> (&f)(const Matrix<T>&) = vec;
+  
+  template<typename DataType>
+  Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp) {
+    Matrix<DataType> (&f)(const Matrix<DataType>&) = vec;
     return vertcat(applymap(f,comp));
   }
   
-  template<class T>
-  Matrix<T> flattencat(const std::vector< Matrix<T> >& comp) {
-    Matrix<T> (&f)(const Matrix<T>&) = flatten;
+  template<typename DataType>
+  Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp) {
+    Matrix<DataType> (&f)(const Matrix<DataType>&) = vecNZ;
     return vertcat(applymap(f,comp));
   }
 
-  template<class T>
-  Matrix<T> vecNZcat(const std::vector< Matrix<T> >& comp) {
-    Matrix<T> (&f)(const Matrix<T>&) = vecNZ;
-    return vertcat(applymap(f,comp));
-  }
-  
-  template<class T>
-  Matrix<T> flattenNZcat(const std::vector< Matrix<T> >& comp) {
-    Matrix<T> (&f)(const Matrix<T>&) = flattenNZ;
-    return vertcat(applymap(f,comp));
-  }
-
-  template<class T>
-  Matrix<T> inner_prod(const Matrix<T> &x, const Matrix<T> &y){
+  template<typename DataType>
+  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y){
     casadi_assert_message(x.shape()==y.shape(), "inner_prod: Dimension mismatch");
     return sumAll(x*y);
   }
 
-  template<class T>
-  Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y){
-    casadi_assert_message(x.vector() && y.vector(), "outer_prod: arguments must be vectors");
-    return mul(x,trans(y));  
+  template<typename DataType>
+  Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y){
+    return mul(x,y.T());
   }
 
-  template<class T>
-  Matrix<T> sumAll(const Matrix<T> &x) {
+  template<typename DataType>
+  Matrix<DataType> sumAll(const Matrix<DataType> &x) {
     // Quick return if empty
-    if (x.empty()) return Matrix<T>(1,1);
+    if (x.isEmpty()) return Matrix<DataType>::sparse(1,1);
     // Sum non-zero elements
-    T res=0;
+    DataType res=0;
     for(int k=0; k<x.size(); k++){
       res += x.data()[k];
     }
     return res;
   }
 
-  template<class T>
-  Matrix<T> sumRows(const Matrix<T> &x) {
-    return mul(Matrix<T>::ones(1,x.size1()),x);
+  template<typename DataType>
+  Matrix<DataType> sumCols(const Matrix<DataType> &x) {
+    return mul(x,Matrix<DataType>::ones(x.size2(),1));
   }
 
-  template<class T>
-  Matrix<T> sumCols(const Matrix<T> &x) {
-    return mul(x,Matrix<T>::ones(x.size2(),1));
+  template<typename DataType>
+  Matrix<DataType> sumRows(const Matrix<DataType> &x) {
+    return mul(Matrix<DataType>::ones(1,x.size1()),x);
   }
 
-  template<class T>
-  T all(const Matrix<T> &x) {
-    if (!x.dense()) return false;
-    T ret=1;
+  template<typename DataType>
+  DataType all(const Matrix<DataType> &x) {
+    if (!x.isDense()) return false;
+    DataType ret=1;
     for (int i=0;i<x.size();++i) {
       ret = ret && x.at(i)==1;
     }
     return ret;
   }
 
-  template<class T>
-  T any(const Matrix<T> &x) {
-    if (!x.dense()) return false;
-    T ret=0;
+  template<typename DataType>
+  DataType any(const Matrix<DataType> &x) {
+    if (!x.isDense()) return false;
+    DataType ret=0;
     for (int i=0;i<x.size();++i) {
       ret = ret || x.at(i)==1;
     }
@@ -995,173 +785,160 @@ namespace CasADi{
   }
 
 
-  template<class T>
-  Matrix<T> norm_1(const Matrix<T>& x){
+  template<typename DataType>
+  Matrix<DataType> norm_1(const Matrix<DataType>& x){
     return sumAll(fabs(x));
   }
 
-  template<class T>
-  Matrix<T> norm_2(const Matrix<T>& x){
-    if(x.vector()){
+  template<typename DataType>
+  Matrix<DataType> norm_2(const Matrix<DataType>& x){
+    if(x.isVector()){
       return norm_F(x);
     } else {
       casadi_error("2-norms currently only supported for vectors. Did you intend to calculate a Frobenius norms (norm_F)?");
     }
   }
 
-  template<class T>
-  Matrix<T> norm_F(const Matrix<T>& x){
+  template<typename DataType>
+  Matrix<DataType> norm_F(const Matrix<DataType>& x){
     return sqrt(1.0*sumAll(x*x));
   }
 
-  template<class T>
-  Matrix<T> norm_inf(const Matrix<T>& x){
+  template<typename DataType>
+  Matrix<DataType> norm_inf(const Matrix<DataType>& x){
     // Get largest element by absolute value
-    T s = 0;
-    for(typename std::vector<T>::const_iterator i=x.begin(); i!=x.end(); ++i){
-      s = fmax(s,T(abs(*i)));
+    DataType s = 0;
+    for(typename std::vector<DataType>::const_iterator i=x.begin(); i!=x.end(); ++i){
+      s = fmax(s,DataType(abs(*i)));
     }
     
     return s;
   }
 
-  template<class T>
-  void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R){
+  template<typename DataType>
+  void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType> &R){
     // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
-    int m = A.size1();
-    int n = A.size2();
-    casadi_assert_message(m>=n, "qr: fewer rows than columns");
-
-    // Transpose of A
-    Matrix<T> AT = trans(A);
-
-    // Transposes of the output matrices
-    Matrix<T> QT, RT;
+    casadi_assert_message(A.size1()>=A.size2(), "qr: fewer rows than columns");
 
     // compute Q and R column by column
-    for(int i=0; i<n; ++i){
+    Q = R = Matrix<DataType>();
+    for(int i=0; i<A.size2(); ++i){
       // Initialize qi to be the i-th column of A
-      Matrix<T> ai = AT(i,ALL);
-      Matrix<T> qi = ai;
+      Matrix<DataType> ai = A(ALL,i);
+      Matrix<DataType> qi = ai;
       // The i-th column of R
-      Matrix<T> ri(1,n);
+      Matrix<DataType> ri = Matrix<DataType>::sparse(A.size2(),1);
   
       // subtract the projection of qi in the previous directions from ai
       for(int j=0; j<i; ++j){
       
         // Get the j-th column of Q
-        Matrix<T> qj = QT(j,ALL);
+        Matrix<DataType> qj = Q(ALL,j);
 
-        ri(0,j) = mul(qj,trans(qi)); // Modified Gram-Schmidt
+        ri(j,0) = mul(qi.T(),qj); // Modified Gram-Schmidt
         // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
      
         // Remove projection in direction j
-        if (ri.hasNZ(0,j))
-          qi -= ri(0,j) * qj;
+        if (ri.hasNZ(j,0))
+          qi -= ri(j,0) * qj;
       }
 
       // Normalize qi
-      ri(0,i) = norm_2(trans(qi));
-      qi /= ri(0,i);
+      ri(i,0) = norm_2(qi);
+      qi /= ri(i,0);
 
-      // Update RT and QT
-      QT.append(qi);
-      RT.append(ri);
+      // Update R and Q
+      Q.appendColumns(qi);
+      R.appendColumns(ri);
     }
-
-    // Save to output
-    Q = trans(QT);
-    R = trans(RT);
   }
   
-  template<class T>
-  Matrix<T> nullspace(const Matrix<T>& A) {
+  template<typename DataType>
+  Matrix<DataType> nullspace(const Matrix<DataType>& A) {
     int n = A.size1();
     int m = A.size2();
     
-    Matrix<T> X = A;
+    Matrix<DataType> X = A;
     
     casadi_assert_message(m>=n,"nullspace(A): expecting a flat matrix (more columns than rows), but got " << A.dimString() << ".");
     
-    Matrix<T> seed = DMatrix::eye(m)(range(m),range(n,m));
+    Matrix<DataType> seed = DMatrix::eye(m)(Slice(0,m),Slice(n,m));
 
-    std::vector< Matrix<T> > us;
-    std::vector< Matrix<T> > betas;
+    std::vector< Matrix<DataType> > us;
+    std::vector< Matrix<DataType> > betas;
     
-    Matrix<T> beta;
+    Matrix<DataType> beta;
     
     for (int i=0;i<n;++i) {
-      Matrix<T> x = X(i,range(i,m));
-      Matrix<T> u = Matrix<T>(x);
-      Matrix<T> sigma = sqrt(sumCols(x*x));
-      const Matrix<T>& x0 = x(0,0);
+      Matrix<DataType> x = X(i,Slice(i,m));
+      Matrix<DataType> u = Matrix<DataType>(x);
+      Matrix<DataType> sigma = sqrt(sumCols(x*x));
+      const Matrix<DataType>& x0 = x(0,0);
       u(0,0) = 1;
       
-      Matrix<T> b = -copysign(sigma,x0);
+      Matrix<DataType> b = -copysign(sigma,x0);
       
-      u(0,range(1,m-i))*= 1/(x0-b);
+      u(Slice(0),Slice(1,m-i))*= 1/(x0-b);
       beta = 1-x0/b;
       
-      X(range(i,n),range(i,m))-= beta*mul(mul(X(range(i,n),range(i,m)),trans(u)),u);
+      X(Slice(i,n),Slice(i,m))-= beta*mul(mul(X(Slice(i,n),Slice(i,m)),u.T()),u);
       us.push_back(u);
       betas.push_back(beta);
     }
     
     for (int i=n-1;i>=0;--i) {
-      seed(range(i,m),range(m-n)) -= betas[i]*mul(trans(us[i]),mul(us[i],seed(range(i,m),range(m-n))));
+      seed(Slice(i,m),Slice(0,m-n)) -= betas[i]*mul(us[i].T(),mul(us[i],seed(Slice(i,m),Slice(0,m-n))));
     }
     
     return seed;
 
   }
 
-  template<class T>
-  Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
+  template<typename DataType>
+  Matrix<DataType> solve(const Matrix<DataType>& A, const Matrix<DataType>& b){
     // check dimensions
     casadi_assert_message(A.size1() == b.size1(),"solve Ax=b: dimension mismatch: b has " << b.size1() << " rows while A has " << A.size1() << ".");
     casadi_assert_message(A.size1() == A.size2(),"solve: A not square but " << A.dimString());
-  
-    if(isTril(A)){
+
+    if(A.isTril()){
       // forward substitution if lower triangular
-      Matrix<T> x = b;
-      const std::vector<int> & Acol = A.col();
-      const std::vector<int> & Arowind = A.rowind();
-      const std::vector<T> & Adata = A.data();
-      for(int i=0; i<A.size1(); ++i){ // loop over rows
+      Matrix<DataType> x = b;
+      const std::vector<int> & Arow = A.row();
+      const std::vector<int> & Acolind = A.colind();
+      const std::vector<DataType> & Adata = A.data();
+      for(int i=0; i<A.size2(); ++i){ // loop over columns forwards
         for(int k=0; k<b.size2(); ++k){ // for every right hand side
-          for(int kk=Arowind[i]; kk<Arowind[i+1] && Acol[kk]<i; ++kk){ 
-            int j = Acol[kk];
-            if (x.hasNZ(j,k))
-              x(i,k) -= Adata[kk]*x(j,k);
+          if(!x.hasNZ(i,k)) continue;
+          x(i,k) /= A(i,i);
+          for(int kk=Acolind[i+1]-1; kk>=Acolind[i] && Arow[kk]>i; --kk){
+            int j = Arow[kk]; 
+            x(j,k) -= Adata[kk]*x(i,k);
           }
-          if (x.hasNZ(i,k))
-            x(i,k) /= A(i,i);
         }
       }
       return x;
-    } else if(isTriu(A)){
+    } else if(A.isTriu()){
       // backward substitution if upper triangular
-      Matrix<T> x = b;
-      const std::vector<int> & Acol = A.col();
-      const std::vector<int> & Arowind = A.rowind();
-      const std::vector<T> & Adata = A.data();
-      for(int i=A.size1()-1; i>=0; --i){ // loop over rows from the back
+      Matrix<DataType> x = b;
+      const std::vector<int> & Arow = A.row();
+      const std::vector<int> & Acolind = A.colind();
+      const std::vector<DataType> & Adata = A.data();
+      for(int i=A.size2()-1; i>=0; --i){ // loop over columns backwards
         for(int k=0; k<b.size2(); ++k){ // for every right hand side
-          for(int kk=Arowind[i+1]-1; kk>=Arowind[i] && Acol[kk]>i; --kk){
-            int j = Acol[kk]; 
-            if (x.hasNZ(j,k))
-              x(i,k) -= Adata[kk]*x(j,k);
+          if(!x.hasNZ(i,k)) continue;
+          x(i,k) /= A(i,i);
+          for(int kk=Acolind[i]; kk<Acolind[i+1] && Arow[kk]<i; ++kk){ 
+            int j = Arow[kk];
+            x(j,k) -= Adata[kk]*x(i,k);
           }
-          if (x.hasNZ(i,k))
-            x(i,k) /= A(i,i);
         }
       }
       return x;
-    } else if(hasNonStructuralZeros(A)){
-    
+    } else if(A.hasNonStructuralZeros()){
+
       // If there are structurally nonzero entries that are known to be zero, remove these and rerun the algorithm
-      Matrix<T> A_sparse = A;
-      makeSparse(A_sparse);
+      Matrix<DataType> A_sparse = A;
+      A_sparse.sparsify();
       return solve(A_sparse,b);
 
     } else {
@@ -1170,39 +947,22 @@ namespace CasADi{
       std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
       A.sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
-      // Get the inverted column permutation
-      std::vector<int> inv_colperm(colperm.size());
-      for(int k=0; k<colperm.size(); ++k)
-        inv_colperm[colperm[k]] = k;
-    
       // Permute the right hand side
-      Matrix<T> bperm(0,b.size2());
-      for(int i=0; i<b.size1(); ++i){
-        bperm.resize(i+1,b.size2());
-        for(int el=b.rowind(rowperm[i]); el<b.rowind(rowperm[i]+1); ++el){
-          bperm(i,b.col(el)) = b[el];
-        }
-      }
+      Matrix<DataType> bperm = b(rowperm,ALL);
 
       // Permute the linear system
-      Matrix<T> Aperm(0,A.size2());
-      for(int i=0; i<A.size1(); ++i){
-        Aperm.resize(i+1,A.size2());
-        for(int el=A.rowind(rowperm[i]); el<A.rowind(rowperm[i]+1); ++el){
-          Aperm(i,inv_colperm[A.col(el)]) = A[el];
-        }
-      }
-    
-      // Permuted solution
-      Matrix<T> xperm;
-    
+      Matrix<DataType> Aperm = A(rowperm,colperm);
+
+      // Solution
+      Matrix<DataType> xperm;
+
       // Solve permuted system
-      if(isTril(Aperm)){
+      if(Aperm.isTril()){
       
-        // Forward substitution if lower triangular after sorting the equations
+        // Forward substitution if lower triangular
         xperm = solve(Aperm,bperm);
       
-      } else if(A.size1()<=3){
+      } else if(A.size2()<=3){
       
         // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
         xperm = mul(inv(Aperm),bperm);
@@ -1210,39 +970,38 @@ namespace CasADi{
       } else {
       
         // Make a QR factorization
-        Matrix<T> Q,R;
+        Matrix<DataType> Q,R;
         qr(Aperm,Q,R);
 
         // Solve the factorized system (note that solve will now be fast since it is triangular)
-        xperm = solve(R,mul(trans(Q),bperm));
+        xperm = solve(R,mul(Q.T(),bperm));
       }
-    
-      // Permute back the solution
-      Matrix<T> x(0,xperm.size2());
-      for(int i=0; i<xperm.size1(); ++i){
-        x.resize(i+1,xperm.size2());
-        for(int el=xperm.rowind(inv_colperm[i]); el<xperm.rowind(inv_colperm[i]+1); ++el){
-          x(i,xperm.col(el)) = xperm[el];
-        }
-      }
+
+      // get the inverted column permutation
+      std::vector<int> inv_colperm(colperm.size());
+      for(int k=0; k<colperm.size(); ++k)
+        inv_colperm[colperm[k]] = k;
+
+      // Permute back the solution and return
+      Matrix<DataType> x = xperm(inv_colperm,ALL);
       return x;
     }
   }
   
-  template<class T>
-  Matrix<T> pinv(const Matrix<T>& A) {
+  template<typename DataType>
+  Matrix<DataType> pinv(const Matrix<DataType>& A) {
     if (A.size2()>=A.size1()) {
-      return trans(solve(mul(A,trans(A)),A));
+      return solve(mul(A,A.T()),A).T();
     } else {
-      return solve(mul(trans(A),A),trans(A));
+      return solve(mul(A.T(),A),A.T());
     }
   }
   
-  template<class T>
-  Matrix<T> kron(const Matrix<T>& a, const Matrix<T>& b) {
-    const CRSSparsity &a_sp = a.sparsity();
-    Matrix<T> filler(b.size1(),b.size2());
-    std::vector< std::vector< Matrix<T> > > blocks(a.size1(),std::vector< Matrix<T> >(a.size2(),filler));
+  template<typename DataType>
+  Matrix<DataType> kron(const Matrix<DataType>& a, const Matrix<DataType>& b) {
+    const Sparsity &a_sp = a.sparsity();
+    Matrix<DataType> filler = Matrix<DataType>::sparse(b.shape());
+    std::vector< std::vector< Matrix<DataType> > > blocks(a.size1(),std::vector< Matrix<DataType> >(a.size2(),filler));
     for (int i=0;i<a.size1();++i) {
       for (int j=0;j<a.size2();++j) {
         int k = a_sp.getNZ(i,j);
@@ -1254,145 +1013,51 @@ namespace CasADi{
     return blockcat(blocks);
   }
 
-  template<class T>
-  bool isOne(const Matrix<T>& ex){  
-    if(!ex.dense()){
-      return false;
-    }
-  
-    // loop over non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isOne(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isMinusOne(const Matrix<T>& ex){  
-    if(!ex.dense()){
-      return false;
-    }
-  
-    // loop over non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isMinusOne(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isZero(const Matrix<T>& ex) {  
-
-    // loop over (potentially) non-zero elements
-    for(int el=0; el<ex.size(); ++el)
-      if(!casadi_limits<T>::isZero(ex.at(el)))
-        return false;
-  
-    return true;
-  }
-
-  template<class T>
-  bool isIdentity(const Matrix<T>& ex) {
-  
-    // Make sure that the matrix is diagonal
-    if(!ex.sparsity().diagonal())
-      return false;
-  
-    // Make sure that all entries are one
-    for(typename Matrix<T>::const_iterator it=ex.begin(); it!=ex.end(); ++it){
-      if(!casadi_limits<T>::isOne(*it))
-        return false;
-    }
-      
-    return true;
-  }
-
-  template<class T>
-  int nnz(const Matrix<T>& ex) {
-    return ex.size();
-  }
-
-  template<class T>
-  int nnz_sym(const Matrix<T>& ex) {
-    int nz = 0; // number of non-zeros  
-    for(int row=0; row<ex.size1(); ++row)
-      {
-        // Loop over the elements in the row
-        for(int el=ex.rowind(row); el<ex.rowind(row+1); ++el){ // loop over the non-zero elements
-          if(ex.col(el) > row) break; // break inner loop (only lower triangular part is used)
-          nz++;
-        }
-      }
-    return nz;
-  }
-
-  template<class T>
-  bool isEqual(const Matrix<T>& ex1,const Matrix<T> &ex2){
-    if ((nnz(ex1)!=0 || nnz(ex2)!=0) && (ex1.size1()!=ex2.size1() || ex1.size2()!=ex2.size2())) return false;
-    Matrix<T> difference = ex1 - ex2;  
-    return isZero(difference);
-  }
-
-  template<class T>
-  Matrix<T> repmat(const Matrix<T> &A, int n, int m){
+  template<typename DataType>
+  Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m){
     // First concatenate horizontally
-    Matrix<T> row = horzcat(std::vector<Matrix<T> >(m, A));
+    Matrix<DataType> col = horzcat(std::vector<Matrix<DataType> >(m, A));
   
     // Then vertically
-    return vertcat(std::vector<Matrix<T> >(n, row));
+    return vertcat(std::vector<Matrix<DataType> >(n, col));
   }
 
-  template<class T>
-  Matrix<T> diag(const Matrix<T>&A){
+  template<typename DataType>
+  Matrix<DataType> diag(const Matrix<DataType>&A){
     // Nonzero mapping
     std::vector<int> mapping;
     // Get the sparsity
-    CRSSparsity sp = A.sparsity().diag(mapping);
+    Sparsity sp = A.sparsity().getDiag(mapping);
   
-    Matrix<T> ret = Matrix<T>(sp);
+    Matrix<DataType> ret = Matrix<DataType>(sp);
   
     for (int k=0;k<mapping.size();k++) ret[k] = A[mapping[k]];
     return ret;
   }
 
   /** \brief   Construct a matrix with given block on the diagonal */
-  template<class T>
-  Matrix<T> blkdiag(const std::vector< Matrix<T> > &A) {
-    std::vector<T> data;
+  template<typename DataType>
+  Matrix<DataType> blkdiag(const std::vector< Matrix<DataType> > &A) {
+    std::vector<DataType> data;
   
-    std::vector<CRSSparsity> sp;
+    std::vector<Sparsity> sp;
     for (int i=0;i<A.size();++i) {
       data.insert(data.end(),A[i].data().begin(),A[i].data().end());
       sp.push_back(A[i].sparsity());
     }
   
-    return Matrix<T>(blkdiag(sp),data);
+    return Matrix<DataType>(blkdiag(sp),data);
   
   }
 
-  template<class T>
-  void getSparseTriplet(const Matrix<T>& A, std::vector<int>& row, std::vector<int>& col){
-    col = A.sparsity().col();
-    row = A.sparsity().getRow();
-  }
-
-  template<class T>
-  std::vector<std::vector<int> > getSparseTriplet(const Matrix<T>& A){
-    std::vector<std::vector<int> > ret(2);
-    getSparseTriplet(A,ret[0],ret[1]);
-    return ret;
-  }
-
-  template<class T>
-  Matrix<T> unite(const Matrix<T>& A, const Matrix<T>& B){
+  template<typename DataType>
+  Matrix<DataType> unite(const Matrix<DataType>& A, const Matrix<DataType>& B){
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
-    CRSSparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
+    Sparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
   
     // Create return matrix
-    Matrix<T> ret(sp);
+    Matrix<DataType> ret(sp);
   
     // Copy sparsity
     int elA=0, elB=0;
@@ -1412,95 +1077,38 @@ namespace CasADi{
     return ret;
   }
 
-  template<class T>
-  void makeDense(Matrix<T>& A){
-    A.makeDense(A.size1(),A.size2(),0);
-  }
-
-  template<class T>
-  Matrix<T> densify(const Matrix<T>& A){
-    Matrix<T> ret(A);
-    makeDense(ret);
+  template<typename DataType>
+  Matrix<DataType> dense(const Matrix<DataType>& A){    
+    Matrix<DataType> ret = A;
+    ret.densify();
     return ret;
   }
 
-  template<class T>
-  Matrix<T> full(const Matrix<T>& A){
-    return densify(A);
-  }
-
-  template<class T>
-  void makeSparse(Matrix<T>& A, double tol){
-    // Quick return if there are no structurally zero entries
-    if(!hasNonStructuralZeros(A) && tol==0)
-      return;
-  
-    // Start with a matrix with no rows
-    Matrix<T> Asp(0,A.size2());
-
-    // Loop over the rows
-    for(int i=0; i<A.size1(); ++i){
-      // Resize the matrix to accomodate the row
-      Asp.resize(i+1,A.size2());
-    
-      // Loop over the existing, possible nonzeros
-      for(int el=A.rowind(i); el<A.rowind(i+1); ++el){
-      
-        // If it is not known to be a zero
-        if(!casadi_limits<T>::isAlmostZero(A.at(el),tol)){
-        
-          // Get the column
-          int j=A.col(el);
-      
-          // Save to new, sparse matrix
-          Asp(i,j) = A.at(el);
-        }
-      }
-    }
-  
-    // Save to A
-    A = Asp;
-  }
-
-  template<class T>
-  Matrix<T> sparse(const Matrix<T>& A, double tol){
-    Matrix<T> ret(A);
-    makeSparse(ret,tol);
+  template<typename DataType>
+  Matrix<DataType> sparse(const Matrix<DataType>& A, double tol){
+    Matrix<DataType> ret(A);
+    ret.sparsify(tol);
     return ret;
   }
-
-  template<class T>
-  bool hasNonStructuralZeros(const Matrix<T>& A){
-    // Loop over the structural nonzeros
-    for(int el=0; el<A.size(); ++el){
-    
-      // Check if the structural nonzero is known to be zero
-      if(casadi_limits<T>::isZero(A.at(el)))
-        return true;
-    }
   
-    // No known zeros amongst the structurally nonzero entries
-    return false;
-  }
-  
-  template<class T>
-  Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x){
-    casadi_assert_message(isDense(p),"polynomial coefficients vector must be a vector");
-    casadi_assert_message(isVector(p) && p.size()>0,"polynomial coefficients must be a vector");
-    Matrix<T> ret = p[0];
+  template<typename DataType>
+  Matrix<DataType> polyval(const Matrix<DataType>& p, const Matrix<DataType>& x){
+    casadi_assert_message(p.isDense(),"polynomial coefficients vector must be dense");
+    casadi_assert_message(p.isVector() && p.size()>0,"polynomial coefficients must be a vector");
+    Matrix<DataType> ret = p[0];
     for(int i=1; i<p.size(); ++i){
       ret = ret*x + p[i];
     }
     return ret;
   }
 
-  template<typename T>
-  void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A){
+  template<typename DataType>
+  void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A){
     // Get dimension and sparsity
-    int d1=A.size1(), d2=A.size2();
-    const std::vector<int> &rowind=A.rowind();
-    const std::vector<int> &col=A.col();
-    const std::vector<T>& data = A.data();
+    int d1=A.size2(), d2=A.size1();
+    const std::vector<int> &colind=A.colind();
+    const std::vector<int> &row=A.row();
+    const std::vector<DataType>& data = A.data();
 
     // Assert consistent dimensions
     if(trans_A){
@@ -1512,9 +1120,9 @@ namespace CasADi{
     }
 
     // Carry out multiplication
-    for(int i=0; i<d1; ++i){ // loop over rows
-      for(int el=rowind[i]; el<rowind[i+1]; ++el){ // loop over the non-zero elements
-        int j=col[el];  // column
+    for(int i=0; i<d1; ++i){ // loop over cols
+      for(int el=colind[i]; el<colind[i+1]; ++el){ // loop over the non-zero elements
+        int j=row[el];  // row
         // Add scalar product
         if(trans_A){
           res[j] += v[i]*data[el];
@@ -1525,33 +1133,33 @@ namespace CasADi{
     }
   }
 
-  template<typename T>
-  T* getPtr(Matrix<T> &v){
-    if(v.empty())
+  template<typename DataType>
+  DataType* getPtr(Matrix<DataType> &v){
+    if(v.isEmpty())
       return 0;
     else
       return &v.front();
   }
   
-  template<typename T>
-  const T* getPtr(const Matrix<T> &v){
-    if(v.empty())
+  template<typename DataType>
+  const DataType* getPtr(const Matrix<DataType> &v){
+    if(v.isEmpty())
       return 0;
     else
       return &v.front();
   }
 
-  template<typename T>
-  Matrix<T> project(const Matrix<T>& A, const CRSSparsity& sparsity){
+  template<typename DataType>
+  Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sparsity){
     // Check dimensions
-    if(!(A.empty() && sparsity.numel()==0)){
-      casadi_assert_message(A.size1()==sparsity.size1() && A.size2()==sparsity.size2(),
+    if(!(A.isEmpty() && sparsity.numel()==0)){
+      casadi_assert_message(A.size2()==sparsity.size2() && A.size1()==sparsity.size1(),
                             "Shape mismatch. Expecting " << A.dimString() << ", but got " << 
                             sparsity.dimString() << " instead.");
     }
     
     // Return value
-    Matrix<T> ret(sparsity,0);
+    Matrix<DataType> ret(sparsity,0);
     
     // Get the elements of the known matrix
     std::vector<int> known_ind = A.sparsity().getElements(false);
@@ -1560,8 +1168,8 @@ namespace CasADi{
     sparsity.getNZInplace(known_ind);
       
     // Set the element values
-    const std::vector<T>& A_data = A.data();
-    std::vector<T>& ret_data = ret.data();
+    const std::vector<DataType>& A_data = A.data();
+    std::vector<DataType>& ret_data = ret.data();
     for(int k=0; k<known_ind.size(); ++k){
       if(known_ind[k]!=-1){
         ret_data[known_ind[k]] = A_data[k];
@@ -1570,8 +1178,8 @@ namespace CasADi{
     return ret;
   }
 
-  template<typename T>
-  int sprank(const Matrix<T>& A) {
+  template<typename DataType>
+  int sprank(const Matrix<DataType>& A) {
     return rank(A.sparsity());
   }
   
@@ -1586,85 +1194,85 @@ namespace CasADi{
 #ifdef SWIG
 
 // map the template name to the instantiated name
-#define MTT_INST(T,function_name)                       \
-  %template(function_name) CasADi::function_name < T >;
+#define MTT_INST(DataType,function_name)                       \
+  %template(function_name) CasADi::function_name <DataType >;
+
+#ifndef WITHOUT_PRE_1_9_X
+#define MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)     \
+  MTT_INST(DataType,trans)                             \
+  MTT_INST(DataType,isConstant)                        \
+  MTT_INST(DataType,isDense)                           \
+  MTT_INST(DataType,isEmpty)                           \
+  MTT_INST(DataType,isInteger)                         \
+  MTT_INST(DataType,isScalar)                          \
+  MTT_INST(DataType,isTril)                            \
+  MTT_INST(DataType,isTriu)                            \
+  MTT_INST(DataType,makeDense)                         \
+  MTT_INST(DataType,densify)                           \
+  MTT_INST(DataType,makeSparse)                        \
+  MTT_INST(DataType,hasNonStructuralZeros)             \
+  MTT_INST(DataType,isZero)                            \
+  MTT_INST(DataType,isOne)                             \
+  MTT_INST(DataType,isMinusOne)                        \
+  MTT_INST(DataType,isIdentity)                        \
+  MTT_INST(DataType,nnz)                               
+#else
+#define MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)
+#endif
 
 // Define template instanciations
-#define MATRIX_TOOLS_TEMPLATES_COMMON(T)        \
-  MTT_INST(T,trans)                             \
-  MTT_INST(T,mul)                               \
-  MTT_INST(T,isConstant)                        \
-  MTT_INST(T,isDense)                           \
-  MTT_INST(T,isEmpty)                           \
-  MTT_INST(T,isInteger)                         \
-  MTT_INST(T,isScalar)                          \
-  MTT_INST(T,isVector)                          \
-  MTT_INST(T,isTril)                            \
-  MTT_INST(T,isTriu)                            \
-  MTT_INST(T,det)                               \
-  MTT_INST(T,getMinor)                          \
-  MTT_INST(T,cofactor)                          \
-  MTT_INST(T,adj)                               \
-  MTT_INST(T,inv)                               \
-  MTT_INST(T,reshape)                           \
-  MTT_INST(T,vec)                               \
-  MTT_INST(T,flatten)                           \
-  MTT_INST(T,vecNZ)                             \
-  MTT_INST(T,flattenNZ)                         \
-  MTT_INST(T,blockcat)                          \
-  MTT_INST(T,blocksplit)                        \
-  MTT_INST(T,horzcat)                           \
-  MTT_INST(T,horzsplit)                         \
-  MTT_INST(T,vertcat)                           \
-  MTT_INST(T,vertsplit)                         \
-  MTT_INST(T,inner_prod)                        \
-  MTT_INST(T,outer_prod)                        \
-  MTT_INST(T,norm_1)                            \
-  MTT_INST(T,norm_2)                            \
-  MTT_INST(T,norm_inf)                          \
-  MTT_INST(T,norm_F)                            \
-  MTT_INST(T,qr)                                \
-  MTT_INST(T,nullspace)                         \
-  MTT_INST(T,solve)                             \
-  MTT_INST(T,pinv)                              \
-  MTT_INST(T,isZero)                            \
-  MTT_INST(T,isOne)                             \
-  MTT_INST(T,isMinusOne)                        \
-  MTT_INST(T,isIdentity)                        \
-  MTT_INST(T,nnz)                               \
-  MTT_INST(T,nnz_sym)                           \
-  MTT_INST(T,isEqual)                           \
-  MTT_INST(T,repmat)                            \
-  MTT_INST(T,getSparseTriplet)                  \
-  MTT_INST(T,unite)                             \
-  MTT_INST(T,sumCols)                           \
-  MTT_INST(T,sumRows)                           \
-  MTT_INST(T,sumAll)                            \
-  MTT_INST(T,trace)                             \
-  MTT_INST(T,makeDense)                         \
-  MTT_INST(T,densify)                           \
-  MTT_INST(T,makeSparse)                        \
-  MTT_INST(T,hasNonStructuralZeros)             \
-  MTT_INST(T,diag)                              \
-  MTT_INST(T,blkdiag)                           \
-  MTT_INST(T,polyval)                           \
-  MTT_INST(T,addMultiple)                       \
-  MTT_INST(T,veccat)                            \
-  MTT_INST(T,vecNZcat)                          \
-  MTT_INST(T,flattencat)                        \
-  MTT_INST(T,flattenNZcat)                      \
-  MTT_INST(T,project)                           \
-  MTT_INST(T,sprank)                            \
-  MTT_INST(T,kron) 
+#define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \
+  MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)           \
+  MTT_INST(DataType,transpose)                         \
+  MTT_INST(DataType,mul)                               \
+  MTT_INST(DataType,det)                               \
+  MTT_INST(DataType,getMinor)                          \
+  MTT_INST(DataType,cofactor)                          \
+  MTT_INST(DataType,adj)                               \
+  MTT_INST(DataType,inv)                               \
+  MTT_INST(DataType,reshape)                           \
+  MTT_INST(DataType,vec)                               \
+  MTT_INST(DataType,vecNZ)                             \
+  MTT_INST(DataType,blockcat)                          \
+  MTT_INST(DataType,blocksplit)                        \
+  MTT_INST(DataType,vertcat)                           \
+  MTT_INST(DataType,vertsplit)                         \
+  MTT_INST(DataType,horzcat)                           \
+  MTT_INST(DataType,horzsplit)                         \
+  MTT_INST(DataType,inner_prod)                        \
+  MTT_INST(DataType,outer_prod)                        \
+  MTT_INST(DataType,norm_1)                            \
+  MTT_INST(DataType,norm_2)                            \
+  MTT_INST(DataType,norm_inf)                          \
+  MTT_INST(DataType,norm_F)                            \
+  MTT_INST(DataType,qr)                                \
+  MTT_INST(DataType,nullspace)                         \
+  MTT_INST(DataType,solve)                             \
+  MTT_INST(DataType,pinv)                              \
+  MTT_INST(DataType,repmat)                            \
+  MTT_INST(DataType,unite)                             \
+  MTT_INST(DataType,sumRows)                           \
+  MTT_INST(DataType,sumCols)                           \
+  MTT_INST(DataType,sumAll)                            \
+  MTT_INST(DataType,trace)                             \
+  MTT_INST(DataType,diag)                              \
+  MTT_INST(DataType,blkdiag)                           \
+  MTT_INST(DataType,polyval)                           \
+  MTT_INST(DataType,addMultiple)                       \
+  MTT_INST(DataType,veccat)                            \
+  MTT_INST(DataType,vecNZcat)                          \
+  MTT_INST(DataType,project)                           \
+  MTT_INST(DataType,sprank)                            \
+  MTT_INST(DataType,kron) 
 #endif //SWIG
 
 #ifdef SWIGOCTAVE
-#define MATRIX_TOOLS_TEMPLATES(T) MATRIX_TOOLS_TEMPLATES_COMMON(T)
+#define MATRIX_TOOLS_TEMPLATES(DataType) MATRIX_TOOLS_TEMPLATES_COMMON(DataType)
 #else
-#define MATRIX_TOOLS_TEMPLATES(T)               \
-  MATRIX_TOOLS_TEMPLATES_COMMON(T)              \
-  MTT_INST(T,sparse)                            \
-  MTT_INST(T,full)
+#define MATRIX_TOOLS_TEMPLATES(DataType)               \
+  MATRIX_TOOLS_TEMPLATES_COMMON(DataType)              \
+  MTT_INST(DataType,sparse)                            \
+  MTT_INST(DataType,dense)
 #endif //SWIGOCTAVE
 
 #endif // MATRIX_TOOLS_HPP

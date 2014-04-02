@@ -5,9 +5,9 @@
 #pragma once
 
 #include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/fx/fx_tools.hpp>
-#include <symbolic/stl_vector_tools.hpp>
-#include <symbolic/fx/sx_function.hpp>
+#include <symbolic/function/function_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
+#include <symbolic/function/sx_function.hpp>
 
 #include <experimental/greg/cppocp/Ocp.hpp>
 
@@ -33,7 +33,7 @@ public:
 	SnoptInterface( Ocp& ocp );
 
 	// objective/constraints
-	CasADi::SXMatrix ftotal;
+	CasADi::SX ftotal;
 
 	// function for nonlinear part of ftotal
 	CasADi::SXFunction Fnonlinear;
@@ -42,7 +42,7 @@ public:
 	CasADi::SXFunction Gfcn;
 
 	// design variables reference
-	const CasADi::SXMatrix & designVariables;
+	const CasADi::SX & designVariables;
 
 	void init(void);
 	void run(void);

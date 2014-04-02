@@ -21,16 +21,15 @@
  */
 
 #include "direct_multiple_shooting_internal.hpp"
-#include "../symbolic/fx/integrator.hpp"
+#include "../symbolic/function/integrator.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
-#include "../symbolic/stl_vector_tools.hpp"
-#include "../symbolic/fx/fx_tools.hpp"
+#include "../symbolic/std_vector_tools.hpp"
 
 using namespace std;
 namespace CasADi{
     
-DirectMultipleShootingInternal::DirectMultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
+DirectMultipleShootingInternal::DirectMultipleShootingInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to CasADi::Parallelizer");
   addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
@@ -47,7 +46,7 @@ void DirectMultipleShootingInternal::init(){
 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
-  integrator_ = integrator_creator(ffcn_,FX());
+  integrator_ = integrator_creator(ffcn_,Function());
   if(hasSetOption("integrator_options")){
     integrator_.setOption(getOption("integrator_options"));
   }
@@ -79,7 +78,7 @@ void DirectMultipleShootingInternal::init(){
   // ------
   // nx x 1  (states at time i=nk)
   
-  MX V("V",NV);
+  MX V = MX::sym("V",NV);
 
   // Global parameters
   MX P = V(Slice(0,np_));
@@ -130,12 +129,12 @@ void DirectMultipleShootingInternal::init(){
     paropt["parallelization"] = getOption("parallelization");
   
   // Evaluate function in parallel
-  vector<vector<MX> > pI_out = integrator_.call(int_in,paropt);
+  vector<vector<MX> > pI_out = integrator_.callParallel(int_in,paropt);
 
   // Evaluate path constraints in parallel
   vector<vector<MX> > pC_out;
   if(path_constraints)
-    pC_out = cfcn_.call(fcn_in,paropt);
+    pC_out = cfcn_.callParallel(fcn_in,paropt);
   
   //Constraint function
   vector<MX> gg(2*nk_);
@@ -156,7 +155,7 @@ void DirectMultipleShootingInternal::init(){
   // Objective function
   MX f;
   if (mfcn_.getNumInputs()==1) {
-    f = mfcn_.call(X.back()).front();
+    f = mfcn_(X.back()).front();
   } else {
     vector<MX> mfcn_argin(MAYER_NUM_IN); 
     mfcn_argin[MAYER_X] = X.back();
@@ -339,9 +338,9 @@ void DirectMultipleShootingInternal::evaluate(){
 void DirectMultipleShootingInternal::reportConstraints(std::ostream &stream) { 
   stream << "Reporting DirectMultipleShooting constraints" << endl;
  
-  CasADi::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
-  CasADi::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
-  CasADi::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
+  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
+  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
+  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
  
 }
 

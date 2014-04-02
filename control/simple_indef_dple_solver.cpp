@@ -31,16 +31,16 @@ namespace CasADi{
   
   }
   
-  SimpleIndefDpleSolver::SimpleIndefDpleSolver(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V) {
+  SimpleIndefDpleSolver::SimpleIndefDpleSolver(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) {
     assignNode(new SimpleIndefDpleInternal(A,V));
   }
 
   SimpleIndefDpleInternal* SimpleIndefDpleSolver::operator->(){
-    return static_cast<SimpleIndefDpleInternal*>(FX::operator->());
+    return static_cast<SimpleIndefDpleInternal*>(Function::operator->());
   }
 
   const SimpleIndefDpleInternal* SimpleIndefDpleSolver::operator->() const{
-    return static_cast<const SimpleIndefDpleInternal*>(FX::operator->()); 
+    return static_cast<const SimpleIndefDpleInternal*>(Function::operator->()); 
   }
   
   bool SimpleIndefDpleSolver::checkNode() const{

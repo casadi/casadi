@@ -30,17 +30,15 @@
 namespace CasADi{
 
   /// Function pointer to a derivative generator function
-  typedef FX (*DerivativeGeneratorCPtr)(FX& fcn, int nfwd, int nadj, void* user_data);
+  typedef Function (*DerivativeGeneratorCPtr)(Function& fcn, int nfwd, int nadj, void* user_data);
 
   /// Wrapper around functions
   typedef void (*CustomEvaluateCPtr)(CustomFunction &f, void* user_data);
 
   /// Wrapper around callback
-  typedef int (*CallbackCPtr)(FX &f, void* user_data);
+  typedef int (*CallbackCPtr)(Function &f, void* user_data);
   
-  class Functor;
-  
-  /** \brief Internal class for Functor
+  /** \brief  Functor
       \author Joris Gillis 
       \date 2013
   */
@@ -72,7 +70,7 @@ namespace CasADi{
       /// Construct from C pointer
       DerivativeGenerator(DerivativeGeneratorCPtr ptr);
       /// Call
-      virtual FX operator() (FX& fcn, int nfwd, int nadj, void* user_data);
+      virtual Function operator() (Function& fcn, int nfwd, int nadj, void* user_data);
   }; 
     
   /** \brief CustomEvaluate
@@ -125,7 +123,7 @@ namespace CasADi{
       /// Construct from C pointer
       Callback(CallbackCPtr ptr);
       /// Call
-      virtual int operator() (FX& fcn, void* user_data);
+      virtual int operator() (Function& fcn, void* user_data);
   };
 
 } // namespace CasADi

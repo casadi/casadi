@@ -46,7 +46,7 @@ class OcpMultipleShooting(ocp.Ocp):
             xErr = x1 - self.ode.rk4Step( x0, u0, u1, p, t0, t1)
             
             #self.addNonlcon( xErr, "==", C.MX(self.ode._Nx()*[0]))
-            self.addNonlcon( xErr, "==", C.SXMatrix(self.ode._Nx()*[0]))
+            self.addNonlcon( xErr, "==", C.SX(self.ode._Nx()*[0]))
             #self._addNonlconIneq( xErr )
 
 

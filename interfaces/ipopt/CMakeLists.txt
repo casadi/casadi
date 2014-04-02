@@ -15,6 +15,10 @@ if(WITH_IPOPT_CALLBACK)
   add_definitions(-DWITH_IPOPT_CALLBACK)
 endif()
 
+if(IPOPT_FOUND)
+  add_definitions(${IPOPT_CFLAGS_OTHER})
+endif()
+
 if(WITH_SIPOPT)
   add_definitions(-DWITH_SIPOPT)
 endif()

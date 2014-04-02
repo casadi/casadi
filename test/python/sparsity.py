@@ -39,19 +39,18 @@ class Sparsitytests(casadiTestCase):
              (0,0),
              (2,2)])
     
-    a = CRSSparsity(4,5)
+    a = Sparsity.sparse(4,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    b = CRSSparsity(4,5)  
+    b = Sparsity.sparse(4,5)  
     for i in nzb:
       b.getNZ(i[0],i[1])
       
-    w = UCharVector()
-    c=a.patternUnion(b,w)
-    self.assertEquals(w.size(),len(nza.union(nzb)))
-    for k in range(w.size()):
-      ind = (c.getRow()[k],c.col(k))
+    c,w =a.patternUnion(b)
+    self.assertEquals(len(w),len(nza.union(nzb)))
+    for k in range(len(w)):
+      ind = (c.row(k),c.getCol()[k])
       if (ind in nza and ind in nzb):
         self.assertEquals(w[k],1 | 2)
       elif (ind in nza):
@@ -62,7 +61,7 @@ class Sparsitytests(casadiTestCase):
     c = a + b
     self.assertEquals(c.size(),len(nza.union(nzb)))
     for k in range(c.size()):
-      ind = (c.getRow()[k],c.col(k))
+      ind = (c.row(k),c.getCol()[k])
       self.assertTrue(ind in nza or ind in nzb)
 
   def test_intersection(self):
@@ -77,44 +76,44 @@ class Sparsitytests(casadiTestCase):
              (2,2),
              (2,3)])
     
-    a = CRSSparsity(4,5)
+    a = Sparsity.sparse(4,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    b = CRSSparsity(4,5)  
+    b = Sparsity.sparse(4,5)  
     for i in nzb:
       b.getNZ(i[0],i[1])
     
-    c=a.patternIntersection(b)
+    c,_=a.patternIntersection(b)
     for k in range(c.size()):
-      ind = (c.getRow()[k],c.col(k))
+      ind = (c.row(k),c.getCol()[k])
       self.assertTrue(ind in nza and ind in nzb)
         
     c = a * b
     self.assertEquals(c.size(),len(nza.intersection(nzb)))
     for k in range(c.size()):
-      ind = (c.getRow()[k],c.col(k))
+      ind = (c.row(k),c.getCol()[k])
       self.assertTrue(ind in nza and ind in nzb)
        
   def test_getNZDense(self):
     self.message("getNZDense")
     nza = set([  (0,0),(0,1),(2,0),(3,1)])
     
-    a = CRSSparsity(4,5)
+    a = Sparsity.sparse(4,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
     A = DMatrix(a,1)
     Ad = DMatrix(array(A))
-    for i in getNZDense(a):
-      self.assertEqual(Ad[i],1)
+    for i in a.getElements():
+      self.assertEqual(Ad.nz[i],1)
 
   def test_enlarge(self):
     self.message("enlarge")
     import numpy
     self.message(":dense")
-    #sp = CRSSparsity(3,4,[1,2,1],[0,2,2,3])
-    sp = CRSSparsity(3,4,True)
+    #sp = Sparsity(3,4,[1,2,1],[0,2,2,3])
+    sp = Sparsity.dense(3,4)
     
     col = [1,2,4]
     row = [0,3,4,6]
@@ -127,7 +126,7 @@ class Sparsitytests(casadiTestCase):
 
     self.checkarray(DMatrix(sp,1),z,"enlarge")
     self.message(":sparse")
-    sp = CRSSparsity(3,4,[1,2,1],[0,2,2,3])
+    sp = Sparsity(4,3,[0,2,2,3],[1,2,1]).T
     n = DMatrix(sp,1)
     z = numpy.zeros((7,8))
     for i in range(3):
@@ -140,7 +139,7 @@ class Sparsitytests(casadiTestCase):
   def tomatrix(self,s):
     d = DMatrix(s,1)
     for k in range(d.size()):
-      d[k] = k+1
+      d.nz[k] = k+1
     return d
 
   def test_NZ(self):
@@ -152,11 +151,11 @@ class Sparsitytests(casadiTestCase):
              (2,4),
              (3,1)]
     
-    a = CRSSparsity(4,5)
+    a = Sparsity.sparse(4,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    b = sp_triplet(4,5,[i[0] for i in nza],[i[1] for i in nza])
+    b = Sparsity.triplet(4,5,[i[0] for i in nza],[i[1] for i in nza])
     self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
 
   def test_rowcol(self):
@@ -164,12 +163,12 @@ class Sparsitytests(casadiTestCase):
     
     r = [0,1,3]
     c = [1,4]
-    a = CRSSparsity(4,5)
+    a = Sparsity.sparse(4,5)
     for i in r:
       for j in c:
         a.getNZ(i,j)
       
-    b = sp_rowcol(r,c,4,5)
+    b = Sparsity.rowcol(r,c,4,5)
     self.checkarray(self.tomatrix(a),self.tomatrix(b),"rowcol")
      
   def test_reshape(self):
@@ -181,13 +180,13 @@ class Sparsitytests(casadiTestCase):
              (2,4),
              (3,1)])
     
-    a = CRSSparsity(4,5)
+    a = Sparsity.sparse(4,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
     A=self.tomatrix(a).toArray()
     B=self.tomatrix(casadi.reshape(a,2,10)).toArray()
-    B_=numpy.reshape(A,(2,10))
+    B_=numpy.reshape(A.T,(10,2)).T
     
     self.checkarray(B,B_,"reshape")
     
@@ -201,7 +200,7 @@ class Sparsitytests(casadiTestCase):
              (2,4),
              (3,1)])
     
-    a = CRSSparsity(4,5)
+    a = Sparsity.sparse(4,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
@@ -213,94 +212,56 @@ class Sparsitytests(casadiTestCase):
     
     
   def test_refcount(self):
-      x = DMatrix(sp_tril(4),5)
+      x = DMatrix(Sparsity.tril(4),5)
       s = mul(x,x).sparsity()
       self.assertEqual(s.numel(),16)
       
   def test_splower(self):
-    sp = CRSSparsity(3,4,[1,2,1],[0,2,2,3])
+    sp = Sparsity(4,3,[0,2,2,3],[1,2,1])
     print array(sp)
-    print array(lowerSparsity(sp))
-    print lowerNZ(sp)
+    print array(tril(sp))
+    print sp.getLowerNZ()
     
     
   def test_diag(self):
     self.message("diag")
-    A = CRSSparsity(5,5)
+    A = Sparsity.sparse(5,5)
     A.getNZ(1,1)
     A.getNZ(2,4)
     A.getNZ(3,3)
     
-    sp, mapping = A.diag()
+    sp, mapping = A.getDiag()
     B = DMatrix(sp,1)
     
-    self.checkarray(array([[0],[1],[0],[1],[0]]),B,"diag(matrix)")
-    self.checkarray(array([0,2]),array(list(mapping)),"diag(vector)")
+    self.checkarray(array([[0],[1],[0],[1],[0]]),B,"getDiag(matrix)")
+    self.checkarray(array([0,1]),array(list(mapping)),"getDiag(vector)")
     
     #print B
     
-    A = CRSSparsity(5,1)
+    A = Sparsity.sparse(5,1)
     A.getNZ(1,0)
     A.getNZ(2,0)
     A.getNZ(4,0)
     
-    sp, mapping = A.diag()
+    sp, mapping = A.getDiag()
     B = DMatrix(sp,1)
     
-    self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"diag(vector)")
+    self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"getDiag(vector)")
     
-    self.checkarray(array([0,1,2]),array(list(mapping)),"diag(vector)")
+    self.checkarray(array([0,1,2]),array(list(mapping)),"getDiag(vector)")
     
-    A = CRSSparsity(1,5)
+    A = Sparsity.sparse(1,5)
     A.getNZ(0,1)
     A.getNZ(0,2)
     A.getNZ(0,4)
     
-    sp, mapping = A.diag()
+    sp, mapping = A.getDiag()
     B = DMatrix(sp,1)
     
-    self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"diag(vector)")
+    self.checkarray(array([[0,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,1]]),B,"getDiag(vector)")
     
-    self.checkarray(array([0,1,2]),array(list(mapping)),"diag(vector)")
-    
-  def test_vecMX(self):
-    self.message("vec MXFunction")
-    q = DMatrix([[1,2,3,4,9],[5,6,7,8,8],[9,10,11,12,6],[1,2,3,4,5]])
-
-    X = MX("X",4,5)
-
-    F = MXFunction([X],[X**2])
-    F.init()
-    F.setInput(q,0)
-    F.evaluate()
-    F_ = vec(F.getOutput(0))
-
-    G = vec(F)
-    G.setInput(vec(q),0)
-    G.evaluate()
-    G_ = G.getOutput()
-
-    self.checkarray(F_,G_,"vec MX")
-    
-  def test_vecSX(self):
-    self.message("vec SXFunction")
-    q = DMatrix([[1,2,3,4,9],[5,6,7,8,8],[9,10,11,12,6],[1,2,3,4,5]])
-
-    X = ssym("X",4,5)
-
-    F = SXFunction([X],[X**2])
-    F.init()
-    F.setInput(q,0)
-    F.evaluate()
-    F_ = vec(F.getOutput(0))
-
-    G = vec(F)
-    G.setInput(vec(q),0)
-    G.evaluate()
-    G_ = G.getOutput()
-
-    self.checkarray(F_,G_,"vec SX")
-    
+    self.checkarray(array([0,1,2]),array(list(mapping)),"getDiag(vector)")
+            
   def test_sparsityindex(self):
     self.message("sparsity indexing")
     nza = set([  (0,0),
@@ -312,15 +273,15 @@ class Sparsitytests(casadiTestCase):
              (3,1),
              (4,1)])
     
-    a = CRSSparsity(5,5)
+    a = Sparsity.sparse(5,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    b = ssym("b",a)
+    b = SX.sym("b",a)
     
-    self.assertRaises(Exception,lambda: b[sp_diag(3)])
+    self.assertRaises(Exception,lambda: b[Sparsity.diag(3)])
     
-    d = sp_diag(5)
+    d = Sparsity.diag(5)
     c = b[d]
 
     self.assertTrue(c.sparsity()==d)
@@ -330,9 +291,9 @@ class Sparsitytests(casadiTestCase):
     f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
-    self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    self.checkarray(DMatrix(f.getOutput().data()),DMatrix([1,0,0,7,0]),"sparsity index")
     
-    self.assertTrue(f.output().data()[1]==0)
+    self.assertTrue(f.getOutput().data()[1]==0)
     
   def test_sparsityindex(self):
     self.message("sparsity indexing")
@@ -345,15 +306,15 @@ class Sparsitytests(casadiTestCase):
              (3,1),
              (4,1)])
     
-    a = CRSSparsity(5,5)
+    a = Sparsity.sparse(5,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    b = msym("b",a)
+    b = MX.sym("b",a)
     
-    self.assertRaises(Exception,lambda: b[sp_diag(3)])
+    self.assertRaises(Exception,lambda: b[Sparsity.diag(3)])
     
-    d = sp_diag(5)
+    d = Sparsity.diag(5)
     c = b[d]
 
     self.assertTrue(c.sparsity()==d)
@@ -363,9 +324,9 @@ class Sparsitytests(casadiTestCase):
     f.setInput(range(1,len(nza)+1))
     f.evaluate()
     
-    self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
+    self.checkarray(DMatrix(f.getOutput().data()),DMatrix([1,0,0,7,0]),"sparsity index")
     
-  def test_getSparsityCCS(self):
+  def test_getCCS(self):
     self.message("CCS format")
     nza = set([  (0,0),
              (0,1),
@@ -375,13 +336,13 @@ class Sparsitytests(casadiTestCase):
              (2,4),
              (3,1)])
     
-    a = CRSSparsity(4,5)
+    a = Sparsity.sparse(4,5)
     for i in nza:
       a.getNZ(i[0],i[1])
       
-    A1, B1= a.getSparsityCCS()
+    A1, B1= a.getCCS()
     
-    A2, B2 = (a.T).getSparsityCRS()
+    A2, B2 = (a.T).getCRS()
     
     print A1, B1
     print A2, B2
@@ -404,13 +365,13 @@ class Sparsitytests(casadiTestCase):
 
       Ar = AP[rowperm,colperm]
       
-      ST = Ar.T.sparsity()
+      ST = Ar.sparsity()
       
       blocks = []
       acc = -1
       mc = 0
       for i in range(0,Ar.size1()):
-        mc = max(ST.col()[ST.rowind()[i+1]-1],mc)
+        mc = max(ST.row()[ST.colind()[i+1]-1],mc)
         if mc==i:
           blocks.append(i-acc)
           acc = i
@@ -444,13 +405,13 @@ class Sparsitytests(casadiTestCase):
       #print "permute"
       #Ar.sparsity().spy()
        
-      ST = Ar.T.sparsity()
+      ST = Ar.sparsity()
       
       blocks = []
       acc = -1
       mc = 0
       for i in range(0,Ar.size1()):
-        mc = max(ST.col()[ST.rowind()[i+1]-1],mc)
+        mc = max(ST.row()[ST.colind()[i+1]-1],mc)
         if mc==i:
           blocks.append(i-acc)
           acc = i
@@ -463,7 +424,7 @@ class Sparsitytests(casadiTestCase):
     
   def test_dm(self):
   
-    A = DMatrix(6,4)
+    A = DMatrix.sparse(6,4)
     A[0,0] = 1
     A[1,2] = 1
     A[2,2] = 1
@@ -481,7 +442,7 @@ class Sparsitytests(casadiTestCase):
     self.checkarray(coarse_colblock,DMatrix([ 0, 1,3,3,4]).T)
     
     
-    A = DMatrix(6,4)
+    A = DMatrix.sparse(6,4)
     A[0,0] = 1
     A[1,2] = 1
     A[2,2] = 1
@@ -502,7 +463,7 @@ class Sparsitytests(casadiTestCase):
     self.checkarray(coarse_rowblock,DMatrix([ 0, 2, 4,6,6]).T)
     self.checkarray(coarse_colblock,DMatrix([ 0, 2,4,4,4]).T)
     
-    A = DMatrix(6,4)
+    A = DMatrix.sparse(6,4)
     A[0,0] = 1
     A[1,2] = 1
     A[2,2] = 1
@@ -527,12 +488,12 @@ class Sparsitytests(casadiTestCase):
     
   def test_jacsparsityHierarchical(self):
 
-    X = ssym("X",100)
-    P = ssym("P",1000)
+    X = SX.sym("X",100)
+    P = SX.sym("P",1000)
 
     optvar = vertcat([X,P])
 
-    p = ssym("p")
+    p = SX.sym("p")
 
     g = SXFunction([optvar,p],[X*p])
     g.setOption("verbose",True)
@@ -542,12 +503,12 @@ class Sparsitytests(casadiTestCase):
     J.setOption("verbose",True)
     J.init()
     
-    self.assertTrue(J.output()[:,:X.size()].sparsity()==sp_diag(100))
+    self.assertTrue(J.getOutput()[:,:X.size()].sparsity()==Sparsity.diag(100))
 
-    X = ssym("X",100)
-    P = ssym("P",1000)
+    X = SX.sym("X",100)
+    P = SX.sym("P",1000)
 
-    p = ssym("p")
+    p = SX.sym("p")
 
     g = SXFunction([X,p],[vertcat([X*p,P])])
     g.setOption("verbose",True)
@@ -557,26 +518,25 @@ class Sparsitytests(casadiTestCase):
     J.setOption("verbose",True)
     J.init()
     
-    self.assertTrue(J.output()[:X.size(),:].sparsity()==sp_diag(100))
+    self.assertTrue(J.getOutput()[:X.size(),:].sparsity()==Sparsity.diag(100))
     
-  def test_sp_rowcol(self):
+  def test_rowcol(self):
     n = 3
     
-    s = sp_rowcol([0,n-1],[n-1,0],n,n)
-    self.checkarray(IMatrix(s.rowind()),IMatrix([0,2,2,4]))
-    self.checkarray(IMatrix(s.col()),IMatrix([0,2,0,2]))
+    s = Sparsity.rowcol([n-1,0],[0,n-1],n,n)
+    self.checkarray(IMatrix(s.colind()),IMatrix([0,2,2,4]))
+    self.checkarray(IMatrix(s.row()),IMatrix([0,2,0,2]))
 
   def test_inverse(self):
     numpy.random.seed(0)
     d = self.randDMatrix(20,20,0.6,symm=True)
     sp = d.sparsity()
     
-    for sp in [sp,sp_dense(4,4),sp_sparse(4,4),sp_tril(4),sp_tril(4).T]:
+    for sp in [sp,Sparsity.dense(4,4),Sparsity.sparse(4,4),Sparsity.tril(4),Sparsity.tril(4).T]:
     
       d = IMatrix(sp,1)
       
-      dt = 1-d
-      makeSparse(dt)
+      dt = sparse(1-d)
       dt = IMatrix(dt.sparsity(),1)
       
       trial = IMatrix(sp.patternInverse(),1)
@@ -586,8 +546,17 @@ class Sparsitytests(casadiTestCase):
       trial.printDense()
       
       self.checkarray(trial,dt)
+      
+  def test_internalapi(self):
+    s = Sparsity.dense(2,2)
+    with warnings.catch_warnings():
+      warnings.simplefilter("error",SyntaxWarning)
+      with self.assertRaises(Exception):
+        s.reCache()
+      
+      with internalAPI():
+        s.reCache()
     
-
 if __name__ == '__main__':
     unittest.main()
 

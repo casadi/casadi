@@ -23,7 +23,7 @@
 #ifndef LIFTED_SQP_HPP
 #define LIFTED_SQP_HPP
 
-#include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/function/nlp_solver.hpp"
 
 namespace CasADi{
   
@@ -40,8 +40,8 @@ class LiftedSQP : public NLPSolver {
     LiftedSQP();
 
     /// \brief Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit LiftedSQP(const FX& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
-                       const FX& G          /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
+    explicit LiftedSQP(const Function& F,         /**< F objective function: \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}]\f$*/
+                       const Function& G          /**< constraint function (default only bound constraints): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^m]\f$ */
                        );
 
     /// Access functions of the node
@@ -55,7 +55,7 @@ class LiftedSQP : public NLPSolver {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static NLPSolver creator(const FX& F, const FX& G, int dummy){ return LiftedSQP(F,G);}
+    static NLPSolver creator(const Function& F, const Function& G, int dummy){ return LiftedSQP(F,G);}
     #ifdef SWIG
     %nocallback;
     #endif

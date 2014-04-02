@@ -26,84 +26,52 @@
 using namespace std;
 namespace CasADi{
   
-VariableInternal::VariableInternal(const string& name) : name_(name){
-  // No expression by default
-  var_ = casadi_limits<SX>::nan;
-  
-  // Not differentable by default
-  der_ = casadi_limits<SX>::nan;
-    
-  // Not binding expressions by default
-  binding_ = casadi_limits<SX>::nan;
-  der_binding_ = casadi_limits<SX>::nan;
-    
-  variability_ = CONTINUOUS;
-  causality_ = INTERNAL;
-  category_ = CAT_UNKNOWN;
-  alias_ = NO_ALIAS;
-  description_ = "";
-  valueReference_ = -1; //?
-  min_ = -numeric_limits<double>::infinity();
-  max_ = numeric_limits<double>::infinity();
-  initial_guess_ = 0;
-  nominal_ = 1.0;
-  start_ = 0.0;
-  derivative_start_ = 0.0;
-  unit_ = "";
-  displayUnit_ = "";
-  free_ = false;
-  is_differential_ = false;
-
-  index_ = -1;
-}
-
-VariableInternal::~VariableInternal(){
-}
-
-const string& VariableInternal::getName() const{
-  return name_;
-}
-
-void VariableInternal::repr(ostream &stream) const{
-  stream << name_;
-}
-
-
-void VariableInternal::print(ostream &stream) const{
-  stream << name_;
-}
-
-SX VariableInternal::atTime(double t, bool allocate) const{
-  casadi_assert(!allocate);
-  return const_cast<VariableInternal*>(this)->atTime(t,false);
-}
-
-SX VariableInternal::atTime(double t, bool allocate){
-  // Find an existing element
-  map<double,SX>::const_iterator it = timed_sx_.find(t);
-  
-  // If not found
-  if(it==timed_sx_.end()){
-    if(allocate){
-      // Create a timed variable
-      stringstream ss;
-      ss << var_ << ".atTime(" << t << ")";
-      SX tvar(ss.str());
-      
-      // Save to map
-      timed_sx_[t] = tvar;
-      
-      // Return the expression
-      return tvar;
-    } else {
-      casadi_error(" has no timed variable with t = " << t << ".");
-    }
-    
-  } else {
-    // Return the expression
-    return it->second;
+  VariableInternal::VariableInternal(const string& name){
   }
-}
+
+  VariableInternal::~VariableInternal(){
+  }
+
+  void VariableInternal::repr(ostream &stream) const{
+    var_.print(stream);
+  }
+
+
+  void VariableInternal::print(ostream &stream) const{
+    var_.print(stream);
+  }
+
+  SX VariableInternal::atTime(double t, bool allocate) const{
+    casadi_assert(!allocate);
+    return const_cast<VariableInternal*>(this)->atTime(t,false);
+  }
+
+  SX VariableInternal::atTime(double t, bool allocate){
+    // Find an existing element
+    map<double,SX>::const_iterator it = timed_sx_.find(t);
+  
+    // If not found
+    if(it==timed_sx_.end()){
+      if(allocate){
+        // Create a timed variable
+        stringstream ss;
+        ss << var_.getName() << ".atTime(" << t << ")";
+        SX tvar = SX::sym(ss.str());
+      
+        // Save to map
+        timed_sx_[t] = tvar;
+      
+        // Return the expression
+        return tvar;
+      } else {
+        casadi_error(" has no timed variable with t = " << t << ".");
+      }
+    
+    } else {
+      // Return the expression
+      return it->second;
+    }
+  }
 
 } // namespace CasADi
 

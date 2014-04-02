@@ -24,11 +24,12 @@
 #define OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
 
 #include "old_collocation_integrator.hpp"
-#include "symbolic/fx/integrator_internal.hpp"
-#include "symbolic/fx/mx_function.hpp"
-#include "symbolic/fx/implicit_function.hpp"
+#include "symbolic/function/integrator_internal.hpp"
+#include "symbolic/function/mx_function.hpp"
+#include "symbolic/function/implicit_function.hpp"
 #include "integration_tools.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
     
   class OldCollocationIntegratorInternal : public IntegratorInternal{
@@ -36,7 +37,7 @@ namespace CasADi{
   public:
   
     /// Constructor
-    explicit OldCollocationIntegratorInternal(const FX& f, const FX& g);
+    explicit OldCollocationIntegratorInternal(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -45,7 +46,7 @@ namespace CasADi{
     virtual OldCollocationIntegratorInternal* clone() const{ return new OldCollocationIntegratorInternal(*this);}
 
     /// Create a new integrator
-    virtual OldCollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new OldCollocationIntegratorInternal(f,g);}
+    virtual OldCollocationIntegratorInternal* create(const Function& f, const Function& g) const{ return new OldCollocationIntegratorInternal(f,g);}
   
     /// Destructor
     virtual ~OldCollocationIntegratorInternal();
@@ -83,5 +84,5 @@ namespace CasADi{
   };
 
 } // namespace CasADi
-
+/// \endcond
 #endif //OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP

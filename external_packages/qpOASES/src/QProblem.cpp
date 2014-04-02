@@ -1690,7 +1690,7 @@ returnValue QProblem::solveQP(	const real_t* const g_new,
 	/* I) PREPARATIONS */
 	/* 1) Allocate delta vectors of gradient and (constraints') bounds,
 	 *    index arrays and step direction arrays. */
-	int nFR, nFX, nAC, nIAC;
+	// int nFR, nFX, nAC, nIAC;  // commented out, but maybe needed for DEBUG_ITER
 
 	real_t* delta_xFR = new real_t[nV];
 	real_t* delta_xFX = new real_t[nV];
@@ -1751,10 +1751,10 @@ returnValue QProblem::solveQP(	const real_t* const g_new,
 		#endif
 
 		/* some more definitions */
-		nFR  = getNFR( );
-		nFX  = getNFX( );
-		nAC  = getNAC( );
-		nIAC = getNIAC( );
+		// nFR  = getNFR( );  // commented out, but maybe needed for DEBUG_ITER
+		// nFX  = getNFX( );  // commented out, but maybe needed for DEBUG_ITER
+		// nAC  = getNAC( );  // commented out, but maybe needed for DEBUG_ITER
+		// nIAC = getNIAC( ); // commented out, but maybe needed for DEBUG_ITER
 
 
 		/* 2) Detemination of shift direction of the gradient and the (constraints') bounds. */

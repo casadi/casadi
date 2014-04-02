@@ -23,10 +23,11 @@
 #ifndef SOCP_QCQP_INTERNAL_HPP
 #define SOCP_QCQP_INTERNAL_HPP
 
-#include "symbolic/fx/qcqp_solver_internal.hpp"
-#include "symbolic/fx/socp_solver.hpp"
+#include "symbolic/function/qcqp_solver_internal.hpp"
+#include "symbolic/function/socp_solver.hpp"
 #include "interfaces/csparse/csparse_cholesky.hpp"
 
+/// \cond INTERNAL
 namespace CasADi{
 
   /** \brief Internal class for SOCPQCQPInternal
@@ -41,7 +42,7 @@ public:
   virtual SOCPQCQPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit SOCPQCQPInternal(const std::vector<CRSSparsity> &st);
+  explicit SOCPQCQPInternal(const std::vector<Sparsity> &st);
 
   /** \brief  Destructor */
   virtual ~SOCPQCQPInternal();
@@ -55,7 +56,7 @@ public:
     SOCPSolver socpsolver_;
     std::vector<CSparseCholesky> cholesky_;
 };
-
+/// \endcond
 } // namespace CasADi
 
 #endif //SOCP_QCQP_INTERNAL_HPP

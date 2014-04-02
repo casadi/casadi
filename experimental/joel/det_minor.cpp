@@ -21,10 +21,10 @@
  */
 
 #include "symbolic/mx/mx.hpp"
-#include "symbolic/stl_vector_tools.hpp"
-#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/std_vector_tools.hpp"
+#include "symbolic/function/sx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/fx/fx.hpp"
+#include "symbolic/function/function.hpp"
 #include <ctime>
 
 using namespace std;

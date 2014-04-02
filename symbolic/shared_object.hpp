@@ -33,8 +33,10 @@ namespace CasADi{
   // Forward declaration of weak reference class
   class WeakRef;
 
+  /// \cond INTERNAL
   // Forward declaration of internal class
   class SharedObjectNode;
+  /// \endcond
 
   /** \brief SharedObject implements a reference counting framework simular for effient and easily-maintained memory management.
   
@@ -52,13 +54,13 @@ namespace CasADi{
       The copy constructor and the assignment operator perform shallow copies only, to make a deep copy you must use the
       clone method explictly. This will give a shared pointer instance.
   
-      In an inheritance hierarchy, you can cast down automatically, e.g. (SXFunction is a child class of FX):
+      In an inheritance hierarchy, you can cast down automatically, e.g. (SXFunction is a child class of Function):
       SXFunction derived(...);
-      FX base = derived;
+      Function base = derived;
   
       To cast up, use the shared_cast template function, which works analogously to dynamic_cast, static_cast, const_cast etc, e.g.:
       SXFunction derived(...);
-      FX base = derived;
+      Function base = derived;
       SXFunction derived_from_base = shared_cast<SXFunction>(base);
   
       A failed shared_cast will result in a null pointer (cf. dynamic_cast)
@@ -89,6 +91,7 @@ namespace CasADi{
     /// Assignment operator
     SharedObject& operator=(const SharedObject& ref);
     
+    /// \cond INTERNAL
     /// Assign the node to a node class pointer (or null)
     void assignNode(SharedObjectNode* node);
     
@@ -112,6 +115,7 @@ namespace CasADi{
 
     /// Const access a member function or object
     const SharedObjectNode* operator->() const;
+    /// \endcond
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream) const;
@@ -121,43 +125,62 @@ namespace CasADi{
     
 #endif // SWIG
     
+    /// \cond INTERNAL
     /// Print the pointer to the internal class
     void printPtr(std::ostream &stream=std::cout) const;
+    /// \endcond
 
-    /// Initialize or re-initialize the object: more documentation in the node class (SharedObjectNode and derived classes)
+    /** \brief Initialize or re-initialize the object:
+    *
+    * more documentation in the node class (SharedObjectNode and derived classes)
+    */
     void init(bool allow_reinit=true);
 
     /// Is initialized?
     bool isInit() const;
     
+    /// \cond INTERNAL
     /// Assert that it is initialized
     void assertInit() const;
+    /// \endcond
     
     /// Is a null pointer?
     bool isNull() const;
-
+    
+    /// \cond INTERNAL
     /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
+    /// \endcond
     
+
     //@{
+    /// \cond SWIGINTERNAL
     /// If there are other references to the object, then make a deep copy of it and point to this new object
     void makeUnique(bool clone_members=true);
+    /// \endcond SWIGINTERNAL
+    /// \cond INTERNAL
 #ifndef SWIG
     void makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied, bool clone_members=true);
+#endif
+    /// \endcond
     //@}
 
+/// \cond INTERNAL
+#ifndef SWIG
     /** \brief Get a weak reference to the object */
     WeakRef* weak();
-    
+#endif // SWIG
+/// \endcond
+ 
   private:
     SharedObjectNode *node;
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
-#endif // SWIG
+    
   };
 
 #ifndef SWIG
-
+  /// \cond INTERNAL
   /// Internal class for the reference counting framework, see comments on the public class.
   class SharedObjectNode{
     friend class SharedObject;
@@ -232,7 +255,9 @@ namespace CasADi{
     /// Weak pointer (non-owning) object for the object
     WeakRef* weak_ref_;
   };
-
+  /// \endcond
+  
+  /// \cond INTERNAL
   /// Typecast a shared object to a base class to a shared object to a derived class, cf. dynamic_cast
   template<class B>
   B shared_cast(SharedObject& A){
@@ -259,6 +284,7 @@ namespace CasADi{
     SharedObject A_copy = A;
     return shared_cast<B>(A_copy);
   }
+  /// \endcond
 
   /// Check if a shared object is of a certain type
   template<class B>
@@ -276,6 +302,7 @@ namespace CasADi{
     return ret;
   }
 
+  /// \cond INTERNAL
   template<class A>
   A deepcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied){
     A ret = a;
@@ -303,8 +330,10 @@ namespace CasADi{
     }
     return ret;
   }
+  /// \endcond
   //@}
 
+  /// \cond INTERNAL
   // Template function implementations
   template<class B>
   B SharedObjectNode::shared_from_this(){
@@ -327,7 +356,7 @@ namespace CasADi{
   
     return ret;
   }
-
+  /// \endcond
 
 #endif // SWIG
 

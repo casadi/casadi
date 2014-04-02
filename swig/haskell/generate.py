@@ -7,6 +7,7 @@ except:
 
 import sys
 import re
+import itertools
 
 # Parse the input XML
 e = etree.parse(sys.argv[1])
@@ -32,11 +33,11 @@ def update_types_table(p):
 
 def tohaskelltype(s,alias=False,level=0):
   """
-  std::vector<(CasADi::FX)>
+  std::vector<(CasADi::Function)>
 
   ->
 
-  Vec (CasadiClass FX)
+  StdVec (CasadiClass CppFunction)
   """
   if level==0:
     if s.startswith("r.q(const)."):
@@ -77,7 +78,7 @@ def tohaskelltype(s,alias=False,level=0):
       if alias:
         return "val"+r
       else:
-        return "Val (" + r + ")"
+        return r
 
   if level==1:
     if s.startswith("std::vector<("):
@@ -86,7 +87,7 @@ def tohaskelltype(s,alias=False,level=0):
       if alias:
         return r + "Vec"
       else:
-        return "Vec (" + r + ")"
+        return "StdVec (" + r + ")"
     else:
       r = tohaskelltype(s,alias,level=2)
       if r is None: return None
@@ -101,25 +102,25 @@ def tohaskelltype(s,alias=False,level=0):
     if alias:
       return r + "Vec"
     else:
-      return "Vec (" + r + ")"
+      return "StdVec (" + r + ")"
   elif s == "std::string":
-    return ("" if alias else "NonVec ")+ "StdString"
+    return "StdString"
   elif s == "std::ostream":
-    return ("" if alias else "NonVec ")+ "StdOstream"
+    return "StdOstream"
   elif s == "bool":
-    return ("" if alias else "NonVec ")+ "CBool"
+    return "CBool"
   elif s == "std::size_t":
-    return ("" if alias else "NonVec ")+ "CSize"
+    return "CSize"
   elif s == "int":
-    return ("" if alias else "NonVec ")+ "CInt"
+    return "CInt"
   elif s == "long":
-    return ("" if alias else "NonVec ")+ "CLong"
+    return "CLong"
   elif s == "double":
-    return ("" if alias else "NonVec ")+ "CDouble"
+    return "CDouble"
   elif s == "unsigned char":
-    return ("" if alias else "NonVec ")+ "CUChar"
+    return "CUChar"
   elif s == "void":
-    return ("" if alias else "NonVec ")+ "CVoid"
+    return "CVoid"
   elif s.startswith("std::pair"):
     return None
   elif s.startswith("CasADi::"):
@@ -131,14 +132,14 @@ def tohaskelltype(s,alias=False,level=0):
       if alias:
         return "enum"+s[len("CasADi::"):]
       else:
-        return "NonVec (CasadiEnum %s)" % ucfirst(s[len("CasADi::"):])
+        return "CasadiEnum %s" % ucfirst(s[len("CasADi::"):])
     else:
       return None
 
     if alias:
       return sym
     else:
-      return "NonVec (CasadiClass " + sym + ")"
+      return "CasadiClass " + sym
   else:
     if s in  symbol_table:
       sym = symbol_table[s]
@@ -148,7 +149,7 @@ def tohaskelltype(s,alias=False,level=0):
       if alias:
         return "enum" +s
       else:
-        return "NonVec (CasadiEnum %s)" % ucfirst(s)
+        return "CasadiEnum %s" % ucfirst(s)
     elif s=='a().q(const).char':
       return None
     else:
@@ -157,7 +158,7 @@ def tohaskelltype(s,alias=False,level=0):
     if alias:
       return sym
     else:
-      return "NonVec (CasadiClass " + sym + ")"
+      return "CasadiClass " + sym
 
 def getAttribute(e,name,default=""):
   d = e.find('attributelist/attribute[@name="' + name + '"]')
@@ -231,7 +232,7 @@ for c in r.findall('*//class'):
 
      data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal",docs))
 
-  for d in c.findall('constructor'):
+  for d in itertools.chain(c.findall('constructor'),c.findall('extend/constructor')):
      dname = symbol_table[name]
      if d.find('attributelist/parmlist') is None:
        params = []
@@ -266,6 +267,7 @@ for d in r.findall('*//namespace/cdecl'):
   if d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function": continue
 
   dname = d.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
+  if dname == "dummy": continue
   if d.find('attributelist/parmlist') is None:
     params = []
   else:
@@ -282,11 +284,11 @@ for d in r.findall('*//namespace/cdecl'):
 
 
 ftree  = file('CasadiTree.hs','w')
-ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.CasadiTree ( classes, ioschemeclasses, tools, ioschemehelpers, enums ) where\n\n\nimport WriteCasadiBindings.Types\n\n\n")
+ftree.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteBindings.Buildbot.CasadiTree ( classes, ioschemeclasses, tools, ioschemehelpers, enums ) where\n\n\nimport WriteBindings.Types\n\n\n")
 
 
 fclasses  = file('CasadiClasses.hs','w')
-fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteCasadiBindings.Buildbot.CasadiClasses ( CasadiEnum(..), CasadiClass(..), cppTypeCasadiPrimClass,cppTypeCasadiPrimEnum,inheritance ) where\n\n")
+fclasses.write("{-# OPTIONS_GHC -Wall #-}\n\nmodule WriteBindings.Buildbot.CasadiClasses ( CasadiEnum(..), CasadiClass(..), cppTypeCasadiPrimClass,cppTypeCasadiPrimEnum,inheritance ) where\n\n")
 
 
 finclude  = file('swiginclude.hpp','w')
@@ -372,14 +374,14 @@ for (name,pars,rettype,docs) in functions:
     tainted_types[p] = True
   tainted_types[t] = True
   target = tools
-  if "Vec" in t and (t.endswith("CRSSparsity") or name.endswith("In") or name.endswith("Out")):
-    #name = name[:-len("CRSSparsity")]
+  if "Vec" in t and (t.endswith("Sparsity") or name.endswith("In") or name.endswith("Out")):
+    #name = name[:-len("Sparsity")]
     target = ioschemehelpers
   elif "Vec" in t and t.endswith("MX") :
     #name = name[:-len("MX")]
     target = ioschemehelpers
-  elif "Vec" in t and t.endswith("SXMatrix"):
-    #name = name[:-len("SXMatrix")]
+  elif "Vec" in t and t.endswith("SX"):
+    #name = name[:-len("SX")]
     target = ioschemehelpers
   if name.endswith("Struct"):
     target = ioschemehelpers
@@ -387,10 +389,10 @@ for (name,pars,rettype,docs) in functions:
     counter[name]+=1
   else:
     counter[name]=0
-  target.append("""  Function (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
+  target.append("""  CppFunction (Name "%s") %s [%s] (Doc "%s") """ % (name+"'"*counter[name],t,",".join(params),haskellstring(docs)))
 
 ftree.write("""
-tools :: [Function]
+tools :: [CppFunction]
 tools =
   [
 %s
@@ -398,7 +400,7 @@ tools =
 \n""" % ",\n".join(tools))
 
 ftree.write("""
-ioschemehelpers :: [Function]
+ioschemehelpers :: [CppFunction]
 ioschemehelpers =
   [
 %s

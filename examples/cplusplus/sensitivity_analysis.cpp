@@ -36,16 +36,16 @@ using namespace std;
 using namespace CasADi;
 
 /** \brief Generate a simple ODE */
-void simpleODE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
+void simpleODE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   // Time 
-  SXMatrix t = ssym("t");
+  SX t = SX::sym("t");
   
   // Parameter
-  SXMatrix u = ssym("u");
+  SX u = SX::sym("u");
   
   // Differential states
-  SXMatrix s = ssym("s"), v = ssym("v"), m = ssym("m");
-  SXMatrix x;
+  SX s = SX::sym("s"), v = SX::sym("v"), m = SX::sym("m");
+  SX x;
   x.append(s);
   x.append(v);
   x.append(m); 
@@ -55,13 +55,13 @@ void simpleODE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
   double beta = 0.1;   // fuel consumption rate
   
   // Differential equation
-  SXMatrix ode;
+  SX ode;
   ode.append(v);
   ode.append((u-alpha*v*v)/m);
   ode.append(-beta*u*u); 
       
   // Quadrature
-  SXMatrix quad = pow(v,3) + pow((3-sin(t))-u,2);
+  SX quad = pow(v,3) + pow((3-sin(t))-u,2);
 
   // Callback function
   ffcn = SXFunction(daeIn("t",t,"x",x,"p",u),daeOut("ode",ode,"quad",quad));
@@ -80,24 +80,24 @@ void simpleODE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
 }
 
 /** \brief Generate a simple DAE */
-void simpleDAE(FX& ffcn, double& tf, vector<double>& x0, double& u0){
+void simpleDAE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
   // Parameter
-  SXMatrix u = ssym("u");
+  SX u = SX::sym("u");
   
   // Differential state
-  SXMatrix x = ssym("x");
+  SX x = SX::sym("x");
 
   // Algebraic variable
-  SXMatrix z = ssym("z");
+  SX z = SX::sym("z");
 
   // Differential equation
-  SXMatrix ode = -x + 0.5*x*x + u + 0.5*z;
+  SX ode = -x + 0.5*x*x + u + 0.5*z;
 
   // Algebraic constraint
-  SXMatrix alg = z + exp(z) - 1. + x;
+  SX alg = z + exp(z) - 1. + x;
 
   // Quadrature
-  SXMatrix quad = x*x + 3.0*u*u;
+  SX quad = x*x + 3.0*u*u;
   
   // Callback function
   ffcn = SXFunction(daeIn("x",x,"z",z,"p",u),daeOut("ode",ode,"alg",alg,"quad",quad));
@@ -120,7 +120,7 @@ int main(){
   for(int problem=0; problem<NUM_PROBLEMS; ++problem){
     
     // Get problem
-    FX ffcn;              // Callback function
+    Function ffcn;              // Callback function
     vector<double> x0;    // Initial value
     double u0;            // Parameter value
     double tf;            // End time
@@ -209,7 +209,7 @@ int main(){
       cout << setw(50) << "Finite difference approximation: " << "d(xf)/d(p) = " << (xf_pert-xf)/h << ", d(qf)/d(p) = " << (qf_pert-qf)/h << endl;
 
       // Calculate once, forward
-      FX I_fwd = I.derivative(1,0);
+      Function I_fwd = I.derivative(1,0);
       I_fwd.setInput(x0,"der_x0");
       I_fwd.setInput(u0,"der_p");
       I_fwd.setInput(0.0,"fwd0_x0");
@@ -220,7 +220,7 @@ int main(){
       cout << setw(50) << "Forward sensitivities: " << "d(xf)/d(p) = " << fwd_xf << ", d(qf)/d(p) = " << fwd_qf << endl;
 
       // Calculate once, adjoint
-      FX I_adj = I.derivative(0,1);
+      Function I_adj = I.derivative(0,1);
       I_adj.setInput(x0,"der_x0");
       I_adj.setInput(u0,"der_p");
       I_adj.setInput(0.0,"adj0_xf");
@@ -241,7 +241,7 @@ int main(){
       cout << setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << (adj_x0_pert-adj_x0)/h << ", d2(qf)/d(p)d(p) = " << (adj_p_pert-adj_p)/h << endl;
       
       // Forward over adjoint to get the second order sensitivities
-      FX I_foa = I_adj.derivative(1,0);
+      Function I_foa = I_adj.derivative(1,0);
       I_foa.setInput(x0,"der_der_x0");
       I_foa.setInput(u0,"der_der_p");
       I_foa.setInput(1.0,"fwd0_der_p");
@@ -253,7 +253,7 @@ int main(){
       cout << setw(50) << "Forward over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fwd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fwd_adj_p << endl;
 
       // Adjoint over adjoint to get the second order sensitivities
-      FX I_aoa = I_adj.derivative(0,1);
+      Function I_aoa = I_adj.derivative(0,1);
       I_aoa.setInput(x0,"der_der_x0");
       I_aoa.setInput(u0,"der_der_p");
       I_aoa.setInput(0.0,"der_adj0_xf");

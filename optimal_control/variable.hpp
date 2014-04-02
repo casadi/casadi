@@ -24,240 +24,136 @@
 #define VARIABLE_HPP
 
 #include <iostream>
-#include "../symbolic/fx/sx_function.hpp"
+#include "../symbolic/function/sx_function.hpp"
 #include "../symbolic/mx/mx.hpp"
 
 namespace CasADi{
     
-    /// Time variability of a variable (see Fritzon page 89)
-    enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
+  /// Time variability of a variable (see Fritzon page 89)
+  enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
 
-    /// Causality of a variable
-    enum Causality{INPUT,OUTPUT,INTERNAL};
+  /// Causality of a variable
+  enum Causality{INPUT,OUTPUT,INTERNAL};
     
-    /// Dynamics of the variable
-    enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
+  /// Dynamics of the variable
+  enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
     
-    /// Dynamics of the variable
-    enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
+  /// Dynamics of the variable
+  enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
-    /// Variable category
-    enum Category{
-      /** Unknown, not set */
-      CAT_UNKNOWN,
-      /** A state derivative */
-      CAT_DERIVATIVE,
-      /** A differential state, i.e. a variable that appears differentiated in the model */
-      CAT_STATE, 
-      /** An independent constant: "constant Real c1 = 3" */
-      CAT_DEPENDENT_CONSTANT,
-      /** A dependent constant "constant Real c2=c1*3". */
-      CAT_INDEPENDENT_CONSTANT,
-      /** A dependent parameter "parameter Real p1=p2"*/
-      CAT_DEPENDENT_PARAMETER,
-      /** An independent parameter "parameter Real p2=3"*/
-      CAT_INDEPENDENT_PARAMETER,
-      /** An algebraic variabel or input */
-      CAT_ALGEBRAIC
-    };
+  /// Variable category
+  enum Category{
+    /** Unknown, not set */
+    CAT_UNKNOWN,
+    /** A state derivative */
+    CAT_DERIVATIVE,
+    /** A differential state, i.e. a variable that appears differentiated in the model */
+    CAT_STATE, 
+    /** An independent constant: "constant Real c1 = 3" */
+    CAT_DEPENDENT_CONSTANT,
+    /** A dependent constant "constant Real c2=c1*3". */
+    CAT_INDEPENDENT_CONSTANT,
+    /** A dependent parameter "parameter Real p1=p2"*/
+    CAT_DEPENDENT_PARAMETER,
+    /** An independent parameter "parameter Real p2=3"*/
+    CAT_INDEPENDENT_PARAMETER,
+    /** An algebraic variabel or input */
+    CAT_ALGEBRAIC
+  };
 
-    // Forward declaration
-    class VariableInternal;
-
-  /** \brief Smart pointer class to a Variable
-  *  
-  *  In a sense, a Variable is an SX expression with meta-data attached.
-  */
-  class Variable : public SharedObject{
-    public:
+  /** \brief Holds expressions and meta-data corresponding to a physical quantity evolving in time
+      \date 2012-2014
+      \author Joel Andersson
+   */
+  struct Variable : public PrintableObject{
     
-    /// Default (empty) constructor
+    /// Default constructor
     Variable();
+    
+    /// Variable name
+    std::string name() const;
 
-    /// Create a new variable
-    explicit Variable(const std::string& name, bool create_expression = true);
-    
-    /// Destructor
-    virtual ~Variable();
-    
-    /// Get the variable expression
-    SX var() const;
-    
-    /// Get differential expression
-    SX der() const;
-    
-    /// Get the binding expression for the variable or its derivative
-    SX binding(bool derivative=false) const;
-    
-    /// Get the highest order derivative (i.e. der() or var())
-    SX highest() const;
-    
-    /// Timed variable (never allocate)
-    SX atTime(double t, bool allocate=false) const;
-
-    /// Timed variable (allocate if necessary)
-    SX atTime(double t, bool allocate=false);
-    
-    /// Get the variable index
-    int index() const;
-        
-    /// Access functions of the node
-    VariableInternal* operator->();
-
-    /// Const access functions of the node
-    const VariableInternal* operator->() const;
-
-    /// Get variable name
-    const std::string& getName() const;
-
-    /// Set variable name
+    /// Set the variable name (and corresponding expressions)
     void setName(const std::string& name);
 
-    /// Get the variability (see Fritzon)
-    Variability getVariability() const;
+    /// Variable expression
+    SXElement v;
 
-    /// Set the variability (see Fritzon)
-    void setVariability(Variability variability);
+    /// Derivative expression
+    SXElement d;
 
-    /// Get the causality (see Fritzon)
-    Causality getCausality() const;
+    /// Binding equation. Equal to "v" if unknown
+    SXElement beq;
 
-    /// Set the causality (see Fritzon)
-    void setCausality(Causality causality);
+    /// Derivative binding equation, i.e. ordinary differential equation (ODE). Equal do "d" if unknown
+    SXElement ode;
 
-    /// Get the variable category
-    Category getCategory() const;
-
-    /// Set the variable category
-    void setCategory(Category category);
-
-    /// Check if the variable is an alias variable
-    Alias getAlias() const;
-
-    /// Set if the variable is an alias variable
-    void setAlias(Alias alias);
+    /// Nominal value
+    double nominal;
     
-    /// Get the description
-    const std::string& getDescription() const;
+    /// Value at time 0
+    double start;
+
+    /// Lower bound
+    SXElement min;
+
+    /// Upper bound
+    SXElement max;
+
+    /// Initial guess
+    SXElement initialGuess;
+
+    /// Derivative at time 0
+    double derivativeStart;
+
+    /// Variability (see Fritzon)
+    Variability variability;
+
+    /// Causality (see Fritzon)
+    Causality causality;
+
+    /// Variable category
+    Category category;
+
+    /// Is the variable is an alias variable?
+    Alias alias;
     
-    /// Set the description
-    void setDescription(const std::string& description);
-    
-    /// Get the variable reference (XML)
-    int getValueReference() const;
+    /// Description
+    std::string description;
 
-    /// Set the variable reference (XML)
-    void setValueReference(int valueReference);
-    
-    /// Get the lower bound
-    double getMin() const;
-
-    /// Set the lower bound
-    void setMin(double min);
-    
-    /// Access the lower bound
-    double& min();
-
-    /// Get the upper bound
-    double getMax() const;
-
-    /// Set the upper bound
-    void setMax(double max);
-    
-    /// Access the upper bound
-    double& max();
-
-    /// Get the nominal value of the variable
-    double getNominal() const;
-
-    /// Set the nominal value of the variable
-    void setNominal(double nominal);
-    
-    /// Access the nominal value of the variable
-    double& nominal();
-
-    /// Get the value at time 0
-    double getStart() const;
-
-    /// Set the value at time 0
-    void setStart(double start);
-
-    /// Access the value at time 0
-    double& start();
+    /// Variable reference (XML)
+    int valueReference;
         
-    /// Get the lower bound
-    double getInitialGuess() const;
+    /// Unit
+    std::string unit;
 
-    /// Set the lower bound
-    void setInitialGuess(double initial_guess);
-
-    /// Access the lower bound
-    double& initialGuess();
-
-    /// Get the derivative at time 0
-    double getDerivativeStart() const;
-
-    /// Set the derivative at time 0
-    void setDerivativeStart(double start);
+    /// Display unit
+    std::string displayUnit;
     
-    /// Access the derivative at time 0
-    double& derivativeStart();
+    /// Variable index
+    int index;
 
-    /// Get the unit
-    const std::string& getUnit() const;
+    /// Free attribute
+    bool free;
 
-    /// Set the unit
-    void setUnit(const std::string& unit);
-    
-    /// Access the unit
-    std::string& unit();
-    
-    /// Get the display unit
-    const std::string& getDisplayUnit() const;
+    /// Timed variable (never allocate)
+    SXElement atTime(double t, bool allocate=false) const;
 
-    /// Set the display unit
-    void setDisplayUnit(const std::string& displayUnit);
-
-    /// Get the display unit
-    std::string& displayUnit();
-    
-    /// Set the expression
-    void setExpression(const SX& v);
-
-    /// Set the derivative expression
-    void setDerivative(const SX& d);
-                
-    /// Set the binding expression for the variable or its derivative
-    void setBinding(const SX& binding, bool derivative=false);
-                
-    /// Set the variable index
-    void setIndex(int ind);
-    
-    /// Is differential?
-    bool isDifferential() const;
-    
-    /// Set differential
-    void setDifferential(bool is_differential);
-    
-    /// Get the the free attribute
-    bool getFree() const;
-
-    /// Set the the free attribute
-    void setFree(bool free);
-
-    /// Access the the free attribute
-    bool& free();
+    /// Timed variable (allocate if necessary)
+    SXElement atTime(double t, bool allocate=false);
         
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
+  private:
+#ifndef SWIG
+    // Timed variables
+    std::map<double,SXElement> timed_;
+
+    // Print
+    virtual void repr(std::ostream &stream) const;
+    virtual void print(std::ostream &stream) const;
+#endif // SWIG
+
   };
 } // namespace CasADi
-
-#ifdef SWIG
-// Template instantiations
-%template(VariableVector) std::vector<CasADi::Variable>;
-#endif // SWIG  
-
 
 #endif // VARIABLE_HPP
 

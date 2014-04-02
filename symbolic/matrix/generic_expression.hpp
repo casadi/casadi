@@ -28,6 +28,7 @@
 namespace CasADi{
 
   /** \brief Expression interface
+  *
   This is a common base class for SX, MX and Matrix<>, introducing a uniform syntax and implementing
   common functionality using the curiously recurring template pattern (CRTP) idiom.\n
   
@@ -53,20 +54,12 @@ class GenericExpression{
 
     /// In-place addition
     inline ExType& operator+=(const ExType &y){
-      if(static_cast<ExType&>(*this).isNull()){
-        return static_cast<ExType&>(*this) = y;
-      } else {
-        return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);
-      }
+      return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);
     }
 
     /// In-place subtraction
     inline ExType& operator-=(const ExType &y){
-      if(static_cast<ExType&>(*this).isNull()){
-        return static_cast<ExType&>(*this) = -y;
-      } else {
-        return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__sub__(y);
-      }
+      return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__sub__(y);
     }
 
     /// In-place elementwise multiplication
@@ -103,6 +96,8 @@ class GenericExpression{
     inline friend ExType operator||(const ExType &x, const ExType &y){ return x.logic_or(y); }
     
     #endif // SWIG
+    
+    // \cond SWIGINTERNAL
 
     /// Matrix division from left
     inline ExType __mldivide__(const ExType& y) const{ return y.__mrdivide__(static_cast<const ExType&>(*this));}
@@ -115,7 +110,7 @@ class GenericExpression{
 
     /// Division (with __future__.division in effect)
     inline ExType __truediv__(const ExType& y) const {return static_cast<const ExType&>(*this)/y;};
-
+    
     /** @name Operations from the left
      *  For Python
      */
@@ -132,6 +127,7 @@ class GenericExpression{
     inline ExType __rne__(const ExType& y) const{ return y.__ne__(static_cast<const ExType&>(*this));}
     inline ExType __rtruediv__(const ExType& y) const {return y.__truediv__(static_cast<const ExType&>(*this));}
     //@}
+    /// \endcond
     
 };
 

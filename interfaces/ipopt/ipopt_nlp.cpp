@@ -123,7 +123,7 @@ void IpoptUserClass::finalize_solution(SolverReturn status,
                                   const IpoptData* ip_data,
                                   IpoptCalculatedQuantities* ip_cq)
 {
-  solver->finalize_solution(x,z_L,z_U,g,lambda,obj_value, ip_data->iter_count());
+  solver->finalize_solution(x,z_L,z_U,g,lambda,obj_value, ip_data? ip_data->iter_count(): 0);
 }
 
   
@@ -182,7 +182,6 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   // multipliers for fixed variables (sign ok?)
   if (tnlp_adapter->fixed_variable_treatment_==TNLPAdapter::MAKE_CONSTRAINT && tnlp_adapter->n_x_fixed_>0) {
     const DenseVector* dy_c = static_cast<const DenseVector*>(&y_c);
-    const Number* values = dy_c->Values();
     Index n_c_no_fixed = y_c.Dim() - tnlp_adapter->n_x_fixed_;
     if (!dy_c->IsHomogeneous()) {
       const Number* values = dy_c->Values();

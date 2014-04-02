@@ -25,18 +25,18 @@
 from numpy import *
 from casadi import *
 #! Let's start with some algebra
-x = MX("x",2,3)
-y = MX("y",3,2)
+x = MX.sym("x",2,3)
+y = MX.sym("y",3,2)
 print x
 for i in range(6):
-	print x[i]
+	print x.nz[i]
 
 for i in range(2):
 	for j in range(3):
 		print "x[%d,%d] = %s" % (i,j,str(x[i,j]))
 		
 print x[1,1]
-print x[3] # Note that index is flattened. x[0,0] is illegal.
+print x.nz[3] # Note that index is flattened. x[0,0] is illegal.
 print norm_2(x)
 z= mul(x,y)
 print z
@@ -70,10 +70,10 @@ print a.T*b.T
 X = MX(DMatrix(array([[1,2,3],[4,5,6]])))
 print X
 print outer_prod(X,X)
-print MX(trans(DMatrix([1,2,3])))
+print MX(DMatrix([1,2,3]).T)
 print MX([1,2,3])
 #! As before, evaluation is lazy on the matrix level
-Y = MX("Y")
+Y = MX.sym("Y")
 f = MXFunction([Y],[X])
 f.init()
 f.setInput([2])
@@ -82,7 +82,7 @@ print f.getOutput()
 
 #! Element assignement
 #! -------------------
-X = MX("x",2,2)
+X = MX.sym("x",2,2)
 X[0,0]=MX(5)
 print X
  

@@ -24,7 +24,7 @@
 #define CASADI_HPP
 
 // Scalar expressions (why do i need to put it up here?)
-#include "sx/sx.hpp"
+#include "sx/sx_element.hpp"
 
 // Generic tools
 #include "polynomial.hpp"
@@ -44,8 +44,8 @@
 #include "mx/mx_tools.hpp"
 
 // Misc functions
-#include "fx/sx_function.hpp"
-#include "fx/mx_function.hpp"
-#include "fx/external_function.hpp"
+#include "function/sx_function.hpp"
+#include "function/mx_function.hpp"
+#include "function/external_function.hpp"
 
 #endif //CASADI_HPP

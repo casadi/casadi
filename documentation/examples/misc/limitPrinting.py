@@ -24,7 +24,7 @@ from casadi import *
 #! SX
 #! ===
 #! Build up a huge expression
-x = SX("x")
+x = SX.sym("x")
 for i in range(5):
   x = sin(x)*x
   
@@ -39,7 +39,7 @@ print x
 #! MX
 #! ===
 #! Build up a huge expression
-x = MX("x")
+x = MX.sym("x")
 for i in range(5):
   x = sin(x)*x
   

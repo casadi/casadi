@@ -45,7 +45,7 @@ class NLPtests(casadiTestCase):
     self.message("Scalar implicit problem, n=0")
     for Solver, options in solvers:
       self.message(Solver.__name__)
-      x=ssym("x")
+      x=SX.sym("x")
       f=SXFunction([x],[sin(x)])
       f.init()
       solver=Solver(f)
@@ -57,15 +57,15 @@ class NLPtests(casadiTestCase):
       refsol = SXFunction([x],[ceil(x/pi-0.5)*pi])
       refsol.init()
       refsol.setInput(6)
-      self.checkfx(solver,refsol,digits=5)         
+      self.checkfunction(solver,refsol,digits=5)         
       
   def test_scalar2(self):
     self.message("Scalar implicit problem, n=1")
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=ssym("x")
-      y=ssym("y")
+      x=SX.sym("x")
+      y=SX.sym("y")
       n=0.2
       f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
@@ -77,14 +77,14 @@ class NLPtests(casadiTestCase):
       refsol = SXFunction([y,x],[sin(x)])
       refsol.init()
       refsol.setInput(n,1)
-      self.checkfx(solver,refsol,digits=6,sens_der=False,failmessage=message)
+      self.checkfunction(solver,refsol,digits=6,sens_der=False,failmessage=message)
 
   def test_scalar2_indirect(self):
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=SX("x")
-      y=SX("y")
+      x=SXElement.sym("x")
+      y=SXElement.sym("y")
       n=0.2
       f=SXFunction([y,x],[x-arcsin(y)])
       f.init()
@@ -92,7 +92,7 @@ class NLPtests(casadiTestCase):
       solver.setOption(options)
       solver.init()
       
-      X = msym("X")
+      X = MX.sym("X")
       [R] = solver.call([MX(),X])
       
       trial = MXFunction([X],[R])
@@ -102,7 +102,7 @@ class NLPtests(casadiTestCase):
       refsol = SXFunction([x],[sin(x)])
       refsol.init()
       refsol.setInput(n)
-      self.checkfx(trial,refsol,digits=6,sens_der=False,failmessage=message)
+      self.checkfunction(trial,refsol,digits=6,sens_der=False,failmessage=message)
       
   def test_large(self):
     for Solver, options in solvers:
@@ -111,11 +111,11 @@ class NLPtests(casadiTestCase):
       
       message = Solver.__name__
       N = 5
-      s = sp_tril(N)
-      x=ssym("x",s)
+      s = Sparsity.tril(N)
+      x=SX.sym("x",s)
 
-      y=ssym("y",s)
-      y0 = DMatrix(sp_diag(N),0.1)
+      y=SX.sym("y",s)
+      y0 = DMatrix(Sparsity.diag(N),0.1)
 
       f=SXFunction([vecNZ(y),vecNZ(x)],[vecNZ((mul((x+y0),(x+y0).T)-mul((y+y0),(y+y0).T))[s])])
       f.init()
@@ -125,7 +125,7 @@ class NLPtests(casadiTestCase):
       solver.setOption("constraints",[1]*s.size())
       solver.init()
       
-      X = msym("X",x.sparsity())
+      X = MX.sym("X",x.sparsity())
       [R] = solver.call([MX(),vecNZ(X)])
       
       trial = MXFunction([X],[R])
@@ -133,19 +133,19 @@ class NLPtests(casadiTestCase):
       trial.setInput([abs(cos(i)) for i in range(x.size())])
       trial.evaluate()
 
-      f.setInput(trial.output(),0)
-      f.setInput(vecNZ(trial.input()),1)
+      f.setInput(trial.getOutput(),0)
+      f.setInput(vecNZ(trial.getInput()),1)
       f.evaluate()
 
-      f.setInput(vecNZ(trial.input()),0)
-      f.setInput(vecNZ(trial.input()),1)
+      f.setInput(vecNZ(trial.getInput()),0)
+      f.setInput(vecNZ(trial.getInput()),1)
       f.evaluate()
       
       refsol = MXFunction([X],[vecNZ(X)])
       refsol.init()
-      refsol.setInput(trial.input())
+      refsol.setInput(trial.getInput())
 
-      self.checkfx(trial,refsol,digits=6,sens_der=False,evals=1,failmessage=message)
+      self.checkfunction(trial,refsol,digits=6,sens_der=False,evals=1,failmessage=message)
       
   @known_bug()  
   def test_vector2(self):
@@ -153,8 +153,8 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       self.message(Solver.__name__)
       message = Solver.__name__
-      x=SX("x")
-      y=ssym("y",2)
+      x=SXElement.sym("x")
+      y=SX.sym("y",2)
       y0 = DMatrix([0.1,0.4])
       yy = y + y0
       n=0.2
@@ -169,11 +169,11 @@ class NLPtests(casadiTestCase):
       refsol = SXFunction([y,x],[vertcat([sin(x),sqrt(sin(x))])-y0]) # ,sin(x)**2])
       refsol.init()
       refsol.setInput(n)
-      self.checkfx(solver,refsol,digits=5,sens_der=False,failmessage=message)
+      self.checkfunction(solver,refsol,digits=5,sens_der=False,failmessage=message)
       
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
-    x=SX("x")
+    x=SXElement.sym("x")
     f=SXFunction([x],[sin(x)])
     f.init()
     solver=KinsolSolver(f)
@@ -188,7 +188,7 @@ class NLPtests(casadiTestCase):
     for Solver, options in solvers:
       if 'Kinsol' in str(Solver): continue
       if 'Newton' in str(Solver): continue
-      x=ssym("x",2)
+      x=SX.sym("x",2)
       f=SXFunction([x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       f.init()
       
@@ -198,7 +198,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.evaluate()
       
-      self.checkarray(solver.output(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
+      self.checkarray(solver.getOutput(),DMatrix([-3.0/50*(sqrt(1201)-1),2.0/25*(sqrt(1201)-1)]),digits=6)
 
       f=SXFunction([x],[vertcat([mul((x+3).T,(x-2)),mul((x-4).T,(x+vertcat([1,2])))])])
       f.init()
@@ -209,12 +209,12 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.evaluate()
       
-      self.checkarray(solver.output(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
+      self.checkarray(solver.getOutput(),DMatrix([3.0/50*(sqrt(1201)+1),-2.0/25*(sqrt(1201)+1)]),digits=6)
 
   def test_implicitbug(self):
     # Total number of variables for one finite element
-    X0 = msym("X0")
-    V = msym("V")
+    X0 = MX.sym("X0")
+    V = MX.sym("V")
 
     V_eq = vertcat([V[0]-X0])
 
@@ -235,7 +235,7 @@ class NLPtests(casadiTestCase):
     #ifcn = MXFunction([X0],[vertcat([X0])])
     #ifcn.setOption("name","I")
     #ifcn.init()
-    [V] = ifcn.eval([0,X0])
+    [V] = ifcn.call([0,X0],True)
 
     f = 1  # fails
 
@@ -251,18 +251,18 @@ class NLPtests(casadiTestCase):
     G.init()
     G.setInput(x0_val)
     G.evaluate()
-    print G.output()
+    print G.getOutput()
     print G
 
     J = F.jacobian(0,0)
     J.init()
     J.setInput(x0_val)
     J.evaluate()
-    print J.output()
+    print J.getOutput()
     print J
     
-    self.checkarray(G.output(),DMatrix([2]))
-    self.checkarray(J.output(),DMatrix([2]))
+    self.checkarray(G.getOutput(),DMatrix([2]))
+    self.checkarray(J.getOutput(),DMatrix([2]))
     
 if __name__ == '__main__':
     unittest.main()

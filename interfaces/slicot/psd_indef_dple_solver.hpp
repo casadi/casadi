@@ -30,7 +30,9 @@ namespace CasADi{
   /// Forward declaration of internal class
   class PsdIndefDpleInternal;
 
-  /**  @copydoc DPLE_doc
+  /** \brief An efficient solver for Discrete Periodic Lyapunov Eaauqtions using SLICOT
+   *
+   * @copydoc DPLE_doc
   
        Uses Periodic Schur Decomposition (psd) and does not assume positive definiteness.
        Based on Periodic Lyapunov equations: some applications and new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997. 
@@ -48,7 +50,7 @@ namespace CasADi{
      *  \param[in] A  List of sparsities of A_i 
      *  \param[in] V  List of sparsities of V_i 
      */
-    explicit PsdIndefDpleSolver(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V);
+    explicit PsdIndefDpleSolver(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V);
     
     /// Access functions of the node
     PsdIndefDpleInternal* operator->();
@@ -63,7 +65,7 @@ namespace CasADi{
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static DpleSolver creator(const std::vector< CRSSparsity > & A, const std::vector< CRSSparsity > &V){ return PsdIndefDpleSolver(A,V);}
+    static DpleSolver creator(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V){ return PsdIndefDpleSolver(A,V);}
     #ifdef SWIG
     %nocallback;
     #endif

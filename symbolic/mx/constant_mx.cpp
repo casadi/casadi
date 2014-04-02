@@ -24,14 +24,14 @@
 #include <cassert>
 #include <vector>
 #include <algorithm>
-#include "../stl_vector_tools.hpp"
+#include "../std_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-  ConstantMX::ConstantMX(const CRSSparsity& sp){
+  ConstantMX::ConstantMX(const Sparsity& sp){
     setSparsity(sp);
   }
 
@@ -41,7 +41,7 @@ namespace CasADi{
   void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
   }
 
-  void ConstantMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp){
+  void ConstantMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
   }
 
   void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
@@ -91,28 +91,36 @@ namespace CasADi{
     return !isZero();
   }
 
-  ConstantMX* ConstantMX::create(const CRSSparsity& sp, int val){
-    switch(val){
-    case 0: return new Constant<CompiletimeConst<0> >(sp);
-    case 1: return new Constant<CompiletimeConst<1> >(sp);
-    case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
-    default: return new Constant<RuntimeConst<int> >(sp,val);        
+  ConstantMX* ConstantMX::create(const Sparsity& sp, int val){
+    if(sp.isEmpty(true)){
+      return ZeroByZero::getInstance();
+    } else {
+      switch(val){
+      case 0: return new Constant<CompiletimeConst<0> >(sp);
+      case 1: return new Constant<CompiletimeConst<1> >(sp);
+      case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
+      default: return new Constant<RuntimeConst<int> >(sp,val);        
+      }
     }
   }
 
-  ConstantMX* ConstantMX::create(const CRSSparsity& sp, double val){
-    int intval(val);
-    if(intval-val==0){
-      return create(sp,intval);
+  ConstantMX* ConstantMX::create(const Sparsity& sp, double val){
+    if(sp.isEmpty(true)){
+      return ZeroByZero::getInstance();
     } else {
-      return new Constant<RuntimeConst<double> >(sp,val);
+      int intval(val);
+      if(intval-val==0){
+        return create(sp,intval);
+      } else {
+        return new Constant<RuntimeConst<double> >(sp,val);
+      }
     }
   }
 
   ConstantMX* ConstantMX::create(const Matrix<double>& val){
     if(val.size()==0){
       return create(val.sparsity(),0);
-    } else if(val.scalar()){
+    } else if(val.isScalar()){
       return create(val.sparsity(),val.toScalar());
     } else {
       // Check if all values are the same
@@ -131,31 +139,31 @@ namespace CasADi{
   }
 
   bool ConstantDMatrix::isZero() const{
-    return CasADi::isZero(x_);
+    return x_.isZero();
   }
 
   bool ConstantDMatrix::isOne() const{
-    return CasADi::isOne(x_);
+    return x_.isOne();
   }
 
   bool ConstantDMatrix::isMinusOne() const{
-    return CasADi::isMinusOne(x_);
+    return x_.isMinusOne();
   }
 
   bool ConstantDMatrix::isIdentity() const{
-    return CasADi::isIdentity(x_);
+    return x_.isIdentity();
   }
 
-  MX ConstantMX::getMultiplication(const MX& y) const{
-    if(y.isConstant()){
-      // Constant folding
-      DMatrix xv = getMatrixValue();
-      DMatrix yv = y->getMatrixValue();
-      return mul(xv,yv);
-    } else {
-      return MXNode::getMultiplication(y);
-    }
-  }
+  // MX ConstantMX::getMultiplication(const MX& y) const{
+  //   if(y.isConstant()){
+  //     // Constant folding
+  //     DMatrix xv = getMatrixValue();
+  //     DMatrix yv = y->getMatrixValue();
+  //     return mul(xv,yv);
+  //   } else {
+  //     return MXNode::getMultiplication(y);
+  //   }
+  // }
 
   MX ConstantMX::getInnerProd(const MX& y) const{
     if(y.isConstant()){
@@ -180,6 +188,40 @@ namespace CasADi{
     if(!std::equal(x_.begin(),x_.end(),n->x_.begin())) return false;
     
     return true;
+  }
+
+  void ZeroByZero::printPart(std::ostream &stream, int part) const{
+    stream << "0x0";
+  }
+
+  MX ZeroByZero::getSetSparse(const Sparsity& sp) const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const{
+    casadi_assert(nz.empty());
+    return MX::zeros(sp);
+  }
+    
+  MX ZeroByZero::getSetNonzeros(const MX& y, const std::vector<int>& nz) const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getTranspose() const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getUnary(int op) const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
+    return shared_from_this<MX>();
+  }
+
+  MX ZeroByZero::getReshape(const Sparsity& sp) const{
+    casadi_assert(sp.isEmpty());
+    return MX::zeros(sp);
   }
 
 } // namespace CasADi

@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/std_vector_tools.hpp>
 
 using namespace CasADi;
 using namespace std;
@@ -35,7 +35,7 @@ using namespace std;
  *  Joel Andersson, K.U. Leuven 2013
  */
 
-FX generateCodeAndCompile(FX fcn, const std::string& name, bool expand){
+Function generateCodeAndCompile(Function fcn, const std::string& name, bool expand){
   cout << "Generating code for " << name << endl;
 
   // Convert to an SXFunction (may or may not improve efficiency)
@@ -68,7 +68,7 @@ int main(){
    */
 
   // Optimization variables
-  MX x = msym("x",2);
+  MX x = MX::sym("x",2);
 
   // Objective
   MX f = x[0]*x[0] + x[1]*x[1];
@@ -76,27 +76,24 @@ int main(){
   // Constraints
   MX g = x[0]+x[1]-10;
     
-  // Infinity
-  double inf = numeric_limits<double>::infinity();
-
   // Convert MXFunction to SXFunction before code generation (may or may not improve efficiency)
   bool expand = true;
 
   // NLP function
-  FX nlp = MXFunction(nlpIn("x",x),nlpOut("f",f,"g",g));
+  Function nlp = MXFunction(nlpIn("x",x),nlpOut("f",f,"g",g));
   nlp.init();
 
   // Gradient of the objective
-  FX grad_f = nlp.gradient("x","f");
+  Function grad_f = nlp.gradient("x","f");
   grad_f.init();
 
   // Jacobian of the constraints
-  FX jac_g = nlp.jacobian("x","g");
+  Function jac_g = nlp.jacobian("x","g");
   jac_g.init();
 
   // Hessian of the lagrangian
-  FX grad_lag = nlp.derivative(0,1);
-  FX hess_lag = grad_lag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
+  Function grad_lag = nlp.derivative(0,1);
+  Function hess_lag = grad_lag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
   hess_lag.init();
 
   // Codegen and compile

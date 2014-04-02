@@ -24,14 +24,15 @@
 #define MX_NODE_HPP
 
 #include "mx.hpp"
-#include "../sx/sx.hpp"
+#include "../sx/sx_element.hpp"
 #include "../casadi_math.hpp"
-#include "../fx/code_generator.hpp"
-#include "../fx/linear_solver.hpp"
+#include "../function/code_generator.hpp"
+#include "../function/linear_solver.hpp"
 #include <vector>
 #include <stack>
 
 namespace CasADi{
+  /// \cond INTERNAL
   //@{
   /** \brief Convenience function, convert vectors to vectors of pointers */
   template<class T>
@@ -130,7 +131,7 @@ namespace CasADi{
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, std::vector<int>& itmp, std::vector<SX>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 
@@ -153,10 +154,10 @@ namespace CasADi{
     virtual bool isMultipleOutput() const{return false;}
 
     /** \brief  Get function reference */
-    virtual FX& getFunction();
+    virtual Function& getFunction();
 
     /** \brief  Get function reference */
-    virtual const FX& getFunction() const{ return const_cast<MXNode*>(this)->getFunction();}
+    virtual const Function& getFunction() const{ return const_cast<MXNode*>(this)->getFunction();}
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const;
@@ -193,16 +194,23 @@ namespace CasADi{
     virtual MX getOutput(int oind) const;
 
     /// Get the sparsity
-    const CRSSparsity& sparsity() const;
+    const Sparsity& sparsity() const{ return sparsity_;}
 
     /// Get the sparsity of output oind
-    virtual const CRSSparsity& sparsity(int oind) const;
+    virtual const Sparsity& sparsity(int oind) const;
+
+    /// Get shape
+    int numel() const{ return sparsity().numel(); }
+    int size() const{ return sparsity().size(); }
+    int size1() const{ return sparsity().size1(); }
+    int size2() const{ return sparsity().size2(); }
+    std::pair<int,int> shape() const{ return sparsity().shape();}
     
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return false;}
     
     /// Set the sparsity
-    void setSparsity(const CRSSparsity& sparsity);
+    void setSparsity(const Sparsity& sparsity);
     
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=0;}
@@ -228,20 +236,8 @@ namespace CasADi{
     /// Assign nonzeros (mapping matrix), output indices sequential
     virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
-    /// Number of elements
-    int numel() const;
-    
-    /// Get size
-    int size() const;
-    
-    /// Get size
-    int size1() const;
-    
-    /// Get size
-    int size2() const;
-
     /// Convert scalar to matrix
-    inline static MX toMatrix(const MX& x, const CRSSparsity& sp){
+    inline static MX toMatrix(const MX& x, const Sparsity& sp){
       if(x.shape()==sp.shape()){
         return x;
       } else {
@@ -272,23 +268,29 @@ namespace CasADi{
     /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
 
-    /// Create a vertical concatenation node
-    static MX getVertcat(const std::vector<MX>& x);
+    /// Create a horizontal concatenation node
+    virtual MX getHorzcat(const std::vector<MX>& x) const;
 
-    /// Create a vertical split node
-    std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
+    /// Create a horizontal split node
+    virtual std::vector<MX> getHorzsplit(const std::vector<int>& output_offset) const;
+
+    /// Create a vertical concatenation node (vectors only)
+    virtual MX getVertcat(const std::vector<MX>& x) const;
+
+    /// Create a vertical split node (vectors only)
+    virtual std::vector<MX> getVertsplit(const std::vector<int>& output_offset) const;
 
     /// Transpose
     virtual MX getTranspose() const;
 
     /// Reshape
-    virtual MX getReshape(const CRSSparsity& sp) const;
+    virtual MX getReshape(const Sparsity& sp) const;
     
     /** \brief Matrix multiplication
     *  
     *  The optinal argument sp_z will be used as the sparsity pattern of the result
     */
-    virtual MX getMultiplication(const MX& y, const CRSSparsity& sp_z=CRSSparsity()) const;
+    virtual MX getMultiplication(const MX& y, const Sparsity& sp_z=Sparsity()) const;
 
     /** \brief Solve a system of linear equations
     *
@@ -300,7 +302,7 @@ namespace CasADi{
     virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const;
 
     /// Get the nonzeros of matrix
-    virtual MX getGetNonzeros(const CRSSparsity& sp, const std::vector<int>& nz) const;
+    virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
 
     /// Assign the nonzeros of a matrix to another matrix
     virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
@@ -315,7 +317,7 @@ namespace CasADi{
     virtual MX getSubAssign(const MX& y, const Slice& i, const Slice& j) const;    
 
     /// Create set sparse
-    virtual MX getSetSparse(const CRSSparsity& sp) const;
+    virtual MX getSetSparse(const Sparsity& sp) const;
     
     /// Get a unary operation
     virtual MX getUnary(int op) const;
@@ -360,7 +362,7 @@ namespace CasADi{
     std::vector<MX> dep_;
     
     /** \brief  The sparsity pattern */
-    CRSSparsity sparsity_;
+    Sparsity sparsity_;
 
     /** \brief  Propagate sparsity, no work */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
@@ -368,6 +370,7 @@ namespace CasADi{
     /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<std::vector<MX*> > v);
   };
+  
 
   // Implementations
 
@@ -390,8 +393,9 @@ namespace CasADi{
     }
     return ret;
   }
+  /// \endcond
 
 } // namespace CasADi
-
+/// \endcond
 
 #endif // MX_NODE_HPP

@@ -35,11 +35,11 @@ QPStabilizer::QPStabilizer(const QPStructure & st)  {
 }
 
 QPStabilizerInternal* QPStabilizer::operator->(){
-  return (QPStabilizerInternal*)(FX::operator->());
+  return (QPStabilizerInternal*)(Function::operator->());
 }
 
 const QPStabilizerInternal* QPStabilizer::operator->() const{
-  return (const QPStabilizerInternal*)(FX::operator->());
+  return (const QPStabilizerInternal*)(Function::operator->());
 
 }
 

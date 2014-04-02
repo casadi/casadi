@@ -21,13 +21,13 @@
  */
 
 %{
-#include "symbolic/matrix/crs_sparsity.hpp"
+#include "symbolic/matrix/sparsity.hpp"
 #include "symbolic/matrix/matrix.hpp"
 #include <sstream>
 #include "symbolic/casadi_exception.hpp"
 
 // to allow for typechecking
-#include "symbolic/sx/sx.hpp"
+#include "symbolic/sx/sx_element.hpp"
 
 // to typecheck for MX
 #include "symbolic/mx/mx.hpp"
@@ -110,8 +110,10 @@ class meta {
     /// Check if Guest object could ultimately be converted to type T
     /// may return true when isa(GUESTOBJECT), but this is not required.
     static bool couldbe(GUESTOBJECT) { 
-        int res = swig::asptr(p, (T**)(0));
-        return SWIG_CheckState(res);
+        //int res = swig::asptr(p, (T**)(0));
+        //if SWIG_CheckState(res) return true;
+        T m;
+        return as(p,m);
     }
     static swig_type_info** name;
     static char expected_message[];
@@ -120,7 +122,7 @@ class meta {
     
     #ifdef SWIGPYTHON
     static bool couldbe_sequence(PyObject * p) {
-      if(PySequence_Check(p) && !PyString_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SXMatrix__") && !PyObject_HasAttrString(p,"__MX__")) {
+      if(PySequence_Check(p) && !PyString_Check(p) && !meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
         PyObject *it = PyObject_GetIter(p);
         if (!it) return false;
         PyObject *pe;
@@ -155,20 +157,26 @@ class meta {
     // Assumes that p is a PYTHON sequence
     #ifdef SWIGPYTHON
     static int as_vector(PyObject * p, std::vector<T> &m) {
-      PyObject *it = PyObject_GetIter(p);
-      PyObject *pe;
-      m.resize(PySequence_Size(p));
-      int i=0;
-      while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
-        bool result=meta< T >::as(pe,m[i++]);
-        if (!result) {
-          Py_DECREF(pe);Py_DECREF(it);
-          return false;
+      if(PySequence_Check(p) && !PyString_Check(p) && !meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) && !meta< CasADi::MX >::isa(p) && !meta< CasADi::Matrix<int> >::isa(p) && !meta< CasADi::Matrix<double> >::isa(p) &&!PyObject_HasAttrString(p,"__DMatrix__") && !PyObject_HasAttrString(p,"__SX__") && !PyObject_HasAttrString(p,"__MX__")) {
+        PyObject *it = PyObject_GetIter(p);
+        if (!it) { PyErr_Clear();  return false;}
+        PyObject *pe;
+        int size = PySequence_Size(p);
+        if (size==-1) { PyErr_Clear();  return false;}
+        m.resize(size);
+        int i=0;
+        while ((pe = PyIter_Next(it))) {                                // Iterate over the sequence inside the sequence
+          bool result=meta< T >::as(pe,m[i++]);
+          if (!result) {
+            Py_DECREF(pe);Py_DECREF(it);
+            return false;
+          }
+          Py_DECREF(pe);
         }
-        Py_DECREF(pe);
+        Py_DECREF(it);
+        return true;
       }
-      Py_DECREF(it);
-      return true;
+      return false;
     }
     #endif // SWIGPYTHON
     
@@ -211,14 +219,8 @@ class meta {
 
 %define %my_generic_const_typemap(Precedence,Type...) 
 %typemap(in) const Type & (Type m) {
-  if (meta< Type >::isa($input)) { // Type object get passed on as-is, and fast.
-    int result = meta< Type >::get_ptr($input,$1);
-    if (!result)
-      SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
-  } else {
-    bool result=meta< Type >::as($input,m);
-    if (!result)
-      SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
+  if (!meta< Type >::get_ptr($input,$1)) {
+    if (!meta< Type >::as($input,m)) SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
     $1 = &m;
   }
 }
@@ -325,6 +327,25 @@ void PyDECREFParent(PyObject* self) {
 }
 %enddef
 
+// Convert reference output to a new data structure
+%define %outputRefNew(Type)
+%typemap(out) Type & {
+   $result = swig::from(static_cast< Type >(*$1));
+}
+%typemap(out) const Type & {
+   $result = swig::from(static_cast< Type >(*$1));
+}
+%extend Type {
+%pythoncode%{
+    def __del__(self):
+      if not(_casadi_main_module is None):
+         _casadi_main_module.PyDECREFParent(self)
+
+%}
+
+}
+%enddef
+
 %inline %{
 /// std::vector< Type >
 #define meta_vector(Type) \
@@ -335,11 +356,7 @@ int meta< std::vector< Type > >::as(GUESTOBJECT,std::vector< Type > &m) { \
   NATIVERETURN(std::vector< Type >,m) \
   return meta< Type >::as_vector(p,m); \
 } \
- \
-template <> \
-bool meta< std::vector< Type > >::couldbe(GUESTOBJECT) { \
-  return meta< std::vector< Type > >::isa(p) ||  meta< Type >::couldbe_sequence(p); \
-}
+
 %}
 
 
@@ -349,6 +366,12 @@ bool meta< std::vector< Type > >::couldbe(GUESTOBJECT) { \
 %inline %{
 template <>
 int meta< std::pair< TypeA, TypeB > >::as(PyObject * p,std::pair< TypeA, TypeB > &m) {
+  std::pair< TypeA, TypeB > * tm;
+  int res1 = meta< std::pair< TypeA, TypeB > >::get_ptr(p,tm); 
+  if (res1) {
+    m = *tm;
+    return true;
+  }
   if(!PySequence_Check(p)) return false;
   if(PySequence_Size(p)!=2) return false;
   PyObject * first =  PySequence_GetItem(p,0);
@@ -357,20 +380,6 @@ int meta< std::pair< TypeA, TypeB > >::as(PyObject * p,std::pair< TypeA, TypeB >
   
   Py_DECREF(first);Py_DECREF(second);
   return result;   
-}
-
-template <>
-bool meta< std::pair< TypeA, TypeB > >::couldbe(PyObject * p) {
-  if (meta< std::pair< TypeA, TypeB > >::isa(p)) return true; 
-  if(!PySequence_Check(p)) return false;
-  if(PySequence_Size(p)!=2) return false;
-  PyObject * first =  PySequence_GetItem(p,0);
-  PyObject * second = PySequence_GetItem(p,1);
-  
-  bool success = (meta< TypeA >::isa(first) || meta< TypeA >::couldbe(first)) &&
-                 (meta< TypeB >::isa(second) || meta< TypeB >::couldbe(second));
-  Py_DECREF(first);Py_DECREF(second);              
-  return success;
 }
 
 template <>
@@ -405,7 +414,7 @@ bool PyObjectHasClassName(PyObject* p, const char * name) {
 }
 
 bool PyIsSequence(PyObject* p) {
-  return PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SX> >::isa(p) && !meta< CasADi::MX >::isa(p);
+  return PySequence_Check(p) && !meta< CasADi::Matrix<CasADi::SXElement> >::isa(p) && !meta< CasADi::MX >::isa(p);
 }
 
 %}

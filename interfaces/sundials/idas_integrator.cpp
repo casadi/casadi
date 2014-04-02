@@ -22,7 +22,7 @@
 
 #include "idas_integrator.hpp"
 #include "idas_internal.hpp"
-#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/function/linear_solver.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -30,16 +30,16 @@ namespace CasADi{
 IdasIntegrator::IdasIntegrator(){ 
 }
 
-IdasIntegrator::IdasIntegrator(const FX& f, const FX& g){
+IdasIntegrator::IdasIntegrator(const Function& f, const Function& g){
   assignNode(new IdasInternal(f,g));
 }
 
 IdasInternal* IdasIntegrator::operator->(){
-  return (IdasInternal*)(FX::operator->());
+  return (IdasInternal*)(Function::operator->());
 }
 
 const IdasInternal* IdasIntegrator::operator->() const{
-  return (const IdasInternal*)(FX::operator->());
+  return (const IdasInternal*)(Function::operator->());
 }
 
 bool IdasIntegrator::checkNode() const{

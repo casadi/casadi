@@ -29,8 +29,6 @@
 #include <interfaces/csparse/csparse.hpp>
 
 #include <optimal_control/symbolic_ocp.hpp>
-#include <optimal_control/ocp_tools.hpp>
-#include <optimal_control/variable_tools.hpp>
 #include <optimal_control/direct_multiple_shooting.hpp>
 
 using namespace CasADi;
@@ -42,38 +40,40 @@ int main(){
   SymbolicOCP ocp;
 
   // Load the XML file
-  Dictionary parse_options;
-  parse_options["scale_variables"] = true;
-  parse_options["eliminate_dependent"] = true;
-  parse_options["scale_equations"] = false;
-  parse_options["make_explicit"] = true;
-  ocp.parseFMI("../examples/xml_files/cstr.xml",parse_options);
-  
-  // Print the ocp to screen
-  ocp.print();
-  
+  ocp.parseFMI("../examples/xml_files/cstr.xml");
+
   // Correct the inital guess and bounds on variables
-  ocp.variable("u").setStart(280);
-  ocp.variable("u").setMin(230);
-  ocp.variable("u").setMax(370);
+  ocp.setStart("u",280);
+  ocp.setMin("u",230);
+  ocp.setMax("u",370);
 
   // Correct bound on state
-  ocp.variable("cstr.T").setMax(350);
+  ocp.setMax("cstr.T",350);
+
+  // Transform into an explicit ODE
+  ocp.makeExplicit();
+
+  // Scale the variables
+  ocp.scaleVariables();
   
-  // Variables
-  SXMatrix t = ocp.t;
-  SXMatrix x = var(ocp.x);
-  SXMatrix u = var(ocp.u);
-    
-  // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.x,true);
-  vector<double> xmin = getMin(ocp.x,true);
-  vector<double> xmax = getMax(ocp.x,true);
-  
-  // Initial guess and bounds for the control
-  vector<double> u0 = getStart(ocp.u,true);
-  vector<double> umin = getMin(ocp.u,true);
-  vector<double> umax = getMax(ocp.u,true);
+  // Eliminate the independent parameters
+  ocp.eliminateIndependentParameters();
+
+  // Print the ocp to screen
+  ocp.print();
+        
+  // Initial guess 
+
+  // Function to evaluate the initial guess and bounds for all time points
+  vector<SX> bfcn_out;
+  bfcn_out.push_back(ocp.start(ocp.x));
+  bfcn_out.push_back(ocp.min(ocp.x));
+  bfcn_out.push_back(ocp.max(ocp.x));
+  bfcn_out.push_back(ocp.start(ocp.u));
+  bfcn_out.push_back(ocp.min(ocp.u));
+  bfcn_out.push_back(ocp.max(ocp.u));
+  SXFunction bfcn(ocp.t,bfcn_out);
+  bfcn.init();
   
   // Number of shooting nodes
   int num_nodes = 100;
@@ -85,11 +85,10 @@ int main(){
   integrator_options["tf"]=ocp.tf/num_nodes;
 
   // Mayer objective function
-  SXMatrix xf = ssym("xf",x.size(),1);
-  SXFunction mterm(xf, xf[0]);
+  SXFunction mterm(ocp.x,ocp.mterm);
   
   // DAE residual function
-  SXFunction dae(daeIn("x",x, "p",u, "t",t),daeOut("ode",ocp.ode));
+  SXFunction dae(daeIn("x",ocp.x,"p",ocp.u,"t",ocp.t),daeOut("ode",ocp.ode(ocp.x)));
 
   // Create a multiple shooting discretization
   DirectMultipleShooting ocp_solver;
@@ -114,26 +113,24 @@ int main(){
   ocp_solver.setOption("nlp_solver_options",nlp_solver_dict);
   ocp_solver.init();
 
-  // Initial condition
-  for(int i=0; i<x.size(); ++i){
-    ocp_solver.input("x_init")(i,0) = ocp_solver.input("lbx")(i,0) = ocp_solver.input("ubx")(i,0) = x0[i];
-  }
+  // Pass the bounds and initial guess
+  for(int i=0; i<num_nodes+1; ++i){
+    // Evaluate the function
+    bfcn.setInput((i*ocp.tf)/num_nodes);
+    bfcn.evaluate();
 
-  // State bounds
-  for(int k=1; k<=num_nodes; ++k){
-    for(int i=0; i<x.size(); ++i){
-      ocp_solver.input("x_init")(i,k) = x0[i];
-      ocp_solver.input("lbx")(i,k) = xmin[i];
-      ocp_solver.input("ubx")(i,k) = xmax[i];
+    if(i==0){
+      ocp_solver.input("x_init")(Slice(),i) = ocp_solver.input("lbx")(Slice(),i) = ocp_solver.input("ubx")(Slice(),i) = bfcn.output(0);
+    } else {
+      ocp_solver.input("x_init")(Slice(),i) = bfcn.output(0);
+      ocp_solver.input("lbx")(Slice(),i) = bfcn.output(1);
+      ocp_solver.input("ubx")(Slice(),i) = bfcn.output(2);
     }
-  }
 
-  // Control bounds
-  for(int k=0; k<num_nodes; ++k){
-    for(int i=0; i<u.size(); ++i){
-      ocp_solver.input("u_init")(i,k) = u0[i];
-      ocp_solver.input("lbu")(i,k) = umin[i];
-      ocp_solver.input("ubu")(i,k) = umax[i];
+    if(i<num_nodes){
+      ocp_solver.input("u_init")(Slice(),i) = bfcn.output(3);
+      ocp_solver.input("lbu")(Slice(),i) = bfcn.output(4);
+      ocp_solver.input("ubu")(Slice(),i) = bfcn.output(5);
     }
   }
 

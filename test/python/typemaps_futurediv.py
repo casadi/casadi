@@ -44,7 +44,7 @@ class typemaptests(casadiTestCase):
   
   def test_floordiv(self):
     self.message("make sure that floor_div raises errors")
-    for x in [SX("x"),MX("x"),DMatrix([3]),ssym("x")]:
+    for x in [SXElement.sym("x"),MX.sym("x"),DMatrix([3]),SX.sym("x")]:
       for y in [2,2.0,DMatrix(3),numpy.matrix([2.0])]:
         print (x,y)
         self.assertRaises(Exception,lambda : x//y)
@@ -118,14 +118,14 @@ class typemaptests(casadiTestCase):
   def test_autoconversionMX(self):
     self.message("Auto conversion MX")
     s = DMatrix([[1,2],[3,4]])
-    x = SX(3)
+    x = SXElement(3)
     y = MX(3)
     
     def doit(z,s,fun):
       function = None
       
-      if type(z) in [type(SX()),type(SXMatrix())]:
-        ztype = [type(SX()),type(SXMatrix())]
+      if type(z) in [type(SXElement()),type(SX())]:
+        ztype = [type(SXElement()),type(SX())]
         function = SXFunction
       
       if type(z) in [type(MX())]:
@@ -134,14 +134,14 @@ class typemaptests(casadiTestCase):
         
       r = fun(z,s)
             
-      if type(z) is type(SX()) and type(s) is type(SX()):
-        self.assertTrue(type(r) is type(SX()))
+      if type(z) is type(SXElement()) and type(s) is type(SXElement()):
+        self.assertTrue(type(r) is type(SXElement()))
         
 
       self.assertTrue(type(r) in ztype)
       
       hasNum = True
-      if type(s) in [type(SX()),type(MX()),type(SXMatrix())]:
+      if type(s) in [type(SXElement()),type(MX()),type(SX())]:
         hasNum = False
       
       if hasNum:
@@ -199,38 +199,38 @@ class typemaptests(casadiTestCase):
       
     nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
         
-    ## numeric & SXMatrix
+    ## numeric & SX
     for s in nums:
-      for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SXElement.sym("x"), SX.sym("x"), SX.sym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
        
     # numeric & MX
     for s in nums:
-      for z in [MX("x",2,2)]:
+      for z in [MX.sym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
         
-    # SX & SX
-    for s in [SX("x"), ssym("x"), ssym("x",2,2)]:
-      for z in [SX("x"),ssym("x"), ssym("x",2,2)]:
+    # SXElement & SX
+    for s in [SXElement.sym("x"), SX.sym("x"), SX.sym("x",2,2)]:
+      for z in [SXElement.sym("x"),SX.sym("x"), SX.sym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
          
     ## MX & MX
-    for s in [MX("x"),MX("x",2,2)]:
-      for z in [MX("x"),MX("x",2,2)]:
+    for s in [MX.sym("x"),MX.sym("x",2,2)]:
+      for z in [MX.sym("x"),MX.sym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         tests(z,s)
         
     for (s,x,y) in [
-                  (matrix([[1,2],[3,4]]),ssym("x",2,2),MX("x",2,2))    
+                  (matrix([[1,2],[3,4]]),SX.sym("x",2,2),MX.sym("x",2,2))    
                   ]:
-      for z,ztype in zip([x,y],[[type(SXMatrix()),type(SX())],[type(MX())]]):
+      for z,ztype in zip([x,y],[[type(SX()),type(SXElement())],[type(MX())]]):
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
         doit(z,s,lambda z,s: -z)

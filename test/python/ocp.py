@@ -40,8 +40,8 @@ class OCPtests(casadiTestCase):
     
     N=100
     
-    X=ssym("X",N+1)
-    U=ssym("U",N)
+    X=SX.sym("X",N+1)
+    U=SX.sym("U",N)
     
     V = vertcat([X,U])
     
@@ -79,9 +79,9 @@ class OCPtests(casadiTestCase):
     yc0=dy0=0
     te=0.4
 
-    t=ssym("t")
-    q=ssym("y",2,1)
-    p=ssym("p",1,1)
+    t=SX.sym("t")
+    q=SX.sym("y",2,1)
+    p=SX.sym("p",1,1)
     # y
     # y'
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
@@ -97,8 +97,8 @@ class OCPtests(casadiTestCase):
 
     integrator.init()
 
-    var = MX("var",2,1)
-    par = MX("par",1,1)
+    var = MX.sym("var",2,1)
+    par = MX.sym("par",1,1)
     parMX= par
     
     q0   = vertcat([var[0],par])
@@ -138,9 +138,9 @@ class OCPtests(casadiTestCase):
     yc0=dy0=0.1
     te=0.4
 
-    t=ssym("t")
-    q=ssym("y",2,1)
-    p=ssym("p",1,1)
+    t=SX.sym("t")
+    q=SX.sym("y",2,1)
+    p=SX.sym("p",1,1)
     # y
     # y'
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
@@ -156,8 +156,8 @@ class OCPtests(casadiTestCase):
 
     integrator.init()
 
-    var = MX("var",2,1)
-    par = MX("par",1,1)
+    var = MX.sym("var",2,1)
+    par = MX.sym("par",1,1)
     
     q0   = vertcat([var[0],par])
     parl  = var[1]
@@ -199,6 +199,9 @@ class OCPtests(casadiTestCase):
     ocp = SymbolicOCP()
     ocp.parseFMI('data/cstr.xml')
     
+    # Separate differential and algebraic variables
+    ocp.separateAlgebraic()
+    
     self.assertEqual(ocp.t0,0)
     self.assertEqual(ocp.tf,150)
     #self.assertFalse(ocp.t0_free)
@@ -206,29 +209,24 @@ class OCPtests(casadiTestCase):
     self.assertTrue(ocp.lterm.size()==0)
     self.assertTrue(ocp.mterm.size()==1)
     m = ocp.mterm
-    self.assertTrue(isinstance(m,SXMatrix))
-    self.assertTrue(isinstance(ocp.t,SXMatrix))
-    self.assertEquals(str(m),'cost.atTime(150)')
+    self.assertTrue(isinstance(m,SX))
+    self.assertTrue(isinstance(ocp.t,SX))
+    self.assertEquals(str(m),'cost')
     print dir(ocp)
-    self.assertEquals(ocp.ode.size(),3)
-    self.assertEquals(len(ocp.x),3) # there are three states
-    c = ocp.variable("cstr.c")
-    T = ocp.variable("cstr.T")
-    cost = ocp.variable("cost")
-    self.assertTrue(isinstance(c,Variable))
+    self.assertEquals(ocp.dae.size(),3)
+    print type(ocp.s)
+    self.assertEquals(ocp.s.size(),3) # there are three states
+    c = ocp("cstr.c")
+    T = ocp("cstr.T")
+    cost = ocp("cost")
+    self.assertTrue(isinstance(c,SX))
     
     self.assertEquals(c.getName(),"cstr.c")
     self.assertEquals(T.getName(),"cstr.T")
     self.assertEquals(cost.getName(),"cost")
-    self.assertEquals(c.getNominal(),1000)
-       
-    #print c.atTime(0)
-       
-    c = c.var()
-    T = T.var()
-    cost = cost.var()
-    
-    u = ocp.variable("u").var()
+    self.assertEquals(ocp.nominal("cstr.c"),1000)
+   
+    u = ocp("u")
     self.assertEquals(ocp.path.size(),3)
     #self.assertEquals(len(ocp.cfcn_lb),3)
     #self.assertEquals(len(ocp.cfcn_ub),3)
@@ -264,9 +262,9 @@ class OCPtests(casadiTestCase):
     nh = 0
     tf = 0.2
     
-    t = ssym("t")
-    x0 = ssym("x0",nx)
-    p = ssym("p",nu)
+    t = SX.sym("t")
+    x0 = SX.sym("x0",nx)
+    p = SX.sym("p",nu)
     xf = x0 + p[0]
     daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
     mayer = SXFunction([x0],[7*x0[0]])
@@ -296,14 +294,14 @@ class OCPtests(casadiTestCase):
     nh = 2
     tf = 0.2
     
-    t = ssym("t")
-    x0 = ssym("x0",nx)
-    p = ssym("p",nu+np)
+    t = SX.sym("t")
+    x0 = SX.sym("x0",nx)
+    p = SX.sym("p",nu+np)
     xf = x0 + p[0]
     daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
     mayer = SXFunction([x0],[7*x0[0]])
     
-    t = SX("t")
+    t = SXElement.sym("t")
     cfcn = SXFunction(daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
     cfcn.init()
     
@@ -347,9 +345,9 @@ class OCPtests(casadiTestCase):
     """
     te = 2*pi
     N = 20
-    t=SX("t")
-    y=ssym("y",3,1)
-    p=SX("p")
+    t=SXElement.sym("t")
+    y=SX.sym("y",3,1)
+    p=SXElement.sym("p")
     f=SXFunction(daeIn(t=t, x=y, p=p),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
     f.init()
     
@@ -421,10 +419,10 @@ class OCPtests(casadiTestCase):
     """
     te = 1
     N = 20
-    t=ssym("t")
-    x=ssym("x")
-    a=ssym("a")
-    u=ssym("u")
+    t=SX.sym("t")
+    x=SX.sym("x")
+    a=SX.sym("a")
+    u=SX.sym("u")
     f=SXFunction(daeIn(t=t, x=x, p=vertcat([a,u])),daeOut(a*x+u))
     f.init()
     

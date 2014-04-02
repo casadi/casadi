@@ -20,11 +20,13 @@
  *
  */
 
-#ifndef CONSTANT_SX_HPP
-#define CONSTANT_SX_HPP
+#ifndef CONSTANT_SXElement_HPP
+#define CONSTANT_SXElement_HPP
 
 #include "sx_node.hpp"
 #include <cassert>
+
+/// \cond INTERNAL
 
 // Cashing of constants requires a map (preferably a hash map)
 #ifdef USE_CXX11
@@ -95,6 +97,7 @@ class RealtypeSX : public ConstantSX{
     virtual ~RealtypeSX(){
       size_t num_erased = cached_constants_.erase(value); 
       assert(num_erased==1);
+      (void)num_erased;
     }
     
     /// Static creator function (use instead of constructor)
@@ -126,7 +129,7 @@ class RealtypeSX : public ConstantSX{
     virtual bool isAlmostZero(double tol) const{ return fabs(value)<=tol; }
     
   protected:
-    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
+    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx_element.cpp) */
     static CACHING_MAP<double,RealtypeSX*> cached_constants_;
     
     /** \brief  Data members */
@@ -149,6 +152,7 @@ class IntegerSX : public ConstantSX{
     virtual ~IntegerSX(){
       size_t num_erased = cached_constants_.erase(value); 
       assert(num_erased==1);
+      (void)num_erased;
     }
     
     /// Static creator function (use instead of constructor)
@@ -182,7 +186,7 @@ class IntegerSX : public ConstantSX{
   
   protected:
 
-    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
+    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx_element.cpp) */
     static CACHING_MAP<int,IntegerSX*> cached_constants_;
     
     /** \brief  Data members */
@@ -317,6 +321,6 @@ public:
 };
 
 } // namespace CasADi
+/// \endcond
 
-
-#endif // CONSTANT_SX_HPP
+#endif // CONSTANT_SXElement_HPP

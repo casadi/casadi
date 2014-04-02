@@ -6,8 +6,8 @@ using namespace CasADi;
 int main(int argc, char *argv[])
 {
 
-  SXMatrix x=ssym("x",4,1);
-  SXMatrix s=sumAll(outer_prod((x-1),(x-1)));
+  SX x=SX::sym("x",4,1);
+  SX s=sumAll(outer_prod((x-1),(x-1)));
 
   std::cout << "Default (10000)" << std::endl;
   std::cout << s << std::endl;
