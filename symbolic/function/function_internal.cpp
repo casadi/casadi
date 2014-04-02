@@ -2116,8 +2116,7 @@ namespace CasADi{
     int n_out = getNumOutputs();
     
     // Define function
-    if (hasSetOption("name"))
-      stream << "/* " << getOption("name") << " */" << std::endl;
+    stream << "/* " << getSanitizedName() << " */" << std::endl;
     stream << "void " << fname << "(";
   
     // Declare inputs
@@ -2719,6 +2718,19 @@ namespace CasADi{
     stream.setf(fmtflags_backup);
     stream.precision(streamsize_backup);
   }
+
+  // helper function for getSanitizedName
+  bool isBadChar(char c){
+    return !std::isalnum(c);
+  }
+
+  std::string FunctionInternal::getSanitizedName() const{
+      casadi_assert(hasSetOption("name"));
+      string name = getOption("name");
+      std::replace_if(name.begin(), name.end(), isBadChar, '_');
+      return name;
+  }
+
 
 } // namespace CasADi
 

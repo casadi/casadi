@@ -440,6 +440,9 @@ namespace CasADi{
 #endif // SWIG
     //@}
 #endif
+
+    /** \brief get function name with all non alphanumeric characters converted to '_' */
+    std::string getSanitizedName() const;
   };
 
 } // namespace CasADi

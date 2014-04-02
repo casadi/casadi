@@ -1177,9 +1177,7 @@ namespace CasADi{
           // if this is a call node, also write the name of the Function
           MX algElem = it->data;
           if (algElem.getOp() == OP_CALL){
-              const Function &algElemFun = algElem.getFunction();
-              if (algElemFun.hasSetOption("name"))
-                stream << " (" << algElemFun.getOption("name") << ")";
+            stream << " (" << algElem.getFunction().getSanitizedName() << ")";
           }
         }
       }

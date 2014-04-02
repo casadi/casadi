@@ -370,6 +370,8 @@ namespace CasADi{
     /// Errors are thrown if numerical values of inputs look bad
     bool inputs_check_;
     
+    /** \brief get function name with all non alphanumeric characters converted to '_' */
+    std::string getSanitizedName() const;
   };
 
 
