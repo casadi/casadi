@@ -903,23 +903,25 @@ class typemaptests(casadiTestCase):
 
 
     for D in [    
-          csc_matrix(([1.0,2.0,3.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
-          csc_matrix(([1,2,3,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.int),
+          csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
+          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.int),
           numpy.matrix([[1,2],[3,4]]),
           numpy.matrix([[1,2],[3,4.0]]),
           numpy.array([[1,2],[3,4]]),
           numpy.array([[1,2],[3,4.0]]),
+          DMatrix([[1,2],[3,4]]).toCsc_matrix()
         ]:
-    d = DMatrix.ones(2,2)
-    
-    x = ssym("x",d.sparsity())
-    f = SXFunction([x],[x])
-    f.init()
-    f.setInput(D)
+      print D
+      d = DMatrix.ones(2,2)
+      
+      x = SX.sym("x",d.sparsity())
+      f = SXFunction([x],[x])
+      f.init()
+      f.setInput(D)
 
-    self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
-    d.set(D)
-    self.checkarray(d,DMatrix([[1,2],[3,4]]))
+      self.checkarray(f.getInput(),DMatrix([[1,2],[3,4]]))
+      d.set(D)
+      self.checkarray(d,DMatrix([[1,2],[3,4]]))
     
 if __name__ == '__main__':
     unittest.main()
