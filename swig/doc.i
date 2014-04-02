@@ -116213,112 +116213,112 @@ calls to this function.
 // File: chapter6.xml
 
 
-// File: dir_fbf0f9c806c617cede843aa59e0342c5.xml
+// File: dir_e2a50488b69715d5548bca2aaaf9863f.xml
 
 
-// File: dir_0c2a6278e6663165ee010387d336730f.xml
+// File: dir_ce1ed73062f868813342a0dbe0b188c3.xml
 
 
-// File: dir_3308830b49fe0e7187c68d9dad156c89.xml
+// File: dir_46be2948e36a72ca7083c45a7aacae3d.xml
 
 
-// File: dir_0fdd75cbbaa4a60b0dc534109d0a8517.xml
+// File: dir_ae41fa44f543d3884cb1229e52cfbde1.xml
 
 
-// File: dir_d812cf9a3b847afe37419709af41bf0c.xml
+// File: dir_62baf75c1cae6d04dc949badf483bad5.xml
 
 
-// File: dir_f22fc47c7a9ff962de9b25d690370d01.xml
+// File: dir_c9fbaf78972edfee4bf9d5b9071a484a.xml
 
 
-// File: dir_4aafbd1cf68e507ba6ae16d6bb586c01.xml
+// File: dir_8eb78af56ef852d69abf4113da88a5b1.xml
 
 
-// File: dir_87c569dac60b85fea4d24072b0318dc3.xml
+// File: dir_60248c841205460cf98fa2018890b346.xml
 
 
-// File: dir_2bf03e13026ba659c25692d0c3a16b35.xml
+// File: dir_57219f8d770ed4e6491bcfbe72b7011f.xml
 
 
-// File: dir_7659e7ddc14d18e934a0940678620d9c.xml
+// File: dir_a984da1ccd3c043fbecd4b1a3559d400.xml
 
 
-// File: dir_1f01c178384c81ebadd7b1e0d8089fd4.xml
+// File: dir_9a6dbbd50d0de6d7f5fded540d662d82.xml
 
 
-// File: dir_f4ede736d600852c8c5ce936172da3a4.xml
+// File: dir_0109fa8becc269e8647c5a1a8998a324.xml
 
 
-// File: dir_0cd0805b9af7b4e8888fa996129c5dc7.xml
+// File: dir_3773ed2679cec60bd80be23ac5e35e06.xml
 
 
-// File: dir_89d9688559b80049b75060f248a24b7a.xml
+// File: dir_e841d045f7c3a6bdbbb6156355455b74.xml
 
 
-// File: dir_fe4105b3ae859602ee94ef9ea1b85eb4.xml
+// File: dir_a725a21e798488997f71696d6eeec41c.xml
 
 
-// File: dir_9fc32cc60f6d58afde9c10c46ea08a5a.xml
+// File: dir_aefdd95fd748783590a947fc47bb53a9.xml
 
 
-// File: dir_f014e86182df796734dae6cd267f5147.xml
+// File: dir_3b99da1e039aa20d2c42bf369d403f80.xml
 
 
-// File: dir_cb6875faa405a668bdea0e8637463557.xml
+// File: dir_7beb3931621bf51a9a0e4e4cab9f0222.xml
 
 
-// File: dir_80ca651ac8d579c399fc6d178d41c5b9.xml
+// File: dir_0ef00fd62c4396deaa893efc1e8eeeca.xml
 
 
-// File: dir_2269f22008a8b54606d8baecdc3ba6ef.xml
+// File: dir_6c6f05b36003a966768934497a9e98ec.xml
 
 
-// File: dir_b49f1cef293494c79074ab105720637c.xml
+// File: dir_9c9bde343795073a87e6a08325b51d76.xml
 
 
-// File: dir_c7f7a827135bb726cb3740befa2c1717.xml
+// File: dir_3ba6a51aef214c11b783c1c5ab85f69c.xml
 
 
-// File: dir_a12d04b58f3b185c42aa5e6db7a2fd7a.xml
+// File: dir_4197094c95560f4cac74547cb6e8c1c9.xml
 
 
-// File: dir_484ae99883153960d749417f00046d53.xml
+// File: dir_e9078b9afc67341ce0051ea8263f6a54.xml
 
 
-// File: dir_99c519290973207332a0df5611078e71.xml
+// File: dir_631365d53216e8869a44acbbbef8850f.xml
 
 
-// File: dir_afa97617c76ff517aa914353e787e143.xml
+// File: dir_17bd1baaf2dd06d6fe6b2a970e7d7a4f.xml
 
 
-// File: dir_adbec669e4ee3124081a3f25480bb641.xml
+// File: dir_2ea7ffc32a222753be66859f14c30b60.xml
 
 
-// File: dir_ccd243ed9a80fc3535870d6146dfd347.xml
+// File: dir_714ec8dbb353bb970985b10d06b51b28.xml
 
 
-// File: dir_a9ad0473ce0a685dd2e41bea62accc67.xml
+// File: dir_0e9dbbf5869827a2c9467439f468682f.xml
 
 
-// File: dir_f69476ad2f61a5f23b645afb80d94d51.xml
+// File: dir_160e375c81aade60a9a3ac5b6f6a1850.xml
 
 
-// File: dir_11d6d7a652ac40b1ad46e450cb800baf.xml
+// File: dir_5d2cea1fb9d6f1a70aa8c32c593e7a64.xml
 
 
-// File: dir_51b82cd46b953f2431ff521211335e74.xml
+// File: dir_38cae3957561478ffeb7ddfac20e384f.xml
 
 
-// File: dir_84122d5450e16229934b711e70d408cd.xml
+// File: dir_38b724e79999953aab66567f3dbbfa93.xml
 
 
-// File: dir_ab950c1db7441136080f3a8f14e264f2.xml
+// File: dir_1936376a71de761d5e90910f3edab001.xml
 
 
-// File: dir_5efa3637118b86818d2413746bfdfc85.xml
+// File: dir_ce445109d2bc54d04c0a5134ae147918.xml
 
 
-// File: dir_ffbc3ac1c51dba7639a2d323ed97b47e.xml
+// File: dir_5f42808c1d4d60c759a1acb709cfb462.xml
 
 
 // File: algebra_2LinearSolver_8py-example.xml
