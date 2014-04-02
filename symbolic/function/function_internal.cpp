@@ -2116,6 +2116,8 @@ namespace CasADi{
     int n_out = getNumOutputs();
     
     // Define function
+    if (hasSetOption("name"))
+      stream << "/* " << getOption("name") << " */" << std::endl;
     stream << "void " << fname << "(";
   
     // Declare inputs
