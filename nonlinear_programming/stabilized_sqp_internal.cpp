@@ -32,6 +32,7 @@
 #include <fstream>
 #include <cmath>
 #include <cfloat>
+#include <ctime>
 
 using namespace std;
 namespace CasADi{
@@ -43,6 +44,7 @@ namespace CasADi{
     addOption("hessian_approximation", OT_STRING, "exact",          "limited-memory|exact");
     addOption("max_iter",           OT_INTEGER,     100,            "Maximum number of SQP iterations");
     addOption("max_iter_ls",        OT_INTEGER,      20,            "Maximum number of linesearch iterations");
+    addOption("max_time",          OT_REAL,       1e12,             "Timeout");
     addOption("tol_pr",            OT_REAL,       1e-5,             "Stopping criterion for primal infeasibility");
     addOption("tol_du",            OT_REAL,       1e-5,             "Stopping criterion for dual infeasability");
     addOption("c1",                OT_REAL,       0.001,             "Armijo condition, coefficient of decrease in merit");
@@ -325,6 +327,7 @@ namespace CasADi{
     double t = 0;
   
     // MAIN OPTIMIZATION LOOP
+    double initial_time = clock();
     while(true){
     
       // Primal infeasability
@@ -450,6 +453,14 @@ namespace CasADi{
         break;
       }
       
+      if (double(clock()-initial_time)/CLOCKS_PER_SEC > double(getOption("max_time"))){
+        cout << endl;
+        cout << "CasADi::StabilizedSQPMethod: Maximum time (" << getOption("max_time")
+             << " sec.) exceeded." << endl;
+        stats_["return_status"] = "Maximum_Time_Exceeded";
+        break;
+      }
+
       printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norm1,reg_,TRDelta_,ls_iter,ls_success, info);
     
       // Start a new iteration
