@@ -52,7 +52,7 @@ endif()
 if(SQIC_FOUND AND IPOPT_FOUND)
   add_executable(stabilized_sqpmethod_nl stabilized_sqpmethod_nl.cpp)
   target_link_libraries(stabilized_sqpmethod_nl 
-    casadi_ipopt_interface casadi_nonlinear_programming casadi_sqic_interface
+    casadi_ipopt_interface casadi_nonlinear_programming casadi_sqic_interface casadi_convex_programming
   )
 endif()
 
