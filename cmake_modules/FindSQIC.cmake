@@ -5,7 +5,7 @@ PATHS $ENV{SQIC_INCLUDE_DIR}
 )
 
 IF(NOT SQIC_INCLUDE_DIR )
-  MESSAGE(STATUS "SQIC: Cound not find include dir. Try stetting SQIC_INCLUDE_DIR env var.") 
+  MESSAGE(STATUS "SQIC: Cound not find include dir. Try setting SQIC_INCLUDE_DIR env var.") 
 ENDIF(NOT SQIC_INCLUDE_DIR )
 
 FIND_LIBRARY(SQIC_LIB_SNBLAS
@@ -13,7 +13,7 @@ snblas
 PATHS $ENV{SQIC_LIBRARY_DIR}
 )
 IF(NOT SQIC_LIB_SNBLAS)
-  MESSAGE(STATUS "SQIC: Cound not find library snblas. Try stetting SQIC_LIBRARY_DIR env var.") 
+  MESSAGE(STATUS "SQIC: Cound not find library snblas. Try setting SQIC_LIBRARY_DIR env var.") 
 ENDIF(NOT SQIC_LIB_SNBLAS)
 
 
@@ -23,7 +23,7 @@ PATHS $ENV{SQIC_LIBRARY_DIR}
 )
 
 IF(NOT SQIC_LIB_SQIC)
-  MESSAGE(STATUS "SQIC: Cound not find library sqic. Try stetting SQIC_LIBRARY_DIR env var.") 
+  MESSAGE(STATUS "SQIC: Cound not find library sqic. Try setting SQIC_LIBRARY_DIR env var.") 
 ENDIF(NOT SQIC_LIB_SQIC)
 
 IF(SQIC_INCLUDE_DIR AND SQIC_LIB_SNBLAS AND SQIC_LIB_SQIC)
