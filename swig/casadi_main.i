@@ -32,3 +32,10 @@
 
 // Auxilliary casadi functions:  printing for std::vector, printable_object, shared_object, casadi_types, generic_type, options_functionality
 %include "casadi_aux.i"
+
+%{
+#include "symbolic/casadi_options.hpp" 
+#include "symbolic/casadi_meta.hpp" 
+%}
+%include "symbolic/casadi_options.hpp"
+%include "symbolic/casadi_meta.hpp"

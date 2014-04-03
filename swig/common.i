@@ -401,13 +401,6 @@ namespace std {
 %}
 #endif
 
-%{
-#include "symbolic/casadi_options.hpp" 
-#include "symbolic/casadi_meta.hpp" 
-%}
-%include "symbolic/casadi_options.hpp"
-%include "symbolic/casadi_meta.hpp"
-
 #ifdef CASADI_MODULE
 
 %define DEPRECATED_MSG(MSG)
