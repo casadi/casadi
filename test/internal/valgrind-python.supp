@@ -530,10 +530,9 @@
    memory leak in swig multiple modules
    Memcheck:Leak
    fun:malloc
-   fun:SwigPyClientData_New*
-   fun:*_swigregister*
-   fun:PyEval_EvalFrameEx*
-   fun:PyEval_EvalCode*
-   fun:PyImport_ExecCodeModuleEx*
+   fun:SwigPyClientData_New
+   fun:*_swigregister
+   fun:PyEval_EvalFrameEx
+   ...
+   fun:PyImport_ExecCodeModuleEx
 }
-
