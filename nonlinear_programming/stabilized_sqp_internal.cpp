@@ -262,6 +262,13 @@ namespace CasADi{
       
     // Set linearization point to initial guess
     copy(x_init.begin(),x_init.end(),x_.begin());
+    // make initial point feasible w.r.t. bounds
+    for (int k=0; k<x_.size(); k++){
+        if (lbx[k] > x_[k])
+            x_[k] = lbx[k];
+        else if (x_[k] > ubx[k])
+            x_[k] = ubx[k];
+    }
   
     // Initialize Lagrange multipliers of the NLP
     copy(input(NLP_SOLVER_LAM_G0).begin(),input(NLP_SOLVER_LAM_G0).end(),mu_.begin());
