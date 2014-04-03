@@ -21,7 +21,6 @@ find_package(NUMPY)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
 
 set(CASADI_SWIG_FLAGS "")
-set(SWIG_LINK_LIBRARIES_LIST "")
 
 # Include the use swig file
 include (../cmake_modules/UseSWIGMOD.cmake)
@@ -91,7 +90,7 @@ SWIG_ADD_MODULE (${my_module} python ${my_module}.i)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
 endif()
-SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} ${my_module})
+SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES} ${my_module})
 endforeach()
 
 # the name used for the shared module for the python interface is determined
@@ -280,8 +279,6 @@ set(CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
 set(CPACK_COMPONENTS_ALL Unspecified componenthaskell)
 # This will not actually work since we are in a EXCLUDE_FROM_ALL
 # http://cmake.3232098.n2.nabble.com/Yet-another-install-vs-exclude-from-all-thread-td4967491.html
-
-set(LINK_LIBRARIES_ALL ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control casadi_integration casadi_convex_programming casadi_nonlinear_programming)
 
 # Pass meta information
 CONFIGURE_FILE(
