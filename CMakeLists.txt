@@ -66,8 +66,8 @@ if (NOT COMMAND add_feature_info)
 endif()
 
 # Options:
-option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
-option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
+option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
+option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 if (WIN32)
  option(WITH_DL "Enable dynamic loading of functions" OFF)
 else (WIN32)
