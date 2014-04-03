@@ -24,7 +24,7 @@
 
 %include "common.i"
 
-%import "casadi.i"
+%import "casadi_main.i"
 
 %{
 #include "integration/fixed_step_integrator.hpp"

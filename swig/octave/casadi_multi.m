@@ -19,7 +19,7 @@
 %     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 % 
 % 
-casadi
+casadi_main
 casadi_integration
 casadi_control
 casadi_convex_programming
@@ -29,80 +29,80 @@ casadi_optimal_control
 failedimport = "Not implemented"
 
 try
-casadi_interface_ipopt
+casadi_ipopt_interface
 catch
-casadi_interface_ipopt = failedimport
+casadi_ipopt_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_sundials
+casadi_sundials_interface
 catch
-casadi_interface_sundials = failedimport
+casadi_sundials_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_qpoases
+casadi_qpoases_interface
 catch
-casadi_interface_qpoases = failedimport
+casadi_qpoases_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_dsdp
+casadi_dsdp_interface
 catch
-casadi_interface_dsdp = failedimport
+casadi_dsdp_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_csparse
+casadi_csparse_interface
 catch
-casadi_interface_csparse = failedimport
+casadi_csparse_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_knitro
+casadi_knitro_interface
 catch
-casadi_interface_knitro = failedimport
+casadi_knitro_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_cplex
+casadi_cplex_interface
 catch
-casadi_interface_cplex = failedimport
+casadi_cplex_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_ooqp
+casadi_ooqp_interface
 catch
-casadi_interface_ooqp = failedimport
+casadi_ooqp_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_slicot
+casadi_slicot_interface
 catch
-casadi_interface_slicot = failedimport
+casadi_slicot_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_worhp
+casadi_worhp_interface
 catch
-casadi_interface_worhp = failedimport
+casadi_worhp_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_snopt
+casadi_snopt_interface
 catch
-casadi_interface_snopt = failedimport
+casadi_snopt_interface = failedimport
 end_try_catch
 
 try
-casadi_interface_lapack
+casadi_lapack_interface
 catch
-casadi_interface_lapack = failedimport
+casadi_lapack_interface = failedimport
 end_try_catch
 
 global casadi = struct();
-names = {'casadi','casadi_integration','casadi_control', 'casadi_convex_programming','casadi_nonlinear_programming','casadi_optimal_control','casadi_interface_ipopt','casadi_interface_sundials','casadi_interface_qpoases','casadi_interface_dsdp','casadi_interface_csparse','casadi_interface_knitro','casadi_interface_cplex','casadi_interface_ooqp','casadi_interface_slicot','casadi_interface_worhp','casadi_interface_snopt','casadi_interface_lapack'};
-interfaces = { casadi casadi_integration casadi_control casadi_convex_programming casadi_nonlinear_programming casadi_optimal_control casadi_interface_ipopt casadi_interface_sundials casadi_interface_qpoases casadi_interface_dsdp casadi_interface_csparse casadi_interface_knitro casadi_interface_cplex casadi_interface_ooqp casadi_interface_slicot casadi_interface_worhp casadi_interface_snopt casadi_interface_lapack};
+names = {'casadi_main','casadi_integration','casadi_control', 'casadi_convex_programming','casadi_nonlinear_programming','casadi_optimal_control','casadi_ipopt_interface','casadi_sundials_interface','casadi_qpoases_interface','casadi_dsdp_interface','casadi_csparse_interface','casadi_knitro_interface','casadi_cplex_interface','casadi_ooqp_interface','casadi_slicot_interface','casadi_worhp_interface','casadi_snopt_interface','casadi_lapack_interface'};
+interfaces = { casadi_main casadi_integration casadi_control casadi_convex_programming casadi_nonlinear_programming casadi_optimal_control casadi_ipopt_interface casadi_sundials_interface casadi_qpoases_interface casadi_dsdp_interface casadi_csparse_interface casadi_knitro_interface casadi_cplex_interface casadi_ooqp_interface casadi_slicot_interface casadi_worhp_interface casadi_snopt_interface casadi_lapack_interface};
 
 for i=1:numel(names)
   name = names{i};

@@ -24,7 +24,7 @@
 
 %include "common.i"
 
-%import "casadi.i"
+%import "casadi_main.i"
 
 %{
 #include "convex_programming/qp_lp_solver.hpp"

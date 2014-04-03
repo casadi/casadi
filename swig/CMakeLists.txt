@@ -71,7 +71,8 @@ link_directories (${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DCASADI_MODULE")
 
-set(CASADI_SWIG_MAIN_MODULE casadi)
+set(CASADI_SWIG_MAIN_MODULE casadi_main)
+list(APPEND CASADI_MODULES ${CASADI_SWIG_MAIN_MODULE})
 
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
@@ -87,10 +88,14 @@ set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 # PYTHON interface
 foreach(my_module ${CASADI_MODULES})
 SWIG_ADD_MODULE (${my_module} python ${my_module}.i)
+if("${my_module}" STREQUAL "${CASADI_SWIG_MAIN_MODULE}")
+SWIG_LINK_LIBRARIES (${CASADI_SWIG_MAIN_MODULE} ${PYTHON_LIBRARIES} casadi)
+else()
+SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES} ${my_module})
+endif()
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
 endif()
-SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES} ${my_module})
 endforeach()
 
 # the name used for the shared module for the python interface is determined
@@ -241,7 +246,11 @@ endforeach()
 # OCTAVE interface
 foreach(my_module ${CASADI_MODULES})
   SWIG_ADD_MODULE (${my_module}_octave octave ${my_module}.i octrun.swg)
-  SWIG_LINK_LIBRARIES (${my_module}_octave ${my_module})
+  if("${my_module}" STREQUAL "${CASADI_SWIG_MAIN_MODULE}")
+    SWIG_LINK_LIBRARIES (${CASADI_SWIG_MAIN_MODULE}_octave casadi)
+  else()
+    SWIG_LINK_LIBRARIES (${my_module}_octave ${my_module})
+  endif()
   set_target_properties(${my_module}_octave PROPERTIES PREFIX "")
   set_target_properties(${my_module}_octave PROPERTIES SUFFIX ".oct")
   set_target_properties(${my_module}_octave PROPERTIES OUTPUT_NAME "${my_module}")
@@ -314,11 +323,6 @@ ADD_CUSTOM_COMMAND(
  TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
  POST_BUILD
  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave/@swig_ref ${LIBRARY_OUTPUT_PATH}/@swig_ref
-)
-ADD_CUSTOM_COMMAND(
- TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E remove ${LIBRARY_OUTPUT_PATH}/casadi.oct
 )
 ADD_CUSTOM_COMMAND(
  TARGET ${CASADI_SWIG_MAIN_MODULE}_octave

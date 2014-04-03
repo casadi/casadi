@@ -131,8 +131,6 @@ if(WITH_OPENCL)
   target_link_libraries(casadi ${OPENCL_LIBRARIES})
 endif(WITH_OPENCL)
 
-set(CASADI_MODULES ${CASADI_MODULES} casadi PARENT_SCOPE)
-
 install(TARGETS casadi
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

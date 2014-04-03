@@ -24,7 +24,7 @@
 
 %include "common.i"
 
-%import "casadi.i"
+%import "casadi_main.i"
 
 %{
 #include "interfaces/sqic/sqic_solver.hpp"

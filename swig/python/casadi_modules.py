@@ -23,7 +23,7 @@
 
 #http://stackoverflow.com/questions/4116061/importing-everything-dynamically-from-a-module
 
-from casadi import *
+from casadi_main import *
 
 from casadi_integration import *
 from casadi_control import *

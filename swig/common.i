@@ -775,7 +775,7 @@ void dummy2(
 
 #ifdef SWIGPYTHON
 %pythoncode %{
-import _casadi as _casadi_main_module
+import _casadi_main as _casadi_main_module
 %}
 #endif // SWIGPYTHON
 
