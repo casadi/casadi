@@ -21,8 +21,8 @@
 # 
 # -*- coding: utf-8 -*-
 
-from casadi import *
-import casadi
+from casadi_modules import *
+import casadi_modules as casadi
 
 import types
   
@@ -114,3 +114,4 @@ def internalAPI():
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':
   __version__  = CasadiMeta.getGitDescribe()
+  

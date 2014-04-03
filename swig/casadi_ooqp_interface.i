@@ -20,12 +20,13 @@
  *
  */
 
-%module casadi_core
+%module casadi_ooqp_interface
 
 %include "common.i"
 
-%import "casadi_main.i"
+%import "casadi.i"
 
-// SX, Matrix, MX
-%include "casadi_primitive.i"
-
+%{
+#include "interfaces/ooqp/ooqp_solver.hpp"
+%}
+%include "interfaces/ooqp/ooqp_solver.hpp"

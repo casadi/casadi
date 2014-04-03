@@ -20,6 +20,8 @@ if(WITH_CSPARSE)
   target_link_libraries(casadi_nonlinear_programming casadi_csparse_interface)
 endif(WITH_CSPARSE)
 
+set(CASADI_MODULES ${CASADI_MODULES} casadi_nonlinear_programming PARENT_SCOPE)
+
 endif(ENABLE_SHARED)
 install(TARGETS casadi_nonlinear_programming
   LIBRARY DESTINATION lib

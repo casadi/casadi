@@ -21,6 +21,7 @@ if(ENABLE_SHARED)
 add_library(casadi_sundials_interface SHARED ${SUNDIALS_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
 target_link_libraries(casadi_sundials_interface casadi ${SUNDIALS_LIBRARIES})
+set(CASADI_MODULES ${CASADI_MODULES} casadi_sundials_interface PARENT_SCOPE)
 
 install(TARGETS casadi_sundials_interface
   LIBRARY DESTINATION lib

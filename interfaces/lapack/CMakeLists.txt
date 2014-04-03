@@ -15,6 +15,7 @@ if(ENABLE_SHARED)
 add_library(casadi_lapack_interface SHARED ${LAPACK_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
 target_link_libraries(casadi_lapack_interface casadi ${LAPACK_LIBRARIES})
+set(CASADI_MODULES ${CASADI_MODULES} casadi_lapack_interface PARENT_SCOPE)
 install(TARGETS casadi_lapack_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

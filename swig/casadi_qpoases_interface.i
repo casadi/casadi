@@ -20,10 +20,13 @@
  *
  */
 
-%module casadi_interface_lapack
+%module casadi_qpoases_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
-%include "lapack_interface.i"
+%{
+#include "interfaces/qpoases/qpoases_solver.hpp"
+%}
+%include "interfaces/qpoases/qpoases_solver.hpp"

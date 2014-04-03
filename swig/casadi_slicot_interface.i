@@ -20,13 +20,16 @@
  *
  */
 
-%module casadi_interface_gsl
+%module casadi_slicot_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi_control.i"
 
 %{
-#include "interfaces/gsl/gsl_integrator.hpp"
+#include "interfaces/slicot/slicot_tools.hpp"
+#include "interfaces/slicot/psd_indef_dple_solver.hpp"
 %}
-%include "interfaces/gsl/gsl_integrator.hpp"
+
+%include "interfaces/slicot/slicot_tools.hpp"
+%include "interfaces/slicot/psd_indef_dple_solver.hpp"

@@ -15,6 +15,8 @@ if(ENABLE_SHARED)
 add_library(casadi_dsdp_interface SHARED ${DSDP_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
 target_link_libraries(casadi_dsdp_interface casadi ${DSDP_LIBRARIES})
+
+set(CASADI_MODULES ${CASADI_MODULES} casadi_dsdp_interface PARENT_SCOPE)
 install(TARGETS casadi_dsdp_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

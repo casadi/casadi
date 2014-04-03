@@ -20,6 +20,8 @@ if(ENABLE_SHARED)
   add_library(casadi_csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
 endif()
 
+set(CASADI_MODULES ${CASADI_MODULES} casadi_csparse_interface PARENT_SCOPE)
+
 target_link_libraries(casadi_csparse_interface casadi ${CSPARSE_LIBRARIES})
 
 install(TARGETS casadi_csparse_interface

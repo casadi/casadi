@@ -19,6 +19,37 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
+ 
+%module casadi_optimal_control
 
-// optimal_control
-%include "optimal_control.i"
+%include "common.i"
+
+%import "casadi.i"
+
+%{
+#include "optimal_control/variable.hpp"
+#include "optimal_control/symbolic_ocp.hpp"
+#include "optimal_control/direct_single_shooting.hpp"
+#include "optimal_control/direct_multiple_shooting.hpp"
+#include "optimal_control/direct_collocation.hpp"
+%}
+
+%include "optimal_control/variable.hpp"
+%include "optimal_control/symbolic_ocp.hpp"
+%include "optimal_control/direct_single_shooting.hpp"
+%include "optimal_control/direct_multiple_shooting.hpp"
+%include "optimal_control/direct_collocation.hpp"
+
+#ifdef SWIGPYTHON
+%pythoncode %{
+  class VariableStruct(object):
+    """Structure for browsing through a variable tree."""
+    def __repr__(self):
+      return repr(self.__dict__)
+%}
+
+#endif // SWIGPYTHON
+
+VECTOR_REPR(CasADi::Variable)
+
+

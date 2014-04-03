@@ -20,12 +20,6 @@
  *
  */
 
-%module casadi_primitive_tools
-
-%include "common.i"
-
-%import "casadi_primitive.i"
-
 #ifdef SWIGPYTHON
 %pythoncode%{
 try:

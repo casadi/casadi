@@ -20,6 +20,7 @@ add_library(snopt_fortran_c_bridge SHARED wsnopt.f90)
 endif(ENABLE_SHARED)
 target_link_libraries(casadi_snopt_interface casadi snopt_fortran_c_bridge ${CMAKE_DL_LIBS})
 target_link_libraries(snopt_fortran_c_bridge ${SNOPT_LIBRARIES})
+set(CASADI_MODULES ${CASADI_MODULES} casadi_snopt_interface PARENT_SCOPE)
 install(TARGETS casadi_snopt_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

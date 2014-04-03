@@ -20,14 +20,13 @@
  *
  */
 
-%{
-#include "interfaces/sundials/sundials_integrator.hpp"
-#include "interfaces/sundials/cvodes_integrator.hpp"
-#include "interfaces/sundials/idas_integrator.hpp"
-#include "interfaces/sundials/kinsol_solver.hpp"
-%}
+%module casadi_snopt_interface
 
-%include "interfaces/sundials/sundials_integrator.hpp"
-%include "interfaces/sundials/cvodes_integrator.hpp"
-%include "interfaces/sundials/idas_integrator.hpp"
-%include "interfaces/sundials/kinsol_solver.hpp"
+%include "common.i"
+
+%import "casadi.i"
+
+%{
+#include "interfaces/snopt/snopt_solver.hpp"
+%}
+%include "interfaces/snopt/snopt_solver.hpp"

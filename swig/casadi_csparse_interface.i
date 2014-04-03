@@ -20,14 +20,16 @@
  *
  */
 
-%module casadi_interface_qpoases
+%module casadi_csparse_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
-%include "qpoases_interface.i"
 %{
-#include "interfaces/qpoases/qpoases_solver.hpp"
+#include "interfaces/csparse/csparse.hpp"
+#include "interfaces/csparse/csparse_cholesky.hpp"
 %}
-%include "interfaces/qpoases/qpoases_solver.hpp"
+%include "interfaces/csparse/csparse.hpp"
+%include "interfaces/csparse/csparse_cholesky.hpp"
+

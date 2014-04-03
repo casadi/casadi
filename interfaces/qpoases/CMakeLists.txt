@@ -15,6 +15,8 @@ if(ENABLE_SHARED)
 add_library(casadi_qpoases_interface SHARED ${QPOASES_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
 target_link_libraries(casadi_qpoases_interface casadi ${QPOASES_LIBRARIES})
+set(CASADI_MODULES ${CASADI_MODULES} casadi_qpoases_interface PARENT_SCOPE)
+
 install(TARGETS casadi_qpoases_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

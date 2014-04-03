@@ -20,6 +20,8 @@ target_link_libraries(casadi_optimal_control
   casadi_integration
   ${TINYXML_LIBRARIES}
 )
+set(CASADI_MODULES ${CASADI_MODULES} casadi_optimal_control PARENT_SCOPE)
+
 install(TARGETS casadi_optimal_control
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

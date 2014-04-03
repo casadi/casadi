@@ -21,93 +21,98 @@
 # 
 # -*- coding: utf-8 -*-
 
-from casadi_main import *
-from casadi_primitive import *
-from casadi_primitive_tools import *
-from casadi_noncore import *
+#http://stackoverflow.com/questions/4116061/importing-everything-dynamically-from-a-module
+
+from casadi import *
+
+from casadi_integration import *
+from casadi_control import *
+from casadi_convex_programming import *
+from casadi_nonlinear_programming import *
+from casadi_optimal_control import *
 
 interfaces = []
 failed_interfaces = {}
 
 try:
-  from casadi_interface_ipopt import *
+  from casadi_ipopt_interface import *
   interfaces.append("ipopt")
 except Exception as e:
   failed_interfaces["ipopt"] = str(e)
 
 
 try:
-  from casadi_interface_sundials import *
+  from casadi_sundials_interface import *
   interfaces.append("sundials")
 except Exception as e:
   failed_interfaces["sundials"] = str(e)
 
 
 try:
-  from casadi_interface_qpoases import *
+  from casadi_qpoases_interface import *
   interfaces.append("qpoases")
 except Exception as e:
   failed_interfaces["qpoases"] = str(e)
 
 
 try:
-  from casadi_interface_dsdp import *
+  from casadi_dsdp_interface import *
   interfaces.append("dsdp")
 except Exception as e:
   failed_interfaces["dsdp"] = str(e)
 
 
 try:
-  from casadi_interface_csparse import *
+  from casadi_csparse_interface import *
   interfaces.append("csparse")
 except Exception as e:
   failed_interfaces["csparse"] = str(e)
 
 
 try:
-  from casadi_interface_knitro import *
+  from casadi_knitro_interface import *
   interfaces.append("knitro")
 except Exception as e:
   failed_interfaces["knitro"] = str(e)
 
 
 try:
-  from casadi_interface_cplex import *
+  from casadi_cplex_interface import *
   interfaces.append("cplex")
 except Exception as e:
   failed_interfaces["cplex"] = str(e)
 
 
 try:
-  from casadi_interface_ooqp import *
+  from casadi_ooqp_interface import *
   interfaces.append("ooqp")
 except Exception as e:
   failed_interfaces["ooqp"] = str(e)
 
 
 try:
-  from casadi_interface_slicot import *
+  from casadi_slicot_interface import *
   interfaces.append("slicot")
 except Exception as e:
   failed_interfaces["slicot"] = str(e)
 
 
 try:
-  from casadi_interface_worhp import *
+  from casadi_worhp_interface import *
   interfaces.append("worhp")
 except Exception as e:
   failed_interfaces["worhp"] = str(e)
 
 
 try:
-  from casadi_interface_snopt import *
+  from casadi_snopt_interface import *
   interfaces.append("snopt")
 except Exception as e:
   failed_interfaces["snopt"] = str(e)
 
 
 try:
-  from casadi_interface_lapack import *
+  from casadi_lapack_interface import *
   interfaces.append("lapack")
 except Exception as e:
   failed_interfaces["lapack"] = str(e)

@@ -17,6 +17,7 @@ if(ENABLE_SHARED)
 add_library(casadi_control SHARED ${CONTROL_SRCS})
 endif(ENABLE_SHARED)
 target_link_libraries(casadi_control casadi)
+set(CASADI_MODULES ${CASADI_MODULES} casadi_control PARENT_SCOPE)
 install(TARGETS casadi_control
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

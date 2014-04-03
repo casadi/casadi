@@ -19,10 +19,12 @@
 %     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 % 
 % 
-casadi_main
-casadi_primitive
-casadi_primitive_tools
-casadi_noncore
+casadi
+casadi_integration
+casadi_control
+casadi_convex_programming
+casadi_nonlinear_programming
+casadi_optimal_control
 
 failedimport = "Not implemented"
 
@@ -99,8 +101,8 @@ casadi_interface_lapack = failedimport
 end_try_catch
 
 global casadi = struct();
-names = {'casadi_main','casadi_primitive','casadi_primitive_tools', 'casadi_noncore','casadi_interface_ipopt','casadi_interface_sundials','casadi_interface_qpoases','casadi_interface_dsdp','casadi_interface_csparse','casadi_interface_knitro','casadi_interface_cplex','casadi_interface_ooqp','casadi_interface_slicot','casadi_interface_worhp','casadi_interface_snopt','casadi_interface_lapack'};
-interfaces = { casadi_main casadi_primitive casadi_primitive_tools casadi_noncore casadi_interface_ipopt casadi_interface_sundials casadi_interface_qpoases casadi_interface_dsdp casadi_interface_csparse casadi_interface_knitro casadi_interface_cplex casadi_interface_ooqp casadi_interface_slicot casadi_interface_worhp casadi_interface_snopt casadi_interface_lapack};
+names = {'casadi','casadi_integration','casadi_control', 'casadi_convex_programming','casadi_nonlinear_programming','casadi_optimal_control','casadi_interface_ipopt','casadi_interface_sundials','casadi_interface_qpoases','casadi_interface_dsdp','casadi_interface_csparse','casadi_interface_knitro','casadi_interface_cplex','casadi_interface_ooqp','casadi_interface_slicot','casadi_interface_worhp','casadi_interface_snopt','casadi_interface_lapack'};
+interfaces = { casadi casadi_integration casadi_control casadi_convex_programming casadi_nonlinear_programming casadi_optimal_control casadi_interface_ipopt casadi_interface_sundials casadi_interface_qpoases casadi_interface_dsdp casadi_interface_csparse casadi_interface_knitro casadi_interface_cplex casadi_interface_ooqp casadi_interface_slicot casadi_interface_worhp casadi_interface_snopt casadi_interface_lapack};
 
 for i=1:numel(names)
   name = names{i};

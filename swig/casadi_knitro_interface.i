@@ -20,13 +20,13 @@
  *
  */
 
-%module casadi_interface_dsdp
+%module casadi_knitro_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
-%{
-#include "interfaces/dsdp/dsdp_solver.hpp"
+%{ 
+  #include "interfaces/knitro/knitro_solver.hpp"
 %}
-%include "interfaces/dsdp/dsdp_solver.hpp"
+%include "interfaces/knitro/knitro_solver.hpp"

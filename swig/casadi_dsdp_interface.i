@@ -20,10 +20,13 @@
  *
  */
 
-%module casadi_interface_sundials
+%module casadi_dsdp_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
-%include "sundials_interface.i"
+%{
+#include "interfaces/dsdp/dsdp_solver.hpp"
+%}
+%include "interfaces/dsdp/dsdp_solver.hpp"

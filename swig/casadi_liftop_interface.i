@@ -20,16 +20,14 @@
  *
  */
 
-%module casadi_interface_csparse
+%module casadi_liftop_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
 %{
-#include "interfaces/csparse/csparse.hpp"
-#include "interfaces/csparse/csparse_cholesky.hpp"
+  #include "interfaces/liftopt/liftopt_solver.hpp"
 %}
-%include "interfaces/csparse/csparse.hpp"
-%include "interfaces/csparse/csparse_cholesky.hpp"
+%include "interfaces/liftopt/liftopt_solver.hpp"
 

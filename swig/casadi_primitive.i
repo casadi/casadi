@@ -20,19 +20,6 @@
  *
  */
 
-%module casadi_primitive
-
-%include "common.i"
-
-%import "casadi_main.i"
-
-
-#ifdef SWIGPYTHON
-%pythoncode %{
-import _casadi_primitive_tools as _casadi_global
-%}
-#endif // SWIGPYTHON
-
 // Matrix typemaps class
 %include "matrix.i"
 

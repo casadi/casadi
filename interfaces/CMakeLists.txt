@@ -49,3 +49,5 @@ endif()
 if(SLICOT_FOUND)
   add_subdirectory(slicot)
 endif()
+
+set (CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)

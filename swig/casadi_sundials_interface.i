@@ -20,13 +20,20 @@
  *
  */
 
-%module casadi_interface_cplex
+%module casadi_sundials_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
-%{ 
-  #include "interfaces/cplex/cplex_solver.hpp"
+%{
+#include "interfaces/sundials/sundials_integrator.hpp"
+#include "interfaces/sundials/cvodes_integrator.hpp"
+#include "interfaces/sundials/idas_integrator.hpp"
+#include "interfaces/sundials/kinsol_solver.hpp"
 %}
-%include "interfaces/cplex/cplex_solver.hpp"
+
+%include "interfaces/sundials/sundials_integrator.hpp"
+%include "interfaces/sundials/cvodes_integrator.hpp"
+%include "interfaces/sundials/idas_integrator.hpp"
+%include "interfaces/sundials/kinsol_solver.hpp"

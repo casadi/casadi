@@ -20,13 +20,13 @@
  *
  */
 
-%module casadi_interface_knitro
+%module casadi_gsl_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
-%{ 
-  #include "interfaces/knitro/knitro_solver.hpp"
+%{
+#include "interfaces/gsl/gsl_integrator.hpp"
 %}
-%include "interfaces/knitro/knitro_solver.hpp"
+%include "interfaces/gsl/gsl_integrator.hpp"

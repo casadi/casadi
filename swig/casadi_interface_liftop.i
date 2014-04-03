@@ -24,7 +24,7 @@
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
 %{
   #include "interfaces/liftopt/liftopt_solver.hpp"

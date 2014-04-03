@@ -16,7 +16,8 @@ endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_ooqp_interface SHARED ${OOQP_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-target_link_libraries(casadi_ooqp_interface casadi ${OOQP_LIBRARIES} ${BLAS_LIBRARIES} )
+target_link_libraries(casadi_ooqp_interface casadi ${OOQP_LIBRARIES})
+set(CASADI_MODULES ${CASADI_MODULES} casadi_ooqp_interface PARENT_SCOPE)
 install(TARGETS casadi_ooqp_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

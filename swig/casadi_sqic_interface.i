@@ -20,13 +20,15 @@
  *
  */
 
-%module casadi_interface_worhp
+%module casadi_sqic_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
 %{
-#include "interfaces/worhp/worhp_solver.hpp"
+#include "interfaces/sqic/sqic_solver.hpp"
+#include "interfaces/sqic/stabilized_sqic_solver.hpp"
 %}
-%include "interfaces/worhp/worhp_solver.hpp"
+%include "interfaces/sqic/sqic_solver.hpp"
+%include "interfaces/sqic/stabilized_sqic_solver.hpp"

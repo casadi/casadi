@@ -20,8 +20,13 @@
  *
  */
 
-%{
-#include "interfaces/qpoases/qpoases_solver.hpp"
-%}
+%module casadi_cplex_interface
 
-%include "interfaces/qpoases/qpoases_solver.hpp"
+%include "common.i"
+
+%import "casadi.i"
+
+%{ 
+  #include "interfaces/cplex/cplex_solver.hpp"
+%}
+%include "interfaces/cplex/cplex_solver.hpp"

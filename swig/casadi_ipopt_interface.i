@@ -20,13 +20,15 @@
  *
  */
 
-%module casadi_interface_snopt
+%module casadi_ipopt_interface
 
 %include "common.i"
 
-%import "casadi_noncore.i"
+%import "casadi.i"
 
 %{
-#include "interfaces/snopt/snopt_solver.hpp"
+#include "interfaces/ipopt/ipopt_solver.hpp"
 %}
-%include "interfaces/snopt/snopt_solver.hpp"
+
+%include "interfaces/ipopt/ipopt_solver.hpp"
+
