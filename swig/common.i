@@ -687,6 +687,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "symbolic/function/parallelizer.hpp"
 #include "symbolic/function/custom_function.hpp"
 #include "symbolic/function/nullspace.hpp"
+#include "symbolic/functor.hpp"
 
 #include "nonlinear_programming/symbolic_nlp.hpp"
 #include "nonlinear_programming/sqp_method.hpp"
