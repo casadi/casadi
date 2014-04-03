@@ -20,12 +20,10 @@
  *
  */
 
-#ifdef WITH_SWIG_SPLIT
 %module casadi_interface_lapack
 
 %include "common.i"
 
 %import "casadi_noncore.i"
-#endif //WITH_SWIG_SPLIT
 
 %include "lapack_interface.i"

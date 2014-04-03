@@ -20,13 +20,11 @@
  *
  */
 
-#ifdef WITH_SWIG_SPLIT
 %module casadi_interface_worhp
 
 %include "common.i"
 
 %import "casadi_noncore.i"
-#endif //WITH_SWIG_SPLIT
 
 %{
 #include "interfaces/worhp/worhp_solver.hpp"

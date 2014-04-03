@@ -158,57 +158,31 @@ endforeach()
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
 
-if(WITH_SWIG_SPLIT)
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SWIG_SPLIT")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=${CASADI_SWIG_MAIN_MODULE}")
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 set_source_files_properties (${my_module}.i  PROPERTIES  CPLUSPLUS ON)
 endforeach()
 set_source_files_properties (${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
-else(WITH_SWIG_SPLIT)
-set_source_files_properties (casadi.i PROPERTIES
-  SWIG_FLAGS "-DSWIG_MAIN_MODULE"
-  CPLUSPLUS ON
-)
-endif(WITH_SWIG_SPLIT)
 
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 
 # PYTHON interface
-if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 SWIG_ADD_MODULE (${my_module} python ${my_module}.i)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
 endif()
 endforeach()
-else(WITH_SWIG_SPLIT)
-SWIG_ADD_MODULE (casadi python casadi.i) #the target corresponding this module is called "_casadi"
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
-endif()
-endif(WITH_SWIG_SPLIT)
 
-if(WITH_SWIG_SPLIT)
-  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-    SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control casadi_integration casadi_convex_programming  casadi_nonlinear_programming)
-  endforeach()
-  foreach(my_interface ${CASADI_SWIG_INTERFACES})
-    SWIG_LINK_LIBRARIES (casadi_interface_${my_interface} casadi_${my_interface}_interface)
-  endforeach()
-  else()
-    foreach(my_interface ${CASADI_SWIG_INTERFACES})
-      SWIG_LINK_LIBRARIES (casadi casadi_${my_interface}_interface)
-    endforeach()
-    SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control casadi_integration casadi_convex_programming casadi_nonlinear_programming)
-endif()
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control casadi_integration casadi_convex_programming  casadi_nonlinear_programming)
+endforeach()
+foreach(my_interface ${CASADI_SWIG_INTERFACES})
+  SWIG_LINK_LIBRARIES (casadi_interface_${my_interface} casadi_${my_interface}_interface)
+endforeach()
 
 # the name used for the shared module for the python interface is determined
-if(WITH_SWIG_SPLIT)
-  get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_${CASADI_SWIG_MAIN_MODULE}_REAL_NAME} SUFFIX)
-else()
-  get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
-endif()
+get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_${CASADI_SWIG_MAIN_MODULE}_REAL_NAME} SUFFIX)
 
 if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
   if( WIN32 )
@@ -218,41 +192,30 @@ if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
   endif()
 endif()
 
-if(WITH_SWIG_SPLIT)
-  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-    set(CASADI_PYTHON_LIBRARY_${my_module} ${SWIG_MODULE_${my_module}_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
-  endforeach()
-else()
-  set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
-endif()
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  set(CASADI_PYTHON_LIBRARY_${my_module} ${SWIG_MODULE_${my_module}_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
+endforeach()
 
 # a python library is built in the build directory inside swig/python 
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 # adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
 
-if(WITH_SWIG_SPLIT)
-  set(modules_python)
-  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-    list(APPEND modules_python _${my_module})
-  endforeach()
-  add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
-  set(modules_octave)
-  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-    list(APPEND modules_octave ${my_module}_octave)
-  endforeach()
-  add_custom_target(_octave_modules DEPENDS ${modules_octave}) # the octave interface is created with the command "make octave"
-  set(modules_haskell)
-  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-    list(APPEND modules_haskell ${my_module}_tree.hs)
-  endforeach()
-  add_custom_target(_haskell_modules DEPENDS ${modules_haskell}) # the haskell interface is created with the command "make octave"
-else(WITH_SWIG_SPLIT)
-  add_custom_target(_python_modules DEPENDS _casadi ) # the python interface is created with the command "make python"
-  add_custom_target(_octave_modules DEPENDS casadi_octave ) # the octave interface is created with the command "make octave"
-  add_custom_target(_haskell_modules DEPENDS casadi_haskell casadiTree.hs) # the haskell interface is created with the command "make haskell"
-endif(WITH_SWIG_SPLIT)
+set(modules_python)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  list(APPEND modules_python _${my_module})
+endforeach()
+add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
+set(modules_octave)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  list(APPEND modules_octave ${my_module}_octave)
+endforeach()
+add_custom_target(_octave_modules DEPENDS ${modules_octave}) # the octave interface is created with the command "make octave"
+set(modules_haskell)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+  list(APPEND modules_haskell ${my_module}_tree.hs)
+endforeach()
+add_custom_target(_haskell_modules DEPENDS ${modules_haskell}) # the haskell interface is created with the command "make octave"
 
-if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 add_custom_command(
   TARGET _python_modules
@@ -265,13 +228,6 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND}
   ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
 )
-else(WITH_SWIG_SPLIT)
-add_custom_command(
-  TARGET _python_modules
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PROJECT_BINARY_DIR}/swig/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
-) 
-endif(WITH_SWIG_SPLIT)
 
 # Workaround bug in cmake 2.8.3 and lower. See #704.
 add_custom_command(
@@ -287,38 +243,22 @@ add_custom_command(
 
 # workaround for Visual Studio! The default way is not general enough and should be changed!
 if(MSVC)
-  if(WITH_SWIG_SPLIT)
   foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
   set(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_${my_module}})
   endforeach()
-  else(WITH_SWIG_SPLIT)
-  set(PYTHONLIBPATH ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY})
-  endif(WITH_SWIG_SPLIT)
 else(MSVC)
-  if(WITH_SWIG_SPLIT)
   foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
   set(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_${my_module}})
   endforeach()
-  else(WITH_SWIG_SPLIT)
-  set(PYTHONLIBPATH ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY})
-  endif(WITH_SWIG_SPLIT)
 endif(MSVC)
 
-if(WITH_SWIG_SPLIT)
-  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-  add_custom_command(
-    TARGET _${my_module}
-    COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy ${PYTHONLIBPATH_${my_module}} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_${my_module}}
-  )
-  endforeach()
-else(WITH_SWIG_SPLIT)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 add_custom_command(
-  TARGET _casadi
+  TARGET _${my_module}
   COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PYTHONLIBPATH} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY}
+  ARGS -E copy ${PYTHONLIBPATH_${my_module}} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_${my_module}}
 )
-endif(WITH_SWIG_SPLIT)
+endforeach()
   
 find_package(PythonInterp)
 if(PYTHONINTERP_FOUND)
@@ -376,47 +316,30 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
     DESTINATION ${PYTHON_PREFIX}/casadi
     COMPONENT install_python
   )
-  if(WITH_SWIG_SPLIT)
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py
-      DESTINATION ${PYTHON_PREFIX}/casadi
-      COMPONENT install_python
-    )
-    foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-      install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py 
-        DESTINATION ${PYTHON_PREFIX}/casadi
-        COMPONENT install_python
-      )
-    endforeach()
-  else()
-    install(FILES ${PROJECT_BINARY_DIR}/swig/casadi.py 
-      DESTINATION ${PYTHON_PREFIX}/casadi
-      COMPONENT install_python
-    )
-  endif()
-  
-  #creation of a custom installation command
-  if(WITH_SWIG_SPLIT)
-    add_custom_target(install_python
-    COMMAND ${CMAKE_COMMAND}
-      -D COMPONENT=install_python
-      -P cmake_install.cmake
-    )
-  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-  add_dependencies(install_python DEPENDS _${my_module})
-  endforeach()
-
-  else()
-  add_custom_target(install_python
-    DEPENDS _casadi
-    COMMAND ${CMAKE_COMMAND}
-      -D COMPONENT=install_python
-      -P cmake_install.cmake
+  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py
+    DESTINATION ${PYTHON_PREFIX}/casadi
+    COMPONENT install_python
   )
-  endif()
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+    install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py 
+      DESTINATION ${PYTHON_PREFIX}/casadi
+      COMPONENT install_python
+    )
+  endforeach()
 endif()
 
+  #creation of a custom installation command
+add_custom_target(install_python
+COMMAND ${CMAKE_COMMAND}
+  -D COMPONENT=install_python
+  -P cmake_install.cmake
+)
+foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+add_dependencies(install_python DEPENDS _${my_module})
+endforeach()
+
+
 # OCTAVE interface
-if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
   SWIG_ADD_MODULE (${my_module}_octave octave ${my_module}.i octrun.swg)
   SWIG_LINK_LIBRARIES (${my_module}_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control  casadi_integration casadi_convex_programming casadi_nonlinear_programming)
@@ -427,26 +350,11 @@ endforeach()
 foreach(my_interface ${CASADI_SWIG_INTERFACES})
   SWIG_LINK_LIBRARIES (casadi_interface_${my_interface}_octave casadi_${my_interface}_interface)
 endforeach()
-else()
-  SWIG_ADD_MODULE (casadi_octave octave casadi.i octrun.swg)
-  foreach(my_interface ${CASADI_SWIG_INTERFACES})
-    SWIG_LINK_LIBRARIES (casadi_octave casadi_${my_interface}_interface)
-  endforeach()
-  SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} casadi_optimal_control casadi_control  casadi_integration casadi_convex_programming casadi_nonlinear_programming)
-  set_target_properties(casadi_octave PROPERTIES PREFIX "")
-  set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
-  set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi_interface")
-endif()
 
 # haskell interface
-if(WITH_SWIG_SPLIT)
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
   SWIG_ADD_MODULE_XML (${my_module}_haskell ${my_module}.i)
 endforeach()
-else()
-  SWIG_ADD_MODULE_XML (casadi_haskell casadi.i) # -xmllang python)
-  #SET_SOURCE_FILES_PROPERTIES( ${swig_generated_file_fullname}   PROPERTIES COMPILE_FLAGS "-bla")
-endif()
 
 foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
 ADD_CUSTOM_COMMAND(
@@ -508,7 +416,6 @@ ADD_CUSTOM_COMMAND(
 endif(OCTAVE_FOUND)
 # end patch
 
-if(WITH_SWIG_SPLIT)
 ADD_CUSTOM_COMMAND(
  TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
  POST_BUILD
@@ -529,28 +436,6 @@ ADD_CUSTOM_COMMAND(
  POST_BUILD
  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_helpers.m ${LIBRARY_OUTPUT_PATH}/casadi_helpers.m
 )
-else(WITH_SWIG_SPLIT)
-ADD_CUSTOM_COMMAND(
- TARGET casadi_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave/@swig_ref ${LIBRARY_OUTPUT_PATH}/@swig_ref
-)
-ADD_CUSTOM_COMMAND(
- TARGET casadi_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E remove ${LIBRARY_OUTPUT_PATH}/casadi.oct
-)
-ADD_CUSTOM_COMMAND(
- TARGET casadi_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_single.m ${LIBRARY_OUTPUT_PATH}/casadi.m
-)
-ADD_CUSTOM_COMMAND(
- TARGET casadi_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_helpers.m ${LIBRARY_OUTPUT_PATH}/casadi_helpers.m
-)
-endif(WITH_SWIG_SPLIT)
 
 
 include(InstallRequiredSystemLibraries)

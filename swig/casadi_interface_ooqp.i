@@ -20,13 +20,11 @@
  *
  */
 
-#ifdef WITH_SWIG_SPLIT
 %module casadi_interface_ooqp
 
 %include "common.i"
 
 %import "casadi_noncore.i"
-#endif //WITH_SWIG_SPLIT
 
 %{
 #include "interfaces/ooqp/ooqp_solver.hpp"

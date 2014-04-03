@@ -20,13 +20,11 @@
  *
  */
 
-#ifdef WITH_SWIG_SPLIT
 %module casadi_interface_knitro
 
 %include "common.i"
 
 %import "casadi_noncore.i"
-#endif //WITH_SWIG_SPLIT
 
 %{ 
   #include "interfaces/knitro/knitro_solver.hpp"

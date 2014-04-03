@@ -20,12 +20,9 @@
  *
  */
 
-#ifdef WITH_SWIG_SPLIT
 %module casadi_main
 
 %include "common.i"
-
-#endif //WITH_SWIG_SPLIT
 
 //  init hooks
 %include "casadi_runtime.i"

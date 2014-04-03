@@ -20,13 +20,11 @@
  *
  */
 
-#ifdef WITH_SWIG_SPLIT
 %module casadi_primitive_tools
 
 %include "common.i"
 
 %import "casadi_primitive.i"
-#endif //WITH_SWIG_SPLIT
 
 #ifdef SWIGPYTHON
 %pythoncode%{
