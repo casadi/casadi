@@ -66,7 +66,7 @@ def attach_return_type(f,t):
   return f
 
 def pyderivativegenerator(f):
-  return attach_return_type(f,FX)
+  return attach_return_type(f,Function)
 
 def pyevaluate(f):
   return attach_return_type(f,None)
