@@ -193,41 +193,41 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
       set(PYTHON_PREFIX  ${PYTHON_INSTALLATION_PATH} CACHE PATH "Python installation prefix")
     endif()
   endif()
-
-  #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
-  install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
-    DESTINATION ${PYTHON_PREFIX}
-    COMPONENT install_python
-    USE_SOURCE_PERMISSIONS
-    PATTERN .pyc EXCLUDE
-    PATTERN .svn EXCLUDE
-    PATTERN .py EXCLUDE
-  )
-  
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
-    DESTINATION ${PYTHON_PREFIX}/casadi
-    COMPONENT install_python
-    USE_SOURCE_PERMISSIONS
-    PATTERN .pyc EXCLUDE
-    PATTERN .svn EXCLUDE
-  )
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
-    DESTINATION ${PYTHON_PREFIX}/casadi
-    COMPONENT install_python
-  )
-  install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi_modules.py
-    DESTINATION ${PYTHON_PREFIX}/casadi
-    COMPONENT install_python
-  )
-  foreach(my_module ${CASADI_MODULES})
-    install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py 
-      DESTINATION ${PYTHON_PREFIX}/casadi
-      COMPONENT install_python
-    )
-  endforeach()
 endif()
 
-  #creation of a custom installation command
+#since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
+install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
+  DESTINATION ${PYTHON_PREFIX}
+  COMPONENT install_python
+  USE_SOURCE_PERMISSIONS
+  PATTERN .pyc EXCLUDE
+  PATTERN .svn EXCLUDE
+  PATTERN .py EXCLUDE
+)
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
+  DESTINATION ${PYTHON_PREFIX}/casadi
+  COMPONENT install_python
+  USE_SOURCE_PERMISSIONS
+  PATTERN .pyc EXCLUDE
+  PATTERN .svn EXCLUDE
+)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
+  DESTINATION ${PYTHON_PREFIX}/casadi
+  COMPONENT install_python
+)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi_modules.py
+  DESTINATION ${PYTHON_PREFIX}/casadi
+  COMPONENT install_python
+)
+foreach(my_module ${CASADI_MODULES})
+  install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py 
+    DESTINATION ${PYTHON_PREFIX}/casadi
+    COMPONENT install_python
+  )
+endforeach()
+
+#creation of a custom installation command
 add_custom_target(install_python
 COMMAND ${CMAKE_COMMAND}
   -D COMPONENT=install_python
