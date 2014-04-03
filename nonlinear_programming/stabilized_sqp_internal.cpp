@@ -516,8 +516,8 @@ namespace CasADi{
       // Reset line-search counter, success marker
       ls_iter = 0;
       ls_success = true;
-// Calculate candidate Merit function
-      t = std::min(1.0,dvMax_/std::max(norm_inf(dx_),norm_inf(dy_)));
+             // Calculate candidate Merit function
+      t = 1; // std::min(1.0,dvMax_/std::max(norm_inf(dx_),norm_inf(dy_)));
      
       double dvHMdv = gain;
       
