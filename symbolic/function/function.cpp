@@ -340,7 +340,7 @@ namespace CasADi{
                           const SXVectorVector& fseed, SXVectorVector& fsens, 
                           const SXVectorVector& aseed, SXVectorVector& asens,
                           bool always_inline, bool never_inline){
-    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
+    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of expected " << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 
@@ -348,7 +348,7 @@ namespace CasADi{
                           const MXVectorVector& fseed, MXVectorVector& fsens, 
                           const MXVectorVector& aseed, MXVectorVector& asens,
                           bool always_inline, bool never_inline){
-    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of suspected " << getNumInputs() << ".");
+    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of expected " << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 
