@@ -34,6 +34,7 @@
 #include "../casadi_options.hpp"
 #include "../profiling.hpp"
 
+#include <cctype>
 #ifdef WITH_DL 
 #include <cstdlib>
 #include <ctime>
