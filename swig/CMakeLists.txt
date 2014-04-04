@@ -221,7 +221,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
   DESTINATION ${PYTHON_PREFIX}/casadi
   COMPONENT install_python
 )
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi_modules.py
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py
   DESTINATION ${PYTHON_PREFIX}/casadi
   COMPONENT install_python
 )

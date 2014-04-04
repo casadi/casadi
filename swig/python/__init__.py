@@ -21,8 +21,8 @@
 # 
 # -*- coding: utf-8 -*-
 
-from casadi_modules import *
-import casadi_modules as casadi
+from casadi import *
+import casadi as casadi
 
 import types
   
