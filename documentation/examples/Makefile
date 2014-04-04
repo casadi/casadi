@@ -7,7 +7,7 @@ OCTLOG=$(OCT:.m=.out)
 PDF=$(PY:.py=.pdf)
 BUILDDIR=../../build
 
-CASADI_OBJECT=$(BUILDDIR)/python/casadi/_casadi.so
+CASADI_OBJECT=$(BUILDDIR)/python/casadi/_casadi_main.so
 OCTAVE_PATH=$(BUILDDIR)/lib
 all: python cpp cpprun octave
 
