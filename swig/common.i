@@ -445,8 +445,6 @@ int internal(const std::string & c) {
 #define STOP \
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } catch (const char* e) { \
-    SWIG_exception(SWIG_RuntimeError, e); \
   } \
 } else
 %}
@@ -481,8 +479,6 @@ int internal(const std::string & c) {
     $action
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } catch (const char* e) { \
-    SWIG_exception(SWIG_RuntimeError, e); \
   }
 }
 
@@ -494,8 +490,6 @@ int internal(const std::string & c) {
     // foobar
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_TypeError, e.what()); \
-  } catch (const char* e) { \
-    SWIG_exception(SWIG_TypeError, e); \
   }
 }
 %include "internal.i"
