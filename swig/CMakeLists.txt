@@ -79,6 +79,7 @@ endforeach()
 set_source_files_properties (${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
 
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
+set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fcompact")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
 
 # PYTHON interface

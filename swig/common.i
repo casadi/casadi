@@ -438,29 +438,15 @@ int internal(const std::string & c) {
 
 #ifdef SWIGPYTHON
 %{
-#define START \
-  if (CasADi::CasadiOptions::catch_errors_python){ \
-  try {
-  
-#define STOP \
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } \
-} else
+#define START if(CasADi::CasadiOptions::catch_errors_python){try{  
+#define STOP }catch (const std::exception& e){SWIG_exception(SWIG_RuntimeError, e.what());}}else
 %}
 #endif
 
 #ifdef SWIGOCTAVE
 %{
-#define START \
-  if (CasADi::CasadiOptions::catch_errors_python){ \
-  try {
-  
-#define STOP \
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } \
-} else
+#define START if(CasADi::CasadiOptions::catch_errors_python){try{  
+#define STOP }catch(const std::exception& e){SWIG_exception(SWIG_RuntimeError, e.what());}}else
 %}
 #endif
 
@@ -475,9 +461,7 @@ int internal(const std::string & c) {
 %exception __int__ {
  try {
     $action
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_RuntimeError, e.what()); \
-  }
+  } catch(const std::exception& e){SWIG_exception(SWIG_RuntimeError, e.what());}
 }
 
 // See https://github.com/casadi/casadi/issues/701
@@ -486,9 +470,7 @@ int internal(const std::string & c) {
  try {
     $action
     // foobar
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_TypeError, e.what()); \
-  }
+  }catch(const std::exception& e){SWIG_exception(SWIG_TypeError, e.what());}
 }
 %include "internal.i"
 %include "deprecated.i"
