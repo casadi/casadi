@@ -46,6 +46,7 @@ namespace CasADi {
       static const std::string compiler_id;
       static const std::string compiler;
       static const std::string compiler_flags;
+      static const std::string modules;
 #endif //SWIG
     /** \brief Obtain the version number of CasADi
     *  The format is x.y.z or x.y.z+
@@ -82,6 +83,9 @@ namespace CasADi {
     /** \brief Obtain compiler flags
     */
     static std::string getCompilerFlags() { return compiler_flags; }
+    /** \brief Obtain modules list
+    */
+    static std::string getModules() { return modules; }
   };
 
 }

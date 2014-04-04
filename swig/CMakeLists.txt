@@ -195,6 +195,33 @@ The idea is to supply a directory that python knows about (included in PYTHONPAT
   endif()
 endif()
 
+# Construct a dynamic loader for python
+file(WRITE "${PROJECT_BINARY_DIR}/python/casadi/casadi.py" "failed_interfaces={}\nloaded_interfaces=[]\n")
+foreach(my_module ${CASADI_MODULES})
+file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi.py"
+"try:\n"
+"  from ${my_module} import *\n"
+"  loaded_interfaces.append('${my_module}')\n"
+"except Exception as e:\n"
+"  failed_interfaces['${my_module}'] = str(e)\n"
+)
+endforeach()
+
+# Construct a dynamic loader for octave
+foreach(my_module ${CASADI_MODULES})
+set(OCTAVE_MODULE_LOADER ${OCTAVE_MODULE_LOADER}
+"try\n"
+"  ${my_module};\n"
+"  names={names{:} \"${my_module}\"};\n"
+"  interfaces={interfaces{:} ${my_module}};\n"
+"catch\n"
+"  ${my_module} = failedimport;\n"
+"end_try_catch\n"
+)
+endforeach()
+#STRING(REGEX REPLACE ";" " " OCTAVE_MODULE_LOADER "${OCTAVE_MODULE_LOADER}")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi.m.cmake ${LIBRARY_OUTPUT_PATH}/casadi.m)
+
 #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
 install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
   DESTINATION ${PYTHON_PREFIX}
@@ -213,10 +240,6 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
   PATTERN .svn EXCLUDE
 )
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
-  DESTINATION ${PYTHON_PREFIX}/casadi
-  COMPONENT install_python
-)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/casadi.py
   DESTINATION ${PYTHON_PREFIX}/casadi
   COMPONENT install_python
 )
@@ -318,11 +341,6 @@ ADD_CUSTOM_COMMAND(
  TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
  POST_BUILD
  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave/@swig_ref ${LIBRARY_OUTPUT_PATH}/@swig_ref
-)
-ADD_CUSTOM_COMMAND(
- TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_multi.m ${LIBRARY_OUTPUT_PATH}/casadi.m
 )
 ADD_CUSTOM_COMMAND(
  TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
