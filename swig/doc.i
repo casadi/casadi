@@ -2244,6 +2244,12 @@ of adjoint directions.
 
 ";
 
+%feature("docstring") CasADi::CollocationIntegrator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::CollocationIntegrator::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
@@ -6018,6 +6024,12 @@ Diagrams
 
 C++ includes: control_simulator.hpp ";
 
+%feature("docstring") CasADi::ControlSimulator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::ControlSimulator::spCanEvaluate "[INTERNAL]
 Is the class able to propate seeds through the algorithm? (for usage, see
 the example propagating_sparsity.cpp)
@@ -7456,6 +7468,12 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
+%feature("docstring") CasADi::CplexSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::CplexSolver::makeUnique "
 
 >  void CasADi::SharedObject::makeUnique(bool clone_members=true)
@@ -8380,6 +8398,12 @@ Get a pointer to the node.
 
 ";
 
+%feature("docstring") CasADi::CSparse::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::CSparse::callDerivative "[INTERNAL]  Evaluate
 the function symbolically or numerically with directional derivatives The
 first two arguments are the nondifferentiated inputs and results of the
@@ -8502,8 +8526,11 @@ Get the type of a certain option.
 
 ";
 
-%feature("docstring") CasADi::CSparse::assertInit "[INTERNAL]  Assert that
-it is initialized
+%feature("docstring") CasADi::CSparse::setJacobian "
+
+Set the Jacobian function of output oind with respect to input iind NOTE:
+Does not take ownership, only weak references to the Jacobians are kept
+internally
 
 ";
 
@@ -8512,11 +8539,8 @@ another instance.
 
 ";
 
-%feature("docstring") CasADi::CSparse::setJacobian "
-
-Set the Jacobian function of output oind with respect to input iind NOTE:
-Does not take ownership, only weak references to the Jacobians are kept
-internally
+%feature("docstring") CasADi::CSparse::assertInit "[INTERNAL]  Assert that
+it is initialized
 
 ";
 
@@ -9396,7 +9420,8 @@ values.
 
 ";
 
-%feature("docstring") CasADi::CSparseCholesky::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
+%feature("docstring") CasADi::CSparseCholesky::printPtr "[INTERNAL]  Print
+the pointer to the internal class
 
 ";
 
@@ -9723,8 +9748,7 @@ Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") CasADi::CSparseCholesky::printPtr "[INTERNAL]  Print
-the pointer to the internal class
+%feature("docstring") CasADi::CSparseCholesky::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
@@ -9737,6 +9761,12 @@ Generate the sparsity of a Jacobian block.
 %feature("docstring") CasADi::CSparseCholesky::prepared "
 
 Check if prepared.
+
+";
+
+%feature("docstring") CasADi::CSparseCholesky::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -10390,6 +10420,12 @@ derivatives are kept internally
 %feature("docstring") CasADi::CustomFunction::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
+
+";
+
+%feature("docstring") CasADi::CustomFunction::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -11337,9 +11373,9 @@ Access input/output scheme.
 
 ";
 
-%feature("docstring") CasADi::CVodesIntegrator::getRepresentation "
+%feature("docstring") CasADi::CVodesIntegrator::getSanitizedName "
 
-Return a string with a representation (for SWIG)
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -11984,6 +12020,12 @@ Set a stop time for the forward integration.
 %feature("docstring") CasADi::CVodesIntegrator::setInputScheme "
 
 Set input scheme.
+
+";
+
+%feature("docstring") CasADi::CVodesIntegrator::getRepresentation "
+
+Return a string with a representation (for SWIG)
 
 ";
 
@@ -14077,8 +14119,9 @@ Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") CasADi::DirectCollocation::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+%feature("docstring") CasADi::DirectCollocation::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -14731,6 +14774,11 @@ are kept internally
 
 ";
 
+%feature("docstring") CasADi::DirectCollocation::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
+counting: inproper use will cause memory leaks!
+
+";
+
 %feature("docstring") CasADi::DirectCollocation::swap "[INTERNAL]  Swap
 content with another instance.
 
@@ -15360,6 +15408,12 @@ Print a destription of the object.
 %feature("docstring") CasADi::DirectMultipleShooting::getGuess "
 
 Get the variables.
+
+";
+
+%feature("docstring") CasADi::DirectMultipleShooting::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -16525,6 +16579,12 @@ Get, if necessary generate, the sparsity of a Jacobian block.
 
 ";
 
+%feature("docstring") CasADi::DirectSingleShooting::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::DirectSingleShooting::solve "
 
 the same as evaluate()
@@ -17626,6 +17686,12 @@ index for a string describing a particular entry of a scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") CasADi::DpleSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -19271,6 +19337,12 @@ Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
+%feature("docstring") CasADi::DSDPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::DSDPSolver::outputSchemeEntry "[INTERNAL]
 Find the index for a string describing a particular entry of an output
 scheme.
@@ -20833,6 +20905,12 @@ Check if the pointer points towards a valid object.
 
 ";
 
+%feature("docstring") CasADi::ExternalFunction::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::ExternalFunction::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
 
@@ -22084,6 +22162,12 @@ Get the type of a certain option.
 %feature("docstring") CasADi::FixedStepIntegrator::getOption "
 
 get an option value
+
+";
+
+%feature("docstring") CasADi::FixedStepIntegrator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -23427,6 +23511,12 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring") CasADi::Function::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -27419,6 +27509,12 @@ Get the number of function inputs.
 
 ";
 
+%feature("docstring") CasADi::HomotopyNLPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::HomotopyNLPSolver::spInit "[INTERNAL]  Reset
 the sparsity propagation (for usage, see the example
 propagating_sparsity.cpp)
@@ -28510,6 +28606,14 @@ Correct the initial value for yp and z after resetting the solver.
 
 ";
 
+%feature("docstring") CasADi::IdasIntegrator::schemeEntry "[INTERNAL]  Find
+the index for a string describing a particular entry of a scheme.
+
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
+
+";
+
 %feature("docstring") CasADi::IdasIntegrator::removeMonitor "
 
 Remove modules to be monitored.
@@ -28601,9 +28705,9 @@ Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") CasADi::IdasIntegrator::integrate "
+%feature("docstring") CasADi::IdasIntegrator::getSanitizedName "
 
-Integrate forward until a specified time point.
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -28687,11 +28791,11 @@ Access input argument
 
 ";
 
-%feature("docstring") CasADi::IdasIntegrator::schemeEntry "[INTERNAL]  Find
-the index for a string describing a particular entry of a scheme.
+%feature("docstring") CasADi::IdasIntegrator::init "
 
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
@@ -28716,11 +28820,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") CasADi::IdasIntegrator::init "
+%feature("docstring") CasADi::IdasIntegrator::integrate "
 
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
+Integrate forward until a specified time point.
 
 ";
 
@@ -30535,6 +30637,13 @@ Get the description of a certain option.
 
 ";
 
+%feature("docstring") CasADi::ImplicitFixedStepIntegrator::getSanitizedName
+"
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::ImplicitFixedStepIntegrator::getDAE "
 
 Get the DAE.
@@ -31175,6 +31284,12 @@ Access input/output scheme.
 
 ";
 
+%feature("docstring") CasADi::ImplicitFunction::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::ImplicitFunction::getInput "
 
 >  Matrix<double> CasADi::IOInterface< Function  >::getInput(int iind=0) const
@@ -31720,11 +31835,9 @@ Get the type name of a certain option.
 
 ";
 
-%feature("docstring") CasADi::ImplicitFunction::symbolicInput "
+%feature("docstring") CasADi::ImplicitFunction::isNull "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-
-There is no guarantee that consecutive calls return identical objects
+Is a null pointer?
 
 ";
 
@@ -31798,9 +31911,11 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring") CasADi::ImplicitFunction::isNull "
+%feature("docstring") CasADi::ImplicitFunction::symbolicInput "
 
-Is a null pointer?
+Get a vector of symbolic variables with the same dimensions as the inputs.
+
+There is no guarantee that consecutive calls return identical objects
 
 ";
 
@@ -32937,6 +33052,12 @@ that it is initialized
 
 %feature("docstring") CasADi::Integrator::spInit "[INTERNAL]  Reset the
 sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") CasADi::Integrator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -39121,6 +39242,12 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
+%feature("docstring") CasADi::IpoptSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::IpoptSolver::solve "
 
 the same as evaluate()
@@ -40407,6 +40534,12 @@ use will cause memory leaks!
 
 ";
 
+%feature("docstring") CasADi::KinsolSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 
 // File: classCasADi_1_1KnitroSolver.xml
 
@@ -40440,6 +40573,11 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 %feature("docstring") CasADi::KnitroSolver::swap "[INTERNAL]  Swap content
 with another instance.
+
+";
+
+%feature("docstring") CasADi::KnitroSolver::print "[INTERNAL]  Print a
+destription of the object.
 
 ";
 
@@ -41638,8 +41776,9 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") CasADi::KnitroSolver::print "[INTERNAL]  Print a
-destription of the object.
+%feature("docstring") CasADi::KnitroSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -42357,6 +42496,14 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
+%feature("docstring") CasADi::LapackLUDense::init "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
+
+";
+
 %feature("docstring") CasADi::LapackLUDense::getOption "
 
 get an option value
@@ -42637,11 +42784,9 @@ Is initialized?
 
 ";
 
-%feature("docstring") CasADi::LapackLUDense::init "
+%feature("docstring") CasADi::LapackLUDense::getSanitizedName "
 
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -43335,6 +43480,12 @@ Const access an output.
 
 ";
 
+%feature("docstring") CasADi::LapackQRDense::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::LapackQRDense::removeMonitor "
 
 Remove modules to be monitored.
@@ -44001,6 +44152,12 @@ Copy all options from another object.
 %feature("docstring") CasADi::LinearSolver::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
+
+";
+
+%feature("docstring") CasADi::LinearSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -45311,6 +45468,12 @@ Return a string with a representation (for SWIG)
 %feature("docstring") CasADi::LPSolver::evaluate "
 
 Evaluate.
+
+";
+
+%feature("docstring") CasADi::LPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -49643,6 +49806,12 @@ CasADi::MXFunction::indexed_zero_based "
 
 ";
 
+%feature("docstring") CasADi::MXFunction::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::MXFunction::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
@@ -51610,9 +51779,8 @@ be passed to the Parallelizer.
 
 ";
 
-%feature("docstring") CasADi::NewtonImplicitSolver::getOption "
-
-get an option value
+%feature("docstring") CasADi::NewtonImplicitSolver::assertInit "[INTERNAL]
+Assert that it is initialized
 
 ";
 
@@ -51972,8 +52140,9 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") CasADi::NewtonImplicitSolver::assertInit "[INTERNAL]
-Assert that it is initialized
+%feature("docstring") CasADi::NewtonImplicitSolver::getOption "
+
+get an option value
 
 ";
 
@@ -52017,6 +52186,12 @@ are kept internally
 %feature("docstring") CasADi::NewtonImplicitSolver::getNumOutputs "
 
 Get the number of function outputs.
+
+";
+
+%feature("docstring") CasADi::NewtonImplicitSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -53208,6 +53383,12 @@ Get the number of function outputs.
 
 ";
 
+%feature("docstring") CasADi::NLPImplicitSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::NLPImplicitSolver::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
@@ -53515,8 +53696,13 @@ CasADi::NLPOutputIOSchemeVector::NLPOutputIOSchemeVector "[INTERNAL] ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-CasADi::NLPQPSolver::getOptionAllowedIndex " [INTERNAL]  Get the index into
-allowed options of a certain option.
+CasADi::NLPQPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") CasADi::NLPQPSolver::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
@@ -55056,6 +55242,12 @@ Joel Andersson
 Diagrams
 
 C++ includes: nlp_solver.hpp ";
+
+%feature("docstring") CasADi::NLPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
 
 %feature("docstring") CasADi::NLPSolver::setJacSparsity "
 
@@ -59211,6 +59403,12 @@ Evaluate the function symbolically or numerically.
 
 ";
 
+%feature("docstring") CasADi::Nullspace::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::Nullspace::setOutputScheme "
 
 Set output scheme.
@@ -59688,6 +59886,12 @@ Set the number of function outputs.
 %feature("docstring") CasADi::OCPSolver::getRepresentation "
 
 Return a string with a representation (for SWIG)
+
+";
+
+%feature("docstring") CasADi::OCPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -60686,6 +60890,12 @@ There is no guarantee that consecutive calls return identical objects
 INTERNAL.
 
 Get the default of a certain option
+
+";
+
+%feature("docstring") CasADi::OldCollocationIntegrator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -62348,6 +62558,12 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") CasADi::OOQPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -64578,6 +64794,12 @@ the node to a node class pointer (or null)
 
 ";
 
+%feature("docstring") CasADi::Parallelizer::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::Parallelizer::outputS "
 
 >  DMatrix& CasADi::IOInterface< Function  >::outputS(int i)
@@ -65599,6 +65821,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
+%feature("docstring") CasADi::PsdIndefDpleSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::PsdIndefDpleSolver::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
@@ -66331,6 +66559,12 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 %feature("docstring") CasADi::QCQPQPSolver::swap "[INTERNAL]  Swap content
 with another instance.
+
+";
+
+%feature("docstring") CasADi::QCQPQPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -67663,6 +67897,12 @@ adheres to SCHEME_NLPINput
 
 ";
 
+%feature("docstring") CasADi::QCQPSolver::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block.
+
+";
+
 %feature("docstring") CasADi::QCQPSolver::clone "[INTERNAL]  Deep copy.
 
 ";
@@ -67879,9 +68119,9 @@ the node to a node class pointer (or null)
 
 ";
 
-%feature("docstring") CasADi::QCQPSolver::jacSparsity "
+%feature("docstring") CasADi::QCQPSolver::getSanitizedName "
 
-Get, if necessary generate, the sparsity of a Jacobian block.
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -68727,6 +68967,12 @@ Get the enum value corresponding to th certain option.
 %feature("docstring") CasADi::QPLPSolver::getNumOutputElements "
 
 Get total number of elements in all of the matrix-valued outputs.
+
+";
+
+%feature("docstring") CasADi::QPLPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -70064,6 +70310,12 @@ Return a string with a representation (for SWIG)
 
 ";
 
+%feature("docstring") CasADi::QPOasesSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::QPOasesSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
@@ -70995,6 +71247,12 @@ reference count.
 %feature("docstring") CasADi::QPSolver::isInit "
 
 Is initialized?
+
+";
+
+%feature("docstring") CasADi::QPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -72003,6 +72261,12 @@ C++ includes: qp_stabilizer.hpp ";
 
 %feature("docstring") CasADi::QPStabilizer::spInit "[INTERNAL]  Reset the
 sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") CasADi::QPStabilizer::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -74413,6 +74677,12 @@ Set output scheme.
 %feature("docstring") CasADi::RKIntegrator::getNumInputs "
 
 Get the number of function inputs.
+
+";
+
+%feature("docstring") CasADi::RKIntegrator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -77361,6 +77631,12 @@ Get a list of all option names
 
 ";
 
+%feature("docstring") CasADi::SCPgen::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SCPgen::getCount "[INTERNAL]  Get the
 reference count.
 
@@ -77674,8 +77950,9 @@ Get the description of a certain option.
 
 ";
 
-%feature("docstring") CasADi::SDPSDQPSolver::swap "[INTERNAL]  Swap content
-with another instance.
+%feature("docstring") CasADi::SDPSDQPSolver::spCanEvaluate "[INTERNAL]  Is
+the class able to propate seeds through the algorithm? (for usage, see the
+example propagating_sparsity.cpp)
 
 ";
 
@@ -77793,6 +78070,12 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
+%feature("docstring") CasADi::SDPSDQPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SDPSDQPSolver::setFullJacobian "
 
 Set the Jacobian of all the input nonzeros with respect to all output
@@ -77801,9 +78084,8 @@ are kept internally
 
 ";
 
-%feature("docstring") CasADi::SDPSDQPSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+%feature("docstring") CasADi::SDPSDQPSolver::swap "[INTERNAL]  Swap content
+with another instance.
 
 ";
 
@@ -79655,6 +79937,12 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
+%feature("docstring") CasADi::SDPSOCPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SDPSOCPSolver::printPtr "[INTERNAL]  Print
 the pointer to the internal class
 
@@ -79889,6 +80177,12 @@ Get a pointer to the node.
 %feature("docstring") CasADi::SDPSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
+
+";
+
+%feature("docstring") CasADi::SDPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -81115,6 +81409,12 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
+
+";
+
+%feature("docstring") CasADi::SDQPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -85101,6 +85401,12 @@ counting: inproper use will cause memory leaks!
 
 ";
 
+%feature("docstring") CasADi::SimpleHomotopyNLPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SimpleHomotopyNLPSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block.
@@ -86457,6 +86763,12 @@ of adjoint directions.
 
 ";
 
+%feature("docstring") CasADi::SimpleIndefDpleSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SimpleIndefDpleSolver::getNumInputs "
 
 Get the number of function inputs.
@@ -86982,6 +87294,12 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 iname:  input name. Only allowed when an input scheme is set.
+
+";
+
+%feature("docstring") CasADi::Simulator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -89083,6 +89401,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
+%feature("docstring") CasADi::SnoptSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SnoptSolver::setOutput "
 
 >  void CasADi::IOInterface< Function  >::setOutput(T val, int oind=0)
@@ -90289,6 +90613,12 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
+%feature("docstring") CasADi::SOCPQCQPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SOCPQCQPSolver::printPtr "[INTERNAL]  Print
 the pointer to the internal class
 
@@ -90472,6 +90802,14 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring") CasADi::SOCPSolver::removeMonitor "
 
 Remove modules to be monitored.
+
+";
+
+%feature("docstring") CasADi::SOCPSolver::init "
+
+Initialize or re-initialize the object:
+
+more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
@@ -91112,11 +91450,9 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") CasADi::SOCPSolver::init "
+%feature("docstring") CasADi::SOCPSolver::getSanitizedName "
 
-Initialize or re-initialize the object:
-
-more documentation in the node class ( SharedObjectNode and derived classes)
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -93769,6 +94105,12 @@ the numerical values of the supplied bounds make sense.
 
 ";
 
+%feature("docstring") CasADi::SQICSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SQICSolver::hasOption "
 
 check if there is an option str
@@ -94532,8 +94874,19 @@ adjoint directions.
 
 ";
 
-%feature("docstring") CasADi::SQPMethod::setOptionByEnumValue "[INTERNAL]
-Set a certain option by giving an enum value.
+%feature("docstring") CasADi::SQPMethod::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
@@ -94751,8 +95104,8 @@ Set input scheme.
 
 ";
 
-%feature("docstring") CasADi::SQPMethod::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+%feature("docstring") CasADi::SQPMethod::setOptionByEnumValue "[INTERNAL]
+Set a certain option by giving an enum value.
 
 ";
 
@@ -95258,6 +95611,12 @@ Get the number of function inputs.
 
 ";
 
+%feature("docstring") CasADi::SQPMethod::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SQPMethod::setJacSparsity "
 
 Generate the sparsity of a Jacobian block.
@@ -95371,54 +95730,6 @@ Evaluate the function symbolically or numerically.
 %feature("docstring") CasADi::SQPMethod::spEvaluate "[INTERNAL]  Propagate
 the sparsity pattern through a set of directional derivatives forward or
 backward (for usage, see the example propagating_sparsity.cpp)
-
-";
-
-%feature("docstring") CasADi::SQPMethod::getInput "
-
->  Matrix<double> CasADi::IOInterface< Function  >::getInput(int iind=0) const
-------------------------------------------------------------------------
-
-Get an input by index.
-
-Parameters:
------------
-
-iind:  index within the range [0.. getNumInputs()-1]
-
->  Matrix<double> CasADi::IOInterface< Function  >::getInput(const std::string &iname) const
-------------------------------------------------------------------------
-
-Get an input by name.
-
-Parameters:
------------
-
-iname:  input name. Only allowed when an input scheme is set.
-
->  void CasADi::IOInterface< Function  >::getInput(T val, int iind=0)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by index.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iind:  index within the range [0.. getNumInputs()-1]
-
->  void CasADi::IOInterface< Function  >::getInput(T val, const std::string &iname)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get an input by name.
-
-Parameters:
------------
-
-val:  can be double&, std::vector<double>&, Matrix<double>&, double *
-
-iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
@@ -95574,6 +95885,11 @@ Get the enum value corresponding to th certain option.
 %feature("docstring") CasADi::SQPMethod::solve "
 
 the same as evaluate()
+
+";
+
+%feature("docstring") CasADi::SQPMethod::repr "[INTERNAL]  Print a
+representation of the object.
 
 ";
 
@@ -95751,24 +96067,56 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") CasADi::SQPMethod::repr "[INTERNAL]  Print a
-representation of the object.
+%feature("docstring") CasADi::SQPMethod::spInit "[INTERNAL]  Reset the
+sparsity propagation (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") CasADi::SQPMethod::gradient "
+%feature("docstring") CasADi::SQPMethod::getInput "
 
-Generate a gradient function of output oind with respect to input iind.
+>  Matrix<double> CasADi::IOInterface< Function  >::getInput(int iind=0) const
+------------------------------------------------------------------------
+
+Get an input by index.
 
 Parameters:
 -----------
 
-iind:  The index of the input
+iind:  index within the range [0.. getNumInputs()-1]
 
-oind:  The index of the output
+>  Matrix<double> CasADi::IOInterface< Function  >::getInput(const std::string &iname) const
+------------------------------------------------------------------------
 
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead.
+Get an input by name.
+
+Parameters:
+-----------
+
+iname:  input name. Only allowed when an input scheme is set.
+
+>  void CasADi::IOInterface< Function  >::getInput(T val, int iind=0)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by index.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iind:  index within the range [0.. getNumInputs()-1]
+
+>  void CasADi::IOInterface< Function  >::getInput(T val, const std::string &iname)
+------------------------------------------------------------------------
+[INTERNAL] 
+Get an input by name.
+
+Parameters:
+-----------
+
+val:  can be double&, std::vector<double>&, Matrix<double>&, double *
+
+iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
@@ -96077,6 +96425,12 @@ input scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
+
+";
+
+%feature("docstring") CasADi::StabilizedQPSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -97430,6 +97784,12 @@ Get output scheme.
 
 ";
 
+%feature("docstring") CasADi::StabilizedSQICSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::StabilizedSQICSolver::inputScheme "[INTERNAL]
 Access input/output scheme.
 
@@ -97920,7 +98280,13 @@ usage, see the example propagating_sparsity.cpp)
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-CasADi::StabilizedSQPMethod::outputS "
+CasADi::StabilizedSQPMethod::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
+%feature("docstring") CasADi::StabilizedSQPMethod::outputS "
 
 >  DMatrix& CasADi::IOInterface< Function  >::outputS(int i)
 ------------------------------------------------------------------------
@@ -100669,8 +101035,9 @@ Get the dictionary.
 
 ";
 
-%feature("docstring") CasADi::SundialsIntegrator::outputScheme "[INTERNAL]
-Access input/output scheme.
+%feature("docstring") CasADi::SundialsIntegrator::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -100735,6 +101102,11 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring") CasADi::SundialsIntegrator::isNull "
 
 Is a null pointer?
+
+";
+
+%feature("docstring") CasADi::SundialsIntegrator::outputScheme "[INTERNAL]
+Access input/output scheme.
 
 ";
 
@@ -103188,6 +103560,12 @@ the output elements).
 
 ";
 
+%feature("docstring") CasADi::SXFunction::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::SXFunction::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
@@ -105348,6 +105726,12 @@ derivatives are kept internally
 %feature("docstring") CasADi::SymbolicQR::assignNodeNoCount "[INTERNAL]
 Assign the node to a node class pointer without reference counting: inproper
 use will cause memory leaks!
+
+";
+
+%feature("docstring") CasADi::SymbolicQR::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
 
 ";
 
@@ -110160,6 +110544,12 @@ Evaluate.
 
 ";
 
+%feature("docstring") CasADi::WorhpSolver::getSanitizedName "
+
+get function name with all non alphanumeric characters converted to '_'
+
+";
+
 %feature("docstring") CasADi::WorhpSolver::checkNode "
 
 Check if the node is pointing to the right type of object.
@@ -111742,14 +112132,7 @@ Print matrix, matlab style.
 
 ";
 
-%feature("docstring") CasADi::socpStruct "
-
->  SOCPStructIOSchemeVector<M> CasADi::socpStruct(const std::string &arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M())
-------------------------------------------------------------------------
-
-Structure specification of an SOCP
-
-";
+%feature("docstring") CasADi::isBadChar "";
 
 %feature("docstring") CasADi::hash_sparsity "
 
@@ -112551,16 +112934,12 @@ Integrate f from a to b using Gaussian quadrature with n points.
 
 ";
 
-%feature("docstring") CasADi::taylor "
+%feature("docstring") CasADi::socpStruct "
 
-univariate taylor series expansion
+>  SOCPStructIOSchemeVector<M> CasADi::socpStruct(const std::string &arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M())
+------------------------------------------------------------------------
 
-Calculate the taylor expansion of expression 'ex' up to order 'order' with
-repsect to variable 'x' around the point 'a'
-
-$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
-
-Example usage:>>   x
+Structure specification of an SOCP
 
 ";
 
@@ -114079,6 +114458,19 @@ Output arguments of an NLP Jacobian function
 
 %feature("docstring") CasADi::sign "[INTERNAL]  Sign function, note that
 sign(nan) == nan.
+
+";
+
+%feature("docstring") CasADi::taylor "
+
+univariate taylor series expansion
+
+Calculate the taylor expansion of expression 'ex' up to order 'order' with
+repsect to variable 'x' around the point 'a'
+
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+
+Example usage:>>   x
 
 ";
 
@@ -116213,112 +116605,112 @@ calls to this function.
 // File: chapter6.xml
 
 
-// File: dir_e2a50488b69715d5548bca2aaaf9863f.xml
+// File: dir_fbf0f9c806c617cede843aa59e0342c5.xml
 
 
-// File: dir_ce1ed73062f868813342a0dbe0b188c3.xml
+// File: dir_0c2a6278e6663165ee010387d336730f.xml
 
 
-// File: dir_46be2948e36a72ca7083c45a7aacae3d.xml
+// File: dir_3308830b49fe0e7187c68d9dad156c89.xml
 
 
-// File: dir_ae41fa44f543d3884cb1229e52cfbde1.xml
+// File: dir_0fdd75cbbaa4a60b0dc534109d0a8517.xml
 
 
-// File: dir_62baf75c1cae6d04dc949badf483bad5.xml
+// File: dir_d812cf9a3b847afe37419709af41bf0c.xml
 
 
-// File: dir_c9fbaf78972edfee4bf9d5b9071a484a.xml
+// File: dir_f22fc47c7a9ff962de9b25d690370d01.xml
 
 
-// File: dir_8eb78af56ef852d69abf4113da88a5b1.xml
+// File: dir_4aafbd1cf68e507ba6ae16d6bb586c01.xml
 
 
-// File: dir_60248c841205460cf98fa2018890b346.xml
+// File: dir_87c569dac60b85fea4d24072b0318dc3.xml
 
 
-// File: dir_57219f8d770ed4e6491bcfbe72b7011f.xml
+// File: dir_2bf03e13026ba659c25692d0c3a16b35.xml
 
 
-// File: dir_a984da1ccd3c043fbecd4b1a3559d400.xml
+// File: dir_7659e7ddc14d18e934a0940678620d9c.xml
 
 
-// File: dir_9a6dbbd50d0de6d7f5fded540d662d82.xml
+// File: dir_1f01c178384c81ebadd7b1e0d8089fd4.xml
 
 
-// File: dir_0109fa8becc269e8647c5a1a8998a324.xml
+// File: dir_f4ede736d600852c8c5ce936172da3a4.xml
 
 
-// File: dir_3773ed2679cec60bd80be23ac5e35e06.xml
+// File: dir_0cd0805b9af7b4e8888fa996129c5dc7.xml
 
 
-// File: dir_e841d045f7c3a6bdbbb6156355455b74.xml
+// File: dir_89d9688559b80049b75060f248a24b7a.xml
 
 
-// File: dir_a725a21e798488997f71696d6eeec41c.xml
+// File: dir_fe4105b3ae859602ee94ef9ea1b85eb4.xml
 
 
-// File: dir_aefdd95fd748783590a947fc47bb53a9.xml
+// File: dir_9fc32cc60f6d58afde9c10c46ea08a5a.xml
 
 
-// File: dir_3b99da1e039aa20d2c42bf369d403f80.xml
+// File: dir_f014e86182df796734dae6cd267f5147.xml
 
 
-// File: dir_7beb3931621bf51a9a0e4e4cab9f0222.xml
+// File: dir_cb6875faa405a668bdea0e8637463557.xml
 
 
-// File: dir_0ef00fd62c4396deaa893efc1e8eeeca.xml
+// File: dir_80ca651ac8d579c399fc6d178d41c5b9.xml
 
 
-// File: dir_6c6f05b36003a966768934497a9e98ec.xml
+// File: dir_2269f22008a8b54606d8baecdc3ba6ef.xml
 
 
-// File: dir_9c9bde343795073a87e6a08325b51d76.xml
+// File: dir_b49f1cef293494c79074ab105720637c.xml
 
 
-// File: dir_3ba6a51aef214c11b783c1c5ab85f69c.xml
+// File: dir_c7f7a827135bb726cb3740befa2c1717.xml
 
 
-// File: dir_4197094c95560f4cac74547cb6e8c1c9.xml
+// File: dir_a12d04b58f3b185c42aa5e6db7a2fd7a.xml
 
 
-// File: dir_e9078b9afc67341ce0051ea8263f6a54.xml
+// File: dir_484ae99883153960d749417f00046d53.xml
 
 
-// File: dir_631365d53216e8869a44acbbbef8850f.xml
+// File: dir_99c519290973207332a0df5611078e71.xml
 
 
-// File: dir_17bd1baaf2dd06d6fe6b2a970e7d7a4f.xml
+// File: dir_afa97617c76ff517aa914353e787e143.xml
 
 
-// File: dir_2ea7ffc32a222753be66859f14c30b60.xml
+// File: dir_adbec669e4ee3124081a3f25480bb641.xml
 
 
-// File: dir_714ec8dbb353bb970985b10d06b51b28.xml
+// File: dir_ccd243ed9a80fc3535870d6146dfd347.xml
 
 
-// File: dir_0e9dbbf5869827a2c9467439f468682f.xml
+// File: dir_a9ad0473ce0a685dd2e41bea62accc67.xml
 
 
-// File: dir_160e375c81aade60a9a3ac5b6f6a1850.xml
+// File: dir_f69476ad2f61a5f23b645afb80d94d51.xml
 
 
-// File: dir_5d2cea1fb9d6f1a70aa8c32c593e7a64.xml
+// File: dir_11d6d7a652ac40b1ad46e450cb800baf.xml
 
 
-// File: dir_38cae3957561478ffeb7ddfac20e384f.xml
+// File: dir_51b82cd46b953f2431ff521211335e74.xml
 
 
-// File: dir_38b724e79999953aab66567f3dbbfa93.xml
+// File: dir_84122d5450e16229934b711e70d408cd.xml
 
 
-// File: dir_1936376a71de761d5e90910f3edab001.xml
+// File: dir_ab950c1db7441136080f3a8f14e264f2.xml
 
 
-// File: dir_ce445109d2bc54d04c0a5134ae147918.xml
+// File: dir_5efa3637118b86818d2413746bfdfc85.xml
 
 
-// File: dir_5f42808c1d4d60c759a1acb709cfb462.xml
+// File: dir_ffbc3ac1c51dba7639a2d323ed97b47e.xml
 
 
 // File: algebra_2LinearSolver_8py-example.xml
