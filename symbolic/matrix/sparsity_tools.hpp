@@ -31,38 +31,6 @@ namespace CasADi{
 \ingroup expression_tools
 @{ 
 */
-
-#ifndef WITHOUT_PRE_1_9_X
-    /** \brief [DEPRECATED] Replaced with static methods in the Sparsity class
-     */
-    //@{
-  inline Sparsity sp_dense(int nrow, int ncol=1){ return Sparsity::dense(nrow,ncol);}
-  inline Sparsity sp_dense(const std::pair<int,int> &rc ){ return Sparsity::dense(rc);}
-  inline Sparsity sp_sparse(int nrow, int ncol=1){ return Sparsity::sparse(nrow,ncol);}
-  inline Sparsity sp_sparse(const std::pair<int,int> &rc){ return Sparsity::sparse(rc);}
-  inline Sparsity sp_unit(int n, int el){ return Sparsity::unit(n,el);}
-  inline Sparsity sp_triu(int n){ return Sparsity::triu(n);}
-  inline Sparsity sp_tril(int n){ return Sparsity::tril(n);}
-  inline Sparsity sp_diag(int n){ return Sparsity::diag(n);}
-  inline Sparsity sp_band(int n, int p){ return Sparsity::band(n,p);}
-  inline Sparsity sp_banded(int n, int p){ return Sparsity::banded(n,p);}
-  inline Sparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol){ return Sparsity::rowcol(row,col,nrow,ncol);}
-  inline Sparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool invert_mapping=false){ return Sparsity::triplet(nrow,ncol,row,col,mapping,invert_mapping);}
-  inline Sparsity sp_triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col){ return Sparsity::triplet(nrow,ncol,row,col);}
-  inline Sparsity trans(const Sparsity& a){ return a.transpose();}
-  inline Sparsity upperSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.getTriu(includeDiagonal); }
-  inline Sparsity lowerSparsity(const Sparsity& a, bool includeDiagonal = true){ return a.getTril(includeDiagonal); }
-  inline std::vector<int> upperNZ(const Sparsity& a) { return a.getUpperNZ(); }
-  inline std::vector<int> lowerNZ(const Sparsity& a) { return a.getLowerNZ(); }
-  inline bool isSingular(const Sparsity& a){ return a.isSingular();}
-  inline std::vector<int> sp_compress(const Sparsity& a){ return a.compress();}
-  inline Sparsity sp_compress(const std::vector<int>& v){ return Sparsity::compressed(v);}
-#ifndef SWIG
-  inline Sparsity sp_compress(const int* v){ return Sparsity::compressed(v);}
-#endif // SWIG
-  inline std::vector<int> getNZDense(const Sparsity& sp){ return sp.getElements();}
-  //@}
-#endif  
     
   /** \brief Reshape the sparsity pattern keeping the relative location of the nonzeros
    */

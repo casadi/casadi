@@ -381,31 +381,6 @@ namespace CasADi{
   template<typename DataType>
   int sprank(const Matrix<DataType>& A);
 
-#ifndef WITHOUT_PRE_1_9_X
-  /** \brief [DEPRECATED]
-   */
-  //@{
-  template<typename DataType> void makeDense(Matrix<DataType>& A){ A.densify();}
-  template<typename DataType> Matrix<DataType> densify(const Matrix<DataType>& A){ Matrix<DataType> ret(A); ret.densify(); return ret;}
-  template<typename DataType> void makeSparse(Matrix<DataType>& A, double tol=0){ A.sparsify(tol);}
-  template<typename DataType> bool isDense(const Matrix<DataType>& ex){ return ex.isDense();}
-  template<typename DataType> bool isEmpty(const Matrix<DataType>& ex){ return ex.isEmpty(); }
-  template<typename DataType> bool isTril(const Matrix<DataType> &A){ return A.isTril(); }
-  template<typename DataType> bool isTriu(const Matrix<DataType> &A){ return A.isTriu(); }
-  template<typename DataType> bool isScalar(const Matrix<DataType>& ex){ return ex.isScalar();}
-  template<typename DataType> bool isRegular(const Matrix<DataType>& ex){ return ex.isRegular();}
-  template<typename DataType> bool isConstant(const Matrix<DataType>& ex){ return ex.isConstant();}
-  template<typename DataType> bool isInteger(const Matrix<DataType>& ex){ return ex.isInteger();}
-  template<typename DataType> bool isZero(const Matrix<DataType>& ex){ return ex.isZero();}
-  template<typename DataType> bool isOne(const Matrix<DataType>& ex){ return ex.isOne();}
-  template<typename DataType> bool isMinusOne(const Matrix<DataType>& ex){ return ex.isMinusOne();}
-  template<typename DataType> bool isIdentity(const Matrix<DataType>& ex){ return ex.isIdentity();}
-  template<typename DataType> int nnz(const Matrix<DataType>& ex) { return ex.size();}
-  template<typename DataType> bool hasNonStructuralZeros(const Matrix<DataType>& A){ return A.hasNonStructuralZeros();}
-  template<typename DataType>  Matrix<DataType> trans(const Matrix<DataType> &x){ return transpose(x);}
- //@}
-#endif
-
 } // namespace CasADi
 
 // Global namespace
@@ -1197,32 +1172,8 @@ namespace CasADi{
 #define MTT_INST(DataType,function_name)                       \
   %template(function_name) CasADi::function_name <DataType >;
 
-#ifndef WITHOUT_PRE_1_9_X
-#define MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)     \
-  MTT_INST(DataType,trans)                             \
-  MTT_INST(DataType,isConstant)                        \
-  MTT_INST(DataType,isDense)                           \
-  MTT_INST(DataType,isEmpty)                           \
-  MTT_INST(DataType,isInteger)                         \
-  MTT_INST(DataType,isScalar)                          \
-  MTT_INST(DataType,isTril)                            \
-  MTT_INST(DataType,isTriu)                            \
-  MTT_INST(DataType,makeDense)                         \
-  MTT_INST(DataType,densify)                           \
-  MTT_INST(DataType,makeSparse)                        \
-  MTT_INST(DataType,hasNonStructuralZeros)             \
-  MTT_INST(DataType,isZero)                            \
-  MTT_INST(DataType,isOne)                             \
-  MTT_INST(DataType,isMinusOne)                        \
-  MTT_INST(DataType,isIdentity)                        \
-  MTT_INST(DataType,nnz)                               
-#else
-#define MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)
-#endif
-
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \
-  MATRIX_TOOLS_TEMPLATES_PRE_1_9_X(DataType)           \
   MTT_INST(DataType,transpose)                         \
   MTT_INST(DataType,mul)                               \
   MTT_INST(DataType,det)                               \

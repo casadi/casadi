@@ -227,35 +227,6 @@ namespace CasADi{
     return (*this)->getOutputScheme();
   }
 
-#ifndef WITHOUT_PRE_1_9_X
-  Function Function::operator[](int k) const {
-
-    // Argument checking
-    if (k<0) k+=getNumOutputs();
-    casadi_assert_message(k<getNumOutputs(),"Function[int k]:: Attempt to select the k'th output with k=" << k << ", but should be smaller or equal to number of outputs (" << getNumOutputs() << ").");
-  
-    // Get the inputs in MX form
-    std::vector< MX > in = symbolicInput();
-  
-    // Clone such that we can use const.
-    Function clone = *this;
-  
-    // Get the outputs
-    std::vector< MX > result = clone.call(in);
-  
-    // Construct an MXFunction with only the k'th output
-    MXFunction ret(in,result[k]);
-  
-    ret.setInputScheme(getInputScheme());
-  
-    // Initialize it
-    ret.init();
-  
-    // And return it, will automatically cast to Function
-    return ret;
-  }
-#endif
-
   void Function::spEvaluate(bool fwd){
     (*this)->spEvaluate(fwd);
   }

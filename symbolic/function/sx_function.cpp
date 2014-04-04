@@ -166,23 +166,6 @@ SXFunction::SXFunction(const Function& f){
   }
 }
 
-#ifndef WITHOUT_PRE_1_9_X
-SXFunction SXFunction::operator[](int k) const {
-
-  // Delegate to Function
-  MXFunction temp = shared_cast<MXFunction>(shared_cast<Function>(*this)[k]);
-  
-  casadi_assert(!temp.isNull());
-  
-  // Expand to SXFunction
-  SXFunction ret = temp.expand(inputExpr());
-
-  ret.init();
-
-  return ret;
-}
-#endif
-
 std::vector<SXElement> SXFunction::getFree() const{
   return (*this)->free_vars_;
 }

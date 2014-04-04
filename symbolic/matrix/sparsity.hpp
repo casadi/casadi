@@ -586,21 +586,6 @@ namespace CasADi{
 
     // Hash the sparsity pattern
     std::size_t hash() const;
-
-#ifndef WITHOUT_PRE_1_9_X
-    /** \brief [DEPRECATED]
-     */
-    //@{
-    Sparsity(int nrow, int ncol, bool dense=false);
-    static Sparsity createDiagonal(int nrow){ return diag(nrow);}
-    static Sparsity createDiagonal(int nrow, int ncol){ return diag(nrow,ncol);}
-    std::vector<int> lowerNZ() const{ return getLowerNZ();}
-    std::vector<int> upperNZ() const{ return getUpperNZ();}
-    void getSparsityCCS(std::vector<int>& SWIG_OUTPUT(colind), std::vector<int>& SWIG_OUTPUT(row)) const;
-    void getSparsityCRS(std::vector<int>& SWIG_OUTPUT(rowind), std::vector<int>& SWIG_OUTPUT(col)) const;
-    void getSparsity(std::vector<int>& SWIG_OUTPUT(row), std::vector<int>& SWIG_OUTPUT(col)) const;
-    //@}
-#endif
   
 #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */

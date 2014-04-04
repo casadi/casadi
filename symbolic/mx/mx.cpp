@@ -63,38 +63,6 @@ namespace CasADi{
     assignNode(ConstantMX::create(DMatrix(x)));
   }
 
-#ifndef WITHOUT_PRE_1_9_X
-
-  MX::MX(int nrow, int ncol){
-    if(nrow==0 && ncol==0){
-      assignNode(ZeroByZero::getInstance());
-    } else {
-      assignNode(new Constant<CompiletimeConst<0> >(Sparsity::sparse(nrow,ncol)));
-    }
-  }
-
-  MX::MX(const string& name, int nrow, int ncol){
-    assignNode(new SymbolicMX(name,nrow,ncol));
-  }
-
-  MX::MX(const std::string& name,const std::pair<int,int>& rc) {
-    assignNode(new SymbolicMX(name,rc.first,rc.second));
-  }
-
-  MX::MX(const string& name, const Sparsity& sp){
-    assignNode(new SymbolicMX(name,sp));
-  }
-
-  MX::MX(int nrow, int ncol, const MX& val){
-    // Make sure that val is scalar
-    casadi_assert(val.isScalar());
-    casadi_assert(val.isDense());
-  
-    Sparsity sp = Sparsity::dense(nrow,ncol);
-    *this = val->getGetNonzeros(sp,std::vector<int>(sp.size(),0));
-  }
-#endif
-
   MX::MX(const Sparsity& sp, const MX& val){
     if(sp.isReshape(val.sparsity())){
       *this = reshape(val,sp);

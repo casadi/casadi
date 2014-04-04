@@ -55,18 +55,6 @@ namespace CasADi{
     /** \brief  Default constructor */
     MX();
 
-#ifndef WITHOUT_PRE_1_9_X
-/** \brief [DEPRECATED]
-*/
-//@{
-    explicit MX(const std::string& name, int nrow=1, int ncol=1);
-    explicit MX(const std::string& name, const std::pair<int,int> &rc);
-    explicit MX(const std::string& name, const Sparsity& sp);
-    MX(int nrow, int ncol);
-    MX(int nrow, int ncol, const MX& val);
-//@}
-#endif
-
     //@{
     /** \brief Construct constant matrix with a given sparsity */
     MX(const Sparsity& sp, int val=0);

@@ -388,36 +388,6 @@ namespace CasADi{
   */
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
 
-/// \cond INTERNAL
-#ifndef WITHOUT_PRE_1_9_X
-/** \brief [DEPRECATED]
-*/
-//@{
-  inline MX msym(const std::string& name, int nrow=1, int ncol=1){ return MX::sym(name,nrow,ncol); }
-  inline MX msym(const std::string& name, const std::pair<int,int> & rc){ return MX::sym(name,rc);}
-  inline std::vector<MX> msym(const std::string& name, const Sparsity& sp, int p){ return MX::sym(name,sp,p);}
-  inline std::vector<MX> msym(const std::string& name, int nrow, int ncol, int p){ return MX::sym(name,nrow,ncol,p);}
-  inline std::vector<std::vector<MX> > msym(const std::string& name, const Sparsity& sp, int p, int r){ return MX::sym(name,sp,p,r);}
-  inline std::vector<std::vector<MX> > msym(const std::string& name, int nrow, int ncol, int p, int r){ return MX::sym(name,nrow,ncol,p,r);}
-  inline MX msym(const std::string& name, const Sparsity& sp){ return MX::sym(name,sp);}
-  inline MX msym(const Matrix<double>& x){ return MX(x);}
-  inline bool isVector(const MX& ex){ return ex.isVector();}
-  inline bool isDense(const MX& ex){ return ex.isDense();}  
-  inline void makeDense(MX& x){ return x.densify();}
-  inline MX densify(const MX& x){ MX ret(x); ret.densify(); return ret;}
-  inline bool isSymbolic(const MX& ex){ return ex.isSymbolic();}
-  inline bool isSymbolicSparse(const MX& ex){ return ex.isSymbolicSparse();}
-  inline bool isIdentity(const MX& ex){ return ex.isIdentity();}
-  inline bool isZero(const MX& ex){ return ex.isZero();}
-  inline bool isOne(const MX& ex){ return ex.isOne();}
-  inline bool isMinusOne(const MX& ex){ return ex.isMinusOne();}
-  inline bool isTranspose(const MX& ex){ return ex.isTranspose();}
-  inline bool isRegular(const MX& ex){ return ex.isRegular();}
-  inline MX trans(const MX &x){ return transpose(x);}
-//@}
-#endif
-/// \endcond
-
 /** @}
 */
 

@@ -330,33 +330,6 @@ namespace CasADi{
    */  
   SX eig_symbolic(const SX& m);
 
-#ifndef WITHOUT_PRE_1_9_X
-  /** \brief [DEPRECATED]
-   */
-  //@{
-  inline SX ssym(const std::string& name, int nrow=1, int ncol=1){ return SX::sym(name,nrow,ncol); }
-  inline SX ssym(const std::string& name, const std::pair<int,int> & rc){ return SX::sym(name,rc);}
-  inline std::vector<SX> ssym(const std::string& name, const Sparsity& sp, int p){ return SX::sym(name,sp,p);}
-  inline std::vector<SX> ssym(const std::string& name, int nrow, int ncol, int p){ return SX::sym(name,nrow,ncol,p);}
-  inline std::vector<std::vector<SX> > ssym(const std::string& name, const Sparsity& sp, int p, int r){ return SX::sym(name,sp,p,r);}
-  inline std::vector<std::vector<SX> > ssym(const std::string& name, int nrow, int ncol, int p, int r){ return SX::sym(name,nrow,ncol,p,r);}
-  inline SX ssym(const std::string& name, const Sparsity& sp){ return SX::sym(name,sp);}
-  inline SX ssym(const Matrix<double>& x){ return SX(x);}
-  inline bool isRegular(const SXElement& ex){ return ex.isRegular();}
-  inline bool isRegular(const SX& ex) { return ex.isRegular();}
-
-  /// [DEPRECATED:use ex.isSmooth()]
-  inline bool isSmooth(const SX& ex){ return ex.isSmooth();}
-  inline bool isSymbolic(const SX& ex){ return ex.isSymbolic();}
-  inline bool isSymbolicSparse(const SX& ex){ return ex.isSymbolicSparse();}
-  inline double getValue(const SX& ex) { return ex.elem(0,0).getValue(); }
-  inline int getIntValue(const SX& ex) { return ex.elem(0,0).getIntValue(); }
-  inline std::string getName(const SX &ex){ return ex.toScalar().getName();}
-  //@}
-
-
-#endif
-
 /*
 @}
 */

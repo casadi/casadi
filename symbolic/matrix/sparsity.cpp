@@ -69,23 +69,6 @@ namespace CasADi{
     return ret;
   }
 
-#ifndef WITHOUT_PRE_1_9_X
-  Sparsity::Sparsity(int nrow, int ncol, bool dense){
-    std::vector<int> row, colind(ncol+1,0);
-    if(dense){
-      row.resize(ncol*nrow);
-      colind.resize(ncol+1);
-      for(int i=0; i<ncol+1; ++i)
-        colind[i] = i*nrow;
-      for(int i=0; i<ncol; ++i)
-        for(int j=0; j<nrow; ++j)
-          row[j+i*nrow] = j;
-    }
- 
-    assignCached(nrow, ncol, colind, row);
-  }
-#endif
-
   Sparsity::Sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row){
     assignCached(nrow, ncol, colind, row);
     sanityCheck(true);
@@ -289,18 +272,6 @@ namespace CasADi{
   std::vector<int> Sparsity::getCol() const{
     return (*this)->getCol();
   }
-
-#ifndef WITHOUT_PRE_1_9_X
-  void Sparsity::getSparsityCCS(std::vector<int>& colind, std::vector<int>& row) const{
-    getCCS(colind,row);
-  }
-  void Sparsity::getSparsityCRS(std::vector<int>& rowind, std::vector<int>& col) const {
-    getCRS(rowind,col);
-  }
-  void Sparsity::getSparsity(std::vector<int>& row, std::vector<int>& col) const{
-    getTriplet(row,col);
-  }
-#endif
 
   void Sparsity::getCCS(std::vector<int>& colind, std::vector<int>& row) const{
     colind = this->colind();

@@ -29,12 +29,6 @@ namespace CasADi{
   StabilizedSQPMethod::StabilizedSQPMethod(){
   }
   
-#ifndef WITHOUT_PRE_1_9_X
-  StabilizedSQPMethod::StabilizedSQPMethod(const Function& F, const Function& G){
-    assignNode(new StabilizedSQPInternal(joinFG(F,G)));
-  }
-#endif
-
   StabilizedSQPMethod::StabilizedSQPMethod(const Function& nlp){
     assignNode(new StabilizedSQPInternal(nlp));
   }

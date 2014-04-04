@@ -94,7 +94,6 @@ option(WITH_CPLEX "Compile the interface to CPLEX" ON)
 option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
-option(WITH_DEPRECATED "Allow usage of deprecated syntax" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
 
 # For code optimization
@@ -108,11 +107,6 @@ string (TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-
-# Disallow Pre 1.9 syntax
-if(NOT WITH_DEPRECATED)
-  add_definitions(-DWITHOUT_PRE_1_9_X)
-endif()
 
 if(WITH_DL)
   add_definitions(-DWITH_DL)

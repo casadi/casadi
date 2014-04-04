@@ -389,58 +389,6 @@ namespace CasADi{
     void checkInputs() const;
     /// \endcond
 
-#ifndef WITHOUT_PRE_1_9_X
-    /** \brief [DEPRECATED]
-     */
-    //@{
-    std::vector<MX> evalMX(const std::vector<MX>& arg){ return eval(arg);}
-    std::vector<SX> evalSX(const std::vector<SX>& arg){ return eval(arg);}
-#ifndef SWIG 
-    Function operator[](int k) const;
-#endif //SWIG 
-    Function indexed_one_based(int k) const{ return operator[](k-1);}
-    Function indexed_zero_based(int k) const{ return operator[](k);}
-    std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary()){
-      return callParallel(arg,paropt);
-    }
-    void call(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
-              const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
-              const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens)){
-      callDerivative(arg,res,fseed,fsens,aseed,asens);
-    }
-    void evalMX(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
-                const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
-                const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens)){
-      callDerivative(arg,res,fseed,fsens,aseed,asens,true);
-    }
-    void evalSX(const SXVector& arg, SXVector& SWIG_OUTPUT(res), 
-                const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens), 
-                const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens)){
-      callDerivative(arg,res,fseed,fsens,aseed,asens,true);
-    }
-    void eval(const SXVector& arg, std::vector<SX>& SWIG_OUTPUT(res), 
-              const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens), 
-              const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens)){
-      callDerivative(arg,res,fseed,fsens,aseed,asens,true);
-    }
-    void eval(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
-              const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
-              const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens)){
-      callDerivative(arg,res,fseed,fsens,aseed,asens,true);
-    }
-    std::vector<SX> eval(const std::vector<SX>& arg){
-      return call(arg);
-    }
-    std::vector<MX> eval(const std::vector<MX>& arg){
-      return call(arg,true);
-    }
-#ifndef SWIG
-    std::vector<MX> call(const MX &arg){ return call(std::vector<MX>(1,arg));}
-    SX eval(const SX& arg){ return call(std::vector<SX>(1,arg)).at(0);}
-#endif // SWIG
-    //@}
-#endif
-
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
   };

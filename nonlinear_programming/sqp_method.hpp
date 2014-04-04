@@ -36,7 +36,7 @@ namespace CasADi{
      damped BFGS Lagrange Hessian approximation.
      Two different line-search algorithms are available.
      First, Armijo (Wolfe) condition with backtracking (suffers from Maratos effect).
-     Seco#ifndef WITHOUT_PRE_1_9_Xnd, a line-search method that checks if the merit function is lower
+     Second, a line-search method that checks if the merit function is lower
      than the last k values (no Maratos effect).
      Both methods employ the L1 merit function.
   
@@ -61,13 +61,6 @@ namespace CasADi{
   public:
     /// Default constructor
     SQPMethod();
-
-#ifndef WITHOUT_PRE_1_9_X
-    /// \brief [DEPRECATED] Create an NLP solver instance (legacy syntax)
-    explicit SQPMethod(const Function& F, /**< objective function: \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}]\f$*/
-                       const Function& G  /**< constraint function \f$ [\mathbb{R}^{n_x}] \mapsto [\mathbb{R}^{n_g}]\f$ */
-                    );
-#endif
 
     /// \brief Create an NLP solver instance
     explicit SQPMethod(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
