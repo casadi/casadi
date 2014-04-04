@@ -459,8 +459,6 @@ int internal(const std::string & c) {
 #define STOP \
   } catch (const std::exception& e) { \
   SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } catch (const char* e) { \
-    SWIG_exception(SWIG_RuntimeError, e); \
   } \
 } else
 %}
