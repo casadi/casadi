@@ -22,7 +22,7 @@
 casadi
 
 a = zeros(2,3)
-b = DMatrix(2,3,1)
+b = DMatrix.ones(2,3)
 c = SX.sym("x",2,3)
 d = MX.sym("x",2,3)
 
