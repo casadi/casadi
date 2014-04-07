@@ -27,10 +27,10 @@
 %import "casadi_main.i"
 
 %{
-#include "control/dple_solver.hpp"
-#include "control/simple_indef_dple_solver.hpp"
+#include "casadi/control/dple_solver.hpp"
+#include "casadi/control/simple_indef_dple_solver.hpp"
 %}
 
-%include "control/dple_solver.hpp"
-%include "control/simple_indef_dple_solver.hpp"
+%include "casadi/control/dple_solver.hpp"
+%include "casadi/control/simple_indef_dple_solver.hpp"
 

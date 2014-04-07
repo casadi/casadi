@@ -27,6 +27,6 @@
 %import "casadi_main.i"
 
 %{ 
-  #include "interfaces/knitro/knitro_solver.hpp"
+  #include "casadi/interfaces/knitro/knitro_solver.hpp"
 %}
-%include "interfaces/knitro/knitro_solver.hpp"
+%include "casadi/interfaces/knitro/knitro_solver.hpp"

@@ -27,6 +27,6 @@
 %import "casadi_main.i"
 
 %{
-#include "interfaces/gsl/gsl_integrator.hpp"
+#include "casadi/interfaces/gsl/gsl_integrator.hpp"
 %}
-%include "interfaces/gsl/gsl_integrator.hpp"
+%include "casadi/interfaces/gsl/gsl_integrator.hpp"

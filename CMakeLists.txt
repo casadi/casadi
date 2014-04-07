@@ -23,7 +23,7 @@ STRING(REPLACE "+-" "+" git_describe "${git_describe}")
 STRING(REPLACE "-g" "." git_describe "${git_describe}")
 
 #begin workaround for http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(language_support)
 workaround_9220(Fortran Fortran_language_works)
 if(Fortran_language_works)
@@ -126,7 +126,7 @@ foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11
       ${CMAKE_BINARY_DIR}
-      ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11.cpp
+      ${CMAKE_MODULE_PATH}/check_cxx11.cpp
       CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
       OUTPUT_VARIABLE OUTPUT)
 
@@ -152,7 +152,7 @@ add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficienc
 if(CXX11FLAG)
   try_compile(HAS_COPYSIGN
     ${CMAKE_BINARY_DIR}
-    ${CMAKE_SOURCE_DIR}/cmake_modules/check_copysign.cpp
+    ${CMAKE_MODULE_PATH}/check_copysign.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
   if(HAS_COPYSIGN)
@@ -161,7 +161,7 @@ if(CXX11FLAG)
 
   try_compile(HAS_ERF
     ${CMAKE_BINARY_DIR}
-    ${CMAKE_SOURCE_DIR}/cmake_modules/check_erf.cpp
+    ${CMAKE_MODULE_PATH}/check_erf.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
   if(HAS_ERF)
@@ -170,7 +170,7 @@ if(CXX11FLAG)
 
   try_compile(HAS_ERFINV
     ${CMAKE_BINARY_DIR}
-    ${CMAKE_SOURCE_DIR}/cmake_modules/check_erfinv.cpp
+    ${CMAKE_MODULE_PATH}/check_erfinv.cpp
     CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
     OUTPUT_VARIABLE OUTPUT)
   if(HAS_ERFINV)
@@ -330,21 +330,12 @@ if(WITH_PROFILING)
   add_definitions(-DWITH_PROFILING)
 endif(WITH_PROFILING)
 
-add_subdirectory(symbolic)  # needed by all except external_packages
 add_subdirectory(external_packages)
-
-add_subdirectory(interfaces)             # needs external_packages
-add_subdirectory(nonlinear_programming)  # needs interfaces
-add_subdirectory(convex_programming)     # needs interfaces
-add_subdirectory(integration)
-add_subdirectory(optimal_control)        # needs integration, external_packages
-add_subdirectory(examples)
+add_subdirectory(casadi)
+add_subdirectory(docs/examples)
 add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
-
-add_subdirectory(control)
-
 add_subdirectory(misc)
 
 find_package(SWIG)
@@ -357,15 +348,15 @@ endif(SWIG_FOUND)
 
 if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
-  set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/documentation/api-doc)
-  set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/documentation/api-doc)
+  set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/docs/api)
+  set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/docs/api)
   set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/symbolic)
   include(UseDoxygen OPTIONAL)
-  add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
+  add_subdirectory(docs/tutorials EXCLUDE_FROM_ALL)
   add_custom_target(tutor)
 endif()
 
-add_subdirectory(documentation/examples/ctemplate)
+add_subdirectory(docs/api/examples/ctemplate)
 
 # Print a summary
 feature_summary(WHAT ALL)
@@ -375,8 +366,8 @@ STRING(REPLACE "\n" "\\n" feature_list "${feature_list}")
 
 # Pass meta information
 CONFIGURE_FILE(
-  ${CMAKE_SOURCE_DIR}/symbolic/casadi_meta.cpp.cmake
-  ${CMAKE_SOURCE_DIR}/symbolic/casadi_meta.cpp
+  ${CMAKE_SOURCE_DIR}/casadi/symbolic/casadi_meta.cpp.cmake
+  ${CMAKE_SOURCE_DIR}/casadi/symbolic/casadi_meta.cpp
   ESCAPE_QUOTES
 )
 

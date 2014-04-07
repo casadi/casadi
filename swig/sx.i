@@ -21,15 +21,15 @@
  */
 
 %{
-#include "symbolic/matrix/sparsity.hpp"
-#include "symbolic/matrix/slice.hpp"
-#include "symbolic/matrix/generic_expression.hpp"
-#include "symbolic/matrix/generic_matrix.hpp"
-#include "symbolic/matrix/matrix.hpp"
-#include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/sx/sx_element.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/mx/mx.hpp"
+#include "casadi/symbolic/matrix/sparsity.hpp"
+#include "casadi/symbolic/matrix/slice.hpp"
+#include "casadi/symbolic/matrix/generic_expression.hpp"
+#include "casadi/symbolic/matrix/generic_matrix.hpp"
+#include "casadi/symbolic/matrix/matrix.hpp"
+#include "casadi/symbolic/matrix/matrix_tools.hpp"
+#include "casadi/symbolic/sx/sx_element.hpp"
+#include "casadi/symbolic/sx/sx_tools.hpp"
+#include "casadi/symbolic/mx/mx.hpp"
 
 %}
 
@@ -42,23 +42,23 @@
 %include "typemaps.i"
 #endif
 
-%include "symbolic/matrix/sparsity.hpp"
-%include "symbolic/matrix/slice.hpp"
+%include "casadi/symbolic/matrix/sparsity.hpp"
+%include "casadi/symbolic/matrix/slice.hpp"
 
-%include "symbolic/matrix/generic_expression.hpp"
+%include "casadi/symbolic/matrix/generic_expression.hpp"
 %template(ExpIMatrix)        CasADi::GenericExpression<CasADi::Matrix<int> >;
 %template(ExpDMatrix)        CasADi::GenericExpression<CasADi::Matrix<double> >;
 %template(ExpSX)       CasADi::GenericExpression<CasADi::Matrix<CasADi::SXElement> >;
 %template(ExpMX)             CasADi::GenericExpression<CasADi::MX>;
 %template(ExpSXElement)             CasADi::GenericExpression<CasADi::SXElement>;
 
-%include "symbolic/matrix/generic_matrix.hpp"
+%include "casadi/symbolic/matrix/generic_matrix.hpp"
 %template(GenIMatrix)        CasADi::GenericMatrix<CasADi::Matrix<int> >;
 %template(GenDMatrix)        CasADi::GenericMatrix<CasADi::Matrix<double> >;
 %template(GenSX)       CasADi::GenericMatrix<CasADi::Matrix<CasADi::SXElement> >;
 %template(GenMX)             CasADi::GenericMatrix<CasADi::MX>;
 
-%include "symbolic/matrix/matrix.hpp"
+%include "casadi/symbolic/matrix/matrix.hpp"
 %template(IMatrix)           CasADi::Matrix<int>;
 %template(DMatrix)           CasADi::Matrix<double>;
 
@@ -66,7 +66,7 @@
    %template(DMatrix) Matrix<int>;
 };
 
-%include "symbolic/sx/sx_element.hpp"
+%include "casadi/symbolic/sx/sx_element.hpp"
 
 
 

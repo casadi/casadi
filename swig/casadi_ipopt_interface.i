@@ -27,8 +27,8 @@
 %import "casadi_main.i"
 
 %{
-#include "interfaces/ipopt/ipopt_solver.hpp"
+#include "casadi/interfaces/ipopt/ipopt_solver.hpp"
 %}
 
-%include "interfaces/ipopt/ipopt_solver.hpp"
+%include "casadi/interfaces/ipopt/ipopt_solver.hpp"
 

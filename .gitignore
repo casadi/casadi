@@ -35,7 +35,7 @@ octave-core
 *.pyc
 documentation/examples/ctemplate/compiler.sh
 documentation/examples/ctemplate/linker.sh
-symbolic/casadi_meta.cpp
+casadi/symbolic/casadi_meta.cpp
 
 # Eclipse
 .project

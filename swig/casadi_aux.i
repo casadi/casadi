@@ -22,16 +22,16 @@
 
 %{
 #include <sstream>
-#include "symbolic/std_vector_tools.hpp"
-#include "symbolic/printable_object.hpp"
-#include "symbolic/shared_object.hpp"
-#include "symbolic/weak_ref.hpp"
-#include "symbolic/generic_type.hpp"
-#include "symbolic/options_functionality.hpp"
-#include "symbolic/casadi_calculus.hpp"
+#include "casadi/symbolic/std_vector_tools.hpp"
+#include "casadi/symbolic/printable_object.hpp"
+#include "casadi/symbolic/shared_object.hpp"
+#include "casadi/symbolic/weak_ref.hpp"
+#include "casadi/symbolic/generic_type.hpp"
+#include "casadi/symbolic/options_functionality.hpp"
+#include "casadi/symbolic/casadi_calculus.hpp"
 %}
 
-%include "symbolic/std_vector_tools.hpp"
+%include "casadi/symbolic/std_vector_tools.hpp"
 VECTOR_TOOLS_TEMPLATES(int)
 VECTOR_TOOLS_TEMPLATES(double)
 
@@ -42,13 +42,13 @@ VECTOR_TOOLS_TEMPLATES(double)
 };
 %enddef
 
-%include "symbolic/printable_object.hpp"
-%include "symbolic/shared_object.hpp"
-%include "symbolic/weak_ref.hpp"
-%include "symbolic/casadi_types.hpp"
-%include "symbolic/generic_type.hpp"
-%include "symbolic/options_functionality.hpp"
-%include "symbolic/casadi_calculus.hpp"
+%include "casadi/symbolic/printable_object.hpp"
+%include "casadi/symbolic/shared_object.hpp"
+%include "casadi/symbolic/weak_ref.hpp"
+%include "casadi/symbolic/casadi_types.hpp"
+%include "casadi/symbolic/generic_type.hpp"
+%include "casadi/symbolic/options_functionality.hpp"
+%include "casadi/symbolic/casadi_calculus.hpp"
 
 namespace CasADi {
   %extend OptionsFunctionality {

@@ -57,11 +57,11 @@ except:
 #endif // SWIGPYTHON
 
 // Matrix tools
-%include "symbolic/matrix/matrix_tools.hpp"
-%include "symbolic/matrix/generic_matrix_tools.hpp"
+%include "casadi/symbolic/matrix/matrix_tools.hpp"
+%include "casadi/symbolic/matrix/generic_matrix_tools.hpp"
 
 // General tools
-%include "symbolic/matrix/generic_expression_tools.hpp"
+%include "casadi/symbolic/matrix/generic_expression_tools.hpp"
 
 // Instantiate the functions
 MATRIX_TOOLS_TEMPLATES(int)
@@ -88,12 +88,12 @@ GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::SXElement)
 
 // Sparsity tools
 %{
-#include "symbolic/matrix/sparsity_tools.hpp"
+#include "casadi/symbolic/matrix/sparsity_tools.hpp"
 %}
-%include "symbolic/matrix/sparsity_tools.hpp"
+%include "casadi/symbolic/matrix/sparsity_tools.hpp"
 
 // SXElement tools
-%include "symbolic/sx/sx_tools.hpp"
+%include "casadi/symbolic/sx/sx_tools.hpp"
 
 
-%include "symbolic/mx/mx_tools.hpp"
+%include "casadi/symbolic/mx/mx_tools.hpp"

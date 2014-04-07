@@ -21,11 +21,11 @@
  */
 
 %{
-#include "symbolic/mx/mx.hpp"
-#include "symbolic/mx/mx_tools.hpp"
+#include "casadi/symbolic/mx/mx.hpp"
+#include "casadi/symbolic/mx/mx_tools.hpp"
 %}
 
-%include "symbolic/mx/mx.hpp"
+%include "casadi/symbolic/mx/mx.hpp"
 
 
 

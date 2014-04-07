@@ -37,18 +37,18 @@
 #endif // SWIGOCTAVE
 
 %{
-#include "symbolic/matrix/sparsity.hpp"
-#include "symbolic/matrix/matrix.hpp"
+#include "casadi/symbolic/matrix/sparsity.hpp"
+#include "casadi/symbolic/matrix/matrix.hpp"
 #include <sstream>
-#include "symbolic/casadi_exception.hpp"
+#include "casadi/symbolic/casadi_exception.hpp"
 
 // to allow for typechecking
-#include "symbolic/sx/sx_element.hpp"
+#include "casadi/symbolic/sx/sx_element.hpp"
 
 // to typecheck for MX
-#include "symbolic/mx/mx.hpp"
+#include "casadi/symbolic/mx/mx.hpp"
 // to have prod available
-#include "symbolic/mx/mx_tools.hpp"
+#include "casadi/symbolic/mx/mx_tools.hpp"
 %}
 
 #ifdef SWIGPYTHON

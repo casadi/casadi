@@ -27,9 +27,9 @@
 %import "casadi_control.i"
 
 %{
-#include "interfaces/slicot/slicot_tools.hpp"
-#include "interfaces/slicot/psd_indef_dple_solver.hpp"
+#include "casadi/interfaces/slicot/slicot_tools.hpp"
+#include "casadi/interfaces/slicot/psd_indef_dple_solver.hpp"
 %}
 
-%include "interfaces/slicot/slicot_tools.hpp"
-%include "interfaces/slicot/psd_indef_dple_solver.hpp"
+%include "casadi/interfaces/slicot/slicot_tools.hpp"
+%include "casadi/interfaces/slicot/psd_indef_dple_solver.hpp"

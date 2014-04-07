@@ -18,12 +18,12 @@ endif()
 find_package(PythonLibs)
 find_package(NUMPY)
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 
 set(CASADI_SWIG_FLAGS "")
 
 # Include the use swig file
-include (../cmake_modules/UseSWIGMOD.cmake)
+include (${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
 
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})

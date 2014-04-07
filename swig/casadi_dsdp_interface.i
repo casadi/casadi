@@ -27,6 +27,6 @@
 %import "casadi_main.i"
 
 %{
-#include "interfaces/dsdp/dsdp_solver.hpp"
+#include "casadi/interfaces/dsdp/dsdp_solver.hpp"
 %}
-%include "interfaces/dsdp/dsdp_solver.hpp"
+%include "casadi/interfaces/dsdp/dsdp_solver.hpp"

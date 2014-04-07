@@ -27,6 +27,6 @@
 %import "casadi_main.i"
 
 %{
-#include "interfaces/ooqp/ooqp_solver.hpp"
+#include "casadi/interfaces/ooqp/ooqp_solver.hpp"
 %}
-%include "interfaces/ooqp/ooqp_solver.hpp"
+%include "casadi/interfaces/ooqp/ooqp_solver.hpp"

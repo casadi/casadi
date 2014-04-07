@@ -1,6 +1,10 @@
-On x86_64 platforms there may be linking problems when you compile Sundials on your own.
-To solve this, configure Sundials with the following options:
+The directory structure is as follows:
 
-./configure --enable-shared --enable-static --with-cflags="-O3 -fPIC"
-
-
+casadi - the c++ source code
+cmake - cmake scripts, e.g. FindBlah.cmake
+docs - documentation and examples
+experimental - mostly deprecated extensions that don't belong in casadi/
+external_packages - source for 3rd party packages which casadi builds and interfaces
+misc - mostly handy scripts
+swig - for buildinge python (and other) interfaces
+test - unit tests

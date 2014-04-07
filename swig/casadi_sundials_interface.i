@@ -27,13 +27,13 @@
 %import "casadi_main.i"
 
 %{
-#include "interfaces/sundials/sundials_integrator.hpp"
-#include "interfaces/sundials/cvodes_integrator.hpp"
-#include "interfaces/sundials/idas_integrator.hpp"
-#include "interfaces/sundials/kinsol_solver.hpp"
+#include "casadi/interfaces/sundials/sundials_integrator.hpp"
+#include "casadi/interfaces/sundials/cvodes_integrator.hpp"
+#include "casadi/interfaces/sundials/idas_integrator.hpp"
+#include "casadi/interfaces/sundials/kinsol_solver.hpp"
 %}
 
-%include "interfaces/sundials/sundials_integrator.hpp"
-%include "interfaces/sundials/cvodes_integrator.hpp"
-%include "interfaces/sundials/idas_integrator.hpp"
-%include "interfaces/sundials/kinsol_solver.hpp"
+%include "casadi/interfaces/sundials/sundials_integrator.hpp"
+%include "casadi/interfaces/sundials/cvodes_integrator.hpp"
+%include "casadi/interfaces/sundials/idas_integrator.hpp"
+%include "casadi/interfaces/sundials/kinsol_solver.hpp"
