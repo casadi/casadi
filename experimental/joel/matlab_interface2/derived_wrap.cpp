@@ -1,5 +1,10 @@
 #include "mex.h" 
 #include "derived.hpp"
+#include <stdint.h>
+#include <string>
+#include <cstring>
+#include <typeinfo>
+
 
 extern "C" 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){

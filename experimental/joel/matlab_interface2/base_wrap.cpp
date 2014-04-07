@@ -1,5 +1,11 @@
 #include "mex.h" 
 #include "base.hpp"
+#include <stdint.h>
+#include <string>
+#include <cstring>
+#include <typeinfo>
+
+
 
 extern "C"
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
@@ -11,10 +17,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]){
     mexErrMsgTxt("Expected nrhs = 1.");
   }
   
-  mxArray* in = prhs[0];
+  const mxArray* in = prhs[0];
   if (mxGetNumberOfElements(in) != 1 || mxGetClassID(in) != mxUINT64_CLASS || mxIsComplex(in))
     mexErrMsgTxt("Input must be a real uint64 scalar.");
-  Base* b = reinterpret_cast<Derived *>(*((uint64_t *)mxGetData(in)));
+  Base* b = reinterpret_cast<Base*>(*((uint64_t *)mxGetData(in)));
   
   int a = b->foo();
   mexPrintf("a = %d \n",a);
