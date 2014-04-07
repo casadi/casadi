@@ -40,7 +40,7 @@ int main(){
   SymbolicOCP ocp;
 
   // Load the XML file
-  ocp.parseFMI("../examples/xml_files/cstr.xml");
+  ocp.parseFMI("../docs/examples/xml_files/cstr.xml");
 
   // Correct the inital guess and bounds on variables
   ocp.setStart("u",280);

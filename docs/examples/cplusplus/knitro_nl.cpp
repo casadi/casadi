@@ -37,7 +37,7 @@ using namespace CasADi;
 int main(int argc, char **argv){
 
   // Get the problem
-  std::string problem = (argc==2) ? argv[1] : "../examples/nl_files/hs107.nl";
+  std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
 
   // Parse an NL-file
   SymbolicNLP nl;
