@@ -910,7 +910,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,7,str(Solver))
 
-  def testactiveLBX(self):
+  def test_activeLBX(self):
     self.message("active LBX")
     x=SX.sym("x")
     y=SX.sym("y")
@@ -933,7 +933,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("f")[0],9.0908263002590e-3,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1.0952466252248,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
-      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,8,str(Solver))
+      self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,5 if "StabilizedSQPMethod" in str(Solver) else 8,str(Solver)+str(solver_options))
       self.assertAlmostEqual(solver.getOutput("lam_x")[1],-8.6963632695079e-2,4,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_g")[0],0,8,str(Solver))
 
