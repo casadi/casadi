@@ -1,22 +1,19 @@
 PY=$(shell find -name "*.py"  -not -name "_temp.py" -not -name "*ctemplate*")
 CPP=$(shell find -name "*.cc" -not -name "_temp.cc" -not -name "*ctemplate*")
-OCT=$(shell find -name "*.m" -not -name "_temp.m" -not -name "*ctemplate*")
 EXE=$(CPP:.cc=.run)
 LOG=$(CPP:.cc=.log)
-OCTLOG=$(OCT:.m=.out)
 PDF=$(PY:.py=.pdf)
 BUILDDIR=../../../build
 
 CASADI_OBJECT=$(BUILDDIR)/python/casadi/_casadi_main.so
 OCTAVE_PATH=$(BUILDDIR)/lib
-all: python cpp cpprun octave
+all: python cpp cpprun
 
 .PHONY = python cpp cpprun
 
 python: $(PDF)
 cpp: $(EXE)
 cpprun: $(LOG)
-octave: $(OCTLOG)
 
 clean: 
 	rm -f _temp.* $(PDF) $(EXE)
@@ -37,9 +34,6 @@ $(EXE): %.run : %.cc $(BUILDDIR)/bin/ctemplate ctemplate/compiler.sh ctemplate/l
 	
 $(LOG): %.log : %.run
 	$< > $@ 2>&1
-	
-$(OCTLOG): %.out : %.m
-	octave --no-init-file -p $(OCTAVE_PATH) -q $< 2>&1 > $@ 
 	
 ctemplate/compiler.sh ctemplate/linker.sh: $(BUILDDIR)/docs/api/examples/ctemplate/CMakeFiles/ctemplate.dir/link.txt  $(BUILDDIR)/docs/api/examples/ctemplate/CMakeFiles/ctemplate.dir/flags.make ctemplate/ctemplate.py
 	cd ctemplate && python ctemplate.py && chmod +x compiler.sh linker.sh && cd ..
