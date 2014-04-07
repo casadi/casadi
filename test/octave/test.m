@@ -132,7 +132,7 @@ s = DMatrix([ 5 6; 4 9])
 full(s)
 
 disp('sparse arrays')
-s = DMatrix(4,3,[0,2,2,3],[1,2,1],[0.738,0.1,0.99])'
+s = DMatrix.triplet([0,0,2],[1,2,1],[0.738,0.1,0.99],3,4)'
 
 disp('bar')
 
