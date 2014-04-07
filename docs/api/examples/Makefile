@@ -5,7 +5,7 @@ EXE=$(CPP:.cc=.run)
 LOG=$(CPP:.cc=.log)
 OCTLOG=$(OCT:.m=.out)
 PDF=$(PY:.py=.pdf)
-BUILDDIR=../../build
+BUILDDIR=../../../build
 
 CASADI_OBJECT=$(BUILDDIR)/python/casadi/_casadi_main.so
 OCTAVE_PATH=$(BUILDDIR)/lib
@@ -41,5 +41,5 @@ $(LOG): %.log : %.run
 $(OCTLOG): %.out : %.m
 	octave --no-init-file -p $(OCTAVE_PATH) -q $< 2>&1 > $@ 
 	
-ctemplate/compiler.sh ctemplate/linker.sh: $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/link.txt  $(BUILDDIR)/documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/flags.make ctemplate/ctemplate.py
+ctemplate/compiler.sh ctemplate/linker.sh: $(BUILDDIR)/docs/api/examples/ctemplate/CMakeFiles/ctemplate.dir/link.txt  $(BUILDDIR)/docs/api/examples/ctemplate/CMakeFiles/ctemplate.dir/flags.make ctemplate/ctemplate.py
 	cd ctemplate && python ctemplate.py && chmod +x compiler.sh linker.sh && cd ..

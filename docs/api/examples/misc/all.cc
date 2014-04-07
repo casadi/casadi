@@ -1,12 +1,12 @@
-#include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/std_vector_tools.hpp"
+#include "casadi/symbolic/matrix/matrix_tools.hpp"
+#include "casadi/symbolic/std_vector_tools.hpp"
 #include <limits>
 
 using namespace CasADi;
 
 int main(int argc, char *argv[])
 {
-  DMatrix d(3,1,0);
+  DMatrix d = DMatrix::zeros(3,1);
 
   assert(!all(d));
   assert(!any(d));

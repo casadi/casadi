@@ -1,5 +1,5 @@
-#include "symbolic/function/custom_function.hpp"
-#include "symbolic/functor.hpp"
+#include "casadi/symbolic/function/custom_function.hpp"
+#include "casadi/symbolic/functor.hpp"
 
 using namespace CasADi;
 
@@ -16,10 +16,10 @@ int main(int argc, char *argv[])
 {
   
   std::vector<Sparsity> ins;
-  ins.push_back(sp_dense(1,1));
+  ins.push_back(Sparsity::dense(1,1));
   
   std::vector<Sparsity> outs;
-  outs.push_back(sp_dense(1,1));
+  outs.push_back(Sparsity::dense(1,1));
   
   CustomFunction f(myEvaluate,ins,outs);
   f.init();

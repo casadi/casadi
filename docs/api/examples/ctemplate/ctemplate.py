@@ -23,8 +23,8 @@ import re
 import os
 
 builddir = 'build/'
-topdir = '../../../'
-makedir = 'documentation/examples/ctemplate/CMakeFiles/ctemplate.dir/'
+topdir = '../../../../'
+makedir = 'docs/api/examples/ctemplate/CMakeFiles/ctemplate.dir/'
 
 cextension = 'cc'
 
@@ -33,7 +33,7 @@ absbuilddir = os.path.abspath(topdir+builddir)
 # Write a linker script
 link = file(topdir+builddir+makedir+'link.txt','r')
 linker = link.readline()
-linker = re.sub(' \.\./\.\./\.\.',' '+ absbuilddir,linker)
+linker = re.sub(' \.\./\.\./\.\./\.\.',' '+ absbuilddir,linker)
 linker = re.sub('CMakeFiles/ctemplate.dir/ctemplate(\.cpp)?\.o','"$1.o"',linker)
 linker = re.sub('-o (.*?) ','-o "$1.run" ',linker)
 

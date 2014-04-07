@@ -1,5 +1,5 @@
-#include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/std_vector_tools.hpp"
+#include "casadi/symbolic/matrix/matrix_tools.hpp"
+#include "casadi/symbolic/std_vector_tools.hpp"
 #include <limits>
 
 using namespace CasADi;

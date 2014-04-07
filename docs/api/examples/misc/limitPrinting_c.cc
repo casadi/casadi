@@ -1,4 +1,4 @@
-#include "symbolic/sx/sx_tools.hpp"
+#include "casadi/symbolic/sx/sx_tools.hpp"
 #include <limits>
 
 using namespace CasADi;
