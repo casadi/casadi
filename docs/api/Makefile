@@ -53,7 +53,7 @@ doxexport:
 	sh extra/doc2swig.sh
 
 full: 
-	cd ../examples && make
+	cd examples && make
 	cd ../documents && make
 	cd ../tutorials/python && python make_tutorials.py
 	#cd ../tutorials/cpp && make

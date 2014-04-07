@@ -586,15 +586,9 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../../symbolic \
-                         ../../interfaces \
-                         ../../optimal_control \
-                         ../../control \
-                         ../../integration \
-                         ../../nonlinear_programming \
-                         ../../convex_programming \
+INPUT                  = ../../casadi/ \
                          ./doxygen-tutorial \
-                         ../examples \
+                         examples \
                          extra
 
 # This tag can be used to specify the character encoding of the source files 

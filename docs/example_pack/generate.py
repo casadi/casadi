@@ -27,13 +27,13 @@ c) start spyder, open vdp_single_shooting.py and press "run".
     
 """ % (release,releasedocurl))
 
-base = "../../examples/python"
+base = "../examples/python"
 for root, dirs, files in os.walk(base): # Walk directory tree
   for f in files:
     if f.endswith(".py"):
        zf.write(os.path.join(root,f),f,compress_type=compression)
 
-base = "../../documents"
+base = "../documents"
 for root, dirs, files in os.walk(base): # Walk directory tree
   for f in files:
     if f.endswith(".pdf"):
