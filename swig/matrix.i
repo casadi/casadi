@@ -20,22 +20,6 @@
  *
  */
 
-#ifdef SWIGOCTAVE
-%rename(__el_mul__) __mul__;
-%rename(__el_div__) __div__;
-%rename(__rel_mul__) __rmul__;
-%rename(__rel_div__) __rdiv__;
-%rename(__el_pow__) __pow__;
-%rename(__rel_pow__) __rpow__;
-%rename(__mul__) mul;
-%rename(__rmul__) rmul;
-%rename(__transpose__) transpose;
-%rename(__div__) __mrdivide__;
-%rename(__rdiv__) __rmrdivide__;
-%rename(__pow__) __mpower__;
-%rename(__rpow__) __rmpower__;
-#endif // SWIGOCTAVE
-
 %{
 #include "casadi/symbolic/matrix/sparsity.hpp"
 #include "casadi/symbolic/matrix/matrix.hpp"
@@ -165,21 +149,6 @@ class NZproxy:
 %enddef
 #endif // SWIGPYTHON
 
-#ifdef SWIGOCTAVE
-%define %matrix_helpers(Type)
-
-  Type __hermitian__() const { return transpose((*$self)); }
-  
-  std::vector<int> __dims__() const {
-    std::vector<int> ret(2);
-    ret[0] = $self->size1();
-    ret[1] = $self->size2();
-    return ret;
-  }
-  
-%enddef
-#endif //SWIGOCTAVE
-
 #ifdef SWIGXML
 %define %matrix_helpers(Type)
 %enddef
@@ -190,18 +159,6 @@ class NZproxy:
 %enddef
 #endif
 
-#ifdef SWIGOCTAVE
-%rename(__paren__) indexed_one_based;
-%rename(__paren__) indexed;
-%rename(__paren_asgn__) indexed_one_based_assignment;
-%rename(__paren_asgn__) indexed_assignment;
-%rename(__vertcat__) vertcat;
-%rename(__horzcat__) horzcat;
-%rename(__brace__) nz_indexed_one_based;
-%rename(__brace__) nz_indexed;
-%rename(__brace_asgn__) nz_indexed_one_based_assignment;
-%rename(__brace_asgn__) nz_indexed_assignment;
-#endif
 #ifdef SWIGPYTHON
 %rename(__Cgetitem__) indexed_zero_based;
 %rename(__Cgetitem__) indexed;
@@ -213,38 +170,6 @@ class NZproxy:
 %rename(__NZsetitem__) nz_indexed_assignment;
 #endif
 
-
-#ifdef SWIGOCTAVE
-namespace CasADi{
-%extend Matrix<double> {
-/// Create a 2D contiguous NP_DOUBLE numpy.ndarray
-
-octave_value toSparse() {
-  int nz = (*$self).size(), nr = (*$self).size1(), nc = (*$self).size2();
-  
-  Array<int> Ar(nz);
-  Array<int> Ac(nz);
-  
-  std::vector<int> vc = (*$self).sparsity().getCol();
-  Array<double> mydata(nz);
-  const std::vector<double> &cdata = (*$self).data();
-  
-  for(int k=0; k<nz; ++k){
-    Ac(k)=vc[k];
-    Ar(k)=(*$self).sparsity().row()[k];
-    mydata(k)=cdata[k];
-  }
-  
-  return octave_value(SparseMatrix(mydata,Ar,Ac,nr,nc));
-}
-
-binopsrFull(CasADi::Matrix<double>)
-binopsFull(const CasADi::Matrix<CasADi::SXElement> & b,,CasADi::Matrix<CasADi::SXElement>,CasADi::Matrix<CasADi::SXElement>)
-binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
-
-}; // extend Matrix<double>
-} // namespace CasADi
-#endif // SWIGOCTAVE
 
 namespace CasADi{
   %extend Matrix<double> {
@@ -505,63 +430,6 @@ int meta< CasADi::IndexList >::as(PyObject * p,CasADi::IndexList &m) {
 
 #endif //SWIGPYTHON
 
-#ifdef SWIGOCTAVE
-/// CasADi::Slice
-template<> char meta< CasADi::Slice >::expected_message[] = "Expecting Slice or number";
-
-template <>
-int meta< CasADi::Slice >::as(const octave_value& p,CasADi::Slice &m) {
-  if (p.is_range()) {
-    Range r = p.range_value();
-    m.start_ = r.base()-1;
-    m.stop_ = r.limit();
-    m.step_ = r.inc();
-  } else if (p.is_magic_colon()) {
-    m.start_ = 0;
-    m.stop_ = std::numeric_limits<int>::max();
-  } else if (p.is_numeric_type()) {
-    m.start_ = p.int_value()-1;
-    m.stop_ = m.start_+1;
-  } else {
-    return false;
-  }
-  return true;
-}
-
-template <>
-bool meta<  CasADi::Slice >::couldbe(const octave_value& p) {
-  return p.is_range() || p.is_magic_colon()|| (p.is_real_scalar() && p.is_numeric_type());
-}
-
-
-/// CasADi::IndexList
-template<> char meta< CasADi::IndexList >::expected_message[] = "Expecting Slice or number or list of ints";
-
-template <>
-int meta< CasADi::IndexList >::as(const octave_value& p,CasADi::IndexList &m) {
-  if ((p.is_real_scalar() && p.is_numeric_type())) {
-    m.type = CasADi::IndexList::INT;
-    m.i = p.int_value()-1;
-  } else if (meta< std::vector<int> >::couldbe(p)) {
-    m.type = CasADi::IndexList::IVECTOR;
-    bool result = meta< std::vector<int> >::as(p,m.iv);
-    if (!result) return false;
-    for (int k=0; k < m.iv.size();k++) m.iv[k]--;
-  } else if (meta< CasADi::Slice>::couldbe(p)) {
-    m.type = CasADi::IndexList::SLICE;
-    return meta< CasADi::Slice >::as(p,m.slice);
-  } else {
-    return false;
-  }
-  return true;
-}
-
-
-template <>
-bool meta<  CasADi::IndexList >::couldbe(const octave_value& p) {
-  return meta< CasADi::Slice >::couldbe(p) || meta< std::vector<int> >::couldbe(p) || (p.is_real_scalar() && p.is_numeric_type());
-}
-#endif // SWIGOCTAVE
 %}
 
 %{

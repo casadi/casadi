@@ -118,27 +118,17 @@ foreach(my_module ${CASADI_MODULES})
   list(APPEND modules_python _${my_module})
 endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
-set(modules_octave)
-foreach(my_module ${CASADI_MODULES})
-  list(APPEND modules_octave ${my_module}_octave)
-endforeach()
-add_custom_target(_octave_modules DEPENDS ${modules_octave}) # the octave interface is created with the command "make octave"
 set(modules_haskell)
 foreach(my_module ${CASADI_MODULES})
   list(APPEND modules_haskell ${my_module}_tree.hs)
 endforeach()
-add_custom_target(_haskell_modules DEPENDS ${modules_haskell}) # the haskell interface is created with the command "make octave"
+add_custom_target(_haskell_modules DEPENDS ${modules_haskell}) # the haskell interface is created with the command "make haskell"
 
 # Workaround bug in cmake 2.8.3 and lower. See #704.
 add_custom_command(
   TARGET _python_modules
   COMMAND ${CMAKE_COMMAND}
   ARGS -E touch ${PROJECT_BINARY_DIR}/_python_modules
-)
-add_custom_command(
-  TARGET _octave_modules
-  COMMAND ${CMAKE_COMMAND}
-  ARGS -E touch ${PROJECT_BINARY_DIR}/_octave_modules
 )
 
 # workaround for Visual Studio! The default way is not general enough and should be changed!
@@ -207,21 +197,6 @@ file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi.py"
 )
 endforeach()
 
-# Construct a dynamic loader for octave
-foreach(my_module ${CASADI_MODULES})
-set(OCTAVE_MODULE_LOADER ${OCTAVE_MODULE_LOADER}
-"try\n"
-"  ${my_module};\n"
-"  names={names{:} \"${my_module}\"};\n"
-"  interfaces={interfaces{:} ${my_module}};\n"
-"catch\n"
-"  ${my_module} = failedimport;\n"
-"end_try_catch\n"
-)
-endforeach()
-#STRING(REGEX REPLACE ";" " " OCTAVE_MODULE_LOADER "${OCTAVE_MODULE_LOADER}")
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi.m.cmake ${LIBRARY_OUTPUT_PATH}/casadi.m)
-
 #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
 install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
   DESTINATION ${PYTHON_PREFIX}
@@ -258,20 +233,6 @@ COMMAND ${CMAKE_COMMAND}
 )
 foreach(my_module ${CASADI_MODULES})
 add_dependencies(install_python DEPENDS _${my_module})
-endforeach()
-
-
-# OCTAVE interface
-foreach(my_module ${CASADI_MODULES})
-  SWIG_ADD_MODULE (${my_module}_octave octave ${my_module}.i octrun.swg)
-  if("${my_module}" STREQUAL "${CASADI_SWIG_MAIN_MODULE}")
-    SWIG_LINK_LIBRARIES (${CASADI_SWIG_MAIN_MODULE}_octave casadi)
-  else()
-    SWIG_LINK_LIBRARIES (${my_module}_octave ${my_module})
-  endif()
-  set_target_properties(${my_module}_octave PROPERTIES PREFIX "")
-  set_target_properties(${my_module}_octave PROPERTIES SUFFIX ".oct")
-  set_target_properties(${my_module}_octave PROPERTIES OUTPUT_NAME "${my_module}")
 endforeach()
 
 # haskell interface
@@ -313,41 +274,6 @@ CONFIGURE_FILE(
   ${PROJECT_BINARY_DIR}/swig/linklist.txt
   ESCAPE_QUOTES
 )
-
-# begin Patch swig to get concat functionality
-find_package(OCTAVE)
-if(OCTAVE_FOUND)
-include_directories (${OCTAVE_INCLUDE_DIR})
-EXECUTE_PROCESS(COMMAND ${SWIG_EXECUTABLE} -swiglib OUTPUT_VARIABLE ORIG_SWIGDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-ADD_CUSTOM_COMMAND(
-   OUTPUT octrun.swg
-   COMMAND ${CMAKE_COMMAND} -E remove octrunORIG.swg octrun.swg
-   COMMAND ${SWIG_EXECUTABLE} -octave -o octrunORIG.swg -co octrun.swg
-   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave/swig_lib .
-   COMMAND ${OCTAVE_EXECUTABLE} -q octrun_patch.m
-   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/octave/swig_lib/octrun_patch.m ${ORIG_SWIGDIR}/octave/octrun.swg
-)
-else(OCTAVE_FOUND)
-#Don't do anything
-ADD_CUSTOM_COMMAND(
-   OUTPUT octrun.swg
-   COMMENT "No octave patch will be applied (octave executable not found)"
-)
-endif(OCTAVE_FOUND)
-# end patch
-
-ADD_CUSTOM_COMMAND(
- TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/octave/@swig_ref ${LIBRARY_OUTPUT_PATH}/@swig_ref
-)
-ADD_CUSTOM_COMMAND(
- TARGET ${CASADI_SWIG_MAIN_MODULE}_octave
- POST_BUILD
- COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/octave/casadi_helpers.m ${LIBRARY_OUTPUT_PATH}/casadi_helpers.m
-)
-
 
 include(InstallRequiredSystemLibraries)
 

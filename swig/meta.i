@@ -90,12 +90,6 @@ template<> swig_type_info** meta< std::vector< CasADi::MX> >::name = &SWIGTYPE_p
 template<> swig_type_info** meta< std::vector<std::string> >::name = &SWIGTYPE_p_std__vectorT_std__string_std__allocatorT_std__string_t_t;
 %}
 
-
-
-#ifdef SWIGOCTAVE
-%include "meta_octave.i"
-#endif
-
 #ifdef SWIGPYTHON
 %inline %{
 template<> swig_type_info** meta< CasADi::DerivativeGenerator >::name = & SWIGTYPE_p_CasADi__DerivativeGenerator;

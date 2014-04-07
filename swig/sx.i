@@ -33,11 +33,6 @@
 
 %}
 
-// http://www.gnu.org/software/octave/doc/interpreter/Operator-Overloading.html#Operator-Overloading
-// http://mentat.za.net/DaCodaAlFine.pdf
-// "dispatch binary operator" can be found in octrun.swg: look for dispatch_binary_op in swig generated
-
-
 #ifndef SWIGXML
 %include "typemaps.i"
 #endif
@@ -189,19 +184,7 @@ namespace CasADi {
     return r
   %}
   
-  
-
   #endif // SWIGPYTHON
-  
-  #ifdef SWIGOCTAVE
-  std::vector<int> __dims__() const {
-    std::vector<int> ret(2);
-    ret[0] = 1;
-    ret[1] = 1;
-    return ret;
-  }
-  
-  #endif // SWIGOCTAVE
   
   binopsrFull(CasADi::SXElement)
   // a+b when a is SXElement, b is numpy.array. __array_priority works, but does not suffice to yield implicit casting

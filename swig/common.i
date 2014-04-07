@@ -395,12 +395,6 @@ namespace std {
   }
 };
 
-#ifdef SWIGOCTAVE
-%inline %{
-#include <octave/dim-vector.h>
-%}
-#endif
-
 #ifdef CASADI_MODULE
 
 %define DEPRECATED_MSG(MSG)
@@ -423,34 +417,7 @@ int internal(const std::string & c) {
 %}
 #endif
 
-#ifdef SWIGOCTAVE
-%wrapper %{
-int deprecated(const std::string & c,const std::string & a) {
-  warning("deprecated",("This function (" + c+") is deprecated. "  + a).c_str());
-  return 0;
-}
-int internal(const std::string & c) {
-  warning("internalAPI",("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str());
-  return 0;
-}
-%}
-#endif
-
 #ifdef SWIGPYTHON
-%{
-#define START \
-  if (CasADi::CasadiOptions::catch_errors_python){ \
-  try {
-  
-#define STOP \
-  } catch (const std::exception& e) { \
-  SWIG_exception(SWIG_RuntimeError, e.what()); \
-  } \
-} else
-%}
-#endif
-
-#ifdef SWIGOCTAVE
 %{
 #define START \
   if (CasADi::CasadiOptions::catch_errors_python){ \
@@ -571,7 +538,6 @@ returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*
 // These methods must be added since the implicit type cast does not work.
 // Consider a+b  with a DMatrix and b SX
 // In C++, operator+(SX,SX) will be called (implicit cast)
-// In octave, a.__add__(b) will be called   (no implicit cast)
 // In python, __array_priority__ will be checked and b.__radd__(a) will be called (effectively implicit casting)
 
 // This is a list of all operators:

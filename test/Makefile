@@ -6,9 +6,9 @@ all: unittests
 
 # Each of these targets will be tested by CasADi's trunktesterbot as individual tests.
 # These targets must all go on one line
-trunktesterbot: unittests_py unittests_oct examples_indoc_py examples_indoc_oct examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
-trunktesterbot_knownbugs: unittests_py_knownbugs unittests_oct examples_indoc_py examples_indoc_oct examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
 # Set to -memcheck if you want to include a check for memory leaks
 MEMCHECK = 
@@ -41,9 +41,6 @@ endif
 unittests_py_knownbugs:
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" -passoptions="--known_bugs"
 
-unittests_oct:
-	python internal/test_oct.py octave
-
 examples: examples_indoc examples_code
 
 examples_indoc: examples_indoc_py examples_indoc_cpp examples_indoc_oct
@@ -64,9 +61,6 @@ examples_indoc_cpp:
 # No memchecks because it's slow
 examples_code_cpp:
 	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp"
-
-examples_indoc_oct:
-	python internal/test_oct.py '../docs/api/examples'
 
 tutorials:
 	python internal/test_py.py '../docs/tutorials/python/src' $(MEMCHECK)
