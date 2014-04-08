@@ -1,9 +1,8 @@
 # libraries
+set(SNOPT_LIBS_LIST
   snopt7
   snprint7
-  snblas
-set(SNOPT_LIBS_LIST
-)
+  snblas)
 
 set(SNOPT_LIBRARIES)
 foreach(LIB in ${SNOPT_LIBS_LIST})
