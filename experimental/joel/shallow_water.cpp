@@ -119,7 +119,7 @@ void Tester::model(){
   }
   
   // Free parameters (nominal values)
-  MX p = msym("p",2);
+  MX p = MX::sym("p",2);
   MX drag_nom = p[0];
   MX depth_nom = p[1];
   
@@ -135,9 +135,9 @@ void Tester::model(){
   MX depth = depth_nom*depth_scale;
 
   // The state at a measurement
-  MX uk = msym("uk",n_+1, n_);
-  MX vk = msym("vk",n_  , n_+1);
-  MX hk = msym("hk",n_  , n_);
+  MX uk = MX::sym("uk",n_+1, n_);
+  MX vk = MX::sym("vk",n_  , n_+1);
+  MX hk = MX::sym("hk",n_  , n_);
   
   // Take one step of the integrator
   MX u = uk;
@@ -186,10 +186,10 @@ void Tester::model(){
 
   // Integrate over one subinterval
   vector<MX> f_in(4);
-  MX P = msym("P",2);
-  MX Uk = msym("Uk",n_+1, n_);
-  MX Vk = msym("Vk",n_  , n_+1);
-  MX Hk = msym("Hk",n_  , n_);
+  MX P = MX::sym("P",2);
+  MX Uk = MX::sym("Uk",n_+1, n_);
+  MX Vk = MX::sym("Vk",n_  , n_+1);
+  MX Hk = MX::sym("Hk",n_  , n_);
   f_in[0] = P;
   f_in[1] = Uk;
   f_in[2] = Vk;
@@ -283,7 +283,7 @@ void Tester::simulate(double drag_true, double depth_true){
 void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, bool ipopt_as_qp_solver, bool regularize, double reg_threshold){
   
   // NLP variables
-  MX P = msym("P",2);
+  MX P = MX::sym("P",2);
 
   // Variables in the lifted NLP
   stringstream ss;
