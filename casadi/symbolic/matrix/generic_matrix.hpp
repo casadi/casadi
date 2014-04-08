@@ -58,7 +58,7 @@ namespace casadi{
       \date 2012    
   */
   template<typename MatType>
-  class CASADI_SYMBOLIC_EXPORT GenericMatrix{
+  class GenericMatrix{
   public:
     
     /** \brief Get the number of (structural) non-zero elements */
