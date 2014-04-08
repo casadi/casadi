@@ -21,8 +21,20 @@
 # 
 # -*- coding: utf-8 -*-
 
-from casadi import *
-import casadi as casadi
+
+# workaround for issue #1012
+# Since ipopt uses "dlopen" internally, we have to make sure that all the
+# libraries we linked against are visible to the libraries dlopen loads.
+# Specifically, hsl.so needs blas and lapack.
+import sys
+import ctypes
+flags0 = sys.getdlopenflags() # get the original flags
+sys.setdlopenflags( flags0 | ctypes.RTLD_GLOBAL ) # set our workaround flags
+
+from casadi import *    # import everything
+import casadi as casadi # import everything
+
+sys.setdlopenflags( flags0 ) # set the old flags back
 
 import types
   
