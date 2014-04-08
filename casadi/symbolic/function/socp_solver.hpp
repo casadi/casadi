@@ -113,7 +113,7 @@ class SOCPSolverInternal;
   \author Joris Gillis
   \date 2013
 */
-class CASADI_EXPORT SOCPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT SOCPSolver : public Function{
   public:
 
   /// Default constructor

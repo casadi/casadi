@@ -119,7 +119,7 @@ public:
   /** \brief  Read node from parsed XML file */
   void addNode(TiXmlNode* node);
 
-  CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream, const XMLNode& node);
+  CASADI_OPTIMAL_CONTROL_EXPORT friend std::ostream& operator<<(std::ostream &stream, const XMLNode& node);
 
   void dump(std::ostream &stream, int indent=0) const;
 

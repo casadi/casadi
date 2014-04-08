@@ -33,7 +33,7 @@ namespace casadi{
   /** Internal class
       @copydoc LinearSolver_doc
   */
-  class CASADI_EXPORT LinearSolverInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT LinearSolverInternal : public FunctionInternal{
   public:
     // Constructor
     LinearSolverInternal(const Sparsity& sparsity, int nrhs);

@@ -34,7 +34,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_EXPORT InnerProd : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT InnerProd : public MXNode{
   public:
 
     /// Constructor

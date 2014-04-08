@@ -40,36 +40,36 @@ namespace casadi{
   /** \brief Matlab's linspace command
    */
   template<typename MatType>
-  CASADI_EXPORT MatType linspace(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int nsteps);
+  MatType linspace(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int nsteps);
 
   /** \brief Matlab's cross command
    */
   template<typename MatType>
-  CASADI_EXPORT MatType cross(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int dim = -1);
+  MatType cross(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int dim = -1);
 
   /** \brief Convert a lower triangular matrix to a symmetric one
    */
   template<typename MatType>
-  CASADI_EXPORT MatType tril2symm(const GenericMatrix<MatType> &a);
+  MatType tril2symm(const GenericMatrix<MatType> &a);
 
   /** \brief Convert a upper triangular matrix to a symmetric one
    */
   template<typename MatType>
-  CASADI_EXPORT MatType triu2symm(const GenericMatrix<MatType> &a);
+  MatType triu2symm(const GenericMatrix<MatType> &a);
 
   /** \brief Get the upper triangular part of a matrix
    */
   template<typename MatType>
-  CASADI_EXPORT MatType triu(const GenericMatrix<MatType> &a);
+  MatType triu(const GenericMatrix<MatType> &a);
 
   /** \brief Get the lower triangular part of a matrix
    */
   template<typename MatType>
-  CASADI_EXPORT MatType tril(const GenericMatrix<MatType> &a);
+  MatType tril(const GenericMatrix<MatType> &a);
 
   /** \brief Check if two expressions are equal, assuming that they are comparible */
   template<typename MatType>
-  CASADI_EXPORT bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y){ 
+  bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y){ 
     return static_cast<const MatType&>(x).isEqual(static_cast<const MatType&>(y));
   }
 

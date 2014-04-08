@@ -95,7 +95,7 @@ class StabilizedQPSolverInternal;
   \author Joel Andersson 
   \date 2010
 */
-class CASADI_EXPORT StabilizedQPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT StabilizedQPSolver : public Function{
   public:
 
   /// Default constructor

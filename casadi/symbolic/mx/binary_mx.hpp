@@ -33,7 +33,7 @@ namespace casadi{
       \date 2010        
   */
   template<bool ScX, bool ScY>
-  class CASADI_EXPORT BinaryMX : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT BinaryMX : public MXNode{
   public:
     /** \brief  Constructor */
     BinaryMX(Operation op, const MX& x, const MX& y);

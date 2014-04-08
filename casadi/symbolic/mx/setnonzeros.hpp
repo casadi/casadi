@@ -36,7 +36,7 @@ namespace casadi{
       \date 2013
   */
   template<bool Add>
-  class CASADI_EXPORT SetNonzeros : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT SetNonzeros : public MXNode{
   public:
 
     /// Constructor
@@ -70,7 +70,7 @@ namespace casadi{
       \date 2013
   */
   template<bool Add>
-  class CASADI_EXPORT SetNonzerosVector : public SetNonzeros<Add>{
+  class CASADI_SYMBOLIC_EXPORT SetNonzerosVector : public SetNonzeros<Add>{
   public:
 
     /// Constructor
@@ -113,7 +113,7 @@ namespace casadi{
 
   // Specialization of the above when nz_ is a Slice
   template<bool Add>
-  class CASADI_EXPORT SetNonzerosSlice : public SetNonzeros<Add>{
+  class CASADI_SYMBOLIC_EXPORT SetNonzerosSlice : public SetNonzeros<Add>{
   public:
 
     /// Constructor
@@ -162,7 +162,7 @@ namespace casadi{
 
   // Specialization of the above when nz_ is a nested Slice
   template<bool Add>
-  class CASADI_EXPORT SetNonzerosSlice2 : public SetNonzeros<Add>{
+  class CASADI_SYMBOLIC_EXPORT SetNonzerosSlice2 : public SetNonzeros<Add>{
   public:
 
     /// Constructor

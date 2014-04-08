@@ -33,7 +33,7 @@ namespace casadi {
   *  \author Joris Gillis 
   *  \date 2012
   */
-  class CASADI_EXPORT CasadiMeta {
+  class CASADI_SYMBOLIC_EXPORT CasadiMeta {
     private:
       /// No instances are allowed
       CasadiMeta();

@@ -28,7 +28,7 @@
 
 namespace casadi{
 
-  class CASADI_EXPORT SparsityInternal : public SharedObjectNode{
+  class CASADI_SYMBOLIC_EXPORT SparsityInternal : public SharedObjectNode{
   public:    
     /// Construct a sparsity pattern from vectors
     SparsityInternal(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row) : nrow_(nrow), ncol_(ncol), colind_(colind), row_(row) { sanityCheck(false); }

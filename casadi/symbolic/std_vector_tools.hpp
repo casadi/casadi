@@ -47,15 +47,15 @@ namespace std{
 #ifndef SWIG
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
-  CASADI_EXPORT ostream& operator<<(ostream &stream, const vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT ostream& operator<<(ostream &stream, const vector<T> &v);
   
   /// Enables flushing an std::pair to a stream (prints representation)
   template<typename T1, typename T2>
-  CASADI_EXPORT ostream& operator<<(ostream &stream, const pair<T1,T2> &p);
+  CASADI_SYMBOLIC_EXPORT ostream& operator<<(ostream &stream, const pair<T1,T2> &p);
   
   /// Enables flushing an std::map to a stream (prints representation)
   template<typename T1, typename T2>
-  CASADI_EXPORT ostream& operator<<(ostream &stream, const std::map<T1,T2> &p);
+  CASADI_SYMBOLIC_EXPORT ostream& operator<<(ostream &stream, const std::map<T1,T2> &p);
   
 #endif //SWIG
   
@@ -74,31 +74,31 @@ namespace casadi{
   * Elements larger than or equal to stop are chopped off.
   *
   */
-  CASADI_EXPORT std::vector<int> range(int start, int stop, int step=1, int len=std::numeric_limits<int>::max());
+  CASADI_SYMBOLIC_EXPORT std::vector<int> range(int start, int stop, int step=1, int len=std::numeric_limits<int>::max());
 
   /** Range function
   * \param stop
   *
   * \return list [0,1,2...stop-1]
   */
-  CASADI_EXPORT std::vector<int> range(int stop);
+  CASADI_SYMBOLIC_EXPORT std::vector<int> range(int stop);
   
   /// Print representation
   template<typename T>
-  CASADI_EXPORT void repr(const std::vector<T> &v, std::ostream &stream=std::cout);
+  CASADI_SYMBOLIC_EXPORT void repr(const std::vector<T> &v, std::ostream &stream=std::cout);
   
   /// Print description
   template<typename T>
-  CASADI_EXPORT void print(const std::vector<T> &v, std::ostream &stream=std::cout);
+  CASADI_SYMBOLIC_EXPORT void print(const std::vector<T> &v, std::ostream &stream=std::cout);
   #endif // SWIG
   
   /// Check if for each element of v holds: v_i < upper
   template<typename T>
-  CASADI_EXPORT bool inBounds(const std::vector<T> &v, int upper);
+  CASADI_SYMBOLIC_EXPORT bool inBounds(const std::vector<T> &v, int upper);
   
   /// Check if for each element of v holds: lower <= v_i < upper
   template<typename T>
-  CASADI_EXPORT bool inBounds(const std::vector<T> &v, int lower, int upper);
+  CASADI_SYMBOLIC_EXPORT bool inBounds(const std::vector<T> &v, int lower, int upper);
   
   /** \brief Returns the list of all i in [0,size[ not found in supplied list
   * 
@@ -106,7 +106,7 @@ namespace casadi{
   * The supplied vector will be checked for bounds
   * The result vector is guaranteed to be monotonously increasing
   */
-  CASADI_EXPORT std::vector<int> complement(const std::vector<int> &v, int size);
+  CASADI_SYMBOLIC_EXPORT std::vector<int> complement(const std::vector<int> &v, int size);
   
   /** \brief Returns a vector for quickly looking up entries of supplied list
   *
@@ -115,7 +115,7 @@ namespace casadi{
   *
   *  Duplicates are treated by looking up last occurence
   */
-  CASADI_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
+  CASADI_SYMBOLIC_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
     
     
   /// \cond INTERNAL
@@ -124,98 +124,98 @@ namespace casadi{
   Apply a function f to each element in a vector
   */
   template<class T>
-  CASADI_EXPORT std::vector<T> applymap(T (*f)(const T& ),const std::vector<T>&);
+  CASADI_SYMBOLIC_EXPORT std::vector<T> applymap(T (*f)(const T& ),const std::vector<T>&);
 
   /**
   Apply a function f to each element in a vector
   */
   template<class T>
-  CASADI_EXPORT void applymap(void (*f)(T&), std::vector<T>&);
+  CASADI_SYMBOLIC_EXPORT void applymap(void (*f)(T&), std::vector<T>&);
   #endif // SWIG
   /// \endcond
   
   
   /// Check if the vector is strictly increasing
   template<typename T>
-  CASADI_EXPORT bool isIncreasing(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT bool isIncreasing(const std::vector<T> &v);
   
   /// Check if the vector is strictly decreasing
   template<typename T>
-  CASADI_EXPORT bool isDecreasing(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT bool isDecreasing(const std::vector<T> &v);
   
   /// Check if the vector is non-increasing
   template<typename T>
-  CASADI_EXPORT bool isNonIncreasing(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT bool isNonIncreasing(const std::vector<T> &v);
   
   /// Check if the vector is non-decreasing
   template<typename T>
-  CASADI_EXPORT bool isNonDecreasing(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT bool isNonDecreasing(const std::vector<T> &v);
   
   /// Check if the vector is monotone
   template<typename T>
-  CASADI_EXPORT bool isMonotone(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT bool isMonotone(const std::vector<T> &v);
 
   /// Check if the vector is strictly monotone
   template<typename T>
-  CASADI_EXPORT bool isStrictlyMonotone(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT bool isStrictlyMonotone(const std::vector<T> &v);
   
 #ifndef SWIG
   /// Print representation to string
   template<typename T>
-  CASADI_EXPORT std::string getRepresentation(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT std::string getRepresentation(const std::vector<T> &v);
   
   /// Print description to string
   template<typename T>
-  CASADI_EXPORT std::string getDescription(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT std::string getDescription(const std::vector<T> &v);
 #endif //SWIG
   
   /// Print vector, matlab style
   template<typename T>
-  CASADI_EXPORT void write_matlab(std::ostream &stream, const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT void write_matlab(std::ostream &stream, const std::vector<T> &v);
   
   /// Print matrix, matlab style
   template<typename T>
-  CASADI_EXPORT void write_matlab(std::ostream &stream, const std::vector<std::vector<T> > &v);
+  CASADI_SYMBOLIC_EXPORT void write_matlab(std::ostream &stream, const std::vector<std::vector<T> > &v);
 
   /// Read vector, matlab style
   template<typename T>
-  CASADI_EXPORT void read_matlab(std::istream &stream, std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT void read_matlab(std::istream &stream, std::vector<T> &v);
 
   /// Read matrix, matlab style
   template<typename T>
-  CASADI_EXPORT void read_matlab(std::ifstream &file, std::vector<std::vector<T> > &v);
+  CASADI_SYMBOLIC_EXPORT void read_matlab(std::ifstream &file, std::vector<std::vector<T> > &v);
 
   #ifndef SWIG
   /// Matlab's linspace
   template<typename T, typename F, typename L>
-  CASADI_EXPORT void linspace(std::vector<T> &v, const F& first, const L& last);
+  CASADI_SYMBOLIC_EXPORT void linspace(std::vector<T> &v, const F& first, const L& last);
 
   /// \cond INTERNAL
   /// Get an pointer of sets of booleans from a double vector
-  CASADI_EXPORT bvec_t* get_bvec_t(std::vector<double>& v);
+  CASADI_SYMBOLIC_EXPORT bvec_t* get_bvec_t(std::vector<double>& v);
 
   /// Get an pointer of sets of booleans from a double vector
-  CASADI_EXPORT const bvec_t* get_bvec_t(const std::vector<double>& v);
+  CASADI_SYMBOLIC_EXPORT const bvec_t* get_bvec_t(const std::vector<double>& v);
   
   /// Get an pointer of sets of booleans from a double vector
   template<typename T>
-  CASADI_EXPORT bvec_t* get_bvec_t(std::vector<T>& v){
+  CASADI_SYMBOLIC_EXPORT bvec_t* get_bvec_t(std::vector<T>& v){
     casadi_assert_message(0,"get_bvec_t only supported for double");
   }
 
   /// Get an pointer of sets of booleans from a double vector
   template<typename T>
-  CASADI_EXPORT const bvec_t* get_bvec_t(const std::vector<T>& v){
+  CASADI_SYMBOLIC_EXPORT const bvec_t* get_bvec_t(const std::vector<T>& v){
     casadi_assert_message(0,"get_bvec_t only supported for double");
   }
   
   /// Get a pointer to the data contained in the vector
   template<typename T>
-  CASADI_EXPORT T* getPtr(std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT T* getPtr(std::vector<T> &v);
   
   /// Get a pointer to the data contained in the vector
   template<typename T>
-  CASADI_EXPORT const T* getPtr(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT const T* getPtr(const std::vector<T> &v);
   
   /// \endcond
   
@@ -227,7 +227,7 @@ namespace casadi{
   * \param[in] invert_indices Output indices such that 'sorted_values[indices=values'
   **/
   template<typename T>
-  CASADI_EXPORT void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices,bool invert_indices =false);
+  CASADI_SYMBOLIC_EXPORT void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices,bool invert_indices =false);
   #endif //SWIG
   
   /** \brief Make a vector of a certain length with its entries specified
@@ -238,7 +238,7 @@ namespace casadi{
   */
   #ifndef SWIG
   template<typename T>
-  CASADI_EXPORT std::vector<T> makeVector(int size, 
+  CASADI_SYMBOLIC_EXPORT std::vector<T> makeVector(int size, 
                             int ind0=-1, const T& val0=T(),
                             int ind1=-1, const T& val1=T(),
                             int ind2=-1, const T& val2=T(),
@@ -278,13 +278,13 @@ namespace casadi{
 #ifndef SWIG
   // Create a vector of length 1
   template<typename T>
-  CASADI_EXPORT std::vector<T> toVector(const T& v0){ 
+  CASADI_SYMBOLIC_EXPORT std::vector<T> toVector(const T& v0){ 
     return std::vector<T>(1,v0);
   }
 
   // Create a vector of length 2
   template<typename T>
-  CASADI_EXPORT std::vector<T> toVector(const T& v0, const T& v1){ 
+  CASADI_SYMBOLIC_EXPORT std::vector<T> toVector(const T& v0, const T& v1){ 
     std::vector<T> ret(2);
     ret[0] = v0;
     ret[1] = v1;
@@ -293,7 +293,7 @@ namespace casadi{
 
   // Create a vector of length 3
   template<typename T>
-  CASADI_EXPORT std::vector<T> toVector(const T& v0, const T& v1, const T& v2){ 
+  CASADI_SYMBOLIC_EXPORT std::vector<T> toVector(const T& v0, const T& v1, const T& v2){ 
     std::vector<T> ret(3);
     ret[0] = v0;
     ret[1] = v1;
@@ -305,7 +305,7 @@ namespace casadi{
   
   /// Checks if vector does not contain NaN or Inf
   template<typename T>
-  CASADI_EXPORT bool isRegular(const std::vector<T> &v);
+  CASADI_SYMBOLIC_EXPORT bool isRegular(const std::vector<T> &v);
   
 } // namespace casadi
 

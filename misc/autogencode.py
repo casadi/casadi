@@ -104,7 +104,7 @@ class Enum:
     s= "/// \cond INTERNAL \n/// Helper function for '" + self.enum + "'\n"
     s+="""
 template<class M>
-class CASADI_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit %sIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_%s){} 
 };
@@ -291,13 +291,13 @@ for h in locate("*.hpp",os.path.join(os.curdir,"..")):
       
 autogenmetadatahpp.write("enum InputOutputScheme { %s };\n" % ", ".join(["SCHEME_"+p.enum for p in schemes]) )
 
-autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);\n")
-autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);\n")
-autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);\n")
-autogenmetadatahpp.write("CASADI_EXPORT int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);\n")
-autogenmetadatahpp.write("CASADI_EXPORT int getSchemeSize(InputOutputScheme scheme);\n")
-autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeName(InputOutputScheme scheme);\n")
-autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryNames(InputOutputScheme scheme);\n")
+autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);\n")
+autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);\n")
+autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);\n")
+autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);\n")
+autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT int getSchemeSize(InputOutputScheme scheme);\n")
+autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT std::string getSchemeName(InputOutputScheme scheme);\n")
+autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT std::string getSchemeEntryNames(InputOutputScheme scheme);\n")
 
 autogenpy.write("#ifdef SWIGPYTHON\n")
 autogenpy.write("%pythoncode %{\n")

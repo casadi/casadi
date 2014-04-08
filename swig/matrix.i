@@ -78,11 +78,11 @@ class NZproxy:
         return (self.size1(),self.size2())
         
     def reshape(self,arg):
-        return _casadi_main_module.reshape(self,arg)
+        return _casadi_symbolic.reshape(self,arg)
         
     @property
     def T(self):
-        return _casadi_main_module.transpose(self)
+        return _casadi_symbolic.transpose(self)
         
     def __getitem__(self,s):
         if isinstance(s,tuple) and len(s)==2:

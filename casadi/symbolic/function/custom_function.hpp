@@ -39,7 +39,7 @@ class CustomFunction;
   \author Joel Andersson 
   \date 2010
 */
-class CASADI_EXPORT CustomFunction : public Function{
+class CASADI_SYMBOLIC_EXPORT CustomFunction : public Function{
 
 public:
 

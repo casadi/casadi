@@ -38,7 +38,7 @@
 
 namespace casadi{
   
-class CASADI_EXPORT ExternalFunctionInternal : public FunctionInternal{
+class CASADI_SYMBOLIC_EXPORT ExternalFunctionInternal : public FunctionInternal{
   friend class ExternalFunction;
   public:
 

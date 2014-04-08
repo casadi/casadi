@@ -37,7 +37,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */
-  class CASADI_EXPORT PrintableObject{
+  class CASADI_SYMBOLIC_EXPORT PrintableObject{
   public:
     
 #ifndef SWIG
@@ -48,13 +48,13 @@ namespace casadi{
     virtual void repr(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object to a stream (shorthand)
-    CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream, const PrintableObject& obj);    
+    CASADI_SYMBOLIC_EXPORT friend std::ostream& operator<<(std::ostream &stream, const PrintableObject& obj);    
 
     /// Return a string with a description of the object, cf. str(Object) in Python
-    CASADI_EXPORT friend std::string str(const PrintableObject& obj);
+    CASADI_SYMBOLIC_EXPORT friend std::string str(const PrintableObject& obj);
 
     /// Return a string with a representation of the object, cf. repr(Object) in Python
-    CASADI_EXPORT friend std::string repr(const PrintableObject& obj);
+    CASADI_SYMBOLIC_EXPORT friend std::string repr(const PrintableObject& obj);
 
 #endif // SWIG
 

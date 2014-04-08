@@ -34,7 +34,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_EXPORT GetNonzeros : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT GetNonzeros : public MXNode{
   public:
 
     /// Constructor
@@ -59,7 +59,7 @@ namespace casadi{
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
   };
 
-  class CASADI_EXPORT GetNonzerosVector : public GetNonzeros{
+  class CASADI_SYMBOLIC_EXPORT GetNonzerosVector : public GetNonzeros{
   public:
     /// Constructor
     GetNonzerosVector(const Sparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x), nz_(nz){}
@@ -100,7 +100,7 @@ namespace casadi{
   };
 
   // Specialization of the above when nz_ is a Slice
-  class CASADI_EXPORT GetNonzerosSlice : public GetNonzeros{
+  class CASADI_SYMBOLIC_EXPORT GetNonzerosSlice : public GetNonzeros{
   public:
 
     /// Constructor
@@ -148,7 +148,7 @@ namespace casadi{
   };
 
   // Specialization of the above when nz_ is a nested Slice
-  class CASADI_EXPORT GetNonzerosSlice2 : public GetNonzeros{
+  class CASADI_SYMBOLIC_EXPORT GetNonzerosSlice2 : public GetNonzeros{
   public:
 
     /// Constructor

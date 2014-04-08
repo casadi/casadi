@@ -36,7 +36,7 @@ namespace casadi{
       \date 2013
   */
   template<class Derived>
-  class CASADI_EXPORT IOInterface {
+  class CASADI_SYMBOLIC_EXPORT IOInterface {
   public:
     
     /// \cond UNSAFE

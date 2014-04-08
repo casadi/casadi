@@ -34,7 +34,7 @@ namespace casadi{
   A regular user is not supposed to work with this Node class.
   This user can call SX(name) instead.
 */
-class CASADI_EXPORT SymbolicSX : public SXNode{
+class CASADI_SYMBOLIC_EXPORT SymbolicSX : public SXNode{
 public:
   explicit SymbolicSX(const std::string &name) : name(name){}
   virtual ~SymbolicSX(){}

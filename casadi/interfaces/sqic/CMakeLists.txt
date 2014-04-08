@@ -26,7 +26,7 @@ if(ENABLE_SHARED)
 add_library(sqic_fortran_c_bridge SHARED wsqic.f90)
 endif()
 target_link_libraries(casadi_sqic_interface sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
-target_link_libraries(sqic_fortran_c_bridge casadi ${SQIC_LIBRARIES})
+target_link_libraries(sqic_fortran_c_bridge ${SQIC_LIBRARIES})
 
 install(TARGETS sqic_fortran_c_bridge
   LIBRARY DESTINATION lib

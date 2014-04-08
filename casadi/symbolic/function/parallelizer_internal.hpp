@@ -35,7 +35,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */
-  class CASADI_EXPORT ParallelizerInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT ParallelizerInternal : public FunctionInternal{
     friend class Parallelizer;
   
   protected:

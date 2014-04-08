@@ -17,7 +17,7 @@ endif()
 if(ENABLE_SHARED)
 add_library(snopt_fortran_c_bridge SHARED wsnopt.f90)
 endif()
-target_link_libraries(casadi_snopt_interface casadi snopt_fortran_c_bridge ${CMAKE_DL_LIBS})
+target_link_libraries(casadi_snopt_interface snopt_fortran_c_bridge ${CMAKE_DL_LIBS})
 target_link_libraries(snopt_fortran_c_bridge ${SNOPT_LIBRARIES})
 
 install(TARGETS snopt_fortran_c_bridge

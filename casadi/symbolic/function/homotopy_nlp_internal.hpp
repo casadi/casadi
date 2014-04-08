@@ -37,7 +37,7 @@ namespace casadi{
   \author Joris Gillis
   \date 2013-2014
 */
-  class CASADI_EXPORT HomotopyNLPInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT HomotopyNLPInternal : public FunctionInternal{
 
   public:
     /// Constructor

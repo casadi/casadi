@@ -24,7 +24,7 @@
 
 %include "common.i"
 
-%import "casadi_main.i"
+%import "casadi_symbolic.i"
 
 #define CASADI_OOQP_INTERFACE_EXPORT
 

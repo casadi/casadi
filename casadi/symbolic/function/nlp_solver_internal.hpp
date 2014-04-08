@@ -36,7 +36,7 @@ namespace casadi{
   \author Joel Andersson 
   \date 2010-2013
 */
-  class CASADI_EXPORT NLPSolverInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT NLPSolverInternal : public FunctionInternal{
 
   public:
     /// Constructor

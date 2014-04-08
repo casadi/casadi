@@ -33,7 +33,7 @@ namespace casadi{
       \date 2010
   */
   template<bool TrX, bool TrY>
-  class CASADI_EXPORT Multiplication : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Multiplication : public MXNode{
   public:
     
     /** \brief  Constructor */
@@ -87,7 +87,7 @@ namespace casadi{
       \date 2010
   */
   template<bool TrX, bool TrY>
-  class CASADI_EXPORT DenseMultiplication : public Multiplication<TrX,TrY>{
+  class CASADI_SYMBOLIC_EXPORT DenseMultiplication : public Multiplication<TrX,TrY>{
   public:
     
     /** \brief  Constructor */

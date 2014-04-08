@@ -31,7 +31,7 @@
 namespace casadi{
 
 /// Internal class
-class CASADI_EXPORT SDQPSolverInternal : public FunctionInternal{
+class CASADI_SYMBOLIC_EXPORT SDQPSolverInternal : public FunctionInternal{
   public:
 
     // Constructor

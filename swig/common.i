@@ -24,7 +24,7 @@
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
 
-#define CASADI_EXPORT
+#define CASADI_SYMBOLIC_EXPORT
 
 // Incude cmath early on, see #622
 %begin %{
@@ -735,7 +735,7 @@ void dummy2(
 
 #ifdef SWIGPYTHON
 %pythoncode %{
-import _casadi_main as _casadi_main_module
+import _casadi_symbolic
 %}
 #endif // SWIGPYTHON
 

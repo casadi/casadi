@@ -20,7 +20,7 @@
  *
  */
 
-%module casadi_main
+%module casadi_symbolic
 
 //  The things needed to make each casadi_*.i  compilable by itself: typemaps
 %include "common.i"

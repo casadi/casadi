@@ -31,7 +31,7 @@
 namespace casadi{
 
 /// Internal class
-class CASADI_EXPORT SOCPSolverInternal : public FunctionInternal{
+class CASADI_SYMBOLIC_EXPORT SOCPSolverInternal : public FunctionInternal{
   public:
 
     // Constructor

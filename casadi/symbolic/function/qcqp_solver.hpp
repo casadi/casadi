@@ -120,7 +120,7 @@ class QCQPSolverInternal;
   \author Joris Gillis 
   \date 2013
 */
-class CASADI_EXPORT QCQPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT QCQPSolver : public Function{
   public:
 
   /// Default constructor

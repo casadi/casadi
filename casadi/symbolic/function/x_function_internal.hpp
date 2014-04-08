@@ -54,7 +54,7 @@ namespace casadi{
       \date 2011
   */
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  class CASADI_EXPORT XFunctionInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT XFunctionInternal : public FunctionInternal{
   public:
     
     /** \brief  Constructor  */

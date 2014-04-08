@@ -8,24 +8,9 @@ add_compiler_export_flags()
 add_library(${name} SHARED ${ARGN})
 generate_export_header(${name})
 endif(ENABLE_SHARED)
-target_link_libraries(${name} casadi)
-set(CASADI_MODULES ${CASADI_MODULES} ${name} PARENT_SCOPE)
-install(TARGETS ${name}
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-endmacro()
-
-macro(casadi_external_library name)
-if(ENABLE_STATIC)
-add_library(${name} STATIC ${ARGN})
-endif(ENABLE_STATIC)
-if(ENABLE_SHARED)
-add_compiler_export_flags()
-add_library(${name} SHARED ${ARGN})
-generate_export_header(${name})
-endif(ENABLE_SHARED)
-target_link_libraries(${name} casadi)
+if(NOT "${name}" STREQUAL "casadi_symbolic")
+target_link_libraries(${name} casadi_symbolic)
+endif()
 set(CASADI_MODULES ${CASADI_MODULES} ${name} PARENT_SCOPE)
 install(TARGETS ${name}
   LIBRARY DESTINATION lib

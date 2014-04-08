@@ -35,7 +35,7 @@ namespace casadi{
   class ImplicitFunctionInternal;
 
   /// Internal class
-  class CASADI_EXPORT ImplicitFunctionInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT ImplicitFunctionInternal : public FunctionInternal{
   public:
     /** \brief Constructor
      *

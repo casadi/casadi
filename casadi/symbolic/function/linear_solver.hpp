@@ -60,7 +60,7 @@ enum LinsolOutput{
    \author Joel Andersson
    \date 2010-2013
   */
-  class CASADI_EXPORT LinearSolver : public Function{
+  class CASADI_SYMBOLIC_EXPORT LinearSolver : public Function{
   public:
     
     /// \cond INTERNAL

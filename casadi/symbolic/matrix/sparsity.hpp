@@ -95,7 +95,7 @@ namespace casadi{
    * \author Joel Andersson 
    * \date 2010
    */
-  class CASADI_EXPORT Sparsity : public SharedObject{
+  class CASADI_SYMBOLIC_EXPORT Sparsity : public SharedObject{
   public:
   
     /// Default constructor
@@ -612,21 +612,21 @@ namespace casadi{
   /// \cond INTERNAL
   /** \brief Hash value of an integer */
   template<typename T>
-  CASADI_EXPORT inline size_t hash_value(T v){ return size_t(v);}
+  CASADI_SYMBOLIC_EXPORT inline size_t hash_value(T v){ return size_t(v);}
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
   template<typename T>
-  CASADI_EXPORT inline void hash_combine(std::size_t& seed, T v){
+  CASADI_SYMBOLIC_EXPORT inline void hash_combine(std::size_t& seed, T v){
     seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
   }
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
-  CASADI_EXPORT inline void hash_combine(std::size_t& seed, const std::vector<int>& v){
+  CASADI_SYMBOLIC_EXPORT inline void hash_combine(std::size_t& seed, const std::vector<int>& v){
     for(std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed,*i);
   }
 
   /** \brief Hash a sparsity pattern */
-  CASADI_EXPORT std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
+  CASADI_SYMBOLIC_EXPORT std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
   /// \endcond
 
   // Template instantiations

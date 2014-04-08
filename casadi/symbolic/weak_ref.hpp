@@ -38,7 +38,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2013
   */
-  class CASADI_EXPORT WeakRef : public SharedObject{
+  class CASADI_SYMBOLIC_EXPORT WeakRef : public SharedObject{
   public:
     friend class SharedObjectNode;
     
@@ -71,7 +71,7 @@ namespace casadi{
  };
   
 #ifndef SWIG
-  class CASADI_EXPORT WeakRefInternal : public SharedObjectNode{
+  class CASADI_SYMBOLIC_EXPORT WeakRefInternal : public SharedObjectNode{
   public:
     // Constructor
     WeakRefInternal(SharedObjectNode* raw);

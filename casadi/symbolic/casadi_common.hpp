@@ -23,7 +23,7 @@
 #ifndef CASADI_COMMON_HPP
 #define CASADI_COMMON_HPP
 
-#include <casadi/symbolic/casadi_export.h>
+#include <casadi/symbolic/casadi_symbolic_export.h>
 
 #endif // CASADI_COMMON_HPP
 

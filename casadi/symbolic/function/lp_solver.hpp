@@ -99,7 +99,7 @@ class LPSolverInternal;
   \author Joris Gillis 
   \date 2013
 */
-class CASADI_EXPORT LPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT LPSolver : public Function{
   public:
 
   /// Default constructor

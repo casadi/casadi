@@ -30,7 +30,7 @@
 
 namespace casadi{
   
-  class CASADI_EXPORT SymbolicQRInternal : public LinearSolverInternal{
+  class CASADI_SYMBOLIC_EXPORT SymbolicQRInternal : public LinearSolverInternal{
   public:
     // Constructor
     SymbolicQRInternal(const Sparsity& sparsity, int nrhs);

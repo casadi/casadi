@@ -49,7 +49,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010-2011
   */
-  class CASADI_EXPORT MX : public GenericExpression<MX>, public GenericMatrix<MX>, public SharedObject{
+  class CASADI_SYMBOLIC_EXPORT MX : public GenericExpression<MX>, public GenericMatrix<MX>, public SharedObject{
   public:
   
     /** \brief  Default constructor */

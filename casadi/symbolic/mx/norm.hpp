@@ -33,7 +33,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010-2013
   */
-  class CASADI_EXPORT Norm : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Norm : public MXNode{
   public:
 
     /** \brief  Constructor */
@@ -47,7 +47,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010-2013
   */
-  class CASADI_EXPORT NormF : public Norm{
+  class CASADI_SYMBOLIC_EXPORT NormF : public Norm{
   public:
 
     /** \brief  Constructor */
@@ -86,7 +86,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010-2013
   */
-  class CASADI_EXPORT Norm2 : public Norm{
+  class CASADI_SYMBOLIC_EXPORT Norm2 : public Norm{
   public:
 
     /** \brief  Constructor */
@@ -109,7 +109,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010-2013
   */
-  class CASADI_EXPORT Norm1 : public Norm{
+  class CASADI_SYMBOLIC_EXPORT Norm1 : public Norm{
   public:
 
     /** \brief  Constructor */
@@ -132,7 +132,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */
-  class CASADI_EXPORT NormInf : public Norm{
+  class CASADI_SYMBOLIC_EXPORT NormInf : public Norm{
   public:
 
     /** \brief  Constructor */

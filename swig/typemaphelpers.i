@@ -258,8 +258,8 @@ void PyDECREFParent(PyObject* self) {
 %extend Type {
 %pythoncode%{
     def __del__(self):
-      if not(_casadi_main_module is None):
-         _casadi_main_module.PyDECREFParent(self)
+      if not(_casadi_symbolic is None):
+         _casadi_symbolic.PyDECREFParent(self)
 
 %}
 
@@ -277,8 +277,8 @@ void PyDECREFParent(PyObject* self) {
 %extend Type {
 %pythoncode%{
     def __del__(self):
-      if not(_casadi_main_module is None):
-         _casadi_main_module.PyDECREFParent(self)
+      if not(_casadi_symbolic is None):
+         _casadi_symbolic.PyDECREFParent(self)
 
 %}
 

@@ -34,7 +34,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_EXPORT Transpose : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Transpose : public MXNode{
   public:
 
     /// Constructor
@@ -88,7 +88,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_EXPORT DenseTranspose : public Transpose{
+  class CASADI_SYMBOLIC_EXPORT DenseTranspose : public Transpose{
   public:
 
     /// Constructor

@@ -34,7 +34,7 @@ namespace casadi{
   \author Joel Andersson 
   \date 2010
 */
-class CASADI_EXPORT BinarySX : public SXNode{
+class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode{
   private:
     
     /** \brief  Constructor is private, use "create" below */

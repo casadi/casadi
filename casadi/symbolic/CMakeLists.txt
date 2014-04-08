@@ -110,30 +110,19 @@ set(CASADI_SRCS
 
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
 
-if(ENABLE_STATIC)
-add_library(casadi STATIC ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
-endif()
-if(ENABLE_SHARED)
-add_compiler_export_flags()
-add_library(casadi SHARED ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
-generate_export_header(casadi)
-endif()
+casadi_library(casadi_symbolic ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
 
-add_dependencies(casadi casadi_runtime_embedded)
+add_dependencies(casadi_symbolic casadi_runtime_embedded)
 
 if(WITH_DL)
   # Core needs support for dynamic linking
-  target_link_libraries(casadi ${CMAKE_DL_LIBS})
+  target_link_libraries(casadi_symbolic ${CMAKE_DL_LIBS})
 endif()
 
 if(WITH_OPENCL)
   # Core depends on OpenCL for GPU calculations
-  target_link_libraries(casadi ${OPENCL_LIBRARIES})
+  target_link_libraries(casadi_symbolic ${OPENCL_LIBRARIES})
 endif()
-
-install(TARGETS casadi
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
 
 install(DIRECTORY ./
   DESTINATION include/casadi/symbolic

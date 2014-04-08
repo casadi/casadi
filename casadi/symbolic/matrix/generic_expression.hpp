@@ -36,7 +36,7 @@ namespace casadi{
   \date 2012    
 */
 template<typename ExType>
-class CASADI_EXPORT GenericExpression{
+class CASADI_SYMBOLIC_EXPORT GenericExpression{
   public:
     
 #ifndef SWIG
@@ -132,7 +132,7 @@ class CASADI_EXPORT GenericExpression{
 };
 
 template<class T>
-CASADI_EXPORT bool __nonzero__(const T &val) { return val!=0;}
+CASADI_SYMBOLIC_EXPORT bool __nonzero__(const T &val) { return val!=0;}
 
 #ifndef SWIG
 // Implementations
