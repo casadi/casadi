@@ -27,7 +27,7 @@
 #include <casadi/interfaces/snopt/snopt_solver.hpp>
 #include <casadi/symbolic/std_vector_tools.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){

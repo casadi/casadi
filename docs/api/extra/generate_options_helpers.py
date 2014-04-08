@@ -37,12 +37,12 @@ def addExtra(metadata):
   i = IpoptSolver(f)
   
   for name in i.getOptionNames():
-    if optionDocumented(name,"CasADi::IpoptInternal",metadata):
+    if optionDocumented(name,"casadi::IpoptInternal",metadata):
       continue
-    meta = metadata["CasADi::IpoptInternal"]["options"][name] = dict()
+    meta = metadata["casadi::IpoptInternal"]["options"][name] = dict()
     meta['name'] = name
     meta['type'] = i.getOptionTypeName(name)
-    meta['used'] = 'CasADi::IpoptInternal'
+    meta['used'] = 'casadi::IpoptInternal'
     meta['inherit'] = False
     meta['description'] = i.getOptionDescription(name)
     try:
@@ -63,11 +63,11 @@ def addExtra(metadata):
     return
     
   for name in i.getOptionNames():
-    if optionDocumented(name,"CasADi::WorhpInternal",metadata): continue
-    meta = metadata["CasADi::WorhpInternal"]["options"][name] = dict()
+    if optionDocumented(name,"casadi::WorhpInternal",metadata): continue
+    meta = metadata["casadi::WorhpInternal"]["options"][name] = dict()
     meta['name'] = name
     meta['type'] = i.getOptionTypeName(name)
-    meta['used'] = 'CasADi::WorhpInternal'
+    meta['used'] = 'casadi::WorhpInternal'
     meta['inherit'] = False
     meta['description'] = i.getOptionDescription(name)
     try:
@@ -84,11 +84,11 @@ def addExtra(metadata):
     return
     
   for name in i.getOptionNames():
-    if optionDocumented(name,"CasADi::QPOasesInternal",metadata): continue
-    meta = metadata["CasADi::QPOasesInternal"]["options"][name] = dict()
+    if optionDocumented(name,"casadi::QPOasesInternal",metadata): continue
+    meta = metadata["casadi::QPOasesInternal"]["options"][name] = dict()
     meta['name'] = name
     meta['type'] = i.getOptionTypeName(name)
-    meta['used'] = 'CasADi::QPOasesInternal'
+    meta['used'] = 'casadi::QPOasesInternal'
     meta['inherit'] = False
     meta['description'] = i.getOptionDescription(name)
     try:

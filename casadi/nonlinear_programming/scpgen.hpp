@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   class SCPgenInternal;
   
@@ -66,6 +66,6 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SCPGEN_HPP

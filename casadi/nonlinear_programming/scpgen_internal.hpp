@@ -30,7 +30,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
     
 class SCPgenInternal : public NLPSolverInternal{
 
@@ -218,7 +218,7 @@ public:
   std::vector<double> qpH_times_du_;
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

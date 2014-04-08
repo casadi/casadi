@@ -28,7 +28,7 @@
 
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
 /** \brief Represents a basic binary operation on two SXElement nodes
   \author Joel Andersson 
@@ -175,7 +175,7 @@ class BinarySX : public SXNode{
     SXElement dep0_, dep1_;
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // BINARY_SXElement_HPP

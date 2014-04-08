@@ -27,7 +27,7 @@
 #include "../../symbolic/casadi_options.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   LapackLUDense::LapackLUDense(){
   }
@@ -195,4 +195,4 @@ namespace CasADi{
     return new LapackLUDenseInternal(*this);
   }
 
-} // namespace CasADi
+} // namespace casadi

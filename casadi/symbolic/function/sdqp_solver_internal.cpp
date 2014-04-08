@@ -30,7 +30,7 @@ INPUTSCHEME(SDQPInput)
 OUTPUTSCHEME(SDQPOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 // Constructor
 SDQPSolverInternal::SDQPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -114,7 +114,7 @@ void SDQPSolverInternal::solve(){
   throw CasadiException("SDQPSolverInternal::solve: Not implemented");
 }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

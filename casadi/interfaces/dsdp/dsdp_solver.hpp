@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/sdp_solver.hpp"
 
 
-namespace CasADi {
+namespace casadi {
   
   
 // Forward declaration of internal class 
@@ -73,7 +73,7 @@ public:
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //DSDP_SOLVER_HPP
 

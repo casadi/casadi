@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   
   class SymbolicQRInternal : public LinearSolverInternal{
   public:
@@ -72,7 +72,7 @@ namespace CasADi{
     DMatrix Q_, R_;
   };  
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //SYMBOLIC_QR_INTERNAL_HPP

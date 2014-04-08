@@ -24,7 +24,7 @@
 #include "casadi/symbolic/mx/mx_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) : FixedStepIntegratorInternal(f,g){
   }
@@ -181,4 +181,4 @@ namespace CasADi{
     }
   }
   
-} // namespace CasADi
+} // namespace casadi

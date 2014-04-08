@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Matrix inner_prod
       \author Joel Andersson
       \date 2013
@@ -73,7 +73,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // INNER_PROD_HPP

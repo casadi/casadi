@@ -35,7 +35,7 @@ INPUTSCHEME(DPLEInput)
 OUTPUTSCHEME(DPLEOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   SimpleIndefDpleInternal::SimpleIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) : DpleInternal(A,V) {
   
@@ -125,6 +125,6 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 
 

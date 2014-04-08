@@ -53,7 +53,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   MXNode::MXNode(){
     temp = 0;
@@ -769,5 +769,5 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 

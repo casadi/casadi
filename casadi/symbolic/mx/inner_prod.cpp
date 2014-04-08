@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   InnerProd::InnerProd(const MX& x, const MX& y){
     casadi_assert(x.sparsity()==y.sparsity());
@@ -109,4 +109,4 @@ namespace CasADi{
     stream << "  *" << res.front() << " = " << gen.casadi_dot(dep().size(),arg.at(0),1,arg.at(1),1) << ";" << endl;
   }
 
-} // namespace CasADi
+} // namespace casadi

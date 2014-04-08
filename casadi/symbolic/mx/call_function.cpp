@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace CasADi {
+namespace casadi {
 
   CallFunction::CallFunction(const Function& fcn, std::vector<MX> arg) : fcn_(fcn) {
 
@@ -97,4 +97,4 @@ namespace CasADi {
     fcn_->nTmp(this,ni,nr);
   }
 
-} // namespace CasADi
+} // namespace casadi

@@ -26,7 +26,7 @@
 #include "casadi_calculus.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
 template<template<int> class F>
 bool operation_checker(unsigned int op){
@@ -507,7 +507,7 @@ inline void casadi_math<T>::printPost(unsigned char op, std::ostream &stream){
   }
 }
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

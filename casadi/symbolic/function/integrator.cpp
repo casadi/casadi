@@ -25,7 +25,7 @@
 #include <cassert>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   Integrator::Integrator(){
   }
@@ -77,5 +77,5 @@ namespace CasADi{
     return (*this)->getAugmented(nfwd,nadj,offset);
   }
  
-} // namespace CasADi
+} // namespace casadi
 

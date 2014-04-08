@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** @copydoc Nullspace_doc
       \author Joris Gillis 
@@ -68,7 +68,7 @@ namespace CasADi{
   
   };
   
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif // NULLSPACE_INTERNAL_HPP

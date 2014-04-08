@@ -31,7 +31,7 @@ INPUTSCHEME(LinsolInput)
 OUTPUTSCHEME(LinsolOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   LinearSolverInternal::LinearSolverInternal(const Sparsity& sparsity, int nrhs){
     // Make sure arguments are consistent
@@ -373,5 +373,5 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
  

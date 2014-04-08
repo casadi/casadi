@@ -1,14 +1,14 @@
 /** 
-* This example looks at the effect of the 'reltol' setting of CasADi::CVodesIntegrator.
+* This example looks at the effect of the 'reltol' setting of casadi::CVodesIntegrator.
 *
 *
 * \pythonexample{integrators/tolerance}
 *
 * \sa
 * \code
-* CasADi::CVodesIntegrator();
-* CasADi::Simulator();
-* CasADi::ODEInput
+* casadi::CVodesIntegrator();
+* casadi::Simulator();
+* casadi::ODEInput
 * \endcode
 *
 */

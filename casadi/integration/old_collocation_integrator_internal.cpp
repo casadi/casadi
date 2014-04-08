@@ -33,7 +33,7 @@
 #include "casadi/symbolic/casadi_options.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
@@ -502,4 +502,4 @@ namespace CasADi{
   void OldCollocationIntegratorInternal::integrateB(double t_out){
   }
 
-} // namespace CasADi
+} // namespace casadi

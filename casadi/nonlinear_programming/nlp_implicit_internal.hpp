@@ -29,7 +29,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for NLPImplicitInternal
    * 
@@ -64,7 +64,7 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //NLP_IMPLICIT_INTERNAL_HPP
 

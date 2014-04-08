@@ -25,7 +25,7 @@
 
 #include "sparsity.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 /**
 \ingroup expression_tools

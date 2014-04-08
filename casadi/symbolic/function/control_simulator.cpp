@@ -24,7 +24,7 @@
 #include "control_simulator_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   ControlSimulator::ControlSimulator(){
   }
@@ -74,5 +74,5 @@ namespace CasADi{
     return dynamic_cast<const ControlSimulatorInternal*>(get())->getCoarseIndex(); 
   }
 
-} // namespace CasADi
+} // namespace casadi
 

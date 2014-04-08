@@ -36,7 +36,7 @@
 #include "../profiling.hpp"
 #include "../casadi_options.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   using namespace std;
 
@@ -851,7 +851,7 @@ namespace CasADi{
     }
     
     // Generate an expression for the Jacobian
-    SX J = CasADi::jacobian(res,arg);
+    SX J = casadi::jacobian(res,arg);
    
     // Generate a function for the full Jacobian
     vector<SX> ret_res(1,J);
@@ -1328,5 +1328,5 @@ namespace CasADi{
 
 
 
-} // namespace CasADi
+} // namespace casadi
 

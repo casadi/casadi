@@ -26,7 +26,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   MultipleOutput::MultipleOutput(){
   }
@@ -62,4 +62,4 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi

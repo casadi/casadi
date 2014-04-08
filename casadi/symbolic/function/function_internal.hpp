@@ -37,7 +37,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   class MXFunction;
   
@@ -375,7 +375,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

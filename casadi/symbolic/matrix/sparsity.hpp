@@ -56,7 +56,7 @@
   %rename(getNZ_const) getNZ(int, int) const;
 #endif
 
-namespace CasADi{
+namespace casadi{
 
   // Forward declaration
   class SparsityInternal;
@@ -863,6 +863,6 @@ namespace CasADi{
 
 #endif //SWIG
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SPARSITY_HPP

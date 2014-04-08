@@ -28,7 +28,7 @@
 #include <utility>
 #include <map>
 #include "io_scheme_vector.hpp"
-namespace CasADi{ 
+namespace casadi{ 
 
 /// \cond INTERNAL 
 /// Helper function for 'DPLEInput'

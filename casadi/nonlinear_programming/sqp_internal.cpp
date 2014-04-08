@@ -34,7 +34,7 @@
 #include <cfloat>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   SQPInternal::SQPInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("The SQP method is under development");
@@ -178,7 +178,7 @@ namespace CasADi{
     // Header
     if(bool(getOption("print_header"))){
       cout << "-------------------------------------------" << endl;
-      cout << "This is CasADi::SQPMethod." << endl;
+      cout << "This is casadi::SQPMethod." << endl;
       if(exact_hessian_){
         cout << "Using exact Hessian" << endl;
       } else {
@@ -318,7 +318,7 @@ namespace CasADi{
         t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
         if (ret) {
           cout << endl;
-          cout << "CasADi::SQPMethod: aborted by callback..." << endl;
+          cout << "casadi::SQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";
           break;
         }
@@ -327,21 +327,21 @@ namespace CasADi{
       // Checking convergence criteria
       if (pr_inf < tol_pr_ && gLag_norminf < tol_du_){
         cout << endl;
-        cout << "CasADi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
+        cout << "casadi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
         stats_["return_status"] = "Solve_Succeeded";
         break;
       }
     
       if (iter >= max_iter_){
         cout << endl;
-        cout << "CasADi::SQPMethod: Maximum number of iterations reached." << endl;
+        cout << "casadi::SQPMethod: Maximum number of iterations reached." << endl;
         stats_["return_status"] = "Maximum_Iterations_Exceeded";
         break;
       }
       
       if (iter > 0 && dx_norminf <= min_step_size_) {
         cout << endl;
-        cout << "CasADi::SQPMethod: Search direction becomes too small without convergence criteria being met." << endl;
+        cout << "casadi::SQPMethod: Search direction becomes too small without convergence criteria being met." << endl;
         stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
       }
@@ -920,4 +920,4 @@ namespace CasADi{
     return pr_inf;
   }  
 
-} // namespace CasADi
+} // namespace casadi

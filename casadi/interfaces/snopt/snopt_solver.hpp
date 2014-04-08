@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   class SnoptInternal;
 
@@ -65,6 +65,6 @@ namespace CasADi{
 #endif
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SNOPT_SOLVER_HPP

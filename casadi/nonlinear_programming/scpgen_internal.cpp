@@ -33,7 +33,7 @@
 #endif // WITH_DL 
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   SCPgenInternal::SCPgenInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("SCPgen is under development");
@@ -566,7 +566,7 @@ namespace CasADi{
     // Header
     if(bool(getOption("print_header"))){
       cout << "-------------------------------------------" << endl;
-      cout << "This is CasADi::SCPgen." << endl;
+      cout << "This is casadi::SCPgen." << endl;
       if(gauss_newton_) {
         cout << "Using Gauss-Newton Hessian" << endl;
       } else {
@@ -710,19 +710,19 @@ namespace CasADi{
       converged = converged && du_inf <= tol_du_;
       if(converged){
         cout << endl;
-        cout << "CasADi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
+        cout << "casadi::SCPgen: Convergence achieved after " << iter << " iterations." << endl;
         break;
       }
     
       if (iter >= max_iter_){
         cout << endl;
-        cout << "CasADi::SCPgen: Maximum number of iterations reached." << endl;
+        cout << "casadi::SCPgen: Maximum number of iterations reached." << endl;
         break;
       }
 
       // Check if not-a-number
       if(f_!=f_ || pr_step_ != pr_step_ || pr_inf != pr_inf){
-        cout << "CasADi::SCPgen: Aborted, nan detected" << endl;
+        cout << "casadi::SCPgen: Aborted, nan detected" << endl;
         break;
       }
     
@@ -1223,4 +1223,4 @@ namespace CasADi{
   }
   
 
-} // namespace CasADi
+} // namespace casadi

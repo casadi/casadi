@@ -26,7 +26,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
       
   Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict) {
     LinearSolver mysolver = lsolver(A.sparsity(),b.size2());
@@ -48,6 +48,6 @@ namespace CasADi{
     }
   }
     
-} // namespace CasADi
+} // namespace casadi
 
 

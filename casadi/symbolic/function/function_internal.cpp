@@ -42,7 +42,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
   
   FunctionInternal::FunctionInternal(){
     setOption("name","unnamed_function"); // name of the function
@@ -2733,5 +2733,5 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 

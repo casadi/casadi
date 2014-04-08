@@ -31,7 +31,7 @@
 #include <vector>
 #include <stack>
 
-namespace CasADi{
+namespace casadi{
   /// \cond INTERNAL
   //@{
   /** \brief Convenience function, convert vectors to vectors of pointers */
@@ -395,7 +395,7 @@ namespace CasADi{
   }
   /// \endcond
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // MX_NODE_HPP

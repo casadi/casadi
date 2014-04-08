@@ -257,7 +257,7 @@ The following list summarizes the most commonly used ways of constructing new \t
 %% It is typically uncomplicated to add new such functions whenever they appear in applications.
 
 \section{\texttt{DMatrix}}
-\texttt{DMatrix} is very similar to \texttt{SX} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not symbolic expressions. The syntax is also the same, except for functions such as \texttt{SX.sym} which have no equivalents.
+\texttt{DMatrix} is very similar to \texttt{SX} (in fact, they are just two template instantiations of the same C++ class \texttt{casadi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not symbolic expressions. The syntax is also the same, except for functions such as \texttt{SX.sym} which have no equivalents.
 
 \texttt{DMatrix} is mainly used for storing matrices in \CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
 \begin{pytex}
@@ -281,7 +281,7 @@ print type(C_scipy)
 print C_scipy
 \end{pytex}
 
-More usage examples for \texttt{SX} can be found in the tutorials at \texttt{casadi.org}. For documentation of particular functions of this class (and others), find the ``C++ API docs'' on the website and search for information about \texttt{CasADi::Matrix<\,T\,>}.
+More usage examples for \texttt{SX} can be found in the tutorials at \texttt{casadi.org}. For documentation of particular functions of this class (and others), find the ``C++ API docs'' on the website and search for information about \texttt{casadi::Matrix<\,T\,>}.
 
 \section{The \texttt{MX} symbolics}
 Let us perform a simple operation using the \texttt{SX} above:
@@ -1254,7 +1254,7 @@ For a more detailed description of this class and its functionalities, we refer 
   \begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.5cm} | }
     \hline
       & Python & C++ & Octave \\ \hline
-    Starting \CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace CasADi;| & \verb|casadi| \\ \hline
+    Starting \CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace casadi;| & \verb|casadi| \\ \hline
     Printing the \emph{representation} (string representation intended to be \emph{unambiguous}) & \verb|A <ENTER>| (interactive), \verb|print repr(A)| (in scripts) & \verb|std::cout << A;|& \verb|A <ENTER>| or \verb|disp A|\\ \hline
     Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
     Calling a class function & \verb|SX.zeros(3,4)| & \verb|SX::zeros(3,4)| & \verb|SX.zeros(3,4)|\\ \hline

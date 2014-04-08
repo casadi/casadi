@@ -28,7 +28,7 @@
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for SDPSDQPInternal
    * 
@@ -66,7 +66,7 @@ namespace CasADi{
     Function mapping_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //SDP_SDQP_INTERNAL_HPP
 

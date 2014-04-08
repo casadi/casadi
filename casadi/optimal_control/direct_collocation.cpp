@@ -22,7 +22,7 @@
 
 #include "direct_collocation_internal.hpp"
 
-namespace CasADi{
+namespace casadi{
     
 DirectCollocation::DirectCollocation(){
 }
@@ -61,5 +61,5 @@ void DirectCollocation::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();
 }
 
-} // namespace CasADi
+} // namespace casadi
 

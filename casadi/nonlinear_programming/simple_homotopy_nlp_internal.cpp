@@ -34,7 +34,7 @@
 #include <cfloat>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   SimpleHomotopyNLPInternal::SimpleHomotopyNLPInternal(const Function& nlp) : HomotopyNLPInternal(nlp){
 
@@ -121,4 +121,4 @@ namespace CasADi{
   }
   
 
-} // namespace CasADi
+} // namespace casadi

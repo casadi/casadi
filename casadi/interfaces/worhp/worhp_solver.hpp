@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   class WorhpInternal;
   
@@ -65,6 +65,6 @@ namespace CasADi{
 #endif
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //WORHP_SOLVER_HPP

@@ -25,7 +25,7 @@
 
 #include "symbolic/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
 class IPInternal;
   
@@ -65,6 +65,6 @@ class IPMethod : public NLPSolver {
     #endif
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //IP_METHOD_HPP

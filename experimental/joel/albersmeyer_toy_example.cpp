@@ -31,7 +31,7 @@
 #include <symbolic/std_vector_tools.hpp>
 #include <nonlinear_programming/lifted_sqp.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){

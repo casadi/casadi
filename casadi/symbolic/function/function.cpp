@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
   
   Function::Function(){
   }
@@ -326,5 +326,5 @@ namespace CasADi{
   std::string Function::getSanitizedName() const{
     return (*this)->getSanitizedName();
   }
-} // namespace CasADi
+} // namespace casadi
 

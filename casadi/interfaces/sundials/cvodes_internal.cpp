@@ -28,7 +28,7 @@
 #include "casadi/symbolic/mx/mx_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   CVodesInternal* CVodesInternal::clone() const{
     // Return a deep copy
@@ -1845,5 +1845,5 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 

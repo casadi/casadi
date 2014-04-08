@@ -31,7 +31,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   Split::Split(const MX& x, const std::vector<int>& offset) : offset_(offset){
     setDependencies(x);
@@ -260,4 +260,4 @@ namespace CasADi{
     return dep();
   }
 
-} // namespace CasADi
+} // namespace casadi

@@ -53,7 +53,7 @@
   
 */
       
-namespace CasADi{
+namespace casadi{
   
   /// Input arguments of a QP problem [qpIn]
   enum QPSolverInput{
@@ -133,7 +133,7 @@ namespace CasADi{
   
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // QP_SOLVER_HPP
 

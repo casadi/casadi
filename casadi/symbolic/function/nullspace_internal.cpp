@@ -30,7 +30,7 @@
 #include <string>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   
   NullspaceInternal::NullspaceInternal(const Sparsity& A_sp) : A_sp_(A_sp) {
@@ -75,6 +75,6 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 
 

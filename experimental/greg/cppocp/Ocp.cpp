@@ -8,7 +8,7 @@
 #include <symbolic/function/sx_function.hpp>
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 Ocp::Ocp(){}
 

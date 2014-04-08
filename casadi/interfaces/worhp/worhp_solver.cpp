@@ -25,7 +25,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   WorhpSolver::WorhpSolver(){
   }
@@ -50,4 +50,4 @@ namespace CasADi{
     dynamic_cast<WorhpInternal*>(get())->setOptionsFromFile(file);
   }
 
-} // namespace CasADi
+} // namespace casadi

@@ -27,7 +27,7 @@
 #include <math.h>
 
 /// \cond INTERNAL
-namespace CasADi {
+namespace casadi {
 
   /// COPY: y <-x
   template<typename real_t>
@@ -92,7 +92,7 @@ namespace CasADi {
         *rr += *ss++**tt++;
 
 
-namespace CasADi {
+namespace casadi {
 
   template<typename real_t>
   void casadi_copy(int n, const real_t* x, int inc_x, real_t* y, int inc_y){

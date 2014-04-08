@@ -28,7 +28,7 @@
 #include "../std_vector_tools.hpp"
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
   
   SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b, int order, const SX& w){
     casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
@@ -1193,6 +1193,6 @@ namespace CasADi{
     return ret;
   }
   
-} // namespace CasADi
+} // namespace casadi
 
 

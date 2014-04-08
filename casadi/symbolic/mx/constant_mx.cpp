@@ -29,7 +29,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   ConstantMX::ConstantMX(const Sparsity& sp){
     setSparsity(sp);
@@ -224,5 +224,5 @@ namespace CasADi{
     return MX::zeros(sp);
   }
 
-} // namespace CasADi
+} // namespace casadi
 

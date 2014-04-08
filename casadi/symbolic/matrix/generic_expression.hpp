@@ -25,7 +25,7 @@
 
 #include "../casadi_math.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief Expression interface
   *
@@ -139,7 +139,7 @@ bool __nonzero__(const T &val) { return val!=0;}
 #endif // SWIG
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // GENERIC_EXPRESSION_HPP
 

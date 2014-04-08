@@ -35,7 +35,7 @@ def update_types_table(p):
 
 def tohaskelltype(s,alias=False,level=0):
   """
-  std::vector<(CasADi::Function)>
+  std::vector<(casadi::Function)>
 
   ->
 
@@ -125,16 +125,16 @@ def tohaskelltype(s,alias=False,level=0):
     return "CVoid"
   elif s.startswith("std::pair"):
     return None
-  elif s.startswith("CasADi::"):
+  elif s.startswith("casadi::"):
     if s in  symbol_table:
       sym = symbol_table[s]
-    elif  s[len("CasADi::"):] in symbol_table_reverse:
-      return tohaskelltype(symbol_table_reverse[s[len("CasADi::"):]],alias,level=2)
-    elif s[len("CasADi::"):] in enums:
+    elif  s[len("casadi::"):] in symbol_table_reverse:
+      return tohaskelltype(symbol_table_reverse[s[len("casadi::"):]],alias,level=2)
+    elif s[len("casadi::"):] in enums:
       if alias:
-        return "enum"+s[len("CasADi::"):]
+        return "enum"+s[len("casadi::"):]
       else:
-        return "CasadiEnum %s" % ucfirst(s[len("CasADi::"):])
+        return "CasadiEnum %s" % ucfirst(s[len("casadi::"):])
     else:
       return None
 
@@ -174,7 +174,7 @@ for c in r.findall('*//class'):
   symbol_table[name] = getAttribute(c,"sym_name",default=name)
 
 def removens(s):
-  return s.replace('CasADi::','')
+  return s.replace('casadi::','')
 
 symbol_table_reverse = dict([(v,k) for k,v in symbol_table.items()])
 symbol_table_nonamespace = dict([(removens(k),k) for k,v in symbol_table.items()])
@@ -441,7 +441,7 @@ for k,v in exportclasses.items():
 
 fclasses.write('cppTypeCasadiPrimEnum :: CasadiEnum -> String\n');
 for k,v in enums.items():
-  fclasses.write('cppTypeCasadiPrimEnum %s = "CasADi::%s"\n' % (ucfirst(k),k))
+  fclasses.write('cppTypeCasadiPrimEnum %s = "casadi::%s"\n' % (ucfirst(k),k))
 
 fclasses.write("\ninheritance :: [(CasadiClass,[CasadiClass])]\n")
 fclasses.write(

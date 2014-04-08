@@ -29,7 +29,7 @@
 #include "../profiling.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   ImplicitFunctionInternal::ImplicitFunctionInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : f_(f), jac_(jac), linsol_(linsol){
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
@@ -321,7 +321,7 @@ namespace CasADi{
   }
 
  
-} // namespace CasADi
+} // namespace casadi
 
   
 

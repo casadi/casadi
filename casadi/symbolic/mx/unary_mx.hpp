@@ -26,7 +26,7 @@
 #include "mx_node.hpp"
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Represents a general unary operation on an MX
       \author Joel Andersson 
       \date 2010
@@ -83,7 +83,7 @@ namespace CasADi{
     Operation op_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // UNARY_MX_HPP

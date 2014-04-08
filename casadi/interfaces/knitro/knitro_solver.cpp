@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   KnitroSolver::KnitroSolver(){
   }
@@ -57,4 +57,4 @@ namespace CasADi{
     (*this)->string_param_[name] = val;
   }
 
-} // namespace CasADi
+} // namespace casadi

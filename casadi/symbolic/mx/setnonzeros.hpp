@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief Assign or add entries to a matrix
       \author Joel Andersson
@@ -203,7 +203,7 @@ namespace CasADi{
     Slice inner_, outer_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // SETNONZEROS_HPP

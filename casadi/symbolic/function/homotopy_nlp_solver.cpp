@@ -26,7 +26,7 @@
 #include "../mx/mx_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   HomotopyNLPSolver::HomotopyNLPSolver(){
   }
@@ -44,5 +44,5 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 

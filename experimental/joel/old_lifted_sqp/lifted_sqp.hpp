@@ -25,7 +25,7 @@
 
 #include "symbolic/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
 class LiftedSQPInternal;
   
@@ -61,6 +61,6 @@ class LiftedSQP : public NLPSolver {
     #endif
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //LIFTED_SQP_HPP

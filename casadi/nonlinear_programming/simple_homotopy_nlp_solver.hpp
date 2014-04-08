@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/homotopy_nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   class SimpleHomotopyNLPInternal;
   
@@ -63,6 +63,6 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SIMPLE_HOMOTOPY_NLP_SOLVER_HPP

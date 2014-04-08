@@ -1,6 +1,6 @@
 #include <symbolic/casadi.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){

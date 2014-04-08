@@ -32,7 +32,7 @@
 #include <sundials/sundials_types.h>
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
 class SundialsInternal : public IntegratorInternal{
 public:
@@ -109,7 +109,7 @@ public:
   
 };
   
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif // SUNDIALS_INTERNAL_HPP

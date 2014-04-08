@@ -28,7 +28,7 @@
 #include <stack>
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
   /** \brief Assertion
       \author Joris Gillis
       \date 2013
@@ -68,7 +68,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

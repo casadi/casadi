@@ -31,10 +31,10 @@
 #include <iomanip>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 LiftedSQPInternal::LiftedSQPInternal(const Function& F, const Function& G) : NLPSolverInternal(Function(),F,G){
-  casadi_warning("CasADi::LiftedSQP has been replaced by CasADi::SCPgen. This class will be deleted.");
+  casadi_warning("casadi::LiftedSQP has been replaced by casadi::SCPgen. This class will be deleted.");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
   addOption("max_iter",           OT_INTEGER,    100,           "Maximum number of SQP iterations");
@@ -152,7 +152,7 @@ void LiftedSQPInternal::init(){
     if(!v.empty()) lag += inner_prod(lam_v_eq,v_def);
     
     // Gradient of the Lagrangian
-    SX lgrad = CasADi::gradient(lag,x);
+    SX lgrad = casadi::gradient(lag,x);
     if(!v.empty()) lgrad -= vertcat(SX::zeros(nu),lam_v_eq); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
     makeDense(lgrad);
     if(verbose_){
@@ -532,4 +532,4 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   stats_["iter_count"] = k;
 }
 
-} // namespace CasADi
+} // namespace casadi

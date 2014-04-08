@@ -35,7 +35,7 @@
 #include <ctime>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   StabilizedSQPInternal::StabilizedSQPInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("The SQP method is under development");
@@ -236,7 +236,7 @@ namespace CasADi{
     // Header
     if(bool(getOption("print_header"))){
       cout << "-------------------------------------------" << endl;
-      cout << "This is CasADi::StabilizedSQPMethod." << endl;
+      cout << "This is casadi::StabilizedSQPMethod." << endl;
       if(exact_hessian_){
         cout << "Using exact Hessian" << endl;
       } else {
@@ -364,7 +364,7 @@ namespace CasADi{
       
         if (!ret) {
           cout << endl;
-          cout << "CasADi::StabilizedSQPMethod: aborted by callback..." << endl;
+          cout << "casadi::StabilizedSQPMethod: aborted by callback..." << endl;
           stats_["return_status"] = "User_Requested_Stop";
           break;
         }
@@ -390,7 +390,7 @@ namespace CasADi{
       if (pr_inf/scaleglag_ < tol_pr_ && gLag_norminf/scaleglag_ < tol_du_){
         printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norm1,reg_,TRDelta_,ls_iter,ls_success, ' ');
         cout << endl;
-        cout << "CasADi::StabilizedSQPMethod: Convergence achieved after " << iter << " iterations." << endl;
+        cout << "casadi::StabilizedSQPMethod: Convergence achieved after " << iter << " iterations." << endl;
         stats_["return_status"] = "Solve_Succeeded";
         break;
       }
@@ -441,21 +441,21 @@ namespace CasADi{
       
       if (iter >= max_iter_){
         cout << endl;
-        cout << "CasADi::StabilizedSQPMethod: Maximum number of iterations reached." << endl;
+        cout << "casadi::StabilizedSQPMethod: Maximum number of iterations reached." << endl;
         stats_["return_status"] = "Maximum_Iterations_Exceeded";
         break;
       }
       
       if (iter > 0 && dx_norminf <= min_step_size_) {
         cout << endl;
-        cout << "CasADi::StabilizedSQPMethod: Search direction becomes too small without convergence criteria being met." << endl;
+        cout << "casadi::StabilizedSQPMethod: Search direction becomes too small without convergence criteria being met." << endl;
         stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
       }
       
       if (double(clock()-initial_time)/CLOCKS_PER_SEC > double(getOption("max_time"))){
         cout << endl;
-        cout << "CasADi::StabilizedSQPMethod: Maximum time (" << getOption("max_time")
+        cout << "casadi::StabilizedSQPMethod: Maximum time (" << getOption("max_time")
              << " sec.) exceeded." << endl;
         stats_["return_status"] = "Maximum_Time_Exceeded";
         break;
@@ -1182,4 +1182,4 @@ void StabilizedSQPInternal::mat_vectran(const std::vector<double>& x, const DMat
     
   }
 
-} // namespace CasADi
+} // namespace casadi

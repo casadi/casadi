@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Reference to a submatrix
       \author Joel Andersson
       \date 2013
@@ -75,6 +75,6 @@ namespace CasADi{
     Slice i_, j_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SUBREF_HPP

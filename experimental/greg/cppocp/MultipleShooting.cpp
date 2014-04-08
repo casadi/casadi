@@ -9,7 +9,7 @@
 
 #include <symbolic/function/sx_function.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 MultipleShooting::MultipleShooting(string name_,

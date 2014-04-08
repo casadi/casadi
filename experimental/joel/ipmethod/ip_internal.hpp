@@ -27,7 +27,7 @@
 #include "symbolic/function/nlp_solver_internal.hpp"
 #include "symbolic/function/linear_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
     
 class IPInternal : public NLPSolverInternal{
 
@@ -48,6 +48,6 @@ public:
   LinearSolver linear_solver_;
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //IP_INTERNAL_HPP

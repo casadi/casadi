@@ -30,7 +30,7 @@
 /** Excercise 1, chapter 10 from Larry Biegler's book */
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 int main(){
   cout << "program started" << endl;

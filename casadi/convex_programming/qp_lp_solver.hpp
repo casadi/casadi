@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/lp_solver.hpp"
 
-namespace CasADi {
+namespace casadi {
   
   
 // Forward declaration of internal class 
@@ -73,7 +73,7 @@ public:
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //QP_LP_SOLVER_HPP
 

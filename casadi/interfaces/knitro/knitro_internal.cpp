@@ -28,7 +28,7 @@
 #include <cstdlib>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   KnitroInternal::KnitroInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("KnitroInternal: the KNITRO interface is still experimental, more tests are needed");
@@ -376,4 +376,4 @@ namespace CasADi{
 
 
 
-} // namespace CasADi
+} // namespace casadi

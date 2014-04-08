@@ -29,7 +29,7 @@
 #include "../function/schemes_helpers.hpp"
 #include "../function/io_scheme.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
@@ -130,22 +130,22 @@ namespace CasADi{
     /// \endcond
 
     /** \brief Set input scheme */
-    void setInputScheme(const CasADi::IOScheme &scheme){
+    void setInputScheme(const casadi::IOScheme &scheme){
       casadi_assert(scheme.compatibleSize(getNumInputs()));
       static_cast<Derived*>(this)->inputScheme() = scheme;
     }
 
     /** \brief Set output scheme */
-    void setOutputScheme(const CasADi::IOScheme &scheme){ 
+    void setOutputScheme(const casadi::IOScheme &scheme){ 
       casadi_assert(scheme.compatibleSize(getNumOutputs()));
       static_cast<Derived*>(this)->outputScheme() = scheme;
     }
 
     /** \brief Get input scheme */
-    CasADi::IOScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
+    casadi::IOScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
 
     /** \brief Get output scheme */
-    CasADi::IOScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
+    casadi::IOScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
 
     /// \cond INTERNAL
     /** \brief Find the index for a string describing a particular entry of an input scheme
@@ -164,7 +164,7 @@ namespace CasADi{
      *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
      */
-    int schemeEntry(const CasADi::IOScheme &scheme,const std::string &name,bool input) const{
+    int schemeEntry(const casadi::IOScheme &scheme,const std::string &name,bool input) const{
       if (scheme.isNull()) casadi_error("Unable to look up '" <<  name<< "' in " << (input? "input": "output") << "scheme, as the " <<  (input? "input": "output") << " scheme of this function is unknown. You can only index with integers.");
       if (name=="") casadi_error("FunctionInternal::schemeEntry: you supplied an empty string as the name of a entry in " << scheme.name() << ". Available names are: " << scheme.entryNames() << ".");
       int n = scheme.index(name);
@@ -342,7 +342,7 @@ GETTERS(Matrix<double>&);
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // IO_INTERFACE_HPP

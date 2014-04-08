@@ -23,7 +23,7 @@
 #include "lp_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 
 LPSolver::LPSolver() {
@@ -41,7 +41,7 @@ bool LPSolver::checkNode() const{
   return dynamic_cast<const LPSolverInternal*>(get())!=0;
 }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

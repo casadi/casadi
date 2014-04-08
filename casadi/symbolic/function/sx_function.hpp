@@ -25,7 +25,7 @@
 
 #include "function.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -111,7 +111,7 @@ namespace CasADi{
     //@{
     /** \brief Jacobian via source code transformation
      *
-     * \see CasADi::Jacobian for an AD approach
+     * \see casadi::Jacobian for an AD approach
      */
     SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),oind,compact,symmetric); } 
@@ -201,6 +201,6 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SX_FUNCTION_HPP

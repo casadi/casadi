@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   Reshape::Reshape(const MX& x, Sparsity sp){
     casadi_assert(x.size()==sp.size());
@@ -120,4 +120,4 @@ namespace CasADi{
     return reshape(dep(0),sp);
   }
 
-} // namespace CasADi
+} // namespace casadi

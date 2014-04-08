@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   int SparsityInternal::size() const{
     return row_.size();
@@ -3628,6 +3628,6 @@ namespace CasADi{
     return ret;
   }
  
-} // namespace CasADi
+} // namespace casadi
 
 

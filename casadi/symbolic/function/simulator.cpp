@@ -24,7 +24,7 @@
 #include "simulator_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   Simulator::Simulator(){
   }
@@ -63,5 +63,5 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 

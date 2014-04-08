@@ -29,7 +29,7 @@
 
 /** Excercise 2, chapter 10 from Larry Biegler's book */
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 // Legendre collocation points

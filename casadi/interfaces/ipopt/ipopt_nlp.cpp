@@ -24,7 +24,7 @@
 #include "ipopt_internal.hpp"
 #include <ctime>
 
-namespace CasADi{
+namespace casadi{
 
 IpoptUserClass::IpoptUserClass(IpoptInternal* solver){
   this->solver = solver;
@@ -233,4 +233,4 @@ void IpoptUserClass::finalize_metadata(Index n, const StringMetaDataMapType& var
 
 
 
-} // namespace CasADi
+} // namespace casadi

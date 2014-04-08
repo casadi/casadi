@@ -26,7 +26,7 @@
 #include "sx_node.hpp"
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
 /** \brief Represents a scalar symbolic expression
   \author Joel Andersson 
@@ -57,6 +57,6 @@ protected:
   }
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif // SYMBOLIC_SXElement_HPP

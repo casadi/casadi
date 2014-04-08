@@ -25,7 +25,7 @@
 
 #include "integrator.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 // Forward declaration of internal class
 class SimulatorInternal;
@@ -37,9 +37,9 @@ class SimulatorInternal;
   The internal stepsizes of the integrator need not coincide with the gridpoints.
   
   
-  Simulator is an CasADi::Function mapping from CasADi::IntegratorInput to n. \\
+  Simulator is an casadi::Function mapping from casadi::IntegratorInput to n. \\
   
-  The output function needs to be a mapping from CasADi::DAEInput to n. The default output has n=1 and the output is the (vectorized) differential state for each time step.
+  The output function needs to be a mapping from casadi::DAEInput to n. The default output has n=1 and the output is the (vectorized) differential state for each time step.
   
   \author Joel Andersson 
   \date 2010
@@ -73,6 +73,6 @@ public:
   virtual bool checkNode() const;
 };
   
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SIMULATOR_HPP

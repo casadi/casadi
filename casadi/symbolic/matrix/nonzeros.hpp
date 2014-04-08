@@ -23,7 +23,7 @@
 #ifndef NONZEROS_HPP
 #define NONZEROS_HPP
 
-namespace CasADi{
+namespace casadi{
 
 
 /** NonZeros class for Matrix 
@@ -100,7 +100,7 @@ M NonZeros<M,K>::operator/=(const M &y){
 }
 
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // NONZEROS_HPP

@@ -28,7 +28,7 @@
 #include "casadi/symbolic/function/stabilized_qp_solver.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
     
 class SimpleHomotopyNLPInternal : public HomotopyNLPInternal{
 
@@ -47,6 +47,6 @@ public:
   
 };
 /// \endcond
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP

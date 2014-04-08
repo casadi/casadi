@@ -25,7 +25,7 @@
 
 #include "variable.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   // Forward declarations
   class XMLNode;
@@ -446,6 +446,6 @@ namespace CasADi{
 
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SYMBOLIC_OCP_HPP

@@ -27,7 +27,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace CasADi{
+namespace casadi{
 
 using namespace std;
 
@@ -144,5 +144,5 @@ void ExternalFunctionInternal::init(){
 
 
 
-} // namespace CasADi
+} // namespace casadi
 

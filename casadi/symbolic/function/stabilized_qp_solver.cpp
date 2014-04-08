@@ -23,7 +23,7 @@
 #include "stabilized_qp_solver_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 
 StabilizedQPSolver::StabilizedQPSolver() {
@@ -51,7 +51,7 @@ void StabilizedQPSolver::generateNativeCode(const std::string &filename) const {
   (*this)->generateNativeCode(file);
 }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

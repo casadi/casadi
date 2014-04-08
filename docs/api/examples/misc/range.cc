@@ -2,7 +2,7 @@
 #include "casadi/symbolic/std_vector_tools.hpp"
 #include <limits>
 
-using namespace CasADi;
+using namespace casadi;
 
 int main(int argc, char *argv[])
 {

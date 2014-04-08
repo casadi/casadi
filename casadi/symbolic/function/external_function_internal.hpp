@@ -36,7 +36,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   
 class ExternalFunctionInternal : public FunctionInternal{
   friend class ExternalFunction;
@@ -89,7 +89,7 @@ class ExternalFunctionInternal : public FunctionInternal{
   
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // EXTERNAL_FUNCTION_INTERNAL_HPP

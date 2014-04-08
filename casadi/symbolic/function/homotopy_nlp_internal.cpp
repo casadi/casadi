@@ -30,7 +30,7 @@ INPUTSCHEME(NLPSolverInput)
 OUTPUTSCHEME(NLPSolverOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   HomotopyNLPInternal::HomotopyNLPInternal(const Function& hnlp) : hnlp_(hnlp){     
 
@@ -104,4 +104,4 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi

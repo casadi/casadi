@@ -34,7 +34,7 @@
 */
 
 
-namespace CasADi{
+namespace casadi{
 
 /**
 \ingroup expression_tools
@@ -227,7 +227,7 @@ namespace CasADi{
   //@{
   /** \brief Calculate jacobian via source code transformation
 
-      Uses CasADi::SXFunction::jac
+      Uses casadi::SXFunction::jac
   */
   SX jacobian(const SX &ex, const SX &arg);
   SX gradient(const SX &ex, const SX &arg);
@@ -334,7 +334,7 @@ namespace CasADi{
 @}
 */
 
-} // namespace CasADi
+} // namespace casadi
 
 
 

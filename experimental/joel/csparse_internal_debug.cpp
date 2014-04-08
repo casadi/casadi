@@ -25,7 +25,7 @@
 #include "symbolic/std_vector_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 CSparseInternal::CSparseInternal(const CRSSparsity& sparsity)  : LinearSolverInternal(sparsity){
   N_ = 0;
@@ -155,4 +155,4 @@ CSparseInternal* CSparseInternal::clone() const{
   return new CSparseInternal(sparsity_);
 }
 
-} // namespace CasADi
+} // namespace casadi

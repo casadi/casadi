@@ -44,7 +44,7 @@
 #define CACHING_MAP std::map
 #endif // USE_CXX11
 
-namespace CasADi{
+namespace casadi{
 
 /** \brief Represents a constant SX
   \author Joel Andersson 
@@ -320,7 +320,7 @@ public:
 
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // CONSTANT_SXElement_HPP

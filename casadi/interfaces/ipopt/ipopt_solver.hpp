@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   class IpoptInternal;
   
@@ -79,6 +79,6 @@ namespace CasADi{
 
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //IPOPT_SOLVER_HPP

@@ -24,7 +24,7 @@
 #include "ooqp_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 OOQPSolver::OOQPSolver(){ 
 }
@@ -47,4 +47,4 @@ bool OOQPSolver::checkNode() const{
   return dynamic_cast<const OOQPInternal*>(get());
 }
 
-} // namespace CasADi
+} // namespace casadi

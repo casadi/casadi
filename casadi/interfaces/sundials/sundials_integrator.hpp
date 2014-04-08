@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/integrator.hpp"
 
-namespace CasADi{
+namespace casadi{
   
 /// Forward declaration of internal class
 class SundialsInternal;
@@ -52,6 +52,6 @@ public:
   void setStopTime(double tf);
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SUNDIALS_INTEGRATOR_HPP

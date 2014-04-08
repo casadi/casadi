@@ -14,7 +14,7 @@
 static SnoptInterface * si;
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 SnoptInterface::~SnoptInterface()
 {

@@ -24,7 +24,7 @@
 #include "kinsol_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   KinsolSolver::KinsolSolver(){ 
   }
@@ -45,6 +45,6 @@ namespace CasADi{
     return dynamic_cast<const KinsolInternal*>(get());
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 

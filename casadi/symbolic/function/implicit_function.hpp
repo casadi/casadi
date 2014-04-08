@@ -26,7 +26,7 @@
 #include "function.hpp"
 #include "linear_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   // Forward declaration of internal class
   class ImplicitFunctionInternal;
 
@@ -83,7 +83,7 @@ namespace CasADi{
     LinearSolver& getLinsol();
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //IMPLICIT_FUNCTION_HPP
 

@@ -30,7 +30,7 @@
 
 #include "sparsity_tools.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   /// Transpose of a matrix
   template<typename DataType>
@@ -381,14 +381,14 @@ namespace CasADi{
   template<typename DataType>
   int sprank(const Matrix<DataType>& A);
 
-} // namespace CasADi
+} // namespace casadi
 
 // Global namespace
 
 #ifndef SWIG
 #include <iterator>
 
-namespace CasADi{
+namespace casadi{
   // Implementations
 
   template<typename DataType>
@@ -1158,7 +1158,7 @@ namespace CasADi{
     return rank(A.sparsity());
   }
   
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif //SWIG
@@ -1170,7 +1170,7 @@ namespace CasADi{
 
 // map the template name to the instantiated name
 #define MTT_INST(DataType,function_name)                       \
-  %template(function_name) CasADi::function_name <DataType >;
+  %template(function_name) casadi::function_name <DataType >;
 
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \

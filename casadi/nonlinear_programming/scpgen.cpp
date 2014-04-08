@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   SCPgen::SCPgen(){
   }
@@ -50,4 +50,4 @@ namespace CasADi{
   }
     
 
-} // namespace CasADi
+} // namespace casadi

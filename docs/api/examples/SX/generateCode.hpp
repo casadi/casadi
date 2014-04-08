@@ -7,9 +7,9 @@
 *
 * \sa
 * \code
-* CasADi::SXFunction::generateCode(const std::string&);
-* CasADi::SXFunction::repr(std::ostream &stream);
-* CasADi::SXFunction::print(std::ostream &stream);
+* casadi::SXFunction::generateCode(const std::string&);
+* casadi::SXFunction::repr(std::ostream &stream);
+* casadi::SXFunction::print(std::ostream &stream);
 * \endcode
 *
 */

@@ -23,7 +23,7 @@
 #include "csparse_cholesky_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   CSparseCholesky::CSparseCholesky(){
   }
@@ -56,4 +56,4 @@ namespace CasADi{
     return (*this)->solveL(x, nrhs, transpose);
   }
 
-} // namespace CasADi
+} // namespace casadi

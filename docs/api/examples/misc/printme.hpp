@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::printme();
+* casadi::printme();
 * \endcode
 *
 */

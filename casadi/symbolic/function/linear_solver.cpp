@@ -23,7 +23,7 @@
 #include "linear_solver_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   LinearSolver::LinearSolver(){
   }
@@ -78,7 +78,7 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

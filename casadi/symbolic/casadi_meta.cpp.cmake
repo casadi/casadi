@@ -22,7 +22,7 @@
  
 #include "casadi_meta.hpp"
 
-namespace CasADi {
+namespace casadi {
   const std::string CasadiMeta::version = "${PACKAGE_VERSION}";
   const std::string CasadiMeta::git_revision = "${git_revision}";
   const std::string CasadiMeta::git_describe = "${git_describe}";

@@ -280,8 +280,8 @@ int main(int argc, char* argv[])
   
   
   //Binning
-  std::vector<int> type_binning_ncalls(CasADi::NUM_BUILT_IN_OPS);
-  std::vector<double> type_binning_time(CasADi::NUM_BUILT_IN_OPS);
+  std::vector<int> type_binning_ncalls(casadi::NUM_BUILT_IN_OPS);
+  std::vector<double> type_binning_time(casadi::NUM_BUILT_IN_OPS);
   
   for (Stats::const_iterator it = data.begin();it!=data.end();++it) {
     const functionstat & f = it->second;
@@ -316,11 +316,11 @@ int main(int argc, char* argv[])
 "</script>";
   
   report << "<table><thead><tr><th>Operation code</th><th>Operation</th><th>total (s)</th><th>ncalls</th></tr></thead>\n";
-  for (int i=0;i<CasADi::NUM_BUILT_IN_OPS;++i) {
+  for (int i=0;i<casadi::NUM_BUILT_IN_OPS;++i) {
     report << "<tr><td>" << i << "</td><td>";
-    CasADi::casadi_math<double>::printPre(i,report);
-    CasADi::casadi_math<double>::printSep(i,report);
-    CasADi::casadi_math<double>::printPost(i,report);
+    casadi::casadi_math<double>::printPre(i,report);
+    casadi::casadi_math<double>::printSep(i,report);
+    casadi::casadi_math<double>::printPost(i,report);
     report << "</td><td>" << type_binning_time[i] << "</td><td>" << type_binning_ncalls[i] <<  "</td><td>";
   }
   report << "</table>";

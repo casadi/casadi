@@ -28,7 +28,7 @@
 #include "casadi/symbolic/function/implicit_function.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
     
   class ImplicitFixedStepIntegratorInternal : public FixedStepIntegratorInternal{
   public:
@@ -61,6 +61,6 @@ namespace CasADi{
     ImplicitFunction implicit_solver_, backward_implicit_solver_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP

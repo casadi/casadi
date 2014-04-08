@@ -29,7 +29,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for NewtonImplicitInternal
    * 
@@ -67,7 +67,7 @@ namespace CasADi{
     double abstolStep_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //NEWTON_IMPLICIT_INTERNAL_HPP
 

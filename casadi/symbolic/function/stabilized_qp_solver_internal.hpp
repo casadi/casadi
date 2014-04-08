@@ -28,7 +28,7 @@
 
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
 /// Internal class
 class StabilizedQPSolverInternal : public FunctionInternal{
@@ -71,7 +71,7 @@ class StabilizedQPSolverInternal : public FunctionInternal{
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 
 /// \endcond

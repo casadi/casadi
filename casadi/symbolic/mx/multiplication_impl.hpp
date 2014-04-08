@@ -31,7 +31,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   template<bool TrX, bool TrY>
   Multiplication<TrX,TrY>::Multiplication(const MX& z, const MX& x, const MX& y){
@@ -156,7 +156,7 @@ namespace CasADi{
     stream << " *rr += *ss++**tt++;" << endl;
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // MULTIPLICATION_IMPL_HPP
 

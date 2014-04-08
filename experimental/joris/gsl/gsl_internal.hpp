@@ -32,7 +32,7 @@
 
 #include <ctime>
 
-namespace CasADi{
+namespace casadi{
 namespace GSL {
   
 /**
@@ -137,7 +137,7 @@ public:
 
 
 } // namespace GSL
-} // namespace CasADi
+} // namespace casadi
 
 #endif //GSL_INTERNAL_HPP
 

@@ -24,7 +24,7 @@
 #include <map>
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
     
     IOSchemeBuiltinInternal::IOSchemeBuiltinInternal(InputOutputScheme scheme) : scheme_(scheme) {}
     
@@ -124,6 +124,6 @@ namespace CasADi{
       stream << "customIO(" << entryNames() << ")";
     }
     
-} // namespace CasADi
+} // namespace casadi
 
 

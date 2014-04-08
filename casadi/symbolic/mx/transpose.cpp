@@ -27,7 +27,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   Transpose::Transpose(const MX& x){
     setDependencies(x);
@@ -177,4 +177,4 @@ namespace CasADi{
     stream << res.front() << "[i+j*" << dep().size2() << "] = " << arg.front() << "[j+i*" << dep().size1() << "];" << endl;
   }
 
-} // namespace CasADi
+} // namespace casadi

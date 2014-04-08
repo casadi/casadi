@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/implicit_function.hpp"
 
-namespace CasADi {
+namespace casadi {
   
   
 // Forward declaration of internal class 
@@ -69,7 +69,7 @@ public:
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //NLP_IMPLICIT_SOLVER_HPP
 

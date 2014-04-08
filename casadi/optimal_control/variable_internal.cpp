@@ -24,7 +24,7 @@
 #include "casadi/symbolic/casadi_exception.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
   
   VariableInternal::VariableInternal(const string& name){
   }
@@ -73,5 +73,5 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi
 

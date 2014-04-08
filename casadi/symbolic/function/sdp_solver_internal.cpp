@@ -30,7 +30,7 @@ INPUTSCHEME(SDPInput)
 OUTPUTSCHEME(SDPOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 // Constructor
 SDPSolverInternal::SDPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -180,7 +180,7 @@ void SDPSolverInternal::checkInputs() const {
   }
 }
  
-} // namespace CasADi
+} // namespace casadi
 
   
 

@@ -30,7 +30,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   
   class CodeGenerator{
   public:
@@ -148,7 +148,7 @@ namespace CasADi{
   };
   
   
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

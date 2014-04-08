@@ -6,8 +6,8 @@
 *
 * \sa
 * \code
-* CasADi::createParent();
-* CasADi::MX();
+* casadi::createParent();
+* casadi::MX();
 * \endcode
 *
 */

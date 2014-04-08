@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/integrator.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   class FixedStepIntegratorInternal;
   
@@ -51,6 +51,6 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //FIXED_STEP_INTEGRATOR_HPP

@@ -30,7 +30,7 @@
 #include "casadi/symbolic/mx/mx_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   CollocationIntegratorInternal::CollocationIntegratorInternal(const Function& f, const Function& g) : ImplicitFixedStepIntegratorInternal(f,g){
     addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
@@ -293,4 +293,4 @@ namespace CasADi{
     casadi_assert(RZ_it==RZ_.end());
   }
 
-} // namespace CasADi
+} // namespace casadi

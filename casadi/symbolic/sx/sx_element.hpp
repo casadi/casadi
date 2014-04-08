@@ -39,7 +39,7 @@
 
 
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
@@ -355,7 +355,7 @@ namespace CasADi{
   template<> void SX::setEqualityCheckingDepth(int eq_depth);
   template<> int SX::getEqualityCheckingDepth();
 
-} // namespace CasADi
+} // namespace casadi
 
 
 
@@ -363,26 +363,26 @@ namespace CasADi{
 
 /// \cond INTERNAL
 // Template specialization
-namespace CasADi{
+namespace casadi{
   template<> inline std::string matrixName<SXElement>() { return "SX"; }
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 namespace std{
   template<>
-  class numeric_limits<CasADi::SXElement>{
+  class numeric_limits<casadi::SXElement>{
   public:
     static const bool is_specialized = true;
-    static CasADi::SXElement min() throw();
-    static CasADi::SXElement max() throw();
+    static casadi::SXElement min() throw();
+    static casadi::SXElement max() throw();
     static const int  digits = 0;
     static const int  digits10 = 0;
     static const bool is_signed = false;
     static const bool is_integer = false;
     static const bool is_exact = false;
     static const int radix = 0;
-    static CasADi::SXElement epsilon() throw();
-    static CasADi::SXElement round_error() throw();
+    static casadi::SXElement epsilon() throw();
+    static casadi::SXElement round_error() throw();
     static const int  min_exponent = 0;
     static const int  min_exponent10 = 0;
     static const int  max_exponent = 0;
@@ -393,8 +393,8 @@ namespace std{
     static const bool has_signaling_NaN = false;
     //    static const float_denorm_style has_denorm = denorm absent;
     static const bool has_denorm_loss = false;
-    static CasADi::SXElement infinity() throw();
-    static CasADi::SXElement quiet_NaN() throw();
+    static casadi::SXElement infinity() throw();
+    static casadi::SXElement quiet_NaN() throw();
     //    static SXElement signaling_NaN() throw();
     //    static SXElement denorm_min() throw();
     static const bool is_iec559 = false;

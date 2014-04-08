@@ -29,7 +29,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   // Helper function
   bool has_empty(const vector<MX>& x){
@@ -986,5 +986,5 @@ namespace CasADi{
     return f(A).at(0);
   }
   
-} // namespace CasADi
+} // namespace casadi
 

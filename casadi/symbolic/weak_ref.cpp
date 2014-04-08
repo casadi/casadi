@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
   
   WeakRef::WeakRef(int dummy){
     casadi_assert(dummy==0);
@@ -68,5 +68,5 @@ namespace CasADi{
   WeakRefInternal::~WeakRefInternal(){
   }
   
-} // namespace CasADi
+} // namespace casadi
 

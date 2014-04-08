@@ -27,7 +27,7 @@
 
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   // Forward declaration
   class WeakRefInternal;
@@ -88,7 +88,7 @@ namespace CasADi{
 
 #endif // SWIG
     
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // CASADI_WEAK_REF_HPP

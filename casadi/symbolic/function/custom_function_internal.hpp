@@ -30,7 +30,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   
   /** \brief  Internal class for CustomFunction
   \author Joel Andersson 
@@ -42,7 +42,7 @@ class CustomFunctionInternal : public FunctionInternal{
   public:
     
     /** \brief  Create a function */
-    explicit CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<CasADi::Sparsity> &inputscheme, const std::vector<CasADi::Sparsity> &outputscheme);
+    explicit CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<casadi::Sparsity> &inputscheme, const std::vector<casadi::Sparsity> &outputscheme);
     
     /** \brief  Destructor */
     virtual ~CustomFunctionInternal();
@@ -65,7 +65,7 @@ class CustomFunctionInternal : public FunctionInternal{
   
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // CUSTOM_FUNCTION_INTERNAL_HPP

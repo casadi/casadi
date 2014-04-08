@@ -24,7 +24,7 @@
 #include "nullspace_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   Nullspace::Nullspace(){
   }
@@ -41,5 +41,5 @@ namespace CasADi{
     return dynamic_cast<const NullspaceInternal*>(get())!=0;
   }
 
-} // namespace CasADi
+} // namespace casadi
 

@@ -54,7 +54,7 @@
   
 */
       
-namespace CasADi{
+namespace casadi{
   
 /// Input arguments of a QP problem [stabilizedQpIn]
 enum StabilizedQPSolverInput{
@@ -115,7 +115,7 @@ class StabilizedQPSolver : public Function{
   virtual void generateNativeCode(const std::string &filename) const;
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // STABILIZED_QP_HPP
 

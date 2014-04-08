@@ -31,7 +31,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   const long double legendre_points1[] = { 0.00000000000000000000, 0.50000000000000000000 };
   const long double legendre_points2[] = { 0.00000000000000000000, 0.21132486540518713447, 0.78867513459481286553 };
@@ -317,5 +317,5 @@ namespace CasADi{
   
   }
 
-} // namespace CasADi
+} // namespace casadi
 

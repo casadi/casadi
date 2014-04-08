@@ -27,7 +27,7 @@
 #include "casadi/symbolic/function/nlp_solver.hpp"
 #include "casadi/integration/integration_tools.hpp"
 
-namespace CasADi{
+namespace casadi{
   class DirectCollocationInternal;
     
   /** \brief Direct collocation
@@ -71,6 +71,6 @@ class DirectCollocation : public OCPSolver{
     std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
 };
                         
-} // namespace CasADi
+} // namespace casadi
 
 #endif // DIRECT_COLLOCATION_HPP

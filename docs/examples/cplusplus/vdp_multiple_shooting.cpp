@@ -36,7 +36,7 @@
 
 bool use_old_collocation_integrator = false;
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 

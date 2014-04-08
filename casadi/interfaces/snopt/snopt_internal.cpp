@@ -38,7 +38,7 @@
 #include "snopt_internal.hpp"
 #include "wsnopt.hpp"
 
-namespace CasADi {
+namespace casadi {
 
   SnoptInternal::SnoptInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     addOption("detect_linear", OT_BOOLEAN, true,
@@ -910,4 +910,4 @@ namespace CasADi {
         casadi_assert_message(Error == 0, "snopt error setting option \"" + snopt_name + "\"")
     }
 
-}  // namespace CasADi
+}  // namespace casadi

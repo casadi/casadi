@@ -28,7 +28,7 @@
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for SOCPQCQPInternal
    * 
@@ -57,7 +57,7 @@ public:
     std::vector<CSparseCholesky> cholesky_;
 };
 /// \endcond
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SOCP_QCQP_INTERNAL_HPP
 

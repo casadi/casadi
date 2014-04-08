@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/implicit_function.hpp"
 #include "casadi/symbolic/function/linear_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   // Forward declaration of internal class 
   class KinsolInternal;
@@ -83,7 +83,7 @@ namespace CasADi{
 
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //KINSOL_SOLVER_HPP
 

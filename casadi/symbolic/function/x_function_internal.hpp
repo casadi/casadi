@@ -46,7 +46,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief  Internal node class for the base class of SXFunctionInternal and MXFunctionInternal (lacks a public counterpart)
       The design of the class uses the curiously recurring template pattern (CRTP) idiom
@@ -1045,7 +1045,7 @@ namespace CasADi{
   }
   
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // X_FUNCTION_INTERNAL_HPP

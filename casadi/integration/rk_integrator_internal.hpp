@@ -27,7 +27,7 @@
 #include "fixed_step_integrator_internal.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
     
   class RKIntegratorInternal : public FixedStepIntegratorInternal{
   public:
@@ -55,6 +55,6 @@ namespace CasADi{
 
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //RK_INTEGRATOR_INTERNAL_HPP

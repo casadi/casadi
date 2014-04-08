@@ -29,7 +29,7 @@
 #include "casadi/interfaces/sundials/idas_integrator.hpp"
 #include "casadi/integration/rk_integrator.hpp"
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 bool sundials_integrator = true;

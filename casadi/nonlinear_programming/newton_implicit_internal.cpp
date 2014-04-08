@@ -30,7 +30,7 @@
 #include "casadi/symbolic/casadi_options.hpp"
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
 
   NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance on max(|F|)");
@@ -196,5 +196,5 @@ namespace CasADi {
     
   }
 
-} // namespace CasADi
+} // namespace casadi
 

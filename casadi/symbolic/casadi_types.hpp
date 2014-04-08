@@ -28,7 +28,7 @@
 #include <vector>
 #include <utility>
 
-namespace CasADi{
+namespace casadi{
   
   /// Forward declarations
   class SXElement;
@@ -120,7 +120,7 @@ namespace CasADi{
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
 #endif // SWIG  
   
-} // namespace CasADi
+} // namespace casadi
 
 #endif // CASADI_TYPES_HPP
 

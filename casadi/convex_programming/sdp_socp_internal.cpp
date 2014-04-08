@@ -28,7 +28,7 @@
 #include "casadi/symbolic/mx/mx_tools.hpp"
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
 
 SDPSOCPInternal* SDPSOCPInternal::clone() const{
   // Return a deep copy
@@ -170,5 +170,5 @@ void SDPSOCPInternal::init(){
   log("SDPSOCPInternal::init","Initialized SDP solver");
 }
 
-} // namespace CasADi
+} // namespace casadi
 

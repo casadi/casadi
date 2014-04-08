@@ -25,7 +25,7 @@
 #include <cassert>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 SundialsIntegrator::SundialsIntegrator(){
 }
@@ -46,5 +46,5 @@ void SundialsIntegrator::setStopTime(double tf){
   (*this)->setStopTime(tf);
 }
   
-} // namespace CasADi
+} // namespace casadi
 

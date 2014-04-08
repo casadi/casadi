@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal storage for integrator related data
 
@@ -151,7 +151,7 @@ namespace CasADi{
 
   };
   
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // INTEGRATOR_INTERNAL_HPP

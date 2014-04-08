@@ -27,7 +27,7 @@
 #include "../function/linear_solver.hpp"
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T
       
       Forward derivatives:
@@ -91,7 +91,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // SOLVE_HPP

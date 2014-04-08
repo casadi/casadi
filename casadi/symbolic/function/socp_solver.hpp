@@ -56,7 +56,7 @@
   
 */
       
-namespace CasADi{
+namespace casadi{
   
 /// Input arguments of a SOCP problem [socpIn]
 enum SOCPInput{
@@ -127,7 +127,7 @@ class SOCPSolver : public Function{
   virtual bool checkNode() const;
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SOCP_SOLVER_HPP
 

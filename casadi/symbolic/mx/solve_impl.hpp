@@ -29,7 +29,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   template<bool Tr>
   Solve<Tr>::Solve(const MX& r, const MX& A, const LinearSolver& linear_solver) : linear_solver_(linear_solver){
@@ -91,7 +91,7 @@ namespace CasADi{
     linear_solver_ = deepcopy(linear_solver_, already_copied);
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SOLVE_IMPL_HPP
 

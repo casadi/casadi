@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** 
       \author Joel Andersson 
@@ -92,7 +92,7 @@ namespace CasADi{
     Function fcn_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // CALL_Function_HPP

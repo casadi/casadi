@@ -26,7 +26,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace CasADi{
+namespace casadi{
 
 using namespace std;
 
@@ -71,5 +71,5 @@ bool CustomFunction::checkNode() const{
 
 
 
-} // namespace CasADi
+} // namespace casadi
 

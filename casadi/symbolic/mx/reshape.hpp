@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Reshape an expression
       \author Joel Andersson
       \date 2013
@@ -81,7 +81,7 @@ namespace CasADi{
     virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth) && sparsity()==node->sparsity();}
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // RESHAPE_HPP

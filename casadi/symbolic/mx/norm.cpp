@@ -25,7 +25,7 @@
 #include "../runtime/runtime.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   Norm::Norm(const MX& x){
     setDependencies(x);
@@ -106,5 +106,5 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi
 

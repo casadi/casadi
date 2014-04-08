@@ -36,7 +36,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
   
   template<bool ScX, bool ScY>
   BinaryMX<ScX,ScY>::BinaryMX(Operation op, const MX& x, const MX& y) : op_(op){
@@ -221,6 +221,6 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // BINARY_MX_IMPL_HPP

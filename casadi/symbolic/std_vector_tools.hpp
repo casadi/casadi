@@ -61,7 +61,7 @@ namespace std{
   
 } // namespace std
 
-namespace CasADi{
+namespace casadi{
 
   #ifndef SWIG
   /** Range function
@@ -307,7 +307,7 @@ namespace CasADi{
   template<typename T>
   bool isRegular(const std::vector<T> &v);
   
-} // namespace CasADi
+} // namespace casadi
 
 // Implementations
 #ifndef SWIG
@@ -316,7 +316,7 @@ namespace std{
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
   ostream& operator<<(ostream &stream, const vector<T> &v){
-    CasADi::repr(v,stream);
+    casadi::repr(v,stream);
     return stream;
   }
   
@@ -354,7 +354,7 @@ namespace std{
   
 } // namespace std
 
-namespace CasADi{
+namespace casadi{
   
   template<typename T>
   void repr(const std::vector<T> &v, std::ostream &stream){
@@ -694,7 +694,7 @@ namespace CasADi{
     return sqrt(ret);
   }
   
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SWIG
 
@@ -702,7 +702,7 @@ namespace CasADi{
 
 // map the template name to the instantiated name
 #define VTT_INST(T,function_name) \
-%template(function_name) CasADi::function_name<T>;
+%template(function_name) casadi::function_name<T>;
 
 // Define template instanciations
 #define VECTOR_TOOLS_TEMPLATES(T) \

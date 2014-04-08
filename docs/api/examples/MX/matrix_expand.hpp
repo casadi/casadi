@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::matrix_expand(x);
-* CasADi::MXFunction::expand();
+* casadi::matrix_expand(x);
+* casadi::MXFunction::expand();
 * \endcode
 */

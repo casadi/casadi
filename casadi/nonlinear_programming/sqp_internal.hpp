@@ -29,7 +29,7 @@
 #include <deque>
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
     
 class SQPInternal : public NLPSolverInternal{
 
@@ -181,6 +181,6 @@ public:
   
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //SQP_INTERNAL_HPP

@@ -33,7 +33,7 @@
 
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief  Interal node class for SX
       \author Joel Andersson 
@@ -124,6 +124,6 @@ namespace CasADi{
 
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif // SX_NODE_HPP

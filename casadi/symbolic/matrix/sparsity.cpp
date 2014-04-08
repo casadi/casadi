@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   /// \cond INTERNAL
   // Singletons
@@ -1031,4 +1031,4 @@ namespace CasADi{
     (*this)->printCompact(stream);
   }
 
-} // namespace CasADi
+} // namespace casadi

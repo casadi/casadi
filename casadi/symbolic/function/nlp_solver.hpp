@@ -45,7 +45,7 @@
 
 */
 
-namespace CasADi{
+namespace casadi{
 
   /// Input arguments of an NLP function [nlpIn]
   enum NLPInput{
@@ -237,7 +237,7 @@ namespace CasADi{
     static Function joinFG(Function F, Function G);
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // NLP_SOLVER_HPP
 

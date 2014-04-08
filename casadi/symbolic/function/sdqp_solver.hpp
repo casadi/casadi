@@ -32,7 +32,7 @@
   
 */
       
-namespace CasADi{
+namespace casadi{
   
 /// Input arguments of a SDQP problem [sdqpIn]
 enum SDQPInput{
@@ -115,7 +115,7 @@ class SDQPSolver : public Function{
   
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SDQP_SOLVER_HPP
 

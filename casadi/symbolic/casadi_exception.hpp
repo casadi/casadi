@@ -29,7 +29,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace CasADi{
+namespace casadi{
 
 /** \brief  Casadi exception class
         \author Joel Andersson 
@@ -110,7 +110,7 @@ class CasadiException : public std::exception{
  {\
   std::stringstream ss_internal_; \
   ss_internal_ << CASADI_ASSERT_WHERE << std::endl << msg  <<  std::endl; \
-  throw CasADi::CasadiException(ss_internal_.str()); \
+  throw casadi::CasadiException(ss_internal_.str()); \
  }
 
 // This assertion checks for illegal user inputs. It will not be checked if CASADI_NDEBUG is defined
@@ -120,12 +120,12 @@ class CasadiException : public std::exception{
   try{ \
     is_ok = x; \
   } catch(std::exception& ex){ \
-      throw CasADi::CasadiException(std::string("When trying to check the assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what());\
+      throw casadi::CasadiException(std::string("When trying to check the assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what());\
   } \
  if(!is_ok) { \
   std::stringstream ss_internal_; \
   ss_internal_ << "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed. " << std::endl << msg  <<  std::endl; \
-  throw CasADi::CasadiException(ss_internal_.str()); \
+  throw casadi::CasadiException(ss_internal_.str()); \
  }\
 } \
 
@@ -150,6 +150,6 @@ std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". 
 
 #endif // CASADI_NDEBUG
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // CASADI_EXCEPTION_HPP

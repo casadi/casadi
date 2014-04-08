@@ -25,7 +25,7 @@
 
 #include "io_interface.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   /** Forward declaration of internal class */
   class FunctionInternal;
@@ -105,11 +105,11 @@ namespace CasADi{
     /// \cond INTERNAL
     //@{
     /** \brief Access input/output scheme */
-    const CasADi::IOScheme& inputScheme() const;
-    const CasADi::IOScheme& outputScheme() const;
+    const casadi::IOScheme& inputScheme() const;
+    const casadi::IOScheme& outputScheme() const;
     
-    CasADi::IOScheme& inputScheme();
-    CasADi::IOScheme& outputScheme();
+    casadi::IOScheme& inputScheme();
+    casadi::IOScheme& outputScheme();
     //@}
     /// \endcond
     
@@ -136,16 +136,16 @@ namespace CasADi{
     int getNumOutputElements() const;
   
     /** \brief Set input scheme */
-    void setInputScheme(const CasADi::IOScheme &scheme);
+    void setInputScheme(const casadi::IOScheme &scheme);
 
     /** \brief Set output scheme */
-    void setOutputScheme(const CasADi::IOScheme &scheme);
+    void setOutputScheme(const casadi::IOScheme &scheme);
 
     /** \brief Get input scheme */
-    CasADi::IOScheme getInputScheme() const;
+    casadi::IOScheme getInputScheme() const;
 
     /** \brief Get output scheme */
-    CasADi::IOScheme getOutputScheme() const;
+    casadi::IOScheme getOutputScheme() const;
     
     /** \brief  Evaluate */
     void evaluate();
@@ -393,11 +393,11 @@ namespace CasADi{
     std::string getSanitizedName() const;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #ifdef SWIG
 // Template instantiations
-%template(FunctionVector)             std::vector<CasADi::Function>;
+%template(FunctionVector)             std::vector<casadi::Function>;
 #endif // SWIG
 
 

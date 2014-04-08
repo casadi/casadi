@@ -23,7 +23,7 @@
 #include "qp_solver_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 
   QPSolver::QPSolver() {
@@ -56,7 +56,7 @@ namespace CasADi{
     (*this)->generateNativeCode(file);
   }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

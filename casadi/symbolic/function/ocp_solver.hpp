@@ -27,7 +27,7 @@
 
 #include "function.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 
 /// Input arguments of a Mayer Term \n [mayerIn]
@@ -130,7 +130,7 @@ enum OCPOutput{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // OCP_SOLVER_HPP

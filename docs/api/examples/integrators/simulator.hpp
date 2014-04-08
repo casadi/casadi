@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::Simulator();
+* casadi::Simulator();
 * \endcode
 *
 */

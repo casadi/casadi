@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   SetSparse::SetSparse(const MX& x, const Sparsity& sp){
     setDependencies(x);
@@ -106,5 +106,5 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 

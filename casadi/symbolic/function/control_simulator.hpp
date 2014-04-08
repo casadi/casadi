@@ -25,7 +25,7 @@
 
 #include "integrator.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   /// Input arguments of an ODE/DAE function [controldaeIn]
   enum ControlledDAEInput{
@@ -93,7 +93,7 @@ namespace CasADi{
     ControlSimulator();
   
     /** \brief Creates a piecewise simulator
-     * \param ffcn Continuous time dynamics, an CasADi::Function with the folowing mapping:
+     * \param ffcn Continuous time dynamics, an casadi::Function with the folowing mapping:
      * \copydoc scheme_ControlledDAEInput
      * \copydoc scheme_DAEOutput
      *
@@ -136,6 +136,6 @@ namespace CasADi{
          
   };
   
-} // namespace CasADi
+} // namespace casadi
 
 #endif //CONTROLSIMULATOR_HPP

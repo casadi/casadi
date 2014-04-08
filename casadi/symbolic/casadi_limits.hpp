@@ -26,8 +26,8 @@
 #include <cmath>
 #include <limits>
 
-/** \brief The CasADi namespace */
-namespace CasADi{
+/** \brief The casadi namespace */
+namespace casadi{
   
   
 /** \brief casadi_limits class
@@ -69,6 +69,6 @@ const T casadi_limits<T>::two = 2;
 template<class T>
 const T casadi_limits<T>::minus_one = -1;
 
-} // namespace CasADi
+} // namespace casadi
 #endif // CASADI_LIMITS_HPP
 

@@ -25,7 +25,7 @@
 #include "casadi/symbolic/casadi_exception.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 XMLNode::XMLNode(){
 }
@@ -196,4 +196,4 @@ void XMLNode::readString(const std::string& str, double& val){
 
 
 
-} // namespace CasADi
+} // namespace casadi

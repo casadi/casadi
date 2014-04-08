@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /// Forward declaration
   class OutputNode;
@@ -102,7 +102,7 @@ namespace CasADi{
     int oind_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // MULTIPLE_OUTPUT_HPP

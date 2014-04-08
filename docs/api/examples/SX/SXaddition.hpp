@@ -8,6 +8,6 @@
 *
 * \sa
 * \code
-*  SXElement CasADi::SX::operator+(const SXElement &, const SXElement &);
+*  SXElement casadi::SX::operator+(const SXElement &, const SXElement &);
 * \endcode
 */

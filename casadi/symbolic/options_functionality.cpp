@@ -32,7 +32,7 @@
 
 using namespace std;
 
-namespace CasADi {
+namespace casadi {
 
 
 double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::string &b) {
@@ -586,5 +586,5 @@ void OptionsFunctionalityNode::setDefault(const std::string &name, const Generic
 }
 
 
-} // namespace CasADi
+} // namespace casadi
 

@@ -26,7 +26,7 @@
 
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   ostream& operator<<(ostream &stream, const PrintableObject& obj){
     obj.repr(stream);
@@ -56,13 +56,13 @@ namespace CasADi{
   }
     
   std::string PrintableObject::getDescription() const{ 
-    return CasADi::str(*this);
+    return casadi::str(*this);
   }
 
   std::string PrintableObject::getRepresentation() const{ 
-    return CasADi::repr(*this);
+    return casadi::repr(*this);
   }
 
 
-} // namespace CasADi
+} // namespace casadi
     

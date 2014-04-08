@@ -35,7 +35,7 @@ extern "C"
   int mb03wd_(char* job, char* compz, f_int* n, f_int* p, f_int* ilo, f_int* ihi, f_int* iloz, f_int* ihiz, double *h, f_int* ldh1, f_int* ldh2, double* z, f_int* ldz1, f_int* ldz2, double* wr, double *wi,double* dwork, f_int *ld_work, f_int *info );
 }
 
-namespace CasADi{
+namespace casadi{
   void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau, int ldtau, double * dwork) {
      if (dwork==0) {
        std::vector<double> work = std::vector<double>(n);
@@ -186,6 +186,6 @@ if (dwork==0) {
     }
   }
  
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond

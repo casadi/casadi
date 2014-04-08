@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   WorhpInternal::WorhpInternal(const Function& nlp) : NLPSolverInternal(nlp){
 
@@ -930,5 +930,5 @@ map<int,string> WorhpInternal::flagmap = WorhpInternal::calc_flagmap();
 
 
 
-} // namespace CasADi
+} // namespace casadi
 

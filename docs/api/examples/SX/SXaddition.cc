@@ -1,7 +1,7 @@
 #include "casadi/symbolic/std_vector_tools.hpp"
 #include "casadi/symbolic/sx/sx_tools.hpp"
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 main(int argc, char *argv[])

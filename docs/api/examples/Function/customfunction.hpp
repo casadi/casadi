@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::CustomFunction();
+* casadi::CustomFunction();
 * \endcode
 *
 */

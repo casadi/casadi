@@ -52,7 +52,7 @@
 
 */
       
-namespace CasADi{
+namespace casadi{
   
 /// Input arguments of a LP problem [lpIn]
 enum LPSolverInput{
@@ -113,7 +113,7 @@ class LPSolver : public Function{
   virtual bool checkNode() const;
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // LP_SOLVER_HPP
 

@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   Function DerivativeGenerator::operator()(Function& fcn, int nfwd, int nadj, void* user_data) {
     checkNode();
@@ -57,4 +57,4 @@ Callback::Callback(CallbackCPtr ptr) {
   assignNode(new CallbackCInternal(ptr));
 }
   
-} // namespace CasADi
+} // namespace casadi

@@ -24,7 +24,7 @@
 #include "../../symbolic/std_vector_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   LapackQRDense::LapackQRDense(){
   }
@@ -120,4 +120,4 @@ namespace CasADi{
     return new LapackQRDenseInternal(*this);
   }
 
-} // namespace CasADi
+} // namespace casadi

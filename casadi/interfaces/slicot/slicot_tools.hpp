@@ -26,7 +26,7 @@
 #include "../../symbolic/matrix/matrix.hpp"
 
 
-namespace CasADi{
+namespace casadi{
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -60,6 +60,6 @@ namespace CasADi{
 */
 void slicot_periodic_schur(const std::vector< Matrix<double> > & A, std::vector< Matrix<double> > & SWIG_OUTPUT(T),  std::vector< Matrix<double> > & SWIG_OUTPUT(Z), std::vector<double> &eig_real, std::vector<double> &SWIG_OUTPUT(eig_imag));
   
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SLICOT_TOOLS_HPP

@@ -28,14 +28,14 @@
 #include "casadi/symbolic/function/integrator.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
     
 DirectCollocationInternal::DirectCollocationInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("nlp_solver",                       OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("interpolation_order",          OT_INTEGER,  3,  "Order of the interpolating polynomials");
   addOption("collocation_scheme",           OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
-  casadi_warning("CasADi::DirectCollocation is still experimental");
+  casadi_warning("casadi::DirectCollocation is still experimental");
 }
 
 DirectCollocationInternal::~DirectCollocationInternal(){
@@ -388,4 +388,4 @@ void DirectCollocationInternal::reportConstraints(std::ostream &stream) {
  
 }
 
-} // namespace CasADi
+} // namespace casadi

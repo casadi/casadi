@@ -29,7 +29,7 @@
 #include <vector>
 #include <iostream>
 
-namespace CasADi{
+namespace casadi{
 
   // Forward declaration
   class IOSchemeInternal;
@@ -193,6 +193,6 @@ class IOScheme : public SharedObject{
     
 };
   
-} // namespace CasADi
+} // namespace casadi
 
 #endif // IO_SCHEME_HPP

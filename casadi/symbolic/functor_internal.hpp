@@ -26,7 +26,7 @@
 #include "functor.hpp"
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   
   /** \brief Internal class for Callback
@@ -85,7 +85,7 @@ namespace CasADi{
     virtual CallbackCInternal* clone() const;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // FUNCTOR_INTERNAL_HPP

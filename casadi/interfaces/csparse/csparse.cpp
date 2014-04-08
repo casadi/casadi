@@ -23,7 +23,7 @@
 #include "csparse_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   CSparse::CSparse(){
   }
@@ -44,4 +44,4 @@ namespace CasADi{
     return dynamic_cast<const CSparseInternal*>(get())!=0;
   }
   
-} // namespace CasADi
+} // namespace casadi

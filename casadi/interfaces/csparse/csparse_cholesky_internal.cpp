@@ -26,7 +26,7 @@
 /// \cond INTERNAL
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   CSparseCholeskyInternal::CSparseCholeskyInternal(const Sparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
     L_ = 0;
@@ -208,6 +208,6 @@ namespace CasADi{
     return new CSparseCholeskyInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size2());
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond

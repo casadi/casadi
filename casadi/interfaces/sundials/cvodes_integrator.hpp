@@ -25,7 +25,7 @@
 
 #include "sundials_integrator.hpp"
 
-namespace CasADi{
+namespace casadi{
   
 // Forward declaration of internal class 
 class CVodesInternal;
@@ -74,7 +74,7 @@ public:
   #endif
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //CVODES_INTEGRATOR_HPP
 

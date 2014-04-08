@@ -34,7 +34,7 @@
 class TiXmlElement;
 class TiXmlNode;
 
-namespace CasADi{
+namespace casadi{
 
 class XMLNode{
 public:
@@ -132,7 +132,7 @@ public:
     std::string text_;
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif //XML_NODE_HPP

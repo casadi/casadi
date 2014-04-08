@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::kinsolSolver();
+* casadi::kinsolSolver();
 * \endcode
 *
 */

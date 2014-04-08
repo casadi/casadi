@@ -29,7 +29,7 @@
 #endif // WITH_DL 
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   SymbolicQRInternal::SymbolicQRInternal(const Sparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){
     addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");
@@ -110,7 +110,7 @@ namespace CasADi{
     SX bperm = b(rowperm_,ALL);
 
     // Solve the factorized system
-    SX xperm = CasADi::solve(R,mul(Q.T(),bperm));
+    SX xperm = casadi::solve(R,mul(Q.T(),bperm));
 
     // Permute back the solution
     SX x = xperm(inv_colperm,ALL);
@@ -144,7 +144,7 @@ namespace CasADi{
     bperm = b(colperm_,ALL);
 
     // Solve the factorized system
-    xperm = mul(Q,CasADi::solve(R.T(),bperm));
+    xperm = mul(Q,casadi::solve(R.T(),bperm));
 
     // Permute back the solution
     x = xperm(inv_rowperm,ALL);
@@ -264,7 +264,7 @@ namespace CasADi{
     stream << "  }" << endl;
   }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

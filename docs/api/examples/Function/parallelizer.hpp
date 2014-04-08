@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::Parallelizer();
+* casadi::Parallelizer();
 * \endcode
 *
 */

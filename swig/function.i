@@ -141,15 +141,15 @@ def PyFunction(obj,inputs,outputs):
 #endif
 
 %include "casadi/symbolic/function/io_interface.hpp"
-%template(IOInterfaceFunction) CasADi::IOInterface<CasADi::Function>;
+%template(IOInterfaceFunction) casadi::IOInterface<casadi::Function>;
 
-%rename(__call__original__) CasADi::IOScheme::operator();
+%rename(__call__original__) casadi::IOScheme::operator();
 %include "casadi/symbolic/function/io_scheme.hpp"
 #ifdef SWIGPYTHON
-%extend CasADi::IOScheme {
-%template(__call__original__) operator()< CasADi::Sparsity >;
-%template(__call__original__) operator()< CasADi::MX> ;
-%template(__call__original__) operator()< CasADi::Matrix<CasADi::SXElement> >;
+%extend casadi::IOScheme {
+%template(__call__original__) operator()< casadi::Sparsity >;
+%template(__call__original__) operator()< casadi::MX> ;
+%template(__call__original__) operator()< casadi::Matrix<casadi::SXElement> >;
 
 %pythoncode %{
   def __call__(self,*dummy,**kwargs):
@@ -163,23 +163,23 @@ def PyFunction(obj,inputs,outputs):
 #endif
 
 %include "casadi/symbolic/function/io_scheme_vector.hpp"
-%template(IOSchemeVectorMX) CasADi::IOSchemeVector< CasADi::MX >;
-%template(IOSchemeVectorSX) CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SXElement> >;
-%template(IOSchemeVectorSparsity) CasADi::IOSchemeVector< CasADi::Sparsity >;
+%template(IOSchemeVectorMX) casadi::IOSchemeVector< casadi::MX >;
+%template(IOSchemeVectorSX) casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> >;
+%template(IOSchemeVectorSparsity) casadi::IOSchemeVector< casadi::Sparsity >;
 #ifdef SWIGPYTHON
-%extend CasADi::IOSchemeVector< CasADi::MX > {
+%extend casadi::IOSchemeVector< casadi::MX > {
 %pythoncode %{
   def __iter__(self):
     return iter(self.data)
 %}
 }
-%extend CasADi::IOSchemeVector< CasADi::Matrix<CasADi::SXElement> > {
+%extend casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> > {
 %pythoncode %{
   def __iter__(self):
     return iter(self.data)
 %}
 }
-%extend CasADi::IOSchemeVector< CasADi::Sparsity > {
+%extend casadi::IOSchemeVector< casadi::Sparsity > {
 %pythoncode %{
   def __iter__(self):
     return iter(self.data)
@@ -188,10 +188,10 @@ def PyFunction(obj,inputs,outputs):
 
 #endif
 
-%extend CasADi::IOInterface<CasADi::Function> {
-  CasADi::Matrix<double> getInput(int iind=0) const             { static_cast<const CasADi::Function*>($self)->assertInit(); return $self->input(iind);}
-  CasADi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputSchemeEntry(iname)); }
-  CasADi::Matrix<double> getOutput(int oind=0) const            { static_cast<const CasADi::Function*>($self)->assertInit(); return $self->output(oind);}
+%extend casadi::IOInterface<casadi::Function> {
+  casadi::Matrix<double> getInput(int iind=0) const             { static_cast<const casadi::Function*>($self)->assertInit(); return $self->input(iind);}
+  casadi::Matrix<double> getInput(const std::string &iname) const             { return $self->input($self->inputSchemeEntry(iname)); }
+  casadi::Matrix<double> getOutput(int oind=0) const            { static_cast<const casadi::Function*>($self)->assertInit(); return $self->output(oind);}
 }
 
 %include "casadi/symbolic/function/function.hpp"
@@ -220,5 +220,5 @@ def PyFunction(obj,inputs,outputs):
 %include "casadi/symbolic/functor.hpp"
 %include "casadi/symbolic/function/nullspace.hpp"
 
-%template(IntegratorVector) std::vector<CasADi::Integrator>;
-%template(Pair_Function_Function) std::pair<CasADi::Function,CasADi::Function>;
+%template(IntegratorVector) std::vector<casadi::Integrator>;
+%template(Pair_Function_Function) std::pair<casadi::Function,casadi::Function>;

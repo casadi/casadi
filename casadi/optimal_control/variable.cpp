@@ -24,7 +24,7 @@
 #include "variable.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   Variable::Variable(){
     this->variability = CONTINUOUS;
@@ -94,4 +94,4 @@ namespace CasADi{
     stream << name();
   }
 
-} // namespace CasADi
+} // namespace casadi

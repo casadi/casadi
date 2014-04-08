@@ -57,7 +57,7 @@
   
     \endverbatim 
 */
-namespace CasADi{
+namespace casadi{
 
   /// Input arguments of an ODE/DAE function [daeIn]
   enum DAEInput{
@@ -214,6 +214,6 @@ namespace CasADi{
     Function getDAE();
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //INTEGRATOR_HPP

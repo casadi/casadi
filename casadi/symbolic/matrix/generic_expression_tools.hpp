@@ -25,7 +25,7 @@
 
 #include "../casadi_math.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief  Logical `and`, returns (an expression evaluating to) 1 if both expressions are nonzero and 0 otherwise */
   template<typename DataType>
@@ -39,13 +39,13 @@ namespace CasADi{
   template<typename DataType>
   DataType logic_not(const DataType &x){ return !x; }
 
-} // namespace CasADi
+} // namespace casadi
 
 #ifdef SWIG
 
 // map the template name to the instantiated name
 #define GET_INST(DataType,function_name) \
-%template(function_name) CasADi::function_name< DataType >;
+%template(function_name) casadi::function_name< DataType >;
 
 // Define template instanciations
 #define GENERIC_EXPRESSION_TOOLS_TEMPLATES(DataType) \

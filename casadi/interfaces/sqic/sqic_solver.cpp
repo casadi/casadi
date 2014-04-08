@@ -24,7 +24,7 @@
 #include "sqic_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 SQICSolver::SQICSolver(){ 
 }
@@ -47,4 +47,4 @@ bool SQICSolver::checkNode() const{
   return dynamic_cast<const SQICInternal*>(get());
 }
 
-} // namespace CasADi
+} // namespace casadi

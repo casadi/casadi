@@ -30,8 +30,8 @@
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/function/sx_function.hpp"
 
-using namespace CasADi;
-using namespace CasADi::OptimalControl;
+using namespace casadi;
+using namespace casadi::OptimalControl;
 using namespace std;
 
 // Symbolc representation of the optimal control problem

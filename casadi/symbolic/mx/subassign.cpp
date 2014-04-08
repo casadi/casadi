@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
   
   SubAssign::SubAssign(const MX& x, const MX& y, const Slice& i, const Slice& j) : i_(i), j_(j) {
     setDependencies(x,y);
@@ -70,4 +70,4 @@ namespace CasADi{
     casadi_error("not ready");  
   }
 
-} // namespace CasADi
+} // namespace casadi

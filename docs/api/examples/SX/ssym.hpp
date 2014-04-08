@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::SX::sym();
+* casadi::SX::sym();
 * \endcode
 *
 */

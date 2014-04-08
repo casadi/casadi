@@ -25,7 +25,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 IdasIntegrator::IdasIntegrator(){ 
 }
@@ -50,6 +50,6 @@ void IdasIntegrator::correctInitialConditions(){
   (*this)->correctInitialConditions();
 }
 
-} // namespace CasADi
+} // namespace casadi
 
 

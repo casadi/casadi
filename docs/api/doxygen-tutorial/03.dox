@@ -27,13 +27,13 @@
 \section section3_1 Symbolic expressions
    Normally, mathematical expressions represent operations between variables and parameters.
    In order to build up our models, we need to have a computer-based abstraction of these. In CasADi
-   the CasADi::SX class provides us exactly these building blocks. We create a simple expression:
+   the casadi::SX class provides us exactly these building blocks. We create a simple expression:
 <table border="0" style="border-style: dotted; border-width: 1px;">
    <tr><td>Example:</td><td>Output:</td>
    <tr style="vertical-align: top;"><td>
 \code
      1  #include "casadi/sx/sx.hpp"
-     2  using namespace CasADi;
+     2  using namespace casadi;
      3  int main(int argc, char* argv[]){
      4     SX x("x");
      5     SX expr;
@@ -57,15 +57,15 @@ expr: ((((3*x)+(x*x))-sin(x))+((y/2)/x))
    </td>
    </tr>
 </table>
-On the 1st line we include the header file containing the CasADi::SX class, on the 4th the \c x object
+On the 1st line we include the header file containing the casadi::SX class, on the 4th the \c x object
 is created and from here on the string \c "x" is assigned to this variable. We can also create 
-CasADi::SX objects by invoking the default constructor (line 5), although this variable is not initialized to any symbolic
+casadi::SX objects by invoking the default constructor (line 5), although this variable is not initialized to any symbolic
 expression at this time. The \c expr object is initialized on line 8, while from the line 10 on we extend our expression
 with a \c y variable. One can always check whether an expression is correct by simply printing it to the standard output.
-With the use of CasADi::SX objects and the <tt>+ - * / += -= *= /= exp log sqrt sin pow</tt> etc. operations we can build up a
+With the use of casadi::SX objects and the <tt>+ - * / += -= *= /= exp log sqrt sin pow</tt> etc. operations we can build up a
 wide range of mathemetical expressions.
 We can also create a vector of expressions if needed, although each element must be initialized that may be
-carried out by the CasADi::make_symbolic() function. Now we demonstrate how this works.
+carried out by the casadi::make_symbolic() function. Now we demonstrate how this works.
 <table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
    <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
    <tr style="vertical-align: top;"><td>
@@ -90,10 +90,10 @@ z[4]: z_4
 After invoking make_symbolic (line 6) the elements of \c z are assigned to <tt>z_0, z_1, ...</tt>  and can be used later on in modelling.
 \section section3_2 Functions 
 Now that we can build up mathematical expressions we would like to evaluate them symbolically or numerically. We will see how this can be
-done with the CasADi::SXFunction object, which can represent mathematical functions that has prototype
+done with the casadi::SXFunction object, which can represent mathematical functions that has prototype
  \f$\mathbb{R} \rightarrow \mathbb{R}\f$, \f$\mathbb{R}^n \rightarrow \mathbb{R}\f$,
 \f$\mathbb{R}^n \rightarrow \mathbb{R}^m \f$ or \f$\mathbb{R}^{n_1 \times n_2} \rightarrow \mathbb{R}^{m_1 \times m_2}\f$.
-In the constructor of CasADi::SXFunction one has to give two arguments. The first argument should contain all the variables
+In the constructor of casadi::SXFunction one has to give two arguments. The first argument should contain all the variables
 that the function will depend on, and the second argument stores the function definition itself. The data type of the arguments may be various
 depending on the prototype of the function that is to be represented. Let's see some examples.
 \subsection subsection3_2_1 Numerical evaluation
@@ -244,7 +244,7 @@ It is important to understand the concept of functions depending on matrices, be
 \subsection subsection3_2_2 Symbolic evaluation
 One might also wish to replace certain variables in a symbolic expression with some other variables
   or with more complex expressions. This may be carried out easily by the use of symbolic evaluation, we use
-  the CasADi::SXFunction::eval() member function.
+  the casadi::SXFunction::eval() member function.
 <table border="0" style="border-style: dotted; border-width: 1px;">                                                                                                                                            
    <tr><td>Example:</td><td>Output:</td>                                                                                                                                                                       
    <tr style="vertical-align: top;"><td>
@@ -334,7 +334,7 @@ and we provide the directions; now only columns of the identity matrix. The way 
 slightly different (line 19), so far we haven't given any arguments. The first argument indicates the number of
 forward derivatives to be evaluated, the second is just the same,
  but with adjoint derivatives. In any case, the function itself is evaluated. We can collect our
-directional derivatives by the CasADi::SXFunction::fwdSens() member function (line 23). Note that the first argument addresses
+directional derivatives by the casadi::SXFunction::fwdSens() member function (line 23). Note that the first argument addresses
 the the matrix input. Since we have only vector input now, this is always zero.
 
 
@@ -374,7 +374,7 @@ Adjoint derivative: [2,5,0.756802]
    </tr>
    </table>
 This time we set the option \c number_of_adj_dir (greater than 1 throws an error) and we invoke SXFunction::evaluate(0, 1).
-The adjoint derivative we can access by the CasADi::SXFunction::adjSens(...) method.
+The adjoint derivative we can access by the casadi::SXFunction::adjSens(...) method.
 
 \subsection subsection3_3_3 Symbolic differentiation
 The second way one can differentiate is by symbolic manipulation. The result of this approach is nothing else than a

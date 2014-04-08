@@ -36,7 +36,7 @@
 #include <ctime>
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
   
 /** \brief Interface to the Sundials CVodes integrators
 
@@ -231,7 +231,7 @@ public:
     
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //CVODES_INTERNAL_HPP

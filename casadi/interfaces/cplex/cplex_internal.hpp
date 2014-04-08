@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** Internal class for CplexSolver
       @copydoc QPSolver_doc
@@ -110,6 +110,6 @@ namespace CasADi{
     CPXLPptr lp_;
 
   };
-} // end namespace CasADi
+} // end namespace casadi
 /// \endcond
 #endif //CPLEX_INTERNAL_HPP

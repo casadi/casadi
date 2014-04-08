@@ -25,7 +25,7 @@
 #include <cassert>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   PsdIndefDpleSolver::PsdIndefDpleSolver(){
   
@@ -47,5 +47,5 @@ namespace CasADi{
     return dynamic_cast<const PsdIndefDpleInternal*>(get())!=0;
   }
  
-} // namespace CasADi
+} // namespace casadi
 

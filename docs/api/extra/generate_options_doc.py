@@ -44,7 +44,7 @@ xmlData = etree.parse(xml+'index.xml')
 classes = xmlData.findall("//compound[@kind='class']")
 
 # The main data structure we will set up
-# Keys are the full names e.g. CasADi::Sundials::CVodesIntegrator
+# Keys are the full names e.g. casadi::Sundials::CVodesIntegrator
 # The values are dicts with the following structure:
 # 
 # parents     - the list of classes from which this class inherits
@@ -175,7 +175,7 @@ parse_match = Literal("addOption(") + parse_quoted_string.setResultsName("name")
     
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
-  if not('CasADi::OptionsFunctionalityNode' in meta['hierarchy']) and not(name=='CasADi::OptionsFunctionalityNode'):
+  if not('casadi::OptionsFunctionalityNode' in meta['hierarchy']) and not(name=='casadi::OptionsFunctionalityNode'):
     continue
   if not('file' in meta):
     meta['options']={}
@@ -458,7 +458,7 @@ for scheme in enums:
   for t in types:
     if re.search(t,scheme,re.IGNORECASE):
       f.write("/** \defgroup scheme_%s\n" % scheme)
-      f.write(enumsashtml(scheme,"%s scheme: CasADi::%s" % (t.capitalize(),scheme)))
+      f.write(enumsashtml(scheme,"%s scheme: casadi::%s" % (t.capitalize(),scheme)))
       f.write( "*/\n")
 
 # Print out doxygen information - schemes

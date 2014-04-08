@@ -25,7 +25,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   SnoptSolver::SnoptSolver(){
   }
@@ -50,4 +50,4 @@ namespace CasADi{
     dynamic_cast<SnoptInternal*>(get())->setOptionsFromFile(file);
   }
 
-} // namespace CasADi
+} // namespace casadi

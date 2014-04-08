@@ -84,16 +84,16 @@ Their data type do not differ, but their use will give them different meaning. W
 function variables. The element addressed by DAE_T
 is a vector containing only the time variable (line 10). The element addressed by DAE_Y is always the vector of all dynamic variables (line 11).
 The element, which is addressed by DAE_P, contains the parameters (now we have only one control variable, line 12). Afterwards, we have to define two functions corresponding
-to our ODE (line 13) and quadrature equations (line 14). Now everything is ready to instantiate the CasADi::Sundials::CVodesIntegrator class, which is an interface
+to our ODE (line 13) and quadrature equations (line 14). Now everything is ready to instantiate the casadi::Sundials::CVodesIntegrator class, which is an interface
 to the CVODES algorithm. If we have no quadratures then we simply pass only the ODE equations (line 15). If we don't set any options a BDF method is used
 to carry out integration. After instantiation, we set the initial time and the final time (line 16-17) of the integration. 
-For a detailed description of the available options consult \c CasADi::Sundials::CVodesIntegrator class. .
+For a detailed description of the available options consult \c casadi::Sundials::CVodesIntegrator class. .
 
 The initial value of the dynamic
-variables must be set by the use of \c INTERGRATOR_X0 enum type in the \c CasADi::Sundials::CVodesIntegrator::setInput(...) function. 
+variables must be set by the use of \c INTERGRATOR_X0 enum type in the \c casadi::Sundials::CVodesIntegrator::setInput(...) function. 
 Note that CVODES handles quadratures by introducing dummy dynamic variables and thus the initial
 value must have length of 3 + 2 = 5 in our example (line 19-22). The parameters (in our case \c u) should also be assigned a value, this may be done
-using the \c INTEGRATOR_P enum type (line 25). After evaluation we can access the solution of the ODE and quadratures by the CasADi::Sundials::CVodesIntegrator::output(...) method
+using the \c INTEGRATOR_P enum type (line 25). After evaluation we can access the solution of the ODE and quadratures by the casadi::Sundials::CVodesIntegrator::output(...) method
 saying that we would like the value of the dynamic variables at the final time \c INTEGRATOR_XF (see line 27).
 
 \subsection subsection4_1_1 Evaluation of forward and backward sensitivities
@@ -221,7 +221,7 @@ Inside the for loop (line 35-39), the integrate(...) method is used to get the a
 \subsection subsection4_1_2 Integrator options
 In the following subsection we would like to introduce the most important integrator options. Most of the options are directly available and usable
  known from the CVODES documentation, altough this is very detailed and quite often one cannot find what he is looking for. One can get the 
- list of actual options by invoking the CasADi::Sundials::CVodesIntegrator::printOptions() method.
+ list of actual options by invoking the casadi::Sundials::CVodesIntegrator::printOptions() method.
 <center>
 <table style="border-style: solid; border-width: 1px; width: 80%;" cellpadding="3" cellspacing="3">
         <tr>

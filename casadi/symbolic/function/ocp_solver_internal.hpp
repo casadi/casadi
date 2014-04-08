@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
  
 /** \brief  Internal node class for OCPSolver
   \author Joel Andersson 
@@ -49,11 +49,11 @@ class OCPSolverInternal : public FunctionInternal{
     *
     * The signatures (number and order of inputs/outputs) of these functions are not restricted at this stage.
     * 
-    * Only ffcn has a general requirement for input interface: { DAE_T, DAE_Y, DAE_P, DAE_YDOT } from CasADi::DAEInput
+    * Only ffcn has a general requirement for input interface: { DAE_T, DAE_Y, DAE_P, DAE_YDOT } from casadi::DAEInput
     *
     * For example:
     *
-    * When using the ACADO interface, all functions should have the same input interface: CasADi::ACADO_FCN_Input \n
+    * When using the ACADO interface, all functions should have the same input interface: casadi::ACADO_FCN_Input \n
     * When using MultipleShooting, mfcn_ is a single input -> single output mapping
     *
     */
@@ -102,7 +102,7 @@ class OCPSolverInternal : public FunctionInternal{
 
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif // OCP_SOLVER_INTERNAL_HPP

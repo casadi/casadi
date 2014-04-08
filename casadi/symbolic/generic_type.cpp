@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
 /// \cond INTERNAL
   typedef GenericTypeInternal<std::string> StringType;
@@ -515,5 +515,5 @@ GenericType::GenericType(void* ptr) : type_(OT_VOIDPTR){
 }
 
 
-} // namespace CasADi
+} // namespace casadi
 

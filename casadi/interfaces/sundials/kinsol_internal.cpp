@@ -27,7 +27,7 @@
 #include "casadi/symbolic/function/linear_solver_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   KinsolInternal::KinsolInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
     addOption("max_iter",                 OT_INTEGER, 0, "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
@@ -705,5 +705,5 @@ namespace CasADi{
     return f;
   }
 
-} // namespace CasADi
+} // namespace casadi
 

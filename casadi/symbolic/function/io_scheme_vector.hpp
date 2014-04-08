@@ -27,7 +27,7 @@
 #include "io_scheme.hpp"
 #include "../casadi_exception.hpp"
 #include "../printable_object.hpp"
-namespace CasADi{
+namespace casadi{
   
 /** \brief A vector container with associated IOScheme
   A class 
@@ -83,7 +83,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // IO_SCHEME_VECTOR_HPP

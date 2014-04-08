@@ -31,7 +31,7 @@
 /// \cond INTERNAL
 class SharedObjectNode;
 
-namespace CasADi{
+namespace casadi{
 
 class IOSchemeInternal : public SharedObjectNode{
   public:    
@@ -150,7 +150,7 @@ class IOSchemeCustomInternal : public IOSchemeInternal {
 
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // IO_SCHEME_INTERNAL_HPP

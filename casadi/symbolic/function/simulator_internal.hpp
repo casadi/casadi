@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief Simulator data storage classs
       \author Joel Andersson 
@@ -68,7 +68,7 @@ namespace CasADi{
     std::vector<std::vector<double>::iterator> output_its_;
   };
   
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif // SIMULATOR_INTERNAL_HPP

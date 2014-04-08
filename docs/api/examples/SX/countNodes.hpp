@@ -6,8 +6,8 @@
 *
 * \sa
 * \code
-* CasADi::countNodes(const Matrix<SXElement>& A);
-* CasADi::countNodesFull(const Matrix<SXElement>& A);
+* casadi::countNodes(const Matrix<SXElement>& A);
+* casadi::countNodesFull(const Matrix<SXElement>& A);
 * \endcode
 *
 */

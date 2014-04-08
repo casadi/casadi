@@ -32,7 +32,7 @@
 #include "generic_matrix.hpp"
 #include "generic_expression.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 /// \cond INTERNAL
   template<typename DataType>
@@ -812,10 +812,10 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 // Typedefs/template initializations
-namespace CasADi{
+namespace casadi{
   typedef Matrix<int> IMatrix;
   typedef Matrix<double> DMatrix;
   typedef std::vector<Matrix<double> > DMatrixVector;
@@ -826,7 +826,7 @@ namespace CasADi{
   typedef std::vector<DMatrixPtr> DMatrixPtrV;
   typedef std::vector<DMatrixPtrV> DMatrixPtrVV;
   /// \endcond
-} // namespace CasADi
+} // namespace casadi
 
 #include "matrix_impl.hpp"
 

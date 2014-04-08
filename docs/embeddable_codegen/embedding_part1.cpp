@@ -25,7 +25,7 @@
 #include <symbolic/function/nlp_solver.hpp>
 #include <fstream>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 /**
  *  Solve an NLP using codegen  

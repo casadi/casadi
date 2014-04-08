@@ -25,7 +25,7 @@
 
 #include "../../control/dple_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   /// Forward declaration of internal class
   class PsdIndefDpleInternal;
@@ -72,6 +72,6 @@ namespace CasADi{
   
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // DPLE_SOLVER_HPP

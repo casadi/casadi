@@ -1,5 +1,5 @@
 file(STRINGS "@file@" FILE_CONTENTS)
-file(WRITE @CMAKE_CURRENT_BINARY_DIR@/${FILE_BASENAME}_embedded.hpp "namespace CasADi {\n" )
+file(WRITE @CMAKE_CURRENT_BINARY_DIR@/${FILE_BASENAME}_embedded.hpp "namespace casadi {\n" )
 
 set(FUNCTION_NAME "")
 set(INDENTATION "")

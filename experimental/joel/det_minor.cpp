@@ -28,7 +28,7 @@
 #include <ctime>
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 /** Determinant example from ADOL-C */
 

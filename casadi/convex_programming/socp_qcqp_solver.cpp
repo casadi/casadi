@@ -24,7 +24,7 @@
 #include "socp_qcqp_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 SOCPQCQPSolver::SOCPQCQPSolver(){ 
 }
@@ -51,4 +51,4 @@ SOCPSolver & SOCPQCQPSolver::getSolver() {
   return (*this)->socpsolver_;
 }
 
-} // namespace CasADi
+} // namespace casadi

@@ -30,7 +30,7 @@
 #include "integration_tools.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
     
   class OldCollocationIntegratorInternal : public IntegratorInternal{
   
@@ -83,6 +83,6 @@ namespace CasADi{
   
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP

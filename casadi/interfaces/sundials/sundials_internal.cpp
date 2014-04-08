@@ -32,7 +32,7 @@ INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
   
 SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
   addOption("max_num_steps",               OT_INTEGER,          10000,          "Maximum number of integrator steps");
@@ -230,6 +230,6 @@ void SundialsInternal::reset(){
   IntegratorInternal::reset();
 }
 
-} // namespace CasADi
+} // namespace casadi
 
 

@@ -24,7 +24,7 @@
 #include "newton_implicit_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   NewtonImplicitSolver::NewtonImplicitSolver(){ 
   }
@@ -46,4 +46,4 @@ namespace CasADi{
     return dynamic_cast<const NewtonImplicitInternal*>(get());
   }
 
-} // namespace CasADi
+} // namespace casadi

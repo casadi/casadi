@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
 IPMethod::IPMethod(){
 }
@@ -45,4 +45,4 @@ bool IPMethod::checkNode() const{
   return dynamic_cast<const IPInternal*>(get());
 }
 
-} // namespace CasADi
+} // namespace casadi

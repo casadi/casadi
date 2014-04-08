@@ -38,7 +38,7 @@ using namespace std;
 #include <SensReducedHessianCalculator.hpp>
 #endif // WITH_SIPOPT
 
-namespace CasADi{
+namespace casadi{
 
   IpoptInternal::IpoptInternal(const Function& nlp) : NLPSolverInternal(nlp){
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
@@ -969,4 +969,4 @@ namespace CasADi{
 
 
 
-} // namespace CasADi
+} // namespace casadi

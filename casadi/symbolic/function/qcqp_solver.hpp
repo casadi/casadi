@@ -56,7 +56,7 @@
   
 */
       
-namespace CasADi{
+namespace casadi{
   
 /// Input arguments of a QP problem [qcqpIn]
 enum QCQPSolverInput{
@@ -137,7 +137,7 @@ class QCQPSolver : public Function{
   void setQPOptions();
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // QCQP_SOLVER_HPP
 

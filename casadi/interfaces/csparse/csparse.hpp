@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/linear_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   
   /** \brief  Forward declaration of internal class */
@@ -35,7 +35,7 @@ namespace CasADi{
    *
    @copydoc LinearSolver_doc
    *  
-   * CSparse is an CasADi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   * CSparse is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use CSparse is: \n
    *  -# init()
@@ -77,7 +77,7 @@ namespace CasADi{
   
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //CSPARSE_HPP
 

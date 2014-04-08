@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/integrator.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   class OldCollocationIntegratorInternal;
   
@@ -74,6 +74,6 @@ namespace CasADi{
 #endif
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //OLD_COLLOCATION_INTEGRATOR_HPP

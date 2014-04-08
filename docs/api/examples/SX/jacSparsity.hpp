@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::SXfunction::jacSparsity();
+* casadi::SXfunction::jacSparsity();
 * \endcode
 *
 */

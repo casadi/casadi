@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
   
   Sparsity reshape(const Sparsity& a, int nrow, int ncol){
     return a.reshape(nrow,ncol);
@@ -182,5 +182,5 @@ namespace CasADi{
     return ret;
   }
 
-} // namespace CasADi
+} // namespace casadi
 

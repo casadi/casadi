@@ -1,14 +1,14 @@
 /** 
-* This example looks at the use of different instances of CasADi::LinearSolver
+* This example looks at the use of different instances of casadi::LinearSolver
 *
 *
 * \pythonexample{algebra/LinearSolver}
 *
 * \sa
 * \code
-* CasADi::LapackLUDense;
-* CasADi::LapackQRDense;
-* CasADi::CSparse;
+* casadi::LapackLUDense;
+* casadi::LapackQRDense;
+* casadi::CSparse;
 * \endcode
 *
 */

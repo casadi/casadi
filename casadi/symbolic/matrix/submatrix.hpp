@@ -23,7 +23,7 @@
 #ifndef SUBMATRIX_HPP
 #define SUBMATRIX_HPP
 
-namespace CasADi{
+namespace casadi{
 
 
   /** SubMatrix class for Matrix 
@@ -101,7 +101,7 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // SUBMATRIX_HPP

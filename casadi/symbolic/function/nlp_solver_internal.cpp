@@ -30,7 +30,7 @@ INPUTSCHEME(NLPSolverInput)
 OUTPUTSCHEME(NLPSolverOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   NLPSolverInternal::NLPSolverInternal(const Function& nlp) : nlp_(nlp){
 
@@ -329,4 +329,4 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi

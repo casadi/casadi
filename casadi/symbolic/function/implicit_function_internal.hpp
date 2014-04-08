@@ -29,7 +29,7 @@
 
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
   
   // Forward declaration of internal class
   class ImplicitFunctionInternal;
@@ -99,7 +99,7 @@ namespace CasADi{
 
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif //IMPLICIT_FUNCTION_INTERNAL_HPP

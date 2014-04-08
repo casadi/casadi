@@ -28,7 +28,7 @@
 #include "casadi/symbolic/runtime/runtime_embedded.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
   
   void CodeGenerator::flush(std::ostream& s) const{
     s << includes_.str();
@@ -323,5 +323,5 @@ namespace CasADi{
     return ss.str();
   }
 
-} // namespace CasADi
+} // namespace casadi
 

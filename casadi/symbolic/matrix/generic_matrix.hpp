@@ -30,7 +30,7 @@
 #include "sparsity_tools.hpp"
 #include "../casadi_math.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   /** Sparsity format for getting and setting inputs and outputs */
   enum SparsityType{SPARSE,SPARSESYM,DENSE,DENSESYM,DENSETRANS};
@@ -352,7 +352,7 @@ namespace CasADi{
     throw CasadiException("\"sym\" not defined for instantiation");
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // GENERIC_MATRIX_HPP
 

@@ -26,7 +26,7 @@
 #include "casadi/symbolic/casadi_options.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   CSparseInternal::CSparseInternal(const Sparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
     N_ = 0;
@@ -182,4 +182,4 @@ namespace CasADi{
     return new CSparseInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size2());
   }
 
-} // namespace CasADi
+} // namespace casadi

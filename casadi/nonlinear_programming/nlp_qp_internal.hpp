@@ -27,7 +27,7 @@
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for NLPQPInternal
    * 
@@ -58,7 +58,7 @@ public:
 
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //NLP_QP_INTERNAL_HPP
 

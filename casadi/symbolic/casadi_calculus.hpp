@@ -37,7 +37,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /// Enum for quick access to any node
   enum Operation{
@@ -337,7 +337,7 @@ namespace CasADi{
   //@}
 }
 
-namespace CasADi{
+namespace casadi{
 
   template<typename T>
   T twice(const T& x){
@@ -931,7 +931,7 @@ namespace CasADi{
 
 #endif // SWIG
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

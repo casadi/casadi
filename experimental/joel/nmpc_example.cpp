@@ -30,7 +30,7 @@
 #include <ctime>
 #include <cstdlib>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){

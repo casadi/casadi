@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
 LiftedSQP::LiftedSQP(){
 }
@@ -45,4 +45,4 @@ bool LiftedSQP::checkNode() const{
   return dynamic_cast<const LiftedSQPInternal*>(get());
 }
 
-} // namespace CasADi
+} // namespace casadi

@@ -37,7 +37,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   
 /**
 @copydoc IdasIntegrator_doc
@@ -240,7 +240,7 @@ class IdasInternal : public SundialsInternal{
   
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //IDAS_INTERNAL_HPP

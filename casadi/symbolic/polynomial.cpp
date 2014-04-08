@@ -25,7 +25,7 @@
 #include <sstream>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   Polynomial::Polynomial(real_t scalar) : p_(1,scalar){
   }
@@ -154,7 +154,7 @@ namespace CasADi{
   }
 
     
-} // namespace CasADi
+} // namespace casadi
     
 
 

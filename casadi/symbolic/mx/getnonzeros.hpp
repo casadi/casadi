@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Get nonzeros of a matrix
       \author Joel Andersson
       \date 2013
@@ -190,7 +190,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // GETNONZEROS_HPP

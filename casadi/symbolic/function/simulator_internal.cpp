@@ -29,7 +29,7 @@
 INPUTSCHEME(IntegratorInput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   
   SimulatorInternal::SimulatorInternal(const Integrator& integrator, const Function& output_fcn, const vector<double>& grid) : integrator_(integrator), output_fcn_(output_fcn), grid_(grid){
@@ -177,6 +177,6 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 

@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
 /** \brief Represents an MX that is only composed of a constant.
         \author Joel Andersson 
@@ -517,7 +517,7 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 

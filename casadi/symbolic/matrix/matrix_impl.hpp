@@ -31,7 +31,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   // Implementations
 
   template<typename DataType>
@@ -62,7 +62,7 @@ namespace CasADi{
   template<typename DataType>
   bool Matrix<DataType>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you provided a shape" << dimString());}
-    return CasADi::__nonzero__(at(0));
+    return casadi::__nonzero__(at(0));
   }
 
   template<typename DataType>
@@ -1913,7 +1913,7 @@ namespace CasADi{
 
   template<typename DataType>
   bool Matrix<DataType>::isRegular() const{
-    return CasADi::isRegular(data_);
+    return casadi::isRegular(data_);
   }
 
   template<typename DataType>
@@ -2070,7 +2070,7 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

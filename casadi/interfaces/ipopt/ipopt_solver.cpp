@@ -24,7 +24,7 @@
 #include "ipopt_nlp.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   IpoptSolver::IpoptSolver(){
   }
@@ -49,4 +49,4 @@ namespace CasADi{
     return (*this)->getReducedHessian();
   }
 
-} // namespace CasADi
+} // namespace casadi

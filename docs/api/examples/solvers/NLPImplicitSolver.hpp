@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::NLPImplicitSolver();
+* casadi::NLPImplicitSolver();
 * \endcode
 *
 */

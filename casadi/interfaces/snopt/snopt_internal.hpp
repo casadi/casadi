@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /**
      @copydoc NLPSolver_doc
@@ -139,7 +139,7 @@ namespace CasADi{
       int n_callback_fun_; // number of calls to callback function
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //SNOPT_INTERNAL_HPP

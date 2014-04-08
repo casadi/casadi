@@ -30,7 +30,7 @@
 #include "../casadi_math.hpp"
 #include "../casadi_exception.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 /**
 \ingroup expression_tools
@@ -157,13 +157,13 @@ namespace CasADi{
 * @}
 */
 
-} // namespace CasADi
+} // namespace casadi
 
 #ifdef SWIG
 
 // map the template name to the instantiated name
 #define GMTT_INST(MatType,function_name) \
-%template(function_name) CasADi::function_name< MatType >;
+%template(function_name) casadi::function_name< MatType >;
 
 // Define template instanciations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType) \

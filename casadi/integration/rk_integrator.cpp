@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   RKIntegrator::RKIntegrator(){
   }
@@ -45,4 +45,4 @@ namespace CasADi{
     return dynamic_cast<const RKIntegratorInternal*>(get())!=0;
   }
 
-} // namespace CasADi
+} // namespace casadi

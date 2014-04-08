@@ -27,7 +27,7 @@
 #include "casadi/symbolic/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
 /**
 @copydoc NLPSolver_doc
@@ -127,7 +127,7 @@ public:
   
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif //IPOPT_INTERNAL_HPP

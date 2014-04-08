@@ -25,7 +25,7 @@
 
 # include "printable_object.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief Helper class for differentiating and integrating polynomials
       \author Joel Andersson 
@@ -116,7 +116,7 @@ namespace CasADi{
     std::vector<real_t> p_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // POLYNOMIAL_HPP

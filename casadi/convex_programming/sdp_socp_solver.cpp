@@ -24,7 +24,7 @@
 #include "sdp_socp_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 SDPSOCPSolver::SDPSOCPSolver(){ 
 }
@@ -51,4 +51,4 @@ SDPSolver & SDPSOCPSolver::getSolver() {
   return (*this)->sdpsolver_;
 }
 
-} // namespace CasADi
+} // namespace casadi

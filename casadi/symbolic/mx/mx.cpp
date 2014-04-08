@@ -34,7 +34,7 @@
 #include "../casadi_math.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   MX::~MX(){
   }
@@ -994,4 +994,4 @@ namespace CasADi{
     }
   }
           
-} // namespace CasADi
+} // namespace casadi

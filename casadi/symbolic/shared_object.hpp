@@ -28,7 +28,7 @@
 #include <map>
 #include <vector>
 
-namespace CasADi{
+namespace casadi{
 
   // Forward declaration of weak reference class
   class WeakRef;
@@ -361,7 +361,7 @@ namespace CasADi{
 #endif // SWIG
 
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // SHARED_OBJECT_HPP

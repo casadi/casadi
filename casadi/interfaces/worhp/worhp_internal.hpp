@@ -36,7 +36,7 @@
 #include "worhp.h"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /**
      @copydoc NLPSolver_doc
@@ -116,7 +116,7 @@ namespace CasADi{
   
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //WORHP_INTERNAL_HPP

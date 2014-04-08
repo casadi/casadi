@@ -27,7 +27,7 @@
 
 #include "function.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   // Forward declaration of internal class
   class ParallelizerInternal;
@@ -53,7 +53,7 @@ namespace CasADi{
   
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // PARALLELIZER_HPP

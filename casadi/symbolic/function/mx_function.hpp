@@ -31,7 +31,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
 /** \brief  An elemenent of the algorithm, namely an MX node */
 struct MXAlgEl{
@@ -48,16 +48,16 @@ struct MXAlgEl{
   std::vector<int> res;
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #ifdef SWIG
 // Template instantiation
-%template(MXAlgElVector) std::vector<CasADi::MXAlgEl>;
+%template(MXAlgElVector) std::vector<casadi::MXAlgEl>;
 #endif // SWIG
 
 /// \endcond
 
-namespace CasADi{
+namespace casadi{
 
 /** \brief  Forward declaration of internal class */
 class MXFunctionInternal;
@@ -183,7 +183,7 @@ public:
   typedef MX MatType;  
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // MX_FUNCTION_HPP

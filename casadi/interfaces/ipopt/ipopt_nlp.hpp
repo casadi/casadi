@@ -43,7 +43,7 @@
 
 /// \cond INTERNAL
 using namespace Ipopt;
-namespace CasADi{
+namespace casadi{
 
 class IpoptUserClass : public TNLP
 {
@@ -147,7 +147,7 @@ private:
   double obj_value_;
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif //IPOPT_NLP

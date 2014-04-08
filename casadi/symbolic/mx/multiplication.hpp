@@ -27,7 +27,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief An MX atomic for matrix-matrix product, note that the first factor must be provided transposed
       \author Joel Andersson 
       \date 2010
@@ -104,7 +104,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 

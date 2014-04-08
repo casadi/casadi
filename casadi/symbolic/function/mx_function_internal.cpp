@@ -35,7 +35,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std::vector<MX>& outputv) :
     XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>(inputv,outputv) {
@@ -1308,5 +1308,5 @@ namespace CasADi{
     vinit_fcn.setOption("name","lifting_variable_guess");
   }
 
-} // namespace CasADi
+} // namespace casadi
 

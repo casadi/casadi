@@ -36,7 +36,7 @@ extern "C"{
 #include <ctime>
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 int main(){
   

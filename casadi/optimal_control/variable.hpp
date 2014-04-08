@@ -27,7 +27,7 @@
 #include "casadi/symbolic/function/sx_function.hpp"
 #include "casadi/symbolic/mx/mx.hpp"
 
-namespace CasADi{
+namespace casadi{
     
   /// Time variability of a variable (see Fritzon page 89)
   enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
@@ -153,7 +153,7 @@ namespace CasADi{
 #endif // SWIG
 
   };
-} // namespace CasADi
+} // namespace casadi
 
 #endif // VARIABLE_HPP
 

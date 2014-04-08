@@ -34,7 +34,7 @@
 #include "../function/sx_function_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   // Allocate storage for the caching
   CACHING_MAP<int,IntegerSX*> IntegerSX::cached_constants_;
@@ -892,17 +892,17 @@ namespace CasADi{
     return toScalar().getName();
   }
 
-} // namespace CasADi
+} // namespace casadi
 
-using namespace CasADi;
+using namespace casadi;
 namespace std{
 
   SXElement numeric_limits<SXElement>::infinity() throw(){
-    return CasADi::casadi_limits<SXElement>::inf;
+    return casadi::casadi_limits<SXElement>::inf;
   }
 
   SXElement numeric_limits<SXElement>::quiet_NaN() throw(){
-    return CasADi::casadi_limits<SXElement>::nan;
+    return casadi::casadi_limits<SXElement>::nan;
   }
 
   SXElement numeric_limits<SXElement>::min() throw(){

@@ -25,7 +25,7 @@
 
 #include <string>
 
-namespace CasADi {
+namespace casadi {
   /**
   * \brief Collects global CasADi meta information
   *

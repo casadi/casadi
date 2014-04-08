@@ -24,7 +24,7 @@
 #include <fstream>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options){
   // Note: The implementation of this function follows the "Writing .nl Files" paper by David M. Gay (2005)
@@ -588,4 +588,4 @@ void SymbolicNLP::repr(std::ostream &stream) const{
   stream << "NLP(#f=" << f.size() << ",#g="<< g.size() << ")";
 }
 
-} // namespace CasADi
+} // namespace casadi

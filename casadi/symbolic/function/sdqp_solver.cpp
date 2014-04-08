@@ -23,7 +23,7 @@
 #include "sdqp_solver_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 
 SDQPSolver::SDQPSolver() {
@@ -45,7 +45,7 @@ void SDQPSolver::setSOCQPOptions() {
   (*this)->setSOCQPOptions();
 }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

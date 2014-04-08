@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::veccat();
+* casadi::veccat();
 * \endcode
 *
 */

@@ -30,7 +30,7 @@
 #include "../function/linear_solver.hpp"
 #include "../function/symbolic_qr.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 /**
 \ingroup expression_tools
@@ -313,7 +313,7 @@ namespace CasADi{
   //@{
   /** \brief Calculate jacobian via source code transformation
 
-      Uses CasADi::MXFunction::jac
+      Uses casadi::MXFunction::jac
   */
   MX jacobian(const MX &ex, const MX &arg);
   MX gradient(const MX &ex, const MX &arg);
@@ -391,11 +391,11 @@ namespace CasADi{
 /** @}
 */
 
-} // namespace CasADi
+} // namespace casadi
 
 #ifdef SWIG
 // Template instantiations
-%template(Pair_MX_MXVector) std::pair<CasADi::MX, std::vector<CasADi::MX> >;
+%template(Pair_MX_MXVector) std::pair<casadi::MX, std::vector<casadi::MX> >;
 #endif // SWIG
 
 

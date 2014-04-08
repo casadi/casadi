@@ -28,7 +28,7 @@
 #include <dsdp5.h>
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for DSDPSolver
    * 
@@ -77,7 +77,7 @@ namespace CasADi{
     Function mappingA_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif //DSDP_INTERNAL_HPP

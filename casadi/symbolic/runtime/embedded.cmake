@@ -1,5 +1,5 @@
 file(STRINGS "${FILE}" FILE_CONTENTS)
-file(WRITE ${BINARY_DIR}/${FILE_BASENAME}_embedded.hpp "namespace CasADi {\n" )
+file(WRITE ${BINARY_DIR}/${FILE_BASENAME}_embedded.hpp "namespace casadi {\n" )
 
 set(FUNCTION_NAME "")
 set(INDENTATION "")

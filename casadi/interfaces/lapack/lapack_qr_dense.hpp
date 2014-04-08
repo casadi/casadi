@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/linear_solver_internal.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   /** \brief  Forward declaration of internal class
       @copydoc LinearSolver_doc
@@ -39,7 +39,7 @@ namespace CasADi{
    * This class solves the linear system A.x=b by making an QR factorization of A: \n
    * A = Q.R, with Q orthogonal and R upper triangular
    * 
-   * LapackQRDense is an CasADi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   * LapackQRDense is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use LapackQRDense is: \n
    *  -# init()
@@ -128,7 +128,7 @@ namespace CasADi{
 #endif // SWIG
 /// \endcond
 
-} // namespace CasADi
+} // namespace casadi
 
 
 

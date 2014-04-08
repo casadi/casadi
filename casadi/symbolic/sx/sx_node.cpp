@@ -26,7 +26,7 @@
 #include <cassert>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   SXNode::SXNode(){
     count = 0;
@@ -128,4 +128,4 @@ namespace CasADi{
   long SXNode::max_num_calls_in_print_ = 10000;
   int SXNode::eq_depth_ = 1;
 
-} // namespace CasADi
+} // namespace casadi

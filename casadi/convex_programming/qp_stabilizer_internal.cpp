@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/sx_function.hpp"
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
 
   QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st) : StabilizedQPSolverInternal(st) {
     addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver used to solve the stabilized QPs.");
@@ -123,5 +123,5 @@ namespace CasADi {
     qp_solver_.generateNativeCode(file);
   }
 
-} // namespace CasADi
+} // namespace casadi
 

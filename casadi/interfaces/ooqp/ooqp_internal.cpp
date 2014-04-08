@@ -37,7 +37,7 @@
 extern int gOoqpPrintLevel;
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
   
   OOQPInternal::OOQPInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
     addOption("print_level",OT_INTEGER,0,"Print level. OOQP listens to print_level 0, 10 and 100");
@@ -432,5 +432,5 @@ namespace CasADi {
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 

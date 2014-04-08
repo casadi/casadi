@@ -27,7 +27,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Represents a symbolic MX
       \author Joel Andersson 
       \date 2010
@@ -75,7 +75,7 @@ namespace CasADi{
     std::string name_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // SYMBOLIC_MX_HPP

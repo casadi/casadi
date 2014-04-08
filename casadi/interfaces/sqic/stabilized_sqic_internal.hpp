@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/stabilized_qp_solver_internal.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
 /** \brief Internal class for StabilizedSQICSolver
  * 
@@ -106,7 +106,7 @@ public:
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //STABILIZED_SQIC_INTERNAL_HPP

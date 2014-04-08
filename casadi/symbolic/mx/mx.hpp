@@ -26,7 +26,7 @@
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"
 #include <vector>
-namespace CasADi{
+namespace casadi{
   
   /** \brief  Forward declaration */
   class MXNode;
@@ -547,6 +547,6 @@ namespace CasADi{
   /// \endcond
   //@}
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // MX_HPP

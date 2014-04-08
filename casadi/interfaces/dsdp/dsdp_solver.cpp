@@ -24,7 +24,7 @@
 #include "dsdp_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 DSDPSolver::DSDPSolver(){ 
 }
@@ -47,4 +47,4 @@ bool DSDPSolver::checkNode() const{
   return dynamic_cast<const DSDPInternal*>(get());
 }
 
-} // namespace CasADi
+} // namespace casadi

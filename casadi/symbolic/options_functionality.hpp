@@ -27,7 +27,7 @@
 #include "shared_object.hpp"
 #include <map>
 
-namespace CasADi{
+namespace casadi{
   
   /// C++ version of Python's dictionary
   typedef GenericType::Dictionary Dictionary;
@@ -297,7 +297,7 @@ private:
 
 /// \endcond
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // OPTIONS_FUNCTIONALITY

@@ -22,7 +22,7 @@
 
 #include "direct_multiple_shooting_internal.hpp"
 
-namespace CasADi{
+namespace casadi{
     
 DirectMultipleShooting::DirectMultipleShooting(){
 }
@@ -61,5 +61,5 @@ void DirectMultipleShooting::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();
 }
 
-} // namespace CasADi
+} // namespace casadi
 

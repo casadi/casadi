@@ -41,7 +41,7 @@
     
 
 */
-namespace CasADi{
+namespace casadi{
 
   /// Input arguments of a dple solver [dpleIn]
   enum DPLEInput{
@@ -93,6 +93,6 @@ namespace CasADi{
  
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // DPLE_SOLVER_HPP

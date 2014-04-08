@@ -50,6 +50,6 @@
 
 #endif // SWIGPYTHON
 
-VECTOR_REPR(CasADi::Variable)
+VECTOR_REPR(casadi::Variable)
 
 

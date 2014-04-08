@@ -2,9 +2,9 @@
   <!-- Navigation index tabs for HTML output -->
   <navindex>
     <tab type="mainpage" visible="yes" title="Function overview"/>
-    <tab type="user" url="@ref CasADi::Matrix" title="SX/DMatrix" intro=""/>
-    <tab type="user" url="@ref CasADi::MX" title="MX" intro=""/>
-    <tab type="user" url="@ref CasADi::Sparsity" title="Sparsity" intro=""/>
+    <tab type="user" url="@ref casadi::Matrix" title="SX/DMatrix" intro=""/>
+    <tab type="user" url="@ref casadi::MX" title="MX" intro=""/>
+    <tab type="user" url="@ref casadi::Sparsity" title="Sparsity" intro=""/>
     <tab type="user" url="@ref expression_tools" title="Expression tools" intro=""/>
     <tab type="pages" visible="no" title="" intro=""/>
     <tab type="classes" visible="yes" title="">

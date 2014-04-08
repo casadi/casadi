@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   //Call
 
@@ -68,5 +68,5 @@ namespace CasADi{
     return new CallbackCInternal(ptr_);
   }
   
-} // namespace CasADi
+} // namespace casadi
 

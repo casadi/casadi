@@ -29,7 +29,7 @@
 #include "symbolic/function/jacobian.hpp"
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
 namespace GSL {
 
 GslInternal* GslInternal::clone() const{
@@ -345,5 +345,5 @@ void GslInternal::setStopTime(double tf){
 
 
 } // namespace GSL
-} // namespace CasADi
+} // namespace casadi
 

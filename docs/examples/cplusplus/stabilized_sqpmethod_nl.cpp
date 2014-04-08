@@ -38,7 +38,7 @@
 */
  
  
-using namespace CasADi;
+using namespace casadi;
  
 int main(int argc, char **argv){
 

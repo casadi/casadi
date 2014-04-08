@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Matrix determinant
       \author Joel Andersson
       \date 2013
@@ -57,7 +57,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // DETERMINANT_HPP

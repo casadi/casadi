@@ -29,7 +29,7 @@
 #include <streambuf>
 #include <vector>
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief Base class for objects that have a natural string representation
       \author Joel Andersson 
@@ -70,7 +70,7 @@ namespace CasADi{
   }
 #endif // SWIG    
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // PRINTABLE_OBJECT_HPP

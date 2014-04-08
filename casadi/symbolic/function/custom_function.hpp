@@ -26,7 +26,7 @@
 #include "function.hpp"
 #include <string>
 
-namespace CasADi{
+namespace casadi{
   
 /** \brief  Forward declaration of internal class */
 class CustomFunctionInternal;
@@ -73,7 +73,7 @@ public:
   
 
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // CUSTOM_FUNCTION_HPP

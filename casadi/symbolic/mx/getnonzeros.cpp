@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   GetNonzeros::GetNonzeros(const Sparsity& sp, const MX& y){
     setSparsity(sp);
@@ -426,4 +426,4 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi

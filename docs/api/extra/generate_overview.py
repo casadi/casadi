@@ -10,7 +10,7 @@ graph = pydot.Dot('Overview', graph_type='digraph',rankdir='LR',dpi=50,ranksep=2
 
 def print_subclasses(myclass, depth=0):
   name = myclass.__name__
-  refid = root.find(".//compound[name='CasADi::%s']" % name).attrib["refid"]
+  refid = root.find(".//compound[name='casadi::%s']" % name).attrib["refid"]
   description = ET.parse('XML/%s.xml' % refid).getroot().findtext("doxygen/compounddef/briefdescription/para")
   graph.add_node(pydot.Node(name,URL=refid+".html",shape="box"))
   for s in myclass.__subclasses__():

@@ -23,7 +23,7 @@
 #include "qcqp_solver_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 
 QCQPSolver::QCQPSolver() {
@@ -45,7 +45,7 @@ void QCQPSolver::setQPOptions() {
   (*this)->setQPOptions();
 }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

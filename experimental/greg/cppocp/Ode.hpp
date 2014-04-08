@@ -34,58 +34,58 @@ public:
      void addAction(std::string _newAction);
      void addOutput(std::string _newOutput);
 
-     void (*dxdt)(std::map<std::string,CasADi::SX> &xDot,
-		  std::map<std::string,CasADi::SX> &outputs,
-		  std::map<std::string,CasADi::SX> state,
-		  std::map<std::string,CasADi::SX> action,
-		  std::map<std::string,CasADi::SX> param,
-		  CasADi::SX t);
+     void (*dxdt)(std::map<std::string,casadi::SX> &xDot,
+		  std::map<std::string,casadi::SX> &outputs,
+		  std::map<std::string,casadi::SX> state,
+		  std::map<std::string,casadi::SX> action,
+		  std::map<std::string,casadi::SX> param,
+		  casadi::SX t);
 
      void assertUnlocked(void);
      void init(void);
   void setupIntegrators(void);
   void setupIntegrators(std::map<std::string,double> & params);
 
-     std::map<std::string,CasADi::SX> getOutputFromDxdt( CasADi::SX x,
-							 CasADi::SX u,
-							 std::map<std::string,CasADi::SX> & p,
-							 CasADi::SX t );
+     std::map<std::string,casadi::SX> getOutputFromDxdt( casadi::SX x,
+							 casadi::SX u,
+							 std::map<std::string,casadi::SX> & p,
+							 casadi::SX t );
 
-     CasADi::SX dxVectorDt( CasADi::SX x,
-				  CasADi::SX u,
-				  std::map<std::string,CasADi::SX> & p,
-				  CasADi::SX t );
+     casadi::SX dxVectorDt( casadi::SX x,
+				  casadi::SX u,
+				  std::map<std::string,casadi::SX> & p,
+				  casadi::SX t );
 
-     CasADi::DMatrix rk4Step( CasADi::DMatrix & xk,
-			      CasADi::DMatrix & uk,
+     casadi::DMatrix rk4Step( casadi::DMatrix & xk,
+			      casadi::DMatrix & uk,
 			      double t0,
 			      double dt);
 
-     CasADi::DMatrix eulerStep( CasADi::DMatrix & xk,
-				CasADi::DMatrix & uk,
+     casadi::DMatrix eulerStep( casadi::DMatrix & xk,
+				casadi::DMatrix & uk,
 				double t0,
 				double dt);
 
-     CasADi::SX rk4Step( CasADi::SX x0Vec,
-			       CasADi::SX u0Vec,
-			       CasADi::SX u1Vec,
-			       std::map<std::string,CasADi::SX> & p,
-			       CasADi::SX t0,
-			       CasADi::SX dt);
+     casadi::SX rk4Step( casadi::SX x0Vec,
+			       casadi::SX u0Vec,
+			       casadi::SX u1Vec,
+			       std::map<std::string,casadi::SX> & p,
+			       casadi::SX t0,
+			       casadi::SX dt);
 
-     CasADi::SX eulerStep( CasADi::SX x0Vec,
-				 CasADi::SX u0Vec,
-				 std::map<std::string,CasADi::SX> & p,
-				 CasADi::SX t0,
-				 CasADi::SX dt);
+     casadi::SX eulerStep( casadi::SX x0Vec,
+				 casadi::SX u0Vec,
+				 std::map<std::string,casadi::SX> & p,
+				 casadi::SX t0,
+				 casadi::SX dt);
 	
-     CasADi::SX simpsonsRuleError( CasADi::SX x0Vec,
-					 CasADi::SX x1Vec,
-					 CasADi::SX u0Vec,
-					 CasADi::SX u1Vec,
-					 std::map<std::string,CasADi::SX> & p,
-					 CasADi::SX t0,
-					 CasADi::SX dt);
+     casadi::SX simpsonsRuleError( casadi::SX x0Vec,
+					 casadi::SX x1Vec,
+					 casadi::SX u0Vec,
+					 casadi::SX u1Vec,
+					 std::map<std::string,casadi::SX> & p,
+					 casadi::SX t0,
+					 casadi::SX dt);
 
      int nx(void);
      int nu(void);
@@ -94,8 +94,8 @@ public:
 
      void assertUniqueName(std::string newName);
 
-     std::map<std::string,CasADi::SX> getStateMap( CasADi::SX & x);
-     std::map<std::string,CasADi::SX> getActionMap( CasADi::SX & u);
+     std::map<std::string,casadi::SX> getStateMap( casadi::SX & x);
+     std::map<std::string,casadi::SX> getActionMap( casadi::SX & u);
 
 private:
      int isState(std::string stateName);
@@ -103,8 +103,8 @@ private:
      int isOutput(std::string outputName);
      int locked;
 
-     CasADi::SXFunction rk4StepFcn;
-     CasADi::SXFunction eulerStepFcn;
+     casadi::SXFunction rk4StepFcn;
+     casadi::SXFunction eulerStepFcn;
 
 protected:
 };

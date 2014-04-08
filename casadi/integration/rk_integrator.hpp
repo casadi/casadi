@@ -25,7 +25,7 @@
 
 #include "fixed_step_integrator.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   class RKIntegratorInternal;
   
@@ -72,6 +72,6 @@ namespace CasADi{
 
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //RK_INTEGRATOR_HPP

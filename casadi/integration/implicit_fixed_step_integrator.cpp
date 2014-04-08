@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(){
   }
@@ -41,4 +41,4 @@ namespace CasADi{
     return dynamic_cast<const ImplicitFixedStepIntegratorInternal*>(get())!=0;
   }
 
-} // namespace CasADi
+} // namespace casadi

@@ -35,7 +35,7 @@
 #include <string>
 #include <map>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 void

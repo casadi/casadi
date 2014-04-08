@@ -37,8 +37,8 @@ VECTOR_TOOLS_TEMPLATES(double)
 
 %define VECTOR_REPR(type)
 %extend std::vector< type >{
-  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
-  std::string __str__(){ return CasADi::getDescription(*$self); }
+  std::string __repr__(){ return casadi::getRepresentation(*$self); }
+  std::string __str__(){ return casadi::getDescription(*$self); }
 };
 %enddef
 
@@ -50,7 +50,7 @@ VECTOR_TOOLS_TEMPLATES(double)
 %include "casadi/symbolic/options_functionality.hpp"
 %include "casadi/symbolic/casadi_calculus.hpp"
 
-namespace CasADi {
+namespace casadi {
   %extend OptionsFunctionality {
     void setOption(const std::string &name, const std::string& val){$self->setOption(name,val);} 
     void setOption(const std::string &name, const std::vector<int>& val){$self->setOption(name,val);} 
@@ -59,5 +59,5 @@ namespace CasADi {
     void setOption(const std::string &name, int val){$self->setOption(name,val);} 
     void setOption(const std::string &name, bool val){$self->setOption(name,val);}  
   }
-} // namespace CasADi
+} // namespace casadi
 

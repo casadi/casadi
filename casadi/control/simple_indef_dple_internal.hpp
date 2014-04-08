@@ -27,7 +27,7 @@
 #include "dple_internal.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal storage for DpleSolver related data
 
@@ -76,6 +76,6 @@ namespace CasADi{
     
   };
   
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif // SIMPLE_INDEF_DPLE_INTERNAL_HPP

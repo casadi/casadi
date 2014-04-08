@@ -1,354 +1,354 @@
-%exception  CasADi::Function::call(const MX &arg) {
+%exception  casadi::Function::call(const MX &arg) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::call(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens) {
+%exception  casadi::Function::call(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::call(const std::vector< std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) {
+%exception  casadi::Function::call(const std::vector< std::vector< MX > > &arg, const Dictionary &paropt=Dictionary()) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::eval(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens) {
+%exception  casadi::Function::eval(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::eval(const SX &arg) {
+%exception  casadi::Function::eval(const SX &arg) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::eval(const SXVector &arg, std::vector< SX > &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens) {
+%exception  casadi::Function::eval(const SXVector &arg, std::vector< SX > &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::eval(const std::vector< MX > &arg) {
+%exception  casadi::Function::eval(const std::vector< MX > &arg) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::eval(const std::vector< SX > &arg) {
+%exception  casadi::Function::eval(const std::vector< SX > &arg) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::evalMX(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens) {
+%exception  casadi::Function::evalMX(const MXVector &arg, MXVector &output_res, const MXVectorVector &fseed, MXVectorVector &output_fsens, const MXVectorVector &aseed, MXVectorVector &output_asens) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::evalMX(const std::vector< MX > &arg) {
+%exception  casadi::Function::evalMX(const std::vector< MX > &arg) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::evalSX(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens) {
+%exception  casadi::Function::evalSX(const SXVector &arg, SXVector &output_res, const SXVectorVector &fseed, SXVectorVector &output_fsens, const SXVectorVector &aseed, SXVectorVector &output_asens) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::evalSX(const std::vector< SX > &arg) {
+%exception  casadi::Function::evalSX(const std::vector< SX > &arg) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::indexed_one_based(int k) const  {
+%exception  casadi::Function::indexed_one_based(int k) const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Function::indexed_zero_based(int k) const  {
+%exception  casadi::Function::indexed_zero_based(int k) const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::SXFunction::indexed_one_based(int k) const  {
+%exception  casadi::SXFunction::indexed_one_based(int k) const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::SXFunction::indexed_zero_based(int k) const  {
+%exception  casadi::SXFunction::indexed_zero_based(int k) const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::createDiagonal(int nrow) {
+%exception  casadi::Sparsity::createDiagonal(int nrow) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::createDiagonal(int nrow, int ncol) {
+%exception  casadi::Sparsity::createDiagonal(int nrow, int ncol) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::getSparsity(std::vector< int > &output_row, std::vector< int > &output_col) const  {
+%exception  casadi::Sparsity::getSparsity(std::vector< int > &output_row, std::vector< int > &output_col) const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::getSparsityCCS(std::vector< int > &output_colind, std::vector< int > &output_row) const  {
+%exception  casadi::Sparsity::getSparsityCCS(std::vector< int > &output_colind, std::vector< int > &output_row) const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::getSparsityCRS(std::vector< int > &output_rowind, std::vector< int > &output_col) const  {
+%exception  casadi::Sparsity::getSparsityCRS(std::vector< int > &output_rowind, std::vector< int > &output_col) const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::lowerNZ() const  {
+%exception  casadi::Sparsity::lowerNZ() const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::Sparsity::upperNZ() const  {
+%exception  casadi::Sparsity::upperNZ() const  {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::densify(const MX &x) {
+%exception  casadi::densify(const MX &x) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::densify(const Matrix< DataType > &A) {
+%exception  casadi::densify(const Matrix< DataType > &A) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::getIntValue(const SX &ex) {
+%exception  casadi::getIntValue(const SX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::getNZDense(const Sparsity &sp) {
+%exception  casadi::getNZDense(const Sparsity &sp) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::getName(const SX &ex) {
+%exception  casadi::getName(const SX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::getValue(const SX &ex) {
+%exception  casadi::getValue(const SX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::hasNonStructuralZeros(const Matrix< DataType > &A) {
+%exception  casadi::hasNonStructuralZeros(const Matrix< DataType > &A) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isConstant(const Matrix< DataType > &ex) {
+%exception  casadi::isConstant(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isDense(const MX &ex) {
+%exception  casadi::isDense(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isDense(const Matrix< DataType > &ex) {
+%exception  casadi::isDense(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isEmpty(const Matrix< DataType > &ex) {
+%exception  casadi::isEmpty(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isIdentity(const MX &ex) {
+%exception  casadi::isIdentity(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isIdentity(const Matrix< DataType > &ex) {
+%exception  casadi::isIdentity(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isInteger(const Matrix< DataType > &ex) {
+%exception  casadi::isInteger(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isMinusOne(const MX &ex) {
+%exception  casadi::isMinusOne(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isMinusOne(const Matrix< DataType > &ex) {
+%exception  casadi::isMinusOne(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isOne(const MX &ex) {
+%exception  casadi::isOne(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isOne(const Matrix< DataType > &ex) {
+%exception  casadi::isOne(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isRegular(const MX &ex) {
+%exception  casadi::isRegular(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isRegular(const Matrix< DataType > &ex) {
+%exception  casadi::isRegular(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isRegular(const SX &ex) {
+%exception  casadi::isRegular(const SX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isRegular(const SXElement &ex) {
+%exception  casadi::isRegular(const SXElement &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isScalar(const Matrix< DataType > &ex) {
+%exception  casadi::isScalar(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isSingular(const Sparsity &a) {
+%exception  casadi::isSingular(const Sparsity &a) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isSmooth(const SX &ex) {
+%exception  casadi::isSmooth(const SX &ex) {
  START DEPRECATED_MSG("use ex.isSmooth()") $action STOP { $action } 
 }
-%exception  CasADi::isSymbolic(const MX &ex) {
+%exception  casadi::isSymbolic(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isSymbolic(const SX &ex) {
+%exception  casadi::isSymbolic(const SX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isSymbolicSparse(const MX &ex) {
+%exception  casadi::isSymbolicSparse(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isSymbolicSparse(const SX &ex) {
+%exception  casadi::isSymbolicSparse(const SX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isTranspose(const MX &ex) {
+%exception  casadi::isTranspose(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isTril(const Matrix< DataType > &A) {
+%exception  casadi::isTril(const Matrix< DataType > &A) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isTriu(const Matrix< DataType > &A) {
+%exception  casadi::isTriu(const Matrix< DataType > &A) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isVector(const MX &ex) {
+%exception  casadi::isVector(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isZero(const MX &ex) {
+%exception  casadi::isZero(const MX &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::isZero(const Matrix< DataType > &ex) {
+%exception  casadi::isZero(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::lowerNZ(const Sparsity &a) {
+%exception  casadi::lowerNZ(const Sparsity &a) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::lowerSparsity(const Sparsity &a, bool includeDiagonal=true) {
+%exception  casadi::lowerSparsity(const Sparsity &a, bool includeDiagonal=true) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::makeDense(MX &x) {
+%exception  casadi::makeDense(MX &x) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::makeDense(Matrix< DataType > &A) {
+%exception  casadi::makeDense(Matrix< DataType > &A) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::makeSparse(Matrix< DataType > &A, double tol=0) {
+%exception  casadi::makeSparse(Matrix< DataType > &A, double tol=0) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::msym(const Matrix< double > &x) {
+%exception  casadi::msym(const Matrix< double > &x) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::msym(const std::string &name, const Sparsity &sp) {
+%exception  casadi::msym(const std::string &name, const Sparsity &sp) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::msym(const std::string &name, const Sparsity &sp, int p) {
+%exception  casadi::msym(const std::string &name, const Sparsity &sp, int p) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::msym(const std::string &name, const Sparsity &sp, int p, int r) {
+%exception  casadi::msym(const std::string &name, const Sparsity &sp, int p, int r) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::msym(const std::string &name, const std::pair< int, int > &rc) {
+%exception  casadi::msym(const std::string &name, const std::pair< int, int > &rc) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::msym(const std::string &name, int nrow, int ncol, int p) {
+%exception  casadi::msym(const std::string &name, int nrow, int ncol, int p) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::msym(const std::string &name, int nrow, int ncol, int p, int r) {
+%exception  casadi::msym(const std::string &name, int nrow, int ncol, int p, int r) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::msym(const std::string &name, int nrow=1, int ncol=1) {
+%exception  casadi::msym(const std::string &name, int nrow=1, int ncol=1) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::nnz(const Matrix< DataType > &ex) {
+%exception  casadi::nnz(const Matrix< DataType > &ex) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_band(int n, int p) {
+%exception  casadi::sp_band(int n, int p) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_banded(int n, int p) {
+%exception  casadi::sp_banded(int n, int p) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_compress(const Sparsity &a) {
+%exception  casadi::sp_compress(const Sparsity &a) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_compress(const int *v) {
+%exception  casadi::sp_compress(const int *v) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_compress(const std::vector< int > &v) {
+%exception  casadi::sp_compress(const std::vector< int > &v) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_dense(const std::pair< int, int > &rc) {
+%exception  casadi::sp_dense(const std::pair< int, int > &rc) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_dense(int nrow, int ncol=1) {
+%exception  casadi::sp_dense(int nrow, int ncol=1) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_diag(int n) {
+%exception  casadi::sp_diag(int n) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_rowcol(const std::vector< int > &row, const std::vector< int > &col, int nrow, int ncol) {
+%exception  casadi::sp_rowcol(const std::vector< int > &row, const std::vector< int > &col, int nrow, int ncol) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_sparse(const std::pair< int, int > &rc) {
+%exception  casadi::sp_sparse(const std::pair< int, int > &rc) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_sparse(int nrow, int ncol=1) {
+%exception  casadi::sp_sparse(int nrow, int ncol=1) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_tril(int n) {
+%exception  casadi::sp_tril(int n) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_triplet(int nrow, int ncol, const std::vector< int > &row, const std::vector< int > &col) {
+%exception  casadi::sp_triplet(int nrow, int ncol, const std::vector< int > &row, const std::vector< int > &col) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_triplet(int nrow, int ncol, const std::vector< int > &row, const std::vector< int > &col, std::vector< int > &mapping, bool invert_mapping=false) {
+%exception  casadi::sp_triplet(int nrow, int ncol, const std::vector< int > &row, const std::vector< int > &col, std::vector< int > &mapping, bool invert_mapping=false) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_triu(int n) {
+%exception  casadi::sp_triu(int n) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::sp_unit(int n, int el) {
+%exception  casadi::sp_unit(int n, int el) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::ssym(const Matrix< double > &x) {
+%exception  casadi::ssym(const Matrix< double > &x) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::ssym(const std::string &name, const Sparsity &sp) {
+%exception  casadi::ssym(const std::string &name, const Sparsity &sp) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::ssym(const std::string &name, const Sparsity &sp, int p) {
+%exception  casadi::ssym(const std::string &name, const Sparsity &sp, int p) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::ssym(const std::string &name, const Sparsity &sp, int p, int r) {
+%exception  casadi::ssym(const std::string &name, const Sparsity &sp, int p, int r) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::ssym(const std::string &name, const std::pair< int, int > &rc) {
+%exception  casadi::ssym(const std::string &name, const std::pair< int, int > &rc) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::ssym(const std::string &name, int nrow, int ncol, int p) {
+%exception  casadi::ssym(const std::string &name, int nrow, int ncol, int p) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::ssym(const std::string &name, int nrow, int ncol, int p, int r) {
+%exception  casadi::ssym(const std::string &name, int nrow, int ncol, int p, int r) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::ssym(const std::string &name, int nrow=1, int ncol=1) {
+%exception  casadi::ssym(const std::string &name, int nrow=1, int ncol=1) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::trans(const MX &x) {
+%exception  casadi::trans(const MX &x) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::trans(const Matrix< DataType > &x) {
+%exception  casadi::trans(const Matrix< DataType > &x) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::trans(const Sparsity &a) {
+%exception  casadi::trans(const Sparsity &a) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::upperNZ(const Sparsity &a) {
+%exception  casadi::upperNZ(const Sparsity &a) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception  CasADi::upperSparsity(const Sparsity &a, bool includeDiagonal=true) {
+%exception  casadi::upperSparsity(const Sparsity &a, bool includeDiagonal=true) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::IpoptSolver::IpoptSolver(const Function &F, const Function &G) {
+%exception casadi::IpoptSolver::IpoptSolver(const Function &F, const Function &G) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::KnitroSolver::KnitroSolver(const Function &F, const Function &G) {
+%exception casadi::KnitroSolver::KnitroSolver(const Function &F, const Function &G) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::MX::MX(const std::string &name, const Sparsity &sp) {
+%exception casadi::MX::MX(const std::string &name, const Sparsity &sp) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::MX::MX(const std::string &name, const std::pair< int, int > &rc) {
+%exception casadi::MX::MX(const std::string &name, const std::pair< int, int > &rc) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::MX::MX(const std::string &name, int nrow=1, int ncol=1) {
+%exception casadi::MX::MX(const std::string &name, int nrow=1, int ncol=1) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::MX::MX(int nrow, int ncol) {
+%exception casadi::MX::MX(int nrow, int ncol) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::MX::MX(int nrow, int ncol, const MX &val) {
+%exception casadi::MX::MX(int nrow, int ncol, const MX &val) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(int nrow, int ncol) {
+%exception casadi::Matrix< DataType >::Matrix(int nrow, int ncol) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(int nrow, int ncol, const DataType &val) {
+%exception casadi::Matrix< DataType >::Matrix(int nrow, int ncol, const DataType &val) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::Matrix< DataType >::Matrix(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row, const std::vector< DataType > &d=std::vector< DataType >()) {
+%exception casadi::Matrix< DataType >::Matrix(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row, const std::vector< DataType > &d=std::vector< DataType >()) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::SCPgen::SCPgen(const Function &F, const Function &G) {
+%exception casadi::SCPgen::SCPgen(const Function &F, const Function &G) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::SQPMethod::SQPMethod(const Function &F, const Function &G) {
+%exception casadi::SQPMethod::SQPMethod(const Function &F, const Function &G) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::SXElement::SXElement(const std::string &name) {
+%exception casadi::SXElement::SXElement(const std::string &name) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::SnoptSolver::SnoptSolver(const Function &F, const Function &G) {
+%exception casadi::SnoptSolver::SnoptSolver(const Function &F, const Function &G) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::Sparsity::Sparsity(int nrow, int ncol, bool dense=false) {
+%exception casadi::Sparsity::Sparsity(int nrow, int ncol, bool dense=false) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::StabilizedSQPMethod::StabilizedSQPMethod(const Function &F, const Function &G) {
+%exception casadi::StabilizedSQPMethod::StabilizedSQPMethod(const Function &F, const Function &G) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }
-%exception CasADi::WorhpSolver::WorhpSolver(const Function &F, const Function &G) {
+%exception casadi::WorhpSolver::WorhpSolver(const Function &F, const Function &G) {
  START DEPRECATED_MSG("") $action STOP { $action } 
 }

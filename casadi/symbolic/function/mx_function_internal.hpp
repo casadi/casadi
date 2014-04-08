@@ -34,7 +34,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief  Internal node class for MXFunction
       \author Joel Andersson 
@@ -145,7 +145,7 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // MX_FUNCTION_INTERNAL_HPP

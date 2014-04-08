@@ -26,7 +26,7 @@
 #include "function.hpp"
 #include <string>
 
-namespace CasADi{
+namespace casadi{
 
   
 /** \brief  Forward declaration of internal class */
@@ -58,7 +58,7 @@ public:
 
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // EXTERNAL_FUNCTION_HPP

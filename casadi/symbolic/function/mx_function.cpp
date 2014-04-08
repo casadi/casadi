@@ -31,7 +31,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
 bool MXFunction::checkNode() const{
   return dynamic_cast<const MXFunctionInternal*>(get())!=0;
@@ -149,5 +149,5 @@ void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vini
 }
 
 
-} // namespace CasADi
+} // namespace casadi
 

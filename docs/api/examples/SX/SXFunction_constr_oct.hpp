@@ -9,6 +9,6 @@
 *
 * \sa
 * \code
-*  CasADi::SXFunction();
+*  casadi::SXFunction();
 * \endcode
 */

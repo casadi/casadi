@@ -24,7 +24,7 @@
 #include "nlp_implicit_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   NLPImplicitSolver::NLPImplicitSolver(){ 
   }
@@ -50,4 +50,4 @@ namespace CasADi{
     return (*this)->nlp_solver_;
   }
 
-} // namespace CasADi
+} // namespace casadi

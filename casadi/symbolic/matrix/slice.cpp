@@ -24,7 +24,7 @@
 #include "matrix_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   Slice::Slice() : start_(0), stop_(std::numeric_limits<int>::max()), step_(1){ 
   }
@@ -228,5 +228,5 @@ namespace CasADi{
   }
 
   
-} // namespace CasADi
+} // namespace casadi
 

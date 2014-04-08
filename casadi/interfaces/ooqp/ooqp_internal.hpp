@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/qp_solver_internal.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for OOQPSolver
    * 
@@ -89,7 +89,7 @@ namespace CasADi{
     double mutol_, artol_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //OOQP_INTERNAL_HPP

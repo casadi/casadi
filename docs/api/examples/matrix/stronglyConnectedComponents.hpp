@@ -6,8 +6,8 @@
 *
 * \sa
 * \code
-* CasADi::Sparsity::stronglyConnectedComponents();
-* CasADi::blkdiag();
+* casadi::Sparsity::stronglyConnectedComponents();
+* casadi::blkdiag();
 * \endcode
 *
 */

@@ -22,7 +22,7 @@
 
 #include "direct_single_shooting_internal.hpp"
 
-namespace CasADi{
+namespace casadi{
     
 DirectSingleShooting::DirectSingleShooting(){
 }
@@ -61,5 +61,5 @@ void DirectSingleShooting::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();
 }
 
-} // namespace CasADi
+} // namespace casadi
 

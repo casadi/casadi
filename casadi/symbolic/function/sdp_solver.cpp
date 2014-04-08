@@ -23,7 +23,7 @@
 #include "sdp_solver_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 
 SDPSolver::SDPSolver() {
@@ -45,7 +45,7 @@ void SDPSolver::setSOCPOptions() {
   (*this)->setSOCPOptions();
 }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   SQPMethod::SQPMethod(){
   }
@@ -49,4 +49,4 @@ namespace CasADi{
     return (*this)->getQPSolver();
   }
 
-} // namespace CasADi
+} // namespace casadi

@@ -31,7 +31,7 @@
 #include "casadi/integration/integration_tools.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
   
 class DirectCollocationInternal : public OCPSolverInternal{
   friend class DirectCollocation;
@@ -78,7 +78,7 @@ class DirectCollocationInternal : public OCPSolverInternal{
 
 };
                         
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // DIRECT_COLLOCATION_INTERNAL_HPP

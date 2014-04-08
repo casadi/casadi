@@ -108,7 +108,7 @@
   
 */
       
-namespace CasADi{
+namespace casadi{
   
 /// Input arguments of a SDP problem [sdpIn]
 enum SDPInput{
@@ -186,7 +186,7 @@ class SDPSolver : public Function{
   void setSOCPOptions();
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SDP_SOLVER_HPP
 

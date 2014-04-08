@@ -24,7 +24,7 @@
 #include "qpoases_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 QPOasesSolver::QPOasesSolver(){ 
 }
@@ -47,4 +47,4 @@ bool QPOasesSolver::checkNode() const{
   return dynamic_cast<const QPOasesInternal*>(get());
 }
 
-} // namespace CasADi
+} // namespace casadi

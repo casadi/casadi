@@ -31,7 +31,7 @@
    "Multiple cones can be created for the same solver, but it is usually more efficient to group all blocks into the same conic structure." user manual   
 */
 using namespace std;
-namespace CasADi {
+namespace casadi {
 
   DSDPInternal* DSDPInternal::clone() const{
     // Return a deep copy
@@ -316,4 +316,4 @@ namespace CasADi {
   
   }
 
-} // namespace CasADi
+} // namespace casadi

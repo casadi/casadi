@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   
   /** Internal class
       @copydoc LinearSolver_doc
@@ -95,7 +95,7 @@ namespace CasADi{
   };
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif //LINEAR_SOLVER_INTERNAL_HPP

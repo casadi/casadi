@@ -23,7 +23,7 @@
 #include "implicit_function_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   ImplicitFunctionInternal* ImplicitFunction::operator->(){
     return static_cast<ImplicitFunctionInternal*>(Function::operator->());
@@ -52,5 +52,5 @@ namespace CasADi{
     return (*this)->linsol_;
   }
 
-} // namespace CasADi
+} // namespace casadi
 

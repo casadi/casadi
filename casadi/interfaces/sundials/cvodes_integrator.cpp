@@ -24,7 +24,7 @@
 #include "cvodes_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 CVodesIntegrator::CVodesIntegrator(){ 
 }
@@ -46,6 +46,6 @@ bool CVodesIntegrator::checkNode() const{
   return dynamic_cast<const CVodesInternal*>(get());
 }
 
-} // namespace CasADi
+} // namespace casadi
 
 

@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/sx_function.hpp"
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
 
 QPLPInternal* QPLPInternal::clone() const{
   // Return a deep copy
@@ -89,5 +89,5 @@ void QPLPInternal::init(){
  
 }
 
-} // namespace CasADi
+} // namespace casadi
 

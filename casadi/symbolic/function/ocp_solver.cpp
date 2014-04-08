@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
 OCPSolver::OCPSolver(){
 }
@@ -46,5 +46,5 @@ Function OCPSolver::getCfcn() const { return isNull() ? Function(): (*this)->cfc
 
 Function OCPSolver::getRfcn() const { return isNull() ? Function(): (*this)->rfcn_; }
 
-} // namespace CasADi
+} // namespace casadi
 

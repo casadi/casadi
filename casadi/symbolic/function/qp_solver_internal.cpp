@@ -28,7 +28,7 @@ INPUTSCHEME(QPSolverInput)
 OUTPUTSCHEME(QPSolverOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   // Constructor
   QPSolverInternal::QPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -108,7 +108,7 @@ namespace CasADi{
     }
   }
  
-} // namespace CasADi
+} // namespace casadi
 
   
 

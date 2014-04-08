@@ -28,7 +28,7 @@
 #include <cassert>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 SharedObject::SharedObject(){
   node = 0;
@@ -247,6 +247,6 @@ void SharedObjectNode::assertInit() const{
     return weak_ref_;
   }
 
-} // namespace CasADi
+} // namespace casadi
     
     

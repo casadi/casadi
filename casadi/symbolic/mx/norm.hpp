@@ -26,7 +26,7 @@
 #include "mx_node.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Matrix and vector norms
 
@@ -151,7 +151,7 @@ namespace CasADi{
     virtual int getOp() const{ return OP_NORMINF;}
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

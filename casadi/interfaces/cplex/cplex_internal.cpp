@@ -30,7 +30,7 @@
 
 #include "ilcplex/cplex.h"
 
-namespace CasADi{
+namespace casadi{
 
   using namespace std;
 
@@ -338,5 +338,5 @@ namespace CasADi{
     }
   }
 
-} // end namespace CasADi
+} // end namespace casadi
 

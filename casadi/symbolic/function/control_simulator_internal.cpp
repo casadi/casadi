@@ -34,7 +34,7 @@
 INPUTSCHEME(ControlSimulatorInput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   
   ControlSimulatorInternal::ControlSimulatorInternal(const Function& control_dae, const Function& output_fcn, const vector<double>& gridc) : control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc){
@@ -409,6 +409,6 @@ namespace CasADi{
     return range(0,grid_.size(),nf_);
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 

@@ -32,7 +32,7 @@
   
 */
 
-namespace CasADi{
+namespace casadi{
 
 // Forward declaration of internal class
 class IdasInternal;
@@ -86,7 +86,7 @@ public:
   #endif
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //IDAS_INTEGRATOR_HPP
 

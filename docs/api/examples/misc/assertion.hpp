@@ -6,8 +6,8 @@
 *
 * \sa
 * \code
-* CasADi::MX::attachAssert();
-* CasADi::CustomFunction();
+* casadi::MX::attachAssert();
+* casadi::CustomFunction();
 * \endcode
 *
 */

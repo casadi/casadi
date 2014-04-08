@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
  
   /** \brief  Internal node class for Parallelizer
       \author Joel Andersson 
@@ -109,7 +109,7 @@ namespace CasADi{
 
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif // PARALLELIZER_INTERNAL_HPP

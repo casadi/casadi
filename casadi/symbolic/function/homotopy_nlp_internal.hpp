@@ -29,7 +29,7 @@
 
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
     
 /** \brief Homotopy NLP solver storage class
   \internal
@@ -58,7 +58,7 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif //NLP_SOLVER_INTERNAL_HPP

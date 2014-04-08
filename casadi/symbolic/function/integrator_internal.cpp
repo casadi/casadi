@@ -33,7 +33,7 @@ INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   IntegratorInternal::IntegratorInternal(const Function& f, const Function& g) : f_(f), g_(g){
     // set default options
@@ -928,6 +928,6 @@ namespace CasADi{
     return ret;
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 

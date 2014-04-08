@@ -24,7 +24,7 @@
 #include "gsl_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 namespace GSL {
 
 GslIntegrator::GslIntegrator(){ 

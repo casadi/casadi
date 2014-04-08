@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   
 class KnitroInternal;
   
@@ -72,6 +72,6 @@ class KnitroSolver : public NLPSolver {
    
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //KNITRO_SOLVER_HPP

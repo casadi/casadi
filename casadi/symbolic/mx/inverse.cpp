@@ -27,7 +27,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   Inverse::Inverse(const MX& x){
     casadi_assert_message(x.size1()==x.size2(),"Inverse: matrix must be square, but you supllied " << x.dimString());
@@ -67,4 +67,4 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi

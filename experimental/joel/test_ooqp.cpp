@@ -25,7 +25,7 @@
 #include <ctime>
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 int main() {
   DMatrix H(2,2,0);

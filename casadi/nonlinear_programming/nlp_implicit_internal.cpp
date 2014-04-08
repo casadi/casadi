@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/mx_function.hpp"
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
   
   NLPImplicitInternal::NLPImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "The NLPSolver used to solve the implicit system.");
@@ -127,5 +127,5 @@ namespace CasADi {
     nlp_solver_.init();
   }
 
-} // namespace CasADi
+} // namespace casadi
 

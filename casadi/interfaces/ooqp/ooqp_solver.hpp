@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/qp_solver.hpp"
 
-namespace CasADi {
+namespace casadi {
   
   
 // Forward declaration of internal class 
@@ -71,7 +71,7 @@ public:
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //OOQP_SOLVER_HPP
 

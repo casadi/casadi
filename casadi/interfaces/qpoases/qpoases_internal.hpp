@@ -28,7 +28,7 @@
 #include <qpOASES.hpp>
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for QPOasesSolver
    * 
@@ -94,7 +94,7 @@ public:
     static std::string getErrorMessage(int flag);
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //QPOASES_INTERNAL_HPP

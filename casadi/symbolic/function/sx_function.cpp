@@ -32,7 +32,7 @@
 #include "../sx/sx_tools.hpp"
 #include "mx_function.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 using namespace std;
 
@@ -174,5 +174,5 @@ int SXFunction::getWorkSize() const{
   return (*this)->work_.size();
 }
 
-} // namespace CasADi
+} // namespace casadi
 

@@ -28,7 +28,7 @@ INPUTSCHEME(LPSolverInput)
 OUTPUTSCHEME(LPSolverOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 // Constructor
 LPSolverInternal::LPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -85,7 +85,7 @@ void LPSolverInternal::checkInputs() const {
   }
 }
  
-} // namespace CasADi
+} // namespace casadi
 
   
 

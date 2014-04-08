@@ -29,7 +29,7 @@
 #include "casadi/symbolic/mx/mx_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   ImplicitFixedStepIntegratorInternal::ImplicitFixedStepIntegratorInternal(const Function& f, const Function& g) : FixedStepIntegratorInternal(f,g){
     addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
@@ -90,4 +90,4 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi

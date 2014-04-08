@@ -25,7 +25,7 @@
 #include <cassert>
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   DpleSolver::DpleSolver(){
   
@@ -53,5 +53,5 @@ namespace CasADi{
     return dynamic_cast<const DpleInternal*>(get())!=0;
   }
  
-} // namespace CasADi
+} // namespace casadi
 

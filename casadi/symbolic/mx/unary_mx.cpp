@@ -29,7 +29,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   UnaryMX::UnaryMX(Operation op, MX x) : op_(op){
     // Put a densifying node in between if necessary
@@ -199,5 +199,5 @@ namespace CasADi{
     return MXNode::getBinary(op,y,scX,scY);    
   }
 
-} // namespace CasADi
+} // namespace casadi
 

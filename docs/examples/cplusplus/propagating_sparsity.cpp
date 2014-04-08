@@ -32,7 +32,7 @@
 
 #include "casadi/symbolic/casadi.hpp"
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 // Print a (typically 64-bit) unsigned integer

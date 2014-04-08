@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/linear_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
 
 
 /** \brief  Forward declaration of internal class */
@@ -35,7 +35,7 @@ class CSparseCholeskyInternal;
 *
  @copydoc LinearSolver_doc
 *  
-* CSparseCholesky is an CasADi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+* CSparseCholesky is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
 *
 *  A = LL'
 *    Ax = b
@@ -91,7 +91,7 @@ public:
   
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //CSPARSE_CHOLESKY_HPP
 

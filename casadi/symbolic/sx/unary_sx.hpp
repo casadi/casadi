@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
 /** \brief Represents a basic unary operation on an SXElement node
   \author Joel Andersson 
@@ -99,7 +99,7 @@ class UnarySX : public SXNode{
     SXElement dep_;
 };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif // UNARY_SXElement_HPP

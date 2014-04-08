@@ -38,7 +38,7 @@
 #include <ctime>
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
   
   typedef std::pair< std::string,std::string> Message;
     
@@ -125,7 +125,7 @@ namespace CasADi{
   
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //KINSOL_INTERNAL_HPP

@@ -26,7 +26,7 @@
 #include "mx_node.hpp"
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Change the sparsity of an expression
       \author Joel Andersson
       \date 2011-2013
@@ -69,7 +69,7 @@ namespace CasADi{
     virtual int getOp() const{ return OP_SET_SPARSE;}
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // SET_SPARSE_HPP

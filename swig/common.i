@@ -76,8 +76,8 @@ def _swig_repr(self):
 
 #ifndef SWIGXML
 %feature("compactdefaultargs","1");
-//%feature("compactdefaultargs","0") CasADi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
-%feature("compactdefaultargs","0") CasADi::solve; // buggy
+//%feature("compactdefaultargs","0") casadi::taylor; // taylor function has a default argument for which the namespace is not recognised by SWIG
+%feature("compactdefaultargs","0") casadi::solve; // buggy
 #endif //SWIGXML
 
 // STL
@@ -420,7 +420,7 @@ int internal(const std::string & c) {
 #ifdef SWIGPYTHON
 %{
 #define START \
-  if (CasADi::CasadiOptions::catch_errors_python){ \
+  if (casadi::CasadiOptions::catch_errors_python){ \
   try {
   
 #define STOP \
@@ -569,12 +569,12 @@ memberbinops(mpower,argtype,argCast,selfCast,returntype)
 #define binopsNoPriority(argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
 
-//%traits_swigtype(CasADi::GenericType);
-//%traits_swigtype(std::mapCasADi::Dictionary);
+//%traits_swigtype(casadi::GenericType);
+//%traits_swigtype(std::mapcasadi::Dictionary);
 
-//%fragment(SWIG_Traits_frag(std::map< std::string, CasADi::GenericType, std::less<std::string > , allocator<std::pair<const std::string, CasADi::GenericType > > >));
+//%fragment(SWIG_Traits_frag(std::map< std::string, casadi::GenericType, std::less<std::string > , allocator<std::pair<const std::string, casadi::GenericType > > >));
 
-//%fragment(SWIG_Traits_frag(CasADi::Dictionary));
+//%fragment(SWIG_Traits_frag(casadi::Dictionary));
 
 // typemaphelpers
 %include "typemaphelpers.i"
@@ -666,24 +666,24 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "casadi/control/dple_solver.hpp"
 #include "casadi/control/simple_indef_dple_solver.hpp"
 
-using namespace CasADi;
+using namespace casadi;
 
 %}
 
 #ifndef SWIGXML
-%traits_swigtype(CasADi::DerivativeGenerator);
-%fragment(SWIG_Traits_frag(CasADi::DerivativeGenerator));
-%traits_swigtype(CasADi::Callback);
-%fragment(SWIG_Traits_frag(CasADi::Callback));
-%traits_swigtype(CasADi::CustomEvaluate);
-%fragment(SWIG_Traits_frag(CasADi::CustomEvaluate));
-%traits_swigtype(CasADi::IndexList);
-%fragment(SWIG_Traits_frag(CasADi::IndexList));
+%traits_swigtype(casadi::DerivativeGenerator);
+%fragment(SWIG_Traits_frag(casadi::DerivativeGenerator));
+%traits_swigtype(casadi::Callback);
+%fragment(SWIG_Traits_frag(casadi::Callback));
+%traits_swigtype(casadi::CustomEvaluate);
+%fragment(SWIG_Traits_frag(casadi::CustomEvaluate));
+%traits_swigtype(casadi::IndexList);
+%fragment(SWIG_Traits_frag(casadi::IndexList));
 
-%template(Dictionary) std::map<std::string,CasADi::GenericType>;
+%template(Dictionary) std::map<std::string,casadi::GenericType>;
 
-%traits_swigtype(CasADi::Function);
-%fragment(SWIG_Traits_frag(CasADi::Function));
+%traits_swigtype(casadi::Function);
+%fragment(SWIG_Traits_frag(casadi::Function));
 
 #endif
 
@@ -693,39 +693,39 @@ using namespace CasADi;
 
 %{
 namespace std {
-void dummy(CasADi::SXElement foo,
+void dummy(casadi::SXElement foo,
 	std::vector< std::vector<double> > foo1,
 	std::vector<double> &foo2,
-	std::vector<CasADi::MX> &foo3,
-	CasADi::MX foo4,
-	CasADi::Matrix<double> foo5,
-	CasADi::Sparsity foo6,
-	std::vector<CasADi::SXElement> foo7,
-	std::vector< std::vector<CasADi::SXElement> > foo8,
-	CasADi::Matrix<CasADi::SXElement> foo9,
-	CasADi::GenericType foo10,
-	std::vector < CasADi::Matrix<double> > foo11,
-  std::vector < std::vector < CasADi::Matrix<double> > > foo12,
-  std::vector < CasADi::Matrix<int> > foo13,
-  std::vector < std::vector < CasADi::Matrix<int> > > foo14,
-  std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
-  std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
-  std::vector < std::vector < CasADi::MX > > foo17,
-  std::vector < std::vector < CasADi::MX* > > foo17b,
-  CasADi::Dictionary foo18,
+	std::vector<casadi::MX> &foo3,
+	casadi::MX foo4,
+	casadi::Matrix<double> foo5,
+	casadi::Sparsity foo6,
+	std::vector<casadi::SXElement> foo7,
+	std::vector< std::vector<casadi::SXElement> > foo8,
+	casadi::Matrix<casadi::SXElement> foo9,
+	casadi::GenericType foo10,
+	std::vector < casadi::Matrix<double> > foo11,
+  std::vector < std::vector < casadi::Matrix<double> > > foo12,
+  std::vector < casadi::Matrix<int> > foo13,
+  std::vector < std::vector < casadi::Matrix<int> > > foo14,
+  std::vector < casadi::Matrix<casadi::SXElement> > foo15,
+  std::vector < std::vector < casadi::Matrix<casadi::SXElement> > > foo16,
+  std::vector < std::vector < casadi::MX > > foo17,
+  std::vector < std::vector < casadi::MX* > > foo17b,
+  casadi::Dictionary foo18,
   std::string& foo19,
-  CasADi::Matrix<int> foo20,
-  CasADi::CustomFunction foo24,
-  CasADi::Function foo25,
+  casadi::Matrix<int> foo20,
+  casadi::CustomFunction foo24,
+  casadi::Function foo25,
 	int &bar,
 	double &baz) {}
 
 
 #ifdef SWIGPYTHON
 void dummy2(
-  CasADi::DerivativeGenerator foo1,
-  CasADi::Callback foo2,
-  CasADi::CustomEvaluate foo3
+  casadi::DerivativeGenerator foo1,
+  casadi::Callback foo2,
+  casadi::CustomEvaluate foo3
   ) {}
 #endif// SWIGPYTHON
 };
@@ -738,39 +738,39 @@ import _casadi_main as _casadi_main_module
 #endif // SWIGPYTHON
 
 namespace std {
-void dummy(CasADi::SXElement foo,
+void dummy(casadi::SXElement foo,
 	std::vector< std::vector<double> > foo1,
 	std::vector<double> &foo2,
-	std::vector<CasADi::MX> &foo3,
-	CasADi::MX foo4,
-	CasADi::Matrix<double> foo5,
-	CasADi::Sparsity foo6,
-	std::vector<CasADi::SXElement> foo7,
-	std::vector< std::vector<CasADi::SXElement> > foo8,
-	CasADi::Matrix<CasADi::SXElement> foo9,
-  CasADi::GenericType foo10,
-  std::vector < CasADi::Matrix<double> > foo11,
-  std::vector < std::vector < CasADi::Matrix<double> > > foo12,
-  std::vector < CasADi::Matrix<int> > foo13,
-  std::vector < std::vector < CasADi::Matrix<int> > > foo14,
-  std::vector < CasADi::Matrix<CasADi::SXElement> > foo15,
-  std::vector < std::vector < CasADi::Matrix<CasADi::SXElement> > > foo16,
-  std::vector < std::vector < CasADi::MX > > foo17,
-  std::vector < std::vector < CasADi::MX* > > foo17b,
-  CasADi::Dictionary foo18,
+	std::vector<casadi::MX> &foo3,
+	casadi::MX foo4,
+	casadi::Matrix<double> foo5,
+	casadi::Sparsity foo6,
+	std::vector<casadi::SXElement> foo7,
+	std::vector< std::vector<casadi::SXElement> > foo8,
+	casadi::Matrix<casadi::SXElement> foo9,
+  casadi::GenericType foo10,
+  std::vector < casadi::Matrix<double> > foo11,
+  std::vector < std::vector < casadi::Matrix<double> > > foo12,
+  std::vector < casadi::Matrix<int> > foo13,
+  std::vector < std::vector < casadi::Matrix<int> > > foo14,
+  std::vector < casadi::Matrix<casadi::SXElement> > foo15,
+  std::vector < std::vector < casadi::Matrix<casadi::SXElement> > > foo16,
+  std::vector < std::vector < casadi::MX > > foo17,
+  std::vector < std::vector < casadi::MX* > > foo17b,
+  casadi::Dictionary foo18,
   std::string& foo19,
-  CasADi::Matrix<int> foo20,
-  CasADi::CustomFunction foo24,
-  CasADi::Function foo25,
+  casadi::Matrix<int> foo20,
+  casadi::CustomFunction foo24,
+  casadi::Function foo25,
 	int &bar,
 	double &baz);
 
 
 #ifdef SWIGPYTHON
 void dummy2(
-  CasADi::DerivativeGenerator foo1,
-  CasADi::Callback foo2,
-  CasADi::CustomEvaluate foo3
+  casadi::DerivativeGenerator foo1,
+  casadi::Callback foo2,
+  casadi::CustomEvaluate foo3
   ) {}
 #endif
 

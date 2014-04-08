@@ -27,10 +27,10 @@
 #include "casadi/symbolic/std_vector_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
     
 DirectSingleShootingInternal::DirectSingleShootingInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
-  addOption("parallelization", OT_STRING, GenericType(), "Passed on to CasADi::Parallelizer");
+  addOption("parallelization", OT_STRING, GenericType(), "Passed on to casadi::Parallelizer");
   addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
@@ -310,4 +310,4 @@ void DirectSingleShootingInternal::reportConstraints(std::ostream &stream) {
  
 }
 
-} // namespace CasADi
+} // namespace casadi

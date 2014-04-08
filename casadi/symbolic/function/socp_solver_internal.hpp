@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
 /// Internal class
 class SOCPSolverInternal : public FunctionInternal{
@@ -80,7 +80,7 @@ class SOCPSolverInternal : public FunctionInternal{
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 

@@ -1,7 +1,7 @@
 #include "casadi/symbolic/sx/sx_tools.hpp"
 #include <limits>
 
-using namespace CasADi;
+using namespace casadi;
 
 int main(int argc, char *argv[])
 {

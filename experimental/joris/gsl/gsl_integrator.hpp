@@ -28,7 +28,7 @@
 
 // http://www.network-theory.co.uk/docs/gslref/OrdinaryDifferentialEquations.html
 
-namespace CasADi {
+namespace casadi {
 namespace GSL {
   
   
@@ -52,7 +52,7 @@ public:
   GslIntegrator();
   
   /** \brief  Create an integrator for explicit ODEs
-  *   \param f CasADi::Function mapping from CasADi::ODEInput to CasADi::ODEOutput.
+  *   \param f casadi::Function mapping from casadi::ODEInput to casadi::ODEOutput.
   */
   explicit GslIntegrator(const Function& f, const Function& q=Function());
   
@@ -67,7 +67,7 @@ public:
 
 
 } // namespace GSL
-} // namespace CasADi
+} // namespace casadi
 
 #endif //GSL_INTEGRATOR_HPP
 

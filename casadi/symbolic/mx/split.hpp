@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief Split: Split into multiple expressions splitting the nonzeros
       \author Joel Andersson
@@ -128,6 +128,6 @@ namespace CasADi{
     virtual MX getVertcat(const std::vector<MX>& x) const;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SPLIT_HPP

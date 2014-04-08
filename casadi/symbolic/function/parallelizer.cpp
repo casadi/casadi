@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   Parallelizer::Parallelizer(){
   }
@@ -41,5 +41,5 @@ namespace CasADi{
     return (ParallelizerInternal*)Function::operator->();
   }
 
-} // namespace CasADi
+} // namespace casadi
 

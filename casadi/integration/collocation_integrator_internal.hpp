@@ -30,7 +30,7 @@
 #include "integration_tools.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
     
   class CollocationIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
   public:
@@ -69,6 +69,6 @@ namespace CasADi{
     int deg_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //COLLOCATION_INTEGRATOR_INTERNAL_HPP

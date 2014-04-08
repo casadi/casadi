@@ -28,7 +28,7 @@
 #include "casadi/symbolic/function/mx_function.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
     
   class FixedStepIntegratorInternal : public IntegratorInternal{
   public:
@@ -100,6 +100,6 @@ namespace CasADi{
     std::vector<std::vector<double> > x_tape_, Z_tape_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //FIXED_STEP_INTEGRATOR_INTERNAL_HPP

@@ -26,7 +26,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace CasADi {
+namespace casadi {
   /**
   * \brief Collects global CasADi options
   *

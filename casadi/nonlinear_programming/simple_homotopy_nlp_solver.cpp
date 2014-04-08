@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver(){
   }
@@ -46,4 +46,4 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi

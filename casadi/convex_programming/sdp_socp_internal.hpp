@@ -27,7 +27,7 @@
 #include "casadi/symbolic/function/sdp_solver.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for SDPSOCPInternal
    * 
@@ -59,7 +59,7 @@ public:
 
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //SDP_SOCP_INTERNAL_HPP
 

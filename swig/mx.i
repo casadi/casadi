@@ -30,13 +30,13 @@
 
 
 
-%template(SparsityVector) std::vector<CasADi::Sparsity>;
+%template(SparsityVector) std::vector<casadi::Sparsity>;
 
 
 
-%extend CasADi::MX{
+%extend casadi::MX{
   
-  %matrix_helpers(CasADi::MX)
+  %matrix_helpers(casadi::MX)
   
   #ifdef SWIGPYTHON
   %python_array_wrappers(1002.0)
@@ -52,11 +52,11 @@
   %}
   #endif //SWIGPYTHON
   
-  binopsrFull(CasADi::MX)
+  binopsrFull(casadi::MX)
 };
 
 
 
-VECTOR_REPR(CasADi::MX)
-VECTOR_REPR(std::vector<CasADi::MX>)
+VECTOR_REPR(casadi::MX)
+VECTOR_REPR(std::vector<casadi::MX>)
 

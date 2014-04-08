@@ -26,7 +26,7 @@
 #include "sparsity.hpp"
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   class SparsityInternal : public SharedObjectNode{
   public:    
@@ -327,7 +327,7 @@ namespace CasADi{
     Sparsity sub2(const std::vector<int>& jj, const std::vector<int>& ii, std::vector<int>& mapping) const;
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // SPARSITY_INTERNAL_HPP

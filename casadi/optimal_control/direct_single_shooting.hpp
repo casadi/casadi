@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/ocp_solver.hpp"
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
-namespace CasADi{
+namespace casadi{
   class DirectSingleShootingInternal;
     
     
@@ -49,7 +49,7 @@ class DirectSingleShooting : public OCPSolver{
     DirectSingleShooting();
   
     /** \brief Create a multiple shooting OCP solver
-    * \param ffcn Continuous time dynamics, an CasADi::Function with the folowing mapping:
+    * \param ffcn Continuous time dynamics, an casadi::Function with the folowing mapping:
     * \copydoc scheme_DAEInput
     * \copydoc scheme_DAEOutput
     * Important notes:
@@ -57,9 +57,9 @@ class DirectSingleShooting : public OCPSolver{
     *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters to be optimized but constant over the whole domain. The remainder are interpreted as controls. 
     *  - BEWARE: if the right hand side of ffcn is dependent on time, the results will be incorrect.
     *
-    * \param mfcn Mayer term, CasADi::Function mapping to cost (1 x 1)
+    * \param mfcn Mayer term, casadi::Function mapping to cost (1 x 1)
     * @copydoc scheme_MayerInput
-    * \param cfcn Path constraints, CasADi::Function mapping to (nh x 1)
+    * \param cfcn Path constraints, casadi::Function mapping to (nh x 1)
     * @copydoc scheme_DAEInput
     * \param rfcn Initial value constraints
     */
@@ -96,7 +96,7 @@ class DirectSingleShooting : public OCPSolver{
     
 };
                         
-} // namespace CasADi
+} // namespace casadi
 
 
 #endif // DIRECT_SINGLE_SHOOTING_HPP

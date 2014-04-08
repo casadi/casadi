@@ -28,7 +28,7 @@
 #include "mx_function.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   NLPSolver::NLPSolver(){
   }
@@ -186,5 +186,5 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi
 

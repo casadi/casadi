@@ -39,7 +39,7 @@
 #include "casadi/symbolic/casadi_calculus.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   SymbolicOCP::SymbolicOCP(bool ignore_timed_variables) : ignore_timed_variables_(ignore_timed_variables){
     t = SX::sym("t");
@@ -1860,5 +1860,5 @@ namespace CasADi{
     setAttribute(&SymbolicOCP::setDerivativeStart,var,val,normalized);
   }
  
-} // namespace CasADi
+} // namespace casadi
 

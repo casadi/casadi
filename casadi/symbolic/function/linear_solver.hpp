@@ -35,7 +35,7 @@
  *
  */
 
-namespace CasADi{
+namespace casadi{
   
 /// Input arguments of a linear solver [linsolIn]
 enum LinsolInput{
@@ -109,7 +109,7 @@ enum LinsolOutput{
     virtual bool checkNode() const;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //LINEAR_SOLVER_HPP
 

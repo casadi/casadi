@@ -27,7 +27,7 @@
 #include "casadi/symbolic/function/qcqp_solver.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /** \brief Internal class for QCQPQPInternal
    * 
@@ -56,7 +56,7 @@ public:
 
 };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //QCQP_QP_INTERNAL_HPP
 

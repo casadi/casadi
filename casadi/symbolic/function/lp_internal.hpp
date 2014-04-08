@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
 /// Internal class
 class LPSolverInternal : public FunctionInternal{
@@ -65,7 +65,7 @@ class LPSolverInternal : public FunctionInternal{
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif //LP_INTERNAL_HPP

@@ -44,7 +44,7 @@
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/interfaces/sundials/cvodes_integrator.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 // Infinity

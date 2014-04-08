@@ -23,7 +23,7 @@
 
 #include "std_vector_tools.hpp"
 
-namespace CasADi{
+namespace casadi{
   std::vector<int> range(int start, int stop, int step, int len){
     start = std::min(start,len);
     stop = std::min(stop,len);
@@ -85,5 +85,5 @@ namespace CasADi{
     }
   }
   
-} // namespace CasADi
+} // namespace casadi
 

@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* CasADi::Sparsity::unidirectionalColoring();
+* casadi::Sparsity::unidirectionalColoring();
 * \endcode
 *
 */

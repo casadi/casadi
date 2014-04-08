@@ -23,7 +23,7 @@
 #include "socp_solver_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 
 SOCPSolver::SOCPSolver() {
@@ -41,7 +41,7 @@ bool SOCPSolver::checkNode() const{
   return dynamic_cast<const SOCPSolverInternal*>(get())!=0;
 }
 
-} // namespace CasADi
+} // namespace casadi
 
   
 

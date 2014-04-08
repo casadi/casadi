@@ -25,7 +25,7 @@
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/symbolic/function/external_function.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 // CONSTRUCT THE INTEGRATOR

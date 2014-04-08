@@ -29,7 +29,7 @@
 #define ALLOW_QPROBLEMB true
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
 
 QPOasesInternal* QPOasesInternal::clone() const{
   // Return a deep copy
@@ -453,4 +453,4 @@ qpOASES::PrintLevel QPOasesInternal::string_to_PrintLevel(std::string b){
 }
 
 
-} // namespace CasADi
+} // namespace casadi

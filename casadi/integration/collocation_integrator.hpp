@@ -25,7 +25,7 @@
 
 #include "implicit_fixed_step_integrator.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   class CollocationIntegratorInternal;
   
@@ -75,6 +75,6 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //COLLOCATION_INTEGRATOR_HPP

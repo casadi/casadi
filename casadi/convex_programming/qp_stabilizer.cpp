@@ -24,7 +24,7 @@
 #include "qp_stabilizer.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 QPStabilizer::QPStabilizer(){ 
 }
@@ -51,4 +51,4 @@ QPSolver & QPStabilizer::getSolver() {
   return (*this)->qp_solver_;
 }
 
-} // namespace CasADi
+} // namespace casadi

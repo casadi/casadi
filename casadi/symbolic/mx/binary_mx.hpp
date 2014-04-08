@@ -27,7 +27,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Represents any binary operation that involves two matrices 
       \author Joel Andersson 
       \date 2010        
@@ -101,7 +101,7 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // BINARY_MX_HPP

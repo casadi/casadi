@@ -24,7 +24,7 @@
 #include "nlp_qp_solver.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 NLPQPSolver::NLPQPSolver(){ 
 }
@@ -47,4 +47,4 @@ bool NLPQPSolver::checkNode() const{
   return dynamic_cast<const NLPQPInternal*>(get());
 }
 
-} // namespace CasADi
+} // namespace casadi

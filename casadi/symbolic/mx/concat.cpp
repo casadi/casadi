@@ -30,7 +30,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   Concat::Concat(const vector<MX>& x){
     setDependencies(x);
@@ -239,4 +239,4 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi

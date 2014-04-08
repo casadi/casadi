@@ -28,7 +28,7 @@
 #include "casadi/symbolic/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
 
   /**
      @copydoc NLPSolver_doc
@@ -66,7 +66,7 @@ namespace CasADi{
     std::map<std::string, std::string> string_param_;
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //KNITRO_INTERNAL_HPP

@@ -28,7 +28,7 @@
 //#include <dlfcn.h>
 #include <cassert>
 
-namespace CasADi{
+namespace casadi{
 
 using namespace std;
 
@@ -52,4 +52,4 @@ bool ExternalFunction::checkNode() const{
 }
 
 
-} // namespace CasADi
+} // namespace casadi

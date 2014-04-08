@@ -38,7 +38,7 @@
     
 */
 
-namespace CasADi{
+namespace casadi{
 
   // Forward declaration of internal class
   class NullspaceInternal;
@@ -67,6 +67,6 @@ namespace CasADi{
          
   };
   
-} // namespace CasADi
+} // namespace casadi
 
 #endif //NULLSPACE_HPP

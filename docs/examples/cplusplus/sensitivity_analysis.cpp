@@ -33,7 +33,7 @@
 #include <iomanip>
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 /** \brief Generate a simple ODE */
 void simpleODE(Function& ffcn, double& tf, vector<double>& x0, double& u0){

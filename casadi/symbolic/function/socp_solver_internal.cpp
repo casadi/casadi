@@ -31,7 +31,7 @@ INPUTSCHEME(SOCPInput)
 OUTPUTSCHEME(SOCPOutput)
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
 // Constructor
 SOCPSolverInternal::SOCPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -124,7 +124,7 @@ void SOCPSolverInternal::checkInputs() const {
   }
 }
  
-} // namespace CasADi
+} // namespace casadi
 
   
 

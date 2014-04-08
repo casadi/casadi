@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   OldCollocationIntegrator::OldCollocationIntegrator(){
   }
@@ -45,4 +45,4 @@ namespace CasADi{
     return dynamic_cast<const OldCollocationIntegratorInternal*>(get())!=0;
   }
 
-} // namespace CasADi
+} // namespace casadi

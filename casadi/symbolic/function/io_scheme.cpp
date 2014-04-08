@@ -23,7 +23,7 @@
 #include "io_scheme.hpp"
 #include "io_scheme_internal.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   IOScheme::IOScheme(){
   }
@@ -163,4 +163,4 @@ namespace CasADi{
     return (*this)->repr(stream);
   }
 
-} // namespace CasADi
+} // namespace casadi

@@ -23,7 +23,7 @@
 #include "casadi_options.hpp"
 #include "casadi_exception.hpp"
 
-namespace CasADi {
+namespace casadi {
 
   bool CasadiOptions::catch_errors_python = true;
   bool CasadiOptions::simplification_on_the_fly = true;

@@ -27,7 +27,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   Determinant::Determinant(const MX& x){
     setDependencies(x);
@@ -71,4 +71,4 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi

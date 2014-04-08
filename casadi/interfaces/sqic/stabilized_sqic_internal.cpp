@@ -34,7 +34,7 @@
 #include "casadi/interfaces/sqic/resource_sqic.hpp"
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
 
 StabilizedSQICInternal* StabilizedSQICInternal::clone() const{
   // Return a deep copy
@@ -294,6 +294,6 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
   
 }
 
-} // namespace CasADi
+} // namespace casadi
 
 // #undef getPtr

@@ -28,7 +28,7 @@
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/symbolic/std_vector_tools.hpp>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 /**
  *  Example program demonstrating NLP solution with Ipopt with callback functions as generated code

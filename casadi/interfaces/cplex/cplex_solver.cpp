@@ -24,7 +24,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
 CplexSolver::CplexSolver(){}
 
@@ -43,4 +43,4 @@ bool CplexSolver::checkNode() const{
   return dynamic_cast<const CplexInternal*>(get());
 }
 
-} // end namespace CasADi
+} // end namespace casadi

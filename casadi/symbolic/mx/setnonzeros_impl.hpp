@@ -35,7 +35,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
   template<bool Add>
   SetNonzeros<Add>::SetNonzeros(const MX& y, const MX& x){
@@ -638,6 +638,6 @@ namespace CasADi{
     }
   }
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // SETNONZEROS_IMPL_HPP

@@ -47,7 +47,7 @@
 
 */
 
-namespace CasADi{
+namespace casadi{
 
   /// Input arguments of an Homotopy NLP function [hnlpIn]
   enum HNLPInput{
@@ -85,7 +85,7 @@ namespace CasADi{
   
   };
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // HOMOTOPY_NLP_SOLVER_HPP
 

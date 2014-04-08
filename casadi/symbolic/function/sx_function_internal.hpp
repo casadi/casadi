@@ -35,7 +35,7 @@
 #endif // WITH_OPENCL
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 #ifdef WITH_OPENCL
   /** \brief Singleton for the sparsity propagation kernel
       TODO: Move to a separate file and make non sparsity pattern specific
@@ -217,7 +217,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif // SX_FUNCTION_INTERNAL_HPP

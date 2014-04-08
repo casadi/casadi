@@ -25,7 +25,7 @@
 
 #include <casadi/symbolic/casadi.hpp>
 
-namespace CasADi{
+namespace casadi{
 
 // Forward declaration
 class SymbolicNLPInternal;
@@ -87,6 +87,6 @@ class SymbolicNLP : public PrintableObject{
     
 };
     
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SYMBOLIC_NLP_HPP

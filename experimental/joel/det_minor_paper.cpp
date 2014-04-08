@@ -30,7 +30,7 @@
 #include <stdlib.h>
 
 using namespace std;
-using namespace CasADi;
+using namespace casadi;
 
 // Function to be called if the size reaches k
 Function det_n_min; 

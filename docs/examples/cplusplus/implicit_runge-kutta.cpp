@@ -32,7 +32,7 @@
 #include <casadi/interfaces/sundials/cvodes_integrator.hpp>
 #include <iomanip>
 
-using namespace CasADi;
+using namespace casadi;
 using namespace std;
 
 int main(){

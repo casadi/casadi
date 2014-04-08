@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
   /** \brief ControlSimulator data storage classs
       \author Joel Andersson 
@@ -104,7 +104,7 @@ namespace CasADi{
   
   };
   
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // CONTROLSIMULATOR_INTERNAL_HPP

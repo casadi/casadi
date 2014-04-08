@@ -29,7 +29,7 @@ OUTPUTSCHEME(OCPOutput)
 
 using namespace std;
 
-namespace CasADi{
+namespace casadi{
 
 OCPSolverInternal::OCPSolverInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn){
   addOption("number_of_parameters",  OT_INTEGER,                0);
@@ -100,5 +100,5 @@ void OCPSolverInternal::init(){
   
 }
 
-} // namespace CasADi
+} // namespace casadi
 

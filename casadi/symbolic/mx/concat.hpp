@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Concatenation: Join multiple expressions stacking the nonzeros
       \author Joel Andersson
       \date 2014
@@ -119,7 +119,7 @@ namespace CasADi{
     virtual int getOp() const{ return OP_VERTCAT;}
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // CONCAT_HPP

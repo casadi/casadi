@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   /** \brief Matrix transpose
       \author Joel Andersson
       \date 2013
@@ -122,6 +122,6 @@ namespace CasADi{
 
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif // TRANSPOSE_HPP

@@ -25,7 +25,7 @@
 
 #include "casadi/symbolic/function/qcqp_solver.hpp"
 
-namespace CasADi {
+namespace casadi {
   
   
 // Forward declaration of internal class 
@@ -97,7 +97,7 @@ public:
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 #endif //SOCP_QCQP_SOLVER_HPP
 

@@ -31,7 +31,7 @@
 #include "casadi/symbolic/function/sx_function.hpp"
 
 /// \cond INTERNAL
-namespace CasADi{
+namespace casadi{
   
 class DirectMultipleShootingInternal : public OCPSolverInternal{
   friend class DirectMultipleShooting;
@@ -77,7 +77,7 @@ class DirectMultipleShootingInternal : public OCPSolverInternal{
     NLPSolver nlp_solver_;
 };
                         
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP

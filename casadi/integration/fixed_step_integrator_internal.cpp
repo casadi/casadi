@@ -29,7 +29,7 @@
 #include "casadi/symbolic/mx/mx_tools.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   FixedStepIntegratorInternal::FixedStepIntegratorInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
@@ -168,4 +168,4 @@ namespace CasADi{
   }
 
 
-} // namespace CasADi
+} // namespace casadi

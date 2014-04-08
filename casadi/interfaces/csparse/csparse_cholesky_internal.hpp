@@ -32,7 +32,7 @@ extern "C"{
 #include "csparse_cholesky.hpp"
 #include "casadi/symbolic/function/linear_solver_internal.hpp"
 
-namespace CasADi{
+namespace casadi{
 
   /**
      @copydoc LinearSolver_doc
@@ -84,7 +84,7 @@ namespace CasADi{
     
   };
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //CSPARSE_CHOLESKY_INTERNAL_HPP
 

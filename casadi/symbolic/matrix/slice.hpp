@@ -29,7 +29,7 @@
 #include <limits>
 #include <iostream>
 
-namespace CasADi{
+namespace casadi{
   
   /** \brief Class representing a Slice
    *
@@ -112,13 +112,13 @@ namespace CasADi{
   };
   /// \endcond
   
-} // namespace CasADi
+} // namespace casadi
 
 
 #ifdef SWIG
-%template(Pair_Slice_Int) std::pair<CasADi::Slice,int>;
-%template(Pair_Int_Slice) std::pair<int,CasADi::Slice>;
-%template(Pair_Slice_Slice) std::pair<CasADi::Slice,CasADi::Slice>;
+%template(Pair_Slice_Int) std::pair<casadi::Slice,int>;
+%template(Pair_Int_Slice) std::pair<int,casadi::Slice>;
+%template(Pair_Slice_Slice) std::pair<casadi::Slice,casadi::Slice>;
 #endif // SWIG
 
 #endif // SLICE_HPP

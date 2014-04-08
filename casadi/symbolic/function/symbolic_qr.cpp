@@ -23,7 +23,7 @@
 #include "symbolic_qr_internal.hpp"
 
 using namespace std;
-namespace CasADi{
+namespace casadi{
 
   SymbolicQR::SymbolicQR(){
   }
@@ -44,6 +44,6 @@ namespace CasADi{
     return dynamic_cast<const SymbolicQRInternal*>(get())!=0;
   }
 
-} // namespace CasADi
+} // namespace casadi
 
   

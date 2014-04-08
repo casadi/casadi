@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
   
   template<typename T>
   class GenericTypeInternal : public SharedObjectNode{
@@ -48,7 +48,7 @@ namespace CasADi{
     return dynamic_cast<const GenericTypeInternal<T>*>(get()) != 0;
   }
   
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 
 #endif // GENERIC_TYPE_INTERNAL_HPP

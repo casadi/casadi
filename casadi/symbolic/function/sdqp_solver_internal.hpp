@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace CasADi{
+namespace casadi{
 
 /// Internal class
 class SDQPSolverInternal : public FunctionInternal{
@@ -75,7 +75,7 @@ class SDQPSolverInternal : public FunctionInternal{
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 
 /// \endcond
 #endif //SDQP_SOLVER_INTERNAL_HPP

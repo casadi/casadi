@@ -29,7 +29,7 @@
 #include "casadi/symbolic/options_functionality.hpp"
 #include "casadi/symbolic/mx/mx.hpp"
 
-namespace CasADi{
+namespace casadi{
   
   //@{
   /** \brief Obtain collocation points of specific order and scheme
@@ -108,7 +108,7 @@ extern const long double** collocation_points[2];
   */
   Function implicitRK(Function& f, implicitFunctionCreator impl, const Dictionary& dict = Dictionary(), const MX &tf=1, int order=4, const std::string& scheme="radau", int ne = 1);
     
-} // namespace CasADi
+} // namespace casadi
 
 #endif // INTEGRATION_TOOLS_HPP
 

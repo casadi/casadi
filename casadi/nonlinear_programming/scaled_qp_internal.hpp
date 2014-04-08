@@ -26,7 +26,7 @@
 #include "casadi/symbolic/fx/qp_solver.hpp"
 
 /// \cond INTERNAL
-namespace CasADi {
+namespace casadi {
   
   
 // Forward declaration of internal class 
@@ -70,7 +70,7 @@ public:
 };
 
 
-} // namespace CasADi
+} // namespace casadi
 /// \endcond
 #endif //NLP_QP_SOLVER_HPP
 

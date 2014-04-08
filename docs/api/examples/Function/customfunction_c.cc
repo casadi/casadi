@@ -1,7 +1,7 @@
 #include "casadi/symbolic/function/custom_function.hpp"
 #include "casadi/symbolic/functor.hpp"
 
-using namespace CasADi;
+using namespace casadi;
 
   /// Wrapper around functions
   typedef void (*CustomEvaluateCPtr)(CustomFunction &f, void* user_data);

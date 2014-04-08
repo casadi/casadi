@@ -29,7 +29,7 @@
 #include "casadi/symbolic/function/mx_function.hpp"
 
 using namespace std;
-namespace CasADi {
+namespace casadi {
 
   SDPSDQPInternal::SDPSDQPInternal(const std::vector<Sparsity> &st) : SDQPSolverInternal(st) {
     addOption("sdp_solver",            OT_SDPSOLVER, GenericType(), "The SDPSolver used to solve the SDQPs.");
@@ -154,4 +154,4 @@ namespace CasADi {
     std::copy(sdpsolver_.output(SDP_SOLVER_LAM_X).begin(),sdpsolver_.output(SDP_SOLVER_LAM_X).begin()+n_,output(SDQP_SOLVER_LAM_X).begin());
   }
 
-} // namespace CasADi
+} // namespace casadi
