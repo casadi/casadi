@@ -20,11 +20,11 @@
  *
  */
 
-#include <symbolic/casadi.hpp>
-#include <interfaces/qpoases/qpoases_solver.hpp>
-#include <interfaces/ipopt/ipopt_solver.hpp>
-#include <nonlinear_programming/nlp_qp_solver.hpp>
-#include <nonlinear_programming/scpgen.hpp>
+#include <casadi/symbolic/casadi.hpp>
+#include <casadi/interfaces/qpoases/qpoases_solver.hpp>
+#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
+#include <casadi/nonlinear_programming/nlp_qp_solver.hpp>
+#include <casadi/nonlinear_programming/scpgen.hpp>
 
 #include <iomanip>
 #include <ctime>
