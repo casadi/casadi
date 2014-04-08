@@ -29,10 +29,9 @@ add_library(casadi_integration STATIC ${INTEGRATION_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_integration SHARED ${INTEGRATION_SRCS})
-target_link_libraries(casadi_integration casadi)
-
-set(CASADI_MODULES ${CASADI_MODULES} casadi_integration PARENT_SCOPE)
 endif(ENABLE_SHARED)
+target_link_libraries(casadi_integration casadi)
+set(CASADI_MODULES ${CASADI_MODULES} casadi_integration PARENT_SCOPE)
 install(TARGETS casadi_integration
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib

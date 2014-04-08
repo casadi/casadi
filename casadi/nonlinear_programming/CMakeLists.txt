@@ -15,6 +15,7 @@ add_library(casadi_nonlinear_programming STATIC ${NONLINEAR_PROGRAMMING_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
 add_library(casadi_nonlinear_programming SHARED ${NONLINEAR_PROGRAMMING_SRCS})
+endif(ENABLE_SHARED)
 target_link_libraries(casadi_nonlinear_programming casadi)
 if(WITH_CSPARSE)
   target_link_libraries(casadi_nonlinear_programming casadi_csparse_interface)
@@ -22,7 +23,6 @@ endif(WITH_CSPARSE)
 
 set(CASADI_MODULES ${CASADI_MODULES} casadi_nonlinear_programming PARENT_SCOPE)
 
-endif(ENABLE_SHARED)
 install(TARGETS casadi_nonlinear_programming
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
