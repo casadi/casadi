@@ -291,13 +291,13 @@ for h in locate("*.hpp",os.path.join(os.curdir,"..")):
       
 autogenmetadatahpp.write("enum InputOutputScheme { %s };\n" % ", ".join(["SCHEME_"+p.enum for p in schemes]) )
 
-autogenmetadatahpp.write("std::string getSchemeEntryName(InputOutputScheme scheme, int i);\n")
-autogenmetadatahpp.write("std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);\n")
-autogenmetadatahpp.write("std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);\n")
-autogenmetadatahpp.write("int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);\n")
-autogenmetadatahpp.write("int getSchemeSize(InputOutputScheme scheme);\n")
-autogenmetadatahpp.write("std::string getSchemeName(InputOutputScheme scheme);\n")
-autogenmetadatahpp.write("std::string getSchemeEntryNames(InputOutputScheme scheme);\n")
+autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);\n")
+autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);\n")
+autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);\n")
+autogenmetadatahpp.write("CASADI_EXPORT int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name);\n")
+autogenmetadatahpp.write("CASADI_EXPORT int getSchemeSize(InputOutputScheme scheme);\n")
+autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeName(InputOutputScheme scheme);\n")
+autogenmetadatahpp.write("CASADI_EXPORT std::string getSchemeEntryNames(InputOutputScheme scheme);\n")
 
 autogenpy.write("#ifdef SWIGPYTHON\n")
 autogenpy.write("%pythoncode %{\n")
