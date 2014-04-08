@@ -14,77 +14,75 @@
 
 FIND_PACKAGE( PackageHandleStandardArgs )
 
-SET (OPENCL_VERSION_STRING "0.1.0")
-SET (OPENCL_VERSION_MAJOR 0)
-SET (OPENCL_VERSION_MINOR 1)
-SET (OPENCL_VERSION_PATCH 0)
+set(OPENCL_VERSION_STRING "0.1.0")
+set(OPENCL_VERSION_MAJOR 0)
+set(OPENCL_VERSION_MINOR 1)
+set(OPENCL_VERSION_PATCH 0)
 
-IF (APPLE)
+if(APPLE)
+  find_library(OPENCL_LIBRARIES OpenCL DOC "OpenCL lib for OSX")
+  find_path(OPENCL_INCLUDE_DIRS OpenCL/cl.h DOC "Include for OpenCL on OSX")
+  find_path(_OPENCL_CPP_INCLUDE_DIRS OpenCL/cl.hpp DOC "Include for OpenCL CPP bindings on OSX")
 
-  FIND_LIBRARY(OPENCL_LIBRARIES OpenCL DOC "OpenCL lib for OSX")
-  FIND_PATH(OPENCL_INCLUDE_DIRS OpenCL/cl.h DOC "Include for OpenCL on OSX")
-  FIND_PATH(_OPENCL_CPP_INCLUDE_DIRS OpenCL/cl.hpp DOC "Include for OpenCL CPP bindings on OSX")
+else()
 
-ELSE (APPLE)
+  if(WIN32)
+    find_path(OPENCL_INCLUDE_DIRS CL/cl.h)
+    find_path(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp)
+  
+    # The AMD SDK currently installs both x86 and x86_64 libraries
+    # This is only a hack to find out architecture
+    if( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64" )
+      set(OPENCL_LIB_DIR "$ENV{ATISTREAMSDKROOT}/lib/x86_64")
+    set(OPENCL_LIB_DIR "$ENV{ATIINTERNALSTREAMSDKROOT}/lib/x86_64")
+    else(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64")
+      set(OPENCL_LIB_DIR "$ENV{ATISTREAMSDKROOT}/lib/x86")
+       set(OPENCL_LIB_DIR "$ENV{ATIINTERNALSTREAMSDKROOT}/lib/x86")
+    endif( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64" )
 
-	IF (WIN32)
-	
-	    FIND_PATH(OPENCL_INCLUDE_DIRS CL/cl.h)
-	    FIND_PATH(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp)
-	
-	    # The AMD SDK currently installs both x86 and x86_64 libraries
-	    # This is only a hack to find out architecture
-	    IF( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64" )
-	    	SET(OPENCL_LIB_DIR "$ENV{ATISTREAMSDKROOT}/lib/x86_64")
-			SET(OPENCL_LIB_DIR "$ENV{ATIINTERNALSTREAMSDKROOT}/lib/x86_64")
-	    ELSE (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64")
-	    	SET(OPENCL_LIB_DIR "$ENV{ATISTREAMSDKROOT}/lib/x86")
-	   		SET(OPENCL_LIB_DIR "$ENV{ATIINTERNALSTREAMSDKROOT}/lib/x86")
-	    ENDIF( ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "AMD64" )
+    # find out if the user asked for a 64-bit build, and use the corresponding 
+    # 64 or 32 bit NVIDIA library paths to the search:
+    string(REGEX MATCH "Win64" ISWIN64 ${CMAKE_GENERATOR})
+    if("${ISWIN64}" STREQUAL "Win64") 
+      find_library(OPENCL_LIBRARIES OpenCL.lib $ENV{CUDA_PATH}/lib/x64 ${OPENCL_LIB_DIR} )
+    else("${ISWIN64}" STREQUAL "Win64") 
+      find_library(OPENCL_LIBRARIES OpenCL.lib $ENV{CUDA_PATH}/lib/Win32 ${OPENCL_LIB_DIR} )
+    endif("${ISWIN64}" STREQUAL "Win64") 
 
-	    # find out if the user asked for a 64-bit build, and use the corresponding 
-	    # 64 or 32 bit NVIDIA library paths to the search:
-	    STRING(REGEX MATCH "Win64" ISWIN64 ${CMAKE_GENERATOR})
-	    IF("${ISWIN64}" STREQUAL "Win64") 
-	    	FIND_LIBRARY(OPENCL_LIBRARIES OpenCL.lib $ENV{CUDA_PATH}/lib/x64 ${OPENCL_LIB_DIR} )
-	    ELSE("${ISWIN64}" STREQUAL "Win64") 
-	    	FIND_LIBRARY(OPENCL_LIBRARIES OpenCL.lib $ENV{CUDA_PATH}/lib/Win32 ${OPENCL_LIB_DIR} )
-	    ENDIF("${ISWIN64}" STREQUAL "Win64") 
+    get_filename_component(_OPENCL_INC_CAND ${OPENCL_LIB_DIR}/../../include ABSOLUTE)
+    
+    # On Win32 search relative to the library
+    find_path(OPENCL_INCLUDE_DIRS CL/cl.h PATHS "${_OPENCL_INC_CAND}" $ENV{CUDA_INC_PATH} $ENV{CUDA_PATH}/include)
+    find_path(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp PATHS "${_OPENCL_INC_CAND}" $ENV{CUDA_INC_PATH} $ENV{CUDA_PATH}/include)
+  
+  else()
 
-	    GET_FILENAME_COMPONENT(_OPENCL_INC_CAND ${OPENCL_LIB_DIR}/../../include ABSOLUTE)
-	    
-	    # On Win32 search relative to the library
-	    FIND_PATH(OPENCL_INCLUDE_DIRS CL/cl.h PATHS "${_OPENCL_INC_CAND}" $ENV{CUDA_INC_PATH} $ENV{CUDA_PATH}/include)
-	    FIND_PATH(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp PATHS "${_OPENCL_INC_CAND}" $ENV{CUDA_INC_PATH} $ENV{CUDA_PATH}/include)
-	
-	ELSE (WIN32)
+    # Unix style platforms
+    find_library(OPENCL_LIBRARIES OpenCL
+      ENV LD_LIBRARY_PATH
+    )
 
-            # Unix style platforms
-            FIND_LIBRARY(OPENCL_LIBRARIES OpenCL
-              ENV LD_LIBRARY_PATH
-            )
+    get_filename_component(OPENCL_LIB_DIR ${OPENCL_LIBRARIES} PATH)
+    get_filename_component(_OPENCL_INC_CAND ${OPENCL_LIB_DIR}/../../include ABSOLUTE)
 
-            GET_FILENAME_COMPONENT(OPENCL_LIB_DIR ${OPENCL_LIBRARIES} PATH)
-            GET_FILENAME_COMPONENT(_OPENCL_INC_CAND ${OPENCL_LIB_DIR}/../../include ABSOLUTE)
+    # The AMD SDK currently does not place its headers
+    # in /usr/include, therefore also search relative
+    # to the library
+    find_path(OPENCL_INCLUDE_DIRS CL/cl.h PATHS ${_OPENCL_INC_CAND} "/usr/local/cuda/include")
+    find_path(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp PATHS ${_OPENCL_INC_CAND} "/usr/local/cuda/include")
 
-            # The AMD SDK currently does not place its headers
-            # in /usr/include, therefore also search relative
-            # to the library
-            FIND_PATH(OPENCL_INCLUDE_DIRS CL/cl.h PATHS ${_OPENCL_INC_CAND} "/usr/local/cuda/include")
-            FIND_PATH(_OPENCL_CPP_INCLUDE_DIRS CL/cl.hpp PATHS ${_OPENCL_INC_CAND} "/usr/local/cuda/include")
+  endif()
 
-	ENDIF (WIN32)
-
-ENDIF (APPLE)
+endif()
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS( OpenCL DEFAULT_MSG OPENCL_LIBRARIES OPENCL_INCLUDE_DIRS )
 
-IF( _OPENCL_CPP_INCLUDE_DIRS )
-	SET( OPENCL_HAS_CPP_BINDINGS TRUE )
-	LIST( APPEND OPENCL_INCLUDE_DIRS ${_OPENCL_CPP_INCLUDE_DIRS} )
-	# This is often the same, so clean up
-	LIST( REMOVE_DUPLICATES OPENCL_INCLUDE_DIRS )
-ENDIF( _OPENCL_CPP_INCLUDE_DIRS )
+if( _OPENCL_CPP_INCLUDE_DIRS )
+  set( OPENCL_HAS_CPP_BINDINGS TRUE )
+  LIST( APPEND OPENCL_INCLUDE_DIRS ${_OPENCL_CPP_INCLUDE_DIRS} )
+  # This is often the same, so clean up
+  LIST( REMOVE_DUPLICATES OPENCL_INCLUDE_DIRS )
+endif( _OPENCL_CPP_INCLUDE_DIRS )
 
 MARK_AS_ADVANCED(
   OPENCL_INCLUDE_DIRS

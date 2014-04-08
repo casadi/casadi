@@ -1,12 +1,12 @@
 # cmake/modules/language_support.cmake
 #
 # Temporary additional general language support is contained within this
-# file.  
+# file.
 
 # This additional function definition is needed to provide a workaround for
 # CMake bug 9220.
 
-# On debian testing (cmake 2.6.2), I get return code zero when calling 
+# On debian testing (cmake 2.6.2), I get return code zero when calling
 # cmake the first time, but cmake crashes when running a second time
 # as follows:
 #
@@ -16,7 +16,7 @@
 #  Call Stack (most recent call first):
 #    CMakeLists.txt:3 (enable_language)
 #
-# My workaround is to invoke cmake twice.  If both return codes are zero, 
+# My workaround is to invoke cmake twice.  If both return codes are zero,
 # it is safe to invoke ENABLE_LANGUAGE(Fortran OPTIONAL)
 
 function(workaround_9220 language language_works)
@@ -36,27 +36,25 @@ enable_language(${language} OPTIONAL)
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/language_tests/${language}
     RESULT_VARIABLE return_code
     OUTPUT_QUIET
-    ERROR_QUIET
-    )
+    ERROR_QUIET)
 
   if(return_code EQUAL 0)
     # Second run
-    execute_process (
+    execute_process(
       COMMAND ${CMAKE_COMMAND} .
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/language_tests/${language}
       RESULT_VARIABLE return_code
       OUTPUT_QUIET
-      ERROR_QUIET
-      )
+      ERROR_QUIET)
     if(return_code EQUAL 0)
       set(${language_works} ON PARENT_SCOPE)
-    else(return_code EQUAL 0)
+    else()
       set(${language_works} OFF PARENT_SCOPE)
-    endif(return_code EQUAL 0)
-  else(return_code EQUAL 0)
+    endif()
+  else()
     set(${language_works} OFF PARENT_SCOPE)
-  endif(return_code EQUAL 0)
-endfunction(workaround_9220)
+  endif()
+endfunction()
 
 # Temporary tests of the above function.
 #workaround_9220(CXX CXX_language_works)

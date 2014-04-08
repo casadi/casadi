@@ -1,17 +1,17 @@
-FIND_PATH(CASADI_INCLUDE_DIR 
+find_path(CASADI_INCLUDE_DIR 
   casadi/symbolic/sx/sx_element.hpp
   HINTS $ENV{CASADI_PREFIX}/include
 )
 
-IF (CASADI_INCLUDE_DIR)
-  SET(CASADI_INCLUDE_DIR ${CASADI_INCLUDE_DIR} ${CASADI_INCLUDE_DIR}/casadi)
-  SET(CASADI_FOUND_INCLUDE TRUE)
-  MESSAGE(STATUS "Found CasADi include dir: ${CASADI_INCLUDE_DIR}")
-ELSE (CASADI_INCLUDE_DIR)
-  MESSAGE(STATUS "Could not find CasADi include dir")
-ENDIF (CASADI_INCLUDE_DIR)
+if(CASADI_INCLUDE_DIR)
+  set(CASADI_INCLUDE_DIR ${CASADI_INCLUDE_DIR} ${CASADI_INCLUDE_DIR}/casadi)
+  set(CASADI_FOUND_INCLUDE TRUE)
+  message(STATUS "Found CasADi include dir: ${CASADI_INCLUDE_DIR}")
+else()
+  message(STATUS "Could not find CasADi include dir")
+endif()
 
-SET(CASADI_LIBS_LIST
+set(CASADI_LIBS_LIST
   casadi_cplex_interface
   casadi_ipopt_interface
   casadi_lapack_interface
@@ -23,32 +23,26 @@ SET(CASADI_LIBS_LIST
   casadi_nonlinear_programming
   casadi_csparse
   casadi_tinyxml
-  casadi
-)
+  casadi)
 
-FOREACH(LIB in ${CASADI_LIBS_LIST})
-  FIND_LIBRARY(CASADI_LIB_${LIB}
+foreach(LIB in ${CASADI_LIBS_LIST})
+  find_library(CASADI_LIB_${LIB}
     NAMES ${LIB}
     HINTS ${CASADI_INCLUDE_DIR}/build/lib $ENV{CASADI_PREFIX}/lib)
-  IF(CASADI_LIB_${LIB})
-    #MESSAGE(STATUS "Found ${LIB}: ${CASADI_LIB_${LIB}}")
-    SET(CASADI_LIBRARIES ${CASADI_LIBRARIES} ${CASADI_LIB_${LIB}})
-  ELSE(CASADI_LIB_${LIB})
-    #MESSAGE(STATUS "Could not find lib${LIB}")
-  ENDIF(CASADI_LIB_${LIB})
-ENDFOREACH(LIB)
+  if(CASADI_LIB_${LIB})
+    #message(STATUS "Found ${LIB}: ${CASADI_LIB_${LIB}}")
+    set(CASADI_LIBRARIES ${CASADI_LIBRARIES} ${CASADI_LIB_${LIB}})
+  else()
+    #message(STATUS "Could not find lib${LIB}")
+  endif()
+endforeach()
 
-IF (CASADI_LIBRARIES)
-   MESSAGE(STATUS "Found CasADi libs: ${CASADI_LIBRARIES}")
-ELSE (CASADI_LIBRARIES)
-   MESSAGE(STATUS "Could not find CasADi libs")
-ENDIF (CASADI_LIBRARIES)
+if(CASADI_LIBRARIES)
+  message(STATUS "Found CasADi libs: ${CASADI_LIBRARIES}")
+else()
+  message(STATUS "Could not find CasADi libs")
+endif()
 
-IF(CASADI_FOUND_INCLUDE AND CASADI_LIBRARIES)
-  SET(CASADI_FOUND TRUE)
-ENDIF(CASADI_FOUND_INCLUDE AND CASADI_LIBRARIES)
-
-
-
-
-
+if(CASADI_FOUND_INCLUDE AND CASADI_LIBRARIES)
+  set(CASADI_FOUND TRUE)
+endif()

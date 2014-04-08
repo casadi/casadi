@@ -1,32 +1,32 @@
 # libraries
-SET(SNOPT_LIBS_LIST
   snopt7
   snprint7
   snblas
+set(SNOPT_LIBS_LIST
 )
 
-SET(SNOPT_LIBRARIES )
-FOREACH(LIB in ${SNOPT_LIBS_LIST})
-  FIND_LIBRARY(SNOPT_LIB_${LIB}
+set(SNOPT_LIBRARIES)
+foreach(LIB in ${SNOPT_LIBS_LIST})
+  find_library(SNOPT_LIB_${LIB}
     NAMES ${LIB}
     HINTS $ENV{SNOPT}/lib)
-  IF(SNOPT_LIB_${LIB})
-    MESSAGE(STATUS "Found ${LIB}: ${SNOPT_LIB_${LIB}}")
-    SET(SNOPT_LIBRARIES ${SNOPT_LIBRARIES} ${SNOPT_LIB_${LIB}})
-  ELSE(SNOPT_LIB_${LIB})
-    MESSAGE(STATUS "Could not find lib${LIB}")
-  ENDIF(SNOPT_LIB_${LIB})
-ENDFOREACH(LIB)
+  if(SNOPT_LIB_${LIB})
+    message(STATUS "Found ${LIB}: ${SNOPT_LIB_${LIB}}")
+    set(SNOPT_LIBRARIES ${SNOPT_LIBRARIES} ${SNOPT_LIB_${LIB}})
+  else()
+    message(STATUS "Could not find lib${LIB}")
+  endif()
+endforeach()
 
-IF (SNOPT_LIBRARIES)
-   SET(SNOPT_LIBRARIES ${SNOPT_LIBRARIES})
-   MESSAGE(STATUS "Found Snopt libs: ${SNOPT_LIBRARIES}")
-   SET(SNOPT_FOUND_LIBS TRUE)
-ELSE (SNOPT_LIBRARIES)
-   MESSAGE(STATUS "Could not find Snopt libs")
-ENDIF (SNOPT_LIBRARIES)
+if(SNOPT_LIBRARIES)
+  set(SNOPT_LIBRARIES ${SNOPT_LIBRARIES})
+  message(STATUS "Found Snopt libs: ${SNOPT_LIBRARIES}")
+  set(SNOPT_FOUND_LIBS TRUE)
+else()
+  message(STATUS "Could not find Snopt libs")
+endif()
 
 
-IF(SNOPT_FOUND_LIBS)
-  SET(SNOPT_FOUND TRUE)
-ENDIF(SNOPT_FOUND_LIBS)
+if(SNOPT_FOUND_LIBS)
+  set(SNOPT_FOUND TRUE)
+endif()

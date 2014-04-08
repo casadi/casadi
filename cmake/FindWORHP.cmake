@@ -1,44 +1,43 @@
 # TRY TO FIND THE INCLUDE DIRECTORY
-FIND_FILE(WORHP_LICENSE_KEY
+find_file(WORHP_LICENSE_KEY
 worhp.lic
 HINTS $ENV{WORHP} $ENV{WORHP_LICENSE_FILE}
 )
 
-IF (WORHP_LICENSE_KEY)
-  MESSAGE(STATUS "Worhp license detected: ${WORHP_LICENSE_KEY}")
-ELSE (WORHP_LICENSE_KEY)
-  MESSAGE(STATUS "Could not find worhp license key, looking in $ENV{WORHP}")
-ENDIF (WORHP_LICENSE_KEY)
+if(WORHP_LICENSE_KEY)
+  message(STATUS "Worhp license detected: ${WORHP_LICENSE_KEY}")
+else()
+  message(STATUS "Could not find worhp license key, looking in $ENV{WORHP}")
+endif()
 
-FIND_PATH(WORHP_INCLUDE_DIR 
+find_path(WORHP_INCLUDE_DIR
 worhp.h
-HINTS $ENV{WORHP}/include/worhp/
-)
+HINTS $ENV{WORHP}/include/worhp/)
 
-IF (WORHP_INCLUDE_DIR)
-  MESSAGE(STATUS "Worhp include dir detected: ${WORHP_INCLUDE_DIR}")
-ELSE (WORHP_INCLUDE_DIR)
-  MESSAGE(STATUS "Could not find worhp include dir, looking in $ENV{WORHP}/include/worhp/")
-ENDIF (WORHP_INCLUDE_DIR)
+if(WORHP_INCLUDE_DIR)
+  message(STATUS "Worhp include dir detected: ${WORHP_INCLUDE_DIR}")
+else()
+  message(STATUS "Could not find worhp include dir, looking in $ENV{WORHP}/include/worhp/")
+endif()
 
-FIND_LIBRARY(WORHP_LIBRARY 
-worhp
-HINTS $ENV{WORHP}/lib/
-)
+find_library(WORHP_LIBRARY
+  worhp
+  HINTS $ENV{WORHP}/lib/)
 
-IF (WORHP_LIBRARY)
-  MESSAGE(STATUS "Worhp library detected: ${WORHP_LIBRARY}")
-ELSE (WORHP_LIBRARY)
-  MESSAGE(STATUS "Could not find worhp library, looking in $ENV{WORHP}/lib/" )
-ENDIF (WORHP_LIBRARY)
 
-SET(WORHP_LIBRARIES ${WORHP_LIBRARY})
+if(WORHP_LIBRARY)
+  message(STATUS "Worhp library detected: ${WORHP_LIBRARY}")
+else()
+  message(STATUS "Could not find worhp library, looking in $ENV{WORHP}/lib/")
+endif()
 
-SET(WORHP_LIBRARIES ${WORHP_LIBRARIES} ${LIBXML2_LIBRARIES} ${WSMP_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} ${METIS_LIBRARIES})
+set(WORHP_LIBRARIES ${WORHP_LIBRARY})
 
-IF (WORHP_LIBRARY AND WORHP_INCLUDE_DIR)
-  MESSAGE(STATUS "Worhp interface ready with these libraries: ${WORHP_LIBRARIES} ")
-  SET(WORHP_FOUND TRUE)
-ELSE (WORHP_LIBRARY AND WORHP_INCLUDE_DIR)
-  MESSAGE(STATUS "Will not compile worhp interface")
-ENDIF (WORHP_LIBRARY AND WORHP_INCLUDE_DIR)
+set(WORHP_LIBRARIES ${WORHP_LIBRARIES} ${LIBXML2_LIBRARIES} ${WSMP_LIBRARIES} ${LAPACK_LIBRARIES} ${BLAS_LIBRARIES} ${METIS_LIBRARIES})
+
+if(WORHP_LIBRARY AND WORHP_INCLUDE_DIR)
+  message(STATUS "Worhp interface ready with these libraries: ${WORHP_LIBRARIES} ")
+  set(WORHP_FOUND TRUE)
+else()
+  message(STATUS "Will not compile worhp interface")
+endif()

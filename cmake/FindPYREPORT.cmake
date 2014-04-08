@@ -1,10 +1,10 @@
-FIND_PATH(PYREPORT_BIN
+find_path(PYREPORT_BIN
 pyreport
 /usr/local/bin/
 /usr/bin/
 ${PYREPORT_BIN_DIR}
 )
 
-IF(PYREPORT_BIN)
-SET(FOUND_PYREPORT TRUE)
-ENDIF()
+if(PYREPORT_BIN)
+set(FOUND_PYREPORT TRUE)
+endif()

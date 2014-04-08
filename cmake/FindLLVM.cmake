@@ -1,6 +1,6 @@
 find_program(LLVM_CONFIG NAMES llvm-config DOC "llvm-config executable")
 
-if (LLVM_CONFIG)
+if(LLVM_CONFIG)
   message(STATUS "LLVM llvm-config found at: ${LLVM_CONFIG}")
 
   execute_process(
@@ -31,7 +31,7 @@ if (LLVM_CONFIG)
 
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(LLVM DEFAULT_MSG LLVM_LIBRARIES LLVM_INCLUDE_DIR)
-else (LLVM_CONFIG)
+else(LLVM_CONFIG)
   message(STATUS "Could NOT find llvm-config executable")
-endif (LLVM_CONFIG)
+endif(LLVM_CONFIG)
 

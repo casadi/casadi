@@ -1,14 +1,14 @@
 # TRY TO FIND THE WSMP LIBRARY
 
-FIND_LIBRARY(WSMP_LIB
+find_library(WSMP_LIB
     names wsmp64 wsmp
     HINTS $ENV{WSMP})
 
-IF(WSMP_LIB)
-  MESSAGE(STATUS "Found WSMP: ${WSMP_LIB}")
-  SET(WSMP_LIBRARIES ${WSMP_LIB})
-  SET(WSMP_FOUND TRUE)
-ELSE(WSMP_LIB)
-  SET(WSMP_FOUND FALSE)
-  MESSAGE(STATUS "Could not find WSMP; looking in environmental variable WSMP ($ENV{WSMP})")
-ENDIF(WSMP_LIB)
+if(WSMP_LIB)
+  message(STATUS "Found WSMP: ${WSMP_LIB}")
+  set(WSMP_LIBRARIES ${WSMP_LIB})
+  set(WSMP_FOUND TRUE)
+else()
+  set(WSMP_FOUND FALSE)
+  message(STATUS "Could not find WSMP; looking in environmental variable WSMP ($ENV{WSMP})")
+endif()
