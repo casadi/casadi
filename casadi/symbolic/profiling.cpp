@@ -22,6 +22,8 @@
 
 #include "profiling.hpp"
 
+namespace casadi{
+
 #ifdef WITH_PROFILING
 
 /*
@@ -46,8 +48,6 @@
 #else
 #error "Unable to define getRealTime( ) for an unknown OS."
 #endif
-
-namespace casadi{
 
 double getRealTime( )
 {
