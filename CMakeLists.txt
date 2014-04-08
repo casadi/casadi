@@ -68,14 +68,13 @@ if(NOT COMMAND add_feature_info)
   endfunction()
 endif()
 
+option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
+option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
+  
 # Options:
 if(WIN32)
-  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
-  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
   option(WITH_DL "Enable dynamic loading of functions" OFF)
 else()
-  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
-  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
   option(WITH_DL "Enable dynamic loading of functions" ON)
 endif()
 option(WITH_DOC "Enable documentation generation" OFF)
