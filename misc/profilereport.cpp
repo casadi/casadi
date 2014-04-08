@@ -14,6 +14,7 @@ linereg = re.compile("^([\d\.]+) ns \| ([\d\.]+) ms \| (0x[\w\d]+:[\w_]+):(\d+)\
 void parseline(const std::string& line,double& ns,double &ms, std::string &id, std::string &name, int & line_number, )
 */
 
+using namespace casadi;
 
 
 struct linestat {
