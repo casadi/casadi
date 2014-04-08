@@ -30,7 +30,7 @@
 /// \cond INTERNAL
 namespace casadi{
     
-class SimpleHomotopyNLPInternal : public HomotopyNLPInternal{
+class CASADI_NONLINEAR_PROGRAMMING_EXPORT SimpleHomotopyNLPInternal : public HomotopyNLPInternal{
 
 public:
   explicit SimpleHomotopyNLPInternal(const Function& hnlp);

@@ -15,15 +15,7 @@ set(CSPARSE_SRC
   Source/cs_dfs.c Source/cs_reach.c Source/cs_spsolve.c Source/cs_ereach.c Source/cs_leaf.c Source/cs_randperm.c
 )
 
-if(ENABLE_STATIC)
-add_library(casadi_csparse STATIC ${CSPARSE_SRC})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_csparse SHARED ${CSPARSE_SRC})
-endif()
-install(TARGETS casadi_csparse
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_external_library(casadi_csparse ${CSPARSE_SRC})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/external_packages/CSparse

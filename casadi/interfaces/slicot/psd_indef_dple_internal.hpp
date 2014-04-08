@@ -35,7 +35,7 @@ namespace casadi{
      \author Joris gillis
       \date 2014
   */
-  class PsdIndefDpleInternal : public DpleInternal{
+  class CASADI_SLICOT_INTERFACE_EXPORT PsdIndefDpleInternal : public DpleInternal{
   public:
     /** \brief  Constructor
      *  \param[in] A  List of sparsities of A_i 

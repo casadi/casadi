@@ -1,3 +1,37 @@
+macro(casadi_library name)
+if(ENABLE_STATIC)
+add_library(${name} STATIC ${ARGN})
+endif(ENABLE_STATIC)
+if(ENABLE_SHARED)
+add_compiler_export_flags()
+add_library(${name} SHARED ${ARGN})
+generate_export_header(${name})
+endif(ENABLE_SHARED)
+target_link_libraries(${name} casadi)
+set(CASADI_MODULES ${CASADI_MODULES} ${name} PARENT_SCOPE)
+install(TARGETS ${name}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+endmacro()
+
+macro(casadi_external_library name)
+if(ENABLE_STATIC)
+add_library(${name} STATIC ${ARGN})
+endif(ENABLE_STATIC)
+if(ENABLE_SHARED)
+add_compiler_export_flags()
+add_library(${name} SHARED ${ARGN})
+generate_export_header(${name})
+endif(ENABLE_SHARED)
+target_link_libraries(${name} casadi)
+set(CASADI_MODULES ${CASADI_MODULES} ${name} PARENT_SCOPE)
+install(TARGETS ${name}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+)
+endmacro()
+
 add_subdirectory(symbolic)  # needed by all except external_packages
 add_subdirectory(interfaces)             # needs external_packages
 add_subdirectory(nonlinear_programming)  # needs interfaces

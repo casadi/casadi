@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_NONLINEAR_PROGRAMMING_EXPORT
+
 %{
 #include "casadi/nonlinear_programming/symbolic_nlp.hpp"
 #include "casadi/nonlinear_programming/sqp_method.hpp"

@@ -26,6 +26,8 @@
 #include "casadi/symbolic/function/ocp_solver.hpp"
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
+#include <casadi/optimal_control/casadi_optimal_control_export.h>
+
 namespace casadi{
   class DirectSingleShootingInternal;
     
@@ -43,7 +45,7 @@ namespace casadi{
    *   \author Joel Andersson
    *   \date 2013
   */ 
-class DirectSingleShooting : public OCPSolver{
+class CASADI_OPTIMAL_CONTROL_EXPORT DirectSingleShooting : public OCPSolver{
   public:
     /// Default constructor
     DirectSingleShooting();

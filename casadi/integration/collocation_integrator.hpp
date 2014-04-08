@@ -40,7 +40,7 @@ namespace casadi{
      \author Joel Andersson
      \date 2014
   */
-  class CollocationIntegrator : public ImplicitFixedStepIntegrator{
+  class CASADI_INTEGRATION_EXPORT CollocationIntegrator : public ImplicitFixedStepIntegrator{
   public:
     /** \brief  Default constructor */
     CollocationIntegrator();

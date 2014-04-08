@@ -9,17 +9,7 @@ set(CONTROL_SRCS
   simple_indef_dple_internal.hpp
   simple_indef_dple_internal.cpp)
 
-if(ENABLE_STATIC)
-add_library(casadi_control STATIC ${CONTROL_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_control SHARED ${CONTROL_SRCS})
-endif()
-target_link_libraries(casadi_control casadi)
-set(CASADI_MODULES ${CASADI_MODULES} casadi_control PARENT_SCOPE)
-install(TARGETS casadi_control
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_control ${CONTROL_SRCS})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/control

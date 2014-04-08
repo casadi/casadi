@@ -27,6 +27,8 @@
 #include "casadi/symbolic/function/sx_function.hpp"
 #include "casadi/symbolic/mx/mx.hpp"
 
+#include <casadi/optimal_control/casadi_optimal_control_export.h>
+
 namespace casadi{
     
   /// Time variability of a variable (see Fritzon page 89)
@@ -65,7 +67,7 @@ namespace casadi{
       \date 2012-2014
       \author Joel Andersson
    */
-  struct Variable : public PrintableObject{
+  struct CASADI_OPTIMAL_CONTROL_EXPORT Variable : public PrintableObject{
     
     /// Default constructor
     Variable();

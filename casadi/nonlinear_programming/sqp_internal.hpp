@@ -31,7 +31,7 @@
 /// \cond INTERNAL
 namespace casadi{
     
-class SQPInternal : public NLPSolverInternal{
+class CASADI_NONLINEAR_PROGRAMMING_EXPORT SQPInternal : public NLPSolverInternal{
 
 public:
   explicit SQPInternal(const Function& nlp);

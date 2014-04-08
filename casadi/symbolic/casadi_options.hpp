@@ -26,7 +26,10 @@
 #include <iostream>
 #include <fstream>
 
+#include "casadi_common.hpp"
+
 namespace casadi {
+
   /**
   * \brief Collects global CasADi options
   *
@@ -38,7 +41,7 @@ namespace casadi {
   *  \author Joris Gillis 
   *  \date 2012
   */
-  class CasadiOptions {
+  class CASADI_EXPORT CasadiOptions {
     private:
       /// No instances are allowed
       CasadiOptions();

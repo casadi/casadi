@@ -31,7 +31,7 @@
 namespace casadi{
 
 /// Internal class
-class QCQPSolverInternal : public FunctionInternal{
+class CASADI_EXPORT QCQPSolverInternal : public FunctionInternal{
   public:
 
     // Constructor

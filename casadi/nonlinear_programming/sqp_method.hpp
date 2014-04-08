@@ -25,6 +25,8 @@
 
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
+#include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
+
 namespace casadi{
   
   class SQPInternal;
@@ -57,7 +59,7 @@ namespace casadi{
      \author Attila Kozma, Joel Andersson and Joris Gillis
      \date 2012
   */
-  class SQPMethod : public NLPSolver {
+  class CASADI_NONLINEAR_PROGRAMMING_EXPORT SQPMethod : public NLPSolver {
   public:
     /// Default constructor
     SQPMethod();

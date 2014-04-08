@@ -27,6 +27,8 @@
 #include "casadi/symbolic/function/nlp_solver.hpp"
 #include "casadi/integration/integration_tools.hpp"
 
+#include <casadi/optimal_control/casadi_optimal_control_export.h>
+
 namespace casadi{
   class DirectCollocationInternal;
     
@@ -35,7 +37,7 @@ namespace casadi{
    *   \author Joel Andersson
    *   \date 2012
   */ 
-class DirectCollocation : public OCPSolver{
+class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocation : public OCPSolver{
   public:
     /// Default constructor
     DirectCollocation();

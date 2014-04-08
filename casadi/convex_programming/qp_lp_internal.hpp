@@ -26,6 +26,8 @@
 #include "casadi/symbolic/function/lp_internal.hpp"
 #include "casadi/symbolic/function/qp_solver.hpp"
 
+#include "qp_lp_solver.hpp"
+
 /// \cond INTERNAL
 namespace casadi{
 
@@ -33,7 +35,7 @@ namespace casadi{
    * 
       @copydoc LPSolver_doc
    * */
-class QPLPInternal : public LPSolverInternal {
+class CASADI_CONVEX_PROGRAMMING_EXPORT QPLPInternal : public LPSolverInternal {
   friend class QPLPSolver;
 public:
 

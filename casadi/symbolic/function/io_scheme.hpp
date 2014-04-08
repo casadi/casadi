@@ -39,7 +39,7 @@ namespace casadi{
    * \author Joris Gillis 
    * \date 2013
    */
-class IOScheme : public SharedObject{
+class CASADI_EXPORT IOScheme : public SharedObject{
   
   public:
   

@@ -35,7 +35,7 @@ namespace casadi{
      \author Joel Andersson
      \date 2014
   */
-  class ImplicitFixedStepIntegrator : public FixedStepIntegrator {
+  class CASADI_INTEGRATION_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
   public:
     /** \brief  Default constructor */
     ImplicitFixedStepIntegrator();

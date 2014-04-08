@@ -7,17 +7,8 @@ set(LAPACK_INTERFACE_SRCS
   lapack_qr_dense.hpp
   lapack_qr_dense.cpp)
 
-if(ENABLE_STATIC)
-add_library(casadi_lapack_interface STATIC ${LAPACK_INTERFACE_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_lapack_interface SHARED ${LAPACK_INTERFACE_SRCS})
-endif()
-target_link_libraries(casadi_lapack_interface casadi ${LAPACK_LIBRARIES})
-set(CASADI_MODULES ${CASADI_MODULES} casadi_lapack_interface PARENT_SCOPE)
-install(TARGETS casadi_lapack_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_lapack_interface ${LAPACK_INTERFACE_SRCS})
+target_link_libraries(casadi_lapack_interface ${LAPACK_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/lapack

@@ -35,7 +35,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */
-  class ControlSimulatorInternal : public FunctionInternal{
+  class CASADI_EXPORT ControlSimulatorInternal : public FunctionInternal{
   public:
   
     /** \brief  Constructor */

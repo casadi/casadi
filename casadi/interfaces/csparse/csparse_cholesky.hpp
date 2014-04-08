@@ -24,6 +24,7 @@
 #define CSPARSE_CHOLESKY_HPP
 
 #include "casadi/symbolic/function/linear_solver.hpp"
+#include <casadi/interfaces/csparse/casadi_csparse_interface_export.h>
 
 namespace casadi{
 
@@ -53,7 +54,7 @@ class CSparseCholeskyInternal;
 * The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
 *
 */
-class CSparseCholesky : public LinearSolver{
+class CASADI_CSPARSE_INTERFACE_EXPORT CSparseCholesky : public LinearSolver{
 public:
 
   /// Default (empty) constructor

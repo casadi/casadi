@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_QPOASES_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/qpoases/qpoases_solver.hpp"
 %}

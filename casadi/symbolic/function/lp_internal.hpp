@@ -31,7 +31,7 @@
 namespace casadi{
 
 /// Internal class
-class LPSolverInternal : public FunctionInternal{
+class CASADI_EXPORT LPSolverInternal : public FunctionInternal{
   public:
         
     // Constructor

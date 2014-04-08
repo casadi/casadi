@@ -33,7 +33,7 @@
 /// \cond INTERNAL
 namespace casadi{
   
-class DirectMultipleShootingInternal : public OCPSolverInternal{
+class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShootingInternal : public OCPSolverInternal{
   friend class DirectMultipleShooting;
   
   public:

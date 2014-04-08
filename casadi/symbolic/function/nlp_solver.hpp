@@ -188,7 +188,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */
-  class NLPSolver : public Function{
+  class CASADI_EXPORT NLPSolver : public Function{
   public:
 
     /// Default constructor

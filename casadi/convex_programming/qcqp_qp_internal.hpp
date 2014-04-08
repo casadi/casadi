@@ -26,6 +26,8 @@
 #include "casadi/symbolic/function/qp_solver_internal.hpp"
 #include "casadi/symbolic/function/qcqp_solver.hpp"
 
+#include "qcqp_qp_solver.hpp"
+
 /// \cond INTERNAL
 namespace casadi{
 
@@ -33,7 +35,7 @@ namespace casadi{
    * 
       @copydoc QPSolver_doc
    * */
-class QCQPQPInternal : public QPSolverInternal {
+class CASADI_CONVEX_PROGRAMMING_EXPORT QCQPQPInternal : public QPSolverInternal {
   friend class QCQPQPSolver;
 public:
 

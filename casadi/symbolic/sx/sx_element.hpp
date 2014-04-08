@@ -56,7 +56,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */ 
-  class SXElement : public GenericExpression<SXElement>{
+  class CASADI_EXPORT SXElement : public GenericExpression<SXElement>{
     friend class SXNode;
     friend class BinarySXNode;
     friend class Matrix<SXElement>;
@@ -108,7 +108,7 @@ namespace casadi{
     operator Matrix<SXElement>() const;
     
     /** \brief  print to stream */
-    friend std::ostream& operator<<(std::ostream &stream, const SXElement &scalar);
+    CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream, const SXElement &scalar);
 
     /** \brief  print to stream, limited */
     void print(std::ostream &stream, long& remaining_calls) const;

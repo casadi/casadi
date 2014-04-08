@@ -35,7 +35,7 @@ namespace casadi{
   \author Joel Andersson 
   \date 2010
 */
-class OCPSolverInternal : public FunctionInternal{
+class CASADI_EXPORT OCPSolverInternal : public FunctionInternal{
   friend class OCPSolver;
   public:
   

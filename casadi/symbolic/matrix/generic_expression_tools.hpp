@@ -29,15 +29,15 @@ namespace casadi{
 
   /** \brief  Logical `and`, returns (an expression evaluating to) 1 if both expressions are nonzero and 0 otherwise */
   template<typename DataType>
-  DataType logic_and(const DataType& x, const DataType& y){ return x && y; }
+  CASADI_EXPORT DataType logic_and(const DataType& x, const DataType& y){ return x && y; }
 
   /** \brief  Logical `or`, returns (an expression evaluating to) 1 if at least one expression is nonzero and 0 otherwise */
   template<typename DataType>
-  DataType logic_or(const DataType& x, const DataType& y){ return x || y; }
+  CASADI_EXPORT DataType logic_or(const DataType& x, const DataType& y){ return x || y; }
 
   /** \brief  Logical `not`, returns (an expression evaluating to) 1 if expression is zero and 0 otherwise */
   template<typename DataType>
-  DataType logic_not(const DataType &x){ return !x; }
+  CASADI_EXPORT DataType logic_not(const DataType &x){ return !x; }
 
 } // namespace casadi
 

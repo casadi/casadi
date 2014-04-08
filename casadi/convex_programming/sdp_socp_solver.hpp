@@ -25,6 +25,8 @@
 
 #include "casadi/symbolic/function/socp_solver.hpp"
 
+#include <casadi/convex_programming/casadi_convex_programming_export.h>
+
 namespace casadi {
   
   
@@ -38,7 +40,7 @@ class SDPSOCPInternal;
    \author Joris Gillis
    \date 2013
   */
-class SDPSOCPSolver : public SOCPSolver {
+class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSOCPSolver : public SOCPSolver {
 public:
 
   /** \brief  Default constructor */

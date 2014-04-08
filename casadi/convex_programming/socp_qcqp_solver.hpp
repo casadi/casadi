@@ -25,6 +25,8 @@
 
 #include "casadi/symbolic/function/qcqp_solver.hpp"
 
+#include <casadi/convex_programming/casadi_convex_programming_export.h>
+
 namespace casadi {
   
   
@@ -62,7 +64,7 @@ class SOCPQCQPInternal;
    \author Joris Gillis
    \date 2013
   */
-class SOCPQCQPSolver : public QCQPSolver {
+class CASADI_CONVEX_PROGRAMMING_EXPORT SOCPQCQPSolver : public QCQPSolver {
 public:
 
   /** \brief  Default constructor */

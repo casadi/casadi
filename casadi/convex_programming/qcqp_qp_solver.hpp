@@ -25,6 +25,8 @@
 
 #include "casadi/symbolic/function/qp_solver.hpp"
 
+#include <casadi/convex_programming/casadi_convex_programming_export.h>
+
 namespace casadi {
   
   
@@ -38,7 +40,7 @@ class QCQPQPInternal;
    \author Joris Gillis
    \date 2013
   */
-class QCQPQPSolver : public QPSolver {
+class CASADI_CONVEX_PROGRAMMING_EXPORT QCQPQPSolver : public QPSolver {
 public:
 
   /** \brief  Default constructor */

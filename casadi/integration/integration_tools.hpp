@@ -29,15 +29,17 @@
 #include "casadi/symbolic/options_functionality.hpp"
 #include "casadi/symbolic/mx/mx.hpp"
 
+#include <casadi/integration/casadi_integration_export.h>
+
 namespace casadi{
   
   //@{
   /** \brief Obtain collocation points of specific order and scheme
   \param scheme  'radau' or 'legendre'
   **/
-  std::vector<double> collocationPoints(int order, const std::string& scheme="radau");
+  CASADI_INTEGRATION_EXPORT std::vector<double> collocationPoints(int order, const std::string& scheme="radau");
 #ifndef SWIG
-  std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
+  CASADI_INTEGRATION_EXPORT std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
 #endif // SWIG
   //@}
   
@@ -52,9 +54,9 @@ namespace casadi{
       Length: order+1
   */
 #ifndef SWIG
-  void collocationInterpolators(const std::vector<double> & tau_root, std::vector< std::vector<double> > &C, std::vector< double > &D);
+  CASADI_INTEGRATION_EXPORT void collocationInterpolators(const std::vector<double> & tau_root, std::vector< std::vector<double> > &C, std::vector< double > &D);
 #else // SWIG
-  void collocationInterpolators(const std::vector<double> & tau_root, std::vector< std::vector<double> > &OUTPUT, std::vector< double > &OUTPUT);
+  CASADI_INTEGRATION_EXPORT void collocationInterpolators(const std::vector<double> & tau_root, std::vector< std::vector<double> > &OUTPUT, std::vector< double > &OUTPUT);
 #endif // SWIG
 
 #ifndef SWIG
@@ -95,7 +97,7 @@ extern const long double** collocation_points[2];
   * \param order Order of integration
   * \param ne    Number of times the RK primitive is repeated over the integration interval
   */
-  Function explicitRK(Function& f, const MX &tf=1, int order=4, int ne = 1);
+  CASADI_INTEGRATION_EXPORT Function explicitRK(Function& f, const MX &tf=1, int order=4, int ne = 1);
   
   /** \brief Construct an implicit Runge-Kutta integrator
   * \param f dynamical system
@@ -106,7 +108,7 @@ extern const long double** collocation_points[2];
   * \param scheme Collocation scheme, as excepted by collocationPoints function.
   * \param ne    Number of times the RK primitive is repeated over the integration interval
   */
-  Function implicitRK(Function& f, implicitFunctionCreator impl, const Dictionary& dict = Dictionary(), const MX &tf=1, int order=4, const std::string& scheme="radau", int ne = 1);
+  CASADI_INTEGRATION_EXPORT Function implicitRK(Function& f, implicitFunctionCreator impl, const Dictionary& dict = Dictionary(), const MX &tf=1, int order=4, const std::string& scheme="radau", int ne = 1);
     
 } // namespace casadi
 

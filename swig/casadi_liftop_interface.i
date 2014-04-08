@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_LIFTOP_INTERFACE_EXPORT
+
 %{
   #include "casadi/interfaces/liftopt/liftopt_solver.hpp"
 %}

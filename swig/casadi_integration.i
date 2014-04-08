@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_INTEGRATION_EXPORT
+
 %{
 #include "casadi/integration/fixed_step_integrator.hpp"
 #include "casadi/integration/implicit_fixed_step_integrator.hpp"

@@ -7,19 +7,8 @@ set(CPLEX_INTERFACE_SRCS
   cplex_internal.hpp
   cplex_internal.cpp)
 
-if(ENABLE_STATIC)
-add_library(casadi_cplex_interface STATIC ${CPLEX_INTERFACE_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_cplex_interface SHARED ${CPLEX_INTERFACE_SRCS})
-endif()
-target_link_libraries(casadi_cplex_interface casadi ${CPLEX_LIBRARIES})
-
-set(CASADI_MODULES ${CASADI_MODULES} casadi_cplex_interface PARENT_SCOPE)
-
-install(TARGETS casadi_cplex_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_cplex_interface ${CPLEX_INTERFACE_SRCS})
+target_link_libraries(casadi_cplex_interface ${CPLEX_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/cplex

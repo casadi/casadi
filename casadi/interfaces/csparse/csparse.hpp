@@ -24,6 +24,7 @@
 #define CSPARSE_HPP
 
 #include "casadi/symbolic/function/linear_solver.hpp"
+#include <casadi/interfaces/csparse/casadi_csparse_interface_export.h>
 
 namespace casadi{
 
@@ -48,7 +49,7 @@ namespace casadi{
    * The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
    *
    */
-  class CSparse : public LinearSolver{
+  class CASADI_CSPARSE_INTERFACE_EXPORT CSparse : public LinearSolver{
   public:
 
     /// Default (empty) constructor

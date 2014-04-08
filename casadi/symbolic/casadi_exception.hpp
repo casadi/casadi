@@ -29,6 +29,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "casadi_common.hpp"
+
 namespace casadi{
 
 /** \brief  Casadi exception class
@@ -47,7 +49,7 @@ namespace casadi{
                 }
         \endcode
 */
-class CasadiException : public std::exception{
+class CASADI_EXPORT CasadiException : public std::exception{
   public:
   //! \brief Default constructor
   CasadiException(){

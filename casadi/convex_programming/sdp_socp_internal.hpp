@@ -26,6 +26,8 @@
 #include "casadi/symbolic/function/socp_solver_internal.hpp"
 #include "casadi/symbolic/function/sdp_solver.hpp"
 
+#include "sdp_socp_solver.hpp"
+
 /// \cond INTERNAL
 namespace casadi{
 
@@ -33,7 +35,7 @@ namespace casadi{
    * 
       @copydoc LPSolver_doc
    * */
-class SDPSOCPInternal : public SOCPSolverInternal {
+class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
   friend class SDPSOCPSolver;
 public:
 

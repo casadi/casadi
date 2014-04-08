@@ -35,7 +35,7 @@ namespace casadi{
    * 
    @copydoc ImplicitFunction_doc
    * */
-  class NLPImplicitInternal : public ImplicitFunctionInternal {
+  class CASADI_NONLINEAR_PROGRAMMING_EXPORT NLPImplicitInternal : public ImplicitFunctionInternal {
     friend class NLPImplicitSolver;
   public:
     /** \brief  Constructor */

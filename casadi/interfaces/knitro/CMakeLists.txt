@@ -7,19 +7,8 @@ set(KNITRO_INTERFACE_SRCS
   knitro_internal.hpp
   knitro_internal.cpp)
 
-
-if(ENABLE_STATIC)
-add_library(casadi_knitro_interface STATIC ${KNITRO_INTERFACE_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_knitro_interface SHARED ${KNITRO_INTERFACE_SRCS})
-endif()
-target_link_libraries(casadi_knitro_interface casadi ${KNITRO_LIBRARIES})
-
-set(CASADI_MODULES ${CASADI_MODULES} casadi_knitro_interface PARENT_SCOPE)
-install(TARGETS casadi_knitro_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_knitro_interface ${KNITRO_INTERFACE_SRCS})
+target_link_libraries(casadi_knitro_interface ${KNITRO_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/knitro

@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_CSPARSE_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/csparse/csparse.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"

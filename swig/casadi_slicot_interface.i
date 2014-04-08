@@ -26,6 +26,8 @@
 
 %import "casadi_control.i"
 
+#define CASADI_SLICOT_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/slicot/slicot_tools.hpp"
 #include "casadi/interfaces/slicot/psd_indef_dple_solver.hpp"

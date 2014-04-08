@@ -33,7 +33,7 @@ namespace casadi{
    * 
       @copydoc QPSolver_doc
    * */
-class NLPQPInternal : public QPSolverInternal {
+class CASADI_NONLINEAR_PROGRAMMING_EXPORT NLPQPInternal : public QPSolverInternal {
   friend class NLPQPSolver;
 public:
   /** \brief  Constructor */

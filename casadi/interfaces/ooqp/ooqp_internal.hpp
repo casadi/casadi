@@ -24,6 +24,7 @@
 #define OOQP_INTERNAL_HPP
 
 #include "casadi/symbolic/function/qp_solver_internal.hpp"
+#include "ooqp_solver.hpp"
 
 /// \cond INTERNAL
 namespace casadi{
@@ -32,7 +33,7 @@ namespace casadi{
    * 
    @copydoc QPSolver_doc
    * */
-  class OOQPInternal : public QPSolverInternal {
+  class CASADI_OOQP_INTERFACE_EXPORT OOQPInternal : public QPSolverInternal {
     friend class OOQPSolver;
   public:
 

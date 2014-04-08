@@ -40,7 +40,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */
-  class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
+  class CASADI_EXPORT MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
     friend class MXFunction;
   
   public:

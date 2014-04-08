@@ -97,7 +97,7 @@ class SDQPSolverInternal;
   \author Joel Andersson 
   \date 2010
 */
-class SDQPSolver : public Function{
+class CASADI_EXPORT SDQPSolver : public Function{
   public:
 
   /// Default constructor

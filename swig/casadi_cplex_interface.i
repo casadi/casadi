@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_CPLEX_INTERFACE_EXPORT
+
 %{ 
   #include "casadi/interfaces/cplex/cplex_solver.hpp"
 %}

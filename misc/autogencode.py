@@ -104,7 +104,7 @@ class Enum:
     s= "/// \cond INTERNAL \n/// Helper function for '" + self.enum + "'\n"
     s+="""
 template<class M>
-class %sIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
   public:
     explicit %sIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_%s){} 
 };

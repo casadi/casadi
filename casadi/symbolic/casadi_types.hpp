@@ -28,6 +28,8 @@
 #include <vector>
 #include <utility>
 
+#include "casadi_common.hpp"
+
 namespace casadi{
   
   /// Forward declarations

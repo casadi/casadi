@@ -34,7 +34,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class Inverse : public MXNode{
+  class CASADI_EXPORT Inverse : public MXNode{
   public:
 
     /// Constructor

@@ -32,7 +32,7 @@
 /// \cond INTERNAL
 namespace casadi{
     
-  class OldCollocationIntegratorInternal : public IntegratorInternal{
+  class CASADI_INTEGRATION_EXPORT OldCollocationIntegratorInternal : public IntegratorInternal{
   
   public:
   

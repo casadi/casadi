@@ -24,6 +24,7 @@
 #define WORHP_INTERNAL_HPP
 
 #include "casadi/symbolic/function/nlp_solver_internal.hpp"
+#include "worhp_solver.hpp"
 
 // GCC_VERSION is defined in worhp.h
 #ifdef GCC_VERSION
@@ -41,7 +42,7 @@ namespace casadi{
   /**
      @copydoc NLPSolver_doc
   */
-  class WorhpInternal : public NLPSolverInternal{
+  class CASADI_WORHP_INTERFACE_EXPORT WorhpInternal : public NLPSolverInternal{
 
   public:
     // Constructor

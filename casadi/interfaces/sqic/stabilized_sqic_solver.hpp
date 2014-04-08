@@ -24,6 +24,7 @@
 #define STABILIZED_SQIC_SOLVER_HPP
 
 #include "casadi/symbolic/function/stabilized_qp_solver.hpp"
+#include <casadi/interfaces/sqic/casadi_sqic_interface_export.h>
 
 namespace casadi {
   
@@ -31,7 +32,7 @@ namespace casadi {
 // Forward declaration of internal class 
 class StabilizedSQICInternal;
 
-class StabilizedSQICSolver : public StabilizedQPSolver {
+class CASADI_SQIC_INTERFACE_EXPORT StabilizedSQICSolver : public StabilizedQPSolver {
 public:
 
   /** \brief  Default constructor */

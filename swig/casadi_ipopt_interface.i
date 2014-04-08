@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_IPOPT_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/ipopt/ipopt_solver.hpp"
 %}

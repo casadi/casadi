@@ -25,6 +25,8 @@
 
 #include "casadi/symbolic/function/qp_solver.hpp"
 
+#include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
+
 namespace casadi {
   
   
@@ -38,7 +40,7 @@ class NLPQPInternal;
    \author Joris Gillis
    \date 2011
   */
-class NLPQPSolver : public QPSolver {
+class CASADI_NONLINEAR_PROGRAMMING_EXPORT NLPQPSolver : public QPSolver {
 public:
 
   /** \brief  Default constructor */

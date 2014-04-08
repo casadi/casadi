@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 
-include_directories(${CMAKE_BINARY_DIR})
-
 add_subdirectory(runtime)
 
 set(CASADI_SRCS
@@ -116,7 +114,9 @@ if(ENABLE_STATIC)
 add_library(casadi STATIC ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
 endif()
 if(ENABLE_SHARED)
+add_compiler_export_flags()
 add_library(casadi SHARED ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
+generate_export_header(casadi)
 endif()
 
 add_dependencies(casadi casadi_runtime_embedded)

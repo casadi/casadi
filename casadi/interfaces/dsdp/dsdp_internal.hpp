@@ -24,6 +24,7 @@
 #define DSDP_INTERNAL_HPP
 
 #include "casadi/symbolic/function/sdp_solver_internal.hpp"
+#include "dsdp_solver.hpp"
 
 #include <dsdp5.h>
 
@@ -34,7 +35,7 @@ namespace casadi{
    * 
    @copydoc SDPSolver_doc
    * */
-  class DSDPInternal : public SDPSolverInternal {
+  class CASADI_DSDP_INTERFACE_EXPORT DSDPInternal : public SDPSolverInternal {
     friend class DSDPSolver;
   public:
 

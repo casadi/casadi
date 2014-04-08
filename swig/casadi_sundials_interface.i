@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_SUNDIALS_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/sundials/sundials_integrator.hpp"
 #include "casadi/interfaces/sundials/cvodes_integrator.hpp"

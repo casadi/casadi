@@ -31,7 +31,7 @@
 namespace casadi{
 
 /// Internal class
-class SDPSolverInternal : public FunctionInternal{
+class CASADI_EXPORT SDPSolverInternal : public FunctionInternal{
   public:
 
     // Constructor

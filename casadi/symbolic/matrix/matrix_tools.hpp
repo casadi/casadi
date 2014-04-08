@@ -34,7 +34,7 @@ namespace casadi{
 
   /// Transpose of a matrix
   template<typename DataType>
-  Matrix<DataType> transpose(const Matrix<DataType> &x);
+  CASADI_EXPORT Matrix<DataType> transpose(const Matrix<DataType> &x);
 
   /** \brief  Matrix product of two matrices
    *
@@ -43,38 +43,38 @@ namespace casadi{
    * inspect the trace of it. sp_z diagonal will be more efficient then. 
    */
   template<typename DataType>
-  Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y, const Sparsity& sp_z=Sparsity());
+  CASADI_EXPORT Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y, const Sparsity& sp_z=Sparsity());
 
   /// Matrix product of n matrices
   template<typename DataType>
-  Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args);
+  CASADI_EXPORT Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args);
 
   template<typename DataType>
-  DataType det(const Matrix<DataType>& a);
+  CASADI_EXPORT DataType det(const Matrix<DataType>& a);
 
   template<typename DataType>
-  DataType getMinor(const Matrix<DataType> &x, int i, int j);
+  CASADI_EXPORT DataType getMinor(const Matrix<DataType> &x, int i, int j);
 
   template<typename DataType>
-  DataType cofactor(const Matrix<DataType> &x, int i, int j);
+  CASADI_EXPORT DataType cofactor(const Matrix<DataType> &x, int i, int j);
 
   template<typename DataType>
-  Matrix<DataType> adj(const Matrix<DataType>& a);
+  CASADI_EXPORT Matrix<DataType> adj(const Matrix<DataType>& a);
 
   template<typename DataType>
-  Matrix<DataType> inv(const Matrix<DataType>& a);
+  CASADI_EXPORT Matrix<DataType> inv(const Matrix<DataType>& a);
 
   template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol);
+  CASADI_EXPORT Matrix<DataType> reshape(const Matrix<DataType>& a, int nrow, int ncol);
 
   template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int,int> rc);
+  CASADI_EXPORT Matrix<DataType> reshape(const Matrix<DataType>& a, std::pair<int,int> rc);
 
   template<typename DataType>
-  Matrix<DataType> reshape(const Matrix<DataType>& a, const Sparsity& sp);
+  CASADI_EXPORT Matrix<DataType> reshape(const Matrix<DataType>& a, const Sparsity& sp);
 
   template<typename DataType>
-  DataType trace(const Matrix<DataType>& a);
+  CASADI_EXPORT DataType trace(const Matrix<DataType>& a);
 
   /** \brief  make a vector
       Reshapes/vectorizes the Matrix<DataType> such that the shape becomes (expr.numel(),1).
@@ -93,23 +93,23 @@ namespace casadi{
     
   */
   template<typename DataType>
-  Matrix<DataType> vec(const Matrix<DataType>& a);
+  CASADI_EXPORT Matrix<DataType> vec(const Matrix<DataType>& a);
 
   /** \brief Returns a flattened version of the Matrix, preserving only nonzeros
    */
   template<typename DataType>
-  Matrix<DataType> vecNZ(const Matrix<DataType>& a);
+  CASADI_EXPORT Matrix<DataType> vecNZ(const Matrix<DataType>& a);
 
   /** \brief Construct a matrix from a list of list of blocks.
    */
   template<typename DataType>
-  Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
+  CASADI_EXPORT Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v);
 
 #ifndef SWIG
   /** \brief Construct a matrix from 4 blocks
    */
   template<typename DataType>
-  Matrix<DataType> blockcat(const Matrix<DataType> &A,const Matrix<DataType> &B,const Matrix<DataType> &C,const Matrix<DataType> &D);
+  CASADI_EXPORT Matrix<DataType> blockcat(const Matrix<DataType> &A,const Matrix<DataType> &B,const Matrix<DataType> &C,const Matrix<DataType> &D);
 #endif // SWIG
 
   /** \brief Concatenate a list of matrices vertically
@@ -118,7 +118,7 @@ namespace casadi{
    *   horzcat(horzsplit(x,...)) = x
    */
   template<typename DataType>
-  Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
+  CASADI_EXPORT Matrix<DataType> horzcat(const std::vector<Matrix<DataType> > &v);
 
   /** \brief  split vertically, retaining groups of cols
    * \param offset List of all start cols for each group
@@ -127,7 +127,7 @@ namespace casadi{
    *   horzcat(horzsplit(x,...)) = x
    */
   template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset);
+  CASADI_EXPORT std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset);
 
   /** \brief  split vertically, retaining fixed-sized groups of cols
    * \param incr Size of each group of cols
@@ -135,7 +135,7 @@ namespace casadi{
    *   horzcat(horzsplit(x,...)) = x
    */
   template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1);
+  CASADI_EXPORT std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, int incr=1);
 
   /** \brief Concatenate a list of matrices horizontally
    * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
@@ -143,7 +143,7 @@ namespace casadi{
    *   vertcat(vertsplit(x,...)) = x
    */
   template<typename DataType>
-  Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
+  CASADI_EXPORT Matrix<DataType> vertcat(const std::vector<Matrix<DataType> > &v);
 
   /** \brief  split horizontally, retaining groups of rows
    * \param output_offset List of all start rows for each group
@@ -152,7 +152,7 @@ namespace casadi{
    *   vertcat(vertsplit(x,...)) = x
    */
   template<typename DataType>
-  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, const std::vector<int>& offset);
+  CASADI_EXPORT std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, const std::vector<int>& offset);
 
   /** \brief  split horizontally, retaining fixed-sized groups of rows
    * \param incr Size of each group of rows
@@ -160,7 +160,7 @@ namespace casadi{
    *   vertcat(vertsplit(x,...)) = x
    */
   template<typename DataType>
-  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, int incr=1);
+  CASADI_EXPORT std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, int incr=1);
 
 
   /** \brief  chop up into blocks
@@ -170,7 +170,7 @@ namespace casadi{
    *   blockcat(blocksplit(x,...,...)) = x
    */
   template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
+  CASADI_EXPORT std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
 
   /** \brief  chop up into blocks
    * \brief vert_incr Defines the increment for block boundaries in row dimension
@@ -179,23 +179,23 @@ namespace casadi{
    *   blockcat(blocksplit(x,...,...)) = x
    */
   template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, int vert_incr = 1, int horz_incr = 1);
+  CASADI_EXPORT std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, int vert_incr = 1, int horz_incr = 1);
 
 #ifndef SWIG
   template<typename DataType>
-  Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
+  CASADI_EXPORT Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
 
   template<typename DataType>
-  Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
+  CASADI_EXPORT Matrix<DataType> horzcat(const Matrix<DataType> &x, const Matrix<DataType> &y);
 #endif // SWIG
 
   template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vec */
-  Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp);
+  CASADI_EXPORT Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp);
 
   template<typename DataType>
   /** \brief  concatenate vertically while vectorizing all arguments with vecNZ */
-  Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp);
+  CASADI_EXPORT Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp);
 
   /** \brief Inner product of two matrices
       Equals
@@ -205,7 +205,7 @@ namespace casadi{
       with x and y matrices of the same dimension
   */
   template<typename DataType>
-  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y); // inner product
+  CASADI_EXPORT Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y); // inner product
 
   /** \brief Outer product of two vectors
       Equals
@@ -215,7 +215,7 @@ namespace casadi{
       with x and y vectors
   */
   template<typename DataType>
-  Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y);
+  CASADI_EXPORT Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y);
 
   /** \brief  QR factorization using the modified Gram-Schmidt algorithm 
    * More stable than the classical Gram-Schmidt, but may break down if the rows of A are nearly linearly dependent
@@ -223,9 +223,9 @@ namespace casadi{
    * Note that in SWIG, Q and R are returned by value. */
   template<typename DataType>
 #ifndef SWIG
-  void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R);
+  CASADI_EXPORT void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType>& R);
 #else // SWIG
-  void qr(const Matrix<DataType>& A, Matrix<DataType>& OUTPUT, Matrix<DataType>& OUTPUT);
+  CASADI_EXPORT void qr(const Matrix<DataType>& A, Matrix<DataType>& OUTPUT, Matrix<DataType>& OUTPUT);
 #endif
 
   /** \brief Computes the nullspace of a matrix A
@@ -238,7 +238,7 @@ namespace casadi{
   * Inspired by Numerical Methods in Scientific Computing by Ake Bjorck
   */
   template<typename DataType>
-  Matrix<DataType> nullspace(const Matrix<DataType>& A);
+  CASADI_EXPORT Matrix<DataType> nullspace(const Matrix<DataType>& A);
 
   /** \brief  Solve a system of equations: A*x = b 
       The solve routine works similar to Matlab's backslash when A is square and nonsingular. The algorithm
@@ -258,7 +258,7 @@ namespace casadi{
   
   */
   template<typename DataType>
-  Matrix<DataType> solve(const Matrix<DataType>& A, const Matrix<DataType>& b);
+  CASADI_EXPORT Matrix<DataType> solve(const Matrix<DataType>& A, const Matrix<DataType>& b);
   
   /** \brief Computes the Moore-Penrose pseudo-inverse
   * 
@@ -271,7 +271,7 @@ namespace casadi{
   
   /** \brief Solve a system of equations: A*x = b 
   */
-  Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+  CASADI_EXPORT Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
   
   
   /** \brief Computes the Moore-Penrose pseudo-inverse
@@ -280,106 +280,106 @@ namespace casadi{
   * If the matrix A is slender (size2<size1), mul(pinv(A),A) is unity.
   *
   */
-  Matrix<double> pinv(const Matrix<double>& A,linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+  CASADI_EXPORT Matrix<double> pinv(const Matrix<double>& A,linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
   
   /** \brief Kronecker tensor product
   *
   * Creates a block matrix in which each element (i,j) is a_ij*b 
   */
   template<typename DataType>
-  Matrix<DataType> kron(const Matrix<DataType>& a, const Matrix<DataType>& b);
+  CASADI_EXPORT Matrix<DataType> kron(const Matrix<DataType>& a, const Matrix<DataType>& b);
 
   /** \brief  Frobenius norm  */
   template<typename DataType>
-  Matrix<DataType> norm_F(const Matrix<DataType> &x);
+  CASADI_EXPORT Matrix<DataType> norm_F(const Matrix<DataType> &x);
 
   /** \brief  2-norm  */
   template<typename DataType>
-  Matrix<DataType> norm_2(const Matrix<DataType> &x);
+  CASADI_EXPORT Matrix<DataType> norm_2(const Matrix<DataType> &x);
 
   /** \brief 1-norm  */
   template<typename DataType>
-  Matrix<DataType> norm_1(const Matrix<DataType> &x);
+  CASADI_EXPORT Matrix<DataType> norm_1(const Matrix<DataType> &x);
 
   /** \brief Infinity-norm */
   template<typename DataType>
-  Matrix<DataType> norm_inf(const Matrix<DataType> &x);
+  CASADI_EXPORT Matrix<DataType> norm_inf(const Matrix<DataType> &x);
 
   /// Return summation of all elements
   template<typename DataType>
-  Matrix<DataType> sumAll(const Matrix<DataType> &x); 
+  CASADI_EXPORT Matrix<DataType> sumAll(const Matrix<DataType> &x); 
 
   /** \brief Return a col-wise summation of elements */
   template<typename DataType>
-  Matrix<DataType> sumCols(const Matrix<DataType> &x);
+  CASADI_EXPORT Matrix<DataType> sumCols(const Matrix<DataType> &x);
 
   /** \brief Return a row-wise summation of elements */
   template<typename DataType>
-  Matrix<DataType> sumRows(const Matrix<DataType> &x);
+  CASADI_EXPORT Matrix<DataType> sumRows(const Matrix<DataType> &x);
 
 #ifdef SWIG
   /// Returns true only if every element in the matrix is true
   template<typename DataType>
-  DataType all(const Matrix<DataType> &x); 
+  CASADI_EXPORT DataType all(const Matrix<DataType> &x); 
 
   /// Returns true if any element in the matrix is true
   template<typename DataType>
-  DataType any(const Matrix<DataType> &x); 
+  CASADI_EXPORT DataType any(const Matrix<DataType> &x); 
 #endif //SWIG
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
   template<typename DataType>
-  Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m);
+  CASADI_EXPORT Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m);
 
   /** \brief  Evaluate a polynomial with coefficeints p in x */
   template<typename DataType>
-  Matrix<DataType> polyval(const Matrix<DataType>& p, const Matrix<DataType>& x);
+  CASADI_EXPORT Matrix<DataType> polyval(const Matrix<DataType>& p, const Matrix<DataType>& x);
 
   /** \brief   Get the diagonal of a matrix or construct a diagonal
       When the input is square, the diagonal elements are returned.
       If the input is vector-like, a diagonal matrix is constructed with it. */
   template<typename DataType>
-  Matrix<DataType> diag(const Matrix<DataType> &A);
+  CASADI_EXPORT Matrix<DataType> diag(const Matrix<DataType> &A);
 
   /** \brief   Construct a matrix with given block on the diagonal */
   template<typename DataType>
-  Matrix<DataType> blkdiag(const std::vector< Matrix<DataType> > &A);
+  CASADI_EXPORT Matrix<DataType> blkdiag(const std::vector< Matrix<DataType> > &A);
 
   /** \brief  Unite two matrices no overlapping sparsity */
   template<typename DataType>
-  Matrix<DataType> unite(const Matrix<DataType>& A, const Matrix<DataType>& B);
+  CASADI_EXPORT Matrix<DataType> unite(const Matrix<DataType>& A, const Matrix<DataType>& B);
 
 #ifndef SWIGOCTAVE
   /** \brief  Make a matrix dense */
   template<typename DataType>
-  Matrix<DataType> dense(const Matrix<DataType>& A);
+  CASADI_EXPORT Matrix<DataType> dense(const Matrix<DataType>& A);
 
   /** \brief  Make a matrix sparse by removing numerical zeros*/
   template<typename DataType>
-  Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0);
+  CASADI_EXPORT Matrix<DataType> sparse(const Matrix<DataType>& A, double tol=0);
 #endif // SWIGOCTAVE
 
   /// same as: res += mul(A,v)
   template<typename DataType>
-  void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A=false);
+  CASADI_EXPORT void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A=false);
   
   /// \cond INTERNAL
   /// Get a pointer to the data contained in the vector
   template<typename DataType>
-  DataType* getPtr(Matrix<DataType> &v);
+  CASADI_EXPORT DataType* getPtr(Matrix<DataType> &v);
   
   /// Get a pointer to the data contained in the vector
   template<typename DataType>
-  const DataType* getPtr(const Matrix<DataType> &v);
+  CASADI_EXPORT const DataType* getPtr(const Matrix<DataType> &v);
   /// \endcond
   
   /** \brief Create a new matrix with a given sparsity pattern but with the nonzeros taken from an existing matrix */
   template<typename DataType>
-  Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sparsity);
+  CASADI_EXPORT Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sparsity);
 
   /// Obtain the structural rank of a sparsity-pattern
   template<typename DataType>
-  int sprank(const Matrix<DataType>& A);
+  CASADI_EXPORT int sprank(const Matrix<DataType>& A);
 
 } // namespace casadi
 

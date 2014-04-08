@@ -34,7 +34,7 @@ namespace casadi{
       \author Joris Gillis 
       \date 2014
   */
-  class NullspaceInternal : public FunctionInternal{
+  class CASADI_EXPORT NullspaceInternal : public FunctionInternal{
   public:
   
     /** \brief  Constructor */

@@ -47,6 +47,8 @@
 #error "Unable to define getRealTime( ) for an unknown OS."
 #endif
 
+namespace casadi{
+
 double getRealTime( )
 {
 #if defined(_WIN32)
@@ -121,5 +123,7 @@ double getRealTime( )
 #else //WITH_PROFILING
  double getRealTime( ) { return 0; }
 #endif
+
+}
 
 

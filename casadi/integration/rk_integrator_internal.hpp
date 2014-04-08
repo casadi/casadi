@@ -29,7 +29,7 @@
 /// \cond INTERNAL
 namespace casadi{
     
-  class RKIntegratorInternal : public FixedStepIntegratorInternal{
+  class CASADI_INTEGRATION_EXPORT RKIntegratorInternal : public FixedStepIntegratorInternal{
   public:
   
     /// Constructor

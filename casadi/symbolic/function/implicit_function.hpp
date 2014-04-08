@@ -61,7 +61,7 @@ namespace casadi{
      \author Joel Andersson
      \date 2011
   */
-  class ImplicitFunction : public Function{
+  class CASADI_EXPORT ImplicitFunction : public Function{
   public:
   
     /// Access functions of the node

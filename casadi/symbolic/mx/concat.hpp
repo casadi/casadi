@@ -34,7 +34,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2014
   */
-  class Concat : public MXNode{
+  class CASADI_EXPORT Concat : public MXNode{
   public:
     
     /// Constructor
@@ -71,7 +71,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class Horzcat : public Concat{
+  class CASADI_EXPORT Horzcat : public Concat{
   public:
 
     /// Constructor
@@ -97,7 +97,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2014
   */
-  class Vertcat : public Concat{
+  class CASADI_EXPORT Vertcat : public Concat{
   public:
 
     /// Constructor

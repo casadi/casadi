@@ -9,17 +9,8 @@ set(OOQP_INTERFACE_SRCS
   ooqp_solver.hpp
   ooqp_solver.cpp)
 
-if(ENABLE_STATIC)
-add_library(casadi_ooqp_interface STATIC ${OOQP_INTERFACE_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_ooqp_interface SHARED ${OOQP_INTERFACE_SRCS})
-endif()
-target_link_libraries(casadi_ooqp_interface casadi ${OOQP_LIBRARIES})
-set(CASADI_MODULES ${CASADI_MODULES} casadi_ooqp_interface PARENT_SCOPE)
-install(TARGETS casadi_ooqp_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_ooqp_interface ${OOQP_INTERFACE_SRCS})
+target_link_libraries(casadi_ooqp_interface ${OOQP_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/ooqp

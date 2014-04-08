@@ -30,7 +30,7 @@
 /// \cond INTERNAL
 namespace casadi{
     
-  class ImplicitFixedStepIntegratorInternal : public FixedStepIntegratorInternal{
+  class CASADI_INTEGRATION_EXPORT ImplicitFixedStepIntegratorInternal : public FixedStepIntegratorInternal{
   public:
   
     /// Constructor

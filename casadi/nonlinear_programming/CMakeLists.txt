@@ -10,22 +10,7 @@ set(NONLINEAR_PROGRAMMING_SRCS
   simple_homotopy_nlp_solver.hpp simple_homotopy_nlp_solver.cpp simple_homotopy_nlp_internal.hpp simple_homotopy_nlp_internal.cpp
 )
 
-if(ENABLE_STATIC)
-add_library(casadi_nonlinear_programming STATIC ${NONLINEAR_PROGRAMMING_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_nonlinear_programming SHARED ${NONLINEAR_PROGRAMMING_SRCS})
-endif()
-target_link_libraries(casadi_nonlinear_programming casadi)
-if(WITH_CSPARSE)
-  target_link_libraries(casadi_nonlinear_programming casadi_csparse_interface)
-endif()
-
-set(CASADI_MODULES ${CASADI_MODULES} casadi_nonlinear_programming PARENT_SCOPE)
-
-install(TARGETS casadi_nonlinear_programming
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_nonlinear_programming ${NONLINEAR_PROGRAMMING_SRCS})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/nonlinear_programming

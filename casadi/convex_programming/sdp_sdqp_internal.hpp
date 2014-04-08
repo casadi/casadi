@@ -27,6 +27,8 @@
 #include "casadi/symbolic/function/sdp_solver.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 
+#include "sdp_sdqp_solver.hpp"
+
 /// \cond INTERNAL
 namespace casadi{
 
@@ -34,7 +36,7 @@ namespace casadi{
    * 
    @copydoc SDQPSolver_doc
    * */
-  class SDPSDQPInternal : public SDQPSolverInternal {
+  class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSDQPInternal : public SDQPSolverInternal {
     friend class SDPSDQPSolver;
   public:
 

@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_SQIC_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/sqic/sqic_solver.hpp"
 #include "casadi/interfaces/sqic/stabilized_sqic_solver.hpp"

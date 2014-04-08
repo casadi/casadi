@@ -33,6 +33,7 @@ endif()
 #end workaround
 
 include(embed_resources)
+include (GenerateExportHeader)
 
 # find the macports python libs if they exist
 if(APPLE)
@@ -122,7 +123,7 @@ if(WITH_PRINTME)
 endif()
 
 include_directories(.)
-
+include_directories(${CMAKE_BINARY_DIR})
 
 # Check if the compiler supports C++11
 foreach(CXX11FLAG_TEST "" "-std=gnu++11" "-std=c++11" "-std=gnu++0x" "-std=c++0x" "-std=c++11 --DUSE_TR1_HASHMAP" "-std=c++0x -DUSE_TR1_HASHMAP")

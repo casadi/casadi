@@ -24,6 +24,7 @@
 #define SQIC_INTERNAL_HPP
 
 #include "casadi/symbolic/function/qp_solver_internal.hpp"
+#include "sqic_solver.hpp"
 
 /// \cond INTERNAL
 namespace casadi{
@@ -32,7 +33,7 @@ namespace casadi{
  * 
     @copydoc QPSolver_doc
  * */
-class SQICInternal : public QPSolverInternal {
+class CASADI_SQIC_INTERFACE_EXPORT SQICInternal : public QPSolverInternal {
   friend class SQICSolver;
 
 public:

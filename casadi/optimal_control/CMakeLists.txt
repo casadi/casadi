@@ -9,22 +9,11 @@ set(OPTIMAL_CONTROL
   direct_collocation.hpp         direct_collocation.cpp         direct_collocation_internal.hpp         direct_collocation_internal.cpp
 )
 
-if(ENABLE_STATIC)
-add_library(casadi_optimal_control STATIC ${OPTIMAL_CONTROL})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_optimal_control SHARED ${OPTIMAL_CONTROL})
-endif()
+casadi_library(casadi_optimal_control ${OPTIMAL_CONTROL})
+
 target_link_libraries(casadi_optimal_control
-  casadi
   casadi_integration
   ${TINYXML_LIBRARIES})
-
-set(CASADI_MODULES ${CASADI_MODULES} casadi_optimal_control PARENT_SCOPE)
-
-install(TARGETS casadi_optimal_control
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
 
 install(DIRECTORY ./
   DESTINATION include/casadi/optimal_control

@@ -33,7 +33,7 @@
 /// \cond INTERNAL
 namespace casadi{
   
-class DirectCollocationInternal : public OCPSolverInternal{
+class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolverInternal{
   friend class DirectCollocation;
   
   public:

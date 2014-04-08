@@ -37,7 +37,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2011-2014
   */
-  class RKIntegrator : public FixedStepIntegrator {
+  class CASADI_INTEGRATION_EXPORT RKIntegrator : public FixedStepIntegrator {
   public:
     /** \brief  Default constructor */
     RKIntegrator();

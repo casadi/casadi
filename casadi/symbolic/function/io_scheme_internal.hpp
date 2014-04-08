@@ -33,7 +33,7 @@ class SharedObjectNode;
 
 namespace casadi{
 
-class IOSchemeInternal : public SharedObjectNode{
+class CASADI_EXPORT IOSchemeInternal : public SharedObjectNode{
   public:    
     
     /// Name of the scheme
@@ -65,7 +65,7 @@ class IOSchemeInternal : public SharedObjectNode{
     
 };
 
-class IOSchemeBuiltinInternal : public IOSchemeInternal {
+class CASADI_EXPORT IOSchemeBuiltinInternal : public IOSchemeInternal {
   public:    
   
     /// Default constructor
@@ -106,7 +106,7 @@ class IOSchemeBuiltinInternal : public IOSchemeInternal {
     
 };
 
-class IOSchemeCustomInternal : public IOSchemeInternal {
+class CASADI_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
   public:    
   
     /// Default constructor

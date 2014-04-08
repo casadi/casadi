@@ -31,7 +31,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */
-  class UnaryMX : public MXNode{
+  class CASADI_EXPORT UnaryMX : public MXNode{
   public:
     
     /** \brief  Constructor is private, use "create" below */

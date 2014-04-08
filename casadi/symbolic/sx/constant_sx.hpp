@@ -50,7 +50,7 @@ namespace casadi{
   \author Joel Andersson 
   \date 2010
 */
-class ConstantSX : public SXNode{
+class CASADI_EXPORT ConstantSX : public SXNode{
 public:
 
 // Destructor
@@ -86,7 +86,7 @@ virtual void print(std::ostream &stream, long& remaining_calls) const{
   \author Joel Andersson 
   \date 2010
 */
-class RealtypeSX : public ConstantSX{
+class CASADI_EXPORT RealtypeSX : public ConstantSX{
   private:
     /// Constructor is private, use "create" below
     explicit RealtypeSX(double value) : value(value){} 
@@ -141,7 +141,7 @@ class RealtypeSX : public ConstantSX{
   \author Joel Andersson 
   \date 2010
 */
-class IntegerSX : public ConstantSX{
+class CASADI_EXPORT IntegerSX : public ConstantSX{
   private:
     /// Constructor is private, use "create" below
     explicit IntegerSX(int value) : value(value){}
@@ -197,7 +197,7 @@ class IntegerSX : public ConstantSX{
   \author Joel Andersson 
   \date 2010
 */
-class ZeroSX : public ConstantSX{
+class CASADI_EXPORT ZeroSX : public ConstantSX{
 public:
 
   virtual ~ZeroSX(){}
@@ -222,7 +222,7 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class OneSX : public ConstantSX{
+class CASADI_EXPORT OneSX : public ConstantSX{
 public:
 
   explicit OneSX(){}
@@ -243,7 +243,7 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class MinusOneSX : public ConstantSX{
+class CASADI_EXPORT MinusOneSX : public ConstantSX{
 public:
 
   explicit MinusOneSX(){}
@@ -268,7 +268,7 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class InfSX : public ConstantSX{
+class CASADI_EXPORT InfSX : public ConstantSX{
 public:
 
   explicit InfSX(){}
@@ -287,7 +287,7 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class MinusInfSX : public ConstantSX{
+class CASADI_EXPORT MinusInfSX : public ConstantSX{
 public:
   
   explicit MinusInfSX(){}
@@ -306,7 +306,7 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class NanSX : public ConstantSX{
+class CASADI_EXPORT NanSX : public ConstantSX{
 public:
   
   explicit NanSX(){this->count++;}

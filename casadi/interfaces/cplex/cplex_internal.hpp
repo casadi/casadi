@@ -24,6 +24,7 @@
 
 #include "ilcplex/cplex.h"
 #include "casadi/symbolic/function/qp_solver_internal.hpp"
+#include "cplex_solver.hpp"
 
 #include <string>
 
@@ -34,7 +35,7 @@ namespace casadi{
   /** Internal class for CplexSolver
       @copydoc QPSolver_doc
   */
-  class CplexInternal : public QPSolverInternal{
+  class CASADI_CPLEX_INTERFACE_EXPORT CplexInternal : public QPSolverInternal{
     friend class CplexSolver;
   public:
     /** \brief Default constructor */

@@ -170,7 +170,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2010
   */
-  class Integrator : public Function{
+  class CASADI_EXPORT Integrator : public Function{
   public:
     /// Default constructor
     Integrator();

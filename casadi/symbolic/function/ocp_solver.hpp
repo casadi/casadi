@@ -103,7 +103,7 @@ enum OCPOutput{
       \author Joel Andersson
       \date 2011-2013
   */ 
-  class OCPSolver : public Function{
+  class CASADI_EXPORT OCPSolver : public Function{
   public:
 
     /// Default constructor

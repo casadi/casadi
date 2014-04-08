@@ -25,6 +25,8 @@
 
 #include "casadi/symbolic/function/lp_solver.hpp"
 
+#include <casadi/convex_programming/casadi_convex_programming_export.h>
+
 namespace casadi {
   
   
@@ -38,7 +40,7 @@ class QPLPInternal;
    \author Joris Gillis
    \date 2013
   */
-class QPLPSolver : public LPSolver {
+class CASADI_CONVEX_PROGRAMMING_EXPORT QPLPSolver : public LPSolver {
 public:
 
   /** \brief  Default constructor */

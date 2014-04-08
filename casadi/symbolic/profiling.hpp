@@ -27,6 +27,9 @@
 #include <cstring>
 #include <iostream>
 
+#include "casadi_common.hpp"
+
+namespace casadi{
 /// \cond INTERNAL
 
 /*
@@ -43,24 +46,24 @@
  * The returned real time is only useful for computing an elapsed time
  * between two calls to this function.
  */
-double getRealTime( );
+CASADI_EXPORT double getRealTime( );
 
 enum ProfilingData_Type { ProfilingData_Type_TIMELINE, ProfilingData_Type_SOURCE, ProfilingData_Type_NAME, ProfilingData_Type_ENTRY, ProfilingData_Type_EXIT, ProfilingData_Type_IO };
 
 enum ProfilingData_FunctionType { ProfilingData_FunctionType_MXFunction, ProfilingData_FunctionType_SXFunction, ProfilingData_FunctionType_Other };
 
-struct ProfilingHeader {
+struct CASADI_EXPORT ProfilingHeader {
   ProfilingData_Type type;
 };
 
-struct ProfilingData_TIMELINE {
+struct CASADI_EXPORT ProfilingData_TIMELINE {
   double local;
   double total;
   long thisp;
   int line_number;
 };
 
-struct ProfilingData_SOURCE {
+struct CASADI_EXPORT ProfilingData_SOURCE {
   long thisp;
   int line_number;
   int length;
@@ -68,7 +71,7 @@ struct ProfilingData_SOURCE {
   long dependency;
 };
 
-struct ProfilingData_NAME {
+struct CASADI_EXPORT ProfilingData_NAME {
   long thisp;
   int length;
   ProfilingData_FunctionType type;
@@ -77,23 +80,23 @@ struct ProfilingData_NAME {
   int numout;
 };
 
-struct ProfilingData_IO {
+struct CASADI_EXPORT ProfilingData_IO {
   int nrow;
   int ncol;
   int ndata;
 };
 
-struct ProfilingData_ENTRY {
+struct CASADI_EXPORT ProfilingData_ENTRY {
   long thisp;
 };
 
-struct ProfilingData_EXIT {
+struct CASADI_EXPORT ProfilingData_EXIT {
   double total;
   long thisp;
 };
 
 template<typename T>
-ProfilingData_Type ProfilingType();
+CASADI_EXPORT ProfilingData_Type ProfilingType();
 
 template<>
 inline ProfilingData_Type ProfilingType<ProfilingData_TIMELINE>() { return ProfilingData_Type_TIMELINE; }
@@ -110,7 +113,7 @@ inline ProfilingData_Type ProfilingType<ProfilingData_IO>() { return ProfilingDa
 
 
 template<typename T>
-void profileWrite(std::ofstream &f,const T& s) {
+CASADI_EXPORT void profileWrite(std::ofstream &f,const T& s) {
   ProfilingHeader hd;
   hd.type   = ProfilingType<T>();
   f.write(reinterpret_cast<const char*>(&hd), sizeof(hd));
@@ -118,19 +121,19 @@ void profileWrite(std::ofstream &f,const T& s) {
 }
 
 template<typename T>
-void profileWriteBare(std::ofstream &f,const T& s) {
+CASADI_EXPORT void profileWriteBare(std::ofstream &f,const T& s) {
   f.write(reinterpret_cast<const char*>(&s), sizeof(s));
 }
 
 template<typename T>
-long ptrToLong(T *a) {
+CASADI_EXPORT long ptrToLong(T *a) {
   long r;
   std::memcpy(&r, &a, sizeof(T*));
   return r;
 }
 
 template<typename T>
-void profileWriteName(std::ofstream &f,T *a,const std::string &name, ProfilingData_FunctionType type, int algorithm_size) {
+CASADI_EXPORT void profileWriteName(std::ofstream &f,T *a,const std::string &name, ProfilingData_FunctionType type, int algorithm_size) {
   ProfilingData_NAME s;
   s.thisp=ptrToLong(a);
   s.length=name.size();
@@ -158,14 +161,14 @@ void profileWriteName(std::ofstream &f,T *a,const std::string &name, ProfilingDa
 }
 
 template<typename T>
-void profileWriteEntry(std::ofstream &f,T *a) {
+CASADI_EXPORT void profileWriteEntry(std::ofstream &f,T *a) {
   ProfilingData_ENTRY s;
   s.thisp=ptrToLong(a);
   profileWrite(f,s);
 }
 
 template<typename T>
-void profileWriteExit(std::ofstream &f,T *a,double total) {
+CASADI_EXPORT void profileWriteExit(std::ofstream &f,T *a,double total) {
   ProfilingData_EXIT s;
   s.thisp=ptrToLong(a);
   s.total=total;
@@ -173,7 +176,7 @@ void profileWriteExit(std::ofstream &f,T *a,double total) {
 }
 
 template<typename T>
-void profileWriteTime(std::ofstream &f,T *a,int line_number,double local, double total) {
+CASADI_EXPORT void profileWriteTime(std::ofstream &f,T *a,int line_number,double local, double total) {
   ProfilingData_TIMELINE s;
   s.local = local;
   s.total = total;
@@ -184,7 +187,7 @@ void profileWriteTime(std::ofstream &f,T *a,int line_number,double local, double
 
 
 template<typename T, typename T2>
-void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline, int opcode, T2 *dependency) {
+CASADI_EXPORT void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline, int opcode, T2 *dependency) {
   ProfilingData_SOURCE s;
   s.thisp = ptrToLong(a);
   s.line_number = line_number;
@@ -197,7 +200,7 @@ void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::str
 }
 
 template<typename T>
-void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline, int opcode) {
+CASADI_EXPORT void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline, int opcode) {
   ProfilingData_SOURCE s;
   s.thisp = ptrToLong(a);
   s.line_number = line_number;
@@ -210,5 +213,6 @@ void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::str
 }
 
 /// \endcond
+}
 
 #endif //PROFILING_HPP

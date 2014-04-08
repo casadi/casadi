@@ -25,6 +25,8 @@
 
 #include "dple_solver.hpp"
 
+#include <casadi/control/casadi_control_export.h>
+
 namespace casadi{
 
   /// Forward declaration of internal class
@@ -41,7 +43,7 @@ namespace casadi{
       \date 2014
       
   */
-  class SimpleIndefDpleSolver : public DpleSolver {
+  class CASADI_CONTROL_EXPORT SimpleIndefDpleSolver : public DpleSolver {
   public:
     /// Default constructor
     SimpleIndefDpleSolver();

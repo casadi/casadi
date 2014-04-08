@@ -24,6 +24,8 @@
 // for example vertcat(SXVector), vertcat(DMatrixVector) and vertcat(MXVector) appears to work fine
 #pragma SWIG nowarn=509,303,302
 
+#define CASADI_EXPORT
+
 // Incude cmath early on, see #622
 %begin %{
 #include <cmath>

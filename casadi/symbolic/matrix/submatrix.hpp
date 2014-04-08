@@ -34,7 +34,7 @@ namespace casadi{
 
   /// submatrix
   template<typename M, typename I, typename J>
-  class SubMatrix : public M{
+  class CASADI_EXPORT SubMatrix : public M{
   public:
     /// Constructor
     SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i,j)), mat_(mat), i_(i), j_(j){}

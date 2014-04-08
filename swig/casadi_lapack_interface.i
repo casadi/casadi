@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_LAPACK_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/lapack/lapack_lu_dense.hpp"
 #include "casadi/interfaces/lapack/lapack_qr_dense.hpp"

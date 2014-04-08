@@ -22,19 +22,8 @@ if(WITH_SIPOPT)
   add_definitions(-DWITH_SIPOPT)
 endif()
 
-if(ENABLE_STATIC)
-add_library(casadi_ipopt_interface STATIC ${IPOPT_INTERFACE_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_ipopt_interface SHARED ${IPOPT_INTERFACE_SRCS})
-endif()
-
-target_link_libraries(casadi_ipopt_interface casadi ${IPOPT_LIBRARIES})
-set(CASADI_MODULES ${CASADI_MODULES} casadi_ipopt_interface PARENT_SCOPE)
-
-install(TARGETS casadi_ipopt_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_ipopt_interface ${IPOPT_INTERFACE_SRCS})
+target_link_libraries(casadi_ipopt_interface ${IPOPT_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/ipopt

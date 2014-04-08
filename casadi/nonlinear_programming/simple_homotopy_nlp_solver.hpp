@@ -25,6 +25,8 @@
 
 #include "casadi/symbolic/function/homotopy_nlp_solver.hpp"
 
+#include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
+
 namespace casadi{
   
   class SimpleHomotopyNLPInternal;
@@ -35,7 +37,7 @@ namespace casadi{
      \author Joris Gillis
      \date 2014
   */
-  class SimpleHomotopyNLPSolver : public HomotopyNLPSolver {
+  class CASADI_NONLINEAR_PROGRAMMING_EXPORT SimpleHomotopyNLPSolver : public HomotopyNLPSolver {
   public:
     /// Default constructor
     SimpleHomotopyNLPSolver();

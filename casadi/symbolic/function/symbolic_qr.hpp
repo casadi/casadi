@@ -35,7 +35,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2013
   */
-  class SymbolicQR : public LinearSolver{
+  class CASADI_EXPORT SymbolicQR : public LinearSolver{
   public:
   
     /// Default (empty) constructor

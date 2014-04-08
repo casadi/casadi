@@ -26,6 +26,8 @@
 #include "casadi/symbolic/function/qp_solver_internal.hpp"
 #include "casadi/symbolic/function/nlp_solver.hpp"
 
+#include "nlp_qp_solver.hpp"
+
 /// \cond INTERNAL
 namespace casadi{
 
@@ -33,7 +35,7 @@ namespace casadi{
    * 
       @copydoc QPSolver_doc
    * */
-class NLPQPInternal : public QPSolverInternal {
+class CASADI_NONLINEAR_PROGRAMMING_EXPORT NLPQPInternal : public QPSolverInternal {
   friend class NLPQPSolver;
 public:
   /** \brief  Constructor */

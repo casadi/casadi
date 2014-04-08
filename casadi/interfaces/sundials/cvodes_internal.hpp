@@ -42,7 +42,7 @@ namespace casadi{
 
   @copydoc DAE_doc
 */
-class CVodesInternal : public SundialsInternal{
+class CASADI_SUNDIALS_INTERFACE_EXPORT CVodesInternal : public SundialsInternal{
   friend class CVodesIntegrator;
 public:
   /** \brief  Constructor */

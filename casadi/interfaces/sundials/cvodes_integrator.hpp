@@ -41,7 +41,7 @@ class CVodesInternal;
   
 
 */
-class CVodesIntegrator : public SundialsIntegrator{
+class CASADI_SUNDIALS_INTERFACE_EXPORT CVodesIntegrator : public SundialsIntegrator{
 public:
 
   /** \brief  Default constructor */

@@ -24,6 +24,7 @@
 #define SQIC_SOLVER_HPP
 
 #include "casadi/symbolic/function/qp_solver.hpp"
+#include <casadi/interfaces/sqic/casadi_sqic_interface_export.h>
 
 namespace casadi {
   
@@ -38,7 +39,7 @@ class SQICInternal;
       \date 2013
       
   */
-class SQICSolver : public QPSolver {
+class CASADI_SQIC_INTERFACE_EXPORT SQICSolver : public QPSolver {
 public:
 
   /** \brief  Default constructor */

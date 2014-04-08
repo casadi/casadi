@@ -34,7 +34,7 @@ namespace casadi{
 
 /// Access to a set of nonzeros
 template<typename M, typename K>
-class NonZeros : public M{
+class CASADI_EXPORT NonZeros : public M{
   public:
     /// Constructor
     NonZeros(M& mat, const K& k) : M(mat.getNZ(k)), mat_(mat), k_(k){}

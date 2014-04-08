@@ -37,7 +37,7 @@ namespace casadi{
   /**
      @copydoc LinearSolver_doc
   */
-  class CSparseInternal : public LinearSolverInternal{
+  class CASADI_CSPARSE_INTERFACE_EXPORT CSparseInternal : public LinearSolverInternal{
   public:
     
     // Create a linear solver given a sparsity pattern and a number of right hand sides

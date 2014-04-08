@@ -24,6 +24,9 @@
 #define FIXED_STEP_INTEGRATOR_HPP
 
 #include "casadi/symbolic/function/integrator.hpp"
+#include "casadi/symbolic/function/integrator.hpp"
+
+#include <casadi/integration/casadi_integration_export.h>
 
 namespace casadi{
   
@@ -35,7 +38,7 @@ namespace casadi{
      \author Joel Andersson
      \date 2014
   */
-  class FixedStepIntegrator : public Integrator {
+  class CASADI_INTEGRATION_EXPORT FixedStepIntegrator : public Integrator {
   public:
     /** \brief  Default constructor */
     FixedStepIntegrator();

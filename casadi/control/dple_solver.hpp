@@ -25,6 +25,8 @@
 
 #include "../symbolic/function/function.hpp"
 
+#include <casadi/control/casadi_control_export.h>
+
 /** \defgroup DPLE_doc Discrete periodic Lyapunov Equation solver
 
 
@@ -70,7 +72,7 @@ namespace casadi{
       \date 2014
       
   */
-  class DpleSolver : public Function {
+  class CASADI_CONTROL_EXPORT DpleSolver : public Function {
   public:
     /// Default constructor
     DpleSolver();

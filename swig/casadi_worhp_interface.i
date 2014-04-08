@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_WORHP_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/worhp/worhp_solver.hpp"
 %}

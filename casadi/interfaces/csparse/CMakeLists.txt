@@ -11,21 +11,9 @@ set(CSPARSE_INTERFACE_SRCS
   csparse_cholesky_internal.hpp
   csparse_cholesky_internal.cpp)
 
-if(ENABLE_STATIC)
-  add_library(casadi_csparse_interface STATIC ${CSPARSE_INTERFACE_SRCS})
-endif()
+casadi_library(casadi_csparse_interface ${CSPARSE_INTERFACE_SRCS})
 
-if(ENABLE_SHARED)
-  add_library(casadi_csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
-endif()
-
-set(CASADI_MODULES ${CASADI_MODULES} casadi_csparse_interface PARENT_SCOPE)
-
-target_link_libraries(casadi_csparse_interface casadi ${CSPARSE_LIBRARIES})
-
-install(TARGETS casadi_csparse_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+target_link_libraries(casadi_csparse_interface ${CSPARSE_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/csparse

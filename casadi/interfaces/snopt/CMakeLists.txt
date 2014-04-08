@@ -9,20 +9,16 @@ set(SNOPT_INTERFACE_SRCS
   snopt_solver.hpp
   snopt_solver.cpp)
 
+casadi_library(casadi_snopt_interface ${SNOPT_INTERFACE_SRCS})
+
 if(ENABLE_STATIC)
-add_library(casadi_snopt_interface STATIC ${SNOPT_INTERFACE_SRCS})
 add_library(snopt_fortran_c_bridge STATIC wsnopt.f90)
 endif()
 if(ENABLE_SHARED)
-add_library(casadi_snopt_interface SHARED ${SNOPT_INTERFACE_SRCS})
 add_library(snopt_fortran_c_bridge SHARED wsnopt.f90)
 endif()
 target_link_libraries(casadi_snopt_interface casadi snopt_fortran_c_bridge ${CMAKE_DL_LIBS})
 target_link_libraries(snopt_fortran_c_bridge ${SNOPT_LIBRARIES})
-set(CASADI_MODULES ${CASADI_MODULES} casadi_snopt_interface PARENT_SCOPE)
-install(TARGETS casadi_snopt_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
 
 install(TARGETS snopt_fortran_c_bridge
   LIBRARY DESTINATION lib

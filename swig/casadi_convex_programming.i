@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_CONVEX_PROGRAMMING_EXPORT
+
 %{
 #include "casadi/convex_programming/qp_lp_solver.hpp"
 #include "casadi/convex_programming/qcqp_qp_solver.hpp"

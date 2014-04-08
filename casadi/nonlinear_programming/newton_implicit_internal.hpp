@@ -35,7 +35,7 @@ namespace casadi{
    * 
    @copydoc ImplicitFunction_doc
    * */
-  class NewtonImplicitInternal : public ImplicitFunctionInternal {
+  class CASADI_NONLINEAR_PROGRAMMING_EXPORT NewtonImplicitInternal : public ImplicitFunctionInternal {
     friend class NewtonImplicitSolver;
   public:
     /** \brief  Constructor */

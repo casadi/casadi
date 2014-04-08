@@ -24,6 +24,7 @@
 #define KNITRO_SOLVER_HPP
 
 #include "casadi/symbolic/function/nlp_solver.hpp"
+#include <casadi/interfaces/knitro/casadi_knitro_interface_export.h>
 
 namespace casadi{
   
@@ -33,7 +34,7 @@ class KnitroInternal;
  *
 @copydoc NLPSolver_doc
 */
-class KnitroSolver : public NLPSolver {
+class CASADI_KNITRO_INTERFACE_EXPORT KnitroSolver : public NLPSolver {
   public:
     /// Default constructor
     KnitroSolver();

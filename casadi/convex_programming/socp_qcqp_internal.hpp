@@ -27,6 +27,8 @@
 #include "casadi/symbolic/function/socp_solver.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 
+#include "socp_qcqp_solver.hpp"
+
 /// \cond INTERNAL
 namespace casadi{
 
@@ -34,7 +36,7 @@ namespace casadi{
    * 
       @copydoc QCQPSolver_doc
    * */
-class SOCPQCQPInternal : public QCQPSolverInternal {
+class CASADI_CONVEX_PROGRAMMING_EXPORT SOCPQCQPInternal : public QCQPSolverInternal {
   friend class SOCPQCQPSolver;
 public:
 

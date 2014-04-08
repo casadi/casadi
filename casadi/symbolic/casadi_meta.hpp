@@ -24,6 +24,7 @@
 #define CASADI_META_HPP
 
 #include <string>
+#include "casadi_common.hpp"
 
 namespace casadi {
   /**
@@ -32,7 +33,7 @@ namespace casadi {
   *  \author Joris Gillis 
   *  \date 2012
   */
-  class CasadiMeta {
+  class CASADI_EXPORT CasadiMeta {
     private:
       /// No instances are allowed
       CasadiMeta();

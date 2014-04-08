@@ -42,7 +42,7 @@ namespace casadi{
   
   typedef std::pair< std::string,std::string> Message;
     
-  class KinsolInternal : public ImplicitFunctionInternal{
+  class CASADI_SUNDIALS_INTERFACE_EXPORT KinsolInternal : public ImplicitFunctionInternal{
     friend class KinsolSolver;
   public:
     /** \brief  Constructor */

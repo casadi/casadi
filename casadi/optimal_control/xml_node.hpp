@@ -28,6 +28,8 @@
 #include <map>
 #include "casadi/symbolic/casadi_exception.hpp"
 
+#include <casadi/optimal_control/casadi_optimal_control_export.h>
+
 /// \cond INTERNAL
 
 /** \brief  Forward declarations */
@@ -36,7 +38,7 @@ class TiXmlNode;
 
 namespace casadi{
 
-class XMLNode{
+class CASADI_OPTIMAL_CONTROL_EXPORT XMLNode{
 public:
   XMLNode();
   ~XMLNode();
@@ -117,7 +119,7 @@ public:
   /** \brief  Read node from parsed XML file */
   void addNode(TiXmlNode* node);
 
-  friend std::ostream& operator<<(std::ostream &stream, const XMLNode& node);
+  CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream, const XMLNode& node);
 
   void dump(std::ostream &stream, int indent=0) const;
 

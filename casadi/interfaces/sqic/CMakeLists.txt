@@ -18,20 +18,15 @@ set(SQIC_INTERFACE_SRCS
   stabilized_sqic_solver.cpp
   ${resource_file})
 
+casadi_library(casadi_sqic_interface ${SQIC_INTERFACE_SRCS})
 if(ENABLE_STATIC)
-add_library(casadi_sqic_interface STATIC ${SQIC_INTERFACE_SRCS})
 add_library(sqic_fortran_c_bridge STATIC wsqic.f90)
 endif()
 if(ENABLE_SHARED)
-add_library(casadi_sqic_interface SHARED ${SQIC_INTERFACE_SRCS})
 add_library(sqic_fortran_c_bridge SHARED wsqic.f90)
 endif()
-target_link_libraries(casadi_sqic_interface casadi sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
+target_link_libraries(casadi_sqic_interface sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
 target_link_libraries(sqic_fortran_c_bridge casadi ${SQIC_LIBRARIES})
-set(CASADI_MODULES ${CASADI_MODULES} casadi_sqic_interface PARENT_SCOPE)
-install(TARGETS casadi_sqic_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
 
 install(TARGETS sqic_fortran_c_bridge
   LIBRARY DESTINATION lib

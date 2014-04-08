@@ -50,7 +50,7 @@ namespace casadi{
       \date 2014
   */
 
-  class Nullspace : public Function{
+  class CASADI_EXPORT Nullspace : public Function{
   public:
 
     /// Default constructor 

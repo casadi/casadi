@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_SNOPT_INTERFACE_EXPORT
+
 %{
 #include "casadi/interfaces/snopt/snopt_solver.hpp"
 %}

@@ -24,6 +24,7 @@
 #define PSD_INDEF_DPLE_SOLVER_HPP
 
 #include "../../control/dple_solver.hpp"
+#include <casadi/interfaces/slicot/casadi_slicot_interface_export.h>
 
 namespace casadi{
 
@@ -41,7 +42,7 @@ namespace casadi{
       \date 2014
       
   */
-  class PsdIndefDpleSolver : public DpleSolver {
+  class CASADI_SLICOT_INTERFACE_EXPORT PsdIndefDpleSolver : public DpleSolver {
   public:
     /// Default constructor
     PsdIndefDpleSolver();

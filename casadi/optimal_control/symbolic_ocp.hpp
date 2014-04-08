@@ -24,6 +24,7 @@
 #define SYMBOLIC_OCP_HPP
 
 #include "variable.hpp"
+#include <casadi/optimal_control/casadi_optimal_control_export.h>
 
 namespace casadi{
   
@@ -81,7 +82,7 @@ namespace casadi{
       \date 2012
       \author Joel Andersson
   */
-  class SymbolicOCP : public PrintableObject{
+  class CASADI_OPTIMAL_CONTROL_EXPORT SymbolicOCP : public PrintableObject{
   public:
 
     /// Default constructor

@@ -169,7 +169,7 @@ class SDPSolverInternal;
   \author Joel Andersson 
   \date 2010
 */
-class SDPSolver : public Function{
+class CASADI_EXPORT SDPSolver : public Function{
   public:
 
   /// Default constructor

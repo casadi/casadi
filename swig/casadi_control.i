@@ -26,6 +26,8 @@
 
 %import "casadi_main.i"
 
+#define CASADI_CONTROL_EXPORT
+
 %{
 #include "casadi/control/dple_solver.hpp"
 #include "casadi/control/simple_indef_dple_solver.hpp"

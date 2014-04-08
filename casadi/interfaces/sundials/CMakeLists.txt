@@ -13,18 +13,8 @@ set(SUNDIALS_INTERFACE_SRCS
   idas_internal.hpp      idas_internal.cpp      idas_integrator.hpp      idas_integrator.cpp
   kinsol_internal.hpp    kinsol_internal.cpp    kinsol_solver.hpp        kinsol_solver.cpp)
 
-if(ENABLE_STATIC)
-add_library(casadi_sundials_interface STATIC ${SUNDIALS_INTERFACE_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_sundials_interface SHARED ${SUNDIALS_INTERFACE_SRCS})
-endif()
-target_link_libraries(casadi_sundials_interface casadi ${SUNDIALS_LIBRARIES})
-set(CASADI_MODULES ${CASADI_MODULES} casadi_sundials_interface PARENT_SCOPE)
-
-install(TARGETS casadi_sundials_interface
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_sundials_interface ${SUNDIALS_INTERFACE_SRCS})
+target_link_libraries(casadi_sundials_interface ${SUNDIALS_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/sundials

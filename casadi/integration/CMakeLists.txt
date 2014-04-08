@@ -24,17 +24,7 @@ set(INTEGRATION_SRCS
   integration_tools.hpp
 )
 
-if(ENABLE_STATIC)
-add_library(casadi_integration STATIC ${INTEGRATION_SRCS})
-endif()
-if(ENABLE_SHARED)
-add_library(casadi_integration SHARED ${INTEGRATION_SRCS})
-endif()
-target_link_libraries(casadi_integration casadi)
-set(CASADI_MODULES ${CASADI_MODULES} casadi_integration PARENT_SCOPE)
-install(TARGETS casadi_integration
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+casadi_library(casadi_integration ${INTEGRATION_SRCS})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/integration

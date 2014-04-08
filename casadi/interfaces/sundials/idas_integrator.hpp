@@ -44,7 +44,7 @@ class IdasInternal;
    \author Joel Andersson
    \date 2010
 */
-class IdasIntegrator : public SundialsIntegrator{
+class CASADI_SUNDIALS_INTERFACE_EXPORT IdasIntegrator : public SundialsIntegrator{
 public:
 
   /// Default constructor

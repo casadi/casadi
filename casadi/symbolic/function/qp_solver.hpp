@@ -109,7 +109,7 @@ namespace casadi{
       \author Joel Andersson 
       \date 2010
   */
-  class QPSolver : public Function{
+  class CASADI_EXPORT QPSolver : public Function{
   public:
 
     /// Default constructor
