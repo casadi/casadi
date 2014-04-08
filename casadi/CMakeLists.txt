@@ -1,3 +1,4 @@
+
 macro(casadi_library name)
 if(ENABLE_STATIC)
 add_library(${name} STATIC ${ARGN})
