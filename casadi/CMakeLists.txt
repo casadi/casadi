@@ -6,4 +6,4 @@ add_subdirectory(integration)
 add_subdirectory(optimal_control)        # needs integration, external_packages
 add_subdirectory(control)
 
-set (CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)
+set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)

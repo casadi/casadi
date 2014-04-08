@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-SET(OPTIMAL_CONTROL
+set(OPTIMAL_CONTROL
   variable.hpp                   variable.cpp
   symbolic_ocp.hpp               symbolic_ocp.cpp
   xml_node.hpp                   xml_node.cpp
@@ -11,23 +11,22 @@ SET(OPTIMAL_CONTROL
 
 if(ENABLE_STATIC)
 add_library(casadi_optimal_control STATIC ${OPTIMAL_CONTROL})
-endif(ENABLE_STATIC)
+endif()
 if(ENABLE_SHARED)
 add_library(casadi_optimal_control SHARED ${OPTIMAL_CONTROL})
-endif(ENABLE_SHARED)
+endif()
 target_link_libraries(casadi_optimal_control
   casadi
   casadi_integration
-  ${TINYXML_LIBRARIES}
-)
+  ${TINYXML_LIBRARIES})
+
 set(CASADI_MODULES ${CASADI_MODULES} casadi_optimal_control PARENT_SCOPE)
 
 install(TARGETS casadi_optimal_control
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-install(DIRECTORY ./ 
-   DESTINATION include/casadi/optimal_control
-   FILES_MATCHING PATTERN "*.hpp"
-   PATTERN ".svn" EXCLUDE
-)
+  ARCHIVE DESTINATION lib)
+
+install(DIRECTORY ./
+  DESTINATION include/casadi/optimal_control
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE)

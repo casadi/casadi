@@ -5,24 +5,22 @@ set(DSDP_INTERFACE_SRCS
   dsdp_internal.hpp
   dsdp_internal.cpp
   dsdp_solver.hpp
-  dsdp_solver.cpp
-)
+  dsdp_solver.cpp)
 
 if(ENABLE_STATIC)
 add_library(casadi_dsdp_interface STATIC ${DSDP_INTERFACE_SRCS})
-endif(ENABLE_STATIC)
+endif()
 if(ENABLE_SHARED)
 add_library(casadi_dsdp_interface SHARED ${DSDP_INTERFACE_SRCS})
-endif(ENABLE_SHARED)
+endif()
 target_link_libraries(casadi_dsdp_interface casadi ${DSDP_LIBRARIES})
 
 set(CASADI_MODULES ${CASADI_MODULES} casadi_dsdp_interface PARENT_SCOPE)
 install(TARGETS casadi_dsdp_interface
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-install(DIRECTORY ./ 
-   DESTINATION include/casadi/interfaces/dsdp
-   FILES_MATCHING PATTERN "*.hpp"
-   PATTERN ".svn" EXCLUDE
-)
+  ARCHIVE DESTINATION lib)
+
+install(DIRECTORY ./
+  DESTINATION include/casadi/interfaces/dsdp
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE)

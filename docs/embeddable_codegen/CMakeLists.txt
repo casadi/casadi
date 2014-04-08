@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(casadi-standalone-example CXX)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../../cmake_modules)
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
 find_package(CASADI REQUIRED)
 include_directories(${CASADI_INCLUDE_DIR})
@@ -14,7 +14,7 @@ find_package(OpenCL)
 if(OPENCL_FOUND)
   add_definitions(-DWITH_OPENCL)
   set(CASADI_DEPENDENCIES ${CASADI_DEPENDENCIES} ${OPENCL_LIBRARIES})
-endif(OPENCL_FOUND)
+endif()
 
 add_executable(embedding_part1 embedding_part1.cpp)
 target_link_libraries(embedding_part1 ${CASADI_LIBRARIES} ${CASADI_DEPENDENCIES})

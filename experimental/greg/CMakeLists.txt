@@ -1,13 +1,13 @@
 find_package(SNOPT QUIET)
 
-IF (SNOPT_FOUND)
+if(SNOPT_FOUND)
 add_subdirectory(snopt)
-ENDIF (SNOPT_FOUND)
+endif()
 
 find_package(MATLAB QUIET)
-IF (MATLAB_FOUND)
+if(MATLAB_FOUND)
 add_subdirectory(matlab)
-ENDIF (MATLAB_FOUND)
+endif()
 
 add_subdirectory(cppocp)
 add_subdirectory(examples)

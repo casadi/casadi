@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-SET(NONLINEAR_PROGRAMMING_SRCS
+set(NONLINEAR_PROGRAMMING_SRCS
   symbolic_nlp.hpp         symbolic_nlp.cpp
   sqp_method.hpp          sqp_method.cpp          sqp_internal.hpp          sqp_internal.cpp
   stabilized_sqp_method.hpp          stabilized_sqp_method.cpp          stabilized_sqp_internal.hpp          stabilized_sqp_internal.cpp
@@ -12,24 +12,22 @@ SET(NONLINEAR_PROGRAMMING_SRCS
 
 if(ENABLE_STATIC)
 add_library(casadi_nonlinear_programming STATIC ${NONLINEAR_PROGRAMMING_SRCS})
-endif(ENABLE_STATIC)
+endif()
 if(ENABLE_SHARED)
 add_library(casadi_nonlinear_programming SHARED ${NONLINEAR_PROGRAMMING_SRCS})
-endif(ENABLE_SHARED)
+endif()
 target_link_libraries(casadi_nonlinear_programming casadi)
 if(WITH_CSPARSE)
   target_link_libraries(casadi_nonlinear_programming casadi_csparse_interface)
-endif(WITH_CSPARSE)
+endif()
 
 set(CASADI_MODULES ${CASADI_MODULES} casadi_nonlinear_programming PARENT_SCOPE)
 
 install(TARGETS casadi_nonlinear_programming
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-install(DIRECTORY ./ 
-   DESTINATION include/casadi/nonlinear_programming
-   FILES_MATCHING PATTERN "*.hpp"
-   PATTERN ".svn" EXCLUDE
-)
+  ARCHIVE DESTINATION lib)
 
+install(DIRECTORY ./
+  DESTINATION include/casadi/nonlinear_programming
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE)

@@ -19,11 +19,12 @@ OUTPUT_STRIP_TRAILING_WHITESPACE
 ERROR_QUIET
 )
 
-STRING(REPLACE "+-" "+" git_describe "${git_describe}")
-STRING(REPLACE "-g" "." git_describe "${git_describe}")
+string(REPLACE "+-" "+" git_describe "${git_describe}")
+string(REPLACE "-g" "." git_describe "${git_describe}")
 
-#begin workaround for http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
-SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+# begin workaround for
+# http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(language_support)
 workaround_9220(Fortran Fortran_language_works)
 if(Fortran_language_works)
@@ -38,7 +39,8 @@ if(APPLE)
   set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
 endif()
 
-# Enforce cmake2.4+ style behaviour for mixed filename/full path linker directives
+# Enforce cmake2.4+ style behaviour for
+# mixed filename/full path linker directives
 if(COMMAND cmake_policy)
 cmake_policy(SET CMP0003 NEW)
 endif()
@@ -57,7 +59,7 @@ endif()
 
 # We use the FeatureSummary module to get a more readable CMake output
 include(FeatureSummary)
-if (NOT COMMAND add_feature_info)
+if(NOT COMMAND add_feature_info)
   function(add_feature_info _name _enabled _description)
     message(STATUS "Detected: ${_name} ${_description}")
   endfunction()
@@ -66,15 +68,15 @@ if (NOT COMMAND add_feature_info)
 endif()
 
 # Options:
-if (WIN32)
- option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
- option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
- option(WITH_DL "Enable dynamic loading of functions" OFF)
-else (WIN32)
- option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
- option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
- option(WITH_DL "Enable dynamic loading of functions" ON)
-endif (WIN32)
+if(WIN32)
+  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
+  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
+  option(WITH_DL "Enable dynamic loading of functions" OFF)
+else()
+  option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
+  option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
+  option(WITH_DL "Enable dynamic loading of functions" ON)
+endif()
 option(WITH_DOC "Enable documentation generation" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
 # option(WITH_GSL "Compile the GSL interface" ON)
@@ -100,11 +102,11 @@ option(WITH_COVERAGE "Create coverage report" OFF)
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
-else(CMAKE_BUILD_TYPE)
- set(CMAKE_BUILD_TYPE Release)
- #set(CMAKE_BUILD_TYPE Debug)
-endif(CMAKE_BUILD_TYPE)
-string (TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
+else()
+  set(CMAKE_BUILD_TYPE Release)
+  #set(CMAKE_BUILD_TYPE Debug)
+endif()
+string(TOUPPER ${CMAKE_BUILD_TYPE} UPPER_CMAKE_BUILD_TYPE)
 
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
@@ -184,12 +186,11 @@ endif()
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 
 # add compiler warnings
-if(    "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"
-  )
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
+  "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
+  "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-delete-non-virtual-dtor")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # I don't know the MSVC warnings, so do nothing for now
 endif()
 
@@ -200,12 +201,12 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
-endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+endif()
 
 if(WITH_COVERAGE)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
-set(CMAKE_EXE_LINKER_FLAGS  " -lgcov -fprofile-arcs --coverage ${CMAKE_EXE_LINKER_FLAGS}" )
+set(CMAKE_EXE_LINKER_FLAGS  " -lgcov -fprofile-arcs --coverage ${CMAKE_EXE_LINKER_FLAGS}")
 endif()
 
 if(MINGW)
@@ -232,16 +233,16 @@ set(TINYXML_LIBRARIES casadi_tinyxml)
 
 # enabling openmp support if requesed
 if(WITH_OPENMP)
-  find_package (OpenMP)
+  find_package(OpenMP)
   if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DWITH_OPENMP")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -DWITH_OPENMP")
   endif()
 endif()
 
-#SET(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
+#set(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
 # OpenCL
 if(WITH_OPENCL)
@@ -249,7 +250,7 @@ if(WITH_OPENCL)
   find_package(OpenCL REQUIRED)
   add_definitions(-DWITH_OPENCL)
   include_directories(${OPENCL_INCLUDE_DIRS})
-endif(WITH_OPENCL)
+endif()
 add_feature_info(opencl-support WITH_OPENCL "Enable just-in-time compiliation to CPUs and GPUs with OpenCL.")
 
 # Optional auxillary dependencies
@@ -270,17 +271,17 @@ add_feature_info(ipopt-interface IPOPT_FOUND "Interface to the NLP solver Ipopt.
 
 if(WITH_KNITRO)
   find_package(KNITRO)
-endif(WITH_KNITRO)
+endif()
 add_feature_info(knitro-interface KNITRO_FOUND "Interface to the NLP solver KNITRO.")
 
 if(WITH_CPLEX)
   find_package(CPLEX)
-endif(WITH_CPLEX)
+endif()
 add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX.")
 
 if(WITH_SNOPT)
   find_package(SNOPT)
-endif(WITH_SNOPT)
+endif()
 add_feature_info(snopt-interface SNOPT_FOUND "Interface to SNOPT.")
 
 # if(WITH_GSL)
@@ -296,23 +297,23 @@ endif()
 add_feature_info(qpoases-interface QPOASES_FOUND "Interface to the active-set QP solver qpOASES.")
 
 if(WITH_OOQP AND BLAS_FOUND AND HSL_FOUND)
-  find_package (OOQP)
+  find_package(OOQP)
 endif()
 add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP (requires BLAS and HSL libraries).")
 
 if(Fortran_language_works AND WITH_SQIC)
-  find_package (SQIC)
+  find_package(SQIC)
 endif()
 add_feature_info(sqic-interface SQIC_FOUND "Interface to the QP solver SQIC.")
 
 if(Fortran_language_works AND WITH_SLICOT)
-  find_package (SLICOT)
+  find_package(SLICOT)
 endif()
 add_feature_info(slicot-interface SLICOT_FOUND "Interface to the controls library SLICOT.")
 
 
 if(WITH_WORHP AND LIBXML2_FOUND  AND WSMP_FOUND AND METIS_FOUND AND BLAS_FOUND AND LAPACK_FOUND)
-  find_package (WORHP)
+  find_package(WORHP)
 endif()
 add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp (requires LibXml2, wsmp, metis, blas, lapack).")
 
@@ -330,7 +331,7 @@ if(WITH_PROFILING)
     list(APPEND CASADI_DEPENDENCIES ${RT})
   endif()
   add_definitions(-DWITH_PROFILING)
-endif(WITH_PROFILING)
+endif()
 
 add_subdirectory(external_packages)
 add_subdirectory(casadi)
@@ -343,9 +344,9 @@ add_subdirectory(misc)
 find_package(SWIG)
   if(SWIG_FOUND)
     add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
-    add_custom_target(python DEPENDS _python_modules )
-    add_custom_target(haskell DEPENDS _haskell_modules )
-endif(SWIG_FOUND)
+    add_custom_target(python DEPENDS _python_modules)
+    add_custom_target(haskell DEPENDS _haskell_modules)
+endif()
 
 if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
@@ -363,10 +364,10 @@ add_subdirectory(docs/api/examples/ctemplate)
 feature_summary(WHAT ALL)
 feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 
-STRING(REPLACE "\n" "\\n" feature_list "${feature_list}")
+string(REPLACE "\n" "\\n" feature_list "${feature_list}")
 
 # Pass meta information
-CONFIGURE_FILE(
+configure_file(
   ${CMAKE_SOURCE_DIR}/casadi/symbolic/casadi_meta.cpp.cmake
   ${CMAKE_SOURCE_DIR}/casadi/symbolic/casadi_meta.cpp
   ESCAPE_QUOTES

@@ -4,7 +4,7 @@ include_directories(${CMAKE_BINARY_DIR})
 
 add_subdirectory(runtime)
 
-SET(CASADI_SRCS
+set(CASADI_SRCS
   # MISC
   casadi_limits.hpp
   casadi_types.hpp
@@ -22,7 +22,7 @@ SET(CASADI_SRCS
   std_vector_tools.hpp        std_vector_tools.cpp      # Set of useful functions for the vector template class in STL
   profiling.hpp               profiling.cpp
   functor.hpp                 functor.cpp              # Classes for callbacks
-  functor_internal.hpp        functor_internal.cpp     
+  functor_internal.hpp        functor_internal.cpp
   polynomial.hpp              polynomial.cpp            # Helper class for differentiating and integrating simple polynomials
 
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
@@ -41,7 +41,7 @@ SET(CASADI_SRCS
   # Directed, acyclic graph representation with scalar expressions
   sx/sx_element.hpp          sx/sx_element.cpp          # Symbolic expression class (scalar-valued atomics)
   sx/sx_node.hpp             sx/sx_node.cpp             # Base class for all the nodes
-  sx/symbolic_sx.hpp                                    # A symbolic SXElement variable 
+  sx/symbolic_sx.hpp                                    # A symbolic SXElement variable
   sx/constant_sx.hpp                                    # A constant SXElement node
   sx/unary_sx.hpp                                       # A unary operation
   sx/binary_sx.hpp                                      # A binary operation
@@ -76,7 +76,7 @@ SET(CASADI_SRCS
 
   # A dynamically created function with AD capabilities
   function/io_interface.hpp                                   # Input/output interface for Function and FunctionInternal
-  function/io_scheme.hpp           function/io_scheme.cpp           function/io_scheme_internal.hpp           function/io_scheme_internal.cpp 
+  function/io_scheme.hpp           function/io_scheme.cpp           function/io_scheme_internal.hpp           function/io_scheme_internal.cpp
   function/function.hpp                  function/function.cpp                  function/function_internal.hpp                  function/function_internal.cpp
   function/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
   function/sx_function.hpp         function/sx_function.cpp         function/sx_function_internal.hpp         function/sx_function_internal.cpp
@@ -105,39 +105,37 @@ SET(CASADI_SRCS
 
   # User include class with the most essential includes
   casadi.hpp
-  
+
   function/schemes_metadata.hpp function/schemes_metadata.cpp function/schemes_helpers.hpp
-  
+
 )
 
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
 
 if(ENABLE_STATIC)
 add_library(casadi STATIC ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
-endif(ENABLE_STATIC)
+endif()
 if(ENABLE_SHARED)
 add_library(casadi SHARED ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
-endif(ENABLE_SHARED)
+endif()
 
 add_dependencies(casadi casadi_runtime_embedded)
 
 if(WITH_DL)
   # Core needs support for dynamic linking
   target_link_libraries(casadi ${CMAKE_DL_LIBS})
-endif(WITH_DL)
+endif()
 
 if(WITH_OPENCL)
   # Core depends on OpenCL for GPU calculations
   target_link_libraries(casadi ${OPENCL_LIBRARIES})
-endif(WITH_OPENCL)
+endif()
 
 install(TARGETS casadi
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-install(DIRECTORY ./                                                                                                                                                                                          
-   DESTINATION include/casadi/symbolic                                                                                                                                                                          
-   FILES_MATCHING PATTERN "*.hpp"                                                                                                                                                                             
-   PATTERN ".svn" EXCLUDE                                                                                                                                                                                     
-)                                                                                                                                                                                                             
-                 
+  ARCHIVE DESTINATION lib)
+
+install(DIRECTORY ./
+  DESTINATION include/casadi/symbolic
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE)

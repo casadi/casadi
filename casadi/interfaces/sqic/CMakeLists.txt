@@ -16,31 +16,28 @@ set(SQIC_INTERFACE_SRCS
   stabilized_sqic_internal.cpp
   stabilized_sqic_solver.hpp
   stabilized_sqic_solver.cpp
-  ${resource_file}
-)
+  ${resource_file})
 
 if(ENABLE_STATIC)
 add_library(casadi_sqic_interface STATIC ${SQIC_INTERFACE_SRCS})
 add_library(sqic_fortran_c_bridge STATIC wsqic.f90)
-endif(ENABLE_STATIC)
+endif()
 if(ENABLE_SHARED)
 add_library(casadi_sqic_interface SHARED ${SQIC_INTERFACE_SRCS})
 add_library(sqic_fortran_c_bridge SHARED wsqic.f90)
-endif(ENABLE_SHARED)
+endif()
 target_link_libraries(casadi_sqic_interface casadi sqic_fortran_c_bridge ${CMAKE_DL_LIBS})
 target_link_libraries(sqic_fortran_c_bridge casadi ${SQIC_LIBRARIES})
 set(CASADI_MODULES ${CASADI_MODULES} casadi_sqic_interface PARENT_SCOPE)
 install(TARGETS casadi_sqic_interface
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+  ARCHIVE DESTINATION lib)
+
 install(TARGETS sqic_fortran_c_bridge
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-install(DIRECTORY ./ 
-   DESTINATION include/casadi/interfaces/sqic
-   FILES_MATCHING PATTERN "*.hpp"
-   PATTERN ".svn" EXCLUDE
-)
+  ARCHIVE DESTINATION lib)
 
+install(DIRECTORY ./
+  DESTINATION include/casadi/interfaces/sqic
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE)

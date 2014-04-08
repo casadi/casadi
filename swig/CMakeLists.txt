@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required(VERSION 2.6)
 
 # NOTE: you are not allowd to generate header files with configure_file in this module.
 # See https://github.com/casadi/casadi/issues/646
@@ -23,7 +23,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 set(CASADI_SWIG_FLAGS "")
 
 # Include the use swig file
-include (${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
+include(${CMAKE_MODULE_PATH}/UseSWIGMOD.cmake)
 
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})
@@ -47,12 +47,12 @@ endif()
 
 # Find python library and add include path for python headers
 if(PYTHONLIBS_FOUND)
-  include_directories (${PYTHON_INCLUDE_PATH})
+  include_directories(${PYTHON_INCLUDE_PATH})
 endif()
 
 if(NUMPY_FOUND)
-  include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-  include_directories (${NUMPY_INCLUDED_DIRS})
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+  include_directories(${NUMPY_INCLUDED_DIRS})
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_NUMPY")
 endif()
 
@@ -60,8 +60,8 @@ if(WITH_PYTHON_INTERRUPTS)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_PYTHON_INTERRUPTS")
 endif()
 
-include_directories (${CMAKE_CURRENT_SOURCE_DIR}/..)
-link_directories (${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DCASADI_MODULE")
@@ -74,20 +74,20 @@ set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=${CASADI_SWIG_MAIN_MODULE}")
 foreach(my_module ${CASADI_MODULES})
-set_source_files_properties (${my_module}.i  PROPERTIES  CPLUSPLUS ON)
+set_source_files_properties(${my_module}.i  PROPERTIES  CPLUSPLUS ON)
 endforeach()
-set_source_files_properties (${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
+set_source_files_properties(${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
 
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
 
 # PYTHON interface
 foreach(my_module ${CASADI_MODULES})
-SWIG_ADD_MODULE (${my_module} python ${my_module}.i)
+swig_add_module(${my_module} python ${my_module}.i)
 if("${my_module}" STREQUAL "${CASADI_SWIG_MAIN_MODULE}")
-SWIG_LINK_LIBRARIES (${CASADI_SWIG_MAIN_MODULE} ${PYTHON_LIBRARIES} casadi)
+swig_link_libraries(${CASADI_SWIG_MAIN_MODULE} ${PYTHON_LIBRARIES} casadi)
 else()
-SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES} ${my_module})
+swig_link_libraries(${my_module} ${PYTHON_LIBRARIES} ${my_module})
 endif()
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
@@ -109,7 +109,7 @@ foreach(my_module ${CASADI_MODULES})
   set(CASADI_PYTHON_LIBRARY_${my_module} ${SWIG_MODULE_${my_module}_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 endforeach()
 
-# a python library is built in the build directory inside swig/python 
+# a python library is built in the build directory inside swig/python
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 # adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
 
@@ -136,11 +136,11 @@ if(MSVC)
   foreach(my_module ${CASADI_MODULES})
   set(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_${my_module}})
   endforeach()
-else(MSVC)
+else()
   foreach(my_module ${CASADI_MODULES})
   set(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_${my_module}})
   endforeach()
-endif(MSVC)
+endif()
 
 foreach(my_module ${CASADI_MODULES})
 add_custom_command(
@@ -149,18 +149,17 @@ add_custom_command(
   ARGS -E copy ${PYTHONLIBPATH_${my_module}} ${PROJECT_BINARY_DIR}/python/casadi/${CASADI_PYTHON_LIBRARY_${my_module}}
 )
 endforeach()
-  
+
 find_package(PythonInterp)
 
-if(NOT DEFINED PYTHON_PREFIX )
+if(NOT DEFINED PYTHON_PREFIX)
   if(PYTHONINTERP_FOUND)
     #determining the installation path for python libraries
     execute_process(COMMAND "${PYTHON_EXECUTABLE}"
       "${CMAKE_CURRENT_SOURCE_DIR}/python/find_installation_path.py"
       OUTPUT_VARIABLE PYTHON_INSTALLATION_PATH
       RESULT_VARIABLE PYTHON_INSTALLATION_PATH_RESULT
-      ERROR_VARIABLE PYTHON_INSTALLATION_PATH_ERROR
-    )
+      ERROR_VARIABLE PYTHON_INSTALLATION_PATH_ERROR)
   endif()
   if(NOT "${PYTHON_INSTALLATION_PATH_RESULT}" STREQUAL "0")
 message(FATAL_ERROR "Something went wrong detecting your python setup...
@@ -198,7 +197,7 @@ file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi.py"
 endforeach()
 
 #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
-install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
+install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
   DESTINATION ${PYTHON_PREFIX}
   COMPONENT install_python
   USE_SOURCE_PERMISSIONS
@@ -219,10 +218,9 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
   COMPONENT install_python
 )
 foreach(my_module ${CASADI_MODULES})
-  install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py 
+  install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py
     DESTINATION ${PYTHON_PREFIX}/casadi
-    COMPONENT install_python
-  )
+    COMPONENT install_python)
 endforeach()
 
 #creation of a custom installation command
@@ -237,14 +235,14 @@ endforeach()
 
 # haskell interface
 foreach(my_module ${CASADI_MODULES})
-  SWIG_ADD_MODULE_XML (${my_module}_haskell ${my_module}.i)
+  swig_add_module_xml(${my_module}_haskell ${my_module}.i)
 endforeach()
 
 foreach(my_module ${CASADI_MODULES})
-ADD_CUSTOM_COMMAND(
-   OUTPUT ${my_module}_tree.hs 
-   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
-   DEPENDS ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
+add_custom_command(
+  OUTPUT ${my_module}_tree.hs
+  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
+  DEPENDS ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
 )
 endforeach()
 
@@ -256,20 +254,20 @@ install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}_tree.hs ${PROJECT_BINARY_D
 endforeach()
 
 
-#SET(CPACK_MONOLITHIC_INSTALL FALSE)
-SET(CPACK_TGZ_COMPONENT_INSTALL TRUE)
+#set(CPACK_MONOLITHIC_INSTALL FALSE)
+set(CPACK_TGZ_COMPONENT_INSTALL TRUE)
 
 set(CPACK_COMPONENT_COMPONENTHASKELL_DISPLAY_NAME "Haskell headers")
-set(CPACK_COMPONENT_COMPONENTHASKELL_DESCRIPTION 
-   "Necessary headers to install a Haskell interface to CasADi")
-   
+set(CPACK_COMPONENT_COMPONENTHASKELL_DESCRIPTION
+  "Necessary headers to install a Haskell interface to CasADi")
+
 set(CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
 set(CPACK_COMPONENTS_ALL Unspecified componenthaskell)
 # This will not actually work since we are in a EXCLUDE_FROM_ALL
 # http://cmake.3232098.n2.nabble.com/Yet-another-install-vs-exclude-from-all-thread-td4967491.html
 
 # Pass meta information
-CONFIGURE_FILE(
+configure_file(
   ${CMAKE_SOURCE_DIR}/swig/linklist.txt.cmake
   ${PROJECT_BINARY_DIR}/swig/linklist.txt
   ESCAPE_QUOTES
@@ -281,28 +279,28 @@ set(CPACK_PACKAGE_CONTACT "${PACKAGE_MAINTAINER} <contact@casadi.org>")
 set(CPACK_PACKAGE_NAME "libcasadi")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PACKAGE_DESCRIPTION}")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
-SET(CPACK_DEBIAN_PACKAGE_LICENSE "LGPL")
+set(CPACK_DEBIAN_PACKAGE_LICENSE "LGPL")
 
 set(THREE_PART_VERSION_REGEX "[0-9]+\\.[0-9]+\\.[0-9]+")
 
 # Breaks up a string in the form n1.n2.n3 into three parts and stores
 # them in major, minor, and patch.  version should be a value, not a
 # variable, while major, minor and patch should be variables.
-MACRO(THREE_PART_VERSION_TO_VARS version major minor patch)
-  IF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
-    STRING(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+\\+?" "\\1" ${major} "${version}")
-    STRING(REGEX REPLACE "^[0-9]+\\.([0-9])+\\.[0-9]+\\+?" "\\1" ${minor} "${version}")
-    STRING(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+)\\+?" "\\1" ${patch} "${version}")
-  ELSE(${version} MATCHES ${THREE_PART_VERSION_REGEX})
-    MESSAGE("MACRO(THREE_PART_VERSION_TO_VARS ${version} ${major} ${minor} ${patch}")
-    MESSAGE(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")
-  ENDIF(${version} MATCHES ${THREE_PART_VERSION_REGEX})
-ENDMACRO(THREE_PART_VERSION_TO_VARS)
+macro(THREE_PART_VERSION_TO_VARS version major minor patch)
+  if(${version} MATCHES ${THREE_PART_VERSION_REGEX})
+    string(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+\\+?" "\\1" ${major} "${version}")
+    string(REGEX REPLACE "^[0-9]+\\.([0-9])+\\.[0-9]+\\+?" "\\1" ${minor} "${version}")
+    string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+)\\+?" "\\1" ${patch} "${version}")
+  else()
+    message("macro(THREE_PART_VERSION_TO_VARS ${version} ${major} ${minor} ${patch}")
+    message(FATAL_ERROR "Problem parsing version string, I can't parse it properly.")
+  endif()
+endmacro()
 
 THREE_PART_VERSION_TO_VARS(${PACKAGE_VERSION} CPACK_PACKAGE_VERSION_MAJOR CPACK_PACKAGE_VERSION_MINOR CPACK_PACKAGE_VERSION_PATCH)
 
 set(PACKAGE_VERSION_FULL "${git_describe}")
-if ((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
+if((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
   set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
 endif()
 

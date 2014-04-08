@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-SET(INTEGRATION_SRCS
+set(INTEGRATION_SRCS
   fixed_step_integrator.hpp
   fixed_step_integrator.cpp
   fixed_step_integrator_internal.hpp
@@ -26,18 +26,17 @@ SET(INTEGRATION_SRCS
 
 if(ENABLE_STATIC)
 add_library(casadi_integration STATIC ${INTEGRATION_SRCS})
-endif(ENABLE_STATIC)
+endif()
 if(ENABLE_SHARED)
 add_library(casadi_integration SHARED ${INTEGRATION_SRCS})
-endif(ENABLE_SHARED)
+endif()
 target_link_libraries(casadi_integration casadi)
 set(CASADI_MODULES ${CASADI_MODULES} casadi_integration PARENT_SCOPE)
 install(TARGETS casadi_integration
   LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-install(DIRECTORY ./ 
-   DESTINATION include/casadi/integration
-   FILES_MATCHING PATTERN "*.hpp"
-   PATTERN ".svn" EXCLUDE
-)
+  ARCHIVE DESTINATION lib)
+
+install(DIRECTORY ./
+  DESTINATION include/casadi/integration
+  FILES_MATCHING PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE)
