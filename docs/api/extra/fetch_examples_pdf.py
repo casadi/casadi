@@ -23,7 +23,7 @@
 Grabs the pdf-compiled examples and puts them in the API tree.
 """
 
-src = '../examples/'
+src = 'examples/'
 xml = 'XML_internal/index.xml'
 
 import re
