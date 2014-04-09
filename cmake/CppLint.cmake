@@ -23,13 +23,9 @@
 
 find_package(PythonInterp)
 
-# start with no filters
-set(STYLE_FILTER "-,")
+set(STYLE_FILTER)
 
-# add all whitespace filters
-set(STYLE_FILTER ${STYLE_FILTER}+whitespace,)
-
-# disable unwanted or unfixed whitespace filters
+# disable unwanted filters
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/braces,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/semicolon,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/blank_line,)
@@ -41,25 +37,17 @@ set(STYLE_FILTER ${STYLE_FILTER}-whitespace/comments,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/line_length,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/newline,)
 
-# c-style casts
-set(STYLE_FILTER ${STYLE_FILTER}+readability/casting,)
+set(STYLE_FILTER ${STYLE_FILTER}-build/include_order,)
+set(STYLE_FILTER ${STYLE_FILTER}-build/namespaces,)
+set(STYLE_FILTER ${STYLE_FILTER}-build/include_what_you_use,)
 
+#set(STYLE_FILTER ${STYLE_FILTER}-readability/casting,)
+set(STYLE_FILTER ${STYLE_FILTER}-readability/braces,)
+set(STYLE_FILTER ${STYLE_FILTER}-readability/streams,)
 
-# Insists on including evrything in the .cpp file even if it is included in the header.
-#set(STYLE_FILTER ${STYLE_FILTER}-build/include_what_you_use,)
-
-# Too many false positives and not very helpful error messages.
-#set(STYLE_FILTER ${STYLE_FILTER}-build/include_order,)
-
-# No thanks.
-#set(STYLE_FILTER ${STYLE_FILTER}-readability/streams,)
-
-# Don't tell me how to name my variables.
-#set(STYLE_FILTER ${STYLE_FILTER}-runtime/arrays,)
-
-# Why?
-#set(STYLE_FILTER ${STYLE_FILTER}-whitespace/todo,)
-#set(STYLE_FILTER ${STYLE_FILTER}-readability/todo,)
+set(STYLE_FILTER ${STYLE_FILTER}-runtime/references,)
+set(STYLE_FILTER ${STYLE_FILTER}-runtime/int,)
+set(STYLE_FILTER ${STYLE_FILTER}-runtime/explicit,)
 
 
 # Add a target that runs cpplint.py
