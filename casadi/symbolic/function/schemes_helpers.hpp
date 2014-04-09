@@ -1867,6 +1867,6 @@ std::vector<M> stabilizedQpIn(const std::vector<M>& args,const std::string &arg_
   return ret;
 
 }
-} // namespace casadi
+}
 #endif //SCHEMES_HELPERS_HPP
 

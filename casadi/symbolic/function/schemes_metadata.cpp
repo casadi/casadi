@@ -1512,5 +1512,5 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   }
   casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme) <<  "' has no entry named '" << name <<  "'. Available entries are: " << getSchemeEntryNames(scheme) << ".");
 }
-} // namespace casadi
+}
 
