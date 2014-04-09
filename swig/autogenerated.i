@@ -52,9 +52,9 @@ def dpleIn(*dummy,**kwargs):
   Helper function for 'DPLEInput'
 
   Two use cases:
-     a) arg = dpleIn(a=my_a, v=my_v) 
+     a) arg = dpleIn(a=my_a, v=my_v)
           all arguments optional
-     b) a, v = dpleIn(arg,"a", "v") 
+     b) a, v = dpleIn(arg,"a", "v")
           all arguments after the first optional
   Input arguments of a dple solver
   
@@ -98,9 +98,9 @@ def dpleOut(*dummy,**kwargs):
   Helper function for 'DPLEOutput'
 
   Two use cases:
-     a) arg = dpleOut(p=my_p) 
+     a) arg = dpleOut(p=my_p)
           all arguments optional
-     b) p = dpleOut(arg,"p") 
+     b) p = dpleOut(arg,"p")
           all arguments after the first optional
   Output arguments of a dple solver
   
@@ -140,9 +140,9 @@ def controldaeIn(*dummy,**kwargs):
   Helper function for 'ControlledDAEInput'
 
   Two use cases:
-     a) arg = controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf) 
+     a) arg = controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf)
           all arguments optional
-     b) t, x, z, p, u, u_interp, x_major, t0, tf = controldaeIn(arg,"t", "x", "z", "p", "u", "u_interp", "x_major", "t0", "tf") 
+     b) t, x, z, p, u, u_interp, x_major, t0, tf = controldaeIn(arg,"t", "x", "z", "p", "u", "u_interp", "x_major", "t0", "tf")
           all arguments after the first optional
   Input arguments of an ODE/DAE function
   
@@ -214,9 +214,9 @@ def controlsimulatorIn(*dummy,**kwargs):
   Helper function for 'ControlSimulatorInput'
 
   Two use cases:
-     a) arg = controlsimulatorIn(x0=my_x0, p=my_p, u=my_u) 
+     a) arg = controlsimulatorIn(x0=my_x0, p=my_p, u=my_u)
           all arguments optional
-     b) x0, p, u = controlsimulatorIn(arg,"x0", "p", "u") 
+     b) x0, p, u = controlsimulatorIn(arg,"x0", "p", "u")
           all arguments after the first optional
   Input arguments of a control simulator
   
@@ -264,9 +264,9 @@ def hnlpIn(*dummy,**kwargs):
   Helper function for 'HNLPInput'
 
   Two use cases:
-     a) arg = hnlpIn(x=my_x, p=my_p, tau=my_tau) 
+     a) arg = hnlpIn(x=my_x, p=my_p, tau=my_tau)
           all arguments optional
-     b) x, p, tau = hnlpIn(arg,"x", "p", "tau") 
+     b) x, p, tau = hnlpIn(arg,"x", "p", "tau")
           all arguments after the first optional
   Input arguments of an Homotopy NLP function
   
@@ -314,9 +314,9 @@ def daeIn(*dummy,**kwargs):
   Helper function for 'DAEInput'
 
   Two use cases:
-     a) arg = daeIn(x=my_x, z=my_z, p=my_p, t=my_t) 
+     a) arg = daeIn(x=my_x, z=my_z, p=my_p, t=my_t)
           all arguments optional
-     b) x, z, p, t = daeIn(arg,"x", "z", "p", "t") 
+     b) x, z, p, t = daeIn(arg,"x", "z", "p", "t")
           all arguments after the first optional
   Input arguments of an ODE/DAE function
   
@@ -368,9 +368,9 @@ def daeOut(*dummy,**kwargs):
   Helper function for 'DAEOutput'
 
   Two use cases:
-     a) arg = daeOut(ode=my_ode, alg=my_alg, quad=my_quad) 
+     a) arg = daeOut(ode=my_ode, alg=my_alg, quad=my_quad)
           all arguments optional
-     b) ode, alg, quad = daeOut(arg,"ode", "alg", "quad") 
+     b) ode, alg, quad = daeOut(arg,"ode", "alg", "quad")
           all arguments after the first optional
   Output arguments of an DAE function
   
@@ -418,9 +418,9 @@ def rdaeIn(*dummy,**kwargs):
   Helper function for 'RDAEInput'
 
   Two use cases:
-     a) arg = rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t) 
+     a) arg = rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t)
           all arguments optional
-     b) rx, rz, rp, x, z, p, t = rdaeIn(arg,"rx", "rz", "rp", "x", "z", "p", "t") 
+     b) rx, rz, rp, x, z, p, t = rdaeIn(arg,"rx", "rz", "rp", "x", "z", "p", "t")
           all arguments after the first optional
   Input arguments of an ODE/DAE backward integration function
   
@@ -484,9 +484,9 @@ def rdaeOut(*dummy,**kwargs):
   Helper function for 'RDAEOutput'
 
   Two use cases:
-     a) arg = rdaeOut(ode=my_ode, alg=my_alg, quad=my_quad) 
+     a) arg = rdaeOut(ode=my_ode, alg=my_alg, quad=my_quad)
           all arguments optional
-     b) ode, alg, quad = rdaeOut(arg,"ode", "alg", "quad") 
+     b) ode, alg, quad = rdaeOut(arg,"ode", "alg", "quad")
           all arguments after the first optional
   Output arguments of an ODE/DAE backward integration function
   
@@ -534,9 +534,9 @@ def integratorIn(*dummy,**kwargs):
   Helper function for 'IntegratorInput'
 
   Two use cases:
-     a) arg = integratorIn(x0=my_x0, p=my_p, z0=my_z0, rx0=my_rx0, rp=my_rp, rz0=my_rz0) 
+     a) arg = integratorIn(x0=my_x0, p=my_p, z0=my_z0, rx0=my_rx0, rp=my_rp, rz0=my_rz0)
           all arguments optional
-     b) x0, p, z0, rx0, rp, rz0 = integratorIn(arg,"x0", "p", "z0", "rx0", "rp", "rz0") 
+     b) x0, p, z0, rx0, rp, rz0 = integratorIn(arg,"x0", "p", "z0", "rx0", "rp", "rz0")
           all arguments after the first optional
   Input arguments of an integrator
   
@@ -596,9 +596,9 @@ def integratorOut(*dummy,**kwargs):
   Helper function for 'IntegratorOutput'
 
   Two use cases:
-     a) arg = integratorOut(xf=my_xf, qf=my_qf, zf=my_zf, rxf=my_rxf, rqf=my_rqf, rzf=my_rzf) 
+     a) arg = integratorOut(xf=my_xf, qf=my_qf, zf=my_zf, rxf=my_rxf, rqf=my_rqf, rzf=my_rzf)
           all arguments optional
-     b) xf, qf, zf, rxf, rqf, rzf = integratorOut(arg,"xf", "qf", "zf", "rxf", "rqf", "rzf") 
+     b) xf, qf, zf, rxf, rqf, rzf = integratorOut(arg,"xf", "qf", "zf", "rxf", "rqf", "rzf")
           all arguments after the first optional
   Output arguments of an integrator
   
@@ -658,9 +658,9 @@ def linsolIn(*dummy,**kwargs):
   Helper function for 'LinsolInput'
 
   Two use cases:
-     a) arg = linsolIn(A=my_A, B=my_B) 
+     a) arg = linsolIn(A=my_A, B=my_B)
           all arguments optional
-     b) A, B = linsolIn(arg,"A", "B") 
+     b) A, B = linsolIn(arg,"A", "B")
           all arguments after the first optional
   Input arguments of a linear solver
   
@@ -704,9 +704,9 @@ def linsolOut(*dummy,**kwargs):
   Helper function for 'LinsolOutput'
 
   Two use cases:
-     a) arg = linsolOut(X=my_X) 
+     a) arg = linsolOut(X=my_X)
           all arguments optional
-     b) X = linsolOut(arg,"X") 
+     b) X = linsolOut(arg,"X")
           all arguments after the first optional
   Output arguments of a linear solver
   
@@ -746,9 +746,9 @@ def lpIn(*dummy,**kwargs):
   Helper function for 'LPSolverInput'
 
   Two use cases:
-     a) arg = lpIn(c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
+     a) arg = lpIn(c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
           all arguments optional
-     b) c, a, lba, uba, lbx, ubx = lpIn(arg,"c", "a", "lba", "uba", "lbx", "ubx") 
+     b) c, a, lba, uba, lbx, ubx = lpIn(arg,"c", "a", "lba", "uba", "lbx", "ubx")
           all arguments after the first optional
   Input arguments of a LP problem
   
@@ -808,9 +808,9 @@ def lpOut(*dummy,**kwargs):
   Helper function for 'LPSolverOutput'
 
   Two use cases:
-     a) arg = lpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+     a) arg = lpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
           all arguments optional
-     b) x, cost, lam_a, lam_x = lpOut(arg,"x", "cost", "lam_a", "lam_x") 
+     b) x, cost, lam_a, lam_x = lpOut(arg,"x", "cost", "lam_a", "lam_x")
           all arguments after the first optional
   Output arguments of an LP Solver
   
@@ -862,9 +862,9 @@ def lpStruct(*dummy,**kwargs):
   Helper function for 'LPStruct'
 
   Two use cases:
-     a) arg = lpStruct(a=my_a) 
+     a) arg = lpStruct(a=my_a)
           all arguments optional
-     b) a = lpStruct(arg,"a") 
+     b) a = lpStruct(arg,"a")
           all arguments after the first optional
   Structure specification of an LP
   
@@ -897,9 +897,9 @@ def nlpIn(*dummy,**kwargs):
   Helper function for 'NLPInput'
 
   Two use cases:
-     a) arg = nlpIn(x=my_x, p=my_p) 
+     a) arg = nlpIn(x=my_x, p=my_p)
           all arguments optional
-     b) x, p = nlpIn(arg,"x", "p") 
+     b) x, p = nlpIn(arg,"x", "p")
           all arguments after the first optional
   Input arguments of an NLP function
   
@@ -943,9 +943,9 @@ def nlpOut(*dummy,**kwargs):
   Helper function for 'NLPOutput'
 
   Two use cases:
-     a) arg = nlpOut(f=my_f, g=my_g) 
+     a) arg = nlpOut(f=my_f, g=my_g)
           all arguments optional
-     b) f, g = nlpOut(arg,"f", "g") 
+     b) f, g = nlpOut(arg,"f", "g")
           all arguments after the first optional
   Output arguments of an NLP function
   
@@ -989,9 +989,9 @@ def gradFIn(*dummy,**kwargs):
   Helper function for 'GradFInput'
 
   Two use cases:
-     a) arg = gradFIn(x=my_x, p=my_p) 
+     a) arg = gradFIn(x=my_x, p=my_p)
           all arguments optional
-     b) x, p = gradFIn(arg,"x", "p") 
+     b) x, p = gradFIn(arg,"x", "p")
           all arguments after the first optional
   Input arguments of an NLP objective gradient function
   
@@ -1035,9 +1035,9 @@ def gradFOut(*dummy,**kwargs):
   Helper function for 'GradFOutput'
 
   Two use cases:
-     a) arg = gradFOut(grad=my_grad, f=my_f, g=my_g) 
+     a) arg = gradFOut(grad=my_grad, f=my_f, g=my_g)
           all arguments optional
-     b) grad, f, g = gradFOut(arg,"grad", "f", "g") 
+     b) grad, f, g = gradFOut(arg,"grad", "f", "g")
           all arguments after the first optional
   Output arguments of an NLP objective gradient function
   
@@ -1085,9 +1085,9 @@ def jacGIn(*dummy,**kwargs):
   Helper function for 'JacGInput'
 
   Two use cases:
-     a) arg = jacGIn(x=my_x, p=my_p) 
+     a) arg = jacGIn(x=my_x, p=my_p)
           all arguments optional
-     b) x, p = jacGIn(arg,"x", "p") 
+     b) x, p = jacGIn(arg,"x", "p")
           all arguments after the first optional
   Input arguments of an NLP Jacobian function
   
@@ -1131,9 +1131,9 @@ def jacGOut(*dummy,**kwargs):
   Helper function for 'JacGOutput'
 
   Two use cases:
-     a) arg = jacGOut(jac=my_jac, f=my_f, g=my_g) 
+     a) arg = jacGOut(jac=my_jac, f=my_f, g=my_g)
           all arguments optional
-     b) jac, f, g = jacGOut(arg,"jac", "f", "g") 
+     b) jac, f, g = jacGOut(arg,"jac", "f", "g")
           all arguments after the first optional
   Output arguments of an NLP Jacobian function
   
@@ -1181,9 +1181,9 @@ def hessLagIn(*dummy,**kwargs):
   Helper function for 'HessLagInput'
 
   Two use cases:
-     a) arg = hessLagIn(x=my_x, p=my_p, lam_f=my_lam_f, lam_g=my_lam_g) 
+     a) arg = hessLagIn(x=my_x, p=my_p, lam_f=my_lam_f, lam_g=my_lam_g)
           all arguments optional
-     b) x, p, lam_f, lam_g = hessLagIn(arg,"x", "p", "lam_f", "lam_g") 
+     b) x, p, lam_f, lam_g = hessLagIn(arg,"x", "p", "lam_f", "lam_g")
           all arguments after the first optional
   Input arguments of an NLP Hessian function
   
@@ -1235,9 +1235,9 @@ def hessLagOut(*dummy,**kwargs):
   Helper function for 'HessLagOutput'
 
   Two use cases:
-     a) arg = hessLagOut(hess=my_hess, f=my_f, g=my_g, grad_x=my_grad_x, grad_p=my_grad_p) 
+     a) arg = hessLagOut(hess=my_hess, f=my_f, g=my_g, grad_x=my_grad_x, grad_p=my_grad_p)
           all arguments optional
-     b) hess, f, g, grad_x, grad_p = hessLagOut(arg,"hess", "f", "g", "grad_x", "grad_p") 
+     b) hess, f, g, grad_x, grad_p = hessLagOut(arg,"hess", "f", "g", "grad_x", "grad_p")
           all arguments after the first optional
   Output arguments of an NLP Hessian function
   
@@ -1293,9 +1293,9 @@ def nlpSolverIn(*dummy,**kwargs):
   Helper function for 'NLPSolverInput'
 
   Two use cases:
-     a) arg = nlpSolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0) 
+     a) arg = nlpSolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0)
           all arguments optional
-     b) x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0 = nlpSolverIn(arg,"x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0") 
+     b) x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0 = nlpSolverIn(arg,"x0", "p", "lbx", "ubx", "lbg", "ubg", "lam_x0", "lam_g0")
           all arguments after the first optional
   Input arguments of an NLP Solver
   
@@ -1363,9 +1363,9 @@ def nlpSolverOut(*dummy,**kwargs):
   Helper function for 'NLPSolverOutput'
 
   Two use cases:
-     a) arg = nlpSolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p) 
+     a) arg = nlpSolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p)
           all arguments optional
-     b) x, f, g, lam_x, lam_g, lam_p = nlpSolverOut(arg,"x", "f", "g", "lam_x", "lam_g", "lam_p") 
+     b) x, f, g, lam_x, lam_g, lam_p = nlpSolverOut(arg,"x", "f", "g", "lam_x", "lam_g", "lam_p")
           all arguments after the first optional
   Output arguments of an NLP Solver
   
@@ -1425,9 +1425,9 @@ def mayerIn(*dummy,**kwargs):
   Helper function for 'MayerInput'
 
   Two use cases:
-     a) arg = mayerIn(x=my_x, p=my_p) 
+     a) arg = mayerIn(x=my_x, p=my_p)
           all arguments optional
-     b) x, p = mayerIn(arg,"x", "p") 
+     b) x, p = mayerIn(arg,"x", "p")
           all arguments after the first optional
   Input arguments of a Mayer Term
   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size()
@@ -1473,9 +1473,9 @@ def ocpIn(*dummy,**kwargs):
   Helper function for 'OCPInput'
 
   Two use cases:
-     a) arg = ocpIn(lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg) 
+     a) arg = ocpIn(lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg)
           all arguments optional
-     b) lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg = ocpIn(arg,"lbx", "ubx", "x_init", "lbu", "ubu", "u_init", "lbp", "ubp", "p_init", "lbh", "ubh", "lbg", "ubg") 
+     b) lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg = ocpIn(arg,"lbx", "ubx", "x_init", "lbu", "ubu", "u_init", "lbp", "ubp", "p_init", "lbh", "ubh", "lbg", "ubg")
           all arguments after the first optional
   Input arguments of an OCP Solver
   ns: Number of shooting nodes: from option number_of_grid_points
@@ -1569,9 +1569,9 @@ def ocpOut(*dummy,**kwargs):
   Helper function for 'OCPOutput'
 
   Two use cases:
-     a) arg = ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost) 
+     a) arg = ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost)
           all arguments optional
-     b) x_opt, u_opt, p_opt, cost = ocpOut(arg,"x_opt", "u_opt", "p_opt", "cost") 
+     b) x_opt, u_opt, p_opt, cost = ocpOut(arg,"x_opt", "u_opt", "p_opt", "cost")
           all arguments after the first optional
   Output arguments of an OCP Solver
   
@@ -1623,9 +1623,9 @@ def qcqpIn(*dummy,**kwargs):
   Helper function for 'QCQPSolverInput'
 
   Two use cases:
-     a) arg = qcqpIn(h=my_h, g=my_g, p=my_p, q=my_q, r=my_r, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0) 
+     a) arg = qcqpIn(h=my_h, g=my_g, p=my_p, q=my_q, r=my_r, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
           all arguments optional
-     b) h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0 = qcqpIn(arg,"h", "g", "p", "q", "r", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0") 
+     b) h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0 = qcqpIn(arg,"h", "g", "p", "q", "r", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0")
           all arguments after the first optional
   Input arguments of a QP problem
   
@@ -1709,9 +1709,9 @@ def qcqpOut(*dummy,**kwargs):
   Helper function for 'QCQPSolverOutput'
 
   Two use cases:
-     a) arg = qcqpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+     a) arg = qcqpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
           all arguments optional
-     b) x, cost, lam_a, lam_x = qcqpOut(arg,"x", "cost", "lam_a", "lam_x") 
+     b) x, cost, lam_a, lam_x = qcqpOut(arg,"x", "cost", "lam_a", "lam_x")
           all arguments after the first optional
   Output arguments of an QP Solver
   
@@ -1763,9 +1763,9 @@ def qcqpStruct(*dummy,**kwargs):
   Helper function for 'QCQPStruct'
 
   Two use cases:
-     a) arg = qcqpStruct(h=my_h, p=my_p, a=my_a) 
+     a) arg = qcqpStruct(h=my_h, p=my_p, a=my_a)
           all arguments optional
-     b) h, p, a = qcqpStruct(arg,"h", "p", "a") 
+     b) h, p, a = qcqpStruct(arg,"h", "p", "a")
           all arguments after the first optional
   Structure specification of a QP
   
@@ -1806,9 +1806,9 @@ def qpIn(*dummy,**kwargs):
   Helper function for 'QPSolverInput'
 
   Two use cases:
-     a) arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0) 
+     a) arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
           all arguments optional
-     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0 = qpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0") 
+     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0 = qpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0")
           all arguments after the first optional
   Input arguments of a QP problem
   
@@ -1880,9 +1880,9 @@ def qpOut(*dummy,**kwargs):
   Helper function for 'QPSolverOutput'
 
   Two use cases:
-     a) arg = qpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+     a) arg = qpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
           all arguments optional
-     b) x, cost, lam_a, lam_x = qpOut(arg,"x", "cost", "lam_a", "lam_x") 
+     b) x, cost, lam_a, lam_x = qpOut(arg,"x", "cost", "lam_a", "lam_x")
           all arguments after the first optional
   Output arguments of an QP Solver
   
@@ -1934,9 +1934,9 @@ def qpStruct(*dummy,**kwargs):
   Helper function for 'QPStruct'
 
   Two use cases:
-     a) arg = qpStruct(h=my_h, a=my_a) 
+     a) arg = qpStruct(h=my_h, a=my_a)
           all arguments optional
-     b) h, a = qpStruct(arg,"h", "a") 
+     b) h, a = qpStruct(arg,"h", "a")
           all arguments after the first optional
   Structure specification of a QP
   
@@ -1973,9 +1973,9 @@ def sdpIn(*dummy,**kwargs):
   Helper function for 'SDPInput'
 
   Two use cases:
-     a) arg = sdpIn(f=my_f, c=my_c, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
+     a) arg = sdpIn(f=my_f, c=my_c, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
           all arguments optional
-     b) f, c, g, a, lba, uba, lbx, ubx = sdpIn(arg,"f", "c", "g", "a", "lba", "uba", "lbx", "ubx") 
+     b) f, c, g, a, lba, uba, lbx, ubx = sdpIn(arg,"f", "c", "g", "a", "lba", "uba", "lbx", "ubx")
           all arguments after the first optional
   Input arguments of a SDP problem
   
@@ -2043,9 +2043,9 @@ def sdpOut(*dummy,**kwargs):
   Helper function for 'SDPOutput'
 
   Two use cases:
-     a) arg = sdpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+     a) arg = sdpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
           all arguments optional
-     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x") 
+     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x")
           all arguments after the first optional
   Output arguments of an SDP Solver
   
@@ -2109,9 +2109,9 @@ def sdpStruct(*dummy,**kwargs):
   Helper function for 'SDPStruct'
 
   Two use cases:
-     a) arg = sdpStruct(f=my_f, g=my_g, a=my_a) 
+     a) arg = sdpStruct(f=my_f, g=my_g, a=my_a)
           all arguments optional
-     b) f, g, a = sdpStruct(arg,"f", "g", "a") 
+     b) f, g, a = sdpStruct(arg,"f", "g", "a")
           all arguments after the first optional
   Structure specification of an SDP
   
@@ -2152,9 +2152,9 @@ def sdqpIn(*dummy,**kwargs):
   Helper function for 'SDQPInput'
 
   Two use cases:
-     a) arg = sdqpIn(h=my_h, c=my_c, f=my_f, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
+     a) arg = sdqpIn(h=my_h, c=my_c, f=my_f, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
           all arguments optional
-     b) h, c, f, g, a, lba, uba, lbx, ubx = sdqpIn(arg,"h", "c", "f", "g", "a", "lba", "uba", "lbx", "ubx") 
+     b) h, c, f, g, a, lba, uba, lbx, ubx = sdqpIn(arg,"h", "c", "f", "g", "a", "lba", "uba", "lbx", "ubx")
           all arguments after the first optional
   Input arguments of a SDQP problem
   
@@ -2226,9 +2226,9 @@ def sdqpOut(*dummy,**kwargs):
   Helper function for 'SDQPOutput'
 
   Two use cases:
-     a) arg = sdqpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+     a) arg = sdqpOut(x=my_x, p=my_p, dual=my_dual, cost=my_cost, dual_cost=my_dual_cost, lam_a=my_lam_a, lam_x=my_lam_x)
           all arguments optional
-     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdqpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x") 
+     b) x, p, dual, cost, dual_cost, lam_a, lam_x = sdqpOut(arg,"x", "p", "dual", "cost", "dual_cost", "lam_a", "lam_x")
           all arguments after the first optional
   Output arguments of an SDQP Solver
   
@@ -2292,9 +2292,9 @@ def sdqpStruct(*dummy,**kwargs):
   Helper function for 'SDQPStruct'
 
   Two use cases:
-     a) arg = sdqpStruct(h=my_h, f=my_f, g=my_g, a=my_a) 
+     a) arg = sdqpStruct(h=my_h, f=my_f, g=my_g, a=my_a)
           all arguments optional
-     b) h, f, g, a = sdqpStruct(arg,"h", "f", "g", "a") 
+     b) h, f, g, a = sdqpStruct(arg,"h", "f", "g", "a")
           all arguments after the first optional
   Structure specification of an SDQP
   
@@ -2339,9 +2339,9 @@ def socpIn(*dummy,**kwargs):
   Helper function for 'SOCPInput'
 
   Two use cases:
-     a) arg = socpIn(g=my_g, h=my_h, e=my_e, f=my_f, c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx) 
+     a) arg = socpIn(g=my_g, h=my_h, e=my_e, f=my_f, c=my_c, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx)
           all arguments optional
-     b) g, h, e, f, c, a, lba, uba, lbx, ubx = socpIn(arg,"g", "h", "e", "f", "c", "a", "lba", "uba", "lbx", "ubx") 
+     b) g, h, e, f, c, a, lba, uba, lbx, ubx = socpIn(arg,"g", "h", "e", "f", "c", "a", "lba", "uba", "lbx", "ubx")
           all arguments after the first optional
   Input arguments of a SOCP problem
   
@@ -2417,9 +2417,9 @@ def socpOut(*dummy,**kwargs):
   Helper function for 'SOCPOutput'
 
   Two use cases:
-     a) arg = socpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x) 
+     a) arg = socpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
           all arguments optional
-     b) x, cost, lam_a, lam_x = socpOut(arg,"x", "cost", "lam_a", "lam_x") 
+     b) x, cost, lam_a, lam_x = socpOut(arg,"x", "cost", "lam_a", "lam_x")
           all arguments after the first optional
   Output arguments of an SOCP Solver
   
@@ -2471,9 +2471,9 @@ def socpStruct(*dummy,**kwargs):
   Helper function for 'SOCPStruct'
 
   Two use cases:
-     a) arg = socpStruct(g=my_g, a=my_a) 
+     a) arg = socpStruct(g=my_g, a=my_a)
           all arguments optional
-     b) g, a = socpStruct(arg,"g", "a") 
+     b) g, a = socpStruct(arg,"g", "a")
           all arguments after the first optional
   Structure specification of an SOCP
   
@@ -2510,9 +2510,9 @@ def stabilizedQpIn(*dummy,**kwargs):
   Helper function for 'StabilizedQPSolverInput'
 
   Two use cases:
-     a) arg = stabilizedQpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0, muR=my_muR, muE=my_muE, mu=my_mu) 
+     a) arg = stabilizedQpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0, muR=my_muR, muE=my_muE, mu=my_mu)
           all arguments optional
-     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu = stabilizedQpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0", "muR", "muE", "mu") 
+     b) h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu = stabilizedQpIn(arg,"h", "g", "a", "lba", "uba", "lbx", "ubx", "x0", "lam_x0", "muR", "muE", "mu")
           all arguments after the first optional
   Input arguments of a QP problem
   

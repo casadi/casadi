@@ -28,7 +28,7 @@
 #include <utility>
 #include <map>
 #include "../casadi_exception.hpp"
-namespace casadi{ 
+namespace casadi{
 template <class T>
 class IOSchemeVector;class Sparsity;
 enum InputOutputScheme { SCHEME_DPLEInput, SCHEME_DPLEOutput, SCHEME_ControlledDAEInput, SCHEME_ControlSimulatorInput, SCHEME_HNLPInput, SCHEME_DAEInput, SCHEME_DAEOutput, SCHEME_RDAEInput, SCHEME_RDAEOutput, SCHEME_IntegratorInput, SCHEME_IntegratorOutput, SCHEME_LinsolInput, SCHEME_LinsolOutput, SCHEME_LPSolverInput, SCHEME_LPSolverOutput, SCHEME_LPStruct, SCHEME_NLPInput, SCHEME_NLPOutput, SCHEME_GradFInput, SCHEME_GradFOutput, SCHEME_JacGInput, SCHEME_JacGOutput, SCHEME_HessLagInput, SCHEME_HessLagOutput, SCHEME_NLPSolverInput, SCHEME_NLPSolverOutput, SCHEME_MayerInput, SCHEME_OCPInput, SCHEME_OCPOutput, SCHEME_QCQPSolverInput, SCHEME_QCQPSolverOutput, SCHEME_QCQPStruct, SCHEME_QPSolverInput, SCHEME_QPSolverOutput, SCHEME_QPStruct, SCHEME_SDPInput, SCHEME_SDPOutput, SCHEME_SDPStruct, SCHEME_SDQPInput, SCHEME_SDQPOutput, SCHEME_SDQPStruct, SCHEME_SOCPInput, SCHEME_SOCPOutput, SCHEME_SOCPStruct, SCHEME_StabilizedQPSolverInput };

@@ -41,8 +41,8 @@ def locate(pattern, root=os.curdir):
 
         for filename in fnmatch.filter(files, pattern):
             yield os.path.join(path, filename)
-            
-            
+
+
 # Part 1:    helper functions for inputs/outputs
 
 
@@ -61,7 +61,7 @@ class Enum:
     self.name    = name
     self.doc     = doc + "\n"
     self.entries = []
-  
+
   def addArg(self, name, doc):
     self.entries.append([name,doc])
 
@@ -70,49 +70,49 @@ class Enum:
 
   def addDoc(self,doc):
     self.doc+=doc + "\n"
-  
+
   def addEnum(self, enum):
     if len(self.entries[-1])>2:
       raise Exception("Enum %s already given" % enum)
     self.entries[-1].append(enum)
-      
+
   def addEnumheader(self,header):
     self.enum = header
-    
+
   def __str__(self):
     s = self.name + "(" + self.doc + ")" + "[" + self.enum  + "]" + ": " + str(self.entries)
     return s
-    
+
   def checkconsistency(self):
     for e in self.entries:
       if not(len(e))==3:
          raise Exception("Consistency"+str(e))
-    
+
     print self.enum, self.__class__.__name__
     assert(self.enum.endswith(self.__class__.__name__))
     prefix = self.enum[:-len(self.__class__.__name__)]
-    
+
     for name, doc, enum in self.entries:
       assert(enum.startswith(enum))
       assert(not("_NUM" in enum))
-      
+
   def num(self):
     #return self.enum[:-len(self.__class__.__name__)] +  "_NUM_" + self.PRE
     return str(len(self.entries))
-      
+
   def hppcode(self):
-    s= "/// \cond INTERNAL \n/// Helper function for '" + self.enum + "'\n"
+    s= "/// \cond INTERNAL\n/// Helper function for '" + self.enum + "'\n"
     s+="""
 template<class M>
 class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit %sIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_%s){} 
+    explicit %sIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_%s){}
 };
 /// \endcond
 """ % (self.enum,self.enum,self.enum)
     #if self.enum.endswith("Struct"):
     #  s+="typedef %sIOSchemeVector<Sparsity> %sure;\n" % (self.enum,self.enum)
-    s+= "\n".join(map(lambda x: "/// " + x.rstrip(),self.doc.split("\n")))+"\n"
+    s+= "\n".join(map(lambda x: ("/// " + x).rstrip(),self.doc.split("\n")))+"\n"
     s+= "/// \\copydoc scheme_" + self.enum +  "\n"
     s+= "template<class M>" + "\n"
     s+= self.enum + "IOSchemeVector<M> " + self.name + "("
@@ -120,8 +120,8 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
       s+="""const std::string &arg_s%d ="",const M &arg_m%d =M()""" % (i,i) + ","
     s=s[:-1] + "){" + "\n"
     s+= "  std::vector<M> ret(%d);\n" % len(self.entries)
-    
-    
+
+
     s+= "  std::map<std::string,M> arg;\n"
     for i,_ in enumerate(self.entries):
       s+="""  if (arg_s%d!="") arg.insert(make_pair(arg_s%d,arg_m%d));\n""" % (i,i,i)
@@ -151,7 +151,7 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
   def cppcode(self):
 
     return ""
-    
+
   def swigcode(self):
     s="namespace casadi {\n"
     #s+= "%warnfilter(302) " + self.name+ ";\n" -- does not seem to work
@@ -179,15 +179,15 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
       s+="%template(" + self.enum + "ure) " + self.enum + "IOSchemeVector<Sparsity>;\n"
     s+="}\n"
     return s
-    
+
   def pycode(self):
     s="def " + self.name + "(*dummy,**kwargs):\n"
     s+='  """\n'
     s+= "  Helper function for '" + self.enum + "'\n\n"
     s+= "  Two use cases:\n"
-    s+= "     a) arg = %s(%s) \n" % (self.name , ", ".join(["%s=my_%s" % (name,name) for name, doc, enum in self.entries]))
+    s+= "     a) arg = %s(%s)\n" % (self.name , ", ".join(["%s=my_%s" % (name,name) for name, doc, enum in self.entries]))
     s+= "          all arguments optional\n"
-    s+= "     b) %s = %s(arg,%s) \n" % ( ", ".join([name for name, doc, enum in self.entries]), self.name , ", ".join(['"' + name+'"' for name, doc, enum in self.entries]))
+    s+= "     b) %s = %s(arg,%s)\n" % ( ", ".join([name for name, doc, enum in self.entries]), self.name , ", ".join(['"' + name+'"' for name, doc, enum in self.entries]))
     s+= "          all arguments after the first optional\n"
     s+= "\n".join(map(lambda x: "  " + x.rstrip(),self.getDoc().split("\n"))) + "\n"
     s+= "  Keyword arguments:\n"
@@ -200,7 +200,7 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     for name, doc, enum in self.entries:
       s+="  %s = []\n  if '%s' in kwargs:\n    %s = kwargs['%s']\n" % (name,name,name,name)
     s+="""  for k in kwargs.keys():\n    if not(k in [%s]):\n      raise Exception("Keyword error in %s: '%%s' is not recognized. Available keywords are: %s" %% k )\n""" % (",".join(["'%s'" % name for name, doc, enum in self.entries]),self.name,", ".join([name for name, doc, enum in self.entries]))
-    
+
     if (self.enum.endswith("Struct")):
       s+="  return %sure([" % self.enum
       for name, doc, enum in self.entries:
@@ -212,17 +212,17 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
         s+=name+","
       s=s[:-1] + "], IOScheme(SCHEME_%s))\n" % self.enum
     return s
-  
+
 class Input(Enum):
   PRE = "IN"
   tp = "Input"
   pass
-  
+
 class Output(Enum):
   PRE = "OUT"
   tp = "Output"
   pass
-  
+
 class Struct(Enum):
   PRE = "STRUCT"
   tp = "Structure"
@@ -236,11 +236,11 @@ autogencpp = file(os.path.join(os.curdir,"..","casadi","symbolic","function","sc
 
 autogenmetadatahpp.write(file('license_header.txt','r').read())
 autogenmetadatahpp.write("/** All edits to this file will be lost - autogenerated by misc/autogencode.py */\n")
-autogenmetadatahpp.write("""#ifndef SCHEMES_METADATA_HPP\n#define SCHEMES_METADATA_HPP\n#include <vector>\n#include <string>\n#include <utility>\n#include <map>\n#include "../casadi_exception.hpp"\nnamespace casadi{ \ntemplate <class T>
+autogenmetadatahpp.write("""#ifndef SCHEMES_METADATA_HPP\n#define SCHEMES_METADATA_HPP\n#include <vector>\n#include <string>\n#include <utility>\n#include <map>\n#include "../casadi_exception.hpp"\nnamespace casadi{\ntemplate <class T>
 class IOSchemeVector;class Sparsity;\n""")
 autogenhelpershpp.write(file('license_header.txt','r').read())
 autogenhelpershpp.write("/** All edits to this file will be lost - autogenerated by misc/autogencode.py */\n")
-autogenhelpershpp.write("""#ifndef SCHEMES_HELPERS_HPP\n#define SCHEMES_HELPERS_HPP\n#include <vector>\n#include <string>\n#include <utility>\n#include <map>\n#include "io_scheme_vector.hpp"\nnamespace casadi{ \n\n""")
+autogenhelpershpp.write("""#ifndef SCHEMES_HELPERS_HPP\n#define SCHEMES_HELPERS_HPP\n#include <vector>\n#include <string>\n#include <utility>\n#include <map>\n#include "io_scheme_vector.hpp"\nnamespace casadi{\n\n""")
 autogencpp.write(file('license_header.txt','r').read())
 autogencpp.write("/** All edits to this file will be lost - autogenerated by misc/autogencode.py */\n")
 autogencpp.write("""#include "schemes_metadata.hpp"\n#include <string>\nnamespace casadi{\n""")
@@ -258,7 +258,7 @@ for h in locate("*.hpp",os.path.join(os.curdir,"..")):
   while 1:
     line = f.readline()
     if not(line):
-      break 
+      break
     p = None
     m = re.match(re_introIn,line)
     if m:
@@ -288,7 +288,7 @@ for h in locate("*.hpp",os.path.join(os.curdir,"..")):
         line = f.readline()
       p.checkconsistency()
       schemes.append(p)
-      
+
 autogenmetadatahpp.write("enum InputOutputScheme { %s };\n" % ", ".join(["SCHEME_"+p.enum for p in schemes]) )
 
 autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);\n")
@@ -333,7 +333,7 @@ for p in schemes:
   autogenpy.write(p.swigcode())
   autogenpy.write("#endif //SWIGPYTHON\n")
   autogenpy.write(p.pureswigcode())
-  
+
 autogencpp.write("std::string getSchemeName(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("""    case SCHEME_%s: return "%s";\n""" % (p.enum,p.enum))
@@ -348,7 +348,7 @@ autogencpp.write("  }\n}\n")
 
 autogencpp.write("std::string getSchemeEntryName(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
 for p in schemes:
-  autogencpp.write("    case SCHEME_%s: \n" % p.enum)
+  autogencpp.write("    case SCHEME_%s:\n" % p.enum)
   for i, (name, doc, enum) in enumerate(p.entries):
     autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,name))
   autogencpp.write("      break;\n")
@@ -358,7 +358,7 @@ autogencpp.write("}\n")
 
 autogencpp.write("std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
 for p in schemes:
-  autogencpp.write("    case SCHEME_%s: \n" % p.enum)
+  autogencpp.write("    case SCHEME_%s:\n" % p.enum)
   for i, (name, doc, enum) in enumerate(p.entries):
     autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,doc))
   autogencpp.write("      break;\n")
@@ -368,7 +368,7 @@ autogencpp.write("}\n")
 
 autogencpp.write("std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
 for p in schemes:
-  autogencpp.write("    case SCHEME_%s: \n" % p.enum)
+  autogencpp.write("    case SCHEME_%s:\n" % p.enum)
   for i, (name, doc, enum) in enumerate(p.entries):
     autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,enum))
   autogencpp.write("      break;\n")
@@ -378,7 +378,7 @@ autogencpp.write("}\n")
 
 autogencpp.write("int getSchemeSize(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
-  autogencpp.write("    case SCHEME_%s: \n" % p.enum)
+  autogencpp.write("    case SCHEME_%s:\n" % p.enum)
   autogencpp.write("""      return %d;\n""" % len(p.entries))
   autogencpp.write("      break;\n")
 autogencpp.write("""  default: casadi_error("getSchemeSize: Scheme '" << scheme <<  "' does not exist.");\n""")
@@ -387,7 +387,7 @@ autogencpp.write("}\n")
 
 autogencpp.write("int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {\n  switch (scheme) {\n")
 for p in schemes:
-  autogencpp.write("    case SCHEME_%s: \n" % p.enum)
+  autogencpp.write("    case SCHEME_%s:\n" % p.enum)
   for i, (name, doc, enum) in enumerate(p.entries):
     autogencpp.write("""      if(name=="%s") return %d;\n""" % (name,i))
   autogencpp.write("      break;\n")
