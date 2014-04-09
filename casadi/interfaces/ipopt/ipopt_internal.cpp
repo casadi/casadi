@@ -291,7 +291,7 @@ namespace casadi{
 
         // Get the dimensions
         int N;
-        for(N=0; N*N<red_hess.size(); ++N);
+        for(N=0; N*N<red_hess.size(); ++N) {};
         casadi_assert(N*N==red_hess.size());
 
         // Store to statistics

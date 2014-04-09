@@ -26,20 +26,24 @@ find_package(PythonInterp)
 # start with no filters
 set(STYLE_FILTER "-,")
 
-# trailing whitespace
-set(STYLE_FILTER ${STYLE_FILTER}+whitespace/end_of_line,)
+# add all whitespace filters
+set(STYLE_FILTER ${STYLE_FILTER}+whitespace,)
 
-# tabs
-set(STYLE_FILTER ${STYLE_FILTER}+whitespace/tab,)
+# disable unwanted or unfixed whitespace filters
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/braces,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/semicolon,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/blank_line,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/comma,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/operators,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/parens,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/indent,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/comments,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/line_length,)
+set(STYLE_FILTER ${STYLE_FILTER}-whitespace/newline,)
 
 # c-style casts
 set(STYLE_FILTER ${STYLE_FILTER}+readability/casting,)
 
-# Yes it is!
-#set(STYLE_FILTER ${STYLE_FILTER}-whitespace/blank_line,)
-
-# Suggessts excessive indentation.
-#set(STYLE_FILTER ${STYLE_FILTER}-whitespace/labels,)
 
 # Insists on including evrything in the .cpp file even if it is included in the header.
 #set(STYLE_FILTER ${STYLE_FILTER}-build/include_what_you_use,)
@@ -56,9 +60,6 @@ set(STYLE_FILTER ${STYLE_FILTER}+readability/casting,)
 # Why?
 #set(STYLE_FILTER ${STYLE_FILTER}-whitespace/todo,)
 #set(STYLE_FILTER ${STYLE_FILTER}-readability/todo,)
-
-# Annoyting to use with boost::program_options
-#set(STYLE_FILTER ${STYLE_FILTER},-whitespace/semicolon,)
 
 
 # Add a target that runs cpplint.py
