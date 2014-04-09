@@ -72,15 +72,16 @@ function(add_style_check_target TARGET_NAME SOURCES_LIST0)# PROJECT)
   list(REMOVE_DUPLICATES SOURCES_LIST0)
   list(SORT SOURCES_LIST0)
 
-  ## filtering out unwanted files
-  #set(SOURCES_LIST)
-  #foreach(item ${SOURCES_LIST0})
-  #  string(REGEX MATCH ".*\\.hpp$" dummy ${item})
-  #  if(NOT dummy)
-  #    list(APPEND SOURCES_LIST ${item})
-  #  endif()
-  #endforeach()
-  set(SOURCES_LIST ${SOURCES_LIST0}) # just use all files
+  # filtering out unwanted files
+  set(SOURCES_LIST)
+  foreach(item ${SOURCES_LIST0})
+    #string(REGEX MATCH ".*\\.hpp$" dummy ${item})
+    string(REGEX MATCH "runtime_embedded\\.hpp" dummy ${item})
+    if(NOT dummy)
+      list(APPEND SOURCES_LIST ${item})
+    endif()
+  endforeach()
+  #set(SOURCES_LIST ${SOURCES_LIST0}) # just use all files
 
   # message("LALALA SOURCES_LIST: ${TARGET_NAME}: ${SOURCES_LIST}")
   add_custom_target(lint_${TARGET_NAME}
