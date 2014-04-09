@@ -26,6 +26,11 @@
 # Since ipopt uses "dlopen" internally, we have to make sure that all the
 # libraries we linked against are visible to the libraries dlopen loads.
 # Specifically, hsl.so needs blas and lapack.
+try:
+  import numpy as np
+except:
+  pass
+
 import sys
 import ctypes
 flags0 = sys.getdlopenflags() # get the original flags
