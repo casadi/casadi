@@ -7,7 +7,7 @@ set(DSDP_INTERFACE_SRCS
   dsdp_solver.hpp
   dsdp_solver.cpp)
 
-casadi_library(casadi_dsdp_interface STATIC ${DSDP_INTERFACE_SRCS})
+casadi_library(casadi_dsdp_interface ${DSDP_INTERFACE_SRCS})
 target_link_libraries(casadi_dsdp_interface ${DSDP_LIBRARIES})
 
 install(DIRECTORY ./

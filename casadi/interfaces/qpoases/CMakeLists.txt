@@ -7,7 +7,7 @@ set(QPOASES_INTERFACE_SRCS
   qpoases_solver.hpp
   qpoases_solver.cpp)
 
-casadi_library(casadi_qpoases_interface STATIC ${QPOASES_INTERFACE_SRCS})
+casadi_library(casadi_qpoases_interface ${QPOASES_INTERFACE_SRCS})
 target_link_libraries(casadi_qpoases_interface ${QPOASES_LIBRARIES})
 
 install(DIRECTORY ./
