@@ -29,7 +29,7 @@ set(STYLE_FILTER "-,")
 set(STYLE_FILTER ${STYLE_FILTER}+readability/casting,)
 
 # tabs
-#set(STYLE_FILTER ${STYLE_FILTER}+whitespace/tab,)
+set(STYLE_FILTER ${STYLE_FILTER}+whitespace/tab,)
 
 # Yes it is!
 #set(STYLE_FILTER ${STYLE_FILTER}-whitespace/blank_line,)

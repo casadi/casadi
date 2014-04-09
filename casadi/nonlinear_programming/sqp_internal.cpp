@@ -281,8 +281,8 @@ namespace casadi{
     
       // Printing information about the actual iterate
       printIteration(cout,iter,fk_,pr_inf,gLag_norminf,dx_norminf,reg_,ls_iter,ls_success);
-	  
-	    if (gather_stats_) {
+
+      if (gather_stats_) {
         Dictionary & iterations = stats_["iterations"];
         static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(pr_inf);
         static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(gLag_norminf);

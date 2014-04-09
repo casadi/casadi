@@ -99,7 +99,7 @@ void NLPQPInternal::init(){
   // The nlp looks exactly like a mathematical description of the NLP
   SXFunction QP_SOLVER_nlp(nlpIn("x",X,"p",vertcat(par)),
                            nlpOut("f",mul(G.T(),X) + 0.5*mul(mul(X.T(),H),X),
-			   "g",mul(A,X)));
+                                  "g",mul(A,X)));
 
   // Create an nlpsolver instance
   NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");

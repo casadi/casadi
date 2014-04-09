@@ -93,7 +93,7 @@ namespace casadi{
       // Cast to MXFunction
       MXFunction hnlp_mx = shared_cast<MXFunction>(hnlp_);
       if(hnlp_mx.isNull()){
-	casadi_warning("Cannot expand NLP as it is not an MXFunction");
+        casadi_warning("Cannot expand NLP as it is not an MXFunction");
       } else {
         hnlp_ = SXFunction(hnlp_mx);
         hnlp_.copyOptions(hnlp_mx, true);

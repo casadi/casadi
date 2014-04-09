@@ -1189,7 +1189,7 @@ namespace casadi{
       // det(lambda*I-m) = 0
       ret.append(poly_roots(poly_coeff(det(SX::eye(r.size())*l-m_perm(r,r)),l)));
     }
-		
+
     return ret;
   }
   
