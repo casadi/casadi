@@ -32,6 +32,7 @@ if(Fortran_language_works)
 endif()
 #end workaround
 
+include(CppLint)
 include(embed_resources)
 include (GenerateExportHeader)
 

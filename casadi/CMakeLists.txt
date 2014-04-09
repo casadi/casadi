@@ -16,6 +16,7 @@ install(TARGETS ${name}
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+add_style_check_target(${name} "${ARGN}")
 endmacro()
 
 add_subdirectory(symbolic)  # needed by all except external_packages
