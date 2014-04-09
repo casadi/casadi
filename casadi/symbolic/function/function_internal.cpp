@@ -490,7 +490,7 @@ namespace casadi{
     // Construct sparsity pattern
     Sparsity ret = Sparsity::triplet(nz_out, nz_in, use_fwd ? jcol : jrow, use_fwd ? jrow : jcol);
 
-    casadi_log("Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", " << ret.size() << " nonzeros, " << (100.0*ret.size())/ret.numel() << " %% nonzeros).");
+    casadi_log("Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", " << ret.size() << " nonzeros, " << (100.0*ret.size())/ret.numel() << " % nonzeros).");
     casadi_log("FunctionInternal::getJacSparsity end ");
 
     // Return sparsity pattern
@@ -718,7 +718,7 @@ namespace casadi{
     }
 
     casadi_log("Number of sweeps: " << nsweeps );
-    casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() << ", " << r.size() << " nonzeros, " << (100.0*r.size())/r.numel() << " %% nonzeros).");
+    casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() << ", " << r.size() << " nonzeros, " << (100.0*r.size())/r.numel() << " % nonzeros).");
 
     return r.T();
   }
@@ -1015,7 +1015,7 @@ namespace casadi{
       hasrun = true;
     }
     casadi_log("Number of sweeps: " << nsweeps );
-    casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() << ", " << r.size() << " nonzeros, " << (100.0*r.size())/r.numel() << " %% nonzeros).");
+    casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() << ", " << r.size() << " nonzeros, " << (100.0*r.size())/r.numel() << " % nonzeros).");
 
     return r.T();
   }
