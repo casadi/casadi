@@ -49,4 +49,4 @@ namespace casadi {
     profiling = false;
   }
 
-}
+} // namespace casadi

@@ -89,6 +89,6 @@ namespace casadi {
     static std::string getModules() { return modules; }
   };
 
-}
+}  // namespace casadi
 
 #endif //CASADI_META_HPP

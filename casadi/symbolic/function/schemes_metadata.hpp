@@ -39,6 +39,6 @@ CASADI_SYMBOLIC_EXPORT int getSchemeEntryEnum(InputOutputScheme scheme, const st
 CASADI_SYMBOLIC_EXPORT int getSchemeSize(InputOutputScheme scheme);
 CASADI_SYMBOLIC_EXPORT std::string getSchemeName(InputOutputScheme scheme);
 CASADI_SYMBOLIC_EXPORT std::string getSchemeEntryNames(InputOutputScheme scheme);
-}
+} // namespace casadi
 #endif //SCHEMES_METADATA_HPP
 

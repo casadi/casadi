@@ -104,6 +104,6 @@ namespace casadi {
       static bool getAllowedInternalAPI() { return allowed_internal_api; }
   };
 
-}
+} // namespace casadi
 
 #endif //CASADI_OPTIONS_HPP

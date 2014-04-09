@@ -1318,15 +1318,6 @@ namespace casadi{
     }
   }
 
-
-
-
-
 #endif // WITH_OPENCL
 
-
-
-
-
 } // namespace casadi
-

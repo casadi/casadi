@@ -335,9 +335,6 @@ namespace casadi{
   }
 #endif // HAS_ERFINV
   //@}
-}
-
-namespace casadi{
 
   template<typename T>
   T twice(const T& x){
