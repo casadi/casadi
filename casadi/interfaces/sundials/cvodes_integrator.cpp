@@ -34,12 +34,11 @@ CVodesIntegrator::CVodesIntegrator(const Function& f, const Function& g){
 }
 
 CVodesInternal* CVodesIntegrator::operator->(){
-  return (CVodesInternal*)(Function::operator->());
+  return static_cast<CVodesInternal*>(Function::operator->());
 }
 
 const CVodesInternal* CVodesIntegrator::operator->() const{
-  return (const CVodesInternal*)(Function::operator->());
-
+  return static_cast<const CVodesInternal*>(Function::operator->());
 }
 
 bool CVodesIntegrator::checkNode() const{

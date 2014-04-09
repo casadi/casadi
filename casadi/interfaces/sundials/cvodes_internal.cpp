@@ -364,7 +364,7 @@ namespace casadi{
 
     // Log time
     time2 = clock();
-    t_res += double(time2-time1)/CLOCKS_PER_SEC;
+    t_res += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     log("CVodesInternal::rhs","end");
 
@@ -715,7 +715,7 @@ namespace casadi{
 
     // Record timings
     time2 = clock();
-    t_fres += double(time2-time1)/CLOCKS_PER_SEC;
+    t_fres += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
   }
 
   int CVodesInternal::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2){
@@ -1030,7 +1030,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     log("CVodesInternal::jtimes","end");
   }
@@ -1062,7 +1062,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("CVodesInternal::jtimesB","end");
   }
 
@@ -1138,7 +1138,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     log("CVodesInternal::djac","end");
   }
@@ -1194,7 +1194,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("CVodesInternal::djacB","end");
   }
 
@@ -1259,7 +1259,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     log("CVodesInternal::bjac","end");
   }
@@ -1316,7 +1316,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     log("CVodesInternal::bjacB","end");
   }
@@ -1390,7 +1390,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
+    t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
   }
 
   void CVodesInternal::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, N_Vector tmpB) {
@@ -1408,7 +1408,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
+    t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
   }
 
   void CVodesInternal::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
@@ -1428,7 +1428,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements, scaled by -gamma, to the linear solver
     linsol_.setInput(jac_.output(),0);
@@ -1438,7 +1438,7 @@ namespace casadi{
 
     // Log time duration
     time1 = clock();
-    t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+    t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
 
     log("CVodesInternal::psetup","end");
   }
@@ -1475,7 +1475,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements, scaled by -gamma, to the linear solver
     linsolB_.setInput(jacB_.output(),0);
@@ -1485,7 +1485,7 @@ namespace casadi{
 
     // Log time duration
     time1 = clock();
-    t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+    t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
     log("CVodesInternal::psetupB","end");
   }
 

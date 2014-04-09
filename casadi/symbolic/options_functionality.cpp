@@ -388,11 +388,11 @@ OptionsFunctionality::~OptionsFunctionality(){
 }
 
 OptionsFunctionalityNode* OptionsFunctionality::operator->(){
-  return (OptionsFunctionalityNode*)(SharedObject::operator->());
+  return static_cast<OptionsFunctionalityNode*>(SharedObject::operator->());
 }
 
 const OptionsFunctionalityNode* OptionsFunctionality::operator->() const{
-  return (const OptionsFunctionalityNode*)(SharedObject::operator->());
+  return static_cast<const OptionsFunctionalityNode*>(SharedObject::operator->());
 }
 
 OptionsFunctionalityNode::OptionsFunctionalityNode(){

@@ -34,11 +34,11 @@ namespace casadi{
   }
 
   KinsolInternal* KinsolSolver::operator->(){
-    return (KinsolInternal*)(Function::operator->());
+    return static_cast<KinsolInternal*>(Function::operator->());
   }
 
   const KinsolInternal* KinsolSolver::operator->() const{
-    return (const KinsolInternal*)(Function::operator->());
+    return static_cast<const KinsolInternal*>(Function::operator->());
   }
 
   bool KinsolSolver::checkNode() const{

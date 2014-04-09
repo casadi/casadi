@@ -425,7 +425,7 @@ namespace casadi{
 
   template<typename Value>
   void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
-    output[0]->set(double(v_.value));
+    output[0]->set(static_cast<double>(v_.value));
     ConstantMX::evaluateD(input,output,itmp,rtmp);
   }
 

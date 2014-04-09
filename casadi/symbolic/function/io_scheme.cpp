@@ -62,11 +62,11 @@ namespace casadi{
   }
 
   IOSchemeInternal* IOScheme::operator->(){
-    return (IOSchemeInternal*)(SharedObject::operator->());
+    return static_cast<IOSchemeInternal*>(SharedObject::operator->());
   }
 
   const IOSchemeInternal* IOScheme::operator->() const{
-    return (const IOSchemeInternal*)(SharedObject::operator->());
+    return static_cast<const IOSchemeInternal*>(SharedObject::operator->());
   }
 
   bool IOScheme::checkNode() const{

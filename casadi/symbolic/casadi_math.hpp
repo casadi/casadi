@@ -127,50 +127,50 @@ struct casadi_math<int>{
   /** \brief Evaluate a built in function */
   static inline void fun(unsigned char op, const int& x, const int& y, int& f){
     double ff(0);
-    casadi_math<double>::fun(op,double(x),double(y),ff);
-    f = int(ff);
+    casadi_math<double>::fun(op,static_cast<double>(x),static_cast<double>(y),ff);
+    f = static_cast<int>(ff);
   }
 
   static inline void fun(unsigned char op, const int* x, const int* y, int* f, int n){
     for(int i=0; i<n; ++i){
       double ff(0);
-      casadi_math<double>::fun(op,double(*x++),double(*y++),ff);
-      *f++ = int(ff);
+      casadi_math<double>::fun(op,static_cast<double>(*x++),static_cast<double>(*y++),ff);
+      *f++ = static_cast<int>(ff);
     }
   }
 
   static inline void fun(unsigned char op, const int* x, const int& y, int* f, int n){
     for(int i=0; i<n; ++i){
       double ff;
-      casadi_math<double>::fun(op,double(*x++),double(y),ff);
-      *f++ = int(ff);
+      casadi_math<double>::fun(op,static_cast<double>(*x++),static_cast<double>(y),ff);
+      *f++ = static_cast<int>(ff);
     }
   }
 
   static inline void fun(unsigned char op, const int& x, const int* y, int* f, int n){
     for(int i=0; i<n; ++i){
       double ff;
-      casadi_math<double>::fun(op,double(x),double(*y++),ff);
-      *f++ = int(ff);
+      casadi_math<double>::fun(op,static_cast<double>(x),static_cast<double>(*y++),ff);
+      *f++ = static_cast<int>(ff);
     }
   }
 
   /** \brief Evaluate a built in derivative function */
   static inline void der(unsigned char op, const int& x, const int& y, const int& f, int* d){
-    double d_real[2] = {double(d[0]),double(d[1])};
-    casadi_math<double>::der(op,double(x),double(y),double(f),d_real);
-    d[0] = int(d_real[0]);
-    d[1] = int(d_real[1]);
+    double d_real[2] = {static_cast<double>(d[0]),static_cast<double>(d[1])};
+    casadi_math<double>::der(op,static_cast<double>(x),static_cast<double>(y),static_cast<double>(f),d_real);
+    d[0] = static_cast<int>(d_real[0]);
+    d[1] = static_cast<int>(d_real[1]);
   }
 
   /** \brief Evaluate the function and the derivative function */
   static inline void derF(unsigned char op, const int& x, const int& y, int& f, int* d){
-    double d_real[2] = {double(d[0]),double(d[1])};
+    double d_real[2] = {static_cast<double>(d[0]),static_cast<double>(d[1])};
     double f_real(f);
-    casadi_math<double>::derF(op,double(x),double(y),f_real,d_real);
-    f = int(f_real);
-    d[0] = int(d_real[0]);
-    d[1] = int(d_real[1]);
+    casadi_math<double>::derF(op,static_cast<double>(x),static_cast<double>(y),f_real,d_real);
+    f = static_cast<int>(f_real);
+    d[0] = static_cast<int>(d_real[0]);
+    d[1] = static_cast<int>(d_real[1]);
   }
 
   /** \brief Number of dependencies */

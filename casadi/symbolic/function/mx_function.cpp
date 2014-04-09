@@ -88,11 +88,11 @@ MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const IOSchemeVector<
 }
 
 const MXFunctionInternal* MXFunction::operator->() const{
-  return (const MXFunctionInternal*)Function::operator->();
+  return static_cast<const MXFunctionInternal*>(Function::operator->());
 }
 
 MXFunctionInternal* MXFunction::operator->(){
-  return (MXFunctionInternal*)Function::operator->();
+  return static_cast<MXFunctionInternal*>(Function::operator->());
 }
 
 const MX& MXFunction::inputExpr(int ind) const{

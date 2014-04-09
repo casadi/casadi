@@ -35,11 +35,11 @@ IdasIntegrator::IdasIntegrator(const Function& f, const Function& g){
 }
 
 IdasInternal* IdasIntegrator::operator->(){
-  return (IdasInternal*)(Function::operator->());
+  return static_cast<IdasInternal*>(Function::operator->());
 }
 
 const IdasInternal* IdasIntegrator::operator->() const{
-  return (const IdasInternal*)(Function::operator->());
+  return static_cast<const IdasInternal*>(Function::operator->());
 }
 
 bool IdasIntegrator::checkNode() const{

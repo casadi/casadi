@@ -200,7 +200,7 @@ namespace casadi{
       }
 
       // Add a preconditioner
-      if(bool(getOption("use_preconditioner"))){
+      if(static_cast<bool>(getOption("use_preconditioner"))){
         // Make sure that a Jacobian has been provided
         casadi_assert_message(!jac_.isNull(),"No Jacobian has been provided");
 
@@ -326,7 +326,7 @@ namespace casadi{
 
     // Log time
     time2_ = clock();
-    t_func_ += double(time2_-time1_)/CLOCKS_PER_SEC;
+    t_func_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
   int KinsolInternal::func_wrapper(N_Vector u, N_Vector fval, void *user_data){
@@ -393,7 +393,7 @@ namespace casadi{
 
     // Log time duration
     time2_ = clock();
-    t_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
+    t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
   int KinsolInternal::bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
@@ -440,7 +440,7 @@ namespace casadi{
 
     // Log time duration
     time2_ = clock();
-    t_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
+    t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
   int KinsolInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u, void *user_data){
@@ -477,7 +477,7 @@ namespace casadi{
 
     // Log time duration
     time2_ = clock();
-    t_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
+    t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
   int KinsolInternal::psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, void* user_data, N_Vector tmp1, N_Vector tmp2){
@@ -550,7 +550,7 @@ namespace casadi{
 
     // Log time duration
     time2_ = clock();
-    t_lsetup_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
+    t_lsetup_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements, scaled by -gamma, to the linear solver
     linsol_.setInput(jac_.output(),LINSOL_A);
@@ -560,7 +560,7 @@ namespace casadi{
 
     // Log time duration
     time1_ = clock();
-    t_lsetup_fac_ += double(time1_-time2_)/CLOCKS_PER_SEC;
+    t_lsetup_fac_ += static_cast<double>(time1_-time2_)/CLOCKS_PER_SEC;
   }
 
   int KinsolInternal::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp){
@@ -584,12 +584,12 @@ namespace casadi{
 
     // Log time duration
     time2_ = clock();
-    t_lsolve_ += double(time2_-time1_)/CLOCKS_PER_SEC;
+    t_lsolve_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
   int KinsolInternal::lsetup_wrapper(KINMem kin_mem){
     try{
-      KinsolInternal *this_ = (KinsolInternal*)(kin_mem->kin_lmem);
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(kin_mem->kin_lmem);
       casadi_assert(this_);
       this_->lsetup(kin_mem);
       return 0;
@@ -611,7 +611,7 @@ namespace casadi{
 
   int KinsolInternal::lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm){
     try{
-      KinsolInternal *this_ = (KinsolInternal*)(kin_mem->kin_lmem);
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(kin_mem->kin_lmem);
       casadi_assert(this_);
       this_->lsolve(kin_mem,x,b,res_norm);
       return 0;
@@ -646,7 +646,7 @@ namespace casadi{
   void KinsolInternal::ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data){
     try{
       casadi_assert(eh_data);
-      KinsolInternal *this_ = (KinsolInternal*)eh_data;
+      KinsolInternal *this_ = static_cast<KinsolInternal*>(eh_data);
       this_->ehfun(error_code,module,function,msg);
     } catch(exception& e){
       cerr << "ehfun failed: " << e.what() << endl;

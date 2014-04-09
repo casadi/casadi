@@ -34,11 +34,11 @@ namespace casadi{
   }
 
   const ParallelizerInternal* Parallelizer::operator->() const{
-    return (const ParallelizerInternal*)Function::operator->();
+    return static_cast<const ParallelizerInternal*>(Function::operator->());
   }
 
   ParallelizerInternal* Parallelizer::operator->(){
-    return (ParallelizerInternal*)Function::operator->();
+    return static_cast<ParallelizerInternal*>(Function::operator->());
   }
 
 } // namespace casadi

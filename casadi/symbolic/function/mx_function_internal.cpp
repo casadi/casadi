@@ -437,7 +437,7 @@ namespace casadi{
         if (CasadiOptions::profilingBinary) {
           profileWriteTime(CasadiOptions::profilingLog,this,alg_counter,time_stop-time_start,time_stop-time_zero);
         } else {
-          CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|";
+          CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|";
           if (it->op == OP_CALL) {
             Function f = it->data->getFunction();
             CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
@@ -454,7 +454,7 @@ namespace casadi{
       if (CasadiOptions::profilingBinary) {
         profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_zero);
       } else {
-        CasadiOptions::profilingLog  << "stop " << this << ":" <<getOption("name") << double(time_stop-time_zero)*1e3 << " ms" << std::endl;
+        CasadiOptions::profilingLog  << "stop " << this << ":" <<getOption("name") << (time_stop-time_zero)*1e3 << " ms" << std::endl;
       }
     }
 

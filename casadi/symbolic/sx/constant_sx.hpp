@@ -123,7 +123,7 @@ class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX{
     //@{
     /** \brief  Get the value */
     virtual double getValue() const{ return value;}
-    virtual int getIntValue() const{ return int(value);}
+    virtual int getIntValue() const{ return static_cast<int>(value);}
     //@}
 
     virtual bool isAlmostZero(double tol) const{ return fabs(value)<=tol; }

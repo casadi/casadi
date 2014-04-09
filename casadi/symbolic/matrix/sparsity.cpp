@@ -881,7 +881,7 @@ namespace casadi{
     std::vector<int>& mapping2 = invert_mapping ? mapping : r_row;
 
     // Make sure that enough memory is allocated to use as a work vector
-    mapping1.reserve(std::max(nrow+1,int(col.size())));
+    mapping1.reserve(std::max(nrow+1,static_cast<int>(col.size())));
 
     // Number of elements in each row
     std::vector<int>& rowcount = mapping1; // reuse memory

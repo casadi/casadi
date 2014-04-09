@@ -59,7 +59,7 @@ namespace casadi{
   }
 
   SXElement::SXElement(double val){
-    int intval = int(val);
+    int intval = static_cast<int>(val);
     if(val-intval == 0){ // check if integer
       if(intval == 0)             node = casadi_limits<SXElement>::zero.node;
       else if(intval == 1)        node = casadi_limits<SXElement>::one.node;

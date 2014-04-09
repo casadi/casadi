@@ -632,7 +632,7 @@ namespace casadi{
       printScalar(stream);
     } else if(isVector()){
       printVector(stream);
-    } else if(std::max(size1(),size2())<=10 || double(size())/numel()>=0.5){ // if "small" or "dense"
+    } else if(std::max(size1(),size2())<=10 || static_cast<double>(size())/numel()>=0.5){ // if "small" or "dense"
       printDense(stream);
     } else {
       printSparse(stream);
@@ -2030,7 +2030,7 @@ namespace casadi{
 
   template<typename DataType>
   double Matrix<DataType>::getValue() const{
-    return double(toScalar());
+    return static_cast<double>(toScalar());
   }
 
   template<typename DataType>

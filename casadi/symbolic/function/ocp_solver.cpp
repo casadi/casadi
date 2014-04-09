@@ -30,11 +30,11 @@ OCPSolver::OCPSolver(){
 }
 
 const OCPSolverInternal* OCPSolver::operator->() const{
-  return (const OCPSolverInternal*)Function::operator->();
+  return static_cast<const OCPSolverInternal*>(Function::operator->());
 }
 
 OCPSolverInternal* OCPSolver::operator->(){
-  return (OCPSolverInternal*)Function::operator->();
+  return static_cast<OCPSolverInternal*>(Function::operator->());
 }
 
 

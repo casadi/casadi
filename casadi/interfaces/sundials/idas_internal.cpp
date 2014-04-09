@@ -496,7 +496,7 @@ namespace casadi{
     }
 
     time2 = clock();
-    t_res += double(time2-time1)/CLOCKS_PER_SEC;
+    t_res += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::res","end");
   }
 
@@ -515,7 +515,7 @@ namespace casadi{
 
   void IdasInternal::ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data){
     try{
-      IdasInternal *this_ = (IdasInternal*)eh_data;
+      IdasInternal *this_ = static_cast<IdasInternal*>(eh_data);
       this_->ehfun(error_code,module,function,msg);
     } catch(exception& e){
       cerr << "ehfun failed: " << e.what() << endl;
@@ -555,7 +555,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::jtimes","end");
   }
 
@@ -642,13 +642,13 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::jtimesB","end");
   }
 
   int IdasInternal::jtimesB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB, void *user_data, N_Vector tmp1B, N_Vector tmp2B) {
     try{
-      IdasInternal *this_ = (IdasInternal*)user_data;
+      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
       this_->jtimesB(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(xzB),NV_DATA_S(xzdotB),NV_DATA_S(resvalB),NV_DATA_S(vB),NV_DATA_S(JvB), cjB, NV_DATA_S(tmp1B), NV_DATA_S(tmp2B));
       return 0;
     } catch(exception& e){
@@ -702,7 +702,7 @@ namespace casadi{
 
     // Record timings
     time2 = clock();
-    t_fres += double(time2-time1)/CLOCKS_PER_SEC;
+    t_fres += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::resS","end");
   }
 
@@ -818,7 +818,7 @@ namespace casadi{
     int icopt = IDA_YA_YDP_INIT; // calculate z and xdot given x
     // int icopt = IDA_Y_INIT; // calculate z and x given zdot and xdot (e.g. start in stationary)
 
-    double t_first = hasSetOption("first_time") ? double(getOption("first_time")) : tf_;
+    double t_first = hasSetOption("first_time") ? static_cast<double>(getOption("first_time")) : tf_;
     int flag = IDACalcIC(mem_, icopt , t_first);
     if(flag != IDA_SUCCESS) idas_error("IDACalcIC",flag);
 
@@ -1303,7 +1303,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::djac","end");
   }
 
@@ -1382,7 +1382,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jacB += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jacB += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::djacB","end");
   }
 
@@ -1432,7 +1432,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::bjac","end");
   }
 
@@ -1511,13 +1511,13 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_jacB += double(time2-time1)/CLOCKS_PER_SEC;
+    t_jacB += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::bjacB","end");
   }
 
   int IdasInternal::bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
     try{
-      IdasInternal *this_ = (IdasInternal*)user_data;
+      IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
       this_->bjacB(NeqB, mupperB, mlowerB, t, cjB, xz, xzdot, xzB, xzdotB, resvalB, JacB, tmp1B, tmp2B, tmp3B);
       return 0;
     } catch(exception& e){
@@ -1597,7 +1597,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
+    t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::psolve","end");
   }
 
@@ -1637,7 +1637,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
+    t_lsolve += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
     log("IdasInternal::psolveB","end");
   }
 
@@ -1671,7 +1671,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements to the linear solver
     linsol_.setInput(jac_.output(),0);
@@ -1681,7 +1681,7 @@ namespace casadi{
 
     // Log time duration
     time1 = clock();
-    t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+    t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
 
     log("IdasInternal::psetup","end");
 
@@ -1734,7 +1734,7 @@ namespace casadi{
 
     // Log time duration
     time2 = clock();
-    t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
+    t_lsetup_jac += static_cast<double>(time2-time1)/CLOCKS_PER_SEC;
 
     // Pass non-zero elements to the linear solver
     linsolB_.setInput(jacB_.output(),0);
@@ -1744,7 +1744,7 @@ namespace casadi{
 
     // Log time duration
     time1 = clock();
-    t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+    t_lsetup_fac += static_cast<double>(time1-time2)/CLOCKS_PER_SEC;
 
     log("IdasInternal::psetupB","end");
 
@@ -1753,7 +1753,7 @@ namespace casadi{
 
   int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
     try{
-      IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
+      IdasInternal *this_ = static_cast<IdasInternal*>(IDA_mem->ida_lmem);
       casadi_assert(this_);
       this_->lsetup(IDA_mem,xz,xzdot,resp,vtemp1,vtemp2,vtemp3);
       return 0;
@@ -1765,7 +1765,7 @@ namespace casadi{
 
   int IdasInternal::lsetupB_wrapper(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB, N_Vector vtemp1B, N_Vector vtemp2B, N_Vector vtemp3B){
     try{
-      IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
+      IdasInternal *this_ = static_cast<IdasInternal*>(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;
@@ -1776,7 +1776,7 @@ namespace casadi{
       // Multiple of df_dydot to be added to the matrix
       double cj = IDA_mem->ida_cj;
 
-      IDA_mem = (IDAMem) IDA_mem->ida_user_data;
+      IDA_mem = static_cast<IDAMem>(IDA_mem->ida_user_data);
 
       IDAADJ_mem = IDA_mem->ida_adj_mem;
       //IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
@@ -1797,7 +1797,7 @@ namespace casadi{
 
   int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector rr){
     try{
-      IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
+      IdasInternal *this_ = static_cast<IdasInternal*>(IDA_mem->ida_lmem);
       casadi_assert(this_);
       this_->lsolve(IDA_mem,b,weight,xz,xzdot,rr);
       return 0;
@@ -1812,7 +1812,7 @@ namespace casadi{
 
   int IdasInternal::lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzB, N_Vector xzdotB, N_Vector rrB){
     try{
-      IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
+      IdasInternal *this_ = static_cast<IdasInternal*>(IDA_mem->ida_lmem);
       casadi_assert(this_);
       IDAadjMem IDAADJ_mem;
       //IDABMem IDAB_mem;

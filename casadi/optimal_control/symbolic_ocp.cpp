@@ -30,9 +30,7 @@
 
 #include "casadi/symbolic/std_vector_tools.hpp"
 #include "external_packages/tinyxml/tinyxml.h"
-
 #include "casadi/symbolic/casadi_exception.hpp"
-#include "casadi/symbolic/std_vector_tools.hpp"
 #include "casadi/symbolic/matrix/matrix_tools.hpp"
 #include "casadi/symbolic/sx/sx_tools.hpp"
 #include "casadi/symbolic/function/integrator.hpp"

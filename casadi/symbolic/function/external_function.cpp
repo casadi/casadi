@@ -40,11 +40,11 @@ ExternalFunction::ExternalFunction(const std::string& bin_name){
 }
 
 ExternalFunctionInternal* ExternalFunction::operator->(){
-  return (ExternalFunctionInternal*)(Function::operator->());
+  return static_cast<ExternalFunctionInternal*>(Function::operator->());
 }
 
 const ExternalFunctionInternal* ExternalFunction::operator->() const{
-   return (const ExternalFunctionInternal*)(Function::operator->());
+   return static_cast<const ExternalFunctionInternal*>(Function::operator->());
 }
 
 bool ExternalFunction::checkNode() const{

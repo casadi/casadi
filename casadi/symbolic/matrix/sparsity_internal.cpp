@@ -1129,7 +1129,7 @@ namespace casadi{
 
     int m = nrow_;
     int n = ncol_;
-    int dense = std::max(16, 10 * int(sqrt(double(n)))) ;   // find dense threshold
+    int dense = std::max(16, 10 * static_cast<int>(sqrt(static_cast<double>(n)))) ;   // find dense threshold
     dense = std::min(n-2, dense);
     Sparsity C;
     if(order == 1 && n == m){
@@ -2195,7 +2195,7 @@ namespace casadi{
       casadi_error("Slicing [jj,ii] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
 
-    if (double(ii.size())*double(jj.size()) > size()) {
+    if (static_cast<double>(ii.size())*static_cast<double>(jj.size()) > size()) {
       // Typical use case:
       // a = SX::sym("a",sp_diag(50000))
       // a[:,:]

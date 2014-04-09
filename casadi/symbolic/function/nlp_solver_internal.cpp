@@ -145,7 +145,7 @@ namespace casadi{
   }
 
   void NLPSolverInternal::checkInitialBounds() {
-    if(bool(getOption("warn_initial_bounds"))){
+    if(static_cast<bool>(getOption("warn_initial_bounds"))){
       bool violated = false;
       for (int k=0;k<input(NLP_SOLVER_X0).size();++k) {
         if (input(NLP_SOLVER_X0).at(k)>input(NLP_SOLVER_UBX).at(k)) {

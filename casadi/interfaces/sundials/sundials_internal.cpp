@@ -97,15 +97,15 @@ void SundialsInternal::init(){
   exact_jacobianB_ = hasSetOption("exact_jacobianB") ? getOption("exact_jacobianB") && !g_.isNull() : exact_jacobian_;
   max_num_steps_ = getOption("max_num_steps");
   finite_difference_fsens_ = getOption("finite_difference_fsens");
-  fsens_abstol_ = hasSetOption("fsens_abstol") ? double(getOption("fsens_abstol")) : abstol_;
-  fsens_reltol_ = hasSetOption("fsens_reltol") ? double(getOption("fsens_reltol")) : reltol_;
-  abstolB_ = hasSetOption("abstolB") ? double(getOption("abstolB")) : abstol_;
-  reltolB_ = hasSetOption("reltolB") ? double(getOption("reltolB")) : reltol_;
+  fsens_abstol_ = hasSetOption("fsens_abstol") ? static_cast<double>(getOption("fsens_abstol")) : abstol_;
+  fsens_reltol_ = hasSetOption("fsens_reltol") ? static_cast<double>(getOption("fsens_reltol")) : reltol_;
+  abstolB_ = hasSetOption("abstolB") ? static_cast<double>(getOption("abstolB")) : abstol_;
+  reltolB_ = hasSetOption("reltolB") ? static_cast<double>(getOption("reltolB")) : reltol_;
   stop_at_end_ = getOption("stop_at_end");
   use_preconditioner_ = getOption("use_preconditioner");
-  use_preconditionerB_ =  hasSetOption("use_preconditionerB") ? bool(getOption("use_preconditionerB")): use_preconditioner_;
+  use_preconditionerB_ =  hasSetOption("use_preconditionerB") ? static_cast<bool>(getOption("use_preconditionerB")): use_preconditioner_;
   max_krylov_ = getOption("max_krylov");
-  max_krylovB_ =  hasSetOption("max_krylovB") ? int(getOption("max_krylovB")): max_krylov_;
+  max_krylovB_ =  hasSetOption("max_krylovB") ? static_cast<int>(getOption("max_krylovB")): max_krylov_;
 
   // Linear solver for forward integration
   if(getOption("linear_solver_type")=="dense"){

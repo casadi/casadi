@@ -50,11 +50,11 @@ namespace casadi{
   }
 
   ControlSimulatorInternal* ControlSimulator::operator->(){
-    return (ControlSimulatorInternal*)(Function::operator->());
+    return static_cast<ControlSimulatorInternal*>(Function::operator->());
   }
 
   const ControlSimulatorInternal* ControlSimulator::operator->() const{
-    return (const ControlSimulatorInternal*)(Function::operator->());
+    return static_cast<const ControlSimulatorInternal*>(Function::operator->());
   }
 
   bool ControlSimulator::checkNode() const{

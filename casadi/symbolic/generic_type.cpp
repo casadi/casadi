@@ -260,7 +260,7 @@ bool GenericType::toBool() const{
   if (isBool()) {
     return static_cast<const BoolType*>(get())->d_;
   } else if (isInt()) {
-    return bool(toInt());
+    return static_cast<bool>(toInt());
   } else {
     casadi_assert_message(isBool(),"type mismatch");
     return false;
@@ -271,9 +271,9 @@ int GenericType::toInt() const{
   if(isDouble()){
     double v = toDouble();
     casadi_assert_message(v == std::floor(v),"The value is not an integer");
-    return int(v);
+    return static_cast<int>(v);
   } else if (isBool()) {
-    return int(toBool());
+    return static_cast<int>(toBool());
   } else {
     casadi_assert_message(isInt(),"type mismatch");
     return static_cast<const IntType*>(get())->d_;
@@ -282,7 +282,7 @@ int GenericType::toInt() const{
 
 double GenericType::toDouble() const{
   if(isInt()){
-    return double(toInt());
+    return static_cast<double>(toInt());
   } else {
     casadi_assert_message(isDouble(),"type mismatch");
     return static_cast<const DoubleType*>(get())->d_;
