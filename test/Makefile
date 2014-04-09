@@ -6,12 +6,15 @@ all: unittests
 
 # Each of these targets will be tested by CasADi's trunktesterbot as individual tests.
 # These targets must all go on one line
-trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
+trunktesterbot: unittests_py examples_indoc_py examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py lint
 
 trunktesterbot_knownbugs: unittests_py_knownbugs examples_indoc_py examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
 # Set to -memcheck if you want to include a check for memory leaks
 MEMCHECK = 
+
+lint :
+	cd ../build && make lint; cd ../test
 
 full: unittests examples tutorials benchmarks
 
@@ -50,14 +53,14 @@ examples_code: examples_code_py examples_code_cpp
 # No memchecks because there is a memory leak in SuperLU
 examples_indoc_py:
 	python internal/test_py.py '../docs/api/examples'
-	
+
 # No memchecks because it leaks like hell, and is slow
 examples_code_py:
 	python internal/test_py.py '../docs/examples/python' -skipfiles="c_code_generation.py parametric_sensitivities.py reduced_hessian.py"
-	
+
 examples_indoc_cpp:
 	python internal/test_cpp.py '../docs/api/examples' $(MEMCHECK)
-	
+
 # No memchecks because it's slow
 examples_code_cpp:
 	python internal/test_cppcmake.py '../docs/examples/cplusplus' -skipfiles="test_liftopt.cpp casadi_error_handling.cpp parametric_sensitivities.cpp reduced_hessian.cpp test_opencl.cpp nlp_codegen.cpp codegen_usage.cpp stabilized_sqpmethod_nl.cpp"
