@@ -32,11 +32,11 @@ DirectSingleShooting::DirectSingleShooting(const Function& ffcn, const Function&
 }
 
 const DirectSingleShootingInternal* DirectSingleShooting::operator->() const{
-  return (const DirectSingleShootingInternal*)Function::operator->();
+  return static_cast<const DirectSingleShootingInternal*>(Function::operator->());
 }
 
 DirectSingleShootingInternal* DirectSingleShooting::operator->(){
-  return (DirectSingleShootingInternal*)Function::operator->();
+  return static_cast<DirectSingleShootingInternal*>(Function::operator->());
 }
 
 void DirectSingleShooting::getGuess(std::vector<double>& V_init) const{

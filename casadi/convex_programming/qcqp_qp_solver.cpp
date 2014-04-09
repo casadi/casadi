@@ -35,11 +35,11 @@ QCQPQPSolver::QCQPQPSolver(const QPStructure & st)  {
 }
 
 QCQPQPInternal* QCQPQPSolver::operator->(){
-  return (QCQPQPInternal*)(Function::operator->());
+  return static_cast<QCQPQPInternal*>(Function::operator->());
 }
 
 const QCQPQPInternal* QCQPQPSolver::operator->() const{
-  return (const QCQPQPInternal*)(Function::operator->());
+  return static_cast<const QCQPQPInternal*>(Function::operator->());
 
 }
 

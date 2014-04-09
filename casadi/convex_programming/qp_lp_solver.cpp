@@ -35,11 +35,11 @@ QPLPSolver::QPLPSolver(const LPStructure & st)  {
 }
 
 QPLPInternal* QPLPSolver::operator->(){
-  return (QPLPInternal*)(Function::operator->());
+  return static_cast<QPLPInternal*>(Function::operator->());
 }
 
 const QPLPInternal* QPLPSolver::operator->() const{
-  return (const QPLPInternal*)(Function::operator->());
+  return static_cast<const QPLPInternal*>(Function::operator->());
 
 }
 

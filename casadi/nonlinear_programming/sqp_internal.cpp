@@ -176,7 +176,7 @@ namespace casadi{
     }
 
     // Header
-    if(bool(getOption("print_header"))){
+    if(static_cast<bool>(getOption("print_header"))){
       cout << "-------------------------------------------" << endl;
       cout << "This is casadi::SQPMethod." << endl;
       if(exact_hessian_){
@@ -311,11 +311,11 @@ namespace casadi{
         stats_["iteration"] = iteration;
 
         double time2 = clock();
-        t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+        t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
         time1 = clock();
         int ret = callback_(ref_,user_data_);
         time2 = clock();
-        t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+        t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
         if (ret) {
           cout << endl;
           cout << "casadi::SQPMethod: aborted by callback..." << endl;
@@ -514,7 +514,7 @@ namespace casadi{
     }
 
     double time2 = clock();
-    t_mainloop_ = double(time2-time1)/CLOCKS_PER_SEC;
+    t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Save results to outputs
     output(NLP_SOLVER_F).set(fk_);
@@ -523,7 +523,7 @@ namespace casadi{
     output(NLP_SOLVER_LAM_X).set(mu_x_);
     output(NLP_SOLVER_G).set(gk_);
 
-    if (hasOption("print_time") && bool(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
       cout << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
@@ -736,7 +736,7 @@ namespace casadi{
       }
 
       double time2 = clock();
-      t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_g_ += 1;
     } catch (exception& ex){
       cerr << "eval_g failed: " << ex.what() << endl;
@@ -773,7 +773,7 @@ namespace casadi{
       }
 
       double time2 = clock();
-      t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_jac_g_ += 1;
 
     } catch (exception& ex){
@@ -811,7 +811,7 @@ namespace casadi{
         cout << "grad_f = " << grad_f << endl;
       }
       double time2 = clock();
-      t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
 
     } catch (exception& ex){
@@ -841,7 +841,7 @@ namespace casadi{
         cout << "f = " << f << endl;
       }
       double time2 = clock();
-      t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_f_ += 1;
 
     } catch (exception& ex){

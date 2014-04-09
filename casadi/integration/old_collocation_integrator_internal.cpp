@@ -486,7 +486,7 @@ namespace casadi{
     // Write out profiling information
     if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
       time_stop = getRealTime(); // Stop timer
-      CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << implicit_solver_.get() << ":" << implicit_solver_.getOption("name") << "|solve system" << std::endl;
+      CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << implicit_solver_.get() << ":" << implicit_solver_.getOption("name") << "|solve system" << std::endl;
     }
 
     // Mark the system integrated at least once

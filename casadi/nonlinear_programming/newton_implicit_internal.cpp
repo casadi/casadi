@@ -104,7 +104,7 @@ namespace casadi {
       // Write out profiling information
       if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << jac_.get() << ":" << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
+        CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << jac_.get() << ":" << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
       }
 
       if (monitored("F")) std::cout << "  F = " << F << std::endl;
@@ -129,7 +129,7 @@ namespace casadi {
       // Write out profiling information
       if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":1||prepare linear system" << std::endl;
+        CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":1||prepare linear system" << std::endl;
       }
 
       if (CasadiOptions::profiling) {
@@ -139,7 +139,7 @@ namespace casadi {
       linsol_.solve(&F.front(),1,false);
       if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;
+        CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;
       }
 
       if (monitored("step")) {

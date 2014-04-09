@@ -35,11 +35,11 @@ DSDPSolver::DSDPSolver(const SDPStructure &st)  {
 }
 
 DSDPInternal* DSDPSolver::operator->(){
-  return (DSDPInternal*)(Function::operator->());
+  return static_cast<DSDPInternal*>(Function::operator->());
 }
 
 const DSDPInternal* DSDPSolver::operator->() const{
-  return (const DSDPInternal*)(Function::operator->());
+  return static_cast<const DSDPInternal*>(Function::operator->());
 
 }
 

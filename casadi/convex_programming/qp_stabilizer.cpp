@@ -35,12 +35,11 @@ QPStabilizer::QPStabilizer(const QPStructure & st)  {
 }
 
 QPStabilizerInternal* QPStabilizer::operator->(){
-  return (QPStabilizerInternal*)(Function::operator->());
+  return static_cast<QPStabilizerInternal*>(Function::operator->());
 }
 
 const QPStabilizerInternal* QPStabilizer::operator->() const{
-  return (const QPStabilizerInternal*)(Function::operator->());
-
+  return static_cast<const QPStabilizerInternal*>(Function::operator->());
 }
 
 bool QPStabilizer::checkNode() const{

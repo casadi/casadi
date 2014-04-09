@@ -34,12 +34,11 @@ namespace casadi{
   }
 
   NewtonImplicitInternal* NewtonImplicitSolver::operator->(){
-    return (NewtonImplicitInternal*)(Function::operator->());
+    return static_cast<NewtonImplicitInternal*>(Function::operator->());
   }
 
   const NewtonImplicitInternal* NewtonImplicitSolver::operator->() const{
-    return (const NewtonImplicitInternal*)(Function::operator->());
-
+    return static_cast<const NewtonImplicitInternal*>(Function::operator->());
   }
 
   bool NewtonImplicitSolver::checkNode() const{

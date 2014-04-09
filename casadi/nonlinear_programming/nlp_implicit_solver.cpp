@@ -34,11 +34,11 @@ namespace casadi{
   }
 
   NLPImplicitInternal* NLPImplicitSolver::operator->(){
-    return (NLPImplicitInternal*)(Function::operator->());
+    return static_cast<NLPImplicitInternal*>(Function::operator->());
   }
 
   const NLPImplicitInternal* NLPImplicitSolver::operator->() const{
-    return (const NLPImplicitInternal*)(Function::operator->());
+    return static_cast<const NLPImplicitInternal*>(Function::operator->());
   }
 
   bool NLPImplicitSolver::checkNode() const{

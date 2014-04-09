@@ -274,7 +274,7 @@ namespace casadi{
     // Ask Ipopt to solve the problem
     Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
     double time2 = clock();
-    t_mainloop_ = double(time2-time1)/CLOCKS_PER_SEC;
+    t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
 #ifdef WITH_SIPOPT
     if(run_sens_ || compute_red_hessian_){
@@ -301,7 +301,7 @@ namespace casadi{
     }
 #endif // WITH_SIPOPT
 
-    if (hasOption("print_time") && bool(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
       cout << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
@@ -430,7 +430,7 @@ namespace casadi{
         int ret = callback_(ref_,user_data_);
 
         double time2 = clock();
-        t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+        t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
         return  !ret;
       } else {
         return 1;
@@ -510,7 +510,7 @@ namespace casadi{
 
       }
       double time2 = clock();
-      t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_h_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_h_ += 1;
       log("eval_h ok");
       return true;
@@ -565,7 +565,7 @@ namespace casadi{
       }
 
       double time2 = clock();
-      t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
@@ -603,7 +603,7 @@ namespace casadi{
       if (regularity_check_ && !isRegular(nlp_.output(NL_F).data())) casadi_error("IpoptInternal::f: NaN or Inf detected.");
 
       double time2 = clock();
-      t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_f_ += 1;
       log("eval_f ok");
       return true;
@@ -641,7 +641,7 @@ namespace casadi{
       if (regularity_check_ && !isRegular(nlp_.output(NL_G).data())) casadi_error("IpoptInternal::g: NaN or Inf detected.");
 
       double time2 = clock();
-      t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_g_ += 1;
       log("eval_g ok");
       return true;
@@ -677,7 +677,7 @@ namespace casadi{
       if (regularity_check_ && !isRegular(gradF_.output().data())) casadi_error("IpoptInternal::grad_f: NaN or Inf detected.");
 
       double time2 = clock();
-      t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
       log("eval_grad_f ok");
       return true;
@@ -765,7 +765,7 @@ namespace casadi{
 
   int IpoptInternal::get_number_of_nonlinear_variables(){
     try {
-      if(!bool(getOption("pass_nonlinear_variables"))){
+      if(!static_cast<bool>(getOption("pass_nonlinear_variables"))){
         // No Hessian has been interfaced
         return -1;
       } else {

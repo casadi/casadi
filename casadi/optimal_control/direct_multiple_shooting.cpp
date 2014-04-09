@@ -32,11 +32,11 @@ DirectMultipleShooting::DirectMultipleShooting(const Function& ffcn, const Funct
 }
 
 const DirectMultipleShootingInternal* DirectMultipleShooting::operator->() const{
-  return (const DirectMultipleShootingInternal*)Function::operator->();
+  return static_cast<const DirectMultipleShootingInternal*>(Function::operator->());
 }
 
 DirectMultipleShootingInternal* DirectMultipleShooting::operator->(){
-  return (DirectMultipleShootingInternal*)Function::operator->();
+  return static_cast<DirectMultipleShootingInternal*>(Function::operator->());
 }
 
 void DirectMultipleShooting::getGuess(std::vector<double>& V_init) const{

@@ -234,7 +234,7 @@ namespace casadi{
     }
 
     // Header
-    if(bool(getOption("print_header"))){
+    if(static_cast<bool>(getOption("print_header"))){
       cout << "-------------------------------------------" << endl;
       cout << "This is casadi::StabilizedSQPMethod." << endl;
       if(exact_hessian_){
@@ -453,7 +453,7 @@ namespace casadi{
         break;
       }
 
-      if (double(clock()-initial_time)/CLOCKS_PER_SEC > double(getOption("max_time"))){
+      if ((clock()-initial_time)/CLOCKS_PER_SEC > static_cast<double>(getOption("max_time"))){
         cout << endl;
         cout << "casadi::StabilizedSQPMethod: Maximum time (" << getOption("max_time")
              << " sec.) exceeded." << endl;

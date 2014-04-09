@@ -32,11 +32,11 @@ DirectCollocation::DirectCollocation(const Function& ffcn, const Function& mfcn,
 }
 
 const DirectCollocationInternal* DirectCollocation::operator->() const{
-  return (const DirectCollocationInternal*)Function::operator->();
+  return static_cast<const DirectCollocationInternal*>(Function::operator->());
 }
 
 DirectCollocationInternal* DirectCollocation::operator->(){
-  return (DirectCollocationInternal*)Function::operator->();
+  return static_cast<DirectCollocationInternal*>(Function::operator->());
 }
 
 void DirectCollocation::getGuess(std::vector<double>& V_init) const{

@@ -42,7 +42,7 @@ namespace casadi {
   }
 
   DSDPInternal::DSDPInternal(const std::vector<Sparsity> &st) : SDPSolverInternal(st){
-    casadi_assert_message(double(m_)*(double(m_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size m is too large to be handled by DSDP.");
+    casadi_assert_message(static_cast<double>(m_)*(static_cast<double>(m_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size m is too large to be handled by DSDP.");
 
     addOption("gapTol",OT_REAL,1e-8,"Convergence criterion based on distance between primal and dual objective");
     addOption("maxIter",OT_INTEGER,500,"Maximum number of iterations");

@@ -198,7 +198,7 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
     }
   }
   double time2 = clock();
-  solver->t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+  solver->t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
   full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 

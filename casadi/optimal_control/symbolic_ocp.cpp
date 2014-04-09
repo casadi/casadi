@@ -1009,7 +1009,7 @@ namespace casadi{
     setOde(this->x,ode(this->x)/scale);
 
     double time2 = clock();
-    double dt = double(time2-time1)/CLOCKS_PER_SEC;
+    double dt = (time2-time1)/CLOCKS_PER_SEC;
     cout << "... equation scaling complete after " << dt << " seconds." << endl;
   }
 
@@ -1310,9 +1310,9 @@ namespace casadi{
 
       // Print value
       if(val.isInt()){
-        datfile << int(val) << endl;
+        datfile << static_cast<int>(val) << endl;
       } else if(val.isDouble()){
-        datfile << double(val) << endl;
+        datfile << static_cast<double>(val) << endl;
       } else if(val.isString()){
         datfile << string(val) << endl;
       } else if(val.isIntVector()){

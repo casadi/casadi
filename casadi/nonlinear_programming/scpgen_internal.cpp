@@ -564,7 +564,7 @@ namespace casadi{
     }
 
     // Header
-    if(bool(getOption("print_header"))){
+    if(static_cast<bool>(getOption("print_header"))){
       cout << "-------------------------------------------" << endl;
       cout << "This is casadi::SCPgen." << endl;
       if(gauss_newton_) {
@@ -745,7 +745,7 @@ namespace casadi{
     }
 
     double time2 = clock();
-    t_mainloop_ = double(time2-time1)/CLOCKS_PER_SEC;
+    t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
     // Store optimal value
     cout << "optimal cost = " << f_ << endl;
@@ -913,7 +913,7 @@ namespace casadi{
     }
 
     double time2 = clock();
-    t_eval_mat_ += double(time2-time1)/CLOCKS_PER_SEC;
+    t_eval_mat_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
   void SCPgenInternal::eval_res(){
@@ -965,7 +965,7 @@ namespace casadi{
     res_fcn_.getOutput(output(NLP_SOLVER_LAM_P),res_p_d_);
 
     double time2 = clock();
-    t_eval_res_ += double(time2-time1)/CLOCKS_PER_SEC;
+    t_eval_res_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
   void SCPgenInternal::eval_vec(){
@@ -1003,7 +1003,7 @@ namespace casadi{
     }
 
     double time2 = clock();
-    t_eval_vec_ += double(time2-time1)/CLOCKS_PER_SEC;
+    t_eval_vec_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
   void SCPgenInternal::regularize(){
@@ -1066,7 +1066,7 @@ namespace casadi{
     std::transform(g_dlam_.begin(),g_dlam_.end(),g_lam_.begin(),g_dlam_.begin(),std::minus<double>());
 
     double time2 = clock();
-    t_solve_qp_ += double(time2-time1)/CLOCKS_PER_SEC;
+    t_solve_qp_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
   void SCPgenInternal::line_search(int& ls_iter, bool& ls_success){
@@ -1219,7 +1219,7 @@ namespace casadi{
     }
 
     double time2 = clock();
-    t_eval_exp_ += double(time2-time1)/CLOCKS_PER_SEC;
+    t_eval_exp_ += (time2-time1)/CLOCKS_PER_SEC;
   }
 
 
