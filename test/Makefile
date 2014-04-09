@@ -21,8 +21,8 @@ full: unittests examples tutorials benchmarks
 full_knownbugs: unittests_knownbugs examples tutorials benchmarks
 
 benchmarks:
-	cd python && python complexity.py && cd ..
-	
+	cd python && python complexity.py; cd ..
+
 python: unittests_py examples_indoc_py examples_code_py user_guide_snippets_py tutorials
 
 python_knownbugs: unittests_py_knownbugs examples_indoc_py examples_code_py user_guide_snippets_py tutorials
