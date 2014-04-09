@@ -28,15 +28,15 @@
 #include <casadi/convex_programming/casadi_convex_programming_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class QPStabilizerInternal;
 
   /** \brief IPOPT QP Solver for quadratic programming
 
    @copydoc StabilizedQPSolver_doc
-      
+
    \author Joris Gillis
    \date 2013
   */
@@ -45,21 +45,21 @@ public:
 
   /** \brief  Default constructor */
   QPStabilizer();
-  
-  
+
+
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_QPStruct
   */
   explicit QPStabilizer(const QPStructure & st);
-  
+
   /** \brief  Access functions of the node */
   QPStabilizerInternal* operator->();
   const QPStabilizerInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
@@ -71,7 +71,7 @@ public:
 
   /// Access underlying QP solver
   QPSolver & getSolver();
-  
+
 };
 
 

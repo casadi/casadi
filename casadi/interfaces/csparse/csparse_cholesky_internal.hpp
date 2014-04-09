@@ -47,41 +47,41 @@ namespace casadi{
 
     // Destructor
     virtual ~CSparseCholeskyInternal();
-    
+
     // Initialize the solver
     virtual void init();
 
     // Factorize the matrix
     virtual void prepare();
-    
+
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
 
     // Solve the system of equations Lx = b
     void solveL(double* x, int nrhs, bool transpose);
-    
+
     /// Obtain a symbolic Cholesky factorization
     Sparsity getFactorizationSparsity(bool transpose=false) const;
-    
+
     /// Obtain a numeric Cholesky factorization
     DMatrix getFactorization(bool transpose=false) const;
-    
+
     // Clone
     virtual CSparseCholeskyInternal* clone() const;
-    
+
     // The tranpose of linear system in form (CCS)
     cs AT_;
 
     // The symbolic factorization
     css *S_;
-    
+
     // The numeric factorization
     csn *L_;
-    
+
     // Temporary
     std::vector<double> temp_;
 
-    
+
   };
 
 } // namespace casadi

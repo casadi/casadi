@@ -32,7 +32,7 @@
 namespace casadi{
 
   /** \brief Internal class for NLPImplicitInternal
-   * 
+   *
    @copydoc ImplicitFunction_doc
    * */
   class CASADI_NONLINEAR_PROGRAMMING_EXPORT NLPImplicitInternal : public ImplicitFunctionInternal {
@@ -46,7 +46,7 @@ namespace casadi{
 
     /** \brief  Clone */
     virtual NLPImplicitInternal* clone() const{ return new NLPImplicitInternal(*this);}
-  
+
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
@@ -55,13 +55,13 @@ namespace casadi{
 
     /** \brief  Initialize */
     virtual void init();
-    
+
     /** \brief  Solve the nonlinear system of equations */
     virtual void solveNonLinear();
-  
+
     // NLP solver instance
-    NLPSolver nlp_solver_; 
-    
+    NLPSolver nlp_solver_;
+
   };
 
 } // namespace casadi

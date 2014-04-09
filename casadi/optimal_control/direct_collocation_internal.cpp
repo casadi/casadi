@@ -29,7 +29,7 @@
 
 using namespace std;
 namespace casadi{
-    
+
 DirectCollocationInternal::DirectCollocationInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("nlp_solver",                       OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
@@ -44,7 +44,7 @@ DirectCollocationInternal::~DirectCollocationInternal(){
 void DirectCollocationInternal::init(){
   // Initialize the base classes
   OCPSolverInternal::init();
-  
+
   // Free parameters currently not supported
   casadi_assert_message(np_==0, "Not implemented");
 
@@ -199,16 +199,16 @@ void DirectCollocationInternal::init(){
 
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
-  
+
   // Allocate an NLP solver
   nlp_solver_ = nlp_solver_creator(nlp_);
-  
+
   // Pass options
   if(hasSetOption("nlp_solver_options")){
     const Dictionary& nlp_solver_options = getOption("nlp_solver_options");
     nlp_solver_.setOption(nlp_solver_options);
   }
-  
+
   // Initialize the solver
   nlp_solver_.init();
 }
@@ -218,15 +218,15 @@ void DirectCollocationInternal::getGuess(vector<double>& V_init) const{
   const Matrix<double> &p_init = input(OCP_P_INIT);
   const Matrix<double> &x_init = input(OCP_X_INIT);
   const Matrix<double> &u_init = input(OCP_U_INIT);
-  
+
   // Running index
   int el=0;
-  
+
   // Pass guess for parameters
   for(int i=0; i<np_; ++i){
     V_init[el++] = p_init.elem(i);
   }
-  
+
   for(int k=0; k<nk_; ++k){
     // Pass guess for state
     for(int j=0; j<=deg_; ++j){
@@ -234,7 +234,7 @@ void DirectCollocationInternal::getGuess(vector<double>& V_init) const{
          V_init[el++] = x_init.elem(i,k);
       }
     }
-    
+
     // Pass guess for control
     for(int i=0; i<nu_; ++i){
       V_init[el++] = u_init.elem(i,k);
@@ -245,12 +245,12 @@ void DirectCollocationInternal::getGuess(vector<double>& V_init) const{
   for(int i=0; i<nx_; ++i){
     V_init[el++] = x_init.elem(i,nk_);
   }
-  
+
   casadi_assert(el==V_init.size());
 }
 
 void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
-  // OCP variable bounds 
+  // OCP variable bounds
   const Matrix<double> &p_min = input(OCP_LBP);
   const Matrix<double> &p_max = input(OCP_UBP);
   const Matrix<double> &x_min = input(OCP_LBX);
@@ -260,7 +260,7 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<
 
   // Running index
   int min_el=0, max_el=0;
-  
+
   // Pass bounds on parameters
   for(int i=0; i<np_; ++i){
     V_min[min_el++] = p_min.elem(i);
@@ -268,13 +268,13 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<
   }
 
   for(int k=0; k<nk_; ++k){
-    
+
     // Pass bounds on state
     for(int i=0; i<nx_; ++i){
       V_min[min_el++] = x_min.elem(i,k);
       V_max[max_el++] = x_max.elem(i,k);
     }
-    
+
     // Pass bounds on collocation points
     for(int j=0; j<deg_; ++j){
       for(int i=0; i<nx_; ++i){
@@ -295,7 +295,7 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<
     V_min[min_el++] = x_min.elem(i,nk_);
     V_max[max_el++] = x_max.elem(i,nk_);
   }
-  
+
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
 }
 
@@ -303,10 +303,10 @@ void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min, vecto
   // OCP constraint bounds
   const Matrix<double> &h_min = input(OCP_LBH);
   const Matrix<double> &h_max = input(OCP_UBH);
-  
+
   // Running index
   int min_el=0, max_el=0;
-  
+
   for(int k=0; k<nk_; ++k){
         for(int j=0; j<=deg_; ++j){
       for(int i=0; i<nx_; ++i){
@@ -314,7 +314,7 @@ void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min, vecto
         G_max[max_el++] = 0.;
       }
     }
-    
+
     for(int i=0; i<nh_; ++i){
       G_min[min_el++] = h_min.elem(i,k);
       G_max[max_el++] = h_max.elem(i,k);
@@ -328,7 +328,7 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
   Matrix<double> &p_opt = output(OCP_P_OPT);
   Matrix<double> &x_opt = output(OCP_X_OPT);
   Matrix<double> &u_opt = output(OCP_U_OPT);
-  
+
   // Running index
   int el=0;
 
@@ -336,14 +336,14 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
   for(int i=0; i<np_; ++i){
     p_opt(i) = V_opt[el++];
   }
-    
+
   for(int k=0; k<nk_; ++k){
-    
+
     // Pass optimized state
     for(int i=0; i<nx_; ++i){
       x_opt(i,k) = V_opt[el++];
     }
-    
+
     // Skip collocation points
     el += deg_*nx_;
 
@@ -364,13 +364,13 @@ void DirectCollocationInternal::evaluate(){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
   getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),nlp_solver_.input(NLP_SOLVER_UBX).data());
-       
+
   // get NLP constraint bounds
   getConstraintBounds(nlp_solver_.input(NLP_SOLVER_LBG).data(), nlp_solver_.input(NLP_SOLVER_UBG).data());
-       
+
   //Solve the problem
   nlp_solver_.solve();
-  
+
   // Save the optimal solution
   setOptimalSolution(nlp_solver_.output(NLP_SOLVER_X).data());
 
@@ -379,13 +379,13 @@ void DirectCollocationInternal::evaluate(){
 }
 
 
-void DirectCollocationInternal::reportConstraints(std::ostream &stream) { 
+void DirectCollocationInternal::reportConstraints(std::ostream &stream) {
   stream << "Reporting Collocation constraints" << endl;
- 
+
   FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
   FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
   FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
- 
+
 }
 
 } // namespace casadi

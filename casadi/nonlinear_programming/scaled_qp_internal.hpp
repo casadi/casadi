@@ -27,15 +27,15 @@
 
 /// \cond INTERNAL
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class NLPQPInternal;
 
   /** \brief IPOPT QP Solver for quadratic programming
 
    @copydoc QPSolver_doc
-      
+
    \author Joris Gillis
    \date 2011
   */
@@ -44,20 +44,20 @@ public:
 
   /** \brief  Default constructor */
   NLPQPSolver();
-  
+
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_QPStruct
   */
   explicit NLPQPSolver(const QPStructure &st);
-  
+
   /** \brief  Access functions of the node */
   NLPQPInternal* operator->();
   const NLPQPInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");

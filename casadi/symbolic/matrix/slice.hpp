@@ -30,7 +30,7 @@
 #include <iostream>
 
 namespace casadi{
-  
+
   /** \brief Class representing a Slice
    *
    * Note that Python or Octave do not need to use this class.
@@ -40,13 +40,13 @@ namespace casadi{
   public:
     /// Defailt constructor - all elements
     Slice();
-    
+
     /// A single element
     Slice(int i);
-    
+
     /// A slice
     Slice(int start, int stop, int step=1);
-    
+
     /// Construct from an index vector (requires isSlice(v) to be true)
     explicit Slice(const std::vector<int>& v);
 
@@ -79,20 +79,20 @@ namespace casadi{
     /// start value: negative values will get added to length
     int start_;
     /// stop value: use std::numeric_limits<int>::max() to indicate unboundedness
-    int stop_; 
+    int stop_;
     int step_;
   };
-  
+
 #ifndef SWIG
   static Slice ALL;
 #endif // SWIG
-  
+
   /// \cond INTERNAL
-  /**  Class representing a non-regular (and thus non-slice) index list 
+  /**  Class representing a non-regular (and thus non-slice) index list
    */
   class CASADI_SYMBOLIC_EXPORT IndexList{
   private:
-    
+
   public:
     enum Type {NILL, INT, SLICE, IVECTOR};
     /// Constructor
@@ -100,10 +100,10 @@ namespace casadi{
     explicit IndexList(int i);
     explicit IndexList(const std::vector<int> &i);
     explicit IndexList(const Slice &i);
-    
+
     /// Get a vector of indices
     std::vector<int> getAll(int len) const;
-    
+
     /// Data members (all public)
     Slice slice;
     int i;
@@ -111,7 +111,7 @@ namespace casadi{
     Type type;
   };
   /// \endcond
-  
+
 } // namespace casadi
 
 

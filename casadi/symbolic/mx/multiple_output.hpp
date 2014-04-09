@@ -33,9 +33,9 @@ namespace casadi{
 
   /// Forward declaration
   class OutputNode;
-  
-  /** 
-      \author Joel Andersson 
+
+  /**
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT MultipleOutput : public MXNode{
@@ -44,16 +44,16 @@ namespace casadi{
 
     /** \brief  Constructor */
     MultipleOutput();
- 
+
     /** \brief  Destructor */
     virtual ~MultipleOutput();
- 
+
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const=0;
-    
+
     /** \brief  Get an output */
     virtual MX getOutput(int oind) const;
-    
+
     /** \brief  Get the sparsity of output oind */
     virtual const Sparsity& sparsity(int oind) const=0;
 
@@ -64,7 +64,7 @@ namespace casadi{
 
   class CASADI_SYMBOLIC_EXPORT OutputNode : public MXNode{
   public:
-  
+
     /** \brief  Constructor */
     OutputNode(const MX& parent, int oind);
 
@@ -78,11 +78,11 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Is the node nonlinear */
-    virtual bool isNonLinear(){return true;} 
+    virtual bool isNonLinear(){return true;}
 
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const{return true;}
-    
+
     /** \brief  Get function input */
     virtual int getFunctionInput() const{ return -1;}
 
@@ -97,7 +97,7 @@ namespace casadi{
 
     /// Create a vertical concatenation node (vectors only)
     virtual MX getVertcat(const std::vector<MX>& x) const{ return dep()->getVertcat(x);}
-    
+
     /** \brief  Output index */
     int oind_;
   };

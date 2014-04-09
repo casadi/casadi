@@ -27,9 +27,9 @@
 #include <casadi/interfaces/knitro/casadi_knitro_interface_export.h>
 
 namespace casadi{
-  
+
 class KnitroInternal;
-  
+
 /** \brief Interface to the Knitro NLP solver
  *
 @copydoc NLPSolver_doc
@@ -38,7 +38,7 @@ class CASADI_KNITRO_INTERFACE_EXPORT KnitroSolver : public NLPSolver {
   public:
     /// Default constructor
     KnitroSolver();
-   
+
     /// \brief Create an NLP solver instance
     explicit KnitroSolver(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                          );
@@ -46,10 +46,10 @@ class CASADI_KNITRO_INTERFACE_EXPORT KnitroSolver : public NLPSolver {
     /// Access functions of the node
     KnitroInternal* operator->();
     const KnitroInternal* operator->() const;
-    
+
     /// Set KNITRO integer parameters
     void setIntParam(const std::string& name, int val);
-    
+
     /// Set KNITRO double parameters
     void setDoubleParam(const std::string& name, double val);
 
@@ -59,7 +59,7 @@ class CASADI_KNITRO_INTERFACE_EXPORT KnitroSolver : public NLPSolver {
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Static creator function 
+    /// Static creator function
     #ifdef SWIG
     %callback("%s_cb");
     #endif
@@ -67,10 +67,10 @@ class CASADI_KNITRO_INTERFACE_EXPORT KnitroSolver : public NLPSolver {
     #ifdef SWIG
     %nocallback;
     #endif
-    
+
     /// @Joris: This would be an alternative
     static NLPSolverCreator getCreator(){return creator;}
-   
+
 };
 
 } // namespace casadi

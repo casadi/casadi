@@ -34,39 +34,39 @@ namespace casadi{
 
   DerivativeGeneratorCInternal::DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr)  : FunctorCInternal(ptr) {
   }
-  
+
   Function DerivativeGeneratorCInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
     casadi_assert(ptr_!=0);
     return ptr_(fcn, nfwd, nadj, user_data);
   }
-  
+
   DerivativeGeneratorCInternal* DerivativeGeneratorCInternal::clone() const {
     return new DerivativeGeneratorCInternal(ptr_);
-  }  
+  }
 
   CustomEvaluateCInternal::CustomEvaluateCInternal(CustomEvaluateCPtr ptr)  : FunctorCInternal<CustomEvaluateCPtr>(ptr) {
   }
-  
+
   void CustomEvaluateCInternal::call(CustomFunction& fcn, void* user_data) {
     casadi_assert(ptr_!=0);
     ptr_(fcn, user_data);
   }
-  
+
   CustomEvaluateCInternal* CustomEvaluateCInternal::clone() const {
     return new CustomEvaluateCInternal(ptr_);
   }
 
   CallbackCInternal::CallbackCInternal(CallbackCPtr ptr)  : FunctorCInternal<CallbackCPtr>(ptr) {
   }
-  
+
   int CallbackCInternal::call(Function& fcn, void* user_data) {
     casadi_assert(ptr_!=0);
     return ptr_(fcn, user_data);
   }
-  
+
   CallbackCInternal* CallbackCInternal::clone() const {
     return new CallbackCInternal(ptr_);
   }
-  
+
 } // namespace casadi
 

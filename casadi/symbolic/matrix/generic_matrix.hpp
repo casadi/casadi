@@ -36,31 +36,31 @@ namespace casadi{
   enum SparsityType{SPARSE,SPARSESYM,DENSE,DENSESYM,DENSETRANS};
 
   /** \brief Matrix base class
-  
+
       This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
       common functionality using the curiously recurring template pattern (CRTP) idiom.\n
-  
+
       The class is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
       This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
-  
+
       The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
 
       Index starts with 0.\n
       Index vec happens as follows: (rr,cc) -> k = rr+cc*size1()\n
       Vectors are column vectors.\n
-  
+
       The storage format is Compressed Column Storage (CCS), similar to that used for sparse matrices in Matlab, \n
       but unlike this format, we do allow for elements to be structurally non-zero but numerically zero.\n
-  
+
       The sparsity pattern, which is reference counted and cached, can be accessed with Sparsity& sparsity()\n
-  
-      \author Joel Andersson 
-      \date 2012    
+
+      \author Joel Andersson
+      \date 2012
   */
   template<typename MatType>
   class GenericMatrix{
   public:
-    
+
     /** \brief Get the number of (structural) non-zero elements */
     int size() const;
 
@@ -72,7 +72,7 @@ namespace casadi{
 
     /** \brief Get get the number of non-zeros on the diagonal */
     int sizeD() const;
-    
+
     /** \brief Get the number of elements */
     int numel() const;
 
@@ -84,23 +84,23 @@ namespace casadi{
 
     /** \brief Get the number if non-zeros for a given sparsity pattern */
     int size(SparsityType sp) const;
-    
+
     /** \brief Get string representation of dimensions.
         The representation is (nrow x ncol = numel | size)
     */
     std::string dimString() const;
-    
-#ifndef SWIG  
+
+#ifndef SWIG
     /** \brief  Get the shape */
     std::pair<int,int> shape() const;
 #endif
 
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero (or optionally both dimensions) */
     bool isEmpty(bool both=false) const{ return sparsity().isEmpty(both);}
-    
+
     /** \brief  Check if the matrix expression is dense */
     bool isDense() const{ return sparsity().isDense();}
- 
+
     /** \brief  Check if the matrix expression is scalar */
     bool isScalar(bool scalar_and_dense=false) const;
 
@@ -137,7 +137,7 @@ namespace casadi{
 
     /** \brief  Get Sparsity slice */
     const MatType operator()(const Sparsity& sp) const{ return static_cast<const MatType*>(this)->sub(sp); }
-    
+
     /** \brief  Get Matrix element or slice */
     template<typename RR, typename CC>
     const MatType operator()(const RR& rr, const CC& cc) const{ return static_cast<const MatType*>(this)->sub(rr,cc); }
@@ -148,7 +148,7 @@ namespace casadi{
 
     /** \brief  Access Sparsity slice */
     SubMatrix<MatType,Sparsity,int> operator()(const Sparsity& sp){ return SubMatrix<MatType,Sparsity,int>(static_cast<MatType&>(*this),sp,0); }
-      
+
     /** \brief  Access Matrix element or slice */
     template<typename RR, typename CC>
     SubMatrix<MatType,RR,CC> operator()(const RR& rr, const CC& cc){ return SubMatrix<MatType,RR,CC>(static_cast<MatType&>(*this),rr,cc); }
@@ -174,14 +174,14 @@ namespace casadi{
 
     /** \brief Create a vector of length p with nrow-by-ncol symbolic primitives */
     static std::vector<MatType > sym(const std::string& name, int nrow, int ncol, int p){ return sym(name,Sparsity::dense(nrow,ncol),p);}
-    
+
     /** \brief Create a vector of length r of vectors of length p with symbolic primitives with given sparsity*/
     static std::vector<std::vector<MatType> > sym(const std::string& name, const Sparsity& sp, int p, int r);
 
     /** \brief Create a vector of length r of vectors of length p with nrow-by-ncol symbolic primitives */
     static std::vector<std::vector<MatType> > sym(const std::string& name, int nrow, int ncol, int p, int r){ return sym(name,Sparsity::dense(nrow,ncol),p,r);}
     ///@}
-    
+
     //@{
     /** \brief  create a sparse matrix with all zeros */
     static MatType sparse(int nrow=1, int ncol=1){ return MatType(Sparsity::sparse(nrow,ncol));}
@@ -203,11 +203,11 @@ namespace casadi{
     //@}
 
     /** \brief Matrix-matrix multiplication.
-     * Attempts to identify quick returns on matrix-level and 
+     * Attempts to identify quick returns on matrix-level and
      * delegates to MatType::mul_full if no such quick returns are found.
      */
     MatType mul_smart(const MatType& y, const Sparsity& sp_z) const;
-    
+
   };
 
 #ifndef SWIG
@@ -276,11 +276,11 @@ namespace casadi{
   template<typename MatType>
   MatType GenericMatrix<MatType>::mul_smart(const MatType& y, const Sparsity &sp_z) const {
     const MatType& x = *static_cast<const MatType*>(this);
-  
+
     if (!(x.isScalar() || y.isScalar())) {
       casadi_assert_message(size2()==y.size1(),"Matrix product with incompatible dimensions. Lhs is " << dimString() << " and rhs is " << y.dimString() << ".");
     }
-  
+
     // Check if we can simplify the product
     if(x.isIdentity()){
       return y;
@@ -348,7 +348,7 @@ namespace casadi{
   }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp){ 
+  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp){
     throw CasadiException("\"sym\" not defined for instantiation");
   }
 

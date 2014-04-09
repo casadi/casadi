@@ -30,7 +30,7 @@
 
 /// \cond INTERNAL
 namespace casadi{
-  
+
   // Forward declaration of internal class
   class ImplicitFunctionInternal;
 
@@ -42,22 +42,22 @@ namespace casadi{
      * \param f   Function mapping from (n+1) inputs to 1 output.
      */
     ImplicitFunctionInternal(const Function& f, const Function& J, const LinearSolver& linsol);
-        
+
     /// Destructor
     virtual ~ImplicitFunctionInternal() = 0;
-    
+
     /** \brief  Clone */
     virtual ImplicitFunctionInternal* clone() const=0;
-    
+
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-    
+
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const = 0;    
+    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const = 0;
 
     /// Initialize
     virtual void init();
-    
+
     /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
@@ -66,7 +66,7 @@ namespace casadi{
 
     /// Solve the system of equations and calculate derivatives
     virtual void evaluate();
- 
+
     /// Solve the nonlinear system of equations
     virtual void solveNonLinear() = 0;
 
@@ -80,19 +80,19 @@ namespace casadi{
 
     /// The function f(z, x1, x2, ..., xn) == 0
     Function f_;
-       
+
     /// Jacobian of f with respect to z
     Function jac_;
-    
+
     /// Linear solver
     LinearSolver linsol_;
 
     /// Factorization up-to-date?
     bool fact_up_to_date_;
-    
+
     /// Constraints on decision variables
     std::vector<int> u_c_;
-    
+
     /// Indices of the input and output that correspond to the actual root-finding
     int iin_, iout_;
   };

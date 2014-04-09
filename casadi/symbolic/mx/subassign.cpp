@@ -25,12 +25,12 @@
 using namespace std;
 
 namespace casadi{
-  
+
   SubAssign::SubAssign(const MX& x, const MX& y, const Slice& i, const Slice& j) : i_(i), j_(j) {
     setDependencies(x,y);
     casadi_error("not ready");
   }
-  
+
   SubAssign* SubAssign::clone() const{
     return new SubAssign(*this);
   }
@@ -67,7 +67,7 @@ namespace casadi{
   }
 
   void SubAssign::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    casadi_error("not ready");  
+    casadi_error("not ready");
   }
 
 } // namespace casadi

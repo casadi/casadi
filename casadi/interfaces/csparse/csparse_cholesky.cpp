@@ -31,7 +31,7 @@ namespace casadi{
   CSparseCholesky::CSparseCholesky(const Sparsity& sp, int nrhs){
     assignNode(new CSparseCholeskyInternal(sp,nrhs));
   }
- 
+
   CSparseCholeskyInternal* CSparseCholesky::operator->(){
     return static_cast<CSparseCholeskyInternal*>(Function::operator->());
   }
@@ -39,7 +39,7 @@ namespace casadi{
   const CSparseCholeskyInternal* CSparseCholesky::operator->() const{
     return static_cast<const CSparseCholeskyInternal*>(Function::operator->());
   }
-  
+
   bool CSparseCholesky::checkNode() const{
     return dynamic_cast<const CSparseCholeskyInternal*>(get())!=0;
   }
@@ -47,7 +47,7 @@ namespace casadi{
   Sparsity CSparseCholesky::getFactorizationSparsity(bool transpose) const {
     return (*this)->getFactorizationSparsity(transpose);
   }
-  
+
   DMatrix CSparseCholesky::getFactorization(bool transpose) const {
     return (*this)->getFactorization(transpose);
   }

@@ -28,15 +28,15 @@
 #include <casadi/convex_programming/casadi_convex_programming_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class SDPSOCPInternal;
 
   /** \brief SOCP Solver for quadratic programming
 
    @copydoc SOCPSolver_doc
-      
+
    \author Joris Gillis
    \date 2013
   */
@@ -45,21 +45,21 @@ public:
 
   /** \brief  Default constructor */
   SDPSOCPSolver();
-  
-  
+
+
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_SOCPStruct
   */
   explicit SDPSOCPSolver(const SOCPStructure & st);
-  
+
   /** \brief  Access functions of the node */
   SDPSOCPInternal* operator->();
   const SDPSOCPInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
@@ -68,7 +68,7 @@ public:
   #ifdef SWIG
   %nocallback;
   #endif
-  
+
   /// Access underlying SDP solver
   SDPSolver & getSolver();
 

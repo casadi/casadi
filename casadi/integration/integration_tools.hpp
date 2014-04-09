@@ -32,7 +32,7 @@
 #include <casadi/integration/casadi_integration_export.h>
 
 namespace casadi{
-  
+
   //@{
   /** \brief Obtain collocation points of specific order and scheme
   \param scheme  'radau' or 'legendre'
@@ -42,14 +42,14 @@ namespace casadi{
   CASADI_INTEGRATION_EXPORT std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
 #endif // SWIG
   //@}
-  
+
   /** \brief Obtain collocation interpolating matrices
   \param tau_root  location of collocation points, as obtained from collocationPoints
   \param[out] C interpolating coefficients to obtain derivatives
       Length: order+1, order + 1
-      
+
       dX/dt @collPoint(j) ~ Sum_i C[j][i]*X@collPoint(i)
-      
+
   \param[out] D interpolating coefficients to obtain end state
       Length: order+1
   */
@@ -88,7 +88,7 @@ extern const long double** collocation_points[2];
 
   // Type of collocation points
   enum CollocationPoints{LEGENDRE,RADAU};
-  
+
   /** \brief Construct an explicit Runge-Kutta integrator
   * \param f dynamical system
   * \copydoc scheme_DAEInput
@@ -98,7 +98,7 @@ extern const long double** collocation_points[2];
   * \param ne    Number of times the RK primitive is repeated over the integration interval
   */
   CASADI_INTEGRATION_EXPORT Function explicitRK(Function& f, const MX &tf=1, int order=4, int ne = 1);
-  
+
   /** \brief Construct an implicit Runge-Kutta integrator
   * \param f dynamical system
   * \copydoc scheme_DAEInput
@@ -109,7 +109,7 @@ extern const long double** collocation_points[2];
   * \param ne    Number of times the RK primitive is repeated over the integration interval
   */
   CASADI_INTEGRATION_EXPORT Function implicitRK(Function& f, implicitFunctionCreator impl, const Dictionary& dict = Dictionary(), const MX &tf=1, int order=4, const std::string& scheme="radau", int ne = 1);
-    
+
 } // namespace casadi
 
 #endif // INTEGRATION_TOOLS_HPP

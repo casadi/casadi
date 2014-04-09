@@ -21,18 +21,18 @@ extern "C" {
    const int* locH, // row of  Compressed Column Storage H, length n + 1
    double* valH
    );
-   
+
   extern void sqicSolve(
    double* Obj // Output: hessian part of the resulting objective
   );
-  
+
   extern void sqicSolveStabilized(
    double* Obj, // Output: hessian part of the resulting objective
    double *mu,
    int *lenpi,
    double* piE
   );
-  
+
   extern void sqicDestroy();
 }
 /// \endcond

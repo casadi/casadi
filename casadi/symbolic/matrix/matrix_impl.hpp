@@ -74,17 +74,17 @@ namespace casadi{
   const Matrix<DataType> Matrix<DataType>::sub(const std::vector<int>& jj, const std::vector<int>& ii) const{
     // Nonzero mapping from submatrix to full
     std::vector<int> mapping;
-  
+
     // Get the sparsity pattern - does bounds checking
     Sparsity sp = sparsity().sub(jj,ii,mapping);
 
     // Create return object
     Matrix<DataType> ret(sp);
-  
+
     // Copy nonzeros
     for(int k=0; k<mapping.size(); ++k)
       ret.data()[k] = data()[mapping[k]];
-  
+
     // Return (RVO)
     return ret;
   }
@@ -93,7 +93,7 @@ namespace casadi{
   const Matrix<DataType> Matrix<DataType>::sub(const Matrix<int>& k, const std::vector<int>& ii) const{
     std::vector< int > rows = range(size1());
     std::vector< Matrix<DataType> > temp;
-  
+
     if (!inBounds(ii,size2())) {
       casadi_error("Slicing [ii,k] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
@@ -105,7 +105,7 @@ namespace casadi{
       }
       temp.push_back(m);
     }
-  
+
     return horzcat(temp);
   }
 
@@ -117,7 +117,7 @@ namespace casadi{
     if (!inBounds(jj,size1())) {
       casadi_error("Slicing [ii,k] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
-  
+
     for (int j=0;j<jj.size();++j) {
       Matrix<DataType> m = k;
       for (int i=0;i<m.size();++i) {
@@ -125,7 +125,7 @@ namespace casadi{
       }
       temp.push_back(m);
     }
-  
+
     return vertcat(temp);
   }
 
@@ -181,7 +181,7 @@ namespace casadi{
     if (!inBounds(cc,size2())) {
       casadi_error("setSub [.,rr,cc] out of bounds. Your cc contains " << *std::min_element(cc.begin(),cc.end()) << " up to " << *std::max_element(cc.begin(),cc.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
-  
+
     // If m is scalar
     if(m.numel() != cc.size() * rr.size()){
       setSub(Matrix<DataType>::repmat(m.toScalar(),rr.size(),cc.size()),rr,cc);
@@ -221,27 +221,27 @@ namespace casadi{
     if (!inBounds(jj,size1())) {
       casadi_error("setSub[.,i,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
-  
+
     Sparsity result_sparsity = repmat(i,jj.size(),1).sparsity();
-  
-  
+
+
     casadi_assert_message(result_sparsity == m.sparsity(),"setSub(Imatrix" << i.dimString() << ",Ivector(length=" << jj.size() << "),Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(IMatrix," << jj.size() << ",1) = " << result_sparsity.dimString()  << " must match the sparsity of Matrix<DataType> = "  << m.dimString() << ".");
-  
-  
+
+
     std::vector<int> slice_i = range(i.size2());
-  
+
     for(int k=0; k<jj.size(); ++k) {
       Matrix<DataType> el_k = m(range(k*i.size1(),(k+1)*i.size1()),slice_i);
       for (int j=0;j<i.size();++j) {
         elem(jj[k],i.at(j))=el_k.at(j);
       }
     }
-  
+
   }
 
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Matrix<int>& j, const std::vector<int>& ii) {
-  
+
     // If el is scalar
     if(m.isScalar() && (ii.size() > 1 || j.size() > 1)){
       setSub(repmat(Matrix<DataType>(j.sparsity(),m.toScalar()),1,ii.size()),j,ii);
@@ -251,21 +251,21 @@ namespace casadi{
     if (!inBounds(ii,size2())) {
       casadi_error("setSub[.,ii,j] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
-  
+
     Sparsity result_sparsity = repmat(j,1,ii.size()).sparsity();
-  
-  
+
+
     casadi_assert_message(result_sparsity == m.sparsity(),"setSub(Ivector(length=" << ii.size() << "),Imatrix" << j.dimString() << ",Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(Imatrix,1," << ii.size() << ") = " << result_sparsity.dimString() << " must match the sparsity of Matrix<DataType> = " << m.dimString() << ".");
-  
+
     std::vector<int> slice_j = range(j.size1());
-  
+
     for(int k=0; k<ii.size(); ++k) {
       Matrix<DataType> el_k = m(slice_j,range(k*j.size2(),(k+1)*j.size2()));
       for (int i=0;i<j.size();++i) {
         elem(j.at(i),ii[k])=el_k.at(i);
       }
     }
-  
+
   }
 
 
@@ -278,11 +278,11 @@ namespace casadi{
       setSub(Matrix<DataType>(i.sparsity(),m.toScalar()),j,i);
       return;
     }
-  
+
     casadi_assert_message(m.sparsity()==i.sparsity(),"setSub(Matrix m, Imatrix i, Imatrix j): sparsities must match. Got " << m.dimString() << " for m and " << j.dimString() << " for i and j.");
-  
+
     for(int k=0; k<i.size(); ++k) {
-      elem(j.at(k),i.at(k)) = m.at(k); 
+      elem(j.at(k),i.at(k)) = m.at(k);
     }
   }
 
@@ -311,7 +311,7 @@ namespace casadi{
       Matrix<DataType> ret = zeros(k.size());
       for(int el=0; el<k.size(); ++el)
         ret.data()[el] = data().at(k[el]);
-  
+
       return ret;
     } catch(std::out_of_range& ex){
       std::stringstream ss;
@@ -326,7 +326,7 @@ namespace casadi{
       Matrix<DataType> ret = zeros(k.sparsity());
       for(int el=0; el<k.size(); ++el)
         ret.data()[el] = data().at(k.at(el));
-  
+
       return ret;
     } catch(std::out_of_range& ex){
       std::stringstream ss;
@@ -394,7 +394,7 @@ namespace casadi{
 
     // Resize data and copy
     data_.resize(nrow*ncol,val);
-    
+
     // Loop over the colums in reverse order
     for(int cc=ncol-1; cc>=0; --cc){
       // Loop over nonzero elements of the column in reverse order
@@ -444,10 +444,10 @@ namespace casadi{
       // Save the new column offset
       new_colind.push_back(new_row.size());
     }
-    
+
     // Trim the data vector
     data_.resize(new_row.size());
-    
+
     // Update the sparsity pattern
     sparsity_ = Sparsity(size1,size2,new_colind,new_row);
   }
@@ -482,11 +482,11 @@ namespace casadi{
   template<typename DataType>
   void Matrix<DataType>::printScalar(std::ostream &stream) const {
     casadi_assert_message(numel()==1, "Not a scalar");
-  
+
     std::streamsize precision = stream.precision();
     std::streamsize width = stream.width();
     std::ios_base::fmtflags flags = stream.flags();
-  
+
     stream.precision(stream_precision_);
     stream.width(stream_width_);
     if (stream_scientific_) {
@@ -494,27 +494,27 @@ namespace casadi{
     } else {
       stream.unsetf(std::ios::scientific);
     }
-    
+
     if(size()==0){
       stream << "00";
     } else {
       stream << toScalar();
     }
-  
+
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
-    stream.flags(flags); 
+    stream.flags(flags);
   }
-  
+
   template<typename DataType>
   void Matrix<DataType>::printVector(std::ostream &stream) const {
     casadi_assert_message(isVector(),"Not a vector");
-  
+
     std::streamsize precision = stream.precision();
     std::streamsize width = stream.width();
     std::ios_base::fmtflags flags = stream.flags();
-  
+
     stream.precision(stream_precision_);
     stream.width(stream_width_);
     if (stream_scientific_) {
@@ -522,10 +522,10 @@ namespace casadi{
     } else {
       stream.unsetf(std::ios::scientific);
     }
-  
+
     // Access data structures
     const std::vector<int>& r = row();
-      
+
     // Nonzero
     int el=0;
 
@@ -534,7 +534,7 @@ namespace casadi{
     for(int rr=0; rr<size1(); ++rr){
       // Add delimitor
       if(rr!=0) stream << ",";
-      
+
       // Check if nonzero
       if(el<r.size() && rr==r[el]){
         stream << at(el++);
@@ -542,23 +542,23 @@ namespace casadi{
         stream << "00";
       }
     }
-    stream << "]"; 
-    
+    stream << "]";
+
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
-    stream.flags(flags); 
+    stream.flags(flags);
   }
 
   template<typename DataType>
   void Matrix<DataType>::printDense(std::ostream &stream) const{
     // Print as a single line
     bool oneliner=this->size1()<=1;
-  
+
     std::streamsize precision = stream.precision();
     std::streamsize width = stream.width();
     std::ios_base::fmtflags flags = stream.flags();
-  
+
     stream.precision(stream_precision_);
     stream.width(stream_width_);
     if (stream_scientific_) {
@@ -579,7 +579,7 @@ namespace casadi{
       } else {
         stream << " [";
       }
-      
+
       // Loop over columns
       for(int cc=0; cc<size2(); ++cc){
         // Separating comma
@@ -592,7 +592,7 @@ namespace casadi{
           stream << "00";
         }
       }
-    
+
       // End of row
       if(rr<size1()-1){
         stream << "],";
@@ -601,7 +601,7 @@ namespace casadi{
         stream << "]]";
       }
     }
-        
+
     stream << std::flush;
     stream.precision(precision);
     stream.width(width);
@@ -700,10 +700,10 @@ namespace casadi{
 
     // Assert consistency
     for(int rr=0; rr<nrow; ++rr){
-      casadi_assert_message(ncol==d[rr].size(), 
+      casadi_assert_message(ncol==d[rr].size(),
         "Matrix<DataType>::Matrix(const std::vector< std::vector<DataType> >& d): shape mismatch" << std::endl <<
         "Attempting to construct a matrix from a nested list." << std::endl <<
-        "I got convinced that the desired size is ("<< nrow << " x " << ncol << " ), but now I encounter a vector of size (" << 
+        "I got convinced that the desired size is ("<< nrow << " x " << ncol << " ), but now I encounter a vector of size (" <<
         d[rr].size() <<  " )" << std::endl);
     }
 
@@ -741,11 +741,11 @@ namespace casadi{
   Matrix<DataType> Matrix<DataType>::unary(int op, const Matrix<DataType> &x){
     // Return value
     Matrix<DataType> ret(x.sparsity());
-  
+
     // Nonzeros
     std::vector<DataType>& ret_data = ret.data();
     const std::vector<DataType>& x_data = x.data();
-  
+
     // Do the operation on all non-zero elements
     for(int el=0; el<x.size(); ++el){
       casadi_math<DataType>::fun(op,x_data[el],x_data[el],ret_data[el]);
@@ -760,7 +760,7 @@ namespace casadi{
         ret.densify(fcn_0);
       }
     }
-    
+
     return ret;
   }
 
@@ -832,14 +832,14 @@ namespace casadi{
     for(int j=0; j<size1(); ++j) // loop over rows
       for(int s=0; s<kl+ku+1; ++s) // loop over the subdiagonals
         res[s + ldres*j] = 0;
-  
+
     // loop over cols
-    for(int i=0; i<size2(); ++i){ 
-    
+    for(int i=0; i<size2(); ++i){
+
       // loop over the non-zero elements
-      for(int el=colind(i); el<colind(i+1); ++el){ 
+      for(int el=colind(i); el<colind(i+1); ++el){
         int j=row(el);  // row
-      
+
         // Check if we have not yet inside the band
         if(j<i-kl) continue;
 
@@ -859,7 +859,7 @@ namespace casadi{
   void Matrix<DataType>::set(DataType val, SparsityType sp){
     std::fill(data().begin(),data().end(),val);
   }
-    
+
   template<typename DataType>
   void Matrix<DataType>::get(DataType& val, SparsityType sp) const{
     getArray(&val,1,DENSE);
@@ -946,19 +946,19 @@ namespace casadi{
     const int size2 = this->size2();
     const std::vector<int>& colind = this->colind();
     const std::vector<int>& row = this->row();
-    
+
     if(sp==SPARSE || (sp==DENSE && isDense())){
       casadi_assert_message(len==size(),
-                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<  
+                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
                             "Trying to fetch " << len << " elements from a " << dimString() << " matrix with " << size() << " non-zeros.");
       copy(data.begin(),data.end(),val);
     } else if(sp==DENSE){
       casadi_assert_message(len==numel(),
-                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<  
+                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
                             "Trying to fetch " << len << " elements from a " << dimString() << " matrix with " << numel() << " entries.");
       // Begin with all zeros
       std::fill(val,val+len,0);
-     
+
       // Add the nonzeros
       for(int cc=0; cc<size2; ++cc){ // loop over columns
         for(int el=colind[cc]; el<colind[cc+1]; ++el){ // loop over the non-zero elements
@@ -968,11 +968,11 @@ namespace casadi{
       }
     } else if(sp==DENSETRANS){
       casadi_assert_message(len==numel(),
-                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<  
+                            "Matrix<DataType>::getArray: Dimension mismatch." << std::endl <<
                             "Trying to fetch " << len << " elements from a " << dimString() << " matrix with " << numel() << " entries.");
       // Begin with all zeros
       std::fill(val,val+len,0);
-     
+
       // Add the nonzeros
       for(int cc=0; cc<size2; ++cc){ // loop over columns
         for(int el=colind[cc]; el<colind[cc+1]; ++el){ // loop over the non-zero elements
@@ -1008,7 +1008,7 @@ namespace casadi{
     const int size2 = this->size2();
     const std::vector<int>& colind = this->colind();
     const std::vector<int>& row = this->row();
-    
+
     if(sp==SPARSE){
       throw CasadiException("Matrix<DataType>::getArray: strided SPARSE not implemented");
     } else if(sp==DENSE && isDense()) {
@@ -1046,12 +1046,12 @@ namespace casadi{
 
     if(sp==SPARSE || (sp==DENSE && numel()==size())){
       casadi_assert_message(len==size(),
-                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<  
+                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<
                             "Trying to pass " << len << " elements to a " << dimString() << " matrix with " << size() << " non-zeros.");
       copy(val,val+len,data.begin());
     } else if(sp==DENSE){
       casadi_assert_message(len==numel(),
-                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<  
+                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<
                             "Trying to pass " << len << " elements to a " << dimString() << " matrix with " << numel() << " entries.");
       // Get the nonzeros
       for(int cc=0; cc<size2; ++cc){ // loop over columns
@@ -1062,7 +1062,7 @@ namespace casadi{
       }
     } else if(sp==DENSETRANS){
       casadi_assert_message(len==numel(),
-                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<  
+                            "Matrix<DataType>::setArray: Dimension mismatch." << std::endl <<
                             "Trying to pass " << len << " elements to a " << dimString() << " matrix with " << numel() << " entries.");
       // Get the nonzeros
       for(int cc=0; cc<size2; ++cc){ // loop over columns
@@ -1267,23 +1267,23 @@ namespace casadi{
 
   template<typename DataType>
   std::vector<DataType>& Matrix<DataType>::data(){
-    return data_;  
+    return data_;
   }
-    
+
   template<typename DataType>
   const std::vector<DataType>& Matrix<DataType>::data() const{
-    return data_;  
+    return data_;
   }
 
   template<typename DataType>
   void Matrix<DataType>::erase(const std::vector<int>& rr, const std::vector<int>& cc){
     // Erase from sparsity pattern
     std::vector<int> mapping = sparsityRef().erase(rr,cc);
-  
+
     // Update non-zero entries
     for(int k=0; k<mapping.size(); ++k)
       data()[k] = data()[mapping[k]];
-    
+
     // Truncate nonzero vector
     data().resize(mapping.size());
   }
@@ -1297,15 +1297,15 @@ namespace casadi{
     if (!inBounds(cc,size2())) {
       casadi_error("Remove(rr,cc) out of bounds. Your cc contains " << *std::min_element(cc.begin(),cc.end()) << " up to " << *std::max_element(cc.begin(),cc.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
-  
+
     // Remove by performing a complementary slice
     std::vector<int> rrc = complement(rr,size1());
     std::vector<int> ccc = complement(cc,size2());
-  
+
     Matrix<DataType> ret = (*this)(rrc,ccc);
-  
+
     operator=(ret);
-  
+
   }
 
   template<typename DataType>
@@ -1316,7 +1316,7 @@ namespace casadi{
   template<typename DataType>
   void Matrix<DataType>::sanityCheck(bool complete) const {
     sparsity_.sanityCheck(complete);
-  
+
     if (data_.size()!=sparsity_.row().size()) {
       std::stringstream s;
       s << "Matrix:Compressed Col Storage is not sane. The following must hold:" << std::endl;
@@ -1335,7 +1335,7 @@ namespace casadi{
   Matrix<DataType> Matrix<DataType>::mul_full(const Matrix<DataType> &y, const Sparsity& sp_z) const{
     // First factor
     const Matrix<DataType>& x = *this;
-  
+
     // Return object (assure RVO)
     Matrix<DataType> ret;
 
@@ -1343,7 +1343,7 @@ namespace casadi{
 
     // Form the transpose of x
     Matrix<DataType> x_trans = x.trans();
-  
+
     if (sp_z.isNull()) {
       // Create the sparsity pattern for the matrix-matrix product
       Sparsity spres = y.sparsity().patternProduct(x_trans.sparsity());
@@ -1356,7 +1356,7 @@ namespace casadi{
 
     // Carry out the matrix product
     mul_no_alloc_tn(x_trans,y,ret);
-  
+
     return ret;
   }
 
@@ -1366,7 +1366,7 @@ namespace casadi{
     casadi_assert_message(x.size1()==z.size1(),"Dimension error. Got x=" << x.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(y.size2()==z.size2(),"Dimension error. Got y=" << y.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(y.size1()==x.size2(),"Dimension error. Got y=" << y.dimString() << " and x=" << x.dimString() << ".");
-  
+
     // Direct access to the arrays
     const std::vector<int> &y_colind = y.colind();
     const std::vector<int> &y_row = y.row();
@@ -1386,7 +1386,7 @@ namespace casadi{
         int el2 = x_colind[j];
         while(el1 < z_colind[i+1] && el2 < x_colind[j+1]){ // loop over matching non-zero elements
           int j1 = z_row[el1];
-          int i2 = x_row[el2];      
+          int i2 = x_row[el2];
           if(j1==i2){
             z_data[el1++] += y_data[el]*x_data[el2++];
           } else if(j1<i2) {
@@ -1404,34 +1404,34 @@ namespace casadi{
     // Assert dimensions
     casadi_assert_message(x_trans.size2()==z.size(),"Dimension error. Got x_trans=" << x_trans.dimString() << " and z=" << z.size() << ".");
     casadi_assert_message(x_trans.size1()==y.size(),"Dimension error. Got x_trans=" << x_trans.dimString() << " and y=" << y.size() << ".");
-    
+
     // Direct access to the arrays
     const std::vector<int> &x_rowind = x_trans.colind();
     const std::vector<int> &x_col = x_trans.row();
     const std::vector<DataType> &x_trans_data = x_trans.data();
-    
+
     // loop over the columns of the matrix
     for(int i=0; i<x_rowind.size()-1; ++i){
       for(int el=x_rowind[i]; el<x_rowind[i+1]; ++el){ // loop over the non-zeros of the matrix
         int j = x_col[el];
-        
+
         // Perform operation
         z[i] += x_trans_data[el] * y[j];
       }
     }
   }
-  
+
   template<typename DataType>
   void Matrix<DataType>::mul_no_alloc_nn(const Matrix<DataType>& x, const std::vector<DataType> &y, std::vector<DataType> &z){
     // Assert dimensions
     casadi_assert_message(x.size1()==z.size(),"Dimension error. Got x=" << x.dimString() << " and z=" << z.size() << ".");
     casadi_assert_message(x.size2()==y.size(),"Dimension error. Got x=" << x.dimString() << " and y=" << y.size() << ".");
-    
+
     // Direct access to the arrays
     const std::vector<int> &x_colind = x.colind();
     const std::vector<int> &x_row = x.row();
     const std::vector<DataType> &x_data = x.data();
-    
+
     // loop over the rows of the matrix
     for(int i=0; i<x_colind.size()-1; ++i){
       for(int el=x_colind[i]; el<x_colind[i+1]; ++el){ // loop over the non-zeros of the matrix
@@ -1440,14 +1440,14 @@ namespace casadi{
       }
     }
   }
-  
+
   template<typename DataType>
   void Matrix<DataType>::mul_no_alloc_nt(const Matrix<DataType> &x, const Matrix<DataType>& y_trans, Matrix<DataType> &z){
     // Assert dimensions
     casadi_assert_message(y_trans.size1()==z.size2(),"Dimension error. Got y_trans=" << y_trans.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(x.size1()==z.size1(),"Dimension error. Got x=" << x.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(y_trans.size2()==x.size2(),"Dimension error. Got y_trans=" << y_trans.dimString() << " and x=" << x.dimString() << ".");
-  
+
     // Direct access to the arrays
     const std::vector<int> &y_rowind = y_trans.colind();
     const std::vector<int> &y_col = y_trans.row();
@@ -1467,7 +1467,7 @@ namespace casadi{
         int el2 = z_colind[j];
         while(el1 < x_colind[i+1] && el2 < z_colind[j+1]){ // loop over matching non-zero elements
           int j1 = x_row[el1];
-          int i2 = z_row[el2];      
+          int i2 = z_row[el2];
           if(j1==i2){
             z_data[el2++] += y_trans_data[el] * x_data[el1++];
           } else if(j1<i2) {
@@ -1486,7 +1486,7 @@ namespace casadi{
     casadi_assert_message(y.size2()==z.size2(),"Dimension error. Got y=" << y.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(x_trans.size2()==z.size1(),"Dimension error. Got x_trans=" << x_trans.dimString() << " and z=" << z.dimString() << ".");
     casadi_assert_message(y.size1()==x_trans.size1(),"Dimension error. Got y=" << y.dimString() << " and x_trans=" << x_trans.dimString() << ".");
-  
+
     // Direct access to the arrays
     const std::vector<int> &y_colind = y.colind();
     const std::vector<int> &y_row = y.row();
@@ -1497,7 +1497,7 @@ namespace casadi{
     const std::vector<int> &z_colind = z.colind();
     const std::vector<int> &z_row = z.row();
     std::vector<DataType> &z_data = z.data();
-  
+
     // loop over the cols of the resulting matrix
     for(int i=0; i<z_colind.size()-1; ++i){
       for(int el=z_colind[i]; el<z_colind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
@@ -1506,7 +1506,7 @@ namespace casadi{
         int el2 = x_rowind[j];
         while(el1 < y_colind[i+1] && el2 < x_rowind[j+1]){ // loop over non-zero elements
           int j1 = y_row[el1];
-          int i2 = x_col[el2];      
+          int i2 = x_col[el2];
           if(j1==i2){
             z_data[el] += y_data[el1++] * x_trans_data[el2++];
           } else if(j1<i2) {
@@ -1534,7 +1534,7 @@ namespace casadi{
     bvec_t *y_data = get_bvec_t(y.data());
     bvec_t *x_trans_data = get_bvec_t(x_trans.data());
     bvec_t *z_data = get_bvec_t(z.data());
-  
+
     // loop over the cols of the resulting matrix)
     for(int i=0; i<z_colind.size()-1; ++i){
       for(int el=z_colind[i]; el<z_colind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
@@ -1543,7 +1543,7 @@ namespace casadi{
         int el2 = x_rowind[j];
         while(el1 < y_colind[i+1] && el2 < x_rowind[j+1]){ // loop over non-zero elements
           int j1 = y_row[el1];
-          int i2 = x_col[el2];      
+          int i2 = x_col[el2];
           if(j1==i2){
             // | and not & since we are propagating dependencies
             if(Fwd){
@@ -1568,12 +1568,12 @@ namespace casadi{
   DataType Matrix<DataType>::quad_form(const Matrix<DataType>& A, const std::vector<DataType>& x){
     // Assert dimensions
     casadi_assert_message(x.size()==A.size2() && x.size()==A.size1(),"Dimension mismatch. Got x=" << x.size() << " and A=" << A.dimString());
-  
+
     // Access the internal data of A
     const std::vector<int> &A_colind = A.colind();
     const std::vector<int> &A_row = A.row();
     const std::vector<DataType> &A_data = A.data();
-  
+
     // Return value
     DataType ret=0;
 
@@ -1583,12 +1583,12 @@ namespace casadi{
       for(int el=A_colind[i]; el<A_colind[i+1]; ++el){
         // Get row
         int j = A_row[el];
-      
+
         // Add contribution
         ret += x[i]*A_data[el]*x[j];
       }
     }
-  
+
     return ret;
   }
 
@@ -1603,11 +1603,11 @@ namespace casadi{
 
     // create the return matrix
     Matrix<DataType> ret(s);
-  
+
     // Copy the content
     for(int i=0; i<mapping.size(); ++i)
       ret.at(i) = at(mapping[i]);
-  
+
     return ret;
   }
 
@@ -1627,7 +1627,7 @@ namespace casadi{
   Matrix<DataType> Matrix<DataType>::binary(int op, const Matrix<DataType> &x, const Matrix<DataType> &y){
     if(x.numel()==1)
       return scalar_matrix(op,x,y);
-    else if(y.numel()==1)  
+    else if(y.numel()==1)
       return matrix_scalar(op,x,y);
     else
       return matrix_matrix(op,x,y);
@@ -1637,13 +1637,13 @@ namespace casadi{
   Matrix<DataType> Matrix<DataType>::scalar_matrix(int op, const Matrix<DataType> &x, const Matrix<DataType> &y){
     // Return value
     Matrix<DataType> ret(y.sparsity());
-  
+
     // Nonzeros
     std::vector<DataType>& ret_data = ret.data();
     const std::vector<DataType>& x_data = x.data();
     const DataType& x_val = x_data.empty() ? casadi_limits<DataType>::zero : x.front();
     const std::vector<DataType>& y_data = y.data();
-  
+
     // Do the operation on all non-zero elements
     for(int el=0; el<y.size(); ++el){
       casadi_math<DataType>::fun(op,x_val,y_data[el],ret_data[el]);
@@ -1658,7 +1658,7 @@ namespace casadi{
         ret.densify(fcn_0);
       }
     }
-    
+
     return ret;
   }
 
@@ -1666,13 +1666,13 @@ namespace casadi{
   Matrix<DataType> Matrix<DataType>::matrix_scalar(int op, const Matrix<DataType> &x, const Matrix<DataType> &y){
     // Return value
     Matrix<DataType> ret(x.sparsity());
-  
+
     // Nonzeros
     std::vector<DataType>& ret_data = ret.data();
     const std::vector<DataType>& x_data = x.data();
     const std::vector<DataType>& y_data = y.data();
     const DataType& y_val = y_data.empty() ? casadi_limits<DataType>::zero : y.front();
-  
+
     // Do the operation on all non-zero elements
     for(int el=0; el<x.size(); ++el){
       casadi_math<DataType>::fun(op,x_data[el],y_val,ret_data[el]);
@@ -1687,7 +1687,7 @@ namespace casadi{
         ret.densify(fcn_0);
       }
     }
-    
+
     return ret;
   }
 
@@ -1698,7 +1698,7 @@ namespace casadi{
       std::stringstream ss;
       casadi_math<DataType>::print(op,ss,"lhs","rhs");
       casadi_error("matrix_matrix: dimension mismatch in element-wise matrix operation " << ss.str() <<"." << std::endl << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString() << ". They should be equal."
-                   ); 
+                   );
     }
 
     // Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
@@ -1708,7 +1708,7 @@ namespace casadi{
 
     // Return value
     Matrix<DataType> r(r_sp);
-  
+
     // Perform the operations elementwise
     if(x_sp==y_sp){
       // Matching sparsities
@@ -1735,7 +1735,7 @@ namespace casadi{
       casadi_math<DataType>::fun(op,casadi_limits<DataType>::zero,casadi_limits<DataType>::zero,fcn_0);
       r.densify(fcn_0);
     }
-  
+
     return r;
   }
 
@@ -1841,7 +1841,7 @@ namespace casadi{
     if(isVector()){
       // Append the sparsity pattern vertically
       sparsityRef().append(y.sparsity());
-  
+
       // Add the non-zeros at the end
       data().insert(end(),y.begin(),y.end());
     } else {
@@ -1861,16 +1861,16 @@ namespace casadi{
 
     // Quick return if empty
     if(y.size2()==0 && y.size1()==0) return;
-  
+
     // Append the sparsity pattern
     sparsityRef().appendColumns(y.sparsity());
-  
+
     // Add the non-zeros at the end
     data().insert(end(),y.begin(),y.end());
   }
 
   template<typename DataType>
-  NonZeroIterator<DataType>::NonZeroIterator(const Matrix<DataType> & m) 
+  NonZeroIterator<DataType>::NonZeroIterator(const Matrix<DataType> & m)
     : m_(m) {
     nz.i  = 0;
     nz.j  = 0;
@@ -1882,14 +1882,14 @@ namespace casadi{
 
   template<typename DataType>
   NonZero<DataType>& NonZeroIterator<DataType>::operator*() {
-  
+
     return nz;
   }
-    
+
   template<typename DataType>
   NonZeroIterator<DataType>& NonZeroIterator<DataType>::operator++() {
     nz.k ++;
-  
+
     if (nz.k < m_.size()) {
       nz.j = m_.row()[nz.k];
       nz.el = m_.data()[nz.k];
@@ -1934,10 +1934,10 @@ namespace casadi{
   template<typename DataType>
   bool Matrix<DataType>::isInteger() const{
     // loop over non-zero elements
-    for(int k=0; k<size(); ++k) 
+    for(int k=0; k<size(); ++k)
       if(!casadi_limits<DataType>::isInteger(at(k))) // if an element is not integer
         return false;
-    
+
     // Integer if reached this point
     return true;
   }
@@ -1945,66 +1945,66 @@ namespace casadi{
   template<typename DataType>
   bool Matrix<DataType>::isConstant() const{
     // loop over non-zero elements
-    for(int k=0; k<size(); ++k) 
+    for(int k=0; k<size(); ++k)
       if(!casadi_limits<DataType>::isConstant(at(k))) // if an element is not constant
         return false;
-    
+
     // Constant if we reach this point
     return true;
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isOne() const{  
+  bool Matrix<DataType>::isOne() const{
     if(!isDense()){
       return false;
     }
-  
+
     // loop over non-zero elements
     for(int el=0; el<size(); ++el)
       if(!casadi_limits<DataType>::isOne(at(el)))
         return false;
-  
+
     return true;
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isMinusOne() const{  
+  bool Matrix<DataType>::isMinusOne() const{
     if(!isDense()){
       return false;
     }
-  
+
     // loop over non-zero elements
     for(int el=0; el<size(); ++el)
       if(!casadi_limits<DataType>::isMinusOne(at(el)))
         return false;
-  
+
     return true;
   }
 
   template<typename DataType>
-  bool Matrix<DataType>::isZero() const{  
+  bool Matrix<DataType>::isZero() const{
 
     // loop over (potentially) non-zero elements
     for(int el=0; el<size(); ++el)
       if(!casadi_limits<DataType>::isZero(at(el)))
         return false;
-  
+
     return true;
   }
 
   template<typename DataType>
   bool Matrix<DataType>::isIdentity() const{
-  
+
     // Make sure that the matrix is diagonal
     if(!sparsity().isDiagonal())
       return false;
-  
+
     // Make sure that all entries are one
     for(typename Matrix<DataType>::const_iterator it=begin(); it!=end(); ++it){
       if(!casadi_limits<DataType>::isOne(*it))
         return false;
     }
-      
+
     return true;
   }
 
@@ -2012,7 +2012,7 @@ namespace casadi{
   bool Matrix<DataType>::isEqual(const Matrix<DataType> &ex2) const{
     // TODO: Very inefficient, refactor
     if((size()!=0 || ex2.size()!=0) && shape()!=ex2.shape()) return false;
-    Matrix<DataType> difference = *this - ex2;  
+    Matrix<DataType> difference = *this - ex2;
     return difference.isZero();
   }
 
@@ -2023,7 +2023,7 @@ namespace casadi{
       if(casadi_limits<DataType>::isZero(at(el)))
         return true;
     }
-  
+
     // No known zeros amongst the structurally nonzero entries
     return false;
   }

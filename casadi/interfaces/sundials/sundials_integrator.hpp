@@ -28,7 +28,7 @@
 #include <casadi/interfaces/sundials/casadi_sundials_interface_export.h>
 
 namespace casadi{
-  
+
 /// Forward declaration of internal class
 class SundialsInternal;
 
@@ -49,7 +49,7 @@ public:
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Set a stop time for the forward integration
   void setStopTime(double tf);
 };

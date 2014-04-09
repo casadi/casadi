@@ -47,6 +47,6 @@ void SDQPSolver::setSOCQPOptions() {
 
 } // namespace casadi
 
-  
+
 
 

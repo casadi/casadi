@@ -27,10 +27,10 @@
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 
 namespace casadi{
-  
+
   // Forward declarations
   class XMLNode;
-      
+
   /** \brief A flat OCP representation coupled to an XML file
 
       <H3>Variables:  </H3>
@@ -42,7 +42,7 @@ namespace casadi{
       u :     control signals
       q :     quadrature states
       y :     dependent variables
-      \endverbatim 
+      \endverbatim
 
       <H3>Equations:  </H3>
       \verbatim
@@ -52,7 +52,7 @@ namespace casadi{
       quadratures:              \dot{q} = quad(t,x,z,u,p_free,pi,pd)
       dependent equations:            y = dep(t,x,z,u,p_free,pi,pd)
       initial equations:              0 = initial(t,x,z,u,p_free,pi,pd)
-      \endverbatim 
+      \endverbatim
 
       <H3>Objective function terms:  </H3>
       \verbatim
@@ -60,21 +60,21 @@ namespace casadi{
       Lagrange terms:       \sum{\integral{mterm}}
       \endverbatim
 
-      Note that when parsed, all dynamic equations end up in the implicit category "dae". 
-      At a later state, the DAE can be reformulated, for example in semi-explicit form, 
+      Note that when parsed, all dynamic equations end up in the implicit category "dae".
+      At a later state, the DAE can be reformulated, for example in semi-explicit form,
       possibly in addition to a set of quadrature states.
- 
+
       <H3>Usage skeleton:</H3>
-  
-      1. Call default constructor 
+
+      1. Call default constructor
       > SymbolicOCP ocp;
-  
+
       2. Parse an FMI conformant XML file <BR>
       > ocp.parseFMI(xml_file_name)
-  
+
       3. Modify/add variables, equations, optimization <BR>
       > ...
-  
+
       When the optimal control problem is in a suitable form, it is possible to either generate functions
       for numeric/symbolic evaluation or exporting the OCP formulation into a new FMI conformant XML file.
       The latter functionality is not yet available.
@@ -87,16 +87,16 @@ namespace casadi{
 
     /// Default constructor
     SymbolicOCP(bool ignore_timed_variables=true);
-    
+
     /** @name Variables and equations
      *  Public data members
      */
     //@{
     /** \brief Independent variable (usually time) */
     SX t;
-    
+
     /** \brief Differential-algebraic equation (DAE) with corresponding state vector and initial conditions
-     * DAE in fully-implicit form and corresponding states and algebraic variables. 
+     * DAE in fully-implicit form and corresponding states and algebraic variables.
      * dae and s have matching dimensions and 0 == dae(der(s),s,...) implicitly defines der(s).
      * At t==0, 0 == initial(der(s),s,...) holds in addition to the dae.
      */
@@ -124,13 +124,13 @@ namespace casadi{
      */
     SX y;
 
-    /** \brief Free controls 
+    /** \brief Free controls
      * The trajectories of the free controls are decision variables of the optimal control problem. They are chosen by
      * the optimization algorithm in order to minimize the cost functional.
      */
     SX u;
-    
-    /** \brief Free parameters 
+
+    /** \brief Free parameters
      * A free parameter is variables which is constant over time, but whose value is chosen by the optimization algorithm
      * in order to minimize the cost functional.
      */
@@ -145,7 +145,7 @@ namespace casadi{
 
     /** \brief Dependent parameters and corresponding definitions
      * A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters.
-     * A dependent parameter is fixed after the DAE has been initialized.        
+     * A dependent parameter is fixed after the DAE has been initialized.
      * Interdependencies are allowed but must be non-cyclic.
      * The definitions can be retrieved by calling the method "beq" with pd as argument.
     */
@@ -167,35 +167,35 @@ namespace casadi{
 
     /// Interval start time
     double t0;
-    
+
     /// Interval final time
     double tf;
-    
+
     /// Interval start time is free
     bool t0_free;
-    
+
     /// Interval final time is free
     bool tf_free;
-    
+
     /// Interval start time initial guess
     double t0_guess;
-    
+
     /// Interval final time initial guess
     double tf_guess;
-    
+
     /// Time points
     std::vector<double> tp;
-    
+
     //@}
 
     /** @name Objective function terms
      *  Terms in the objective function.
      */
     //@{
-      
+
     /// Mayer terms in the objective (point terms)
     SX mterm;
-    
+
     /// Lagrange terms in the objective (integral terms)
     SX lterm;
     //@}
@@ -213,13 +213,13 @@ namespace casadi{
 
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
-    
+
     //@{
     /// Access a variable by name
     Variable& variable(const std::string& name);
     const Variable& variable(const std::string& name) const;
     //@}
-    
+
     /** @name Manipulation
      *  Reformulate the dynamic optimization problem.
      */
@@ -239,10 +239,10 @@ namespace casadi{
 
     /// Eliminate independent parameters
     void eliminateIndependentParameters();
-    
+
     /// Sort the dependent parameters
     void sortDependentParameters();
-    
+
     /// Eliminate interdependencies amongst the dependent parameters
     void eliminateDependentParameterInterdependencies();
 
@@ -260,24 +260,24 @@ namespace casadi{
 
     /// Eliminate Lagrange terms from the objective function and make them quadrature states
     void eliminateLagrangeTerms();
-    
+
     /// Eliminate quadrature states and turn them into ODE states
     void eliminateQuadratureStates();
-    
+
     /// Sort the DAE and implictly defined states
     void sortDAE();
 
     /// Sort the algebraic equations and algebraic states
     void sortALG();
-        
+
     /// Generate a MUSCOD-II compatible DAT file
     void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
-    
+
     //@}
 
     /// Scale the variables
     void scaleVariables();
-    
+
     /// Scale the implicit equations
     void scaleEquations();
 
@@ -313,10 +313,10 @@ namespace casadi{
 
     /// Set an derivative binding expression by non-differentiated expression
     void setOde(const SX& var, const SX& val);
-    
+
     /// Get the nominal value by name
     double nominal(const std::string& name) const;
-    
+
     /// Get the nominal value(s) by expression
     std::vector<double> nominal(const SX& var) const;
 
@@ -405,7 +405,7 @@ namespace casadi{
     ///  Print representation
     virtual void repr(std::ostream &stream=std::cout) const;
 
-    /// Print description 
+    /// Print description
     virtual void print(std::ostream &stream=std::cout) const;
 
     // Internal methods
@@ -413,7 +413,7 @@ namespace casadi{
 
     /// Get the qualified name
     static std::string qualifiedName(const XMLNode& nn);
-    
+
     /// Find of variable by name
     typedef std::map<std::string,Variable> VarMap;
     VarMap varmap_;
@@ -436,11 +436,11 @@ namespace casadi{
     SX attribute(getAttS f, const SX& var) const;
 
     /// Set an attribute by expression
-    typedef void (SymbolicOCP::*setAtt)(const std::string& name, double val, bool normalized);  
+    typedef void (SymbolicOCP::*setAtt)(const std::string& name, double val, bool normalized);
     void setAttribute(setAtt f, const SX& var, const std::vector<double>& val, bool normalized);
 
     /// Set a symbolic attribute by expression
-    typedef void (SymbolicOCP::*setAttS)(const std::string& name, const SX& val);  
+    typedef void (SymbolicOCP::*setAttS)(const std::string& name, const SX& val);
     void setAttribute(setAttS f, const SX& var, const SX& val);
 
 #endif // SWIG

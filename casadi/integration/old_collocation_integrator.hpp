@@ -27,17 +27,17 @@
 #include <casadi/integration/casadi_integration_export.h>
 
 namespace casadi{
-  
+
   class OldCollocationIntegratorInternal;
-  
+
   /**
      \brief Collocation integrator
      ODE/DAE integrator based on collocation
-  
+
      The method is still under development
-  
+
      @copydoc DAE_doc
-  
+
      \author Joel Andersson
      \date 2011
   */
@@ -45,7 +45,7 @@ namespace casadi{
   public:
     /** \brief  Default constructor */
     OldCollocationIntegrator();
-    
+
     /** \brief  Create an integrator for explicit ODEs
      *   \param f dynamical system
      * \copydoc scheme_DAEInput

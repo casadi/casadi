@@ -40,7 +40,7 @@ bool XMLNode::hasAttribute(const string& attribute_name) const{
 
 XMLNode& XMLNode::operator[](int i){
   casadi_assert_message(i>=0 && i < size(), "XMLNode::operator[]: index out of bounds for element " << i << " of node " << getName());
-  
+
   return children_.at(i);
 }
 
@@ -79,9 +79,9 @@ void XMLNode::addNode(TiXmlNode* n){
 
   // Save name
   setName(n->Value());
-  
+
   // Save attributes
-  int type = n->Type();  
+  int type = n->Type();
   if(type == TiXmlNode::ELEMENT){
     if(n->ToElement()!=0){
       for(TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute(); pAttrib; pAttrib=pAttrib->Next()){
@@ -100,11 +100,11 @@ void XMLNode::addNode(TiXmlNode* n){
     num_children++;
   }
   children_.reserve(num_children);
-  
+
   // add children
   int ch = 0;
-  for ( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch){ 
-      int childtype = child->Type();  
+  for ( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch){
+      int childtype = child->Type();
 
       if(childtype == TiXmlNode::ELEMENT){
         XMLNode newnode;
@@ -173,7 +173,7 @@ bool XMLNode::checkName(const string& str) const{
 void XMLNode::readString(const std::string& str, std::string& val){
   val = str;
 }
-  
+
 void XMLNode::readString(const std::string& str, bool& val){
   if(str.compare("true")==0)
     val = true;
@@ -187,12 +187,12 @@ void XMLNode::readString(const std::string& str, int& val){
   std::istringstream buffer(str);
   buffer >> val;
 }
-  
+
 void XMLNode::readString(const std::string& str, double& val){
   std::istringstream buffer(str);
   buffer >> val;
 }
-  
+
 
 
 

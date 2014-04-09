@@ -34,7 +34,7 @@ namespace casadi{
   }
 
   const NullspaceInternal* Nullspace::operator->() const{
-    return static_cast<const NullspaceInternal*>(Function::operator->()); 
+    return static_cast<const NullspaceInternal*>(Function::operator->());
   }
 
   bool Nullspace::checkNode() const{

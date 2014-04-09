@@ -27,7 +27,7 @@ namespace casadi{
 
   SymbolicQR::SymbolicQR(){
   }
-  
+
   SymbolicQR::SymbolicQR(const Sparsity& sp, int nrhs){
     assignNode(new SymbolicQRInternal(sp,nrhs));
   }
@@ -46,4 +46,4 @@ namespace casadi{
 
 } // namespace casadi
 
-  
+

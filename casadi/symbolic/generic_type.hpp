@@ -32,9 +32,9 @@ namespace casadi{
 
   /** \brief  Types of options */
   enum opt_type { OT_BOOLEAN, OT_INTEGER, OT_REAL, OT_STRING, OT_INTEGERVECTOR, OT_BOOLVECTOR, OT_REALVECTOR, OT_STRINGVECTOR, OT_DICTIONARY, OT_NLPSOLVER, OT_LPSOLVER, OT_LINEARSOLVER, OT_INTEGRATOR, OT_QPSOLVER, OT_STABILIZEDQPSOLVER, OT_SOCPSOLVER, OT_QCQPSOLVER, OT_SDPSOLVER,  OT_SDQPSOLVER, OT_IMPLICITFUNCTION, OT_DERIVATIVEGENERATOR, OT_Function, OT_CALLBACK, OT_VOIDPTR, OT_UNKNOWN};
-  
+
   /** \brief Generic data type
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
   Return type when getting an option, can be converted into bool, int, string, vector, etc */
   class CASADI_SYMBOLIC_EXPORT GenericType : public SharedObject{
@@ -51,15 +51,15 @@ namespace casadi{
     GenericType(const char s[]);
     GenericType(const Function& f);
     GenericType(const SharedObject& obj);
-    //GenericType(const GenericType& obj);    
-    
+    //GenericType(const GenericType& obj);
+
     #ifndef SWIG
     GenericType(void* ptr);
     #endif // SWIG
 
     /// Get a description of a type
     static std::string get_type_description(const opt_type &type);
-    
+
     /// Get a description of the object's type
     std::string get_description() const { return get_type_description(type_); }
 
@@ -83,11 +83,11 @@ namespace casadi{
     GenericType(implicitFunctionCreator ptr);
     GenericType(const DerivativeGenerator& c);
     GenericType(const Callback& c);
-    
+
     /// Implicit typecasting
     #ifndef SWIG
-    operator bool() const{ return toBool();} 
-    operator int() const{ return toInt();} 
+    operator bool() const{ return toBool();}
+    operator int() const{ return toInt();}
     operator double() const{ return toDouble();}
     operator const std::string& () const{ return toString();}
     operator const std::vector<int>& () const{ return toIntVector();}
@@ -96,11 +96,11 @@ namespace casadi{
     operator const Function& () const{ return toFunction();}
     //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
-    
+
     operator std::vector<int>& () { return toIntVector();}
     operator std::vector<double>& () { return toDoubleVector();}
     operator std::map<std::string, GenericType>& ();
-    
+
     operator NLPSolverCreator() const;
     operator linearSolverCreator() const;
     operator LPSolverCreator() const;
@@ -115,30 +115,30 @@ namespace casadi{
     operator const DerivativeGenerator& () const;
     operator const Callback& () const;
     #endif // SWIG
-    
+
     opt_type getType() const;
-    
+
     bool can_cast_to(opt_type other) const;
     bool can_cast_to(const GenericType& other) const { return can_cast_to(other.type_) ;}
-    
+
     //! \brief Is boolean?
     bool isBool() const;
 
     //! \brief Is an integer?
     bool isInt() const;
-    
+
     //! \brief Is a double?
     bool isDouble() const;
-    
+
     //! \brief Is a string?
     bool isString() const;
 
     //! \brief Is an empty vector?
     bool isEmptyVector() const;
-    
+
     //! \brief Is a vector of ints?
     bool isIntVector() const;
-    
+
     //! \brief Is a vector of doubles?
     bool isDoubleVector() const;
 
@@ -150,36 +150,36 @@ namespace casadi{
 
     //! \brief Is a shared object?
     bool isDictionary() const;
-    
+
     //! \brief Is a shared object?
     bool isFunction() const;
-    
+
     //! \brief Convert to boolean
     bool toBool() const;
 
     //! \brief Convert to int
     int toInt() const;
-    
+
     //! \brief Convert to double
     double toDouble() const;
-    
+
     //! \brief Convert to string
     const std::string& toString() const;
 
     //! \brief Convert to vector of ints
     const std::vector<int>& toIntVector() const;
-    
+
     //! \brief Convert to vector of doubles
     const std::vector<double>& toDoubleVector() const;
-    
+
     #ifndef SWIG
     //! \brief Convert to vector of ints
     std::vector<int>& toIntVector();
-    
+
     //! \brief Convert to vector of doubles
     std::vector<double>& toDoubleVector();
     #endif
-    
+
     //! \brief Convert to vector of strings
     const std::vector<std::string>& toStringVector() const;
 
@@ -193,34 +193,34 @@ namespace casadi{
     //! \brief Convert to Dictionary
     Dictionary& toDictionary();
     #endif
-    
+
     //! \brief Convert to shared object
     const Function& toFunction() const;
-    
+
     //! \brief Convert to void pointer
     void * toVoidPointer() const;
 
     //! \brief Equality
     bool operator==(const GenericType& op2) const;
     bool operator!=(const GenericType& op2) const;
-   
-    #ifndef SWIG 
+
+    #ifndef SWIG
     //! \brief Print
     CASADI_SYMBOLIC_EXPORT friend std::ostream& operator<<(std::ostream &stream, const GenericType& ref);
     #endif
-        
+
     /// Check if it is of a certain type (implementation in generic_type_internal.hpp)
     #ifndef SWIG
     template<typename T>
     bool is_a() const;
     #endif // SWIG
-    
-   private:  
+
+   private:
     opt_type type_;
-      
-    
+
+
   };
-  
+
 
 } // namespace casadi
 

@@ -30,8 +30,8 @@
 
 namespace casadi{
   class DirectSingleShootingInternal;
-    
-    
+
+
   /** \brief Direct Single Shooting
    *
    *   ns: Number of shooting nodes: from option number_of_grid_points\n
@@ -44,19 +44,19 @@ namespace casadi{
    *
    *   \author Joel Andersson
    *   \date 2013
-  */ 
+  */
 class CASADI_OPTIMAL_CONTROL_EXPORT DirectSingleShooting : public OCPSolver{
   public:
     /// Default constructor
     DirectSingleShooting();
-  
+
     /** \brief Create a multiple shooting OCP solver
     * \param ffcn Continuous time dynamics, an casadi::Function with the folowing mapping:
     * \copydoc scheme_DAEInput
     * \copydoc scheme_DAEOutput
     * Important notes:
     *  - In the above table, INTEGRATOR_P input is not really of shape (np x 1), but rather ( (np+nu) x 1 ).
-    *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters to be optimized but constant over the whole domain. The remainder are interpreted as controls. 
+    *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters to be optimized but constant over the whole domain. The remainder are interpreted as controls.
     *  - BEWARE: if the right hand side of ffcn is dependent on time, the results will be incorrect.
     *
     * \param mfcn Mayer term, casadi::Function mapping to cost (1 x 1)
@@ -72,32 +72,32 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectSingleShooting : public OCPSolver{
 
     /// Const access functions of the node
     const DirectSingleShootingInternal* operator->() const;
-    
+
     /// Get the variables
     void getGuess(std::vector<double>& V_init) const;
-    
+
     /// Get the variables
     void getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const;
-    
+
     /// Get the constraints
     void getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const;
 
     /// Set the optimal solution
     void setOptimalSolution( const std::vector<double> &V_opt );
-    
+
     // Access the underlying NLPSolver object
     NLPSolver getNLPSolver() const;
 
-    // Prints out a human readable report about possible constraint violations, after solving 
+    // Prints out a human readable report about possible constraint violations, after solving
     void reportConstraints(std::ostream &stream=std::cout);
 
     std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
 
-    
-    
-    
+
+
+
 };
-                        
+
 } // namespace casadi
 
 

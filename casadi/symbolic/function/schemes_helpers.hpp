@@ -28,19 +28,19 @@
 #include <utility>
 #include <map>
 #include "io_scheme_vector.hpp"
-namespace casadi{ 
+namespace casadi{
 
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'DPLEInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT DPLEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit DPLEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DPLEInput){} 
+    explicit DPLEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DPLEInput){}
 };
 /// \endcond
 /// Input arguments of a dple solver
-/// 
+///
 /// \copydoc scheme_DPLEInput
 template<class M>
 DPLEInputIOSchemeVector<M> dpleIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -65,17 +65,17 @@ std::vector<M> dpleIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'DPLEOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT DPLEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit DPLEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DPLEOutput){} 
+    explicit DPLEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DPLEOutput){}
 };
 /// \endcond
 /// Output arguments of a dple solver
-/// 
+///
 /// \copydoc scheme_DPLEOutput
 template<class M>
 DPLEOutputIOSchemeVector<M> dpleOut(const std::string &arg_s0 ="",const M &arg_m0 =M()){
@@ -98,17 +98,17 @@ std::vector<M> dpleOut(const std::vector<M>& args,const std::string &arg_s0=""){
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'ControlledDAEInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT ControlledDAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit ControlledDAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ControlledDAEInput){} 
+    explicit ControlledDAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ControlledDAEInput){}
 };
 /// \endcond
 /// Input arguments of an ODE/DAE function
-/// 
+///
 /// \copydoc scheme_ControlledDAEInput
 template<class M>
 ControlledDAEInputIOSchemeVector<M> controldaeIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M()){
@@ -147,17 +147,17 @@ std::vector<M> controldaeIn(const std::vector<M>& args,const std::string &arg_s0
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'ControlSimulatorInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT ControlSimulatorInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit ControlSimulatorInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ControlSimulatorInput){} 
+    explicit ControlSimulatorInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_ControlSimulatorInput){}
 };
 /// \endcond
 /// Input arguments of a control simulator
-/// 
+///
 /// \copydoc scheme_ControlSimulatorInput
 template<class M>
 ControlSimulatorInputIOSchemeVector<M> controlsimulatorIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
@@ -184,17 +184,17 @@ std::vector<M> controlsimulatorIn(const std::vector<M>& args,const std::string &
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'HNLPInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT HNLPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit HNLPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HNLPInput){} 
+    explicit HNLPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HNLPInput){}
 };
 /// \endcond
 /// Input arguments of an Homotopy NLP function
-/// 
+///
 /// \copydoc scheme_HNLPInput
 template<class M>
 HNLPInputIOSchemeVector<M> hnlpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
@@ -221,17 +221,17 @@ std::vector<M> hnlpIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'DAEInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT DAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit DAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DAEInput){} 
+    explicit DAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DAEInput){}
 };
 /// \endcond
 /// Input arguments of an ODE/DAE function
-/// 
+///
 /// \copydoc scheme_DAEInput
 template<class M>
 DAEInputIOSchemeVector<M> daeIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
@@ -260,17 +260,17 @@ std::vector<M> daeIn(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'DAEOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT DAEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit DAEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DAEOutput){} 
+    explicit DAEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_DAEOutput){}
 };
 /// \endcond
 /// Output arguments of an DAE function
-/// 
+///
 /// \copydoc scheme_DAEOutput
 template<class M>
 DAEOutputIOSchemeVector<M> daeOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
@@ -297,17 +297,17 @@ std::vector<M> daeOut(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'RDAEInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT RDAEInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit RDAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_RDAEInput){} 
+    explicit RDAEInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_RDAEInput){}
 };
 /// \endcond
 /// Input arguments of an ODE/DAE backward integration function
-/// 
+///
 /// \copydoc scheme_RDAEInput
 template<class M>
 RDAEInputIOSchemeVector<M> rdaeIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M()){
@@ -342,17 +342,17 @@ std::vector<M> rdaeIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'RDAEOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT RDAEOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit RDAEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_RDAEOutput){} 
+    explicit RDAEOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_RDAEOutput){}
 };
 /// \endcond
 /// Output arguments of an ODE/DAE backward integration function
-/// 
+///
 /// \copydoc scheme_RDAEOutput
 template<class M>
 RDAEOutputIOSchemeVector<M> rdaeOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
@@ -379,17 +379,17 @@ std::vector<M> rdaeOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'IntegratorInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT IntegratorInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit IntegratorInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_IntegratorInput){} 
+    explicit IntegratorInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_IntegratorInput){}
 };
 /// \endcond
 /// Input arguments of an integrator
-/// 
+///
 /// \copydoc scheme_IntegratorInput
 template<class M>
 IntegratorInputIOSchemeVector<M> integratorIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
@@ -422,17 +422,17 @@ std::vector<M> integratorIn(const std::vector<M>& args,const std::string &arg_s0
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'IntegratorOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT IntegratorOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit IntegratorOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_IntegratorOutput){} 
+    explicit IntegratorOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_IntegratorOutput){}
 };
 /// \endcond
 /// Output arguments of an integrator
-/// 
+///
 /// \copydoc scheme_IntegratorOutput
 template<class M>
 IntegratorOutputIOSchemeVector<M> integratorOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
@@ -465,17 +465,17 @@ std::vector<M> integratorOut(const std::vector<M>& args,const std::string &arg_s
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'LinsolInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT LinsolInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit LinsolInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LinsolInput){} 
+    explicit LinsolInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LinsolInput){}
 };
 /// \endcond
 /// Input arguments of a linear solver
-/// 
+///
 /// \copydoc scheme_LinsolInput
 template<class M>
 LinsolInputIOSchemeVector<M> linsolIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -500,17 +500,17 @@ std::vector<M> linsolIn(const std::vector<M>& args,const std::string &arg_s0="",
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'LinsolOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT LinsolOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit LinsolOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LinsolOutput){} 
+    explicit LinsolOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LinsolOutput){}
 };
 /// \endcond
 /// Output arguments of a linear solver
-/// 
+///
 /// \copydoc scheme_LinsolOutput
 template<class M>
 LinsolOutputIOSchemeVector<M> linsolOut(const std::string &arg_s0 ="",const M &arg_m0 =M()){
@@ -533,17 +533,17 @@ std::vector<M> linsolOut(const std::vector<M>& args,const std::string &arg_s0=""
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'LPSolverInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT LPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit LPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPSolverInput){} 
+    explicit LPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPSolverInput){}
 };
 /// \endcond
 /// Input arguments of a LP problem
-/// 
+///
 /// \copydoc scheme_LPSolverInput
 template<class M>
 LPSolverInputIOSchemeVector<M> lpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
@@ -576,17 +576,17 @@ std::vector<M> lpIn(const std::vector<M>& args,const std::string &arg_s0="",cons
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'LPSolverOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT LPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit LPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPSolverOutput){} 
+    explicit LPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPSolverOutput){}
 };
 /// \endcond
 /// Output arguments of an LP Solver
-/// 
+///
 /// \copydoc scheme_LPSolverOutput
 template<class M>
 LPSolverOutputIOSchemeVector<M> lpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
@@ -615,17 +615,17 @@ std::vector<M> lpOut(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'LPStruct'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT LPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit LPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPStruct){} 
+    explicit LPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_LPStruct){}
 };
 /// \endcond
 /// Structure specification of an LP
-/// 
+///
 /// \copydoc scheme_LPStruct
 template<class M>
 LPStructIOSchemeVector<M> lpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M()){
@@ -648,17 +648,17 @@ std::vector<M> lpStruct(const std::vector<M>& args,const std::string &arg_s0="")
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'NLPInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT NLPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit NLPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPInput){} 
+    explicit NLPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPInput){}
 };
 /// \endcond
 /// Input arguments of an NLP function
-/// 
+///
 /// \copydoc scheme_NLPInput
 template<class M>
 NLPInputIOSchemeVector<M> nlpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -683,17 +683,17 @@ std::vector<M> nlpIn(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'NLPOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT NLPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit NLPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPOutput){} 
+    explicit NLPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPOutput){}
 };
 /// \endcond
 /// Output arguments of an NLP function
-/// 
+///
 /// \copydoc scheme_NLPOutput
 template<class M>
 NLPOutputIOSchemeVector<M> nlpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -718,17 +718,17 @@ std::vector<M> nlpOut(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'GradFInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT GradFInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit GradFInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_GradFInput){} 
+    explicit GradFInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_GradFInput){}
 };
 /// \endcond
 /// Input arguments of an NLP objective gradient function
-/// 
+///
 /// \copydoc scheme_GradFInput
 template<class M>
 GradFInputIOSchemeVector<M> gradFIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -753,17 +753,17 @@ std::vector<M> gradFIn(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'GradFOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT GradFOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit GradFOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_GradFOutput){} 
+    explicit GradFOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_GradFOutput){}
 };
 /// \endcond
 /// Output arguments of an NLP objective gradient function
-/// 
+///
 /// \copydoc scheme_GradFOutput
 template<class M>
 GradFOutputIOSchemeVector<M> gradFOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
@@ -790,17 +790,17 @@ std::vector<M> gradFOut(const std::vector<M>& args,const std::string &arg_s0="",
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'JacGInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT JacGInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit JacGInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_JacGInput){} 
+    explicit JacGInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_JacGInput){}
 };
 /// \endcond
 /// Input arguments of an NLP Jacobian function
-/// 
+///
 /// \copydoc scheme_JacGInput
 template<class M>
 JacGInputIOSchemeVector<M> jacGIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -825,17 +825,17 @@ std::vector<M> jacGIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'JacGOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT JacGOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit JacGOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_JacGOutput){} 
+    explicit JacGOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_JacGOutput){}
 };
 /// \endcond
 /// Output arguments of an NLP Jacobian function
-/// 
+///
 /// \copydoc scheme_JacGOutput
 template<class M>
 JacGOutputIOSchemeVector<M> jacGOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
@@ -862,17 +862,17 @@ std::vector<M> jacGOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'HessLagInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT HessLagInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit HessLagInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HessLagInput){} 
+    explicit HessLagInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HessLagInput){}
 };
 /// \endcond
 /// Input arguments of an NLP Hessian function
-/// 
+///
 /// \copydoc scheme_HessLagInput
 template<class M>
 HessLagInputIOSchemeVector<M> hessLagIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
@@ -901,17 +901,17 @@ std::vector<M> hessLagIn(const std::vector<M>& args,const std::string &arg_s0=""
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'HessLagOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT HessLagOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit HessLagOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HessLagOutput){} 
+    explicit HessLagOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_HessLagOutput){}
 };
 /// \endcond
 /// Output arguments of an NLP Hessian function
-/// 
+///
 /// \copydoc scheme_HessLagOutput
 template<class M>
 HessLagOutputIOSchemeVector<M> hessLagOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M()){
@@ -942,17 +942,17 @@ std::vector<M> hessLagOut(const std::vector<M>& args,const std::string &arg_s0="
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'NLPSolverInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT NLPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit NLPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPSolverInput){} 
+    explicit NLPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPSolverInput){}
 };
 /// \endcond
 /// Input arguments of an NLP Solver
-/// 
+///
 /// \copydoc scheme_NLPSolverInput
 template<class M>
 NLPSolverInputIOSchemeVector<M> nlpSolverIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M()){
@@ -989,17 +989,17 @@ std::vector<M> nlpSolverIn(const std::vector<M>& args,const std::string &arg_s0=
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'NLPSolverOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT NLPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit NLPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPSolverOutput){} 
+    explicit NLPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_NLPSolverOutput){}
 };
 /// \endcond
 /// Output arguments of an NLP Solver
-/// 
+///
 /// \copydoc scheme_NLPSolverOutput
 template<class M>
 NLPSolverOutputIOSchemeVector<M> nlpSolverOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M()){
@@ -1032,19 +1032,19 @@ std::vector<M> nlpSolverOut(const std::vector<M>& args,const std::string &arg_s0
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'MayerInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT MayerInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit MayerInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_MayerInput){} 
+    explicit MayerInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_MayerInput){}
 };
 /// \endcond
 /// Input arguments of a Mayer Term \n
 /// nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
 /// np: Number of parameters: from option number_of_parameters\n
-/// 
+///
 /// \copydoc scheme_MayerInput
 template<class M>
 MayerInputIOSchemeVector<M> mayerIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -1069,13 +1069,13 @@ std::vector<M> mayerIn(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'OCPInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT OCPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit OCPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_OCPInput){} 
+    explicit OCPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_OCPInput){}
 };
 /// \endcond
 /// Input arguments of an OCP Solver \n
@@ -1085,7 +1085,7 @@ class CASADI_SYMBOLIC_EXPORT OCPInputIOSchemeVector : public IOSchemeVector<M> {
 /// nu: Number of controls: from nc - np \n
 /// np: Number of parameters: from option number_of_parameters\n
 /// nh: Number of point constraints: from cfcn.input(0).size()
-/// 
+///
 /// \copydoc scheme_OCPInput
 template<class M>
 OCPInputIOSchemeVector<M> ocpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M(),const std::string &arg_s9 ="",const M &arg_m9 =M(),const std::string &arg_s10 ="",const M &arg_m10 =M(),const std::string &arg_s11 ="",const M &arg_m11 =M(),const std::string &arg_s12 ="",const M &arg_m12 =M()){
@@ -1132,17 +1132,17 @@ std::vector<M> ocpIn(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'OCPOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT OCPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit OCPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_OCPOutput){} 
+    explicit OCPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_OCPOutput){}
 };
 /// \endcond
 /// Output arguments of an OCP Solver
-/// 
+///
 /// \copydoc scheme_OCPOutput
 template<class M>
 OCPOutputIOSchemeVector<M> ocpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
@@ -1171,17 +1171,17 @@ std::vector<M> ocpOut(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'QCQPSolverInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT QCQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QCQPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPSolverInput){} 
+    explicit QCQPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPSolverInput){}
 };
 /// \endcond
 /// Input arguments of a QP problem
-/// 
+///
 /// \copydoc scheme_QCQPSolverInput
 template<class M>
 QCQPSolverInputIOSchemeVector<M> qcqpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M(),const std::string &arg_s9 ="",const M &arg_m9 =M(),const std::string &arg_s10 ="",const M &arg_m10 =M(),const std::string &arg_s11 ="",const M &arg_m11 =M()){
@@ -1226,17 +1226,17 @@ std::vector<M> qcqpIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'QCQPSolverOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT QCQPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QCQPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPSolverOutput){} 
+    explicit QCQPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPSolverOutput){}
 };
 /// \endcond
 /// Output arguments of an QP Solver
-/// 
+///
 /// \copydoc scheme_QCQPSolverOutput
 template<class M>
 QCQPSolverOutputIOSchemeVector<M> qcqpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
@@ -1265,17 +1265,17 @@ std::vector<M> qcqpOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'QCQPStruct'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT QCQPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QCQPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPStruct){} 
+    explicit QCQPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QCQPStruct){}
 };
 /// \endcond
 /// Structure specification of a QP
-/// 
+///
 /// \copydoc scheme_QCQPStruct
 template<class M>
 QCQPStructIOSchemeVector<M> qcqpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
@@ -1302,17 +1302,17 @@ std::vector<M> qcqpStruct(const std::vector<M>& args,const std::string &arg_s0="
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'QPSolverInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT QPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPSolverInput){} 
+    explicit QPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPSolverInput){}
 };
 /// \endcond
 /// Input arguments of a QP problem
-/// 
+///
 /// \copydoc scheme_QPSolverInput
 template<class M>
 QPSolverInputIOSchemeVector<M> qpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M()){
@@ -1351,17 +1351,17 @@ std::vector<M> qpIn(const std::vector<M>& args,const std::string &arg_s0="",cons
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'QPSolverOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT QPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPSolverOutput){} 
+    explicit QPSolverOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPSolverOutput){}
 };
 /// \endcond
 /// Output arguments of an QP Solver
-/// 
+///
 /// \copydoc scheme_QPSolverOutput
 template<class M>
 QPSolverOutputIOSchemeVector<M> qpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
@@ -1390,17 +1390,17 @@ std::vector<M> qpOut(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'QPStruct'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT QPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit QPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPStruct){} 
+    explicit QPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_QPStruct){}
 };
 /// \endcond
 /// Structure specification of a QP
-/// 
+///
 /// \copydoc scheme_QPStruct
 template<class M>
 QPStructIOSchemeVector<M> qpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -1425,17 +1425,17 @@ std::vector<M> qpStruct(const std::vector<M>& args,const std::string &arg_s0="",
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SDPInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SDPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SDPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPInput){} 
+    explicit SDPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPInput){}
 };
 /// \endcond
 /// Input arguments of a SDP problem
-/// 
+///
 /// \copydoc scheme_SDPInput
 template<class M>
 SDPInputIOSchemeVector<M> sdpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M()){
@@ -1472,17 +1472,17 @@ std::vector<M> sdpIn(const std::vector<M>& args,const std::string &arg_s0="",con
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SDPOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SDPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SDPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPOutput){} 
+    explicit SDPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPOutput){}
 };
 /// \endcond
 /// Output arguments of an SDP Solver
-/// 
+///
 /// \copydoc scheme_SDPOutput
 template<class M>
 SDPOutputIOSchemeVector<M> sdpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M()){
@@ -1517,17 +1517,17 @@ std::vector<M> sdpOut(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SDPStruct'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SDPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SDPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPStruct){} 
+    explicit SDPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDPStruct){}
 };
 /// \endcond
 /// Structure specification of an SDP
-/// 
+///
 /// \copydoc scheme_SDPStruct
 template<class M>
 SDPStructIOSchemeVector<M> sdpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M()){
@@ -1554,17 +1554,17 @@ std::vector<M> sdpStruct(const std::vector<M>& args,const std::string &arg_s0=""
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SDQPInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SDQPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SDQPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPInput){} 
+    explicit SDQPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPInput){}
 };
 /// \endcond
 /// Input arguments of a SDQP problem
-/// 
+///
 /// \copydoc scheme_SDQPInput
 template<class M>
 SDQPInputIOSchemeVector<M> sdqpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M()){
@@ -1603,17 +1603,17 @@ std::vector<M> sdqpIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SDQPOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SDQPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SDQPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPOutput){} 
+    explicit SDQPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPOutput){}
 };
 /// \endcond
 /// Output arguments of an SDQP Solver
-/// 
+///
 /// \copydoc scheme_SDQPOutput
 template<class M>
 SDQPOutputIOSchemeVector<M> sdqpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M()){
@@ -1648,17 +1648,17 @@ std::vector<M> sdqpOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SDQPStruct'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SDQPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SDQPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPStruct){} 
+    explicit SDQPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SDQPStruct){}
 };
 /// \endcond
 /// Structure specification of an SDQP
-/// 
+///
 /// \copydoc scheme_SDQPStruct
 template<class M>
 SDQPStructIOSchemeVector<M> sdqpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
@@ -1687,17 +1687,17 @@ std::vector<M> sdqpStruct(const std::vector<M>& args,const std::string &arg_s0="
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SOCPInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SOCPInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SOCPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPInput){} 
+    explicit SOCPInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPInput){}
 };
 /// \endcond
 /// Input arguments of a SOCP problem
-/// 
+///
 /// \copydoc scheme_SOCPInput
 template<class M>
 SOCPInputIOSchemeVector<M> socpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M(),const std::string &arg_s9 ="",const M &arg_m9 =M()){
@@ -1738,17 +1738,17 @@ std::vector<M> socpIn(const std::vector<M>& args,const std::string &arg_s0="",co
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SOCPOutput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SOCPOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SOCPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPOutput){} 
+    explicit SOCPOutputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPOutput){}
 };
 /// \endcond
 /// Output arguments of an SOCP Solver
-/// 
+///
 /// \copydoc scheme_SOCPOutput
 template<class M>
 SOCPOutputIOSchemeVector<M> socpOut(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M()){
@@ -1777,17 +1777,17 @@ std::vector<M> socpOut(const std::vector<M>& args,const std::string &arg_s0="",c
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'SOCPStruct'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT SOCPStructIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit SOCPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPStruct){} 
+    explicit SOCPStructIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_SOCPStruct){}
 };
 /// \endcond
 /// Structure specification of an SOCP
-/// 
+///
 /// \copydoc scheme_SOCPStruct
 template<class M>
 SOCPStructIOSchemeVector<M> socpStruct(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M()){
@@ -1812,17 +1812,17 @@ std::vector<M> socpStruct(const std::vector<M>& args,const std::string &arg_s0="
   return ret;
 
 }
-/// \cond INTERNAL 
+/// \cond INTERNAL
 /// Helper function for 'StabilizedQPSolverInput'
 
 template<class M>
 class CASADI_SYMBOLIC_EXPORT StabilizedQPSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit StabilizedQPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_StabilizedQPSolverInput){} 
+    explicit StabilizedQPSolverInputIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_StabilizedQPSolverInput){}
 };
 /// \endcond
 /// Input arguments of a QP problem
-/// 
+///
 /// \copydoc scheme_StabilizedQPSolverInput
 template<class M>
 StabilizedQPSolverInputIOSchemeVector<M> stabilizedQpIn(const std::string &arg_s0 ="",const M &arg_m0 =M(),const std::string &arg_s1 ="",const M &arg_m1 =M(),const std::string &arg_s2 ="",const M &arg_m2 =M(),const std::string &arg_s3 ="",const M &arg_m3 =M(),const std::string &arg_s4 ="",const M &arg_m4 =M(),const std::string &arg_s5 ="",const M &arg_m5 =M(),const std::string &arg_s6 ="",const M &arg_m6 =M(),const std::string &arg_s7 ="",const M &arg_m7 =M(),const std::string &arg_s8 ="",const M &arg_m8 =M(),const std::string &arg_s9 ="",const M &arg_m9 =M(),const std::string &arg_s10 ="",const M &arg_m10 =M(),const std::string &arg_s11 ="",const M &arg_m11 =M()){

@@ -40,7 +40,7 @@ namespace casadi{
 
   Split::~Split(){
   }
-  
+
   void Split::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
@@ -73,10 +73,10 @@ namespace casadi{
         vector<double>& res_i = output[i]->data();
         bvec_t *res_i_ptr = get_bvec_t(res_i);
         for(int k=0; k<res_i.size(); ++k){
-          if(fwd){        
+          if(fwd){
             *res_i_ptr++ = *arg_ptr++;
           } else {
-            *arg_ptr++ |= *res_i_ptr;          
+            *arg_ptr++ |= *res_i_ptr;
             *res_i_ptr++ = 0;
           }
         }
@@ -97,7 +97,7 @@ namespace casadi{
   }
 
   Horzsplit::Horzsplit(const MX& x, const std::vector<int>& offset) : Split(x,offset){
-    
+
     // Split up the sparsity pattern
     output_sparsity_ = horzsplit(x.sparsity(),offset_);
 
@@ -128,7 +128,7 @@ namespace casadi{
     for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin(); it!=output_sparsity_.end(); ++it){
       col_offset.push_back(col_offset.back() + it->size2());
     }
-    
+
     // Non-differentiated output and forward sensitivities
     int first_d = output_given ? 0 : -1;
     for(int d=first_d; d<nfwd; ++d){
@@ -148,7 +148,7 @@ namespace casadi{
       if(adjSens[d][0]!=0){
         vector<MX> v;
         for(int i=0; i<nx; ++i){
-          MX* x_i = adjSeed[d][i];          
+          MX* x_i = adjSeed[d][i];
           if(x_i!=0){
             v.push_back(*x_i);
             *x_i = MX();
@@ -162,7 +162,7 @@ namespace casadi{
   }
 
   Vertsplit::Vertsplit(const MX& x, const std::vector<int>& offset) : Split(x,offset){
-    
+
     // Split up the sparsity pattern
     output_sparsity_ = vertsplit(x.sparsity(),offset_);
 
@@ -193,7 +193,7 @@ namespace casadi{
     for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin(); it!=output_sparsity_.end(); ++it){
       row_offset.push_back(row_offset.back() + it->size1());
     }
-    
+
     // Non-differentiated output and forward sensitivities
     int first_d = output_given ? 0 : -1;
     for(int d=first_d; d<nfwd; ++d){
@@ -213,7 +213,7 @@ namespace casadi{
       if(adjSens[d][0]!=0){
         vector<MX> v;
         for(int i=0; i<nx; ++i){
-          MX* x_i = adjSeed[d][i];          
+          MX* x_i = adjSeed[d][i];
           if(x_i!=0){
             v.push_back(*x_i);
             *x_i = MX();

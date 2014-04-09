@@ -33,14 +33,14 @@
   Primal:
 
   \verbatim
-  min          c' x 
-   x 
+  min          c' x
+   x
   subject to
                 || Gi' x + hi ||_2 <= ei' x + fi  i = 1..m
 
               LBA <= A x <= UBA
               LBX <= x   <= UBX
-              
+
       with x ( n x 1)
            c ( n x 1 )
            Gi  sparse (n x ni)
@@ -53,11 +53,11 @@
            LBX, UBX dense vector (n x 1)
 
   \endverbatim
-  
+
 */
-      
+
 namespace casadi{
-  
+
 /// Input arguments of a SOCP problem [socpIn]
 enum SOCPInput{
   /// The horizontal stack of all matrices Gi: ( n x N) [g]
@@ -93,7 +93,7 @@ enum SOCPOutput{
   /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
   SOCP_SOLVER_LAM_X,
   SOCP_SOLVER_NUM_OUT};
-  
+
 /// Structure specification of an SOCP [socpStruct]
 enum SOCPStruct{
   /// The horizontal stack of all matrices Gi: ( n x N) [g]
@@ -101,7 +101,7 @@ enum SOCPStruct{
   /// The matrix A: ( nc x n) [a]
   SOCP_STRUCT_A,
   SOCP_STRUCT_NUM};
-  
+
 // Forward declaration of internal class
 class SOCPSolverInternal;
 
@@ -118,7 +118,7 @@ class CASADI_SYMBOLIC_EXPORT SOCPSolver : public Function{
 
   /// Default constructor
   SOCPSolver();
-  
+
   /// Access functions of the node
   SOCPSolverInternal* operator->();
   const SOCPSolverInternal* operator->() const;

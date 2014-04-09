@@ -27,31 +27,31 @@
 #include "../matrix/generic_expression.hpp"
 #include <vector>
 namespace casadi{
-  
+
   /** \brief  Forward declaration */
   class MXNode;
   class Function;
 
 
   /** \brief MX - Matrix expression
-  
+
       The MX class is used to build up trees made up from MXNodes. It is a more general graph representation than the scalar expression,
       SX, and much less efficient for small objects. On the other hand, the class allows much more general operations than does SX,
       in particular matrix valued operations and calls to arbitrary differentiable functions.
-  
-      The MX class is designed to have identical syntax with the Matrix<> template class, and uses Matrix<double> as its internal 
-      representation of the values at a node. By keeping the syntaxes identical, it is possible to switch from one class to the other, 
+
+      The MX class is designed to have identical syntax with the Matrix<> template class, and uses Matrix<double> as its internal
+      representation of the values at a node. By keeping the syntaxes identical, it is possible to switch from one class to the other,
       as well as inlining MX functions to SXElement functions.
-  
+
       Note that an operation is always "lazy", making a matrix multiplication will create a matrix multiplication node, not perform
       the actual multiplication.
 
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010-2011
   */
   class CASADI_SYMBOLIC_EXPORT MX : public GenericExpression<MX>, public GenericMatrix<MX>, public SharedObject{
   public:
-  
+
     /** \brief  Default constructor */
     MX();
 
@@ -70,11 +70,11 @@ namespace casadi{
 
     /** \brief  Create vector constant (also implicit type conversion) */
     MX(const std::vector<double> &x);
-    
+
     /** \brief  Create sparse matrix constant (also implicit type conversion) */
     MX(const Matrix<double> &x);
- 
-/// \cond INTERNAL   
+
+/// \cond INTERNAL
     /** \brief  Destructor */
     virtual ~MX();
 /// \endcond
@@ -93,63 +93,63 @@ namespace casadi{
 
     /// Access a non-zero element, with bounds checking
     NonZeros<MX,int> at(int k);
-    
+
 #endif // SWIG
-    
+
     /// Returns the truth value of an MX expression
     bool __nonzero__() const;
-    
+
     /// \cond CLUTTER
     //@{
     /// Indexing for interfaced languages
-    
+
     /// get a non-zero
     const MX nz_indexed_one_based(int k) const{ return at(k-1);}
     const MX nz_indexed_zero_based(int k) const{ return at(k);}
     const MX nz_indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
-    const MX nz_indexed(const Slice &k) const{ 
+    const MX nz_indexed(const Slice &k) const{
       return (*this)[k.getAll(size())];
     }
-    
+
     /// get a matrix element
     const MX indexed_one_based(int rr, int cc) const{ return (*this)(rr-1,cc-1);}
     const MX indexed_zero_based(int rr, int cc) const{ return (*this)(rr,cc);}
-    const MX indexed(const IndexList &rr, const IndexList &cc) const{ 
+    const MX indexed(const IndexList &rr, const IndexList &cc) const{
       return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
-    const MX indexed(const Slice &rr, const Slice &cc) const{ 
+    const MX indexed(const Slice &rr, const Slice &cc) const{
       return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
-    const MX indexed(const Matrix<int> &k) const{ 
+    const MX indexed(const Matrix<int> &k) const{
       return (*this)(k);
     }
-    const MX indexed(const Sparsity &sp) const{ 
+    const MX indexed(const Sparsity &sp) const{
       return (*this)(sp);
     }
     const MX indexed(const Slice &rr, const Matrix<int>& cc) const{ return (*this)(rr,cc); }
-    const MX indexed(const Matrix<int>& rr, const IndexList& cc) const{ 
+    const MX indexed(const Matrix<int>& rr, const IndexList& cc) const{
       return (*this)(rr,cc.getAll(size2()));
     }
     const MX indexed(const Matrix<int>& rr, const Slice& cc) const{ return (*this)(rr,cc); }
-    const MX indexed(const IndexList& rr, const Matrix<int>& cc) const{ 
+    const MX indexed(const IndexList& rr, const Matrix<int>& cc) const{
       return (*this)(rr.getAll(size1()),cc);
     }
-    const MX indexed(const Matrix<int>& rr, const Matrix<int>& cc) const{ 
+    const MX indexed(const Matrix<int>& rr, const Matrix<int>& cc) const{
       return (*this)(rr,cc);
     }
-    
+
     // get a vector element
     const MX indexed_one_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr-1);}
     const MX indexed_zero_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr);}
-    const MX indexed(const IndexList &rr) const{ 
+    const MX indexed(const IndexList &rr) const{
       casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr.getAll(size1()));
     }
-    const MX indexed(const Slice &rr) const{ 
+    const MX indexed(const Slice &rr) const{
       casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr.getAll(size1()));
     }
-    
+
     /// set a non-zero
     void nz_indexed_one_based_assignment(int k, const MX &m){ at(k-1) = m(0,0);}
     void nz_indexed_zero_based_assignment(int k, const MX &m){ at(k) = m(0,0);}
@@ -159,18 +159,18 @@ namespace casadi{
     void nz_indexed_assignment(const Slice &k, const MX &m){
       (*this)[k.getAll(size())] = m;
     }
-    
+
     /// set a matrix element
     void indexed_one_based_assignment(int rr, int cc, const MX &m){ (*this)(rr-1,cc-1) = m;}
     void indexed_zero_based_assignment(int rr, int cc, const MX &m){ (*this)(rr,cc) = m;}
     void indexed_assignment(const IndexList &rr, const IndexList &cc, const MX &m){
       setSub(m,rr.getAll(size1()),cc.getAll(size2()));
     }
-    
+
     void indexed_assignment(const Slice &rr, const Slice &cc, const MX &m){
       (*this)(rr.getAll(size1()),cc.getAll(size2())) = m;
     }
-    
+
     void indexed_zero_based_assignment(const Matrix<int>& k, const MX &m){
       (*this)[k] = m;
     }
@@ -188,31 +188,31 @@ namespace casadi{
     }
     void indexed_assignment(const IndexList& rr, const Matrix<int>& cc, const MX& m){
       (*this)(rr.getAll(size1()),cc) = m;
-    } 
+    }
     void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const MX& m){
       (*this)(rr,cc) = m;
-    } 
+    }
     //@}
-    
+
     // set a vector element
     void indexed_one_based_assignment(int rr, const MX &m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr-1) = m;}
     void indexed_zero_based_assignment(int rr, const MX &m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr) = m;}
     void indexed_assignment(const IndexList &rr, const MX &m){
       casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr.getAll(size1())) = m;
     }
-    
+
     void indexed_assignment(const Slice &rr, const MX &m){
       (*this
       )(rr.getAll(size1())) = m;
     }
-    
+
     /// \endcond
-    
+
     /// \cond INTERNAL
     /// Scalar type
     typedef MX ScalarType;
     /// \endcond
-    
+
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
 
@@ -227,7 +227,7 @@ namespace casadi{
     void enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc);
 
     MX operator-() const;
-  
+
     /// \cond INTERNAL
     //@{
     /** \brief  Access a member of the node */
@@ -237,52 +237,52 @@ namespace casadi{
     const MXNode* operator->() const;
     //@}
     /// \endcond
-  
+
     /** \brief Get the nth dependency as MX */
     MX getDep(int ch=0) const;
-  
+
     /** \brief  Number of outputs */
     int getNumOutputs() const;
-  
+
     /** \brief  Get an output */
     MX getOutput(int oind=0) const;
 
     /** \brief Get the number of dependencies of a binary SXElement */
     int getNdeps() const;
-    
+
     /// Get the name.
     std::string getName() const;
-  
+
     /// Get the value (only for scalar constant nodes)
     double getValue() const;
-    
+
     /// Get the value (only for constant nodes)
     Matrix<double> getMatrixValue() const;
-  
+
     /// Check if symbolic
     bool isSymbolic() const;
-  
+
     /// Check if constant
     bool isConstant() const;
-  
+
     /// Check if evaluation
     bool isEvaluation() const;
-  
+
     /// Check if evaluation output
     bool isEvaluationOutput() const;
-  
+
     /// Get the index of evaluation output - only valid when isEvaluationoutput() is true
     int getEvaluationOutput() const;
-  
+
     /// Is it a certain operation
     bool isOperation (int op) const;
-  
+
     /// Check if multiplication
     bool isMultiplication() const;
-  
+
     /// Check if commutative operation
     bool isCommutative() const;
-    
+
     /// Check if norm
     bool isNorm() const;
 
@@ -303,25 +303,25 @@ namespace casadi{
 
     /** \brief  Is the expression a transpose? */
     bool isTranspose() const;
-  
+
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;
-  
+
     /// Get function
     Function getFunction();
 
     /// Is binary operation
     bool isBinary() const;
-  
+
     /// Is unary operation
     bool isUnary() const;
-  
+
     /// Get operation type
     int getOp() const;
 
-    /** \brief Check if two nodes are equivalent up to a given depth. 
+    /** \brief Check if two nodes are equivalent up to a given depth.
      *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
-     * 
+     *
      *  a = x*x
      *  b = x*x
      *
@@ -331,40 +331,40 @@ namespace casadi{
 #ifndef SWIG
     bool isEqual(const MXNode* y, int depth=0) const;
 #endif // SWIG
-  
-    /** \brief Returns a number that is unique for a given MXNode. 
+
+    /** \brief Returns a number that is unique for a given MXNode.
      * If the MX does not point to any node, 0 is returned.
      */
     long __hash__() const;
-    
+
     /// \cond INTERNAL
     /// Get the temporary variable
     int getTemp() const;
-  
+
     /// Set the temporary variable
     void setTemp(int t);
     /// \endcond
-  
+
     //@{
     /** \brief  Create nodes by their ID */
     static MX binary(int op, const MX &x, const MX &y);
     static MX unary(int op, const MX &x);
     //@}
-  
+
     //@{
     /** \brief  create a matrix with all inf */
     static MX inf(const Sparsity& sp);
     static MX inf(int nrow=1, int ncol=1);
     static MX inf(const std::pair<int,int>& rc);
     //@}
-  
+
     //@{
     /** \brief  create a matrix with all nan */
     static MX nan(const Sparsity& sp);
     static MX nan(int nrow=1, int ncol=1);
     static MX nan(const std::pair<int,int>& rc);
     //@}
-  
+
     //@{
     /** \brief  create a matrix by repeating an existing matrix */
     static MX repmat(const MX& x, const Sparsity& sp);
@@ -372,10 +372,10 @@ namespace casadi{
     static MX repmat(const MX& x, const std::pair<int, int> &rc);
     //@}
 
-    /** \brief  Identity matrix */  
+    /** \brief  Identity matrix */
     static MX eye(int ncol);
-    
-    
+
+
     /// \cond INTERNAL
     const MX sub(int rr, int cc) const;
     const MX sub(const std::vector<int>& rr, int cc) const;
@@ -402,7 +402,7 @@ namespace casadi{
     void setSub(const MX& m, const Slice& rr, const Slice& cc);
     void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc);
     void setSub(const MX& m, const Sparsity& sp, int dummy);
-    
+
     MX getNZ(int k) const;
     MX getNZ(const std::vector<int>& k) const;
     MX getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
@@ -412,14 +412,14 @@ namespace casadi{
     void setNZ(const Slice& k, const MX& m){ setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const MX& m);
     /// \endcond
-    
-    
+
+
     /** \brief Append a matrix vertically (NOTE: only efficient if vector) */
     void append(const MX& y);
 
     /** \brief Append a matrix horizontally */
     void appendColumns(const MX& y);
-  
+
     /// \cond SWIGINTERNAL
     // all binary operations
     MX __add__(const MX& y) const;
@@ -436,7 +436,7 @@ namespace casadi{
     MX __mrdivide__  (const MX& b) const;
     MX __mpower__(const MX& b) const;
     /// \endcond
-    
+
     MX mul(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX mul_full(const MX& y, const Sparsity &sp_z=Sparsity()) const;
     MX inner_prod(const MX& y) const;
@@ -475,7 +475,7 @@ namespace casadi{
     MX arccosh() const;
     MX arctanh() const;
     MX logic_not() const;
-    
+
     /** \brief returns itself, but with an assertion attached
     *
     *  If y does not evaluate to 1, a runtime error is raised
@@ -496,7 +496,7 @@ namespace casadi{
 
     /// Transpose the matrix
     MX trans() const;
-    
+
 #ifndef SWIG
     /// Transpose the matrix (shorthand)
     MX T() const{ return trans();}
@@ -504,7 +504,7 @@ namespace casadi{
 
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;
-    
+
     /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
 
@@ -525,10 +525,10 @@ namespace casadi{
 
     // Maximum number of calls
     static long max_num_calls_in_print_;
-  
+
     // Depth when checking equalities
     static int eq_depth_;
-  
+
 #endif // SWIG
   };
 

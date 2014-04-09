@@ -46,7 +46,7 @@ namespace casadi{
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosVector::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){    
+  void GetNonzerosVector::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     const vector<T>& idata = input[0]->data();
     typename vector<T>::iterator odata_it = output[0]->begin();
     for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
@@ -95,12 +95,12 @@ namespace casadi{
       }
     }
   }
-  
+
   void GetNonzerosVector::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
-    
+
     // Propate sparsity
     if(fwd){
       for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
@@ -118,7 +118,7 @@ namespace casadi{
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
-    
+
     // Propate sparsity
     if(fwd){
       for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
@@ -136,7 +136,7 @@ namespace casadi{
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
-    
+
     // Propate sparsity
     if(fwd){
       for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
@@ -184,7 +184,7 @@ namespace casadi{
     const Sparsity& osp = sparsity();
     const vector<int>& orow = osp.row();
     vector<int> ocol = osp.getCol();
-    
+
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
     //const vector<int>& irow = isp.row();
@@ -193,18 +193,18 @@ namespace casadi{
     // Get all input elements
     vector<int> el_input;
     isp.getElements(el_input,false);
-    
+
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
-        
+
     // Nondifferentiated function and forward sensitivities
     int first_d = output_given ? 0 : -1;
     for(int d=first_d; d<nfwd; ++d){
 
       // Get references to arguments and results
       const MX& arg = d<0 ? *input[0] : *fwdSeed[d][0];
-      MX& res = d<0 ? *output[0] : *fwdSens[d][0];      
-      
+      MX& res = d<0 ? *output[0] : *fwdSens[d][0];
+
       // Get the matching nonzeros
       r_ind.resize(el_input.size());
       copy(el_input.begin(),el_input.end(),r_ind.begin());
@@ -221,13 +221,13 @@ namespace casadi{
 
         // Get the corresponding nonzero for the input
         int el = nz[k];
-        
+
         // Skip if zero assignment
         if(el==-1) continue;
 
         // Get the corresponding nonzero in the argument
         int el_arg = r_ind[el];
-        
+
         // Skip if no argument
         if(el_arg==-1) continue;
 
@@ -241,9 +241,9 @@ namespace casadi{
         r_row.push_back(j);
         r_colind[1+i]++;
       }
-      
+
       // col count -> col offset
-      for(int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1]; 
+      for(int i=1; i<r_colind.size(); ++i) r_colind[i] += r_colind[i-1];
 
       // Create a sparsity pattern from vectors
       if(r_nz.size()==0){
@@ -262,7 +262,7 @@ namespace casadi{
       *adjSeed[d][0] = MX();
       MX& asens = *adjSens[d][0]; // Sensitivity after addition
       MX asens0 = asens; // Sensitivity before addition
-      
+
       // Get the corresponding nz locations in the output sparsity pattern
       aseed.sparsity().getElements(r_nz,false);
       osp.getNZInplace(r_nz);
@@ -281,16 +281,16 @@ namespace casadi{
 
       // Quick continue of no elements to add
       if(!elements_to_add) continue;
-     
+
       // Get the nz locations in the adjoint sensitivity corresponding to the inputs
       r_ind.resize(el_input.size());
       copy(el_input.begin(),el_input.end(),r_ind.begin());
       asens0.sparsity().getNZInplace(r_ind);
-      
+
       // Enlarge the sparsity pattern of the sensitivity if not all additions fit
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
         if(*k>=0 && r_ind[nz[*k]]<0){
-          
+
           // Create a new pattern which includes both the the previous seed and the addition
           Sparsity sp = asens0.sparsity().patternUnion(dep().sparsity());
           asens0 = asens0->getSetSparse(sp);
@@ -314,7 +314,7 @@ namespace casadi{
       asens = aseed->getAddNonzeros(asens0,r_nz);
     }
   }
-  
+
   Matrix<int> GetNonzeros::mapping() const {
     vector<int> nz = getAll();
     return Matrix<int>(sparsity(),nz);
@@ -324,12 +324,12 @@ namespace casadi{
     // Check sparsity
     if(!(sparsity() == dep().sparsity()))
       return false;
-      
+
     // Check if the nonzeros follow in increasing order
     if(s_.start_ != 0) return false;
     if(s_.step_ != 1) return false;
     if(s_.stop_ != size()) return false;
-    
+
     // True if reached this point
     return true;
   }
@@ -337,7 +337,7 @@ namespace casadi{
   void GetNonzerosVector::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Condegen the indices
     int ind = gen.getConstant(nz_,true);
-    
+
     // Codegen the assignments
     stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front() << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
   }
@@ -361,19 +361,19 @@ namespace casadi{
     }
     return dep()->getGetNonzeros(sp,nz_new);
   }
- 
+
   void GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_ << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") ";
     stream << "*rr++ = *ss;" << endl;
   }
-   
+
   void GetNonzerosSlice2::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << outer_.start_ << "; ss!=" << arg.front() << "+" << outer_.stop_ << "; ss+=" << outer_.step_ << ") ";
     stream << "for(tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_ << "; tt+=" << inner_.step_ << ") ";
     stream << "*rr++ = *tt;" << endl;
   }
 
-  bool GetNonzerosVector::isEqual(const MXNode* node, int depth) const{ 
+  bool GetNonzerosVector::isEqual(const MXNode* node, int depth) const{
     // Check dependencies
     if(!sameOpAndDeps(node,depth)) return false;
 
@@ -391,7 +391,7 @@ namespace casadi{
     return true;
   }
 
-  bool GetNonzerosSlice::isEqual(const MXNode* node, int depth) const{ 
+  bool GetNonzerosSlice::isEqual(const MXNode* node, int depth) const{
     // Check dependencies
     if(!sameOpAndDeps(node,depth)) return false;
 
@@ -408,7 +408,7 @@ namespace casadi{
     return true;
   }
 
-  bool GetNonzerosSlice2::isEqual(const MXNode* node, int depth) const{ 
+  bool GetNonzerosSlice2::isEqual(const MXNode* node, int depth) const{
     // Check dependencies
     if(!sameOpAndDeps(node,depth)) return false;
 

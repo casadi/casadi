@@ -35,7 +35,7 @@ class CSparseCholeskyInternal;
 /** \brief  LinearSolver with CSparseCholesky Interface
 *
  @copydoc LinearSolver_doc
-*  
+*
 * CSparseCholesky is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
 *
 *  A = LL'
@@ -59,28 +59,28 @@ public:
 
   /// Default (empty) constructor
   CSparseCholesky();
-  
+
   /// Create a linear solver given a sparsity pattern
   CSparseCholesky(const Sparsity& sp, int nrhs=1);
-  
+
   /** \brief  Access internal functions and data members */
   CSparseCholeskyInternal* operator->();
-  
+
   /** \brief  Access internal functions and data members */
   const CSparseCholeskyInternal* operator->() const;
-  
+
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
   /// Solve the system of equations Lx = b
   void solveL(double* x, int nrhs, bool transpose);
-  
+
   /// Obtain a symbolic Cholesky factorization
   Sparsity getFactorizationSparsity(bool transpose=false) const;
-  
+
   /// Obtain a numeric Cholesky factorization
   DMatrix getFactorization(bool transpose=false) const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
@@ -89,7 +89,7 @@ public:
   #ifdef SWIG
   %nocallback;
   #endif
-  
+
 };
 
 } // namespace casadi

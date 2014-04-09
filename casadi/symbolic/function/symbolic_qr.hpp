@@ -26,21 +26,21 @@
 #include "linear_solver.hpp"
 
 namespace casadi{
-  
+
   // Forward declaration of internal class
   class SymbolicQRInternal;
 
   /** \brief  LinearSolver based on QR factorization with sparsity pattern based reordering  _without_ partial pivoting
       @copydoc LinearSolver_doc
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2013
   */
   class CASADI_SYMBOLIC_EXPORT SymbolicQR : public LinearSolver{
   public:
-  
+
     /// Default (empty) constructor
     SymbolicQR();
-  
+
     /// Create a linear solver given a sparsity pattern
     explicit SymbolicQR(const Sparsity& sp, int nrhs=1);
 
@@ -49,7 +49,7 @@ namespace casadi{
 
     /// Const access functions of the node
     const SymbolicQRInternal* operator->() const;
-  
+
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 

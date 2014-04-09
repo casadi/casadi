@@ -47,6 +47,6 @@ void QCQPSolver::setQPOptions() {
 
 } // namespace casadi
 
-  
+
 
 

@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   bu[12] =  90.0;
   bu[13] = 120.0;
   bu[14] =  60.0;
-  
+
   //
   std::fill(bl.begin()+n,bl.begin()+n+m,0);
   std::fill(bu.begin()+n,bu.begin()+n+m,inf);
@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
   bl[n+14] =  70.0;
   bl[n+15] =  85.0;
   bl[n+16] = 100.0;
-  
-  
+
+
   std::vector<double> x0(n);
 
   x0[ 0]  =  20.0;
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   x0[12]  =  20.0;
   x0[13]  =  60.0;
   x0[14]  =  20.0;
-  
+
   sqic(&m , &n, &bl[0], &bu[0]);
 
   return 0;

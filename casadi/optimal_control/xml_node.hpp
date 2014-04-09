@@ -55,7 +55,7 @@ public:
 
   /** \brief  Read the value of an attribute */
   template<typename T>
-  void readAttribute(const std::string& attribute_name, T& val, bool assert_existance=true) const{ 
+  void readAttribute(const std::string& attribute_name, T& val, bool assert_existance=true) const{
     // find the attribute
     std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
 
@@ -66,7 +66,7 @@ public:
       readString(it->second,val);
     }
   }
-  
+
   /** \brief  Get a reference to a child by its index */
   const XMLNode& operator[](int i) const;
 
@@ -81,7 +81,7 @@ public:
 
   /** \brief  Check if a child is present */
   bool hasChild(const std::string& childname) const;
-  
+
   /** \brief  Check if an attribute is present */
   bool hasAttribute(const std::string& attribute_name) const;
 
@@ -103,19 +103,19 @@ public:
   /** \brief  Get value of text field */
   template<typename T>
   void getText(T& val) const{ readString(text_,val);}
-  
+
   /** \brief  Read the string value of a string (i.e. copy) */
   static void readString(const std::string& str, std::string& val);
-  
+
   /** \brief  Read the boolean value of a string */
   static void readString(const std::string& str, bool& val);
-  
+
   /** \brief  Read the integer value of a string */
   static void readString(const std::string& str, int& val);
-  
+
   /** \brief  Read the double value of a string */
   static void readString(const std::string& str, double& val);
-  
+
   /** \brief  Read node from parsed XML file */
   void addNode(TiXmlNode* node);
 

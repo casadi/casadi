@@ -47,7 +47,7 @@
 namespace casadi{
 
 /** \brief Represents a constant SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT ConstantSX : public SXNode{
@@ -55,7 +55,7 @@ public:
 
 // Destructor
 virtual ~ConstantSX(){};
-  
+
 /** \brief  Get the value must be defined */
 virtual double getValue() const = 0;
 
@@ -83,98 +83,98 @@ virtual void print(std::ostream &stream, long& remaining_calls) const{
 /** \brief  DERIVED CLASSES */
 
 /** \brief  Represents a constant real SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX{
   private:
     /// Constructor is private, use "create" below
-    explicit RealtypeSX(double value) : value(value){} 
-  
+    explicit RealtypeSX(double value) : value(value){}
+
   public:
-    
+
     /// Destructor
     virtual ~RealtypeSX(){
-      size_t num_erased = cached_constants_.erase(value); 
+      size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
       (void)num_erased;
     }
-    
+
     /// Static creator function (use instead of constructor)
     inline static RealtypeSX* create(double value){
       // Try to find the constant
       CACHING_MAP<double,RealtypeSX*>::iterator it = cached_constants_.find(value);
-      
+
       // If not found, add it,
       if(it==cached_constants_.end()){
         // Allocate a new object
         RealtypeSX* n = new RealtypeSX(value);
-        
+
         // Add to hash_table
         cached_constants_.insert(it,std::make_pair(value,n));
-        
+
         // Return it to caller
         return n;
       } else { // Else, returned the object
         return it->second;
       }
     }
-    
+
     //@{
     /** \brief  Get the value */
     virtual double getValue() const{ return value;}
     virtual int getIntValue() const{ return int(value);}
     //@}
-    
+
     virtual bool isAlmostZero(double tol) const{ return fabs(value)<=tol; }
-    
+
   protected:
     /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx_element.cpp) */
     static CACHING_MAP<double,RealtypeSX*> cached_constants_;
-    
+
     /** \brief  Data members */
     double value;
 };
 
 
 /** \brief  Represents a constant integer SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX{
   private:
     /// Constructor is private, use "create" below
     explicit IntegerSX(int value) : value(value){}
-  
+
   public:
 
     /// Destructor
     virtual ~IntegerSX(){
-      size_t num_erased = cached_constants_.erase(value); 
+      size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
       (void)num_erased;
     }
-    
+
     /// Static creator function (use instead of constructor)
     inline static IntegerSX* create(int value){
       // Try to find the constant
       CACHING_MAP<int,IntegerSX*>::iterator it = cached_constants_.find(value);
-      
+
       // If not found, add it,
       if(it==cached_constants_.end()){
         // Allocate a new object
         IntegerSX* n = new IntegerSX(value);
-        
+
         // Add to hash_table
         cached_constants_.insert(it,std::make_pair(value,n));
-        
+
         // Return it to caller
         return n;
       } else { // Else, returned the object
         return it->second;
       }
     }
-    
+
     //@{
     /** \brief  evaluate function */
     virtual double getValue() const{  return value; }
@@ -183,18 +183,18 @@ class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX{
 
     /** \brief  Properties */
     virtual bool isInteger() const{ return true; }
-  
+
   protected:
 
     /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx_element.cpp) */
     static CACHING_MAP<int,IntegerSX*> cached_constants_;
-    
+
     /** \brief  Data members */
     int value;
 };
 
 /** \brief  Represents a zero SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT ZeroSX : public ConstantSX{
@@ -219,7 +219,7 @@ public:
 
 
 /** \brief  Represents a one SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT OneSX : public ConstantSX{
@@ -240,7 +240,7 @@ public:
 
 
 /** \brief  Represents a minus one SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT MinusOneSX : public ConstantSX{
@@ -265,7 +265,7 @@ public:
 
 
 /** \brief  Represents an infinity SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT InfSX : public ConstantSX{
@@ -284,12 +284,12 @@ public:
 
 
 /** \brief  Represents a minus infinity SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT MinusInfSX : public ConstantSX{
 public:
-  
+
   explicit MinusInfSX(){}
   virtual ~MinusInfSX(){}
 
@@ -303,12 +303,12 @@ public:
 
 
 /** \brief  Represents a not-a-number SX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT NanSX : public ConstantSX{
 public:
-  
+
   explicit NanSX(){this->count++;}
   virtual ~NanSX(){this->count--;}
 

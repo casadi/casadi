@@ -49,22 +49,22 @@ namespace casadi{
     // Call the init method of the base class
     LinearSolverInternal::init();
 
-    AT_.nzmax = input().size();  // maximum number of entries 
+    AT_.nzmax = input().size();  // maximum number of entries
     AT_.m = input().size1(); // number of cols
     AT_.n = input().size2(); // number of rows
     AT_.p = const_cast<int*>(&input().colind().front()); // row pointers (size n+1) or row indices (size nzmax)
     AT_.i = const_cast<int*>(&input().row().front()); // col indices, size nzmax
     AT_.x = &input().front(); // col indices, size nzmax
-    AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-row 
+    AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-row
 
     // Temporary
     temp_.resize(AT_.n);
-  
+
     if(verbose()){
       cout << "CSparseCholeskyInternal::prepare: symbolic factorization" << endl;
     }
 
-    // ordering and symbolic analysis 
+    // ordering and symbolic analysis
     int order = 0; // ordering?
     if(S_) cs_sfree(S_);
     S_ = cs_schol (order, &AT_) ;
@@ -95,15 +95,15 @@ namespace casadi{
           Li [p] = k ;                /* store L(k,i) in row i */
         }
       int p = c [k]++ ;
-      Li [p] = k ;    
+      Li [p] = k ;
     }
-    Lp [n] = S_->cp [n] ; 
+    Lp [n] = S_->cp [n] ;
     Sparsity ret(n, n, row, colind); // BUG?
 
     return transpose? ret.T() : ret;
-  
+
   }
-  
+
   DMatrix CSparseCholeskyInternal::getFactorization(bool transpose) const {
     casadi_assert(L_);
     cs *L = L_->L;
@@ -116,32 +116,32 @@ namespace casadi{
     std::copy(L->i,L->i+nz,row.begin());
     std::vector< double > data(nz);
     std::copy(L->x,L->x+nz,data.begin());
-    DMatrix ret(Sparsity(n, m, colind, row),data); 
-    
+    DMatrix ret(Sparsity(n, m, colind, row),data);
+
     return transpose? ret.T() : ret;
   }
-  
+
   void CSparseCholeskyInternal::prepare(){
 
     prepared_ = false;
-  
+
     // Get a reference to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();
-  
+
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<linsys_nz.size(); ++k){
       casadi_assert_message(!isnan(linsys_nz[k]),"Nonzero " << k << " is not-a-number");
       casadi_assert_message(!isinf(linsys_nz[k]),"Nonzero " << k << " is infinite");
     }
-  
+
     if(verbose()){
       cout << "CSparseCholeskyInternal::prepare: numeric factorization" << endl;
       cout << "linear system to be factorized = " << endl;
       input(0).printSparse();
     }
-  
+
     if(L_) cs_nfree(L_);
-    L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization 
+    L_ = cs_chol(&AT_, S_) ;                 // numeric Cholesky factorization
     if(L_==0){
       DMatrix temp = input();
       temp.sparsify();
@@ -167,7 +167,7 @@ namespace casadi{
 
     prepared_ = true;
   }
-  
+
   void CSparseCholeskyInternal::solve(double* x, int nrhs, bool transpose){
     casadi_assert(prepared_);
     casadi_assert(L_!=0);
@@ -176,14 +176,14 @@ namespace casadi{
     for(int k=0; k<nrhs; ++k){
       if (transpose) {
         cs_pvec (S_->q, x, t, AT_.n) ;   // t = P1\b
-        cs_ltsolve (L_->L, t) ;               // t = L\t 
-        cs_lsolve (L_->L, t) ;              // t = U\t 
-        cs_pvec (L_->pinv, t, x, AT_.n) ;      // x = P2\t 
+        cs_ltsolve (L_->L, t) ;               // t = L\t
+        cs_lsolve (L_->L, t) ;              // t = U\t
+        cs_pvec (L_->pinv, t, x, AT_.n) ;      // x = P2\t
       } else {
         cs_ipvec (L_->pinv, x, t, AT_.n) ;   // t = P1\b
-        cs_lsolve (L_->L, t) ;               // t = L\t 
-        cs_ltsolve (L_->L, t) ;              // t = U\t 
-        cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
+        cs_lsolve (L_->L, t) ;               // t = L\t
+        cs_ltsolve (L_->L, t) ;              // t = U\t
+        cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t
       }
       x += ncol();
     }
@@ -192,14 +192,14 @@ namespace casadi{
   void CSparseCholeskyInternal::solveL(double* x, int nrhs, bool transpose){
     casadi_assert(prepared_);
     casadi_assert(L_!=0);
-  
+
     double *t = getPtr(temp_);
-  
+
     for(int k=0; k<nrhs; ++k){
       cs_ipvec (L_->pinv, x, t, AT_.n) ;   // t = P1\b
-      if (transpose) cs_lsolve (L_->L, t) ; // t = L\t 
-      if (!transpose) cs_ltsolve (L_->L, t) ; // t = U\t 
-      cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t 
+      if (transpose) cs_lsolve (L_->L, t) ; // t = L\t
+      if (!transpose) cs_ltsolve (L_->L, t) ; // t = U\t
+      cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t
       x += ncol();
     }
   }

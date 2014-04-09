@@ -37,27 +37,27 @@ SDPSOCPInternal* SDPSOCPInternal::clone() const{
     node->init();
   return node;
 }
-  
+
 SDPSOCPInternal::SDPSOCPInternal(const std::vector<Sparsity> &st) : SOCPSolverInternal(st) {
 
   addOption("sdp_solver",       OT_SDPSOLVER, GenericType(), "The SDPSolver used to solve the SOCPs.");
   addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the SDPSOlver");
-  
+
 }
 
-SDPSOCPInternal::~SDPSOCPInternal(){ 
+SDPSOCPInternal::~SDPSOCPInternal(){
 }
 
 void SDPSOCPInternal::evaluate() {
   if (print_problem_) printProblem();
-    
+
   mapping_.setInput(input(SOCP_SOLVER_G),0);
   mapping_.setInput(input(SOCP_SOLVER_H),1);
   mapping_.setInput(input(SOCP_SOLVER_E),2);
   mapping_.setInput(input(SOCP_SOLVER_F),3);
-  
+
   mapping_.evaluate();
-  
+
   sdpsolver_.setInput(mapping_.output(0),SDP_SOLVER_F);
   sdpsolver_.setInput(mapping_.output(1),SDP_SOLVER_G);
   sdpsolver_.setInput(input(SOCP_SOLVER_A),SDP_SOLVER_A);
@@ -66,12 +66,12 @@ void SDPSOCPInternal::evaluate() {
   sdpsolver_.setInput(input(SOCP_SOLVER_UBX),SDP_SOLVER_UBX);
   sdpsolver_.setInput(input(SOCP_SOLVER_LBA),SDP_SOLVER_LBA);
   sdpsolver_.setInput(input(SOCP_SOLVER_UBA),SDP_SOLVER_UBA);
-  
+
   sdpsolver_.evaluate();
 
   // Pass the stats
   stats_["sdp_solver_stats"] = sdpsolver_.getStats();
-  
+
   setOutput(sdpsolver_.output(SDP_SOLVER_X),SOCP_SOLVER_X);
   setOutput(sdpsolver_.output(SDP_SOLVER_COST),SOCP_SOLVER_COST);
   setOutput(sdpsolver_.output(SDP_SOLVER_LAM_X),SOCP_SOLVER_LAM_X);
@@ -81,8 +81,8 @@ void SDPSOCPInternal::evaluate() {
 void SDPSOCPInternal::init(){
 
   SOCPSolverInternal::init();
-  
-  
+
+
   /*
   *   || Gi' x + hi ||_2 <=  ei'x + fi
   *
@@ -90,34 +90,34 @@ void SDPSOCPInternal::init(){
   *
   *  | (ei' x + fi) I   Gi' x + hi   |   >= 0
   *  | (Gi' x + hi)'     ei' x + fi  |
-  *  
+  *
   *        <=>
-  * 
+  *
   *  | ei[k]I     Gi(:,k)'  |
   *  | Gi(:,k)     ei[k]  |
-  *  
+  *
   *      | k  (n)      \   i  (for each cone)
   *      v              \
   */
- 
-  
+
+
   MX G = MX::sym("G",input(SOCP_SOLVER_G).sparsity());
   MX H = MX::sym("H",input(SOCP_SOLVER_H).sparsity());
   MX E = MX::sym("E",input(SOCP_SOLVER_E).sparsity());
   MX F = MX::sym("F",input(SOCP_SOLVER_F).sparsity());
-  
-  
+
+
   int i_start;
-  
+
   // The blocks that will make up Fi of SDP
   std::vector<MX> Fi;
 
-  
+
   for (int k=0;k<n_;++k) {
-    
+
     // The blocks that will end up on the diagonal of Fi of SDP
     std::vector<MX> Fi_d;
-    
+
     i_start = 0;
     // Loop over all SOCP constraints
     for (int i=0;i<ni_.size();++i) {
@@ -130,7 +130,7 @@ void SDPSOCPInternal::init(){
   }
   // The blocks that will end up on the diagonal of G of SDP
   std::vector<MX> G_d;
-  
+
   i_start = 0;
   // Loop over all SOCP constraints
   for (int i=0;i<ni_.size();++i) {
@@ -139,22 +139,22 @@ void SDPSOCPInternal::init(){
     G_d.push_back(blockcat(Fi*MX::eye(ni_[i]),Hi,Hi.T(),Fi));
     i_start += ni_[i];
   }
-  
+
   std::vector<MX> out;
   out.push_back(-horzcat(Fi));
   out.push_back(blkdiag(G_d));
-  
+
   std::vector<MX> syms;
   syms.push_back(G);
   syms.push_back(H);
   syms.push_back(E);
   syms.push_back(F);
-  
+
   mapping_ = MXFunction(syms,out);
   mapping_.init();
-  
+
   log("SDPSOCPInternal::init","Created mapping function");
-  
+
   // Create an sdpsolver instance
   SDPSolverCreator sdpsolver_creator = getOption("sdp_solver");
   sdpsolver_ = sdpsolver_creator(sdpStruct("a",input(SOCP_SOLVER_A).sparsity(),"f",mapping_.output(0).sparsity(),"g",mapping_.output(1).sparsity()));
@@ -163,10 +163,10 @@ void SDPSOCPInternal::init(){
   if(hasSetOption("sdp_solver_options")){
     sdpsolver_.setOption(getOption("sdp_solver_options"));
   }
-  
+
   // Initialize the SDP solver
   sdpsolver_.init();
-  
+
   log("SDPSOCPInternal::init","Initialized SDP solver");
 }
 

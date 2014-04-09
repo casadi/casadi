@@ -26,9 +26,9 @@
 namespace casadi{
 
 
-/** NonZeros class for Matrix 
+/** NonZeros class for Matrix
   NonZeros is the return type for operator[] of the Matrix class, it allows access to the value as well as changing the parent object
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2011
 */
 
@@ -52,50 +52,50 @@ class CASADI_SYMBOLIC_EXPORT NonZeros : public M{
   private:
     /// A reference to the matrix that is allowed to be modified
     M& mat_;
-    
+
     /// The element of the matrix that is allowed to be modified
     K k_;
 };
 
 // Implementation
 template<typename M, typename K>
-const M& NonZeros<M,K>::operator=(const NonZeros<M,K> &y){ 
-  mat_.setNZ(k_,y); 
+const M& NonZeros<M,K>::operator=(const NonZeros<M,K> &y){
+  mat_.setNZ(k_,y);
   return y;
 }
 
 // Implementation
 template<typename M, typename K>
-const M& NonZeros<M,K>::operator=(const M &y) { 
-  mat_.setNZ(k_,y); 
+const M& NonZeros<M,K>::operator=(const M &y) {
+  mat_.setNZ(k_,y);
   return y;
 }
 
 template<typename M, typename K>
 M NonZeros<M,K>::operator+=(const M &y){
   M s = *this+y;
-  mat_.setNZ(k_,s); 
+  mat_.setNZ(k_,s);
   return s;
 }
 
 template<typename M, typename K>
-M NonZeros<M,K>::operator-=(const M &y){ 
+M NonZeros<M,K>::operator-=(const M &y){
   M s = *this-y;
-  mat_.setNZ(k_,s); 
+  mat_.setNZ(k_,s);
   return s;
 }
 
 template<typename M, typename K>
-M NonZeros<M,K>::operator*=(const M &y){ 
+M NonZeros<M,K>::operator*=(const M &y){
    M s = *this*y;
-   mat_.setNZ(k_,s); 
+   mat_.setNZ(k_,s);
    return s;
 }
 
 template<typename M, typename K>
-M NonZeros<M,K>::operator/=(const M &y){ 
+M NonZeros<M,K>::operator/=(const M &y){
   M s = *this/y;
-  mat_.setNZ(k_,s); 
+  mat_.setNZ(k_,s);
   return s;
 }
 

@@ -38,7 +38,7 @@ QPOasesInternal* QPOasesInternal::clone() const{
     node->init();
   return node;
 }
-  
+
 QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
   addOption("nWSR",                   OT_INTEGER,     GenericType(), "The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)");
   addOption("CPUtime",                OT_REAL,        GenericType(), "The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.");
@@ -76,12 +76,12 @@ QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QPSolverInte
   addOption("epsIterRef",             OT_REAL, double(ops.epsIterRef), "Early termination tolerance for iterative  refinement.");
   addOption("epsLITests",             OT_REAL, double(ops.epsLITests), "Tolerance for linear independence tests.");
   addOption("epsNZCTests",            OT_REAL, double(ops.epsNZCTests), "Tolerance for nonzero curvature tests.");
-  
+
   called_once_ = false;
   qp_ = 0;
 }
 
-QPOasesInternal::~QPOasesInternal(){ 
+QPOasesInternal::~QPOasesInternal(){
   if(qp_!=0) delete qp_;
 }
 
@@ -102,16 +102,16 @@ void QPOasesInternal::init(){
   } else {
     max_cputime_ = -1;
   }
-  
+
   // Create data for H if not dense
   if(!input(QP_SOLVER_H).sparsity().isDense()) h_data_.resize(n_*n_);
-  
-  // Create data for A 
+
+  // Create data for A
   a_data_.resize(n_*nc_);
-  
+
   // Dual solution vector
   dual_.resize(n_+nc_);
-  
+
   // Create qpOASES instance
   if(qp_) delete qp_;
   if(ALLOW_QPROBLEMB && nc_==0){
@@ -153,7 +153,7 @@ void QPOasesInternal::init(){
   ops.epsIterRef = getOption("epsIterRef");
   ops.epsLITests = getOption("epsLITests");
   ops.epsNZCTests = getOption("epsNZCTests");
-  
+
   // Pass to qpOASES
   qp_->setOptions(ops);
   #else // ALLOW_ALL_OPTIONS
@@ -172,7 +172,7 @@ void QPOasesInternal::evaluate() {
     cout << "LBA = " << input(QP_SOLVER_LBA) << endl;
     cout << "UBA = " << input(QP_SOLVER_UBA) << endl;
   }
-  
+
   // Get pointer to H
   const double* h=0;
   if(h_data_.empty()){
@@ -183,14 +183,14 @@ void QPOasesInternal::evaluate() {
     input(QP_SOLVER_H).get(h_data_,DENSE);
     h = getPtr(h_data_);
   }
-  
+
   // Copy A to a row-major dense vector
   const double* a=0;
   if(nc_>0){
     input(QP_SOLVER_A).get(a_data_,DENSETRANS);
     a = getPtr(a_data_);
   }
-  
+
   // Maxiumum number of working set changes
   int nWSR = max_nWSR_;
   double cputime = max_cputime_;
@@ -229,10 +229,10 @@ void QPOasesInternal::evaluate() {
 
   // Get the primal solution
   qp_->getPrimalSolution(&output(QP_SOLVER_X).front());
-  
+
   // Get the dual solution
   qp_->getDualSolution(&dual_.front());
-  
+
   // Split up the dual solution in multipliers for the simple bounds and the linear bounds
   transform(dual_.begin(),   dual_.begin()+n_,output(QP_SOLVER_LAM_X).begin(),negate<double>());
   transform(dual_.begin()+n_,dual_.end(),     output(QP_SOLVER_LAM_A).begin(),negate<double>());
@@ -379,14 +379,14 @@ std::string QPOasesInternal::getErrorMessage(int flag){
     case qpOASES::RET_QP_SOLUTION_STARTED: return "Solving QP...";
     case qpOASES::RET_BENCHMARK_SUCCESSFUL: return "Benchmark terminated successfully.";
   }
-  
+
   // Default error message
   stringstream ss;
   ss << "Unknown error flag: " << flag << ". Consult qpOASES documentation.";
   return ss.str();
 }
 
-bool QPOasesInternal::BooleanType_to_bool(qpOASES::BooleanType b){ 
+bool QPOasesInternal::BooleanType_to_bool(qpOASES::BooleanType b){
   switch(b){
     case qpOASES::BT_TRUE:              return true;
     case qpOASES::BT_FALSE:             return false;
@@ -394,10 +394,10 @@ bool QPOasesInternal::BooleanType_to_bool(qpOASES::BooleanType b){
   }
 }
 
-qpOASES::BooleanType QPOasesInternal::bool_to_BooleanType(bool b){ 
+qpOASES::BooleanType QPOasesInternal::bool_to_BooleanType(bool b){
   return b ? qpOASES::BT_TRUE : qpOASES::BT_FALSE;
 }
-        
+
 std::string QPOasesInternal::SubjectToStatus_to_string(qpOASES::SubjectToStatus b){
   switch(b){
     case qpOASES::ST_INACTIVE:          return "inactive";

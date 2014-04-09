@@ -38,7 +38,7 @@ namespace casadi{
   const HomotopyNLPInternal* HomotopyNLPSolver::operator->() const{
     return static_cast<const HomotopyNLPInternal*>(Function::operator->());
   }
-    
+
   bool HomotopyNLPSolver::checkNode() const{
     return dynamic_cast<const HomotopyNLPInternal*>(get())!=0;
   }

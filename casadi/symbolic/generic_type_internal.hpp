@@ -29,7 +29,7 @@
 /// \cond INTERNAL
 
 namespace casadi{
-  
+
   template<typename T>
   class CASADI_SYMBOLIC_EXPORT GenericTypeInternal : public SharedObjectNode{
     public:
@@ -39,15 +39,15 @@ namespace casadi{
       virtual void print(std::ostream &stream) const{ stream << d_; }
       T d_;
   };
-  
+
   //template<> GenericTypeInternal<bool>::type = OT_BOOLEAN;
-      
+
   // Implementations of public functions
   template<typename T>
   bool GenericType::is_a() const{
     return dynamic_cast<const GenericTypeInternal<T>*>(get()) != 0;
   }
-  
+
 } // namespace casadi
 /// \endcond
 

@@ -28,7 +28,7 @@ namespace casadi{
 
   SCPgen::SCPgen(){
   }
-  
+
   SCPgen::SCPgen(const Function& nlp){
     assignNode(new SCPgenInternal(nlp));
   }
@@ -40,7 +40,7 @@ namespace casadi{
   const SCPgenInternal* SCPgen::operator->() const{
     return static_cast<const SCPgenInternal*>(NLPSolver::operator->());
   }
-    
+
   bool SCPgen::checkNode() const{
     return dynamic_cast<const SCPgenInternal*>(get())!=0;
   }
@@ -48,6 +48,6 @@ namespace casadi{
   const QPSolver SCPgen::getQPSolver() const {
     return (*this)->getQPSolver();
   }
-    
+
 
 } // namespace casadi

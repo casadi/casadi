@@ -32,7 +32,7 @@
 namespace casadi{
 
   /** \brief Internal class for NewtonImplicitInternal
-   * 
+   *
    @copydoc ImplicitFunction_doc
    * */
   class CASADI_NONLINEAR_PROGRAMMING_EXPORT NewtonImplicitInternal : public ImplicitFunctionInternal {
@@ -46,23 +46,23 @@ namespace casadi{
 
     /** \brief  Clone */
     virtual NewtonImplicitInternal* clone() const{ return new NewtonImplicitInternal(*this);}
-  
+
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const { return new NewtonImplicitInternal(f,jac,linsol);}
 
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Solve the nonlinear system of equations */ 
+    /** \brief  Solve the nonlinear system of equations */
     virtual void solveNonLinear();
-  
+
   protected:
     /// Maximum number of Newton iterations
     int max_iter_;
-    
+
     /// Absolute tolerance that should be met on residual
     double abstol_;
-    
+
     /// Absolute tolerance that should be met on step
     double abstolStep_;
   };

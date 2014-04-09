@@ -39,65 +39,65 @@ namespace casadi{
   /// \endcond
 
   /** \brief SharedObject implements a reference counting framework simular for effient and easily-maintained memory management.
-  
+
       To use the class, both the SharedObject class (the public class), and the SharedObjectNode class (the internal class)
       must be inherited from. It can be done in two different files and together with memory management, this approach
-      provides a clear destinction of which methods of the class are to be considered "public", i.e. methods for public use 
+      provides a clear destinction of which methods of the class are to be considered "public", i.e. methods for public use
       that can be considered to remain over time with small changes, and the internal memory.
-  
-      When interfacing a software, which typically includes including some header file, this is best done only in the file 
+
+      When interfacing a software, which typically includes including some header file, this is best done only in the file
       where the internal class is defined, to avoid polluting the global namespace and other side effects.
 
       The default constructor always means creating a null pointer to an internal class only. To allocate an internal class
       (this works only when the internal class isn't abstract), use the constructor with arguments.
-  
+
       The copy constructor and the assignment operator perform shallow copies only, to make a deep copy you must use the
       clone method explictly. This will give a shared pointer instance.
-  
+
       In an inheritance hierarchy, you can cast down automatically, e.g. (SXFunction is a child class of Function):
       SXFunction derived(...);
       Function base = derived;
-  
+
       To cast up, use the shared_cast template function, which works analogously to dynamic_cast, static_cast, const_cast etc, e.g.:
       SXFunction derived(...);
       Function base = derived;
       SXFunction derived_from_base = shared_cast<SXFunction>(base);
-  
+
       A failed shared_cast will result in a null pointer (cf. dynamic_cast)
 
-      \author Joel Andersson 
-      \date 2010        
+      \author Joel Andersson
+      \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT SharedObject : public PrintableObject{
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);
 #endif // SWIG
-  
+
   public:
 #ifndef SWIG
     /// Default constructor
     SharedObject();
-    
+
     /// Copy constructor (shallow copy)
     SharedObject(const SharedObject& ref);
 
     /// Deep copy
     SharedObject clone() const;
-    
+
     /// Destructor
     ~SharedObject();
-    
+
     /// Assignment operator
     SharedObject& operator=(const SharedObject& ref);
-    
+
     /// \cond INTERNAL
     /// Assign the node to a node class pointer (or null)
     void assignNode(SharedObjectNode* node);
-    
+
     /// Assign the node to a node class pointer without reference counting: inproper use will cause memory leaks!
     void assignNodeNoCount(SharedObjectNode* node);
-    
+
     /// Get a const pointer to the node
     const SharedObjectNode* get() const;
 
@@ -106,7 +106,7 @@ namespace casadi{
 
     /// Get the reference count
     int getCount() const;
-    
+
     /// Swap content with another instance
     void swap(SharedObject& other);
 
@@ -122,9 +122,9 @@ namespace casadi{
 
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
-    
+
 #endif // SWIG
-    
+
     /// \cond INTERNAL
     /// Print the pointer to the internal class
     void printPtr(std::ostream &stream=std::cout) const;
@@ -138,20 +138,20 @@ namespace casadi{
 
     /// Is initialized?
     bool isInit() const;
-    
+
     /// \cond INTERNAL
     /// Assert that it is initialized
     void assertInit() const;
     /// \endcond
-    
+
     /// Is a null pointer?
     bool isNull() const;
-    
+
     /// \cond INTERNAL
     /// Assert that the node is pointing to the right type of object
     virtual bool checkNode() const;
     /// \endcond
-    
+
 
     //@{
     /// \cond SWIGINTERNAL
@@ -171,12 +171,12 @@ namespace casadi{
     WeakRef* weak();
 #endif // SWIG
 /// \endcond
- 
+
   private:
     SharedObjectNode *node;
     void count_up(); // increase counter of the node
     void count_down(); // decrease counter of the node
-    
+
   };
 
 #ifndef SWIG
@@ -185,20 +185,20 @@ namespace casadi{
   class CASADI_SYMBOLIC_EXPORT SharedObjectNode{
     friend class SharedObject;
   public:
-  
+
     /// Default constructor
     SharedObjectNode();
 
     /// Copy constructor
     SharedObjectNode(const SharedObjectNode& node);
-  
+
     /// Assignment operator
     SharedObjectNode& operator=(const SharedObjectNode& node);
-  
+
     /// Destructor
     virtual ~SharedObjectNode() = 0;
 
-    /// Make a deep copy of the instance  
+    /// Make a deep copy of the instance
     virtual SharedObjectNode* clone() const=0;
 
     /// Deep copy data members
@@ -209,10 +209,10 @@ namespace casadi{
 
     /// Initialize the object
     virtual void init();
-  
+
     /// Check if the object has been initialized
     bool isInit() const;
-  
+
     /// Assert that the object has been initialized
     void assertInit() const;
 
@@ -227,13 +227,13 @@ namespace casadi{
 
   protected:
     /** Called in the constructor of singletons to avoid that the counter reaches zero */
-    void initSingleton(){      
+    void initSingleton(){
       casadi_assert(count==0);
       count++;
     }
 
     /** Called in the destructor of singletons */
-    void destroySingleton(){      
+    void destroySingleton(){
       count--;
     }
 
@@ -256,23 +256,23 @@ namespace casadi{
     WeakRef* weak_ref_;
   };
   /// \endcond
-  
+
   /// \cond INTERNAL
   /// Typecast a shared object to a base class to a shared object to a derived class, cf. dynamic_cast
   template<class B>
   B shared_cast(SharedObject& A){
-  
+
     /// Get a pointer to the node
     SharedObjectNode* ptr = A.get();
-  
+
     /// Create a return object
     B ret;
-  
+
     /// Assign node of B and return
     ret.assignNode(ptr);
-      
+
     /// Null pointer if not pointing towards the right type of object
-    if(ptr && !ret.checkNode()) 
+    if(ptr && !ret.checkNode())
       ret.assignNode(0);
 
     return ret;
@@ -339,10 +339,10 @@ namespace casadi{
   B SharedObjectNode::shared_from_this(){
     B ret;
     ret.assignNode(this);
-  
+
     // Assert that the object is valid
     casadi_assert(ret.checkNode());
-  
+
     return ret;
   }
 
@@ -350,10 +350,10 @@ namespace casadi{
   const B SharedObjectNode::shared_from_this() const{
     B ret;
     ret.assignNode(const_cast<SharedObjectNode*>(this));
-  
+
     // Assert that the object is valid
     casadi_assert(ret.checkNode());
-  
+
     return ret;
   }
   /// \endcond

@@ -47,7 +47,7 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief  Evaluate the function (template) */
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /** \brief  Evaluate the function numerically */

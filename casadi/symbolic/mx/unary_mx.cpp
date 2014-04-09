@@ -36,7 +36,7 @@ namespace casadi{
     if(!operation_checker<F00Checker>(op_)){
       x.densify();
     }
-  
+
     setDependencies(x);
     setSparsity(x->sparsity());
   }
@@ -57,7 +57,7 @@ namespace casadi{
     double nan = numeric_limits<double>::quiet_NaN();
     vector<double> &outputd = output[0]->data();
     const vector<double> &inputd = input[0]->data();
-  
+
     for(int i=0; i<size(); ++i){
       casadi_math<double>::fun(op_,inputd[i],nan,outputd[i]);
     }
@@ -67,7 +67,7 @@ namespace casadi{
     // Do the operation on all non-zero elements
     const vector<SXElement> &xd = input[0]->data();
     vector<SXElement> &od = output[0]->data();
-  
+
     for(int el=0; el<size(); ++el){
       casadi_math<SXElement>::fun(op_,xd[el],0,od[el]);
     }
@@ -89,12 +89,12 @@ namespace casadi{
       // Get partial derivatives
       MX pd[2];
       casadi_math<MX>::der(op_,*input[0],dummy,f,pd);
-    
+
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
         *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]);
       }
-    
+
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
         MX s = *adjSeed[d][0];
@@ -102,7 +102,7 @@ namespace casadi{
         adjSens[d][0]->addToSum(pd[0]*s);
       }
     }
- 
+
     // Perform the assignment (which may be inplace, hence delayed)
     if(!output_given){
       *output[0] = f;
@@ -138,7 +138,7 @@ namespace casadi{
 
   MX UnaryMX::getUnary(int op) const{
     if (!CasadiOptions::simplification_on_the_fly) return MXNode::getUnary(op);
-    
+
     switch(op_){
     case OP_NEG:
       if(op==OP_NEG) return dep();
@@ -187,16 +187,16 @@ namespace casadi{
       if(op==OP_SUB && y.isEqual(dep(),maxDepth())) return dep();
       break;
     case OP_SQ:
-      if(op==OP_ADD && y.getOp()==OP_SQ) /*sum of squares:*/ 
+      if(op==OP_ADD && y.getOp()==OP_SQ) /*sum of squares:*/
         if((dep().getOp()==OP_SIN && y->dep().getOp()==OP_COS) || (dep().getOp()==OP_COS && y->dep()->getOp()==OP_SIN)) /* sin^2(x)+sin^2(y) */
           if(dep()->dep().isEqual(y->dep()->dep(),maxDepth())) /*sin^2(x) + cos^2(x) */
             return MX::ones(y.sparsity());
       break;
     default: break; // no rule
     }
-    
+
     // Fallback to default implementation
-    return MXNode::getBinary(op,y,scX,scY);    
+    return MXNode::getBinary(op,y,scX,scY);
   }
 
 } // namespace casadi

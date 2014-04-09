@@ -42,10 +42,10 @@ namespace casadi{
 
     /// Clone function
     virtual SubRef* clone() const;
-      
+
     /// Destructor
     virtual ~SubRef(){}
-    
+
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
@@ -60,17 +60,17 @@ namespace casadi{
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-    
+
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
-    void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);    
-    
+    template<typename T, typename MatV, typename MatVV>
+    void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
+
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_SUBREF;}
-    
+
     /// Data members
     Slice i_, j_;
   };

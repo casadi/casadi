@@ -27,15 +27,15 @@ namespace casadi{
 
   IOScheme::IOScheme(){
   }
-  
+
   IOScheme::IOScheme(InputOutputScheme scheme) {
     assignNode(new IOSchemeBuiltinInternal(scheme));
   }
-  
+
   IOScheme::IOScheme(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions) {
     assignNode(new IOSchemeCustomInternal(entries,descriptions));
   }
-  
+
   IOScheme::IOScheme(const std::string &arg_s0,const std::string &arg_s1,const std::string &arg_s2,const std::string &arg_s3,const std::string &arg_s4,const std::string &arg_s5,const std::string &arg_s6,const std::string &arg_s7,const std::string &arg_s8,const std::string &arg_s9,const std::string &arg_s10,const std::string &arg_s11,const std::string &arg_s12,const std::string &arg_s13,const std::string &arg_s14,const std::string &arg_s15,const std::string &arg_s16,const std::string &arg_s17,const std::string &arg_s18,const std::string &arg_s19) {
     std::vector<std::string> k;
     if (arg_s0!="") { k.push_back(arg_s0);}
@@ -60,7 +60,7 @@ namespace casadi{
     if (arg_s19!="") { k.push_back(arg_s19);}
     assignNode(new IOSchemeCustomInternal(k));
   }
- 
+
   IOSchemeInternal* IOScheme::operator->(){
     return (IOSchemeInternal*)(SharedObject::operator->());
   }
@@ -68,7 +68,7 @@ namespace casadi{
   const IOSchemeInternal* IOScheme::operator->() const{
     return (const IOSchemeInternal*)(SharedObject::operator->());
   }
-  
+
   bool IOScheme::checkNode() const{
     return dynamic_cast<const IOScheme*>(get())!=0;
   }
@@ -77,22 +77,22 @@ namespace casadi{
     if (isNull()) return "Unknown";
     return (*this)->name();
   }
-    
+
   std::string IOScheme::entryNames() const {
     if (isNull()) return "Not available";
     return (*this)->entryNames();
   }
-    
+
   int IOScheme::index(const std::string &name) const {
     if (isNull()) casadi_error("Unknown scheme");
     return (*this)->index(name);
   }
-    
+
   int IOScheme::size() const {
     if (isNull()) casadi_error("Unknown scheme has no known size.");
     return (*this)->size();
   }
-  
+
   std::string IOScheme::entry(int i) const {
     if (isNull()) return "none";
     return (*this)->entry(i);
@@ -102,23 +102,23 @@ namespace casadi{
     if (isNull()) return "none";
     return (*this)->entryEnum(i);
   }
-  
+
   std::string IOScheme::describe(int i) const {
     if (isNull()) {
       return "";
     }
     return (*this)->describe(i);
   }
-  
+
   bool IOScheme::known() const {
     return !isNull();
   }
-  
+
   int IOScheme::compatibleSize(int size) const {
     if (isNull()) return true;
     return true;
   }
-  
+
   std::string IOScheme::describeInput(int i) const {
     std::stringstream ss;
     ss << "Input argument #" << i;
@@ -146,7 +146,7 @@ namespace casadi{
       return ss.str();
     }
   }
-  
+
   void IOScheme::print(std::ostream &stream) const {
     if (isNull()) {
       stream << "UnknownScheme";

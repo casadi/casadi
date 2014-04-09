@@ -33,48 +33,48 @@ namespace casadi{
 
   // Forward declaration
   class IOSchemeInternal;
-  
+
   /** \brief Class with mapping between names and indices
    *
-   * \author Joris Gillis 
+   * \author Joris Gillis
    * \date 2013
    */
 class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
-  
+
   public:
-  
+
     /// Default constructor
     IOScheme();
-    
+
     /// Constructor with enum
     IOScheme(InputOutputScheme scheme);
 
     /// Constructor with entry names
     IOScheme(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions=std::vector<std::string>());
-    
+
     #ifndef SWIGPYTHON
     IOScheme(const std::string &arg_s0,const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8="",const std::string &arg_s9="",const std::string &arg_s10="",const std::string &arg_s11="",const std::string &arg_s12="",const std::string &arg_s13="",const std::string &arg_s14="",const std::string &arg_s15="",const std::string &arg_s16="",const std::string &arg_s17="",const std::string &arg_s18="",const std::string &arg_s19="");
    #endif // SWIG
-    
+
     /** \brief  Access functions of the node */
     IOSchemeInternal* operator->();
     const IOSchemeInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-    
+
     /// Name of the scheme
     std::string name() const;
-      
+
     /// List available entries
     std::string entryNames() const;
-      
+
     /// Get index by entry name
     int index(const std::string &name) const;
-      
+
     /// Number of entries
     int size() const;
-    
+
     /// Get the entry name by index
     std::string entry(int i) const;
 
@@ -82,25 +82,25 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
     * If scheme is unknown, returns the index as a string
     */
     std::string entryLabel(int i) const;
-    
+
     /// Get the entry enum name by index
     std::string entryEnum(int i) const;
-    
+
     /// Describe the index as an input
     std::string describeInput(int i) const;
 
     /// Describe the index as an output
     std::string describeOutput(int i) const;
-    
+
     /// Describe the index
     std::string describe(int i) const;
-    
+
     /// Check wether the scheme is known
     bool known() const;
-    
+
     /// Check wether this scheme is compatible with the given size
     int compatibleSize(int size) const;
-    
+
     #ifndef SWIG
     /// Print a destription of the object
     virtual void print(std::ostream &stream=std::cout) const;
@@ -108,8 +108,8 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const;
 
-    #endif // SWIG  
-    
+    #endif // SWIG
+
     #ifndef SWIGPYTHON
     template<class M>
     IOSchemeVector<M> operator()(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M(),const std::string arg_s13="",M arg_m13=M(),const std::string arg_s14="",M arg_m14=M(),const std::string arg_s15="",M arg_m15=M(),const std::string arg_s16="",M arg_m16=M(),const std::string arg_s17="",M arg_m17=M(),const std::string arg_s18="",M arg_m18=M(),const std::string arg_s19="",M arg_m19=M()){
@@ -137,8 +137,8 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
       if (arg_s19!="") { k.push_back(arg_s19);  v.push_back(arg_m19); }
       return operator()(k,v);
     }
-    #endif // SWIG 
-  
+    #endif // SWIG
+
   #ifndef SWIGPYTHON
   template<class M>
   std::vector<M> operator()(const std::vector<M> arg_m0,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8="",const std::string &arg_s9="",const std::string &arg_s10="",const std::string &arg_s11="",const std::string &arg_s12="",const std::string &arg_s13="",const std::string &arg_s14="",const std::string &arg_s15="",const std::string &arg_s16="",const std::string &arg_s17="",const std::string &arg_s18="",const std::string &arg_s19=""){
@@ -165,7 +165,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
     if (arg_s19!="") { k.push_back(arg_s19);   }
     return operator()(arg_m0,k);
   }
-  #endif // SWIG 
+  #endif // SWIG
 
   template<class M>
     std::vector<M> operator()(const std::vector<M> arg_m,const std::vector<std::string> & arg_s){
@@ -175,10 +175,10 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
       int k = index(arg_s[i]);
       ret.push_back(arg_m[k]);
     }
-        
+
     return ret;
   }
-  
+
   template<class M>
     IOSchemeVector<M> operator()(const std::vector<std::string> arg_s,const std::vector<M> & arg_m){
     casadi_assert(arg_s.size()==arg_m.size());
@@ -187,12 +187,12 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
       int k = index(arg_s[i]);
       v[k]=arg_m[i];
     }
-        
+
     return IOSchemeVector<M>(v,*this);
   }
-    
+
 };
-  
+
 } // namespace casadi
 
 #endif // IO_SCHEME_HPP

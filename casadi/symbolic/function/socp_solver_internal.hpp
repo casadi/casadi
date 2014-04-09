@@ -36,45 +36,45 @@ class CASADI_SYMBOLIC_EXPORT SOCPSolverInternal : public FunctionInternal{
 
     // Constructor
     SOCPSolverInternal(const std::vector<Sparsity>& st);
-    
+
     // Destructor
     virtual ~SOCPSolverInternal() = 0;
-    
+
     // Initialize
     virtual void init();
-    
+
     // Solve the system of equations
     virtual void evaluate();
-    
+
     // Solve the system of equations
     virtual void solve();
-    
+
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
-    
+
     /// Print out problem statement for debugging
     void printProblem(std::ostream &stream=std::cout) const;
-    
+
   protected:
-  
+
     /// Problem structure
     std::vector<Sparsity> st_;
-    
+
     /// Sizes of each block
     std::vector<int> ni_;
-    
+
     /// Total size of G
     int N_;
-    
+
     /// Size of decision variable vector
     int n_;
-    
+
     /// The number SOC constraints
     int m_;
-    
+
     /// Number of linear constraints
     int nc_;
-    
+
     /// Indicates wether problem is printed before solving
     bool print_problem_;
 };

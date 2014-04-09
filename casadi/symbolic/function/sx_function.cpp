@@ -83,7 +83,7 @@ SXFunction::SXFunction(const vector< SX>& arg, const SX& res){
 SXFunction::SXFunction(const SX& arg, const std::vector< std::vector<SXElement> >& res){
   assignNode(new SXFunctionInternal(vector<SX>(1,arg),
                                     vector<SX>(res.begin(),res.end())));
-  
+
 }
 
 SXFunction::SXFunction(const SX& arg, const std::vector< SX>& res){
@@ -127,11 +127,11 @@ const SX& SXFunction::inputExpr(int ind) const{
 const SX& SXFunction::outputExpr(int ind) const{
   return (*this)->outputv_.at(ind);
 }
-  
+
 const std::vector<SX>& SXFunction::inputExpr() const{
   return (*this)->inputv_;
 }
-  
+
 const std::vector<SX> & SXFunction::outputExpr() const{
   return (*this)->outputv_;
 }

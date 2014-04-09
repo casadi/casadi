@@ -32,17 +32,17 @@
   \verbatim
   min          F(x,p,tau)
    x
-  
+
   subject to
               LBX <=   x    <= UBX
               LBG <= G(x,p) <= UBG
                          p  == P
-              
+
       nx: number of decision variables
       ng: number of constraints
       np: number of parameters
   \endverbatim
-  
+
   In a homotopy from tau = 0 to tau = 1.
 
 */
@@ -54,17 +54,17 @@ namespace casadi{
     /// Decision variable [x]
     HNL_X,
     /// Fixed parameter [p]
-    HNL_P, 
+    HNL_P,
     /// Homotopy parameter [tau]
-    HNL_TAU, 
+    HNL_TAU,
     /// Number of NLP inputs
     HNL_NUM_IN
   };
-  
+
   class HomotopyNLPInternal;
 
   /** \brief Base class for Homotopy NLP Solvers
-  
+
       @copydoc HomotopyNLPSolver_doc
 
       \author Joris Gillis
@@ -82,7 +82,7 @@ namespace casadi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
+
   };
 
 } // namespace casadi

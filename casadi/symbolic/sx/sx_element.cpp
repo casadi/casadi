@@ -87,7 +87,7 @@ namespace casadi{
     // quick return if the old and new pointers point to the same object
     if(node == scalar.node) return *this;
 
-    // decrease the counter and delete if this was the last pointer        
+    // decrease the counter and delete if this was the last pointer
     if(--node->count == 0) delete node;
 
     // save the new pointer
@@ -116,7 +116,7 @@ namespace casadi{
     // save the new pointer
     node = scalar.node;
     node->count++;
-  
+
     // Return a pointer to the old node
     return ret;
   }
@@ -127,7 +127,7 @@ namespace casadi{
 
   std::ostream &operator<<(std::ostream &stream, const SXElement &scalar)
   {
-    scalar.node->print(stream);  
+    scalar.node->print(stream);
     return stream;
   }
 
@@ -156,7 +156,7 @@ namespace casadi{
   SXElement SXElement::sign() const{
     return UnarySX::create(OP_SIGN, *this);
   }
-  
+
   SXElement SXElement::__copysign__(const SXElement &y) const{
     return BinarySX::create(OP_COPYSIGN, *this,y);
   }
@@ -172,9 +172,9 @@ namespace casadi{
 
   SXElement SXElement::__add__(const SXElement& y) const{
     // NOTE: Only simplifications that do not result in extra nodes area allowed
-    
+
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_ADD,*this, y);
-    
+
     if(node->isZero())
       return y;
     else if(y->isZero()) // term2 is zero
@@ -183,15 +183,15 @@ namespace casadi{
       return __sub__(-y);
     else if(hasDep() && getOp()==OP_NEG) // (-x) + y -> y - x
       return y.__sub__(getDep());
-    else if(hasDep() && getOp()==OP_MUL && 
-            y.hasDep() && y.getOp()==OP_MUL && 
-            getDep(0).isConstant() && getDep(0).getValue()==0.5 && 
+    else if(hasDep() && getOp()==OP_MUL &&
+            y.hasDep() && y.getOp()==OP_MUL &&
+            getDep(0).isConstant() && getDep(0).getValue()==0.5 &&
             y.getDep(0).isConstant() && y.getDep(0).getValue()==0.5 &&
             y.getDep(1).isEqual(getDep(1),SXNode::eq_depth_)) // 0.5x+0.5x = x
       return getDep(1);
-    else if(hasDep() && getOp()==OP_DIV && 
-            y.hasDep() && y.getOp()==OP_DIV && 
-            getDep(1).isConstant() && getDep(1).getValue()==2 && 
+    else if(hasDep() && getOp()==OP_DIV &&
+            y.hasDep() && y.getOp()==OP_DIV &&
+            getDep(1).isConstant() && getDep(1).getValue()==2 &&
             y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
             y.getDep(0).isEqual(getDep(0),SXNode::eq_depth_)) // x/2+x/2 = x
       return getDep(0);
@@ -205,9 +205,9 @@ namespace casadi{
 
   SXElement SXElement::__sub__(const SXElement& y) const{
     // Only simplifications that do not result in extra nodes area allowed
-    
+
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_SUB,*this,y);
-    
+
     if(y->isZero()) // term2 is zero
       return *this;
     if(node->isZero()) // term1 is zero
@@ -229,9 +229,9 @@ namespace casadi{
   }
 
   SXElement SXElement::__mul__(const SXElement& y) const{
-  
+
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_MUL,*this,y);
-    
+
     // Only simplifications that do not result in extra nodes area allowed
     if(y.isEqual(*this,SXNode::eq_depth_))
       return sq();
@@ -267,10 +267,10 @@ namespace casadi{
   bool SXElement::isDoubled() const{
     return isOp(OP_ADD) && node->dep(0).isEqual(node->dep(1),SXNode::eq_depth_);
   }
-    
+
   SXElement SXElement::__div__(const SXElement& y) const{
     // Only simplifications that do not result in extra nodes area allowed
-    
+
     if (!CasadiOptions::simplification_on_the_fly) return BinarySX::create(OP_DIV,*this,y);
 
     if(y->isZero()) // term2 is zero
@@ -295,7 +295,7 @@ namespace casadi{
       return (*this)*y.inv();
     else if(isDoubled() && y.isDoubled())
       return node->dep(0) / y->dep(0);
-    else if(y.isConstant() && hasDep() && getOp()==OP_DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2 
+    else if(y.isConstant() && hasDep() && getOp()==OP_DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2
       return getDep(0);
     else if(y.hasDep() && y.getOp()==OP_MUL && y.getDep(1).isEqual(*this,SXNode::eq_depth_)) // x/(2*x) = 1/2
       return BinarySX::create(OP_DIV,1,y.getDep(0));
@@ -319,7 +319,7 @@ namespace casadi{
     }
   }
 
-  SX SXElement::fmin(const SX& b) const { 
+  SX SXElement::fmin(const SX& b) const {
     return SX(*this).fmin(b);
   }
   SX SXElement::fmax(const SX& b) const {
@@ -332,7 +332,7 @@ namespace casadi{
     return SX(*this).__copysign__(n);
   }
 
-  SX SXElement::arctan2(const SX& b) const { 
+  SX SXElement::arctan2(const SX& b) const {
     return SX(*this).arctan2(b);
   }
 
@@ -381,11 +381,11 @@ namespace casadi{
   }
 
   SXElement SXElement::binary(int op, const SXElement& x, const SXElement& y){
-    return BinarySX::create(Operation(op),x,y);    
+    return BinarySX::create(Operation(op),x,y);
   }
 
   SXElement SXElement::unary(int op, const SXElement& x){
-    return UnarySX::create(Operation(op),x);  
+    return UnarySX::create(Operation(op),x);
   }
 
   // SXElement::operator vector<SXElement>() const{
@@ -429,7 +429,7 @@ namespace casadi{
   bool SXElement::isZero() const{
     return node->isZero();
   }
-  
+
   bool SXElement::isAlmostZero(double tol) const{
     return node->isAlmostZero(tol);
   }
@@ -508,7 +508,7 @@ namespace casadi{
   }
 
   template<>
-  bool __nonzero__<SXElement>(const SXElement& val) { return val.__nonzero__();} 
+  bool __nonzero__<SXElement>(const SXElement& val) { return val.__nonzero__();}
 
   const SXElement casadi_limits<SXElement>::zero(new ZeroSX(),false); // node corresponding to a constant 0
   const SXElement casadi_limits<SXElement>::one(new OneSX(),false); // node corresponding to a constant 1
@@ -518,19 +518,19 @@ namespace casadi{
   const SXElement casadi_limits<SXElement>::inf(new InfSX(),false);
   const SXElement casadi_limits<SXElement>::minus_inf(new MinusInfSX(),false);
 
-  bool casadi_limits<SXElement>::isZero(const SXElement& val){ 
+  bool casadi_limits<SXElement>::isZero(const SXElement& val){
     return val.isZero();
   }
-  
-  bool casadi_limits<SXElement>::isAlmostZero(const SXElement& val, double tol){ 
+
+  bool casadi_limits<SXElement>::isAlmostZero(const SXElement& val, double tol){
     return val.isAlmostZero(tol);
   }
 
-  bool casadi_limits<SXElement>::isOne(const SXElement& val){ 
+  bool casadi_limits<SXElement>::isOne(const SXElement& val){
     return val.isOne();
   }
 
-  bool casadi_limits<SXElement>::isMinusOne(const SXElement& val){ 
+  bool casadi_limits<SXElement>::isMinusOne(const SXElement& val){
     return val.isMinusOne();
   }
 
@@ -749,7 +749,7 @@ namespace casadi{
   int SXElement::getTemp() const{
     return (*this)->temp;
   }
-    
+
   void SXElement::setTemp(int t){
     (*this)->temp = t;
   }
@@ -757,7 +757,7 @@ namespace casadi{
   bool SXElement::marked() const{
     return (*this)->marked();
   }
-    
+
   void SXElement::mark(){
     (*this)->mark();
   }
@@ -786,7 +786,7 @@ namespace casadi{
   SX GenericMatrix<SX>::sym(const std::string& name, const Sparsity& sp){
     // Create a dense n-by-m matrix
     std::vector<SXElement> retv;
-  
+
     // Check if individial names have been provided
     if(name[0]=='['){
 
@@ -797,15 +797,15 @@ namespace casadi{
         case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
         }
       }
-    
+
       istringstream iss(modname);
       string varname;
-    
+
       // Loop over elements
       while(!iss.fail()){
         // Read the name
         iss >> varname;
-      
+
         // Append to the return vector
         if(!iss.fail())
           retv.push_back(SXElement::sym(varname));
@@ -859,7 +859,7 @@ namespace casadi{
     // Make a function
     SXFunction temp(SX(),*this);
     temp.init();
-  
+
     // Run the function on the temporary variable
     return temp->isSmooth();
   }
@@ -878,7 +878,7 @@ namespace casadi{
     for(int k=0; k<size(); ++k) // loop over non-zero elements
       if(!at(k)->isSymbolic()) // if an element is not symbolic
         return false;
-    
+
     return true;
   }
 

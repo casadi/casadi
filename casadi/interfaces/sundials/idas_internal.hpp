@@ -28,7 +28,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
-#include <idas/idas_band.h> 
+#include <idas/idas_band.h>
 #include <idas/idas_spgmr.h>
 #include <idas/idas_spbcgs.h>
 #include <idas/idas_sptfqmr.h>
@@ -38,7 +38,7 @@
 /// \cond INTERNAL
 
 namespace casadi{
-  
+
 /**
 @copydoc IdasIntegrator_doc
 */
@@ -46,7 +46,7 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
   friend class IdasIntegrator;
 
   public:
-  
+
   /** \brief  Constructor */
   explicit IdasInternal(const Function& f, const Function& g);
 
@@ -55,7 +55,7 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
 
   /** \brief  Clone */
   virtual IdasInternal* clone() const;
-  
+
   /** \brief  Create a new integrator */
   virtual IdasInternal* create(const Function& f, const Function& g) const{ return new IdasInternal(f,g);}
 
@@ -70,13 +70,13 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
 
   /** \brief  Initialize */
   virtual void init();
-  
+
   /** \brief Initialize the taping */
   virtual void initTaping();
-  
+
   /** \brief Initialize the backward problem (can only be called after the first integration) */
   virtual void initAdj();
-  
+
   /** \brief  Reset the forward problem and bring the time back to t0 */
   virtual void reset();
 
@@ -91,15 +91,15 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
 
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);
-  
-  /** \brief  Print solver statistics */  
+
+  /** \brief  Print solver statistics */
   virtual void printStats(std::ostream &stream) const;
-  
+
   /** \brief  Get the integrator Jacobian for the forward problem (generic) */
   template<typename FunctionType>
   FunctionType getJacGen();
-  
-  /** \brief  Get the integrator Jacobian for the backward problem (generic) 
+
+  /** \brief  Get the integrator Jacobian for the backward problem (generic)
   *   Structure:
   *
   *
@@ -111,13 +111,13 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
 
   /** \brief  Get the integrator Jacobian for the forward problem */
   virtual Function getJac();
-  
+
   /** \brief  Get the integrator Jacobian for the backward problem */
   virtual Function getJacB();
-  
+
   /// Correct the initial conditions, i.e. calculate
   void correctInitialConditions();
-  
+
   protected:
 
   // Sundials callback functions
@@ -142,7 +142,7 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
   void lsetupB(double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   void lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector rr);
   void lsolveB(double t, double cj, double cjratio, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rr);
-  
+
   // Static wrappers to be passed to Sundials
   static int res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
   static int resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, void *user_data);
@@ -172,7 +172,7 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
 
   // N-vectors for the forward integration
   N_Vector xz_, xzdot_, q_;
-  
+
   // N-vectors for the backward integration
   N_Vector rxz_, rxzdot_, rq_;
 
@@ -181,40 +181,40 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
 
   // sensitivity method
   int ism_;
- 
+
   // Throw error
   static void idas_error(const std::string& module, int flag);
-  
+
   // Initialize the dense linear solver
   void initDenseLinearSolver();
-  
+
   // Initialize the banded linear solver
   void initBandedLinearSolver();
-  
+
   // Initialize the iterative linear solver
   void initIterativeLinearSolver();
-  
+
   // Initialize the user defined linear solver
   void initUserDefinedLinearSolver();
-  
+
   // Initialize the dense linear solver (backward integration)
   void initDenseLinearSolverB();
-  
+
   // Initialize the banded linear solver (backward integration)
   void initBandedLinearSolverB();
-  
+
   // Initialize the iterative linear solver (backward integration)
   void initIterativeLinearSolverB();
-  
+
   // Initialize the user defined linear solver (backward integration)
   void initUserDefinedLinearSolverB();
-  
+
   // Ids of backward problem
   int whichB_;
 
   // For timings
   clock_t time1, time2;
-  
+
   // Accummulated time since last reset:
   double t_res; // time spent in the DAE residual
   double t_fres; // time spent in the forward sensitivity residual
@@ -222,11 +222,11 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
   double t_lsolve; // preconditioner/linear solver solve function
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
-    
+
   // Has the adjoint problem been initialized
   bool isInitAdj_;
   bool isInitTaping_;
-  
+
   // Options
   bool cj_scaling_;
   bool calc_ic_;
@@ -234,10 +234,10 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
 
   // Disable IDAS internal warning messages
   bool disable_internal_warnings_;
-  
+
   //  Initial values for xdot and z
   std::vector<double> init_xdot_;
-  
+
 };
 
 } // namespace casadi

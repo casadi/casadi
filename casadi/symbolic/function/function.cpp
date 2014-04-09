@@ -23,7 +23,7 @@
 #include "function_internal.hpp"
 #include "../mx/call_function.hpp"
 #include "../function/mx_function.hpp"
-#include <typeinfo> 
+#include <typeinfo>
 #include "../std_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "parallelizer.hpp"
@@ -31,7 +31,7 @@
 using namespace std;
 
 namespace casadi{
-  
+
   Function::Function(){
   }
 
@@ -75,13 +75,13 @@ namespace casadi{
 
   vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x, const Dictionary& paropt){
     assertInit();
-  
+
     // Make sure not empty
     casadi_assert_message(x.size()>1,"Function: callParallel(vector<vector<MX> >): argument must be of length > 1. You supplied length " << x.size() << ".");
-  
+
     // Return object
     vector<vector<MX> > ret(x.size());
-    
+
     // Check if we are bypassing the parallelizer
     Dictionary::const_iterator ii=paropt.find("parallelization");
     if(ii!=paropt.end() && ii->second=="expand"){
@@ -90,12 +90,12 @@ namespace casadi{
       }
       return ret;
     }
-      
+
     // Create parallelizer object and initialize it
     Parallelizer p(vector<Function>(x.size(),*this));
     p.setOption(paropt);
     p.init();
-  
+
     // Concatenate the arguments
     vector<MX> p_in;
     p_in.reserve(x.size() * getNumInputs());
@@ -103,7 +103,7 @@ namespace casadi{
       p_in.insert(p_in.end(),x[i].begin(),x[i].end());
       p_in.resize(p_in.size()+getNumInputs()-x[i].size());
     }
-  
+
     // Call the parallelizer
     vector<MX> p_out = p.call(p_in);
     casadi_assert(p_out.size() == x.size() * getNumOutputs());
@@ -163,7 +163,7 @@ namespace casadi{
 
   Function Function::hessian(int iind, int oind){
     assertInit();
-    return (*this)->hessian(iind,oind);  
+    return (*this)->hessian(iind,oind);
   }
 
   Function Function::fullJacobian(){
@@ -267,56 +267,56 @@ namespace casadi{
   const IOScheme& Function::inputScheme() const{
     return (*this)->inputScheme();
   }
-  
+
   const IOScheme& Function::outputScheme() const{
     return (*this)->outputScheme();
   }
-  
+
   IOScheme& Function::inputScheme(){
     return (*this)->inputScheme();
   }
-  
+
   IOScheme& Function::outputScheme(){
     return (*this)->outputScheme();
   }
-  
+
   const IOSchemeVector<DMatrix>& Function::input_struct() const{
     return (*this)->input_struct();
   }
-  
+
   const IOSchemeVector<DMatrix>& Function::output_struct() const{
     return (*this)->output_struct();
   }
-  
+
   IOSchemeVector<DMatrix>& Function::input_struct(){
     return (*this)->input_struct();
   }
-  
+
   IOSchemeVector<DMatrix>& Function::output_struct(){
     return (*this)->output_struct();
-  }  
+  }
 
   void Function::checkInputs() const {
     return (*this)->checkInputs();
   }
 
-  void Function::callDerivative(const DMatrixVector& arg, DMatrixVector& res, 
-                          const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens, 
+  void Function::callDerivative(const DMatrixVector& arg, DMatrixVector& res,
+                          const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens,
                           const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
                           bool always_inline, bool never_inline){
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
-  
-  void Function::callDerivative(const SXVector& arg, SXVector& res, 
-                          const SXVectorVector& fseed, SXVectorVector& fsens, 
+
+  void Function::callDerivative(const SXVector& arg, SXVector& res,
+                          const SXVectorVector& fseed, SXVectorVector& fsens,
                           const SXVectorVector& aseed, SXVectorVector& asens,
                           bool always_inline, bool never_inline){
     casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of expected " << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 
-  void Function::callDerivative(const MXVector& arg, MXVector& res, 
-                          const MXVectorVector& fseed, MXVectorVector& fsens, 
+  void Function::callDerivative(const MXVector& arg, MXVector& res,
+                          const MXVectorVector& fseed, MXVectorVector& fsens,
                           const MXVectorVector& aseed, MXVectorVector& asens,
                           bool always_inline, bool never_inline){
     casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of expected " << getNumInputs() << ".");

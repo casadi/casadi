@@ -36,39 +36,39 @@ class CASADI_SYMBOLIC_EXPORT SDQPSolverInternal : public FunctionInternal{
 
     // Constructor
     SDQPSolverInternal(const std::vector<Sparsity>& st);
-    
+
     // Destructor
     virtual ~SDQPSolverInternal() = 0;
-    
+
     // Initialize
     virtual void init();
-    
+
     // Solve the system of equations
     virtual void evaluate();
-    
+
     // Solve the system of equations
     virtual void solve();
-    
+
     /// Set options that make the SDQP solver more suitable for solving SOCPs
     virtual void setSOCQPOptions() { };
-    
+
     /// Print out problem statement for debugging
     void printProblem(std::ostream &stream=std::cout) const;
-    
+
   protected:
-  
+
     /// Problem structure
     std::vector<Sparsity> st_;
-    
+
     /// Size of decision variable vector
     int n_;
-    
+
     /// The number of matrices F
     int m_;
-    
+
     /// Number of identified blocks
     int nb_;
-    
+
     /// Number of linear constraints
     int nc_;
 

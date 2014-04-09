@@ -33,35 +33,35 @@ namespace casadi{
 /// Internal class
 class CASADI_SYMBOLIC_EXPORT LPSolverInternal : public FunctionInternal{
   public:
-        
+
     // Constructor
     LPSolverInternal(const std::vector<Sparsity> &st);
-    
+
     // Destructor
     virtual ~LPSolverInternal() = 0;
-    
+
     // Initialize
     virtual void init();
-    
+
     // Solve the system of equations
     virtual void evaluate();
-    
+
     // Solve the system of equations
     virtual void solve();
-    
+
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
-    
+
   protected:
-  
+
     /// Problem structure
     std::vector<Sparsity> st_;
-    
+
     /// Number of decision variables
     int n_;
-    
+
     /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc_; 
+    int nc_;
 };
 
 

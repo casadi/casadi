@@ -26,19 +26,19 @@
 #include "sundials_integrator.hpp"
 
 namespace casadi{
-  
-// Forward declaration of internal class 
+
+// Forward declaration of internal class
 class CVodesInternal;
 
 /** \brief Interface to CVodes from the Sundials suite.
 
   @copydoc DAE_doc
-  
+
   A call to evaluate will integrate to the end.
-  
-  You can retrieve the entire state trajectory as follows, after the evaluate call: 
+
+  You can retrieve the entire state trajectory as follows, after the evaluate call:
   Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
-  
+
 
 */
 class CASADI_SUNDIALS_INTERFACE_EXPORT CVodesIntegrator : public SundialsIntegrator{
@@ -46,7 +46,7 @@ public:
 
   /** \brief  Default constructor */
   CVodesIntegrator();
-  
+
   /** \brief  Create an integrator for explicit ODEs
   *   \param f dynamical system
   * \copydoc scheme_DAEInput
@@ -56,14 +56,14 @@ public:
   * \copydoc scheme_RDAEOutput
   */
   explicit CVodesIntegrator(const Function& f, const Function& g=Function());
-  
+
   /** \brief  Access functions of the node */
   CVodesInternal* operator->();
   const CVodesInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");

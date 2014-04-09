@@ -29,7 +29,7 @@
 
 namespace casadi{
   /** \brief Represents a symbolic MX
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
       A regular user is not supposed to work with this Node class.
       This user can call MX(name,n,m) directly.

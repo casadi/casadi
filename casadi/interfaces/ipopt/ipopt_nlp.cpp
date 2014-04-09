@@ -30,25 +30,25 @@ IpoptUserClass::IpoptUserClass(IpoptInternal* solver){
   this->solver = solver;
   n_ = solver->nx_;
   m_ = solver->ng_;
-  
-#ifdef WITH_IPOPT_CALLBACK 
+
+#ifdef WITH_IPOPT_CALLBACK
   x_ = new double[n_];
   g_ = new double[m_];
   z_L_ = new double[n_];
   z_U_ = new double[n_];
   lambda_ = new double[m_];
-#endif // WITH_IPOPT_CALLBACK 
+#endif // WITH_IPOPT_CALLBACK
 
 }
 
 IpoptUserClass::~IpoptUserClass(){
-#ifdef WITH_IPOPT_CALLBACK 
+#ifdef WITH_IPOPT_CALLBACK
   if (x_) delete [] x_;
   if (g_) delete [] g_;
   if (z_U_) delete [] z_U_;
   if (z_L_) delete [] z_L_;
   if (lambda_) delete [] lambda_;
-#endif // WITH_IPOPT_CALLBACK 
+#endif // WITH_IPOPT_CALLBACK
 
 }
 
@@ -111,7 +111,7 @@ bool IpoptUserClass::eval_h(Index n, const Number* x, bool new_x,
                        Number obj_factor, Index m, const Number* lambda,
                        bool new_lambda, Index nele_hess, Index* iRow,
                        Index* jCol, Number* values)
-{  
+{
   return solver->eval_h(x,new_x,obj_factor,lambda,new_lambda,nele_hess,iRow,jCol,values);
 }
 
@@ -126,7 +126,7 @@ void IpoptUserClass::finalize_solution(SolverReturn status,
   solver->finalize_solution(x,z_L,z_U,g,lambda,obj_value, ip_data? ip_data->iter_count(): 0);
 }
 
-  
+
 bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Number obj_value,
                                        Number inf_pr, Number inf_du,
                                        Number mu, Number d_norm,
@@ -142,16 +142,16 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   /// Code copied from TNLPAdapter::FinalizeSolution
   /// See also: http://list.coin-or.org/pipermail/ipopt/2010-July/002078.html
   // http://list.coin-or.org/pipermail/ipopt/2010-April/001965.html
-  
+
   bool full_callback = false;
-    
-#ifdef WITH_IPOPT_CALLBACK 
+
+#ifdef WITH_IPOPT_CALLBACK
   double time1 = clock();
   OrigIpoptNLP* orignlp = dynamic_cast<OrigIpoptNLP*>(GetRawPtr(ip_cq->GetIpoptNLP()));
   if (!orignlp) return true;
   TNLPAdapter* tnlp_adapter = dynamic_cast<TNLPAdapter*>(GetRawPtr(orignlp->nlp()));
   if (!tnlp_adapter) return true;
-  
+
   const Vector& x = *ip_data->curr()->x();
   const Vector& z_L = *ip_data->curr()->z_L();
   const Vector& z_U = *ip_data->curr()->z_U();
@@ -159,13 +159,13 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   const Vector& d = *ip_cq->curr_d();
   const Vector& y_c = *ip_data->curr()->y_c();
   const Vector& y_d = *ip_data->curr()->y_d();
-  
+
   std::fill_n(x_, n_, 0);
   std::fill_n(g_, m_, 0);
   std::fill_n(z_L_, n_, 0);
   std::fill_n(z_U_, n_, 0);
   std::fill_n(lambda_, m_, 0);
-  
+
   tnlp_adapter->ResortX(x, x_);             // no further steps needed
   tnlp_adapter->ResortG(y_c, y_d, lambda_); // no further steps needed
   tnlp_adapter->ResortG(c, d, g_);
@@ -176,7 +176,7 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   for (Index i=0; i<n_c_no_fixed; i++) {
     g_[c_pos[i]] += tnlp_adapter->c_rhs_[i];
   }
-    
+
   tnlp_adapter->ResortBnds(z_L, z_L_, z_U, z_U_);
   // Copied from Ipopt source: Hopefully the following is correct to recover the bound
   // multipliers for fixed variables (sign ok?)
@@ -200,15 +200,15 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   double time2 = clock();
   solver->t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
   full_callback = true;
-#endif // WITH_IPOPT_CALLBACK 
+#endif // WITH_IPOPT_CALLBACK
 
   return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,inf_pr,inf_du,mu,d_norm,regularization_size,alpha_du,alpha_pr,ls_trials,full_callback);
 
-                 
+
 }
 
 
-  
+
 Index IpoptUserClass::get_number_of_nonlinear_variables(){
   return solver->get_number_of_nonlinear_variables();
 }
@@ -219,7 +219,7 @@ bool IpoptUserClass::get_list_of_nonlinear_variables(Index num_nonlin_vars, Inde
 
 bool IpoptUserClass::get_var_con_metadata(Index n,StringMetaDataMapType& var_string_md, IntegerMetaDataMapType& var_integer_md, NumericMetaDataMapType& var_numeric_md,
                                           Index m,StringMetaDataMapType& con_string_md, IntegerMetaDataMapType& con_integer_md, NumericMetaDataMapType& con_numeric_md){
-  
+
   return solver->get_var_con_metadata(n, var_string_md, var_integer_md, var_numeric_md, m, con_string_md, con_integer_md, con_numeric_md);
 }
 

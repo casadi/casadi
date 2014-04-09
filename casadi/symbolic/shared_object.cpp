@@ -42,7 +42,7 @@ SharedObjectNode::SharedObjectNode(const SharedObjectNode& node){
 
 SharedObjectNode& SharedObjectNode::operator=(const SharedObjectNode& node){
   is_init_ = node.is_init_;
-  // do _not_ copy the reference counter 
+  // do _not_ copy the reference counter
   return *this;
 }
 
@@ -69,7 +69,7 @@ SharedObject& SharedObject::operator=(const SharedObject& ref){
   // quick return if the old and new pointers point to the same object
   if(node == ref.node) return *this;
 
-  // decrease the counter and delete if this was the last pointer       
+  // decrease the counter and delete if this was the last pointer
   count_down();
 
   // save the new pointer
@@ -91,14 +91,14 @@ bool SharedObject::isNull() const{
 }
 
 void SharedObject::count_up(){
-  if(node) node->count++;  
+  if(node) node->count++;
 }
 
 void SharedObject::count_down(){
   if(node && --node->count == 0){
     delete node;
     node = 0;
-  }  
+  }
 }
 
 const SharedObjectNode* SharedObject::operator->() const{
@@ -110,7 +110,7 @@ SharedObjectNode* SharedObject::operator->(){
   casadi_assert(!isNull());
   return node;
 }
-    
+
 SharedObjectNode::SharedObjectNode(){
   is_init_ = false;
   count = 0;
@@ -121,7 +121,7 @@ SharedObjectNode::~SharedObjectNode(){
    assert(count==0);
    if(weak_ref_!=0){
      weak_ref_->kill();
-     delete weak_ref_;    
+     delete weak_ref_;
    }
 }
 
@@ -133,7 +133,7 @@ void SharedObject::init(bool allow_reinit){
 
 void SharedObjectNode::init(){
 }
-    
+
 bool SharedObject::checkNode() const{
   return dynamic_cast<const SharedObjectNode*>(get());
 }
@@ -173,19 +173,19 @@ void SharedObject::makeUnique(std::map<SharedObjectNode*,SharedObject>& already_
   if(node && node->count>1){
     // First find out if the expression has already been copied
     std::map<SharedObjectNode*,SharedObject>::iterator it = already_copied.find(node);
-    
+
     if(it==already_copied.end()){
       // If the expression has not yet been copied
       SharedObjectNode *newnode = node->clone();
-      
+
       // Copy the data members
       if(clone_members) newnode->deepCopyMembers(already_copied);
-      
+
       // Initialize object if parent was initialized
       if(isInit() && !newnode->is_init_){
         newnode->init();
       }
-      
+
       // Assign cloned node to object
       assignNode(newnode);
     } else {
@@ -248,5 +248,5 @@ void SharedObjectNode::assertInit() const{
   }
 
 } // namespace casadi
-    
-    
+
+

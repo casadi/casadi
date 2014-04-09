@@ -27,7 +27,7 @@
 using namespace std;
 namespace casadi{
 
-IdasIntegrator::IdasIntegrator(){ 
+IdasIntegrator::IdasIntegrator(){
 }
 
 IdasIntegrator::IdasIntegrator(const Function& f, const Function& g){

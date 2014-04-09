@@ -38,11 +38,11 @@ namespace casadi{
   class CASADI_CONTROL_EXPORT SimpleIndefDpleInternal : public DpleInternal{
   public:
     /** \brief  Constructor
-     *  \param[in] A  List of sparsities of A_i 
-     *  \param[in] V  List of sparsities of V_i 
+     *  \param[in] A  List of sparsities of A_i
+     *  \param[in] V  List of sparsities of V_i
      */
     SimpleIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V);
-    
+
     /** \brief  Destructor */
     virtual ~SimpleIndefDpleInternal();
 
@@ -51,10 +51,10 @@ namespace casadi{
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-  
+
     /** \brief  Create a new solver */
     virtual SimpleIndefDpleInternal* create(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) const{ return new SimpleIndefDpleInternal(A,V);}
-     
+
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}
 
@@ -66,16 +66,16 @@ namespace casadi{
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual Function getDerivative(int nfwd, int nadj);
-    
+
   private:
     /// Main implementation as MXFunction
     Function f_;
-    
+
     /// State space dimension
     int n_;
-    
+
   };
-  
+
 } // namespace casadi
 /// \endcond
 #endif // SIMPLE_INDEF_DPLE_INTERNAL_HPP

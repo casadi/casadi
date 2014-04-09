@@ -30,7 +30,7 @@
 #include <sundials/sundials_types.h>  /* definition of type double */
 #include <kinsol/kinsol.h>            /* prototypes for CVode fcts. and consts. */
 #include <kinsol/kinsol_dense.h>
-#include <kinsol/kinsol_band.h> 
+#include <kinsol/kinsol_band.h>
 #include <kinsol/kinsol_spgmr.h>
 #include <kinsol/kinsol_spbcgs.h>
 #include <kinsol/kinsol_sptfqmr.h>
@@ -39,9 +39,9 @@
 
 /// \cond INTERNAL
 namespace casadi{
-  
+
   typedef std::pair< std::string,std::string> Message;
-    
+
   class CASADI_SUNDIALS_INTERFACE_EXPORT KinsolInternal : public ImplicitFunctionInternal{
     friend class KinsolSolver;
   public:
@@ -59,10 +59,10 @@ namespace casadi{
 
     /** \brief  Initialize stage */
     virtual void init();
-  
-    /** \brief  Solve the nonlinear system of equations */ 
+
+    /** \brief  Solve the nonlinear system of equations */
     virtual void solveNonLinear();
-  
+
     /** \brief Residual */
     void func(N_Vector u, N_Vector fval);
     void djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
@@ -73,7 +73,7 @@ namespace casadi{
     void lsetup(KINMem kin_mem);
     void lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
     void ehfun(int error_code, const char *module, const char *function, char *msg);
-  
+
     /** \brief Wrappers */
     static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
     static int djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2);
@@ -84,19 +84,19 @@ namespace casadi{
     static int lsetup_wrapper(KINMem kin_mem);
     static int lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
     static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
-  
+
     /// KINSOL memory block
     void* mem_;
-  
+
     /// Variable
     N_Vector u_;
-  
+
     // Scaling
     N_Vector u_scale_, f_scale_;
-  
+
     /// For timings
     clock_t time1_, time2_;
-  
+
     /// Accummulated time since last reset:
     double t_func_; // time spent in the residual function
     double t_jac_; // time spent in the jacobian function
@@ -109,20 +109,20 @@ namespace casadi{
 
     // Should KINSOL internal warning messages be ignored
     bool disable_internal_warnings_;
-  
+
     // Jacobian times vector function
     Function f_fwd_;
 
     // Calculate the error message map
     static std::map<int, Message > calc_flagmap();
-  
+
     // Error message map
     static std::map<int,Message> flagmap;
- 
- 
+
+
     // Raise an error specific to KinSol
     void kinsol_error(const std::string& module, int flag, bool fatal=true);
-  
+
   };
 
 } // namespace casadi

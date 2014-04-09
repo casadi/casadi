@@ -31,7 +31,7 @@ namespace casadi{
   CSparse::CSparse(const Sparsity& sp, int nrhs){
     assignNode(new CSparseInternal(sp,nrhs));
   }
- 
+
   CSparseInternal* CSparse::operator->(){
     return static_cast<CSparseInternal*>(Function::operator->());
   }
@@ -39,9 +39,9 @@ namespace casadi{
   const CSparseInternal* CSparse::operator->() const{
     return static_cast<const CSparseInternal*>(Function::operator->());
   }
-  
+
   bool CSparse::checkNode() const{
     return dynamic_cast<const CSparseInternal*>(get())!=0;
   }
-  
+
 } // namespace casadi

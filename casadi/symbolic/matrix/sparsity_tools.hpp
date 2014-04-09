@@ -29,9 +29,9 @@ namespace casadi{
 
 /**
 \ingroup expression_tools
-@{ 
+@{
 */
-    
+
   /** \brief Reshape the sparsity pattern keeping the relative location of the nonzeros
    */
   CASADI_SYMBOLIC_EXPORT Sparsity reshape(const Sparsity& a, int nrow, int ncol);
@@ -41,11 +41,11 @@ namespace casadi{
 
   /** \brief Vectorize the pattern */
   CASADI_SYMBOLIC_EXPORT Sparsity vec(const Sparsity& a);
-  
+
   /** \brief Get the sparsity resulting from a matrix multiplication
    */
   CASADI_SYMBOLIC_EXPORT Sparsity mul(const Sparsity& a, const Sparsity &b);
-  
+
   /** \brief Concatenate a list of sparsities vertically
   * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
   */
@@ -63,10 +63,10 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT Sparsity horzcat(const Sparsity &x, const Sparsity &y);
 
   CASADI_SYMBOLIC_EXPORT Sparsity vertcat(const Sparsity &x, const Sparsity &y);
-  
+
   CASADI_SYMBOLIC_EXPORT Sparsity blkdiag(const Sparsity &x, const Sparsity &y);
   #endif // SWIG
-  
+
   /** \brief Split up a sparsity pattern horizontally */
   CASADI_SYMBOLIC_EXPORT std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& output_offset);
 
@@ -75,13 +75,13 @@ namespace casadi{
 
   /// Obtain the structural rank of a sparsity-pattern
   CASADI_SYMBOLIC_EXPORT int rank(const Sparsity& a);
-  
+
   /// Get upper triangular part
   CASADI_SYMBOLIC_EXPORT inline Sparsity triu(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTriu(includeDiagonal);}
 
   /// Get lower triangular part
   CASADI_SYMBOLIC_EXPORT inline Sparsity tril(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTril(includeDiagonal);}
-  
+
   /*
   @}
   */

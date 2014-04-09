@@ -28,7 +28,7 @@ namespace casadi{
 
   FixedStepIntegrator::FixedStepIntegrator(){
   }
-  
+
   FixedStepIntegratorInternal* FixedStepIntegrator::operator->(){
     return static_cast<FixedStepIntegratorInternal*>(Integrator::operator->());
   }
@@ -36,7 +36,7 @@ namespace casadi{
   const FixedStepIntegratorInternal* FixedStepIntegrator::operator->() const{
     return static_cast<const FixedStepIntegratorInternal*>(Integrator::operator->());
   }
-    
+
   bool FixedStepIntegrator::checkNode() const{
     return dynamic_cast<const FixedStepIntegratorInternal*>(get())!=0;
   }

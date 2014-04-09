@@ -28,34 +28,34 @@
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 
 namespace casadi{
-  
+
   class SQPInternal;
-  
+
   /**
      \brief Sequential Quadratic Programming method.
-     
-     The algorithm is a classical SQP method with either exact (may be also provided) or 
+
+     The algorithm is a classical SQP method with either exact (may be also provided) or
      damped BFGS Lagrange Hessian approximation.
      Two different line-search algorithms are available.
      First, Armijo (Wolfe) condition with backtracking (suffers from Maratos effect).
      Second, a line-search method that checks if the merit function is lower
      than the last k values (no Maratos effect).
      Both methods employ the L1 merit function.
-  
+
      The method solves the problems of form:
      \verbatim
      min          F(x)
      x
-  
+
      subject to
      LBG <= G(x) <= UBG
      LBX <=   x  <= UBX
      \endverbatim
-  
+
      Nonlinear equalities can be introduced by setting LBG and UBG equal at the correct positions.
-  
+
      The method is still under development and should be used with care
-  
+
      \author Attila Kozma, Joel Andersson and Joris Gillis
      \date 2012
   */
@@ -75,7 +75,7 @@ namespace casadi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Static creator function 
+    /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
 #endif
@@ -86,7 +86,7 @@ namespace casadi{
 
     /// Access the QPSolver used internally
     const QPSolver getQPSolver() const;
-    
+
   };
 
 } // namespace casadi

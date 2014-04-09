@@ -39,16 +39,16 @@ namespace casadi{
 
     /// Constructor
     GetNonzeros(const Sparsity& sp, const MX& x);
-      
+
     /// Destructor
     virtual ~GetNonzeros(){}
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
-            
+
     /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
-    
+
     /// Get all the nonzeros
     virtual std::vector<int> getAll() const = 0;
 
@@ -63,10 +63,10 @@ namespace casadi{
   public:
     /// Constructor
     GetNonzerosVector(const Sparsity& sp, const MX& x, const std::vector<int>& nz) : GetNonzeros(sp,x), nz_(nz){}
-    
+
     /// Clone function
     virtual GetNonzerosVector* clone() const{ return new GetNonzerosVector(*this);}
-      
+
     /// Destructor
     virtual ~GetNonzerosVector(){}
 
@@ -74,10 +74,10 @@ namespace casadi{
     virtual std::vector<int> getAll() const{ return nz_;}
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Evaluate the function numerically
@@ -88,7 +88,7 @@ namespace casadi{
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-    
+
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
@@ -108,7 +108,7 @@ namespace casadi{
 
     /// Clone function
     virtual GetNonzerosSlice* clone() const{ return new GetNonzerosSlice(*this);}
-      
+
     /// Destructor
     virtual ~GetNonzerosSlice(){}
 
@@ -116,16 +116,16 @@ namespace casadi{
     virtual std::vector<int> getAll() const{ return s_.getAll(s_.stop_);}
 
     /// Check if the instance is in fact an identity mapping (that can be simplified)
-    bool isIdentity() const;    
+    bool isIdentity() const;
 
     /// Simplify
     virtual void simplifyMe(MX& ex);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Evaluate the function numerically
@@ -142,7 +142,7 @@ namespace casadi{
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const;
-    
+
     // Data member
     Slice s_;
   };
@@ -156,7 +156,7 @@ namespace casadi{
 
     /// Clone function
     virtual GetNonzerosSlice2* clone() const{ return new GetNonzerosSlice2(*this);}
-      
+
     /// Destructor
     virtual ~GetNonzerosSlice2(){}
 
@@ -164,10 +164,10 @@ namespace casadi{
     virtual std::vector<int> getAll() const{ return inner_.getAll(outer_,outer_.stop_);}
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Evaluate the function numerically
@@ -184,7 +184,7 @@ namespace casadi{
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const;
-    
+
     // Data members
     Slice inner_, outer_;
   };

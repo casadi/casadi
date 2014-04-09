@@ -39,7 +39,7 @@ namespace casadi{
   const LinearSolverInternal* LinearSolver::operator->() const{
     return static_cast<const LinearSolverInternal*>(Function::operator->());
   }
- 
+
   void LinearSolver::prepare(){
     assertInit();
     (*this)->prepare();
@@ -49,7 +49,7 @@ namespace casadi{
     assertInit();
     (*this)->solve(x,nrhs,transpose);
   }
- 
+
   void LinearSolver::solve(bool transpose){
     assertInit();
     (*this)->solve(transpose);
@@ -59,12 +59,12 @@ namespace casadi{
     assertInit();
     return (*this)->solve(A,B,transpose);
   }
- 
+
   bool LinearSolver::prepared() const{
     assertInit();
     return (*this)->prepared_;
   }
- 
+
   bool LinearSolver::checkNode() const{
     return dynamic_cast<const LinearSolverInternal*>(get())!=0;
   }
@@ -80,6 +80,6 @@ namespace casadi{
 
 } // namespace casadi
 
-  
+
 
 

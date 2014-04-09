@@ -36,32 +36,32 @@ namespace casadi{
     }
     return ret;
   }
-  
+
   std::vector<int> range(int stop){
     return range(0,stop);
   }
-  
+
   std::vector<int> complement(const std::vector<int> &v, int size) {
     casadi_assert_message(inBounds(v,size),"complement: out of bounds. Some elements in v fall out of [0,size[");
     std::vector<int> lookup(size,0);
     std::vector<int> ret;
-    
+
     for (int i=0;i<v.size();i++) {
       lookup[v[i]] = 1;
     }
-    
+
     for (int i=0;i<size;i++) {
       if (lookup[i]==0) ret.push_back(i);
     }
-   
+
     return ret;
-    
+
   }
-  
+
   std::vector<int> lookupvector(const std::vector<int> &v, int size) {
     casadi_assert_message(inBounds(v,size),"lookupvector: out of bounds. Some elements in v fall out of [0,size[");
     std::vector<int> lookup(size,-1);
-    
+
     for (int i=0;i<v.size();i++) {
       lookup[v[i]] = i;
     }
@@ -84,6 +84,6 @@ namespace casadi{
       return reinterpret_cast<const bvec_t*>(&v.front());
     }
   }
-  
+
 } // namespace casadi
 

@@ -31,21 +31,21 @@ namespace casadi{
   *
   This is a common base class for SX, MX and Matrix<>, introducing a uniform syntax and implementing
   common functionality using the curiously recurring template pattern (CRTP) idiom.\n
-  
-  \author Joel Andersson 
-  \date 2012    
+
+  \author Joel Andersson
+  \date 2012
 */
 template<typename ExType>
 class CASADI_SYMBOLIC_EXPORT GenericExpression{
   public:
-    
+
 #ifndef SWIG
     /// Addition
     inline friend ExType operator+(const ExType &x, const ExType &y){ return x.__add__(y); }
-    
+
     /// Subtraction
     inline friend ExType operator-(const ExType &x, const ExType &y){ return x.__sub__(y); }
-    
+
     /// Elementwise multiplication
     inline friend ExType operator*(const ExType &x, const ExType &y){ return x.__mul__(y); }
 
@@ -70,33 +70,33 @@ class CASADI_SYMBOLIC_EXPORT GenericExpression{
 
     /// Logic less than
     inline friend ExType operator<(const ExType &x, const ExType &y){ return x.__lt__(y); }
-    
+
     /// Logic less or equal to
     inline friend ExType operator<=(const ExType &x, const ExType &y){ return x.__le__(y); }
-    
+
     /// Logic greater than
     inline friend ExType operator>(const ExType &x, const ExType &y){ return x.__gt__(y); }
-    
+
     /// Logic greater or equal to
     inline friend ExType operator>=(const ExType &x, const ExType &y){ return x.__ge__(y); }
-    
+
     /// Logic equal to
     inline friend ExType operator==(const ExType &x, const ExType &y){ return x.__eq__(y); }
-    
+
     /// Logic not equal to
     inline friend ExType operator!=(const ExType &x, const ExType &y){ return x.__ne__(y); }
-    
+
     /// Logic not
     inline ExType operator!() const{ return static_cast<const ExType &>(*this).logic_not(); }
-    
+
     /// Logic and
     inline friend ExType operator&&(const ExType &x, const ExType &y){ return x.logic_and(y); }
-    
+
     /// Logic or
     inline friend ExType operator||(const ExType &x, const ExType &y){ return x.logic_or(y); }
-    
+
     #endif // SWIG
-    
+
     // \cond SWIGINTERNAL
 
     /// Matrix division from left
@@ -104,13 +104,13 @@ class CASADI_SYMBOLIC_EXPORT GenericExpression{
 
     /// No need to have both < and >
     inline ExType __gt__(const ExType& y) const{ return y.__lt__(static_cast<const ExType&>(*this));}
-    
+
     /// No need to have both <= and >=
     inline ExType __ge__(const ExType& y) const{ return y.__le__(static_cast<const ExType&>(*this));}
 
     /// Division (with __future__.division in effect)
     inline ExType __truediv__(const ExType& y) const {return static_cast<const ExType&>(*this)/y;};
-    
+
     /** @name Operations from the left
      *  For Python
      */
@@ -128,7 +128,7 @@ class CASADI_SYMBOLIC_EXPORT GenericExpression{
     inline ExType __rtruediv__(const ExType& y) const {return y.__truediv__(static_cast<const ExType&>(*this));}
     //@}
     /// \endcond
-    
+
 };
 
 template<class T>

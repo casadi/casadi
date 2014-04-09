@@ -32,12 +32,12 @@
   \verbatim
   min          F(x,p)
    x
-  
+
   subject to
               LBX <=   x    <= UBX
               LBG <= G(x,p) <= UBG
                          p  == P
-              
+
       nx: number of decision variables
       ng: number of constraints
       np: number of parameters
@@ -52,13 +52,13 @@ namespace casadi{
     /// Decision variable [x]
     NL_X,
     /// Fixed parameter [p]
-    NL_P, 
+    NL_P,
     /// Number of NLP inputs
     NL_NUM_IN
   };
 
   /// Output arguments of an NLP function [nlpOut]
-  enum NLPOutput{ 
+  enum NLPOutput{
     /// Objective function [f]
     NL_F,
     /// Constraint function [g]
@@ -72,13 +72,13 @@ namespace casadi{
     /// Decision variable [x]
     GRADF_X,
     /// Fixed parameter [p]
-    GRADF_P, 
+    GRADF_P,
     /// Number of inputs
     GRADF_NUM_IN
   };
 
   /// Output arguments of an NLP objective gradient function [gradFOut]
-  enum GradFOutput{ 
+  enum GradFOutput{
     /// Jacobian of the constraints [grad]
     GRADF_GRAD,
     /// Objective function [f]
@@ -94,13 +94,13 @@ namespace casadi{
     /// Decision variable [x]
     JACG_X,
     /// Fixed parameter [p]
-    JACG_P, 
+    JACG_P,
     /// Number of inputs
     JACG_NUM_IN
   };
 
   /// Output arguments of an NLP Jacobian function [jacGOut]
-  enum JacGOutput{ 
+  enum JacGOutput{
     /// Jacobian of the constraints [jac]
     JACG_JAC,
     /// Objective function [f]
@@ -116,7 +116,7 @@ namespace casadi{
     /// Decision variable [x]
     HESSLAG_X,
     /// Fixed parameter [p]
-    HESSLAG_P, 
+    HESSLAG_P,
     /// Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. [lam_f]
     HESSLAG_LAM_F,
     /// Multiplier for g [lam_g]
@@ -126,7 +126,7 @@ namespace casadi{
   };
 
   /// Output arguments of an NLP Hessian function [hessLagOut]
-  enum HessLagOutput{ 
+  enum HessLagOutput{
     /// Hessian of the Lagrangian [hess]
     HESSLAG_HESS,
     /// Objective function [f]
@@ -140,7 +140,7 @@ namespace casadi{
     /// Number of outputs
     HESSLAG_NUM_OUT
   };
-  
+
   /// Input arguments of an NLP Solver [nlpSolverIn]
   enum NLPSolverInput{
     /// Decision variables, initial guess (nx x 1)  [x0]
@@ -171,11 +171,11 @@ namespace casadi{
     /// Constraints function at the optimal solution (ng x 1) [g]
     NLP_SOLVER_G,
     /// Lagrange multipliers for bounds on X at the solution (nx x 1) [lam_x]
-    NLP_SOLVER_LAM_X, 
+    NLP_SOLVER_LAM_X,
     /// Lagrange multipliers for bounds on G at the solution (ng x 1) [lam_g]
     NLP_SOLVER_LAM_G,
     /// Lagrange multipliers for bounds on P at the solution (np x 1) [lam_p]
-    NLP_SOLVER_LAM_P, 
+    NLP_SOLVER_LAM_P,
     NLP_SOLVER_NUM_OUT
   };
 
@@ -185,7 +185,7 @@ namespace casadi{
 
       @copydoc NLPSolver_doc
 
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT NLPSolver : public Function{
@@ -200,15 +200,15 @@ namespace casadi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
-    /// Prints out a human readable report about possible constraint violations, after solving 
+
+    /// Prints out a human readable report about possible constraint violations, after solving
     void reportConstraints(std::ostream &stream=std::cout);
 
     std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
-  
+
     /// Set options that make the NLP solver more suitable for solving QPs
     void setQPOptions();
-  
+
     /** \brief Access the NLP
     *  \copydoc scheme_NLPSolverInput
     *  \copydoc scheme_NLPSolverOutput

@@ -32,7 +32,7 @@
 namespace casadi{
 
   /** \brief Internal class for QPOasesSolver
-   * 
+   *
       @copydoc QPSolver_doc
    * */
 class CASADI_QPOASES_INTERFACE_EXPORT QPOasesInternal : public QPSolverInternal {
@@ -43,7 +43,7 @@ public:
 
   /** \brief  Clone */
   virtual QPOasesInternal* clone() const;
-  
+
   /** \brief  Create a new Solver */
   explicit QPOasesInternal(const std::vector<Sparsity>& st);
 
@@ -52,16 +52,16 @@ public:
 
   /** \brief  Initialize */
   virtual void init();
-  
+
   virtual void evaluate();
-  
+
   protected:
-    
+
     /// QP Solver
     union{
       qpOASES::QProblemB *qp_;
     };
-    
+
     //@{
       /// Convert between qpOASES types and standard types
     static bool BooleanType_to_bool(qpOASES::BooleanType b);
@@ -71,26 +71,26 @@ public:
     static std::string PrintLevel_to_string(qpOASES::PrintLevel b);
     static qpOASES::PrintLevel string_to_PrintLevel(std::string b);
     //@}
-    
+
     /// Number of working set recalculations
     int max_nWSR_;
-    
+
     /// CPUtime for initialisation
     double max_cputime_;
-    
+
     /// Throw error
     static void qpoases_error(const std::string& module, int flag);
-    
+
     /// Has qpOASES been called once?
     bool called_once_;
-    
+
     /// Dense data for H and A
     std::vector<double> h_data_;
     std::vector<double> a_data_;
-    
+
     /// Temporary vector holding the dual solution
     std::vector<double> dual_;
-    
+
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
 };

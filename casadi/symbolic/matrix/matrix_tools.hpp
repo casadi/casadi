@@ -39,8 +39,8 @@ namespace casadi{
   /** \brief  Matrix product of two matrices
    *
    * With optional sp_z you can specify the sparsity of the result
-   * A typical use case might be where the product is only constructed to 
-   * inspect the trace of it. sp_z diagonal will be more efficient then. 
+   * A typical use case might be where the product is only constructed to
+   * inspect the trace of it. sp_z diagonal will be more efficient then.
    */
   template<typename DataType>
   Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y, const Sparsity& sp_z=Sparsity());
@@ -80,17 +80,17 @@ namespace casadi{
       Reshapes/vectorizes the Matrix<DataType> such that the shape becomes (expr.numel(),1).
       Columns are stacked on top of each other.
       Same as reshape(expr, expr.numel(),1)
-  
+
       a c \n
       b d \n
-    
+
       turns into
-    
+
       a \n
       b \n
       c \n
       d \n
-    
+
   */
   template<typename DataType>
   Matrix<DataType> vec(const Matrix<DataType>& a);
@@ -217,9 +217,9 @@ namespace casadi{
   template<typename DataType>
   Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y);
 
-  /** \brief  QR factorization using the modified Gram-Schmidt algorithm 
+  /** \brief  QR factorization using the modified Gram-Schmidt algorithm
    * More stable than the classical Gram-Schmidt, but may break down if the rows of A are nearly linearly dependent
-   * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.). 
+   * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
    * Note that in SWIG, Q and R are returned by value. */
   template<typename DataType>
 #ifndef SWIG
@@ -230,7 +230,7 @@ namespace casadi{
 
   /** \brief Computes the nullspace of a matrix A
   *
-  * Finds Z m-by-(m-n) such that AZ = 0 
+  * Finds Z m-by-(m-n) such that AZ = 0
   * with A n-by-m with m > n
   *
   * Assumes A is full rank
@@ -240,7 +240,7 @@ namespace casadi{
   template<typename DataType>
   Matrix<DataType> nullspace(const Matrix<DataType>& A);
 
-  /** \brief  Solve a system of equations: A*x = b 
+  /** \brief  Solve a system of equations: A*x = b
       The solve routine works similar to Matlab's backslash when A is square and nonsingular. The algorithm
       used is the following:
       1. A simple forward or backward substitution if A is upper or lower triangular
@@ -255,36 +255,36 @@ namespace casadi{
       Note 2: When permuting the linear system, a BLT (block lower triangular) transformation is formed.
       Only the permutation part of this is however used. An improvement would be to solve block-by-block
       if there are multiple BLT blocks.
-  
+
   */
   template<typename DataType>
   Matrix<DataType> solve(const Matrix<DataType>& A, const Matrix<DataType>& b);
-  
+
   /** \brief Computes the Moore-Penrose pseudo-inverse
-  * 
+  *
   * If the matrix A is fat (size2>size1), mul(A,pinv(A)) is unity.
   * If the matrix A is slender (size1<size2), mul(pinv(A),A) is unity.
   *
   */
   template<typename DataType>
   Matrix<DataType> pinv(const Matrix<DataType>& A);
-  
-  /** \brief Solve a system of equations: A*x = b 
+
+  /** \brief Solve a system of equations: A*x = b
   */
   CASADI_SYMBOLIC_EXPORT Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
-  
-  
+
+
   /** \brief Computes the Moore-Penrose pseudo-inverse
-  * 
+  *
   * If the matrix A is fat (size1>size2), mul(A,pinv(A)) is unity.
   * If the matrix A is slender (size2<size1), mul(pinv(A),A) is unity.
   *
   */
   CASADI_SYMBOLIC_EXPORT Matrix<double> pinv(const Matrix<double>& A,linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
-  
+
   /** \brief Kronecker tensor product
   *
-  * Creates a block matrix in which each element (i,j) is a_ij*b 
+  * Creates a block matrix in which each element (i,j) is a_ij*b
   */
   template<typename DataType>
   Matrix<DataType> kron(const Matrix<DataType>& a, const Matrix<DataType>& b);
@@ -307,7 +307,7 @@ namespace casadi{
 
   /// Return summation of all elements
   template<typename DataType>
-  Matrix<DataType> sumAll(const Matrix<DataType> &x); 
+  Matrix<DataType> sumAll(const Matrix<DataType> &x);
 
   /** \brief Return a col-wise summation of elements */
   template<typename DataType>
@@ -320,11 +320,11 @@ namespace casadi{
 #ifdef SWIG
   /// Returns true only if every element in the matrix is true
   template<typename DataType>
-  DataType all(const Matrix<DataType> &x); 
+  DataType all(const Matrix<DataType> &x);
 
   /// Returns true if any element in the matrix is true
   template<typename DataType>
-  DataType any(const Matrix<DataType> &x); 
+  DataType any(const Matrix<DataType> &x);
 #endif //SWIG
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
@@ -362,17 +362,17 @@ namespace casadi{
   /// same as: res += mul(A,v)
   template<typename DataType>
   void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A=false);
-  
+
   /// \cond INTERNAL
   /// Get a pointer to the data contained in the vector
   template<typename DataType>
   DataType* getPtr(Matrix<DataType> &v);
-  
+
   /// Get a pointer to the data contained in the vector
   template<typename DataType>
   const DataType* getPtr(const Matrix<DataType> &v);
   /// \endcond
-  
+
   /** \brief Create a new matrix with a given sparsity pattern but with the nonzeros taken from an existing matrix */
   template<typename DataType>
   Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sparsity);
@@ -422,34 +422,34 @@ namespace casadi{
 
     // Trivial case 2 x 2
     if(n==2) return a.elem(0,0) * a.elem(1,1) - a.elem(0,1) * a.elem(1,0);
-  
+
     // Return expression
     Matrix<DataType> ret = 0;
-  
+
     // Find out which is the best direction to expand along
 
     // Build up an IMatrix with ones on the non-zeros
     Matrix<int> sp = IMatrix(a.sparsity(),1);
-  
+
     // Have a count of the nonzeros for each row
     Matrix<int> row_count = sumCols(sp);
-  
+
     // A blank row? determinant is structurally zero
     if (!row_count.isDense()) return 0;
 
     // Have a count of the nonzeros for each col
     Matrix<int> col_count = sumRows(sp).T();
-  
+
     // A blank col? determinant is structurally zero
     if (!row_count.isDense()) return 0;
-  
+
     int min_row = std::distance(row_count.data().begin(), std::min_element(row_count.data().begin(),row_count.data().end()));
     int min_col = std::distance(col_count.data().begin(), std::min_element(col_count.data().begin(),col_count.data().end()));
-  
+
     if (min_row <= min_col) {
       // Expand along row j
       int j = row_count.sparsity().row(min_row);
-    
+
       Matrix<DataType> row = a(j,range(n));
 
       std::vector< int > col_i = row.sparsity().getCol();
@@ -464,7 +464,7 @@ namespace casadi{
       int i = col_count.sparsity().row(min_col);
 
       Matrix<DataType> col = a(range(n),i);
-    
+
       const std::vector< int > &row_i = col.sparsity().row();
 
       for(int k=0; k<col.size(); ++k) {
@@ -473,7 +473,7 @@ namespace casadi{
       }
       return ret.toScalar();
     }
- 
+
   }
 
   template<typename DataType>
@@ -486,7 +486,7 @@ namespace casadi{
 
     // Remove col i and row j
     Matrix<DataType> M = Matrix<DataType>::sparse(n-1,n-1);
-  
+
     std::vector<int> col = x.sparsity().getCol();
     const std::vector<int> &row = x.sparsity().row();
 
@@ -523,7 +523,7 @@ namespace casadi{
 
     // Temporary placeholder
     DataType temp;
-  
+
     // Cofactor matrix
     Matrix<DataType> C = Matrix<DataType>::sparse(n,n);
     for(int i=0; i<n; ++i)
@@ -532,7 +532,7 @@ namespace casadi{
         if (!casadi_limits<DataType>::isZero(temp))
           C(j,i) = temp;
       }
-  
+
     return C.T();
   }
 
@@ -558,10 +558,10 @@ namespace casadi{
     // quick return if already the right shape
     if(sp==x.sparsity())
       return x;
-  
+
     // make sure that the patterns match
     casadi_assert(sp.isReshape(x.sparsity()));
-  
+
     return Matrix<DataType>(sp,x.data());
   }
 
@@ -585,7 +585,7 @@ namespace casadi{
   Matrix<DataType> vecNZ(const Matrix<DataType>& a){
     return Matrix<DataType>(a.data());
   }
-  
+
   template<typename DataType>
   Matrix<DataType> blockcat(const std::vector< std::vector<Matrix<DataType> > > &v) {
     std::vector< Matrix<DataType> > ret;
@@ -611,7 +611,7 @@ namespace casadi{
   std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset) {
     // Split up the sparsity pattern
     std::vector<Sparsity> sp = horzsplit(v.sparsity(),offset);
-    
+
     // Return object
     std::vector<Matrix<DataType> > ret;
     ret.reserve(sp.size());
@@ -642,7 +642,7 @@ namespace casadi{
     Matrix<DataType> ret;
     for(int i=0; i<v.size(); ++i)
       ret.appendColumns(v[i].T());
-    return ret.T();  
+    return ret.T();
   }
 
   template<typename DataType>
@@ -652,7 +652,7 @@ namespace casadi{
     std::transform(ret.begin(),ret.end(),ret.begin(),transposeT);
     return ret;
   }
-  
+
   template<typename DataType>
   std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x, int incr){
     casadi_assert(incr>=1);
@@ -693,13 +693,13 @@ namespace casadi{
   Matrix<DataType> vertcat(const Matrix<DataType> &x, const Matrix<DataType> &y){
     return horzcat(x.T(),y.T()).T();
   }
-  
+
   template<typename DataType>
   Matrix<DataType> veccat(const std::vector< Matrix<DataType> >& comp) {
     Matrix<DataType> (&f)(const Matrix<DataType>&) = vec;
     return vertcat(applymap(f,comp));
   }
-  
+
   template<typename DataType>
   Matrix<DataType> vecNZcat(const std::vector< Matrix<DataType> >& comp) {
     Matrix<DataType> (&f)(const Matrix<DataType>&) = vecNZ;
@@ -786,7 +786,7 @@ namespace casadi{
     for(typename std::vector<DataType>::const_iterator i=x.begin(); i!=x.end(); ++i){
       s = fmax(s,DataType(abs(*i)));
     }
-    
+
     return s;
   }
 
@@ -803,16 +803,16 @@ namespace casadi{
       Matrix<DataType> qi = ai;
       // The i-th column of R
       Matrix<DataType> ri = Matrix<DataType>::sparse(A.size2(),1);
-  
+
       // subtract the projection of qi in the previous directions from ai
       for(int j=0; j<i; ++j){
-      
+
         // Get the j-th column of Q
         Matrix<DataType> qj = Q(ALL,j);
 
         ri(j,0) = mul(qi.T(),qj); // Modified Gram-Schmidt
         // ri[j] = inner_prod(qj,ai); // Classical Gram-Schmidt
-     
+
         // Remove projection in direction j
         if (ri.hasNZ(j,0))
           qi -= ri(j,0) * qj;
@@ -827,44 +827,44 @@ namespace casadi{
       R.appendColumns(ri);
     }
   }
-  
+
   template<typename DataType>
   Matrix<DataType> nullspace(const Matrix<DataType>& A) {
     int n = A.size1();
     int m = A.size2();
-    
+
     Matrix<DataType> X = A;
-    
+
     casadi_assert_message(m>=n,"nullspace(A): expecting a flat matrix (more columns than rows), but got " << A.dimString() << ".");
-    
+
     Matrix<DataType> seed = DMatrix::eye(m)(Slice(0,m),Slice(n,m));
 
     std::vector< Matrix<DataType> > us;
     std::vector< Matrix<DataType> > betas;
-    
+
     Matrix<DataType> beta;
-    
+
     for (int i=0;i<n;++i) {
       Matrix<DataType> x = X(i,Slice(i,m));
       Matrix<DataType> u = Matrix<DataType>(x);
       Matrix<DataType> sigma = sqrt(sumCols(x*x));
       const Matrix<DataType>& x0 = x(0,0);
       u(0,0) = 1;
-      
+
       Matrix<DataType> b = -copysign(sigma,x0);
-      
+
       u(Slice(0),Slice(1,m-i))*= 1/(x0-b);
       beta = 1-x0/b;
-      
+
       X(Slice(i,n),Slice(i,m))-= beta*mul(mul(X(Slice(i,n),Slice(i,m)),u.T()),u);
       us.push_back(u);
       betas.push_back(beta);
     }
-    
+
     for (int i=n-1;i>=0;--i) {
       seed(Slice(i,m),Slice(0,m-n)) -= betas[i]*mul(us[i].T(),mul(us[i],seed(Slice(i,m),Slice(0,m-n))));
     }
-    
+
     return seed;
 
   }
@@ -886,7 +886,7 @@ namespace casadi{
           if(!x.hasNZ(i,k)) continue;
           x(i,k) /= A(i,i);
           for(int kk=Acolind[i+1]-1; kk>=Acolind[i] && Arow[kk]>i; --kk){
-            int j = Arow[kk]; 
+            int j = Arow[kk];
             x(j,k) -= Adata[kk]*x(i,k);
           }
         }
@@ -902,7 +902,7 @@ namespace casadi{
         for(int k=0; k<b.size2(); ++k){ // for every right hand side
           if(!x.hasNZ(i,k)) continue;
           x(i,k) /= A(i,i);
-          for(int kk=Acolind[i]; kk<Acolind[i+1] && Arow[kk]<i; ++kk){ 
+          for(int kk=Acolind[i]; kk<Acolind[i+1] && Arow[kk]<i; ++kk){
             int j = Arow[kk];
             x(j,k) -= Adata[kk]*x(i,k);
           }
@@ -917,7 +917,7 @@ namespace casadi{
       return solve(A_sparse,b);
 
     } else {
-    
+
       // Make a BLT transformation of A
       std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
       A.sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
@@ -933,17 +933,17 @@ namespace casadi{
 
       // Solve permuted system
       if(Aperm.isTril()){
-      
+
         // Forward substitution if lower triangular
         xperm = solve(Aperm,bperm);
-      
+
       } else if(A.size2()<=3){
-      
+
         // Form inverse by minor expansion and multiply if very small (up to 3-by-3)
         xperm = mul(inv(Aperm),bperm);
 
       } else {
-      
+
         // Make a QR factorization
         Matrix<DataType> Q,R;
         qr(Aperm,Q,R);
@@ -962,7 +962,7 @@ namespace casadi{
       return x;
     }
   }
-  
+
   template<typename DataType>
   Matrix<DataType> pinv(const Matrix<DataType>& A) {
     if (A.size2()>=A.size1()) {
@@ -971,7 +971,7 @@ namespace casadi{
       return solve(mul(A.T(),A),A.T());
     }
   }
-  
+
   template<typename DataType>
   Matrix<DataType> kron(const Matrix<DataType>& a, const Matrix<DataType>& b) {
     const Sparsity &a_sp = a.sparsity();
@@ -992,7 +992,7 @@ namespace casadi{
   Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m){
     // First concatenate horizontally
     Matrix<DataType> col = horzcat(std::vector<Matrix<DataType> >(m, A));
-  
+
     // Then vertically
     return vertcat(std::vector<Matrix<DataType> >(n, col));
   }
@@ -1003,9 +1003,9 @@ namespace casadi{
     std::vector<int> mapping;
     // Get the sparsity
     Sparsity sp = A.sparsity().getDiag(mapping);
-  
+
     Matrix<DataType> ret = Matrix<DataType>(sp);
-  
+
     for (int k=0;k<mapping.size();k++) ret[k] = A[mapping[k]];
     return ret;
   }
@@ -1014,15 +1014,15 @@ namespace casadi{
   template<typename DataType>
   Matrix<DataType> blkdiag(const std::vector< Matrix<DataType> > &A) {
     std::vector<DataType> data;
-  
+
     std::vector<Sparsity> sp;
     for (int i=0;i<A.size();++i) {
       data.insert(data.end(),A[i].data().begin(),A[i].data().end());
       sp.push_back(A[i].sparsity());
     }
-  
+
     return Matrix<DataType>(blkdiag(sp),data);
-  
+
   }
 
   template<typename DataType>
@@ -1030,10 +1030,10 @@ namespace casadi{
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
     Sparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
-  
+
     // Create return matrix
     Matrix<DataType> ret(sp);
-  
+
     // Copy sparsity
     int elA=0, elB=0;
     for(int k=0; k<mapping.size(); ++k){
@@ -1045,15 +1045,15 @@ namespace casadi{
         throw CasadiException("Pattern intersection not empty");
       }
     }
-  
+
     casadi_assert(A.size()==elA);
     casadi_assert(B.size()==elB);
-  
+
     return ret;
   }
 
   template<typename DataType>
-  Matrix<DataType> dense(const Matrix<DataType>& A){    
+  Matrix<DataType> dense(const Matrix<DataType>& A){
     Matrix<DataType> ret = A;
     ret.densify();
     return ret;
@@ -1065,7 +1065,7 @@ namespace casadi{
     ret.sparsify(tol);
     return ret;
   }
-  
+
   template<typename DataType>
   Matrix<DataType> polyval(const Matrix<DataType>& p, const Matrix<DataType>& x){
     casadi_assert_message(p.isDense(),"polynomial coefficients vector must be dense");
@@ -1115,7 +1115,7 @@ namespace casadi{
     else
       return &v.front();
   }
-  
+
   template<typename DataType>
   const DataType* getPtr(const Matrix<DataType> &v){
     if(v.isEmpty())
@@ -1129,19 +1129,19 @@ namespace casadi{
     // Check dimensions
     if(!(A.isEmpty() && sparsity.numel()==0)){
       casadi_assert_message(A.size2()==sparsity.size2() && A.size1()==sparsity.size1(),
-                            "Shape mismatch. Expecting " << A.dimString() << ", but got " << 
+                            "Shape mismatch. Expecting " << A.dimString() << ", but got " <<
                             sparsity.dimString() << " instead.");
     }
-    
+
     // Return value
     Matrix<DataType> ret(sparsity,0);
-    
+
     // Get the elements of the known matrix
     std::vector<int> known_ind = A.sparsity().getElements(false);
-      
+
     // Find the corresponding nonzeros in the return matrix
     sparsity.getNZInplace(known_ind);
-      
+
     // Set the element values
     const std::vector<DataType>& A_data = A.data();
     std::vector<DataType>& ret_data = ret.data();
@@ -1157,7 +1157,7 @@ namespace casadi{
   int sprank(const Matrix<DataType>& A) {
     return rank(A.sparsity());
   }
-  
+
 } // namespace casadi
 
 
@@ -1214,7 +1214,7 @@ namespace casadi{
   MTT_INST(DataType,vecNZcat)                          \
   MTT_INST(DataType,project)                           \
   MTT_INST(DataType,sprank)                            \
-  MTT_INST(DataType,kron) 
+  MTT_INST(DataType,kron)
 #endif //SWIG
 
 #ifdef SWIGOCTAVE

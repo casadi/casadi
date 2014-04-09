@@ -31,33 +31,33 @@
 /** \defgroup QCQPSolver_doc
 
   Solves the following strictly convex problem:
-  
+
   \verbatim
-  min          1/2 x' H x + g' x 
+  min          1/2 x' H x + g' x
    x
-  
+
   subject to
-              1/2 x' Pi x  +  qi' x + ri  <= 0   for i=0..nq-1             
+              1/2 x' Pi x  +  qi' x + ri  <= 0   for i=0..nq-1
               LBA <= A x <= UBA
               LBX <= x   <= UBX
-              
+
       with :
         H, Pi sparse (n x n) positive definite
         g, qi dense  (n x 1)
         ri scalar
-              
+
       n: number of decision variables (x)
       nc: number of linear constraints (A)
       nq: number of quadratic constraints
-      
+
   \endverbatim
-  
+
   If H, Pi is not positive-definite, the solver should throw an error.
-  
+
 */
-      
+
 namespace casadi{
-  
+
 /// Input arguments of a QP problem [qcqpIn]
 enum QCQPSolverInput{
   /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
@@ -108,7 +108,7 @@ enum QCQPStruct{
   /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
   QCQP_STRUCT_A,
   QCQP_STRUCT_NUM};
-  
+
 // Forward declaration of internal class
 class QCQPSolverInternal;
 
@@ -117,7 +117,7 @@ class QCQPSolverInternal;
 
 @copydoc QCQPSolver_doc
 
-  \author Joris Gillis 
+  \author Joris Gillis
   \date 2013
 */
 class CASADI_SYMBOLIC_EXPORT QCQPSolver : public Function{
@@ -125,14 +125,14 @@ class CASADI_SYMBOLIC_EXPORT QCQPSolver : public Function{
 
   /// Default constructor
   QCQPSolver();
-  
+
   /// Access functions of the node
   QCQPSolverInternal* operator->();
   const QCQPSolverInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Set options that make the QP solver more suitable for solving LPs
   void setQPOptions();
 };

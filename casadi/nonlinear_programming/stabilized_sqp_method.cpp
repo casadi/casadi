@@ -28,7 +28,7 @@ namespace casadi{
 
   StabilizedSQPMethod::StabilizedSQPMethod(){
   }
-  
+
   StabilizedSQPMethod::StabilizedSQPMethod(const Function& nlp){
     assignNode(new StabilizedSQPInternal(nlp));
   }
@@ -40,7 +40,7 @@ namespace casadi{
   const StabilizedSQPInternal* StabilizedSQPMethod::operator->() const{
     return static_cast<const StabilizedSQPInternal*>(NLPSolver::operator->());
   }
-    
+
   bool StabilizedSQPMethod::checkNode() const{
     return dynamic_cast<const StabilizedSQPInternal*>(get())!=0;
   }

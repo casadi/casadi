@@ -32,7 +32,7 @@
 namespace casadi{
 
   /** \brief Internal class for SDPSOCPInternal
-   * 
+   *
       @copydoc LPSolver_doc
    * */
 class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
@@ -41,7 +41,7 @@ public:
 
   /** \brief  Clone */
   virtual SDPSOCPInternal* clone() const;
-  
+
   /** \brief  Create a new Solver */
   explicit SDPSOCPInternal(const std::vector<Sparsity> &st);
 
@@ -50,12 +50,12 @@ public:
 
   /** \brief  Initialize */
   virtual void init();
-  
+
   virtual void evaluate();
-  
+
   protected:
     SDPSolver sdpsolver_;
-    
+
     /// Mapping from G, H, E, F to P, G
     Function mapping_;
 

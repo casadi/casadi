@@ -40,11 +40,11 @@ namespace casadi{
   class CASADI_CONTROL_EXPORT DpleInternal : public FunctionInternal{
   public:
     /** \brief  Constructor
-     *  \param[in] A  List of sparsities of A_i 
-     *  \param[in] V  List of sparsities of V_i 
+     *  \param[in] A  List of sparsities of A_i
+     *  \param[in] V  List of sparsities of V_i
      */
     DpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V, int nfwd=0, int nadj=0);
-    
+
     /** \brief  Destructor */
     virtual ~DpleInternal()=0;
 
@@ -53,10 +53,10 @@ namespace casadi{
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-  
+
     /** \brief  Create a new solver */
     virtual DpleInternal* create(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) const = 0;
-  
+
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}
 
@@ -69,24 +69,24 @@ namespace casadi{
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual Function getDerivative(int nfwd, int nadj)=0;
 
-    /// List of sparsities of A_i 
+    /// List of sparsities of A_i
     std::vector< Sparsity > A_;
-    
-    /// List of sparsities of V_i 
+
+    /// List of sparsities of V_i
     std::vector< Sparsity > V_;
-    
+
     /// Period
     int K_;
-    
+
     /// Constant dimensions
     bool const_dim_;
-    
+
     /// Assume positive definiteness of P_i
     bool pos_def_;
-    
+
     /// Throw an error when system is unstable
     bool error_unstable_;
-    
+
     /// Margin for unstability detection
     double eps_unstable_;
 
@@ -95,9 +95,9 @@ namespace casadi{
 
     /// Number of adjoint derivatives
     int nadj_;
-    
+
   };
-  
+
 } // namespace casadi
 /// \endcond
 #endif // DPLE_INTERNAL_HPP

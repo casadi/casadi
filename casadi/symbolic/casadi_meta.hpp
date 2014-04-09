@@ -30,7 +30,7 @@ namespace casadi {
   /**
   * \brief Collects global CasADi meta information
   *
-  *  \author Joris Gillis 
+  *  \author Joris Gillis
   *  \date 2012
   */
   class CASADI_SYMBOLIC_EXPORT CasadiMeta {
@@ -52,11 +52,11 @@ namespace casadi {
     /** \brief Obtain the version number of CasADi
     *  The format is x.y.z or x.y.z+
     *
-    *  The variant without + indicates that the version is an official release  
+    *  The variant without + indicates that the version is an official release
     *
     *  The variant with + indicates that the version is more recent than x.y.z,
     *     and might be more recent than x.y.w  with w>z.
-    *     
+    *
     *  \see getGitRevision getGitDescribe
     */
     static std::string getVersion() { return version; }
@@ -78,7 +78,7 @@ namespace casadi {
     * Provided by http://www.cmake.org/cmake/help/v2.8.10/cmake.html#variable:CMAKE_LANG_COMPILER_ID
     */
     static std::string getCompilerId() { return compiler_id; }
-    /** \brief Obtain compiler 
+    /** \brief Obtain compiler
     */
     static std::string getCompiler() { return compiler; }
     /** \brief Obtain compiler flags

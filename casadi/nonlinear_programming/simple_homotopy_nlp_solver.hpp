@@ -28,9 +28,9 @@
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 
 namespace casadi{
-  
+
   class SimpleHomotopyNLPInternal;
-  
+
   /**
      \brief Solving an NLP homotopy with regular NLP solvers
 
@@ -53,7 +53,7 @@ namespace casadi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Static creator function 
+    /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
 #endif
@@ -62,7 +62,7 @@ namespace casadi{
     %nocallback;
 #endif
 
-    
+
   };
 
 } // namespace casadi

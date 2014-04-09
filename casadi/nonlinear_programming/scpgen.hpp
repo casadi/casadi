@@ -28,13 +28,13 @@
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 
 namespace casadi{
-  
+
   class SCPgenInternal;
-  
+
   /**
      \brief A structure-exploiting sequential quadratic programming (to be come sequential convex programming)
      method for nonlinear programming.
-  
+
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */
@@ -54,7 +54,7 @@ namespace casadi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Static creator function 
+    /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
 #endif
@@ -65,7 +65,7 @@ namespace casadi{
 
     /// Access the QPSolver used internally
     const QPSolver getQPSolver() const;
-    
+
   };
 
 } // namespace casadi

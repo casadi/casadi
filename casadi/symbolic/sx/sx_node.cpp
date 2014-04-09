@@ -120,7 +120,7 @@ namespace casadi{
   bool SXNode::marked() const{
     return temp<0;
   }
-    
+
   void SXNode::mark(){
     temp = -temp-1;
   }

@@ -25,25 +25,25 @@
 using namespace std;
 
 namespace casadi{
-    
+
     IOSchemeBuiltinInternal::IOSchemeBuiltinInternal(InputOutputScheme scheme) : scheme_(scheme) {}
-    
+
     std::string IOSchemeBuiltinInternal::name() const {
       return getSchemeName(scheme_);
     }
-    
+
     std::string IOSchemeBuiltinInternal::entryNames() const {
       return getSchemeEntryNames(scheme_);
     }
-    
+
     std::string IOSchemeBuiltinInternal::entry(int i) const {
       return getSchemeEntryName(scheme_,i);
     }
-    
+
     std::string IOSchemeBuiltinInternal::entryEnum(int i) const {
       return getSchemeEntryEnumName(scheme_,i);
     }
-    
+
     std::string IOSchemeBuiltinInternal::describe(int i) const {
       std::stringstream ss;
       ss << entryEnum(i) <<  " aka '" << entry(i) << "'";
@@ -53,19 +53,19 @@ namespace casadi{
     int IOSchemeBuiltinInternal::index(const std::string &name) const {
       return getSchemeEntryEnum(scheme_, name);
     }
-    
+
     int IOSchemeBuiltinInternal::size() const {
       return getSchemeSize(scheme_);
     }
-    
+
     void IOSchemeBuiltinInternal::print(std::ostream &stream) const {
       stream << "builtinIO(" << name() << ")";
     }
- 
+
     void IOSchemeBuiltinInternal::repr(std::ostream &stream) const {
       stream << "builtinIO(" << name() << ")";
     }
-    
+
     IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions) : entries_(entries), descriptions_(descriptions)  {
       for (int i=0;i<entries.size();++i) {
         entrymap_[entries[i]] = i;
@@ -73,11 +73,11 @@ namespace casadi{
       if (descriptions_.empty())  descriptions_.resize(entries.size());
       casadi_assert(descriptions_.size()==entries.size());
     }
-    
+
     std::string IOSchemeCustomInternal::name() const {
       return "customIO";
     }
-    
+
     std::string IOSchemeCustomInternal::entryNames() const {
       std::stringstream ss;
       for (int i=0;i<entries_.size();++i) {
@@ -86,12 +86,12 @@ namespace casadi{
       }
       return ss.str();
     }
-    
+
     std::string IOSchemeCustomInternal::entry(int i) const {
       casadi_assert_message(i>=0 && i<entries_.size(),"customIO::entry(): requesting entry for index " << i << ", but IOScheme is only length " << entries_.size());
       return entries_[i];
     }
-    
+
     std::string IOSchemeCustomInternal::entryEnum(int i) const {
       return "";
     }
@@ -111,19 +111,19 @@ namespace casadi{
       casadi_assert_message(it!=entrymap_.end(),"customIO::index(): entry '" << name << "' not available. Available entries are " << entryNames());
       return it->second;
     }
-    
+
     int IOSchemeCustomInternal::size() const {
       return entries_.size();
     }
-    
+
     void IOSchemeCustomInternal::print(std::ostream &stream) const{
       stream << "customIO(" << entryNames() << ")";
     }
- 
+
     void IOSchemeCustomInternal::repr(std::ostream &stream) const {
       stream << "customIO(" << entryNames() << ")";
     }
-    
+
 } // namespace casadi
 
 

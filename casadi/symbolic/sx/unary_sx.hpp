@@ -31,17 +31,17 @@
 namespace casadi{
 
 /** \brief Represents a basic unary operation on an SXElement node
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2012
 */
 class CASADI_SYMBOLIC_EXPORT UnarySX : public SXNode{
   private:
-    
+
     /** \brief  Constructor is private, use "create" below */
     UnarySX(unsigned char op, const SXElement& dep) : op_(op), dep_(dep){}
-    
+
   public:
-    
+
     /** \brief  Create a unary expression */
     inline static SXElement create(unsigned char op, const SXElement& dep){
       if(dep.isConstant()){
@@ -55,46 +55,46 @@ class CASADI_SYMBOLIC_EXPORT UnarySX : public SXNode{
         return SXElement::create(new UnarySX(op,dep));
       }
     }
-    
+
     /** \brief Destructor */
     virtual ~UnarySX(){}
-    
+
     virtual bool isSmooth() const{ return operation_checker<SmoothChecker>(op_);}
-    
+
     virtual bool hasDep() const{ return true; }
-    
+
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const SXNode* node, int depth) const{
       const UnarySX* n = dynamic_cast<const UnarySX*>(node);
       return n && n->op_ == op_ &&  n->dep_.isEqual(dep_,depth-1);
     }
-      
+
     /** \brief  Number of dependencies */
     virtual int ndep() const{ return 1;}
-    
+
     /** \brief  get the reference of a dependency */
     virtual const SXElement& dep(int i) const{ return dep_; }
     virtual SXElement& dep(int i){ return dep_; }
-    
+
     /** \brief  Get the operation */
     virtual int getOp() const{ return op_;}
-    
+
     /** \brief  Print the expression (recursively with a maximum number of levels) */
     virtual void print(std::ostream &stream, long& remaining_calls) const{
 
       // Print the prefix
       casadi_math<double>::printPre(op_,stream);
-      
+
       // Print the dependency
       dep_.print(stream,remaining_calls);
-      
+
       // Print the suffix
       casadi_math<double>::printPost(op_,stream);
     }
-    
+
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */
     unsigned char op_;
-    
+
     /** \brief  The dependencies of the node */
     SXElement dep_;
 };

@@ -26,7 +26,7 @@
 using namespace std;
 namespace casadi{
 
-QPStabilizer::QPStabilizer(){ 
+QPStabilizer::QPStabilizer(){
 }
 
 

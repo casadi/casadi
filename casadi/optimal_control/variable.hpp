@@ -30,19 +30,19 @@
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 
 namespace casadi{
-    
+
   /// Time variability of a variable (see Fritzon page 89)
   enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
 
   /// Causality of a variable
   enum Causality{INPUT,OUTPUT,INTERNAL};
-    
+
   /// Dynamics of the variable
   enum Dynamics{ALGEBRAIC,DIFFERENTIAL};
-    
+
   /// Dynamics of the variable
   enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
-    
+
   /// Variable category
   enum Category{
     /** Unknown, not set */
@@ -50,7 +50,7 @@ namespace casadi{
     /** A state derivative */
     CAT_DERIVATIVE,
     /** A differential state, i.e. a variable that appears differentiated in the model */
-    CAT_STATE, 
+    CAT_STATE,
     /** An independent constant: "constant Real c1 = 3" */
     CAT_DEPENDENT_CONSTANT,
     /** A dependent constant "constant Real c2=c1*3". */
@@ -68,10 +68,10 @@ namespace casadi{
       \author Joel Andersson
    */
   struct CASADI_OPTIMAL_CONTROL_EXPORT Variable : public PrintableObject{
-    
+
     /// Default constructor
     Variable();
-    
+
     /// Variable name
     std::string name() const;
 
@@ -92,7 +92,7 @@ namespace casadi{
 
     /// Nominal value
     double nominal;
-    
+
     /// Value at time 0
     double start;
 
@@ -119,19 +119,19 @@ namespace casadi{
 
     /// Is the variable is an alias variable?
     Alias alias;
-    
+
     /// Description
     std::string description;
 
     /// Variable reference (XML)
     int valueReference;
-        
+
     /// Unit
     std::string unit;
 
     /// Display unit
     std::string displayUnit;
-    
+
     /// Variable index
     int index;
 
@@ -143,7 +143,7 @@ namespace casadi{
 
     /// Timed variable (allocate if necessary)
     SXElement atTime(double t, bool allocate=false);
-        
+
   private:
 #ifndef SWIG
     // Timed variables

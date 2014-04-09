@@ -32,7 +32,7 @@ namespace casadi{
   Parallelizer::Parallelizer(const std::vector<Function>& funcs){
     assignNode(new ParallelizerInternal(funcs));
   }
-  
+
   const ParallelizerInternal* Parallelizer::operator->() const{
     return (const ParallelizerInternal*)Function::operator->();
   }

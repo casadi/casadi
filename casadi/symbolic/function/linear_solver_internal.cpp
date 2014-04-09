@@ -25,7 +25,7 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../mx/mx_node.hpp"
-#include <typeinfo> 
+#include <typeinfo>
 
 INPUTSCHEME(LinsolInput)
 OUTPUTSCHEME(LinsolOutput)
@@ -36,7 +36,7 @@ namespace casadi{
   LinearSolverInternal::LinearSolverInternal(const Sparsity& sparsity, int nrhs){
     // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
-    casadi_assert_message(sparsity.size2()==sparsity.size1(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());  
+    casadi_assert_message(sparsity.size2()==sparsity.size1(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());
     casadi_assert_message(!sparsity.isSingular(),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size2() << ")");
 
     // Calculate the Dulmage-Mendelsohn decomposition
@@ -47,7 +47,7 @@ namespace casadi{
     setNumInputs(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
     input(LINSOL_B) = DMatrix::zeros(sparsity.size2(),nrhs);
-  
+
     // Allocate outputs
     setNumOutputs(LINSOL_NUM_OUT);
     output(LINSOL_X) = input(LINSOL_B);
@@ -59,14 +59,14 @@ namespace casadi{
   void LinearSolverInternal::init(){
     // Call the base class initializer
     FunctionInternal::init();
-    
+
     // Not prepared
     prepared_ = false;
   }
 
   LinearSolverInternal::~LinearSolverInternal(){
   }
- 
+
   void LinearSolverInternal::evaluate(){
     /*  Factorization fact;
         if(called_once){
@@ -79,25 +79,25 @@ namespace casadi{
         break;
         }
         }
-    
+
         // Reuse factored matrix if matrix hasn't changed
         fact = any_change ? SAMEPATTERN : FACTORED;
         } else {
         fact = DOFACT;
         called_once = true;
         }*/
-  
+
     // Call the solve routine
     prepare();
-  
+
     // Make sure preparation successful
-    if(!prepared_) 
+    if(!prepared_)
       throw CasadiException("LinearSolverInternal::evaluate: Preparation failed");
-  
+
     // Solve the factorized system
     solve(false);
   }
- 
+
   void LinearSolverInternal::solve(bool transpose){
     // Get input and output vector
     const vector<double>& b = input(LINSOL_B).data();
@@ -106,7 +106,7 @@ namespace casadi{
 
     // Copy input to output
     copy(b.begin(),b.end(),x.begin());
-  
+
     // Solve the factorized system in-place
     solve(getPtr(x),nrhs,transpose);
   }
@@ -134,7 +134,7 @@ namespace casadi{
     for(int d=0; d<nfwd; ++d){
       const MX& B_hat = *fwdSeed[d][0];
       const MX& A_hat = *fwdSeed[d][1];
-      
+
       // Get right hand side
       MX rhs_d;
       if(tr){
@@ -142,7 +142,7 @@ namespace casadi{
       } else {
         rhs_d = B_hat - mul(A_hat,X);
       }
-      
+
       // Simplifiy if zero
       if(rhs_d.isZero()){
         *fwdSens[d][0] = MX::sparse(rhs_d.shape());
@@ -152,11 +152,11 @@ namespace casadi{
         col_offset.push_back(col_offset.back()+rhs_d.size2());
       }
     }
-    
+
     if(!rhs.empty()){
       // Solve for all directions at once
       rhs = horzsplit(solve(A,horzcat(rhs),tr),col_offset);
-    
+
       // Save result
       for(int i=0; i<rhs.size(); ++i){
         *fwdSens[rhs_ind[i]][0] = rhs[i];
@@ -169,7 +169,7 @@ namespace casadi{
     col_offset.resize(1);
     for(int d=0; d<nadj; ++d){
       MX& X_bar = *adjSeed[d][0];
-      
+
       // Simplifiy if zero
       if(X_bar.isZero()){
         if(adjSeed[d][0]!=adjSens[d][0]){
@@ -189,7 +189,7 @@ namespace casadi{
     if(!rhs.empty()){
       // Solve for all directions at once
       rhs = horzsplit(solve(A,horzcat(rhs),!tr),col_offset);
-    
+
       for(int i=0; i<rhs.size(); ++i){
         int d = rhs_ind[i];
 
@@ -246,13 +246,13 @@ namespace casadi{
         // Propagate to X_ptr
         std::fill(X_ptr,X_ptr+n,0);
         spSolve(X_ptr,tmp_ptr,transpose);
-      
+
       } else { // adjoint
-        
+
         // Solve transposed
         std::fill(tmp_ptr,tmp_ptr+n,0);
         spSolve(tmp_ptr,B_ptr,!transpose);
-        
+
         // Clear seeds
         std::fill(B_ptr,B_ptr+n,0);
 
@@ -272,7 +272,7 @@ namespace casadi{
 
       // Continue to the next right-hand-side
       B_ptr += n;
-      X_ptr += n;      
+      X_ptr += n;
     }
   }
 
@@ -304,11 +304,11 @@ namespace casadi{
           int cc = colperm_[el];
           block_dep |= X[cc];
         }
-        
+
         // Propagate ...
         for(int el=colblock_[b]; el<colblock_[b+1]; ++el){
           int cc = colperm_[el];
-          
+
           // ... to all variables in the block ...
           X[cc] |= block_dep;
 
@@ -348,11 +348,11 @@ namespace casadi{
   }
 
   void LinearSolverInternal::evaluateDGen(const DMatrixPtrV& input, DMatrixPtrV& output, bool tr){
-    
+
     // Factorize the matrix
     setInput(*input[1],LINSOL_A);
     prepare();
-    
+
     // Solve for nondifferentiated output
     if(input[0]!=output[0]){
       copy(input[0]->begin(),input[0]->end(),output[0]->begin());
@@ -367,11 +367,11 @@ namespace casadi{
   MX LinearSolverInternal::solve(const MX& A, const MX& B, bool transpose){
     return A->getSolve(B, transpose, shared_from_this<LinearSolver>());
   }
- 
+
   void LinearSolverInternal::solve(double* x, int nrhs, bool transpose){
     casadi_error("LinearSolverInternal::solve not defined for class " << typeid(*this).name());
   }
 
 
 } // namespace casadi
- 
+

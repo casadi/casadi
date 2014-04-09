@@ -47,21 +47,21 @@ namespace casadi{
     void evalfc(const double* x, double& obj, double *c);
     void evalga(const double* x, double* objGrad, double* jac);
     void evalh(const double* x, const double* lambda, double* hessian);
-  
+
     // KNITRO callback wrapper
     static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double * const x,
 			const double * const lambda,double * const obj, double * const c, double * const objGrad,
 			double * const jac, double * const hessian, double * const hessVector, void *userParams);
-                        
+
     // KNITRO context pointer
     KTR_context_ptr kc_handle_;
-  
+
     // KNITRO double parameter
     std::map<std::string, double> double_param_;
-  
+
     // KNITRO int parameter
     std::map<std::string, int> int_param_;
-  
+
     // KNITRO string parameter
     std::map<std::string, std::string> string_param_;
   };

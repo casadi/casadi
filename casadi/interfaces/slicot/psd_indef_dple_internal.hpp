@@ -38,11 +38,11 @@ namespace casadi{
   class CASADI_SLICOT_INTERFACE_EXPORT PsdIndefDpleInternal : public DpleInternal{
   public:
     /** \brief  Constructor
-     *  \param[in] A  List of sparsities of A_i 
-     *  \param[in] V  List of sparsities of V_i 
+     *  \param[in] A  List of sparsities of A_i
+     *  \param[in] V  List of sparsities of V_i
      */
     PsdIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V, int nwfd=0, int nadj=0);
-    
+
     /** \brief  Destructor */
     virtual ~PsdIndefDpleInternal();
 
@@ -51,10 +51,10 @@ namespace casadi{
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-  
+
     /** \brief  Create a new solver */
     virtual PsdIndefDpleInternal* create(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) const{ return new PsdIndefDpleInternal(A,V);}
-     
+
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}
 
@@ -66,59 +66,59 @@ namespace casadi{
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual Function getDerivative(int nfwd, int nadj);
-    
+
   private:
     /// Dimension of state-space
     int n_;
-    
+
     /// Hessenberg-triangular data
     std::vector<double> T_;
 
     /// Schur form multiplier data
     std::vector<double> Z_;
-    
+
     /// Schur form multiplier data
     std::vector<double> X_;
-    
+
     /// Schur form multiplier data
     std::vector<double> dX_;
-    
+
     // Schur form multiplier data
     std::vector<double> Xbar_;
-    
+
     /// Transformed V data
     std::vector<double> VZ_;
-    
+
     /// Temp data  nxn x K
     std::vector< Matrix<double> > nnKa_;
-    
+
     /// Temp data  nxn x K
     std::vector< Matrix<double> > nnKb_;
-    
+
     /// Real parts of eigenvalues
     std::vector< double > eig_real_;
 
     /// Imaginary parts of eigenvalues
     std::vector< double > eig_imag_;
-      
+
     /// Solvers for low-order Discrete Periodic Sylvester Equations
     std::vector< std::vector< LinearSolver> > dpse_solvers_;
-    
+
     std::vector<int> partition_;
-    
+
     int partindex(int i, int j, int k, int r, int c);
-    
+
     /// Temp data  F
     std::vector< double > F_;
-    
+
     /// Temp data  FF
     std::vector< double > FF_;
-    
+
     /// Work vector for periodic Schur form
     std::vector< double > dwork_;
-    
+
   };
-  
+
 } // namespace casadi
 
 /// \endcond

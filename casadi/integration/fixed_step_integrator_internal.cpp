@@ -35,7 +35,7 @@ namespace casadi{
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
-  void FixedStepIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){    
+  void FixedStepIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     IntegratorInternal::deepCopyMembers(already_copied);
     F_ = deepcopy(F_,already_copied);
     G_ = deepcopy(G_,already_copied);
@@ -47,12 +47,12 @@ namespace casadi{
   void FixedStepIntegratorInternal::init(){
     // Call the base class init
     IntegratorInternal::init();
-  
+
     // Number of finite elements and time steps
     nk_ = getOption("number_of_finite_elements");
     casadi_assert(nk_>0);
     h_ = (tf_ - t0_)/nk_;
-    
+
     // Setup discrete time dynamics
     setupFG();
 

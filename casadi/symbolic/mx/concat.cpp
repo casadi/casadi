@@ -96,7 +96,7 @@ namespace casadi{
 
     // Quick return if none
     if(nz_test<0) return MX::zeros(sp);
-    
+
     // Find out to which dependency it might depend
     int begin=0, end=0;
     int i;
@@ -105,16 +105,16 @@ namespace casadi{
       end += dep(i).size();
       if(nz_test < end) break;
     }
-    
+
     // Check if any nz refer to a different nonzero
     for(vector<int>::const_iterator j=nz.begin(); j!=nz.end(); ++j){
       if(*j>=0 && (*j < begin || *j >= end)){
-        
+
         // Fallback to the base class
         return MXNode::getGetNonzeros(sp,nz);
       }
     }
-    
+
     // All nz refer to the same dependency, update the nonzero indices
     if(begin==0){
       return dep(i)->getGetNonzeros(sp,nz);
@@ -156,12 +156,12 @@ namespace casadi{
     if(!output_given){
       *output[0] = horzcat(getVector(input));
     }
-    
+
     // Forward sensitivities
     for(int d = 0; d<nfwd; ++d){
       *fwdSens[d][0] = horzcat(getVector(fwdSeed[d]));
     }
-    
+
     // Quick return?
     if(nadj==0) return;
 
@@ -212,12 +212,12 @@ namespace casadi{
     if(!output_given){
       *output[0] = vertcat(getVector(input));
     }
-    
+
     // Forward sensitivities
     for(int d = 0; d<nfwd; ++d){
       *fwdSens[d][0] = vertcat(getVector(fwdSeed[d]));
     }
-    
+
     // Quick return?
     if(nadj==0) return;
 

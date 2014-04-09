@@ -29,7 +29,7 @@
 /// \cond INTERNAL
 
 namespace casadi{
-  
+
   /** Internal class
       @copydoc LinearSolver_doc
   */
@@ -37,16 +37,16 @@ namespace casadi{
   public:
     // Constructor
     LinearSolverInternal(const Sparsity& sparsity, int nrhs);
-        
+
     // Destructor
     virtual ~LinearSolverInternal();
 
     // Clone
     virtual LinearSolverInternal* clone() const{ return new LinearSolverInternal(*this);}
-    
+
     // Initialize
     virtual void init();
-    
+
     // Solve the system of equations
     virtual void evaluate();
 
@@ -91,7 +91,7 @@ namespace casadi{
     int ncol() const{ return input(LINSOL_A).size2();}
     int nnz() const{ return input(LINSOL_A).size();}
     const std::vector<int>& row() const{ return input(LINSOL_A).row();}
-    const std::vector<int>& colind() const{ return input(LINSOL_A).colind();}    
+    const std::vector<int>& colind() const{ return input(LINSOL_A).colind();}
   };
 
 

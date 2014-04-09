@@ -46,10 +46,10 @@ namespace casadi{
   }
 
   void CollocationIntegratorInternal::init(){
-  
+
     // Call the base class init
     ImplicitFixedStepIntegratorInternal::init();
-  
+
   }
 
   void CollocationIntegratorInternal::setupFG(){
@@ -62,10 +62,10 @@ namespace casadi{
 
     // Coefficients of the collocation equation
     vector<vector<double> > C(deg_+1,vector<double>(deg_+1,0));
-      
+
     // Coefficients of the continuity equation
     vector<double> D(deg_+1,0);
-      
+
     // Coefficients of the quadratures
     vector<double> B(deg_+1,0);
 
@@ -79,16 +79,16 @@ namespace casadi{
           p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
         }
       }
-    
+
       // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
       D[j] = zeroIfSmall(p(1.0L));
-    
+
       // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
       Polynomial dp = p.derivative();
       for(int r=0; r<deg_+1; ++r){
         C[j][r] = zeroIfSmall(dp(tau_root[r]));
       }
-        
+
       // Integrate polynomial to get the coefficients of the quadratures
       Polynomial ip = p.anti_derivative();
       B[j] = zeroIfSmall(ip(1.0L));
@@ -149,16 +149,16 @@ namespace casadi{
       for(int r=1; r<deg_+1; ++r){
         xp_j += C[r][j] * x[r];
       }
-      
+
       // Add collocation equation
       eq.push_back(vec(h_*f_res[DAE_ODE] - xp_j));
-        
+
       // Add the algebraic conditions
       eq.push_back(vec(f_res[DAE_ALG]));
 
       // Add contribution to the final state
       xf += D[j]*x[j];
-        
+
       // Add contribution to quadratures
       qf += (B[j]*h_)*f_res[DAE_QUAD];
     }
@@ -201,7 +201,7 @@ namespace casadi{
         rz[d] = reshape(*rvv_it++,this->rz0().shape());
       }
       casadi_assert(rvv_it==rvv.end());
-           
+
       // Equations that implicitly define v
       eq.clear();
 
@@ -233,13 +233,13 @@ namespace casadi{
 
         // Add collocation equation
         eq.push_back(vec(h_*B[j]*g_res[RDAE_ODE] - rxp_j));
-        
+
         // Add the algebraic conditions
         eq.push_back(vec(g_res[RDAE_ALG]));
 
         // Add contribution to the final state
         rxf += -B[j]*C[0][j]*rx[j];
-        
+
         // Add contribution to quadratures
         rqf += h_*B[j]*g_res[RDAE_QUAD];
       }
@@ -261,7 +261,7 @@ namespace casadi{
       G_.init();
     }
   }
-  
+
 
   double CollocationIntegratorInternal::zeroIfSmall(double x){
     return fabs(x) < numeric_limits<double>::epsilon() ? 0 : x;

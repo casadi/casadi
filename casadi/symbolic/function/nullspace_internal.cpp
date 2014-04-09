@@ -32,12 +32,12 @@
 using namespace std;
 namespace casadi{
 
-  
+
   NullspaceInternal::NullspaceInternal(const Sparsity& A_sp) : A_sp_(A_sp) {
     addOption("dense",        OT_BOOLEAN,       true, "Indicates that dense matrices can be assumed");
-  
+
   }
-  
+
   NullspaceInternal::~NullspaceInternal(){
   }
 
@@ -45,29 +45,29 @@ namespace casadi{
   void NullspaceInternal::init(){
 
     dense_ = getOption("dense");
-    
+
     casadi_assert(!dense_ || A_sp_.isDense());
-    
+
     m_ = A_sp_.size1();
     n_ = A_sp_.size2();
-    
+
     casadi_assert(m_<=n_);
-    
+
     Sparsity dense;
     if (dense_) {
       dense = Sparsity::dense(n_,n_-m_);
     }
-  
+
     FunctionInternal::init();
-    
+
     setNumInputs(1);
     input(0)  = DMatrix::zeros(A_sp_);
-    
+
     setNumOutputs(1);
     if (dense_) {
       output(0)  = DMatrix::zeros(dense);
     }
-  
+
   }
 
   void NullspaceInternal::evaluate(){

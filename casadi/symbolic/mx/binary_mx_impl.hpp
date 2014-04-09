@@ -37,7 +37,7 @@
 using namespace std;
 
 namespace casadi{
-  
+
   template<bool ScX, bool ScY>
   BinaryMX<ScX,ScY>::BinaryMX(Operation op, const MX& x, const MX& y) : op_(op){
     setDependencies(x,y);
@@ -80,12 +80,12 @@ namespace casadi{
       // Get partial derivatives
       MX pd[2];
       casadi_math<MX>::der(op_,*input[0],*input[1],f,pd);
-    
+
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d){
         *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
       }
-    
+
       // Propagate adjoint seeds
       for(int d=0; d<nadj; ++d){
         MX s = *adjSeed[d][0];
@@ -93,13 +93,13 @@ namespace casadi{
         for(int c=0; c<2; ++c){
           // Get increment of sensitivity c
           MX t = pd[c]*s;
-          
+
           // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
           if(!t.isScalar() && t.shape() != dep(c).shape()){
             if(pd[c].shape()!=s.shape()) pd[c] = MX(s.sparsity(),pd[c]);
             t = inner_prod(pd[c],s);
           }
-          
+
           // Propagate the seeds
           adjSens[d][c]->addToSum(t);
         }
@@ -129,7 +129,7 @@ namespace casadi{
     default:
       inplace = false;
     }
-    
+
     if(inplace){
       casadi_math<double>::printSep(op_,stream);
       stream << "=";
@@ -163,7 +163,7 @@ namespace casadi{
     vector<T>& output0 = output[0]->data();
     const vector<T> &input0 = input[0]->data();
     const vector<T> &input1 = input[1]->data();
-  
+
     if(!ScX && !ScY){
       casadi_math<T>::fun(op_, getPtr(input0), getPtr(input1), getPtr(output0), output0.size());
     } else if(ScX){
@@ -203,7 +203,7 @@ namespace casadi{
   template<bool ScX, bool ScY>
   MX BinaryMX<ScX,ScY>::getBinary(int op, const MX& y, bool scX, bool scY) const{
     if (!CasadiOptions::simplification_on_the_fly) return MXNode::getBinary(op,y,scX,scY);
-    
+
     switch(op_){
     case OP_ADD:
       if(op==OP_SUB && y.isEqual(dep(0),maxDepth())) return dep(1);
@@ -217,7 +217,7 @@ namespace casadi{
     }
 
     // Fallback to default implementation
-    return MXNode::getBinary(op,y,scX,scY);    
+    return MXNode::getBinary(op,y,scX,scY);
   }
 
 

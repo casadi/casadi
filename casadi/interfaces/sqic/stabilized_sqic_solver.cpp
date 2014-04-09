@@ -26,7 +26,7 @@
 using namespace std;
 namespace casadi{
 
-StabilizedSQICSolver::StabilizedSQICSolver(){ 
+StabilizedSQICSolver::StabilizedSQICSolver(){
 }
 
 

@@ -46,11 +46,11 @@ namespace casadi{
     virtual ~SetNonzeros() = 0;
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const = 0;    
+    virtual std::vector<int> getAll() const = 0;
 
     /// Clone function
     virtual SetNonzeros* clone() const = 0;
-    
+
     /// Evaluate the function symbolically (MX)
     void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
@@ -78,7 +78,7 @@ namespace casadi{
 
     /// Clone function
     virtual SetNonzerosVector* clone() const{ return new SetNonzerosVector(*this);}
-      
+
     /// Destructor
     virtual ~SetNonzerosVector(){}
 
@@ -95,18 +95,18 @@ namespace casadi{
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
-    void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);    
+    template<typename T, typename MatV, typename MatVV>
+    void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-    
+
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const;
-            
+
     /// Operation sequence
     std::vector<int> nz_;
   };
@@ -121,7 +121,7 @@ namespace casadi{
 
     /// Clone function
     virtual SetNonzerosSlice* clone() const{ return new SetNonzerosSlice(*this);}
-      
+
     /// Destructor
     virtual ~SetNonzerosSlice(){}
 
@@ -130,15 +130,15 @@ namespace casadi{
 
     /// Check if the instance is in fact a simple assignment
     bool isAssignment() const;
-    
+
     /// Simplify
     virtual void simplifyMe(MX& ex);
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Evaluate the function numerically
@@ -152,7 +152,7 @@ namespace casadi{
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-    
+
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const;
 
@@ -170,18 +170,18 @@ namespace casadi{
 
     /// Clone function
     virtual SetNonzerosSlice2* clone() const{ return new SetNonzerosSlice2(*this);}
-      
+
     /// Destructor
     virtual ~SetNonzerosSlice2(){}
-    
+
     /// Get all the nonzeros
     virtual std::vector<int> getAll() const{ return inner_.getAll(outer_,outer_.stop_);}
 
     /// Propagate sparsity
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);    
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Evaluate the function numerically
@@ -198,7 +198,7 @@ namespace casadi{
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const;
-    
+
     // Data members
     Slice inner_, outer_;
   };

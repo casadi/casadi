@@ -30,7 +30,7 @@
 #include "../function/io_scheme.hpp"
 
 namespace casadi{
-  
+
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
       \date 2013
@@ -38,7 +38,7 @@ namespace casadi{
   template<class Derived>
   class CASADI_SYMBOLIC_EXPORT IOInterface {
   public:
-    
+
     /// \cond UNSAFE
     /// \brief [UNSAFE] Obtain reference to inputs
     // \seealso getInput, setInput
@@ -52,7 +52,7 @@ namespace casadi{
     inline Matrix<double>& input(int iind=0){ return inputS<true>(iind);}
     inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
     //@}
-    
+
     /// \brief [UNSAFE] Obtain reference to outputs
     // \seealso getOutput, getOutput
     //@{
@@ -75,10 +75,10 @@ namespace casadi{
 
     /// Set the number of function inputs
     inline void setNumInputs(int num_in){ static_cast<Derived*>(this)->input_struct().data.resize(num_in); }
-    
+
     /// Set the number of function outputs
     inline void setNumOutputs(int num_out){ static_cast<Derived*>(this)->output_struct().data.resize(num_out); }
-    
+
     /// \cond INTERNAL
 
     /** \brief  Access an input */
@@ -94,7 +94,7 @@ namespace casadi{
           throw CasadiException(ss.str());
         }
       } else {
-        return static_cast<Derived*>(this)->input_struct().data[i];        
+        return static_cast<Derived*>(this)->input_struct().data[i];
       }
     }
 
@@ -103,7 +103,7 @@ namespace casadi{
     inline const DMatrix& inputS(int i) const{
       return const_cast<IOInterface<Derived>*>(this)->inputS<check>(i);
     }
-    
+
     /** \brief  Access an output*/
     template<bool check>
     DMatrix& outputS(int i){
@@ -117,7 +117,7 @@ namespace casadi{
           throw CasadiException(ss.str());
         }
       } else {
-        return static_cast<Derived*>(this)->output_struct().data[i];        
+        return static_cast<Derived*>(this)->output_struct().data[i];
       }
     }
 
@@ -126,7 +126,7 @@ namespace casadi{
     inline const DMatrix& outputS(int i) const{
       return const_cast<IOInterface<Derived>*>(this)->outputS<check>(i);
     }
-    
+
     /// \endcond
 
     /** \brief Set input scheme */
@@ -136,7 +136,7 @@ namespace casadi{
     }
 
     /** \brief Set output scheme */
-    void setOutputScheme(const casadi::IOScheme &scheme){ 
+    void setOutputScheme(const casadi::IOScheme &scheme){
       casadi_assert(scheme.compatibleSize(getNumOutputs()));
       static_cast<Derived*>(this)->outputScheme() = scheme;
     }
@@ -150,19 +150,19 @@ namespace casadi{
     /// \cond INTERNAL
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput
      */
     int inputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->inputScheme(),name,true);}
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput
      */
     int outputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name,false);}
-    
+
     /** \brief Find the index for a string describing a particular entry of a scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput 
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput
      */
     int schemeEntry(const casadi::IOScheme &scheme,const std::string &name,bool input) const{
       if (scheme.isNull()) casadi_error("Unable to look up '" <<  name<< "' in " << (input? "input": "output") << "scheme, as the " <<  (input? "input": "output") << " scheme of this function is unknown. You can only index with integers.");
@@ -172,27 +172,27 @@ namespace casadi{
       return n;
     }
     /// \endcond
-    
+
     /**
     * \defgroup  iname
     *   \param[in] iname input name. Only allowed when an input scheme is set.
     */
-    
+
     /**
     * \defgroup  oname
     *   \param[in] oname output name. Only allowed when an output scheme is set.
     */
-    
+
     /**
     * \defgroup  iind
     *   \param[in] iind index within the range [0..getNumInputs()-1]
     */
-    
+
     /**
     * \defgroup  oind
     *   \param[in] oind index within the range [0..getNumOutputs()-1]
     */
-    
+
     /**
     * \defgroup  Tvalset
     *   \param[in] val can be double, const std::vector<double>&, const Matrix<double>&, double *
@@ -202,7 +202,7 @@ namespace casadi{
     * \defgroup  Tvalget
     *   \param[in] val can be double&, std::vector<double>&, Matrix<double>&, double *
     */
-    
+
     /// \name Simple Getters & Setters
     ///
     /// @{
@@ -217,7 +217,7 @@ namespace casadi{
     *
      */
     Matrix<double> getInput(const std::string &iname) const  { return input(iname); }
-    
+
     /** \brief Get an output by index
     *
     *  @copydoc oind
@@ -236,16 +236,16 @@ namespace casadi{
     *  @copydoc Tvalset
     *  @copydoc iind
     */
-    
+
     void setInput(T val, int iind=0);
-    
+
      /** \brief Set an output by index
      *
      * @copydoc Tvalset
      * @copydoc oind
      */
     void setOutput(T val, int oind=0);
-    
+
     /** \brief Set an input by name
     *
     *  @copydoc Tvalset
@@ -262,30 +262,30 @@ namespace casadi{
      */
     void setOutput(T val, const std::string &oname);
 #endif
-    
+
     /// @}
-    
+
 /// \cond INTERNAL
 #ifdef DOXYGENPROC
     /// \name Advanced Getters
     ///
     /// @{
-    
+
     /** \brief Get an input by index
     *
     *  @copydoc Tvalget
     *  @copydoc iind
     */
-    
+
     void getInput(T val, int iind=0);
-    
+
      /** \brief Get an output by index
      *
      * @copydoc Tvalget
      * @copydoc oind
      */
     void getOutput(T val, int oind=0);
-    
+
     /** \brief Get an input by name
     *
     *  @copydoc Tvalget
@@ -305,7 +305,7 @@ namespace casadi{
 #endif
 /// \endcond
 
-    
+
 #define SETTERS(T)                                                        \
     void setInput(T val, int iind=0)             { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
     void setOutput(T val, int oind=0)            { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
@@ -322,13 +322,13 @@ namespace casadi{
 #endif // DOXYGENPROC
 
 #undef SETTERS
-    
+
 #define GETTERS(T)                                                        \
     void getInput(T val, int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);} \
     void getOutput(T val, int oind=0) const            { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
     void getInput(T val, const std::string &iname) const             { getInput(val,inputSchemeEntry(iname)); } \
     void getOutput(T val, const std::string &oname) const            { getOutput(val,outputSchemeEntry(oname)); } \
-    
+
 #ifndef DOXYGENPROC
 #ifndef SWIG
 GETTERS(double&);

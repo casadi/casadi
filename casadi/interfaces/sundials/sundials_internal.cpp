@@ -33,7 +33,7 @@ OUTPUTSCHEME(IntegratorOutput)
 
 using namespace std;
 namespace casadi{
-  
+
 SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
   addOption("max_num_steps",               OT_INTEGER,          10000,          "Maximum number of integrator steps");
   addOption("reltol",                      OT_REAL,             1e-6,           "Relative tolerence for the IVP solution");
@@ -51,7 +51,7 @@ SundialsInternal::SundialsInternal(const Function& f, const Function& g) : Integ
   addOption("use_preconditioner",          OT_BOOLEAN,          false,          "Precondition an iterative solver");
   addOption("use_preconditionerB",         OT_BOOLEAN,          GenericType(),  "Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]");
   addOption("stop_at_end",                 OT_BOOLEAN,          true,          "Stop the integrator at the end of the interval");
-  
+
   // Quadratures
   addOption("quad_err_con",                OT_BOOLEAN,          false,          "Should the quadratures affect the step size control");
 
@@ -80,13 +80,13 @@ SundialsInternal::SundialsInternal(const Function& f, const Function& g) : Integ
   addOption("linear_solver_optionsB",      OT_DICTIONARY,       GenericType(),  "Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]");
 }
 
-SundialsInternal::~SundialsInternal(){ 
+SundialsInternal::~SundialsInternal(){
 }
 
 void SundialsInternal::init(){
   // Call the base class method
   IntegratorInternal::init();
- 
+
   // Reset checkpoints counter
   ncheck_ = 0;
 
@@ -106,7 +106,7 @@ void SundialsInternal::init(){
   use_preconditionerB_ =  hasSetOption("use_preconditionerB") ? bool(getOption("use_preconditionerB")): use_preconditioner_;
   max_krylov_ = getOption("max_krylov");
   max_krylovB_ =  hasSetOption("max_krylovB") ? int(getOption("max_krylovB")): max_krylov_;
-  
+
   // Linear solver for forward integration
   if(getOption("linear_solver_type")=="dense"){
     linsol_f_ = SD_DENSE;
@@ -123,7 +123,7 @@ void SundialsInternal::init(){
     } else if(getOption("iterative_solver")=="tfqmr") {
       itsol_f_ = SD_TFQMR;
     } else throw CasadiException("Unknown sparse solver for forward integration");
-      
+
     // Preconditioning type
     if(getOption("pretype")=="none")               pretype_f_ = PREC_NONE;
     else if(getOption("pretype")=="left")          pretype_f_ = PREC_LEFT;
@@ -133,12 +133,12 @@ void SundialsInternal::init(){
   } else if(getOption("linear_solver_type")=="user_defined") {
     linsol_f_ = SD_USER_DEFINED;
   } else throw CasadiException("Unknown linear solver for forward integration");
-  
-  
+
+
   std::string linear_solver_typeB = hasSetOption("linear_solver_typeB") ? getOption("linear_solver_typeB") : getOption("linear_solver_type");
   std::string iterative_solverB = hasSetOption("iterative_solverB") ? getOption("iterative_solverB") : getOption("iterative_solver");
   std::string pretypeB = hasSetOption("pretypeB") ? getOption("pretypeB"): getOption("pretype");
-  
+
   // Linear solver for backward integration
   if(linear_solver_typeB=="dense"){
     linsol_g_ = SD_DENSE;
@@ -155,7 +155,7 @@ void SundialsInternal::init(){
     } else if(iterative_solverB=="tfqmr") {
       itsol_g_ = SD_TFQMR;
     } else throw CasadiException("Unknown sparse solver for backward integration");
-    
+
     // Preconditioning type
     if(pretypeB=="none")               pretype_g_ = PREC_NONE;
     else if(pretypeB=="left")          pretype_g_ = PREC_LEFT;
@@ -167,15 +167,15 @@ void SundialsInternal::init(){
   } else {
    casadi_error("Unknown linear solver for backward integration: " << iterative_solverB);
   }
-  
+
   // Create a Jacobian if requested
   if (exact_jacobian_) jac_ = getJac();
   // Initialize Jacobian if availabe
   if(!jac_.isNull() && !jac_.isInit()) jac_.init();
-  
+
   if (!jac_.isNull()) {
     casadi_assert_message(jac_.output().size2()==jac_.output().size1(),"SundialsInternal::init: the jacobian of the forward problem must be square but got " << jac_.output().dimString());
-    
+
     casadi_assert_message(!jac_.output().sparsity().isSingular(),"SundialsInternal::init: singularity - the jacobian of the forward problem is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (in stead of "<< jac_.output().size2() << ")");
   }
 
@@ -183,13 +183,13 @@ void SundialsInternal::init(){
   if(exact_jacobianB_ && !g_.isNull()) jacB_ = getJacB();
   // Initialize backwards  Jacobian if availabe
   if(!jacB_.isNull() && !jacB_.isInit()) jacB_.init();
-  
+
   if (!jacB_.isNull()) {
     casadi_assert_message(jacB_.output().size2()==jacB_.output().size1(),"SundialsInternal::init: the jacobian of the backward problem must be square but got " << jacB_.output().dimString());
-    
+
     casadi_assert_message(!jacB_.output().sparsity().isSingular(),"SundialsInternal::init: singularity - the jacobian of the backward problem is structurally rank-deficient. sprank(J)=" << sprank(jacB_.output()) << " (in stead of "<< jacB_.output().size2() << ")");
   }
-  
+
   if(hasSetOption("linear_solver") && !jac_.isNull()){
     // Create a linear solver
     linearSolverCreator creator = getOption("linear_solver");
@@ -200,7 +200,7 @@ void SundialsInternal::init(){
     }
     linsol_.init();
   }
-  
+
   if((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()){
     // Create a linear solver
     linearSolverCreator creator = hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
@@ -220,7 +220,7 @@ void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>&
   linsol_ = deepcopy(linsol_,already_copied);
   linsolB_ = deepcopy(linsolB_,already_copied);
   jac_ = deepcopy(jac_,already_copied);
-  jacB_ = deepcopy(jacB_,already_copied);  
+  jacB_ = deepcopy(jacB_,already_copied);
   f_fwd_ = deepcopy(f_fwd_,already_copied);
   g_fwd_ = deepcopy(g_fwd_,already_copied);
 }

@@ -45,7 +45,7 @@ namespace casadi{
 
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const{ return output_sparsity_.size(); }
-        
+
     /** \brief  Get the sparsity of output oind */
     virtual const Sparsity& sparsity(int oind) const{ return output_sparsity_.at(oind);}
 
@@ -62,8 +62,8 @@ namespace casadi{
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
-    void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);    
+    template<typename T, typename MatV, typename MatVV>
+    void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     // Sparsity pattern of the outputs
     std::vector<int> offset_;
@@ -76,7 +76,7 @@ namespace casadi{
   */
   class CASADI_SYMBOLIC_EXPORT Horzsplit : public Split{
   public:
-    
+
     /// Constructor
     Horzsplit(const MX& x, const std::vector<int>& offset);
 
@@ -85,15 +85,15 @@ namespace casadi{
 
     /// Clone function
     virtual Horzsplit* clone() const{ return new Horzsplit(*this);}
-          
+
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-        
+
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_HORZSPLIT;}    
+    virtual int getOp() const{ return OP_HORZSPLIT;}
 
     /// Create a horizontal concatenation node
     virtual MX getHorzcat(const std::vector<MX>& x) const;
@@ -105,7 +105,7 @@ namespace casadi{
   */
   class CASADI_SYMBOLIC_EXPORT Vertsplit : public Split{
   public:
-    
+
     /// Constructor
     Vertsplit(const MX& x, const std::vector<int>& offset);
 
@@ -114,13 +114,13 @@ namespace casadi{
 
     /// Clone function
     virtual Vertsplit* clone() const{ return new Vertsplit(*this);}
-          
+
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-        
+
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_VERTSPLIT;}
 

@@ -28,7 +28,7 @@ using namespace std;
 namespace casadi{
 
   DpleSolver::DpleSolver(){
-  
+
   }
 
   DpleSolver  DpleSolver::clone() const{
@@ -40,18 +40,18 @@ namespace casadi{
   void DpleSolver::printStats(ostream &stream) const{
     (*this)->printStats(stream);
   }
-  
+
   DpleInternal* DpleSolver::operator->(){
     return static_cast<DpleInternal*>(Function::operator->());
   }
 
   const DpleInternal* DpleSolver::operator->() const{
-    return static_cast<const DpleInternal*>(Function::operator->()); 
+    return static_cast<const DpleInternal*>(Function::operator->());
   }
-  
+
   bool DpleSolver::checkNode() const{
     return dynamic_cast<const DpleInternal*>(get())!=0;
   }
- 
+
 } // namespace casadi
 

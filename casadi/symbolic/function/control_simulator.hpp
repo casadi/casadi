@@ -29,7 +29,7 @@ namespace casadi{
 
   /// Input arguments of an ODE/DAE function [controldaeIn]
   enum ControlledDAEInput{
-    /// Global physical time. (1-by-1) [t] 
+    /// Global physical time. (1-by-1) [t]
     CONTROL_DAE_T,
     /// State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [x]
     CONTROL_DAE_X,
@@ -39,7 +39,7 @@ namespace casadi{
     CONTROL_DAE_P,
     /// Control vector (dimension nu-by-1). [u]
     CONTROL_DAE_U,
-    /// Control vector, linearly interpolated (dimension nu-by-1). [u_interp] 
+    /// Control vector, linearly interpolated (dimension nu-by-1). [u_interp]
     CONTROL_DAE_U_INTERP,
     /// State vector (dimension nx-by-1) at the last major time-step [x_major]
     CONTROL_DAE_X_MAJOR,
@@ -47,31 +47,31 @@ namespace casadi{
     CONTROL_DAE_T0,
     /// Time at end of control interval (1-by-1) [tf]
     CONTROL_DAE_TF,
-    /// Number of arguments. 
+    /// Number of arguments.
     CONTROL_DAE_NUM_IN
   };
 
   /// Input arguments of a control simulator [controlsimulatorIn]
   enum ControlSimulatorInput{
     /// Differential or algebraic state at t0  (dimension nx-by-1) [x0]
-    CONTROLSIMULATOR_X0, 
+    CONTROLSIMULATOR_X0,
     /// Parameters that are fixed over the entire horizon  (dimension np-by-1) [p]
-    CONTROLSIMULATOR_P, 
+    CONTROLSIMULATOR_P,
     /// Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [u]
-    CONTROLSIMULATOR_U, 
+    CONTROLSIMULATOR_U,
     /// Number of input arguments of a piecewise simulator
     CONTROLSIMULATOR_NUM_IN};
-  
+
   // Forward declaration of internal class
   class ControlSimulatorInternal;
 
   /** \brief Piecewise Simulation class
-  
+
       A ControlSimulator can be seen as a chain of Simulators whereby some parameters change from one Simulator to the next.
-  
+
       These changing parameters can typically be interpreted as "controls" in the context of dynamic optimization.
-  
-  
+
+
       We discriminate between the following time steps:
       * Major time-steps. These are the time steps provided by the supplied grid. Controls are constant inbetween major time-steps\n
       * Minor time-steps. These are time steps linearly interpolated from one major time-step to the next. The option 'nf' regulates how many minor time-steps are taken.\n
@@ -81,17 +81,17 @@ namespace casadi{
       nu  Number of controls
       ns  The number of major grid points, as supplied in the constructor
       nf  The number of minor grid points per major interval
-  
-      \author Joris Gillis 
+
+      \author Joris Gillis
       \date 2011
   */
 
   class CASADI_SYMBOLIC_EXPORT ControlSimulator : public Function{
   public:
 
-    /// Default constructor 
+    /// Default constructor
     ControlSimulator();
-  
+
     /** \brief Creates a piecewise simulator
      * \param ffcn Continuous time dynamics, an casadi::Function with the folowing mapping:
      * \copydoc scheme_ControlledDAEInput
@@ -105,11 +105,11 @@ namespace casadi{
      */
     ControlSimulator(const Function& dae, const Function& output_fcn, const std::vector<double>& grid);
     ControlSimulator(const Function& dae, const Function& output_fcn, const Matrix<double>& grid);
-  
+
     /// Output function equal to the state
     ControlSimulator(const Function& dae, const std::vector<double>& grid);
     ControlSimulator(const Function& dae, const Matrix<double>& grid);
-  
+
     /// Access functions of the node.
     ControlSimulatorInternal* operator->();
 
@@ -118,24 +118,24 @@ namespace casadi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
+
     /** Get the (minor) time grid
      *  The length is (ns-1)*nf + 1
      */
-    std::vector<double> getMinorT() const; 
-         
+    std::vector<double> getMinorT() const;
+
     /** \brief Get the controls, sampled on the minor timescale.
      * Number of rows is (ns-1)*nf
      */
-    Matrix<double> getMinorU() const; 
-         
-         
-    /** \brief Get the index i such that gridminor[i] == gridmajor 
+    Matrix<double> getMinorU() const;
+
+
+    /** \brief Get the index i such that gridminor[i] == gridmajor
      */
-    std::vector< int > getMajorIndex() const; 
-         
+    std::vector< int > getMajorIndex() const;
+
   };
-  
+
 } // namespace casadi
 
 #endif //CONTROLSIMULATOR_HPP

@@ -29,12 +29,12 @@
 #include <casadi/integration/casadi_integration_export.h>
 
 namespace casadi{
-  
+
   class FixedStepIntegratorInternal;
-  
+
   /**
      \brief Base class for fixed step integrators
-  
+
      \author Joel Andersson
      \date 2014
   */
@@ -42,7 +42,7 @@ namespace casadi{
   public:
     /** \brief  Default constructor */
     FixedStepIntegrator();
-    
+
     /// Access functions of the node
     FixedStepIntegratorInternal* operator->();
 
@@ -51,7 +51,7 @@ namespace casadi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-    
+
   };
 
 } // namespace casadi

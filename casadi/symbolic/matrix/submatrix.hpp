@@ -26,9 +26,9 @@
 namespace casadi{
 
 
-  /** SubMatrix class for Matrix 
+  /** SubMatrix class for Matrix
       SubMatrix is the return type for operator() of the Matrix class, it allows access to the value as well as changing the parent object
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2011
   */
 
@@ -48,11 +48,11 @@ namespace casadi{
     M operator*=(const M &y);
     M operator/=(const M &y);
     //@}
-    
+
   private:
     /// A reference to the matrix that is allowed to be modified
     M& mat_;
-    
+
     /// The element of the matrix that is allowed to be modified
     I i_;
     J j_;
@@ -60,43 +60,43 @@ namespace casadi{
 
   // Implementation
   template<typename M, typename I, typename J>
-  const M& SubMatrix<M,I,J>::operator=(const SubMatrix<M,I,J> &y) { 
-    mat_.setSub(y,i_,j_); 
+  const M& SubMatrix<M,I,J>::operator=(const SubMatrix<M,I,J> &y) {
+    mat_.setSub(y,i_,j_);
     return y;
   }
 
   // Implementation
   template<typename M, typename I, typename J>
-  const M& SubMatrix<M,I,J>::operator=(const M &y) { 
-    mat_.setSub(y,i_,j_); 
+  const M& SubMatrix<M,I,J>::operator=(const M &y) {
+    mat_.setSub(y,i_,j_);
     return y;
   }
 
   template<typename M, typename I, typename J>
-  M SubMatrix<M,I,J>::operator+=(const M &y){ 
+  M SubMatrix<M,I,J>::operator+=(const M &y){
     M s = *this+y;
-    mat_.setSub(s,i_,j_); 
+    mat_.setSub(s,i_,j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
-  M SubMatrix<M,I,J>::operator-=(const M &y){ 
+  M SubMatrix<M,I,J>::operator-=(const M &y){
     M s = *this-y;
-    mat_.setSub(s,i_,j_); 
+    mat_.setSub(s,i_,j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
-  M SubMatrix<M,I,J>::operator*=(const M &y){ 
+  M SubMatrix<M,I,J>::operator*=(const M &y){
     M s = *this*y;
-    mat_.setSub(s,i_,j_); 
+    mat_.setSub(s,i_,j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
-  M SubMatrix<M,I,J>::operator/=(const M &y){ 
+  M SubMatrix<M,I,J>::operator/=(const M &y){
     M s = *this/y;
-    mat_.setSub(s,i_,j_); 
+    mat_.setSub(s,i_,j_);
     return s;
   }
 

@@ -35,7 +35,7 @@ OCPSolverInternal::OCPSolverInternal(const Function& ffcn, const Function& mfcn,
   addOption("number_of_parameters",  OT_INTEGER,                0);
   addOption("number_of_grid_points", OT_INTEGER,               20);
   addOption("final_time",            OT_REAL,                 1.0);
-    
+
   input_.scheme = SCHEME_OCPInput;
   output_.scheme = SCHEME_OCPOutput;
 }
@@ -50,7 +50,7 @@ void OCPSolverInternal::init(){
   mfcn_.init();
   if(!cfcn_.isNull()) cfcn_.init();
   if(!mfcn_.isNull()) mfcn_.init();
-  
+
   // Get the number of grid points
   nk_ = getOption("number_of_grid_points");
 
@@ -65,20 +65,20 @@ void OCPSolverInternal::init(){
 
   // Get the number of controls
   nu_ = ffcn_.input(DAE_P).size() - np_;
-  
+
   // Number of point constraints
   nh_ = cfcn_.isNull() ? 0 : cfcn_.output().size();
-    
+
   // Number of point coupling constraints
   ng_ = 0;
-  
+
   casadi_assert_message(mfcn_.getNumInputs()<=2, "Mayer term must map endstate [ (nx x 1) , (np x 1) ] to cost (1 x 1). So it needs to accept 2 matrix-valued inputs. You supplied " << mfcn_.getNumInputs());
-  
+
   if (mfcn_.getNumInputs()==2) {
       casadi_assert_message(mfcn_.input(1).size()==np_, "Mayer term must map endstate [ (nx x 1) , (np x 1) ] to cost (1 x 1). Shape of the second input " << mfcn_.input(1).dimString() << " must match the number of parameters np " << np_);
   }
-  
-  
+
+
   // Specify the inputs
   setNumInputs(OCP_NUM_IN);
   input(OCP_LBX) = input(OCP_UBX) = input(OCP_X_INIT) = Matrix<double>::zeros(nx_,nk_+1);
@@ -86,18 +86,18 @@ void OCPSolverInternal::init(){
   input(OCP_LBP) = input(OCP_UBP) = input(OCP_P_INIT) = Matrix<double>::zeros(np_);
   input(OCP_LBH) = input(OCP_UBH) = Matrix<double>::zeros(nh_,nk_+1);
   input(OCP_LBG) = input(OCP_UBG) = Matrix<double>::zeros(ng_);
-  
+
   // Specify the outputs
   setNumOutputs(OCP_NUM_OUT);
   output(OCP_X_OPT) = input(OCP_X_INIT);
   output(OCP_U_OPT) = input(OCP_U_INIT);
   output(OCP_P_OPT) = input(OCP_P_INIT);
   output(OCP_COST) = 0.;
-  
+
   // Call the init function of the base class
   FunctionInternal::init();
-  
-  
+
+
 }
 
 } // namespace casadi

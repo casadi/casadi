@@ -38,25 +38,25 @@ extern int gOoqpPrintLevel;
 
 using namespace std;
 namespace casadi {
-  
+
   OOQPInternal::OOQPInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
     addOption("print_level",OT_INTEGER,0,"Print level. OOQP listens to print_level 0, 10 and 100");
     addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
     addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");
   }
 
-  OOQPInternal::~OOQPInternal(){ 
+  OOQPInternal::~OOQPInternal(){
   }
 
   void OOQPInternal::init(){
     // Initialize the base classes
     QPSolverInternal::init();
-    
+
     // Read options
     print_level_ = getOption("print_level");
     mutol_ = getOption("mutol");
     artol_ = getOption("artol");
-    
+
     // Allocate memory for problem
     c_.resize(n_);
     xlow_.resize(n_);
@@ -116,7 +116,7 @@ namespace casadi {
 
         // Add contribution to objective
         objParam += g[i]*p_[np];
-        
+
         // Save index
         x_index_[i] = -1-np++;
 
@@ -140,7 +140,7 @@ namespace casadi {
         x_index_[i] = nx++;
       }
     }
-    
+
     // Get quadratic term
     const vector<double>& H = input(QP_SOLVER_H).data();
     const vector<int>& H_colind = input(QP_SOLVER_H).colind();
@@ -159,14 +159,14 @@ namespace casadi {
         // Get variable types
         int icc=x_index_[cc];
         int irr=x_index_[rr];
-      
-        if(icc<0){ 
+
+        if(icc<0){
           if(irr<0){
             // Add contribution to objective
             objParam += icc==irr ? H[el]*sq(p_[-1-icc])/2 : H[el]*p_[-1-irr]*p_[-1-icc];
           } else {
             // Add contribution to gradient term
-            c_[irr] += H[el]*p_[-1-icc];            
+            c_[irr] += H[el]*p_[-1-icc];
           }
         } else {
           if(irr<0){
@@ -185,10 +185,10 @@ namespace casadi {
     // Get the transpose of the sparsity pattern to be able to loop over the constraints
     const vector<double>& A = input(QP_SOLVER_A).data();
     const vector<int>& A_colind = input(QP_SOLVER_A).colind();
-    const vector<int>& A_row = input(QP_SOLVER_A).row(); 
+    const vector<int>& A_row = input(QP_SOLVER_A).row();
     vector<double>& AT = AT_.data();
     const vector<int>& AT_colind = AT_.colind();
-    const vector<int>& AT_row = AT_.row(); 
+    const vector<int>& AT_row = AT_.row();
     std::copy(AT_colind.begin(),AT_colind.begin()+nc_,AT_tmp_.begin());
     for(int cc=0; cc<n_; ++cc){
       for(int el=A_colind[cc]; el<A_colind[cc+1]; ++el){
@@ -197,7 +197,7 @@ namespace casadi {
         AT[elT] = A[el];
       }
     }
-    
+
     // Loop over constraints
     int nA=0, nC=0, /*mz=0,*/ nnzA=0, nnzC=0;
     for(int j=0; j<nc_; ++j){
@@ -207,7 +207,7 @@ namespace casadi {
       } else if(lba[j]==uba[j]){
         // Equality constraint
         bA_[nA] = lba[j];
-        
+
         // Add to A
         for(int el=AT_colind[j]; el<AT_colind[j+1]; ++el){
           int i=AT_row[el];
@@ -288,7 +288,7 @@ namespace casadi {
     fill(z_.begin(),z_.end(),0);
     fill(lambda_.begin(),lambda_.end(),0);
     fill(pi_.begin(),pi_.end(),0);
-    
+
     // Solve the QP
     double objectiveValue;
 
@@ -313,15 +313,15 @@ namespace casadi {
       ierr=0;
       // All OOQP related allocations in evaluate
 
-      std::vector<int> krowQ(nx+1); 
-      std::vector<int> krowA(nA+1); 
-      std::vector<int> krowC(nC+1); 
+      std::vector<int> krowQ(nx+1);
+      std::vector<int> krowA(nA+1);
+      std::vector<int> krowC(nC+1);
 
       //int status_code = 0;
       makehb( getPtr(irowQ_), nnzQ, getPtr(krowQ), nx, &ierr );
       if( ierr == 0 ) makehb( getPtr(irowA_), nnzA, getPtr(krowA), nA, &ierr );
       if( ierr == 0 ) makehb( getPtr(irowC_), nnzC, getPtr(krowC), nC, &ierr );
-      
+
       if( ierr == 0 ) {
         QpGenContext ctx;
 
@@ -344,7 +344,7 @@ namespace casadi {
               &objectiveValue,
                        &ierr );
         }
-        
+
         QpGenCleanup( &ctx );
       }
     }

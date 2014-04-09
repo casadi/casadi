@@ -32,30 +32,30 @@
 /** \defgroup StabilizedQPSolver_doc
 
   Solves the following strictly convex problem:
-  
+
   \verbatim
-  min          1/2 x' H x + g' x 
+  min          1/2 x' H x + g' x
    x
-  
+
   subject to
               LBA <= A x <= UBA
               LBX <= x   <= UBX
-              
+
       with :
         H sparse (n x n) positive definite
         g dense  (n x 1)
-              
+
       n: number of decision variables (x)
       nc: number of constraints (A)
-      
+
   \endverbatim
-  
+
   If H is not positive-definite, the solver should throw an error.
-  
+
 */
-      
+
 namespace casadi{
-  
+
 /// Input arguments of a QP problem [stabilizedQpIn]
 enum StabilizedQPSolverInput{
   /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
@@ -92,7 +92,7 @@ class StabilizedQPSolverInternal;
 
 @copydoc StabilizedQPSolver_doc
 
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT StabilizedQPSolver : public Function{
@@ -100,17 +100,17 @@ class CASADI_SYMBOLIC_EXPORT StabilizedQPSolver : public Function{
 
   /// Default constructor
   StabilizedQPSolver();
-  
+
   /// Access functions of the node
   StabilizedQPSolverInternal* operator->();
   const StabilizedQPSolverInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Set options that make the QP solver more suitable for solving LPs
   void setLPOptions();
-  
+
   /** Generate native code in the interfaced language for debugging */
   virtual void generateNativeCode(const std::string &filename) const;
 };

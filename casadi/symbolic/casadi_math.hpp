@@ -82,7 +82,7 @@ bool operation_checker(unsigned int op){
     case OP_ATAN2:         return F<OP_ATAN2>::check;
     case OP_LIFT:          return F<OP_LIFT>::check;
   }
-  
+
   // False by default
   return false;
 };
@@ -94,7 +94,7 @@ struct casadi_math{
 
   /** \brief Evaluate a built in function (scalar-scalar) */
   static inline void fun(unsigned char op, const T& x, const T& y, T& f);
-  
+
   /** \brief Evaluate a built in function (vector-vector) */
   static inline void fun(unsigned char op, const T* x, const T* y, T* f, int n);
 
@@ -109,10 +109,10 @@ struct casadi_math{
 
   /** \brief Evaluate the function and the derivative function */
   static inline void derF(unsigned char op, const T& x, const T& y, T& f, T* d);
-  
+
   /** \brief Number of dependencies */
   static inline int ndeps(unsigned char op);
-  
+
   /** \brief Print */
   static inline void print(unsigned char op, std::ostream &stream, const std::string& x, const std::string& y);
   static inline void printPre(unsigned char op, std::ostream &stream);
@@ -131,14 +131,14 @@ struct casadi_math<int>{
     f = int(ff);
   }
 
-  static inline void fun(unsigned char op, const int* x, const int* y, int* f, int n){     
+  static inline void fun(unsigned char op, const int* x, const int* y, int* f, int n){
     for(int i=0; i<n; ++i){
       double ff(0);
       casadi_math<double>::fun(op,double(*x++),double(*y++),ff);
       *f++ = int(ff);
     }
   }
-  
+
   static inline void fun(unsigned char op, const int* x, const int& y, int* f, int n){
     for(int i=0; i<n; ++i){
       double ff;
@@ -146,7 +146,7 @@ struct casadi_math<int>{
       *f++ = int(ff);
     }
   }
-  
+
   static inline void fun(unsigned char op, const int& x, const int* y, int* f, int n){
     for(int i=0; i<n; ++i){
       double ff;
@@ -154,7 +154,7 @@ struct casadi_math<int>{
       *f++ = int(ff);
     }
   }
-  
+
   /** \brief Evaluate a built in derivative function */
   static inline void der(unsigned char op, const int& x, const int& y, const int& f, int* d){
     double d_real[2] = {double(d[0]),double(d[1])};
@@ -172,10 +172,10 @@ struct casadi_math<int>{
     d[0] = int(d_real[0]);
     d[1] = int(d_real[1]);
   }
-  
+
   /** \brief Number of dependencies */
   static inline int ndeps(unsigned char op){ return casadi_math<double>::ndeps(op);}
-  
+
   /** \brief Print */
   static inline void print(unsigned char op, std::ostream &stream, const std::string& x, const std::string& y){ casadi_math<double>::print(op,stream,x,y);}
   static inline void printPre(unsigned char op, std::ostream &stream){ casadi_math<double>::printPre(op,stream);}
@@ -237,7 +237,7 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X,Y,F,N);       break;
 
 #define CASADI_MATH_FUN_BUILTIN(X,Y,F) CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationSS,X,Y,F,1)
-  
+
   switch(op){
     CASADI_MATH_FUN_BUILTIN(x,y,f)
   }
@@ -315,7 +315,7 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X,Y,F,D);     break;\
     case OP_LIFT:      BinaryOperation<OP_LIFT>::der(X,Y,F,D);       break;\
     case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X,Y,F,D);    break;
-  
+
   switch(op){
     CASADI_MATH_DER_BUILTIN(x,y,f,d)
   }
@@ -372,7 +372,7 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X,Y,F,D);     break;\
     case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X,Y,F,D);       break;\
     case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X,Y,F,D);    break;
-  
+
   switch(op){
     CASADI_MATH_DERF_BUILTIN(x,y,f,d)
   }
@@ -400,7 +400,7 @@ inline int casadi_math<T>::ndeps(unsigned char op){
     case OP_ATAN2:\
     case OP_PRINTME:\
     case OP_LIFT:
-  
+
   switch(op){
     case OP_CONST:
     case OP_PARAMETER:

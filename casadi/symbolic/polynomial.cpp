@@ -42,7 +42,7 @@ namespace casadi{
     p_[1] = p1;
     p_[2] = p2;
   }
-  
+
   Polynomial::Polynomial(real_t p0, real_t p1, real_t p2, real_t p3){
     p_.resize(2);
     p_[0] = p0;
@@ -153,8 +153,8 @@ namespace casadi{
     return Polynomial(ret_p);
   }
 
-    
+
 } // namespace casadi
-    
+
 
 

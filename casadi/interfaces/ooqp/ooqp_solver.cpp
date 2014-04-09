@@ -26,7 +26,7 @@
 using namespace std;
 namespace casadi{
 
-OOQPSolver::OOQPSolver(){ 
+OOQPSolver::OOQPSolver(){
 }
 
 

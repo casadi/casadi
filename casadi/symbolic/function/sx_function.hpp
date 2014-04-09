@@ -51,8 +51,8 @@ namespace casadi{
   class MXFunction;
 
   /**   \brief Dynamically created function that can be expanded into a series of scalar operations.
-  
-        \author Joel Andersson 
+
+        \author Joel Andersson
         \date 2010-2013
   */
   class CASADI_SYMBOLIC_EXPORT SXFunction : public Function{
@@ -60,51 +60,51 @@ namespace casadi{
   public:
     /// Default constructor
     SXFunction();
-  
+
     /// Expand an MXFunction
     explicit SXFunction(const MXFunction &f);
 
     /// Expand an Function
     explicit SXFunction(const Function &f);
-  
-    /// Multiple (matrix valued) input, multiple (matrix valued) output 
+
+    /// Multiple (matrix valued) input, multiple (matrix valued) output
     SXFunction(const std::vector< SX>& arg, const std::vector<SX>& res);
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output 
+    /// Multiple (matrix valued) input, multiple (matrix valued) output
     SXFunction(const std::vector< SX>& arg, const IOSchemeVector< SX >& res);
 
-    /// Multiple (matrix valued) input, multiple (matrix valued) output 
+    /// Multiple (matrix valued) input, multiple (matrix valued) output
     SXFunction(const IOSchemeVector< SX >& arg, const std::vector< SX>& res);
-  
-    /// Multiple (matrix valued) input, multiple (matrix valued) output 
+
+    /// Multiple (matrix valued) input, multiple (matrix valued) output
     SXFunction(const IOSchemeVector< SX >& arg, const IOSchemeVector< SX >& res);
-  
+
 #ifndef SWIG
 
-    /// Multiple (vector valued) input, multiple (vector valued) output 
+    /// Multiple (vector valued) input, multiple (vector valued) output
     SXFunction(const std::vector< std::vector<SXElement> >& arg, const std::vector< std::vector<SXElement> >& res);
 
-    /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output  
+    /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output
     SXFunction(const SX& arg, const SX& res);
 
-    /// Multiple (vector valued) input, single (scalar/vector/matrix valued) output 
+    /// Multiple (vector valued) input, single (scalar/vector/matrix valued) output
     SXFunction(const std::vector< std::vector<SXElement> >& arg, const SX& res);
 
-    /// Multiple (matrix valued) input, single (scalar/vector/matrix valued) output 
+    /// Multiple (matrix valued) input, single (scalar/vector/matrix valued) output
     SXFunction(const std::vector< SX>& arg, const SX& res);
 
-    /// Single (scalar/vector/matrix valued) input, multiple (vector valued) output 
+    /// Single (scalar/vector/matrix valued) input, multiple (vector valued) output
     SXFunction(const SX& arg, const std::vector< std::vector<SXElement> >& res);
 
-    /// Single (scalar/vector/matrix valued) input, multiple (matrix valued) output 
+    /// Single (scalar/vector/matrix valued) input, multiple (matrix valued) output
     SXFunction(const SX& arg, const std::vector< SX>& res);
 #endif // SWIG
 
 /// \cond INTERNAL
-    /// Access functions of the node 
+    /// Access functions of the node
     SXFunctionInternal* operator->();
 
-    /// Const access functions of the node 
+    /// Const access functions of the node
     const SXFunctionInternal* operator->() const;
 /// \endcond
 
@@ -114,11 +114,11 @@ namespace casadi{
      * \see casadi::Jacobian for an AD approach
      */
     SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),oind,compact,symmetric); } 
-    SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(iind,outputSchemeEntry(oname),compact,symmetric); } 
-    SX jac(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); } 
+    SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),oind,compact,symmetric); }
+    SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(iind,outputSchemeEntry(oname),compact,symmetric); }
+    SX jac(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
     //@}
-   
+
     //@{
     /// Gradient via source code transformation
     SX grad(int iind=0, int oind=0);
@@ -134,7 +134,7 @@ namespace casadi{
     SX tang(int iind, const std::string& oname) { return tang(iind,outputSchemeEntry(oname)); }
     SX tang(const std::string& iname, const std::string& oname) { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
-  
+
     //@{
     /// Hessian (forward over adjoint) via source code transformation
     SX hess(int iind=0, int oind=0);
@@ -142,31 +142,31 @@ namespace casadi{
     SX hess(int iind, const std::string& oname) { return hess(iind,outputSchemeEntry(oname)); }
     SX hess(const std::string& iname, const std::string& oname) { return hess(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
-  
+
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-    
+
     /** \brief Get function input */
     const SX& inputExpr(int iind) const;
     const SX& inputExpr(const std::string& iname) const { return inputExpr(inputSchemeEntry(iname)); }
-  
+
     /** \brief Get function output */
     const SX& outputExpr(int oind) const;
     const SX& outputExpr(const std::string& oname) const { return outputExpr(outputSchemeEntry(oname)); }
-  
+
     /** \brief Get all function inputs */
     const std::vector<SX>& inputExpr() const;
-  
+
     /** \brief Get all function outputs */
     const std::vector<SX> & outputExpr() const;
-    
+
 /// \cond INTERNAL
 #ifndef SWIG
     /** \brief Access the algorithm directly */
     const std::vector<ScalarAtomic>& algorithm() const;
 #endif // SWIG
 /// \endcond
-  
+
     /** \brief Get the number of atomic operations */
     int getAlgorithmSize() const{ return algorithm().size();}
 
@@ -177,7 +177,7 @@ namespace casadi{
     int getAtomicOperation(int k) const{ return algorithm().at(k).op;}
 
     /** \brief Get the (integer) input arguments of an atomic operation */
-    std::pair<int,int> getAtomicInput(int k) const{ 
+    std::pair<int,int> getAtomicInput(int k) const{
       const ScalarAtomic& atomic = algorithm().at(k);
       return std::pair<int,int>(atomic.i1,atomic.i2);}
 
@@ -189,15 +189,15 @@ namespace casadi{
 
     /** \brief Number of nodes in the algorithm */
     int countNodes() const;
-  
+
     /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
     void clearSymbolic();
- 
+
     /** \brief Get all the free variables of the function */
     std::vector<SXElement> getFree() const;
 
     /** \brief Get the corresponding matrix type */
-    typedef SX MatType;  
+    typedef SX MatType;
   };
 
 

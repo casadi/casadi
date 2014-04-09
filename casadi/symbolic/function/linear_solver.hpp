@@ -25,8 +25,8 @@
 
 #include "function.hpp"
 
-/** \defgroup LinearSolver_doc 
- * 
+/** \defgroup LinearSolver_doc
+ *
  * Solves the linear system A*X = B or A^T*X = B for X
  * with A square and non-singular
  *
@@ -36,7 +36,7 @@
  */
 
 namespace casadi{
-  
+
 /// Input arguments of a linear solver [linsolIn]
 enum LinsolInput{
   /// The square matrix A: sparse, (n x n). [A]
@@ -55,19 +55,19 @@ enum LinsolOutput{
   class LinearSolverInternal;
 
   /** \brief Base class for the linear solver classes
-  
+
    *  @copydoc LinearSolver_doc
    \author Joel Andersson
    \date 2010-2013
   */
   class CASADI_SYMBOLIC_EXPORT LinearSolver : public Function{
   public:
-    
+
     /// \cond INTERNAL
     /// Default (empty) constructor
     LinearSolver();
     /// \endcond
-  
+
     /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
     explicit LinearSolver(const Sparsity& sp, int nrhs=1);
 
@@ -104,7 +104,7 @@ enum LinsolOutput{
 
     /// Check if prepared
     bool prepared() const;
-  
+
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
   };

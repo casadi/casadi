@@ -48,7 +48,7 @@ namespace casadi{
     // Call the init method of the base class
     LinearSolverInternal::init();
 
-    A_.nzmax = input().size();  // maximum number of entries 
+    A_.nzmax = input().size();  // maximum number of entries
     A_.m = input().size1(); // number of rows
     A_.n = input().size2(); // number of columns
     A_.p = const_cast<int*>(&input().colind().front()); // column pointers (size n+1) or col indices (size nzmax)
@@ -58,13 +58,13 @@ namespace casadi{
 
     // Temporary
     temp_.resize(A_.n);
-  
+
     // Has the routine been called once
     called_once_ = false;
-    
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) { 
+
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       profileWriteName(CasadiOptions::profilingLog,this,"CSparse",ProfilingData_FunctionType_Other,2);
-      
+
       profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"prepare",-1);
       profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"solve",-1);
     }
@@ -80,25 +80,25 @@ namespace casadi{
       if(verbose()){
         cout << "CSparseInternal::prepare: symbolic factorization" << endl;
       }
-        
-      // ordering and symbolic analysis 
+
+      // ordering and symbolic analysis
       int order = 0; // ordering?
       if(S_) cs_sfree(S_);
-      S_ = cs_sqr (order, &A_, 0) ;              
+      S_ = cs_sqr (order, &A_, 0) ;
     }
-  
+
     prepared_ = false;
     called_once_ = true;
-  
+
     // Get a referebce to the nonzeros of the linear system
     const vector<double>& linsys_nz = input().data();
-  
+
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<linsys_nz.size(); ++k){
       casadi_assert_message(!isnan(linsys_nz[k]),"Nonzero " << k << " is not-a-number");
       casadi_assert_message(!isinf(linsys_nz[k]),"Nonzero " << k << " is infinite");
     }
-  
+
     if(verbose()){
       cout << "CSparseInternal::prepare: numeric factorization" << endl;
       cout << "linear system to be factorized = " << endl;
@@ -106,9 +106,9 @@ namespace casadi{
     }
 
     double tol = 1e-8;
-  
+
     if(N_) cs_nfree(N_);
-    N_ = cs_lu(&A_, S_, tol) ;                 // numeric LU factorization 
+    N_ = cs_lu(&A_, S_, tol) ;                 // numeric LU factorization
     if(N_==0){
       DMatrix temp = input();
       temp.sparsify();
@@ -133,14 +133,14 @@ namespace casadi{
     casadi_assert(N_!=0);
 
     prepared_ = true;
-    
+
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
       profileWriteTime(CasadiOptions::profilingLog,this,0,time_stop-time_start,time_stop-time_start);
       profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_start);
     }
   }
-  
+
   void CSparseInternal::solve(double* x, int nrhs, bool transpose){
     double time_start=0;
     if(CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
@@ -148,28 +148,28 @@ namespace casadi{
       profileWriteEntry(CasadiOptions::profilingLog,this);
     }
 
-    
+
     casadi_assert(prepared_);
     casadi_assert(N_!=0);
-  
+
     double *t = &temp_.front();
-  
+
     for(int k=0; k<nrhs; ++k){
       if(transpose){
-        cs_pvec (S_->q, x, t, A_.n) ;       // t = P2*b 
+        cs_pvec (S_->q, x, t, A_.n) ;       // t = P2*b
         casadi_assert(N_->U!=0);
-        cs_utsolve (N_->U, t) ;              // t = U'\t 
-        cs_ltsolve (N_->L, t) ;              // t = L'\t 
-        cs_pvec (N_->pinv, t, x, A_.n) ;    // x = P1*t 
+        cs_utsolve (N_->U, t) ;              // t = U'\t
+        cs_ltsolve (N_->L, t) ;              // t = L'\t
+        cs_pvec (N_->pinv, t, x, A_.n) ;    // x = P1*t
       } else {
         cs_ipvec (N_->pinv, x, t, A_.n) ;   // t = P1\b
-        cs_lsolve (N_->L, t) ;               // t = L\t 
-        cs_usolve (N_->U, t) ;               // t = U\t 
-        cs_ipvec (S_->q, t, x, A_.n) ;      // x = P2\t 
+        cs_lsolve (N_->L, t) ;               // t = L\t
+        cs_usolve (N_->U, t) ;               // t = U\t
+        cs_ipvec (S_->q, t, x, A_.n) ;      // x = P2\t
       }
       x += ncol();
     }
-    
+
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
       profileWriteTime(CasadiOptions::profilingLog,this,1,time_stop-time_start,time_stop-time_start);

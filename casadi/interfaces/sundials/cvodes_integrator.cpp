@@ -26,7 +26,7 @@
 using namespace std;
 namespace casadi{
 
-CVodesIntegrator::CVodesIntegrator(){ 
+CVodesIntegrator::CVodesIntegrator(){
 }
 
 CVodesIntegrator::CVodesIntegrator(const Function& f, const Function& g){

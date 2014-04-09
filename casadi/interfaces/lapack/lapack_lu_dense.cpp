@@ -35,7 +35,7 @@ namespace casadi{
   LapackLUDense::LapackLUDense(const Sparsity& sparsity, int nrhs){
     assignNode(new LapackLUDenseInternal(sparsity,nrhs));
   }
- 
+
   LapackLUDenseInternal* LapackLUDense::operator->(){
     return static_cast<LapackLUDenseInternal*>(Function::operator->());
   }
@@ -56,18 +56,18 @@ namespace casadi{
   void LapackLUDenseInternal::init(){
     // Call the base class initializer
     LinearSolverInternal::init();
-  
+
     // Get dimensions
     ncol_ = ncol();
     nrow_ = nrow();
-  
+
     // Currently only square matrices tested
     if(ncol_!=nrow_) throw CasadiException("LapackLUDenseInternal::LapackLUDenseInternal: currently only square matrices implemented.");
 
     // Allocate matrix
     mat_.resize(ncol_*ncol_);
     ipiv_.resize(ncol_);
-  
+
     // Equilibriate?
     equilibriate_ = getOption("equilibration").toInt();
     if(equilibriate_){
@@ -78,10 +78,10 @@ namespace casadi{
 
     // Allow equilibration failures
     allow_equilibration_failure_ = getOption("allow_equilibration_failure").toInt();
-    
-    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) { 
+
+    if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       profileWriteName(CasadiOptions::profilingLog,this,"LapackLUDense",ProfilingData_FunctionType_Other,2);
-      
+
       profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"prepare",-1);
       profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"solve",-1);
     }
@@ -94,7 +94,7 @@ namespace casadi{
       profileWriteEntry(CasadiOptions::profilingLog,this);
     }
     prepared_ = false;
-  
+
     // Get the elements of the matrix, dense format
     input(0).get(mat_,DENSE);
 
@@ -114,33 +114,33 @@ namespace casadi{
         cout << "Warning: " << ss.str() << endl;
 
 
-      
+
         if(allow_equilibration_failure_)  cout << "Warning: " << ss.str() << endl;
         else                              casadi_error(ss.str());
       }
-  
+
       // Equilibriate the matrix if scaling was successful
       if(info!=0)
         dlaqge_(&ncol_,&nrow_,getPtr(mat_),&ncol_,getPtr(r_),getPtr(c_),&colcnd, &rowcnd, &amax, &equed_);
       else
         equed_ = 'N';
     }
-  
+
     // Factorize the matrix
     int info = -100;
     dgetrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(ipiv_), &info);
     if(info != 0) throw CasadiException("LapackLUDenseInternal::prepare: dgetrf_ failed to factorize the jacobian");
-  
+
     // Sucess if reached this point
     prepared_ = true;
-    
+
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
       profileWriteTime(CasadiOptions::profilingLog,this,0,time_stop-time_start,time_stop-time_start);
       profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_start);
     }
   }
-    
+
   void LapackLUDenseInternal::solve(double* x, int nrhs, bool transpose){
     double time_start=0;
     if(CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
@@ -167,7 +167,7 @@ namespace casadi{
     } else {
       rowScaling(x,nrhs);
     }
-    
+
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
       profileWriteTime(CasadiOptions::profilingLog,this,1,time_stop-time_start,time_stop-time_start);
@@ -182,7 +182,7 @@ namespace casadi{
         for(int i=0; i<ncol_; ++i)
           x[i+rhs*nrow_] *= r_[i];
   }
-    
+
   void LapackLUDenseInternal::rowScaling(double* x, int nrhs){
     // Scale right hand side if this was done to the matrix
     if(equed_=='C' || equed_=='B')

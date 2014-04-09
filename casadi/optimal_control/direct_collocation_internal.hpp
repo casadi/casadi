@@ -32,10 +32,10 @@
 
 /// \cond INTERNAL
 namespace casadi{
-  
+
 class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolverInternal{
   friend class DirectCollocation;
-  
+
   public:
     // Constructor
     DirectCollocationInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn);
@@ -45,28 +45,28 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolver
 
     // Destructor
     virtual ~DirectCollocationInternal();
-    
+
     // Initialize
     virtual void init();
 
     // Solve the OCP
     virtual void evaluate();
-   
+
     // Get the variables
     void getGuess(std::vector<double>& V_init) const;
-    
+
     // Get the variables
     void getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const;
-    
+
     // Get the constraints
     void getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const;
 
     // Set the optimal solution
     void setOptimalSolution( const std::vector<double> &V_opt );
-    
+
     // Prints out a human readable report about possible constraint violations - all constraints
     void reportConstraints(std::ostream &stream=std::cout);
-    
+
     // NLP
     MXFunction nlp_;
 
@@ -77,7 +77,7 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolver
     int deg_;
 
 };
-                        
+
 } // namespace casadi
 /// \endcond
 

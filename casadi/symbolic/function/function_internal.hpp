@@ -40,9 +40,9 @@
 namespace casadi{
 
   class MXFunction;
-  
+
   /** \brief Internal class for Function
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
       A regular user should never work with any Node class. Use Function directly.
   */
@@ -52,7 +52,7 @@ namespace casadi{
   protected:
     /** \brief  Default constructor (accessable from the Function class and derived classes) */
     FunctionInternal();
-  
+
   public:
     /** \brief  Destructor */
     virtual ~FunctionInternal() = 0;
@@ -64,7 +64,7 @@ namespace casadi{
     virtual void evaluate() = 0;
 
     /** \brief Initialize
-        Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating. 
+        Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating.
         If passed to another class (in the constructor), this class should invoke this function when initialized. */
     virtual void init();
 
@@ -79,53 +79,53 @@ namespace casadi{
 
     /** \brief  Reset the sparsity propagation */
     virtual void spInit(bool fwd){}
-    
+
     /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
-    virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res, 
-                        const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+    virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res,
+                        const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens,
                         const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
 
     /** \brief  Evaluate symbolically, MX type */
-    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
-                        const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
+                        const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens,
                         const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens);
 
     /** \brief  Evaluate symbolically, SXElement type, matching sparsity patterns */
-    virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res, 
-                              const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+    virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res,
+                              const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens,
                               const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
 
     /** \brief  Create function call node */
-    virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res, 
-                            const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
+    virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res,
+                            const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens,
                             const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
 
     /** \brief  Create derivative node */
-    virtual void createCallDerivative(const std::vector<MX> &arg, std::vector<MX> &res, 
-                                      const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
+    virtual void createCallDerivative(const std::vector<MX> &arg, std::vector<MX> &res,
+                                      const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens,
                                       const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
 
     /** \brief  Create a call to this */
     std::vector<MX> callSelf(const std::vector<MX> &arg);
 
     /** \brief Call a function, DMatrix type (overloaded) */
-    void call(const DMatrixVector& arg, DMatrixVector& res, 
-              const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens, 
+    void call(const DMatrixVector& arg, DMatrixVector& res,
+              const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens,
               const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
               bool always_inline, bool never_inline);
-    
+
     /** \brief Call a function, MX type (overloaded) */
-    void call(const MXVector& arg, MXVector& res, 
-              const MXVectorVector& fseed, MXVectorVector& fsens, 
+    void call(const MXVector& arg, MXVector& res,
+              const MXVectorVector& fseed, MXVectorVector& fsens,
               const MXVectorVector& aseed, MXVectorVector& asens,
               bool always_inline, bool never_inline);
-    
+
     /** \brief Call a function, SX type (overloaded) */
-    void call(const SXVector& arg, SXVector& res, 
-              const SXVectorVector& fseed, SXVectorVector& fsens, 
+    void call(const SXVector& arg, SXVector& res,
+              const SXVectorVector& fseed, SXVectorVector& fsens,
               const SXVectorVector& aseed, SXVectorVector& asens,
               bool always_inline, bool never_inline);
-        
+
     //@{
     /** \brief Return Hessian function */
     Function hessian(int iind, int oind);
@@ -151,7 +151,7 @@ namespace casadi{
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
     virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
     //@}
-    
+
     //@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     Function fullJacobian();
@@ -159,7 +159,7 @@ namespace casadi{
     //@}
 
     //@{
-    /** \brief Return function that calculates forward derivatives 
+    /** \brief Return function that calculates forward derivatives
      *    This method returns a cached instance if available, and calls Function getDerivative(int nfwd, int nadj) if no cached version is available.
      */
     Function derivative(int nfwd, int nadj);
@@ -174,15 +174,15 @@ namespace casadi{
     virtual Function getDerivativeViaJac(int nfwd, int nadj);
 
     //@}
-    
-    
+
+
     /** \brief Create a helper MXFunction with some properties copied
     *
-    * Copied properties: 
+    * Copied properties:
     *
     *    input/outputscheme
     *    ad_mode
-    *   
+    *
     *  The function is not initialized
     */
     MXFunction wrapMXFunction();
@@ -195,7 +195,7 @@ namespace casadi{
 
     /** \brief Generate code the functon */
     virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
-    
+
     /** \brief Generate code for the declarations of the C function */
     virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
 
@@ -204,22 +204,22 @@ namespace casadi{
 
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
-    
+
     /** \brief  Print */
     virtual void repr(std::ostream &stream) const;
-    
+
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const {};
-            
+
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);
 
     /// Verbose mode?
     bool verbose() const;
-    
+
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
-        
+
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
     int getNumInputNonzeros() const;
 
@@ -231,40 +231,40 @@ namespace casadi{
 
     /** \brief  Get total number of elements in all of the matrix-valued outputs */
     int getNumOutputElements() const;
-    
+
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary & getStats() const;
 
     /// Get single statistic obtained at the end of the last evaluate call
     GenericType getStat(const std::string & name) const;
-    
+
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
-    
+
     /// A flavour of getJacSparsity without any magic
     Sparsity getJacSparsityPlain(int iind, int oind);
-    
+
     /// A flavour of getJacSparsity that does hierachical block structure recognition
     Sparsity getJacSparsityHierarchical(int iind, int oind);
-    
+
     /// A flavour of getJacSparsity that does hierachical block structure recognition for symmetric jacobians
     Sparsity getJacSparsityHierarchicalSymm(int iind, int oind);
-    
+
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact);
-    
+
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& jacSparsity(int iind, int oind, bool compact, bool symmetric);
-    
+
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const;
 
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
-  
+
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SX> symbolicInputSX() const;
-  
+
     // Workaround helper functions: assign nonzeros but ignore all -1
     static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
     static void assignIgnore(SX& y, const SX& x, const std::vector<int>& nz);
@@ -337,13 +337,13 @@ namespace casadi{
 
     /** \brief  Verbose -- for debugging purposes */
     bool verbose_;
-    
+
     /// Set of module names which are extra monitored
     std::set<std::string> monitors_;
-    
+
     /** \brief  Dictionary of statistics (resulting from evaluate) */
     Dictionary stats_;
-    
+
     /** \brief  Flag to indicate wether statistics must be gathered */
     bool gather_stats_;
 
@@ -361,15 +361,15 @@ namespace casadi{
 
     /// User-set field
     void* user_data_;
-    
+
     bool monitor_inputs_, monitor_outputs_;
-        
+
     /// Errors are thrown when NaN is produced
     bool regularity_check_;
-    
+
     /// Errors are thrown if numerical values of inputs look bad
     bool inputs_check_;
-    
+
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
   };

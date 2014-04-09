@@ -28,16 +28,16 @@
 /// \cond INTERNAL
 
 namespace casadi{
-  /** \brief Represents any binary operation that involves two matrices 
-      \author Joel Andersson 
-      \date 2010        
+  /** \brief Represents any binary operation that involves two matrices
+      \author Joel Andersson
+      \date 2010
   */
   template<bool ScX, bool ScY>
   class CASADI_SYMBOLIC_EXPORT BinaryMX : public MXNode{
   public:
     /** \brief  Constructor */
     BinaryMX(Operation op, const MX& x, const MX& y);
-    
+
     /** \brief  Destructor */
     virtual ~BinaryMX();
 
@@ -49,7 +49,7 @@ namespace casadi{
 
     /** \brief Get the operation */
     virtual int getOp() const{ return op_;}
-    
+
     /** \brief Check if binary operation */
     virtual bool isBinaryOp() const { return true;}
 
@@ -66,7 +66,7 @@ namespace casadi{
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
@@ -98,7 +98,7 @@ namespace casadi{
 
     //! \brief Operation
     Operation op_;
-    
+
   };
 
 } // namespace casadi

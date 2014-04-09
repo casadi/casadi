@@ -26,7 +26,7 @@
 using namespace std;
 namespace casadi{
 
-  NewtonImplicitSolver::NewtonImplicitSolver(){ 
+  NewtonImplicitSolver::NewtonImplicitSolver(){
   }
 
   NewtonImplicitSolver::NewtonImplicitSolver(const Function& f, const Function& jac, const LinearSolver& linsol)  {

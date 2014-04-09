@@ -36,9 +36,9 @@ namespace casadi {
   *
   * Note to developers:  \n
   *  - use sparingly. Global options are - in general - a rather bad idea \n
-  *  - this class must never be instantiated. Access its static members directly \n 
+  *  - this class must never be instantiated. Access its static members directly \n
   *
-  *  \author Joris Gillis 
+  *  \author Joris Gillis
   *  \date 2012
   */
   class CASADI_SYMBOLIC_EXPORT CasadiOptions {
@@ -63,19 +63,19 @@ namespace casadi {
       * Default: true
       */
       static bool simplification_on_the_fly;
-      
+
       /** \brief Stream on which profiling log should be written */
       static std::ofstream profilingLog;
-      
+
       /** \brief flag to indicate if profiling is active */
       static bool profiling;
-      
+
       static bool profilingBinary;
-      
+
       static bool purgeSeeds;
-      
+
       static bool allowed_internal_api;
-      
+
 #endif //SWIG
       // Setter and getter for catch_errors_python
       static void setCatchErrorsPython(bool flag) { catch_errors_python = flag; }
@@ -84,7 +84,7 @@ namespace casadi {
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
       static bool getSimplificationOnTheFly() { return simplification_on_the_fly; }
-      
+
       /** \brief Start virtual machine profiling
       *
       *  When profiling is active, each primitive of an MX algorithm is profiling and dumped into the supplied file _filename_
@@ -93,13 +93,13 @@ namespace casadi {
       */
       static void startProfiling(const std::string &filename);
       static void stopProfiling();
-      
+
       static void setProfilingBinary(bool flag) {  profilingBinary = flag; }
       static bool getProfilingBinary() { return  profilingBinary; }
-      
-      static void setPurgeSeeds(bool flag) { purgeSeeds = flag; } 
-      static bool setPurgeSeeds() { return purgeSeeds; } 
- 
+
+      static void setPurgeSeeds(bool flag) { purgeSeeds = flag; }
+      static bool setPurgeSeeds() { return purgeSeeds; }
+
       static void setAllowedInternalAPI(bool flag) { allowed_internal_api= flag; }
       static bool getAllowedInternalAPI() { return allowed_internal_api; }
   };

@@ -28,14 +28,14 @@
 
 namespace casadi{
 
-  
+
   /** \brief  Forward declaration of internal class */
   class CSparseInternal;
 
   /** \brief  LinearSolver with CSparse Interface
    *
    @copydoc LinearSolver_doc
-   *  
+   *
    * CSparse is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use CSparse is: \n
@@ -54,19 +54,19 @@ namespace casadi{
 
     /// Default (empty) constructor
     CSparse();
-  
+
     /// Create a linear solver given a sparsity pattern
     explicit CSparse(const Sparsity& sp, int nrhs=1);
-  
+
     /** \brief  Access internal functions and data members */
     CSparseInternal* operator->();
-  
+
     /** \brief  Access internal functions and data members */
     const CSparseInternal* operator->() const;
-  
+
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
+
     /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
@@ -75,7 +75,7 @@ namespace casadi{
 #ifdef SWIG
     %nocallback;
 #endif
-  
+
   };
 
 } // namespace casadi

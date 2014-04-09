@@ -30,7 +30,7 @@ namespace casadi{
 
   /** \brief Matrix and vector norms
 
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010-2013
   */
   class CASADI_SYMBOLIC_EXPORT Norm : public MXNode{
@@ -44,7 +44,7 @@ namespace casadi{
   };
 
   /** \brief Represents a Frobenius norm
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010-2013
   */
   class CASADI_SYMBOLIC_EXPORT NormF : public Norm{
@@ -58,12 +58,12 @@ namespace casadi{
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
-    
+
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
@@ -83,7 +83,7 @@ namespace casadi{
   };
 
   /** \brief Represents a 2-norm (spectran norm)
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010-2013
   */
   class CASADI_SYMBOLIC_EXPORT Norm2 : public Norm{
@@ -106,7 +106,7 @@ namespace casadi{
   };
 
   /** \brief 1-norm
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010-2013
   */
   class CASADI_SYMBOLIC_EXPORT Norm1 : public Norm{
@@ -129,7 +129,7 @@ namespace casadi{
   };
 
   /** \brief Represents an infinity-norm operation on a MX
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT NormInf : public Norm{

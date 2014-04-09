@@ -37,17 +37,17 @@ namespace casadi{
     // Monitors
     addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
     addOption("print_time",         OT_BOOLEAN,       true,           "Print information about execution time");
-  
+
     int status;
     InitParams(&status, &worhp_p_);
-  
+
     std::stringstream ss;
     ss << "Armijo recovery strategies. Vector of size " << NAres;
-  
+
     std::vector<int> ares(NAres);
     std::copy(worhp_p_.Ares,worhp_p_.Ares+NAres,ares.begin());
     addOption("Ares",OT_INTEGERVECTOR,ares,ss.str());
-    
+
     for (int i=0;i<WorhpGetParamCount();++i) {
       WorhpType type = WorhpGetParamType(i+1);
       const char* name = WorhpGetParamName(i+1);
@@ -71,8 +71,8 @@ namespace casadi{
         default:
           break;// do nothing
       }
-    } 
-    
+    }
+
     addOption("qp_ipBarrier",OT_REAL,worhp_p_.qp.ipBarrier,"IP barrier parameter.");
     addOption("qp_ipComTol",OT_REAL,worhp_p_.qp.ipComTol,"IP complementarity tolerance.");
     addOption("qp_ipFracBound",OT_REAL,worhp_p_.qp.ipFracBound,"IP fraction-to-the-boundary parameter.");
@@ -108,12 +108,12 @@ namespace casadi{
     setOptionByEnumValue("qp_printLevel",worhp_p_.qp.printLevel);
     addOption("qp_scaleIntern",OT_BOOLEAN,worhp_p_.qp.scaleIntern,"Enable scaling on QP level.");
     addOption("qp_strict",OT_BOOLEAN,worhp_p_.qp.strict,"Use strict termination criteria in IP method.");
-  
+
     worhp_o_.initialised = false;
     worhp_w_.initialised = false;
     worhp_p_.initialised = false;
     worhp_c_.initialised = false;
-  
+
     // WORKAROUND: Bug in scaling, set to false by default // FIXME
     setOption("ScaledObj",false);
 
@@ -126,16 +126,16 @@ namespace casadi{
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
   }
 
-  WorhpInternal* WorhpInternal::clone() const{ 
+  WorhpInternal* WorhpInternal::clone() const{
     // Use default copy routine
     WorhpInternal* node = new WorhpInternal(*this);
-    
+
     // Mark Worhp datastructures not initialized to avoid double freeing
     node->worhp_o_.initialised = false;
     node->worhp_w_.initialised = false;
     node->worhp_p_.initialised = false;
-    node->worhp_c_.initialised = false;    
-    
+    node->worhp_c_.initialised = false;
+
     return node;
   }
 
@@ -148,10 +148,10 @@ namespace casadi{
       std::vector<int> ares = getOption("Ares");
       std::copy(ares.begin(),ares.begin()+NAres,worhp_p_.Ares);
     }
-  
+
     // Read options
     passOptions();
-  
+
     // Exact Hessian?
     exact_hessian_ = getOption("UserHM");
 
@@ -161,7 +161,7 @@ namespace casadi{
     if(exact_hessian_){ // does not appear to work
       hessLag();
     }
-    
+
     // Update status?
     status_[TerminateSuccess]="TerminateSuccess";
     status_[OptimalSolution]="OptimalSolution";
@@ -207,19 +207,19 @@ namespace casadi{
     worhp_o_.m = ng_;
 
     // Free existing Worhp memory (except parameters)
-    bool p_init_backup = worhp_p_.initialised; 
+    bool p_init_backup = worhp_p_.initialised;
     worhp_p_.initialised = false; // Avoid freeing the memory for parameters
     if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised){
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
     }
-    worhp_p_.initialised = p_init_backup; 
-  
+    worhp_p_.initialised = p_init_backup;
+
     /// Control data structure needs to be reset every time
     worhp_c_.initialised = false;
     worhp_w_.initialised = false;
     worhp_o_.initialised = false;
-    
-    // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.  
+
+    // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
     worhp_w_.DF.nnz = nx_;
     if (worhp_o_.m>0) {
       worhp_w_.DG.nnz = jacG_.output().size();  // Jacobian of G
@@ -253,14 +253,14 @@ namespace casadi{
 
     if (worhp_w_.DF.NeedStructure){
       for(int i=0; i<nx_; ++i){
-        worhp_w_.DF.row[i] = i + 1; // Index-1 based    
+        worhp_w_.DF.row[i] = i + 1; // Index-1 based
       }
     }
-  
-    if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {    
+
+    if (worhp_o_.m>0 && worhp_w_.DG.NeedStructure) {
       // Get sparsity pattern. Note WORHP is column major
       const DMatrix & J = jacG_.output(JACG_JAC);
-      
+
       int nz=0;
       const vector<int>& colind = J.colind();
       const vector<int>& row = J.row();
@@ -272,7 +272,7 @@ namespace casadi{
           nz++;
         }
       }
-    }    
+    }
 
     if (worhp_w_.HM.NeedStructure) {
       // Get the sparsity pattern of the Hessian
@@ -281,7 +281,7 @@ namespace casadi{
       const vector<int>& row = spHessLag.row();
 
       int nz=0;
-      
+
       // Upper triangular part of the Hessian (note CCS -> CRS format change)
       for(int c=0; c<nx_; ++c){
         for(int el=colind[c]; el<colind[c+1]; ++el){
@@ -292,7 +292,7 @@ namespace casadi{
           }
         }
       }
-      
+
       // Diagonal always included
       for(int r=0; r<nx_; ++r){
         worhp_w_.HM.row[nz] = r + 1;
@@ -307,7 +307,7 @@ namespace casadi{
   }
 
   void WorhpInternal::passOptions() {
-     
+
      for (int i=0;i<WorhpGetParamCount();++i) {
       WorhpType type = WorhpGetParamType(i+1);
       const char* name = WorhpGetParamName(i+1);
@@ -326,8 +326,8 @@ namespace casadi{
         default:
           break;// do nothing
       }
-    } 
-  
+    }
+
     if (hasSetOption("qp_ipBarrier")) worhp_p_.qp.ipBarrier = getOption("qp_ipBarrier");
     if (hasSetOption("qp_ipComTol")) worhp_p_.qp.ipComTol = getOption("qp_ipComTol");
     if (hasSetOption("qp_ipFracBound")) worhp_p_.qp.ipFracBound = getOption("qp_ipFracBound");
@@ -356,7 +356,7 @@ namespace casadi{
     if (hasSetOption("qp_nsnSigma")) worhp_p_.qp.nsnSigma = getOption("qp_nsnSigma");
     if (hasSetOption("qp_printLevel")) worhp_p_.qp.printLevel = getOptionEnumValue("qp_printLevel");
     if (hasSetOption("qp_scaleIntern")) worhp_p_.qp.scaleIntern = getOption("qp_scaleIntern");
-    if (hasSetOption("qp_strict")) worhp_p_.qp.strict = getOption("qp_strict");  
+    if (hasSetOption("qp_strict")) worhp_p_.qp.strict = getOption("qp_strict");
 
     // Mark the parameters as set
     worhp_p_.initialised = true;
@@ -374,7 +374,7 @@ namespace casadi{
 
   void WorhpInternal::evaluate(){
     log("WorhpInternal::evaluate");
-    
+
     if (gather_stats_) {
       Dictionary iterations;
       iterations["iter_sqp"] = std::vector<int>();
@@ -384,21 +384,21 @@ namespace casadi{
       iterations["alpha_pr"] = std::vector<double>();
       stats_["iterations"] = iterations;
     }
-    
+
     // Prepare the solver
     reset();
-    
+
     if (inputs_check_) checkInputs();
     checkInitialBounds();
-  
+
     // Reset the counters
     t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
-    
+
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
-  
+
     // Get inputs
     log("WorhpInternal::evaluate: Reading user inputs");
-    const DMatrix& x0 = input(NLP_SOLVER_X0);    
+    const DMatrix& x0 = input(NLP_SOLVER_X0);
     const DMatrix& lbx = input(NLP_SOLVER_LBX);
     const DMatrix& ubx = input(NLP_SOLVER_UBX);
     const DMatrix& lam_x0 = input(NLP_SOLVER_LAM_X0);
@@ -406,12 +406,12 @@ namespace casadi{
     const DMatrix& ubg = input(NLP_SOLVER_UBG);
     const DMatrix& lam_g0 = input(NLP_SOLVER_LAM_G0);
 
-    double inf = numeric_limits<double>::infinity();  
+    double inf = numeric_limits<double>::infinity();
 
     for (int i=0;i<nx_;++i) {
       casadi_assert_message(lbx.at(i)!=ubx.at(i),"WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX. You have that case at non-zero " << i << " , which has value " << ubx.at(i) << ". Reformulate your problem by using a parameter for the corresponding variable.");
     }
-  
+
     for (int i=0;i<lbg.size();++i) {
       casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),"WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite. You have that case at non-zero " << i << ". Reformulate your problem eliminating the corresponding constraint.");
     }
@@ -432,11 +432,11 @@ namespace casadi{
     for(int i=0; i<nx_; ++i) if(worhp_o_.XU[i]== inf) worhp_o_.XU[i] =  worhp_p_.Infty;
     for(int i=0; i<ng_; ++i) if(worhp_o_.GL[i]==-inf) worhp_o_.GL[i] = -worhp_p_.Infty;
     for(int i=0; i<ng_; ++i) if(worhp_o_.GU[i]== inf) worhp_o_.GU[i] =  worhp_p_.Infty;
-  
+
     log("WorhpInternal::starting iteration");
 
     double time1 = clock();
-  
+
     // Reverse Communication loop
     while(worhp_c_.status < TerminateSuccess &&  worhp_c_.status > TerminateError) {
       if (GetUserAction(&worhp_c_, callWorhp)) {
@@ -445,7 +445,7 @@ namespace casadi{
 
 
       if (GetUserAction(&worhp_c_, iterOutput)) {
-            
+
         if (!worhp_w_.FirstIteration) {
           if (gather_stats_) {
             Dictionary & iterations = stats_["iterations"];
@@ -455,7 +455,7 @@ namespace casadi{
             static_cast<std::vector<double> &>(iterations["obj"]).push_back(worhp_o_.F);
             static_cast<std::vector<double> &>(iterations["alpha_pr"]).push_back(worhp_w_.ArmijoAlpha);
           }
-        
+
           if (!callback_.isNull()) {
             double time1 = clock();
             // Copy outputs
@@ -465,11 +465,11 @@ namespace casadi{
               output(NLP_SOLVER_F).set(worhp_o_.F);
             if (!output(NLP_SOLVER_G).isEmpty())
               output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
-            if (!output(NLP_SOLVER_LAM_X).isEmpty()) 
+            if (!output(NLP_SOLVER_LAM_X).isEmpty())
               output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
             if (!output(NLP_SOLVER_LAM_G).isEmpty())
               output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
-              
+
             Dictionary iteration;
             iteration["iter"] = worhp_w_.MajorIter;
             iteration["iter_sqp"] = worhp_w_.MinorIter;
@@ -485,13 +485,13 @@ namespace casadi{
             int ret = callback_(ref_,user_data_);
             time2 = clock();
             t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
-            
+
             if(ret) worhp_c_.status = TerminatedByUser;
-            
+
           }
         }
 
-    
+
         IterationOutput(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
         DoneUserAction(&worhp_c_, iterOutput);
       }
@@ -520,7 +520,7 @@ namespace casadi{
         eval_h(worhp_o_.X, worhp_w_.ScaleObj, worhp_o_.Mu, worhp_w_.HM.val);
         DoneUserAction(&worhp_c_, evalHM);
       }
-    
+
       if (GetUserAction(&worhp_c_, fidif)) {
         WorhpFidif(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
@@ -528,16 +528,16 @@ namespace casadi{
 
     double time2 = clock();
     t_mainloop_ += double(time2-time1)/CLOCKS_PER_SEC;
-  
+
     // Copy outputs
     output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n,DENSE);
     output(NLP_SOLVER_F).set(worhp_o_.F);
     output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m,DENSE);
     output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
     output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m,DENSE);
-  
+
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
- 
+
     if (hasOption("print_time") && bool(getOption("print_time"))) {
       // Write timings
       cout << "time spent in eval_f: " << t_eval_f_ << " s.";
@@ -564,7 +564,7 @@ namespace casadi{
       cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
       cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
     }
-  
+
     stats_["t_eval_f"] = t_eval_f_;
     stats_["t_eval_grad_f"] = t_eval_grad_f_;
     stats_["t_eval_g"] = t_eval_g_;
@@ -579,10 +579,10 @@ namespace casadi{
     stats_["n_eval_jac_g"] = n_eval_jac_g_;
     stats_["n_eval_h"] = n_eval_h_;
     stats_["iter_count"] = worhp_w_.MajorIter;
-    
+
     stats_["return_code"] = worhp_c_.status;
     stats_["return_status"] = flagmap[worhp_c_.status];
-    
+
   }
 
   bool WorhpInternal::eval_h(const double* x, double obj_factor, const double* lambda, double* values){
@@ -593,7 +593,7 @@ namespace casadi{
       // Make sure generated
       casadi_assert_warning(!hessLag_.isNull(),"Hessian function not pregenerated");
 
-      // Get Hessian 
+      // Get Hessian
       Function& hessLag = this->hessLag();
 
       // Pass input
@@ -632,7 +632,7 @@ namespace casadi{
           }
         }
       }
-      
+
       if(monitored("eval_h")){
         std::cout << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
         std::cout << "obj_factor= " << obj_factor << std::endl;
@@ -641,7 +641,7 @@ namespace casadi{
       }
 
       if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
-      
+
       double time2 = clock();
       t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
       n_eval_h_ += 1;
@@ -656,16 +656,16 @@ namespace casadi{
   bool WorhpInternal::eval_jac_g(const double* x,double* values){
     try{
       log("eval_jac_g started");
-    
+
       // Quich finish if no constraints
       if(worhp_o_.m==0){
         log("eval_jac_g quick return (m==0)");
         return true;
       }
-   
+
       // Make sure generated
       casadi_assert(!jacG_.isNull());
- 
+
       // Get Jacobian
       Function& jacG = this->jacG();
 
@@ -674,20 +674,20 @@ namespace casadi{
       // Pass the argument to the function
       jacG.setInput(x,JACG_X);
       jacG.setInput(input(NLP_SOLVER_P),JACG_P);
-    
+
       // Evaluate the function
       jacG.evaluate();
-      
+
       const DMatrix& J = jacG.output(JACG_JAC);
-      
+
       std::copy(J.data().begin(),J.data().end(),values);
-    
+
       if(monitored("eval_jac_g")){
         cout << "x = " << jacG_.input().data() << endl;
         cout << "J = " << endl;
         jacG_.output().printSparse();
       }
-    
+
       double time2 = clock();
       t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
       n_eval_jac_g_ += 1;
@@ -702,14 +702,14 @@ namespace casadi{
   bool WorhpInternal::eval_f(const double* x, double scale, double& obj_value){
     try {
       log("eval_f started");
-    
+
       // Log time
       double time1 = clock();
 
       // Pass the argument to the function
       nlp_.setInput(x, NL_X);
       nlp_.setInput(input(NLP_SOLVER_P),NL_P);
-      
+
       // Evaluate the function
       nlp_.evaluate();
 
@@ -761,7 +761,7 @@ namespace casadi{
       }
 
       if (regularity_check_ && !isRegular(nlp_.output(NL_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
-    
+
       double time2 = clock();
       t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
       n_eval_g_ += 1;
@@ -778,14 +778,14 @@ namespace casadi{
     try {
       log("eval_grad_f started");
       double time1 = clock();
-    
+
       // Pass the argument to the function
       gradF_.setInput(x,NL_X);
       gradF_.setInput(input(NLP_SOLVER_P),NL_P);
-      
+
       // Evaluate, adjoint mode
       gradF_.evaluate();
-      
+
       // Get the result
       gradF_.output().get(grad_f,DENSE);
 
@@ -793,14 +793,14 @@ namespace casadi{
       for(int i=0; i<nx_; ++i){
         grad_f[i] *= scale;
       }
-      
+
       // Printing
       if(monitored("eval_grad_f")){
         cout << "grad_f = " << gradF_.output() << endl;
       }
-      
+
       if (regularity_check_ && !isRegular(gradF_.output().data())) casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
-    
+
       double time2 = clock();
       t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
@@ -827,7 +827,7 @@ namespace casadi{
     worhp_p_.initialised = true;
     ReadParamsNoInit(&status, cpy, &worhp_p_);
     delete cpy;
-    
+
     for (int i=0;i<WorhpGetParamCount();++i) {
       WorhpType type = WorhpGetParamType(i+1);
       const char* name = WorhpGetParamName(i+1);
@@ -851,9 +851,9 @@ namespace casadi{
         default:
           break; // do nothing
       }
-    } 
+    }
 
-    
+
     setOption("qp_ipBarrier",worhp_p_.qp.ipBarrier);
     setOption("qp_ipComTol",worhp_p_.qp.ipComTol);
     setOption("qp_ipFracBound",worhp_p_.qp.ipFracBound);
@@ -883,10 +883,10 @@ namespace casadi{
     setOptionByEnumValue("qp_printLevel",worhp_p_.qp.printLevel );
     setOption("qp_scaleIntern",worhp_p_.qp.scaleIntern);
     setOption("qp_strict",worhp_p_.qp.strict);
-      
+
     std::cout << "readparams status: " << status << std::endl;
   }
-  
+
   map<int,string> WorhpInternal::calc_flagmap(){
   map<int,string> f;
   f[TerminateSuccess] = "TerminateSuccess";
@@ -925,7 +925,7 @@ namespace casadi{
   f[FunctionErrorHM] = "FunctionErrorHM";
   return f;
 }
-  
+
 map<int,string> WorhpInternal::flagmap = WorhpInternal::calc_flagmap();
 
 

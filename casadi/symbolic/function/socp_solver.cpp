@@ -43,6 +43,6 @@ bool SOCPSolver::checkNode() const{
 
 } // namespace casadi
 
-  
+
 
 

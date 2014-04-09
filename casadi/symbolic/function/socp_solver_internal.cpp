@@ -42,28 +42,28 @@ SOCPSolverInternal::SOCPSolverInternal(const std::vector<Sparsity> &st) : st_(st
   output_.scheme = SCHEME_SOCPOutput;
 
 }
-    
+
 void SOCPSolverInternal::init() {
   // Call the init method of the base class
   FunctionInternal::init();
-  
+
   ni_ = getOption("ni");
   print_problem_ = getOption("print_problem");
-  
+
   m_ = ni_.size();
-  
+
   const Sparsity& A = st_[SOCP_STRUCT_A];
   const Sparsity& G = st_[SOCP_STRUCT_G];
-  
+
   N_ = std::accumulate(ni_.begin(), ni_.end(), 0);
   casadi_assert_message(N_==G.size2(),"SOCPSolverInternal: Supplied G sparsity: number of cols (" << G.size2() <<  ")  must match sum of vector provided with option 'ni' (" << N_ << ").");
-  
+
   nc_ = A.size1();
   n_ = A.size2();
-  
+
   casadi_assert_message(n_==G.size1(),"SOCPSolverInternal: Supplied G sparsity: number of rows (" << G.size1() <<  ")  must match number of decision variables (cols of A): " << n_ << ".");
-  
-  
+
+
   // Input arguments
   setNumInputs(SOCP_SOLVER_NUM_IN);
   input(SOCP_SOLVER_G) = DMatrix(G,0);
@@ -83,16 +83,16 @@ void SOCPSolverInternal::init() {
   output(SOCP_SOLVER_COST) = 0.0;
   output(SOCP_SOLVER_LAM_X) = DMatrix::zeros(n_,1);
   output(SOCP_SOLVER_LAM_A) = DMatrix::zeros(nc_,1);
-  
+
 }
 
 SOCPSolverInternal::~SOCPSolverInternal(){
 }
- 
+
 void SOCPSolverInternal::evaluate(){
   throw CasadiException("SOCPSolverInternal::evaluate: Not implemented");
 }
- 
+
 void SOCPSolverInternal::solve(){
   throw CasadiException("SOCPSolverInternal::solve: Not implemented");
 }
@@ -110,10 +110,10 @@ void SOCPSolverInternal::printProblem(std::ostream &stream) const {
   stream << "uba: " << input(SOCP_SOLVER_UBA) << std::endl;
   stream << "lbx: " << input(SOCP_SOLVER_LBX) << std::endl;
   stream << "ubx: " << input(SOCP_SOLVER_UBX) << std::endl;
-  
+
   stream << "SOCP Problem statement -- end" << std::endl;
 }
- 
+
 
 void SOCPSolverInternal::checkInputs() const {
   for (int i=0;i<input(SOCP_SOLVER_LBX).size();++i) {
@@ -123,9 +123,9 @@ void SOCPSolverInternal::checkInputs() const {
     casadi_assert_message(input(SOCP_SOLVER_LBA).at(i)<=input(SOCP_SOLVER_UBA).at(i),"LBA[i] <= UBA[i] was violated for i=" << i << ". Got LBA[i]=" << input(SOCP_SOLVER_LBA).at(i) << " and UBA[i]=" << input(SOCP_SOLVER_UBA).at(i));
   }
 }
- 
+
 } // namespace casadi
 
-  
+
 
 

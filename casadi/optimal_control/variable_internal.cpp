@@ -25,7 +25,7 @@
 
 using namespace std;
 namespace casadi{
-  
+
   VariableInternal::VariableInternal(const string& name){
   }
 
@@ -49,7 +49,7 @@ namespace casadi{
   SX VariableInternal::atTime(double t, bool allocate){
     // Find an existing element
     map<double,SX>::const_iterator it = timed_sx_.find(t);
-  
+
     // If not found
     if(it==timed_sx_.end()){
       if(allocate){
@@ -57,16 +57,16 @@ namespace casadi{
         stringstream ss;
         ss << var_.getName() << ".atTime(" << t << ")";
         SX tvar = SX::sym(ss.str());
-      
+
         // Save to map
         timed_sx_[t] = tvar;
-      
+
         // Return the expression
         return tvar;
       } else {
         casadi_error(" has no timed variable with t = " << t << ".");
       }
-    
+
     } else {
       // Return the expression
       return it->second;

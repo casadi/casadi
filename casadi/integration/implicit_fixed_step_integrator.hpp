@@ -26,12 +26,12 @@
 #include "fixed_step_integrator.hpp"
 
 namespace casadi{
-  
+
   class ImplicitFixedStepIntegratorInternal;
-  
+
   /**
      \brief Base class for implicit fixed step integrators
-  
+
      \author Joel Andersson
      \date 2014
   */
@@ -39,7 +39,7 @@ namespace casadi{
   public:
     /** \brief  Default constructor */
     ImplicitFixedStepIntegrator();
-    
+
     /// Access functions of the node
     ImplicitFixedStepIntegratorInternal* operator->();
 
@@ -48,7 +48,7 @@ namespace casadi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-    
+
   };
 
 } // namespace casadi

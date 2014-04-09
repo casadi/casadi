@@ -79,7 +79,7 @@ namespace casadi{
   void Solve<Tr>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
     linear_solver_->evaluateMXGen(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,Tr);
   }
-  
+
   template<bool Tr>
   void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){
     linear_solver_->propagateSparsityGen(input,output,itmp,rtmp,fwd,Tr);

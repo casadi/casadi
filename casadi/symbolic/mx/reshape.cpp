@@ -37,7 +37,7 @@ namespace casadi{
     setDependencies(x);
     setSparsity(sp);
   }
-  
+
   Reshape* Reshape::clone() const{
     return new Reshape(*this);
   }
@@ -98,7 +98,7 @@ namespace casadi{
     for(int d = 0; d<nfwd; ++d){
       *fwdSens[d][0] = reshape(*fwdSeed[d][0],shape());
     }
-    
+
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
@@ -116,7 +116,7 @@ namespace casadi{
     stream << "  for(i=0; i<" << size() << "; ++i) " << res.front() << "[i] = " << arg.front() << "[i];" << endl;
   }
 
-  MX Reshape::getReshape(const Sparsity& sp) const{ 
+  MX Reshape::getReshape(const Sparsity& sp) const{
     return reshape(dep(0),sp);
   }
 

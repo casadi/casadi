@@ -46,7 +46,7 @@ namespace casadi{
   string str(const PrintableObject& obj){
     stringstream ss;
     obj.print(ss);
-    return ss.str();  
+    return ss.str();
   }
 
   string repr(const PrintableObject& obj){
@@ -54,15 +54,15 @@ namespace casadi{
     obj.repr(ss);
     return ss.str();
   }
-    
-  std::string PrintableObject::getDescription() const{ 
+
+  std::string PrintableObject::getDescription() const{
     return casadi::str(*this);
   }
 
-  std::string PrintableObject::getRepresentation() const{ 
+  std::string PrintableObject::getRepresentation() const{
     return casadi::repr(*this);
   }
 
 
 } // namespace casadi
-    
+

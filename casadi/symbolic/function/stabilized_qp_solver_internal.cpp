@@ -37,17 +37,17 @@ namespace casadi{
     casadi_assert_message(st_.size()==QP_STRUCT_NUM,"Problem structure mismatch");
     const Sparsity& A = st_[QP_STRUCT_A];
     const Sparsity& H = st_[QP_STRUCT_H];
-  
+
     // Dimensions
     n_ = H.size2();
     nc_ = A.isNull() ? 0 : A.size1();
-  
+
     // Check consistency
     casadi_assert_message(A.isNull() || A.size2()==n_,
                           "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl <<
                           "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
                           "We need: H.size2()==A.size2()" << std::endl);
-  
+
     casadi_assert_message(H.isSymmetric(),
                           "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
                           "H: " << H.dimString() <<
@@ -56,7 +56,7 @@ namespace casadi{
     // IO sparsities
     Sparsity x_sparsity = Sparsity::dense(n_,1);
     Sparsity a_sparsity = Sparsity::dense(nc_,1);
-  
+
     // Input arguments
     setNumInputs(STABILIZED_QP_SOLVER_NUM_IN);
     input(STABILIZED_QP_SOLVER_X0)  =  DMatrix::zeros(x_sparsity);
@@ -70,19 +70,19 @@ namespace casadi{
     input(STABILIZED_QP_SOLVER_MUR) =  0.0;
     input(STABILIZED_QP_SOLVER_MUE) =  DMatrix::zeros(a_sparsity);
     input(STABILIZED_QP_SOLVER_MU)  =  DMatrix::zeros(a_sparsity);
-  
+
     // Output arguments
     setNumOutputs(QP_SOLVER_NUM_OUT);
     output(QP_SOLVER_X)             =  DMatrix::zeros(x_sparsity);
     output(QP_SOLVER_COST)          =  0.0;
     output(QP_SOLVER_LAM_X)         =  DMatrix::zeros(x_sparsity);
     output(QP_SOLVER_LAM_A)         =  DMatrix::zeros(a_sparsity);
-  
+
     // IO scheme
     input_.scheme = SCHEME_StabilizedQPSolverInput;
     output_.scheme = SCHEME_QPSolverOutput;
   }
-    
+
   void StabilizedQPSolverInternal::init() {
     // Call the init method of the base class
     FunctionInternal::init();
@@ -90,11 +90,11 @@ namespace casadi{
 
   StabilizedQPSolverInternal::~StabilizedQPSolverInternal(){
   }
- 
+
   void StabilizedQPSolverInternal::evaluate(){
     throw CasadiException("StabilizedQPSolverInternal::evaluate: Not implemented");
   }
- 
+
   void StabilizedQPSolverInternal::solve(){
     throw CasadiException("StabilizedQPSolverInternal::solve: Not implemented");
   }
@@ -114,9 +114,9 @@ namespace casadi{
       casadi_assert_message(lba.at(i)<=uba.at(i),"LBA[" << i << "]== <= UBA[" << i << "] was violated. Got LBA["<<i<<"]=" << lba.at(i) << " and UBA[" << i << "]=" << uba.at(i));
     }
   }
- 
+
 } // namespace casadi
 
-  
+
 
 

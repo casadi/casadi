@@ -32,7 +32,7 @@
 namespace casadi{
 
 /** \brief Represents an MX that is only composed of a constant.
-        \author Joel Andersson 
+        \author Joel Andersson
         \date 2010-2013
 
         A regular user is not supposed to work with this Node class.
@@ -70,10 +70,10 @@ namespace casadi{
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
-   
+
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_CONST;}
-    
+
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const = 0;
 
@@ -96,7 +96,7 @@ namespace casadi{
 
     /** \brief  Constructor */
     explicit ConstantDMatrix(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x){}
-    
+
     /// Destructor
     virtual ~ConstantDMatrix(){}
 
@@ -107,9 +107,9 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const{
       x_.print(stream);
     }
-    
+
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){ 
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
       output[0]->set(x_);
       ConstantMX::evaluateD(input,output,itmp,rtmp);
     }
@@ -128,7 +128,7 @@ namespace casadi{
     virtual bool isOne() const;
     virtual bool isMinusOne() const;
     virtual bool isIdentity() const;
-  
+
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const{return x_.toScalar();}
 
@@ -167,7 +167,7 @@ namespace casadi{
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-    
+
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){}
 
@@ -188,7 +188,7 @@ namespace casadi{
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
-    
+
     /// Assign the nonzeros of a matrix to another matrix
     virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
 
@@ -200,7 +200,7 @@ namespace casadi{
 
     /// Get a binary operation operation
     virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
-    
+
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
   };
@@ -212,7 +212,7 @@ namespace casadi{
     RuntimeConst(){}
     RuntimeConst(T v) : value(v){}
   };
-  
+
   /** \brief  Constant known at compiletime */
   template<int v>
   struct CompiletimeConst{
@@ -223,7 +223,7 @@ namespace casadi{
   template<typename Value>
   class CASADI_SYMBOLIC_EXPORT Constant : public ConstantMX{
   public:
-    
+
     /** \brief  Constructor */
     explicit Constant(const Sparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v){}
 
@@ -235,7 +235,7 @@ namespace casadi{
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-    
+
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
@@ -266,7 +266,7 @@ namespace casadi{
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
-    
+
     /// Assign the nonzeros of a matrix to another matrix
     virtual MX getSetNonzeros(const MX& y, const std::vector<int>& nz) const;
 
@@ -278,7 +278,7 @@ namespace casadi{
 
     /// Get a binary operation operation
     virtual MX getBinary(int op, const MX& y, bool ScX, bool ScY) const;
-    
+
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
 
@@ -291,7 +291,7 @@ namespace casadi{
     /** \brief The actual numerical value */
     Value v_;
   };
-  
+
   template<typename Value>
   MX Constant<Value>::getHorzcat(const std::vector<MX>& x) const{
     // Check if all arguments have the same constant value
@@ -330,12 +330,12 @@ namespace casadi{
 
   template<typename Value>
   MX Constant<Value>::getReshape(const Sparsity& sp) const{
-    return MX::create(new Constant<Value>(sp,v_)); 
+    return MX::create(new Constant<Value>(sp,v_));
   }
 
   template<typename Value>
   MX Constant<Value>::getTranspose() const{
-    return MX::create(new Constant<Value>(sparsity().transpose(),v_));    
+    return MX::create(new Constant<Value>(sparsity().transpose(),v_));
   }
 
   template<typename Value>
@@ -362,11 +362,11 @@ namespace casadi{
   template<typename Value>
   MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
     casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
-    
+
     if (ScX && !operation_checker<Function0Checker>(op)) {
       double ret;
       casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,0,ret);
-      
+
       if (ret!=0) {
         Sparsity f = Sparsity::dense(y.size1(),y.size2());
         MX yy = y.setSparse(f);
@@ -385,7 +385,7 @@ namespace casadi{
         return xx->getBinary(op,MX(f,y),false,false);
       }
     }
-    
+
     switch(op){
     case OP_ADD:
       if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(y,size1(),size2()) : y;
@@ -415,7 +415,7 @@ namespace casadi{
       double y_value = y.size()>0 ? y->getValue() : 0;
       double ret;
       casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,y_value,ret);
-      
+
       return MX(y.sparsity(),ret);
     }
 
@@ -445,7 +445,7 @@ namespace casadi{
     stream << v_.value << ";" << std::endl;
     stream.flags(fmtfl); // reset current format flags
   }
-  
+
   template<typename Value>
   MX Constant<Value>::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const{
     if(v_.value!=0){
@@ -458,14 +458,14 @@ namespace casadi{
       }
     }
     return MX::create(new Constant<Value>(sp,v_));
-  }  
-  
+  }
+
   template<typename Value>
   MX Constant<Value>::getSetNonzeros(const MX& y, const std::vector<int>& nz) const {
     if (y.isConstant() && y->isZero() && v_.value==0) {
       return y;
     }
-    
+
     // Fall-back
     return MXNode::getSetNonzeros(y,nz);
   }

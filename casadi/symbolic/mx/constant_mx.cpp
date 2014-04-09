@@ -51,7 +51,7 @@ namespace casadi{
         *output[0] = shared_from_this<MX>();
       }
     }
-  
+
     // Forward sensitivities
     if(!fwdSens.empty()){
       MX zero_sens = MX::sparse(size1(),size2());
@@ -61,12 +61,12 @@ namespace casadi{
         }
       }
     }
-    
+
     // Clear adjoint seeds
     for(int d=0; d<adjSeed.size(); ++d){
       if(adjSeed[d][0]!=0){
         *adjSeed[d][0] = MX();
-      }      
+      }
     }
   }
 
@@ -99,7 +99,7 @@ namespace casadi{
       case 0: return new Constant<CompiletimeConst<0> >(sp);
       case 1: return new Constant<CompiletimeConst<1> >(sp);
       case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
-      default: return new Constant<RuntimeConst<int> >(sp,val);        
+      default: return new Constant<RuntimeConst<int> >(sp,val);
       }
     }
   }
@@ -180,13 +180,13 @@ namespace casadi{
     // Check if same node
     const ConstantDMatrix* n = dynamic_cast<const ConstantDMatrix*>(node);
     if(n==0) return false;
-    
+
     // Check sparsity
     if(this->sparsity()!=node->sparsity()) return false;
-    
+
     // Check indices
     if(!std::equal(x_.begin(),x_.end(),n->x_.begin())) return false;
-    
+
     return true;
   }
 
@@ -202,7 +202,7 @@ namespace casadi{
     casadi_assert(nz.empty());
     return MX::zeros(sp);
   }
-    
+
   MX ZeroByZero::getSetNonzeros(const MX& y, const std::vector<int>& nz) const{
     return shared_from_this<MX>();
   }

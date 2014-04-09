@@ -31,17 +31,17 @@
 
 namespace casadi{
   class DirectCollocationInternal;
-    
+
   /** \brief Direct collocation
    *
    *   \author Joel Andersson
    *   \date 2012
-  */ 
+  */
 class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocation : public OCPSolver{
   public:
     /// Default constructor
     DirectCollocation();
-  
+
     /// Constructor
     explicit DirectCollocation(const Function& ffcn, const Function& mfcn, const Function& cfcn=Function(), const Function& rfcn=Function());
 
@@ -50,29 +50,29 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocation : public OCPSolver{
 
     /// Const access functions of the node
     const DirectCollocationInternal* operator->() const;
-    
+
     /// Get the variables
     void getGuess(std::vector<double>& V_init) const;
-    
+
     /// Get the variables
     void getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const;
-    
+
     /// Get the constraints
     void getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const;
 
     /// Set the optimal solution
     void setOptimalSolution( const std::vector<double> &V_opt );
-    
+
     /// Access the underlying NLPSolver object
     NLPSolver getNLPSolver() const;
 
-    /// Prints out a human readable report about possible constraint violations, after solving 
+    /// Prints out a human readable report about possible constraint violations, after solving
     void reportConstraints(std::ostream &stream=std::cout);
 
     /// Return the report as a string
     std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
 };
-                        
+
 } // namespace casadi
 
 #endif // DIRECT_COLLOCATION_HPP

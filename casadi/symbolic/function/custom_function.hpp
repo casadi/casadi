@@ -27,7 +27,7 @@
 #include <string>
 
 namespace casadi{
-  
+
 /** \brief  Forward declaration of internal class */
 class CustomFunctionInternal;
 
@@ -35,8 +35,8 @@ class CustomFunctionInternal;
 class CustomFunction;
 
 /** \brief  Interface to a custom function
-  
-  \author Joel Andersson 
+
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT CustomFunction : public Function{
@@ -49,28 +49,28 @@ public:
   //@{
   /** \brief  Create a function with input/output schemes given */
   explicit CustomFunction(const CustomEvaluate &c_fcn, const std::vector<Sparsity> &inputscheme, const std::vector<Sparsity> &outputscheme);
-  
+
   explicit CustomFunction(const CustomEvaluate &c_fcn, const IOSchemeVector< Sparsity > &inputscheme, const std::vector<Sparsity> &outputscheme);
-  
+
   explicit CustomFunction(const CustomEvaluate &c_fcn, const std::vector<Sparsity> &inputscheme, const IOSchemeVector< Sparsity > &outputscheme);
-  
+
   explicit CustomFunction(const CustomEvaluate &c_fcn, const IOSchemeVector< Sparsity > &inputscheme, const IOSchemeVector< Sparsity > &outputscheme);
   //@}
-  
+
   /** \brief  Create a function, user sets inputs outputs manually */
   explicit CustomFunction(const CustomEvaluate &c_fcn);
 
   /** \brief  Access functions of the node */
   CustomFunctionInternal* operator->();
-  
+
   /** \brief  Const access functions of the node */
   const CustomFunctionInternal* operator->() const;
-  
+
   /** \brief  Check if the pointer points towards a valid object */
   virtual bool checkNode() const;
 
 }; // class CustomFunction
-  
+
 
 
 } // namespace casadi

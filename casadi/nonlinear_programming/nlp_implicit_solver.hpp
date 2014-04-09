@@ -28,15 +28,15 @@
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class NLPImplicitInternal;
 
-  /** \brief Use an NLPSolver as ImplicitFunction solver 
+  /** \brief Use an NLPSolver as ImplicitFunction solver
 
    @copydoc ImplicitFunction_doc
-      
+
    \author Joris Gillis
    \date 2012
   */
@@ -46,16 +46,16 @@ public:
   /** \brief  Default constructor */
   NLPImplicitSolver();
 
-  /** \brief Create a new solver instance */  
+  /** \brief Create a new solver instance */
   explicit NLPImplicitSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
-  
+
   /** \brief  Access functions of the node */
   NLPImplicitInternal* operator->();
   const NLPImplicitInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Access NLP solver
   NLPSolver& getNLPSolver();
 

@@ -32,7 +32,7 @@ namespace casadi{
   LapackQRDense::LapackQRDense(const Sparsity& sparsity, int nrhs){
     assignNode(new LapackQRDenseInternal(sparsity,nrhs));
   }
- 
+
   LapackQRDenseInternal* LapackQRDense::operator->(){
     return static_cast<LapackQRDenseInternal*>(Function::operator->());
   }
@@ -50,14 +50,14 @@ namespace casadi{
   void LapackQRDenseInternal::init(){
     // Call the base class initializer
     LinearSolverInternal::init();
-  
+
     // Get dimensions
     ncol_ = ncol();
     nrow_ = nrow();
-  
+
     // Currently only square matrices tested
     if(ncol_!=nrow_) throw CasadiException("LapackQRDenseInternal::init: currently only square matrices implemented.");
-  
+
     // Allocate matrix
     mat_.resize(ncol_*ncol_);
     tau_.resize(ncol_);
@@ -66,10 +66,10 @@ namespace casadi{
 
   void LapackQRDenseInternal::prepare(){
     prepared_ = false;
-  
+
     // Get the elements of the matrix, dense format
     input(0).get(mat_,DENSE);
-  
+
     // Factorize the matrix
     int info = -100;
     int lwork = work_.size();
@@ -79,7 +79,7 @@ namespace casadi{
     // Success if reached this point
     prepared_ = true;
   }
-    
+
   void LapackQRDenseInternal::solve(double* x, int nrhs, bool transpose){
     // Properties of R
     char uploR = 'U';
@@ -87,18 +87,18 @@ namespace casadi{
     char sideR = 'L';
     double alphaR = 1.;
     char transR = transpose ? 'T' : 'N';
-  
+
     // Properties of Q
     char transQ = transpose ? 'N' : 'T';
     char sideQ = 'L';
     int k = tau_.size(); // minimum of ncol_ and nrow_
     int lwork = work_.size();
-  
+
     if(transpose){
 
       // Solve for transpose(R)
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR, getPtr(mat_), &ncol_, x, &ncol_);
-    
+
       // Multiply by Q
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x, &ncol_, getPtr(work_), &lwork, &info);
@@ -112,7 +112,7 @@ namespace casadi{
       if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
 
       // Solve for R
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR, getPtr(mat_), &ncol_, x, &ncol_);  
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR, getPtr(mat_), &ncol_, x, &ncol_);
     }
   }
 

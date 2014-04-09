@@ -33,7 +33,7 @@
 namespace casadi{
 
   /** \brief Internal class for SOCPQCQPInternal
-   * 
+   *
       @copydoc QCQPSolver_doc
    * */
 class CASADI_CONVEX_PROGRAMMING_EXPORT SOCPQCQPInternal : public QCQPSolverInternal {
@@ -42,7 +42,7 @@ public:
 
   /** \brief  Clone */
   virtual SOCPQCQPInternal* clone() const;
-  
+
   /** \brief  Create a new Solver */
   explicit SOCPQCQPInternal(const std::vector<Sparsity> &st);
 
@@ -51,9 +51,9 @@ public:
 
   /** \brief  Initialize */
   virtual void init();
-  
+
   virtual void evaluate();
-  
+
   protected:
     SOCPSolver socpsolver_;
     std::vector<CSparseCholesky> cholesky_;

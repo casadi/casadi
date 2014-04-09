@@ -34,12 +34,12 @@
 namespace casadi{
 
   /** \brief Base class for objects that have a natural string representation
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT PrintableObject{
   public:
-    
+
 #ifndef SWIG
     /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
@@ -48,7 +48,7 @@ namespace casadi{
     virtual void repr(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object to a stream (shorthand)
-    CASADI_SYMBOLIC_EXPORT friend std::ostream& operator<<(std::ostream &stream, const PrintableObject& obj);    
+    CASADI_SYMBOLIC_EXPORT friend std::ostream& operator<<(std::ostream &stream, const PrintableObject& obj);
 
     /// Return a string with a description of the object, cf. str(Object) in Python
     CASADI_SYMBOLIC_EXPORT friend std::string str(const PrintableObject& obj);
@@ -70,7 +70,7 @@ namespace casadi{
     std::string __str__()  { return $self->getDescription(); }
     std::string __repr__()  { return $self->getRepresentation(); }
   }
-#endif // SWIG    
+#endif // SWIG
 
 } // namespace casadi
 

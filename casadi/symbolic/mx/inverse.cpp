@@ -34,7 +34,7 @@ namespace casadi{
     setDependencies(x);
     setSparsity(Sparsity::dense(x.size1(),x.size2()));
   }
-  
+
   void Inverse::printPart(std::ostream &stream, int part) const{
     if(part==0){
       stream << "inv(";
@@ -55,7 +55,7 @@ namespace casadi{
     for(int d=0; d<nfwd; ++d){
       *fwdSens[d][0] = -mul(inv_X,mul(*fwdSeed[d][0],inv_X));
     }
-  
+
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     if(nadj>0){

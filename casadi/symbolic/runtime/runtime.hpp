@@ -32,47 +32,47 @@ namespace casadi {
   /// COPY: y <-x
   template<typename real_t>
   void casadi_copy(int n, const real_t* x, int inc_x, real_t* y, int inc_y);
-  
+
   /// SWAP: x <-> y
   template<typename real_t>
   void casadi_swap(int n, real_t* x, int inc_x, real_t* y, int inc_y);
-  
+
   /// COPY sparse: y <- x
   template<typename real_t>
   void casadi_copy_sparse(const real_t* x, const int* sp_x, real_t* y, const int* sp_y);
-  
+
   /// SCAL: x <- alpha*x
   template<typename real_t>
   void casadi_scal(int n, real_t alpha, real_t* x, int inc_x);
-  
+
   /// AXPY: y <- a*x + y
   template<typename real_t>
   void casadi_axpy(int n, real_t alpha, const real_t* x, int inc_x, real_t* y, int inc_y);
-  
+
   /// DOT: inner_prod(x,y) -> return
   template<typename real_t>
   real_t casadi_dot(int n, const real_t* x, int inc_x, const real_t* y, int inc_y);
-  
+
   /// ASUM: ||x||_1 -> return
   template<typename real_t>
   real_t casadi_asum(int n, const real_t* x, int inc_x);
-  
+
   /// IAMAX: index corresponding to the entry with the largest absolute value
   template<typename real_t>
   int casadi_iamax(int n, const real_t* x, int inc_x);
-  
+
   /// FILL: x <- alpha
   template<typename real_t>
   void casadi_fill(int n, real_t alpha, real_t* x, int inc_x);
-  
+
   /// Sparse matrix-matrix multiplication, the first argument is transposed: z <- z + x'*y
   template<typename real_t>
   void casadi_mm_tn_sparse(const real_t* trans_x, const int* sp_trans_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z);
-  
+
   /// NRM2: ||x||_2 -> return
   template<typename real_t>
   real_t casadi_nrm2(int n, const real_t* x, int inc_x);
-  
+
   /// TRANS: y <- trans(x)
   template<typename real_t>
   void casadi_trans(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp);
@@ -103,7 +103,7 @@ namespace casadi {
       y += inc_y;
     }
   }
-  
+
   template<typename real_t>
   void casadi_swap(int n, real_t* x, int inc_x, real_t* y, int inc_y){
     real_t t;
@@ -116,7 +116,7 @@ namespace casadi {
       y += inc_y;
     }
   }
-  
+
   template<typename real_t>
   void casadi_copy_sparse(const real_t* x, const int* sp_x, real_t* y, const int* sp_y){
     int nrow_x = sp_x[0];
@@ -154,7 +154,7 @@ namespace casadi {
       }
     }
   }
-  
+
   template<typename real_t>
   void casadi_scal(int n, real_t alpha, real_t* x, int inc_x){
     int i;
@@ -163,7 +163,7 @@ namespace casadi {
       x += inc_x;
     }
   }
-  
+
   template<typename real_t>
   void casadi_axpy(int n, real_t alpha, const real_t* x, int inc_x, real_t* y, int inc_y){
     int i;
@@ -173,7 +173,7 @@ namespace casadi {
       y += inc_y;
     }
   }
-  
+
   template<typename real_t>
   real_t casadi_dot(int n, const real_t* x, int inc_x, const real_t* y, int inc_y){
     real_t r = 0;
@@ -185,7 +185,7 @@ namespace casadi {
     }
     return r;
   }
-  
+
   template<typename real_t>
   real_t casadi_asum(int n, const real_t* x, int inc_x){
     real_t r = 0;
@@ -196,7 +196,7 @@ namespace casadi {
     }
     return r;
   }
-  
+
   template<typename real_t>
   int casadi_iamax(int n, const real_t* x, int inc_x){
     real_t t;
@@ -213,7 +213,7 @@ namespace casadi {
     }
     return largest_index;
   }
-  
+
   template<typename real_t>
   void casadi_fill(int n, real_t alpha, real_t* x, int inc_x){
     int i;
@@ -222,7 +222,7 @@ namespace casadi {
       x += inc_x;
     }
   }
-  
+
   template<typename real_t>
   void casadi_mm_tn_sparse(const real_t* trans_x, const int* sp_trans_x, const real_t* y, const int* sp_y, real_t* z, const int* sp_z){
 
@@ -251,7 +251,7 @@ namespace casadi {
         int j = row_z[el];
         int el1 = colind_y[i];
         int el2 = rowind_x[j];
-        while(el1 < colind_y[i+1] && el2 < rowind_x[j+1]){ 
+        while(el1 < colind_y[i+1] && el2 < rowind_x[j+1]){
           int j1 = row_y[el1];
           int i2 = col_x[el2];
           if(j1==i2){
@@ -265,7 +265,7 @@ namespace casadi {
       }
     }
   }
-  
+
   template<typename real_t>
   real_t casadi_nrm2(int n, const real_t* x, int inc_x){
     real_t r = 0;
@@ -276,7 +276,7 @@ namespace casadi {
     }
     return sqrt(r);
   }
-  
+
   template<typename real_t>
   void casadi_trans(const real_t* x, const int* sp_x, real_t* y, const int* sp_y, int *tmp){
     int ncol_x = sp_x[1];
@@ -290,7 +290,7 @@ namespace casadi {
       y[tmp[row_x[k]]++] = x[k];
     }
   }
-  
+
 }
 
 /// \endcond

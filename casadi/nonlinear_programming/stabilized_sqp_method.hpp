@@ -28,9 +28,9 @@
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 
 namespace casadi{
-  
+
   class StabilizedSQPInternal;
-  
+
   /**
      \brief Stabilized Sequential Quadratic Programming method.
 
@@ -53,7 +53,7 @@ namespace casadi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Static creator function 
+    /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
 #endif
@@ -64,7 +64,7 @@ namespace casadi{
 
     /// Access the StabilizedQPSolver used internally
     const StabilizedQPSolver getStabilizedQPSolver() const;
-    
+
   };
 
 } // namespace casadi

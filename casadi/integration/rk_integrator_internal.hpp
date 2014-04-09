@@ -28,10 +28,10 @@
 
 /// \cond INTERNAL
 namespace casadi{
-    
+
   class CASADI_INTEGRATION_EXPORT RKIntegratorInternal : public FixedStepIntegratorInternal{
   public:
-  
+
     /// Constructor
     explicit RKIntegratorInternal(const Function& f, const Function& g);
 
@@ -43,7 +43,7 @@ namespace casadi{
 
     /// Create a new integrator
     virtual RKIntegratorInternal* create(const Function& f, const Function& g) const{ return new RKIntegratorInternal(f,g);}
-  
+
     /// Destructor
     virtual ~RKIntegratorInternal();
 

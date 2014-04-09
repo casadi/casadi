@@ -28,7 +28,7 @@ namespace casadi{
 
   CollocationIntegrator::CollocationIntegrator(){
   }
-  
+
   CollocationIntegrator::CollocationIntegrator(const Function& f, const Function& g){
     assignNode(new CollocationIntegratorInternal(f,g));
   }
@@ -40,7 +40,7 @@ namespace casadi{
   const CollocationIntegratorInternal* CollocationIntegrator::operator->() const{
     return static_cast<const CollocationIntegratorInternal*>(Integrator::operator->());
   }
-    
+
   bool CollocationIntegrator::checkNode() const{
     return dynamic_cast<const CollocationIntegratorInternal*>(get())!=0;
   }

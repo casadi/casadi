@@ -32,7 +32,7 @@
 namespace casadi{
 
   /** \brief Internal class for QPStabilizerInternal
-   * 
+   *
    @copydoc StabilizedQPSolver_doc
    * */
   class CASADI_CONVEX_PROGRAMMING_EXPORT QPStabilizerInternal : public StabilizedQPSolverInternal {
@@ -56,11 +56,11 @@ namespace casadi{
 
     /** \brief Solve the QP */
     virtual void evaluate();
-  
+
     /** \brief Generate native code for debugging */
     virtual void generateNativeCode(std::ostream &file) const;
-  
-    /// Data members 
+
+    /// Data members
     QPSolver qp_solver_;
   };
 

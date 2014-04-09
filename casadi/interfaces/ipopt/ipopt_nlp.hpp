@@ -102,14 +102,14 @@ public:
                                  Number obj_value,
                                  const IpoptData* ip_data,
                                  IpoptCalculatedQuantities* ip_cq);
-                                 
+
  /** Specify the number of variables that appear in the Hessian */
  virtual Index get_number_of_nonlinear_variables();
-                                 
+
  /** Specify which variables that appear in the Hessian */
  virtual bool get_list_of_nonlinear_variables(Index num_nonlin_vars, Index* pos_nonlin_vars);
- 
-   
+
+
  /** This method is called at every iteration */
  virtual bool intermediate_callback(AlgorithmMode mode, Index iter, Number obj_value,
                                     Number inf_pr, Number inf_du,
@@ -119,24 +119,24 @@ public:
                                     Index ls_trials,
                                     const IpoptData* ip_data,
                                     IpoptCalculatedQuantities* ip_cq);
- 
+
   /** Allows setting information about variables and constraints */
-  virtual bool get_var_con_metadata(Index n, StringMetaDataMapType& var_string_md, 
+  virtual bool get_var_con_metadata(Index n, StringMetaDataMapType& var_string_md,
                                     IntegerMetaDataMapType& var_integer_md, NumericMetaDataMapType& var_numeric_md,
-                                    Index m, StringMetaDataMapType& con_string_md, 
+                                    Index m, StringMetaDataMapType& con_string_md,
                                     IntegerMetaDataMapType& con_integer_md, NumericMetaDataMapType& con_numeric_md);
-  
+
   /** Retrieve information about variables and constraints */
   virtual void finalize_metadata(Index n, const StringMetaDataMapType& var_string_md,
                                  const IntegerMetaDataMapType& var_integer_md, const NumericMetaDataMapType& var_numeric_md,
                                  Index m, const StringMetaDataMapType& con_string_md,
                                  const IntegerMetaDataMapType& con_integer_md, const NumericMetaDataMapType& con_numeric_md);
-  
+
 private:
   IpoptUserClass(const IpoptUserClass&);
-  IpoptUserClass& operator=(const IpoptUserClass&);  
+  IpoptUserClass& operator=(const IpoptUserClass&);
   IpoptInternal* solver;
-  
+
   double * x_;
   double * z_L_;
   double * z_U_;

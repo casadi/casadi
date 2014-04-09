@@ -36,11 +36,11 @@ namespace casadi{
 /** \brief  An elemenent of the algorithm, namely an MX node */
 struct MXAlgEl{
   /// Operator index
-  int op; 
-  
+  int op;
+
   /// Data associated with the operation
   MX data;
-  
+
   /// Work vector indices of the arguments
   std::vector<int> arg;
 
@@ -63,7 +63,7 @@ namespace casadi{
 class MXFunctionInternal;
 
   /** \brief  General function mapping from/to MX
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT MXFunction : public Function{
@@ -71,11 +71,11 @@ public:
 
   /** \brief  Default constructor */
   MXFunction();
-  
+
   /** \brief  Attempt to form an MXFunction out of an Function */
   explicit MXFunction(const Function& function);
 
-#ifndef SWIG  
+#ifndef SWIG
   /** \brief  Single input, single output */
   MXFunction(const MX& input, const MX& output);
 
@@ -84,7 +84,7 @@ public:
 
   /** \brief  Multiple input, single output */
   MXFunction(const std::vector<MX>& input, const MX& output);
-#endif // SWIG  
+#endif // SWIG
 
   /** \brief  Multiple input, multiple output*/
   MXFunction(const std::vector<MX>& input, const std::vector<MX>& output);
@@ -94,10 +94,10 @@ public:
 
   /** \brief  Multiple input, multiple output*/
   MXFunction(const IOSchemeVector< MX >& input, const std::vector<MX>& output);
-  
+
   /** \brief  Multiple input, multiple output*/
   MXFunction(const IOSchemeVector< MX >& input, const IOSchemeVector< MX >& output);
-  
+
   /// \cond INTERNAL
   /** \brief  Access functions of the node */
   MXFunctionInternal* operator->();
@@ -109,36 +109,36 @@ public:
   /** \brief Get function input */
   const MX& inputExpr(int ind) const;
   const MX& inputExpr(const std::string & iname) const { return inputExpr(inputSchemeEntry(iname)); }
-  
+
   /** \brief Get function output */
   const MX& outputExpr(int ind) const;
   const MX& outputExpr(const std::string & oname) const { return outputExpr(outputSchemeEntry(oname)); }
-  
+
   /** \brief Get all function inputs */
   const std::vector<MX>& inputExpr() const;
-  
+
   /** \brief Get all function outputs */
   const std::vector<MX> & outputExpr() const;
-  
+
 /// \cond INTERNAL
 #ifndef SWIG
   /** \brief Access the algorithm directly */
   const std::vector<MXAlgEl>& algorithm() const;
 #endif // SWIG
 /// \endcond
-  
+
   /** \brief Get the number of atomic operations */
   int getAlgorithmSize() const{ return algorithm().size();}
 
   /** \brief Get the length of the work vector */
   int getWorkSize() const;
-  
+
   /** \brief Number of nodes in the algorithm */
   int countNodes() const;
-  
+
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   //@{
   /** \brief Jacobian via source code transformation */
   MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
@@ -146,7 +146,7 @@ public:
   MX jac(int iind, const std::string & oname, bool compact=false, bool symmetric=false) { return jac(iind,outputSchemeEntry(oname),compact,symmetric); }
   MX jac(const std::string & iname, const std::string & oname, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
   //@}
-  
+
   //@{
   /** \brief Gradient via source code transformation */
   MX grad(int iind=0, int oind=0);
@@ -162,13 +162,13 @@ public:
   MX tang(int iind, const std::string & oname) { return tang(iind,outputSchemeEntry(oname)); }
   MX tang(const std::string & iname, const std::string & oname) { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
   //@}
-  
+
   /** \brief Expand the matrix valued graph into a scalar valued graph */
   SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());
-  
+
   /** \brief Get all the free variables of the function */
   std::vector<MX> getFree() const;
-  
+
 /// \cond INTERNAL
 #ifndef SWIG
   /** \brief Extract the functions needed for the Lifted Newton method */
@@ -180,7 +180,7 @@ public:
 /// \endcond
 
   /** \brief Get the corresponding matrix type */
-  typedef MX MatType;  
+  typedef MX MatType;
 };
 
 } // namespace casadi

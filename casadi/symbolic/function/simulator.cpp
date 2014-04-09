@@ -55,7 +55,7 @@ namespace casadi{
   }
 
   const SimulatorInternal* Simulator::operator->() const{
-    return static_cast<const SimulatorInternal*>(Function::operator->()); 
+    return static_cast<const SimulatorInternal*>(Function::operator->());
   }
 
   bool Simulator::checkNode() const{

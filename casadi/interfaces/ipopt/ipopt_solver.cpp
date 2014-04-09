@@ -40,7 +40,7 @@ namespace casadi{
   const IpoptInternal* IpoptSolver::operator->() const{
     return static_cast<const IpoptInternal*>(NLPSolver::operator->());
   }
-    
+
   bool IpoptSolver::checkNode() const{
     return dynamic_cast<const IpoptInternal*>(get());
   }

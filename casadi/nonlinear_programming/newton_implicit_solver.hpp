@@ -28,15 +28,15 @@
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class NewtonImplicitInternal;
 
   /** \brief Implements simple newton iterations to solve an implicit function.
 
    @copydoc ImplicitFunction_doc
-      
+
    \author Joris Gillis
    \date 2012
   */
@@ -45,17 +45,17 @@ public:
 
   /** \brief Default constructor */
   NewtonImplicitSolver();
-  
+
   /** \brief Create a solver instance */
   explicit NewtonImplicitSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
-  
+
   /** \brief  Access functions of the node */
   NewtonImplicitInternal* operator->();
   const NewtonImplicitInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");

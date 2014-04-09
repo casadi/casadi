@@ -36,38 +36,38 @@ class CASADI_SYMBOLIC_EXPORT StabilizedQPSolverInternal : public FunctionInterna
 
     // Constructor
     StabilizedQPSolverInternal(const std::vector<Sparsity> &st);
-    
+
     // Destructor
     virtual ~StabilizedQPSolverInternal() = 0;
-    
+
     // Initialize
     virtual void init();
-    
+
     // Solve the system of equations
     virtual void evaluate();
-    
+
     // Solve the system of equations
     virtual void solve();
-    
+
     /// Set options that make the QP solver more suitable for solving LPs
     virtual void setLPOptions() { };
-    
+
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
-    
+
     /** Generate native code in the interfaced language for debugging */
     virtual void generateNativeCode(std::ostream& file) const {};
-    
+
   protected:
 
     /// Problem structure
     std::vector<Sparsity> st_;
-    
+
     /// Number of decision variables
     int n_;
-    
+
     /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc_; 
+    int nc_;
 };
 
 

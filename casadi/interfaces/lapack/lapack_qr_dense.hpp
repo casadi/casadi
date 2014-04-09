@@ -27,7 +27,7 @@
 #include <casadi/interfaces/lapack/casadi_lapack_interface_export.h>
 
 namespace casadi{
-  
+
   /** \brief  Forward declaration of internal class
       @copydoc LinearSolver_doc
   */
@@ -39,7 +39,7 @@ namespace casadi{
    *
    * This class solves the linear system A.x=b by making an QR factorization of A: \n
    * A = Q.R, with Q orthogonal and R upper triangular
-   * 
+   *
    * LapackQRDense is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use LapackQRDense is: \n
@@ -58,14 +58,14 @@ namespace casadi{
 
     /// Default (empty) constructor
     LapackQRDense();
-  
+
     /// Create a linear solver given a sparsity pattern
     explicit LapackQRDense(const Sparsity& sparsity, int nrhs=1);
-    
+
     /// Access functions of the node
     LapackQRDenseInternal* operator->();
     const LapackQRDenseInternal* operator->() const;
-  
+
     /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
@@ -100,13 +100,13 @@ namespace casadi{
 
     // Destructor
     virtual ~LapackQRDenseInternal();
-    
+
     // Initialize the solver
     virtual void init();
 
     // Prepare the solution of the linear system
     virtual void prepare();
-    
+
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
 
@@ -114,13 +114,13 @@ namespace casadi{
 
     // Matrix
     std::vector<double> mat_;
-    
+
     // The scalar factors of the elementary reflectors
-    std::vector<double> tau_; 
-    
+    std::vector<double> tau_;
+
     // qr work array
-    std::vector<double> work_; 
-    
+    std::vector<double> work_;
+
     // Dimensions
     int ncol_, nrow_;
 

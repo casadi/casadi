@@ -53,6 +53,6 @@ void StabilizedQPSolver::generateNativeCode(const std::string &filename) const {
 
 } // namespace casadi
 
-  
+
 
 

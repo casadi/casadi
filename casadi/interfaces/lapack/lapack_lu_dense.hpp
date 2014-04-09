@@ -27,7 +27,7 @@
 #include <casadi/interfaces/lapack/casadi_lapack_interface_export.h>
 
 namespace casadi{
-  
+
   /** \brief  Forward declaration of internal class
 
       @copydoc LinearSolver_doc
@@ -39,7 +39,7 @@ namespace casadi{
    *
    * This class solves the linear system A.x=b by making an LU factorization of A: \n
    * A = L.U, with L lower and U upper triangular
-   * 
+   *
    * LapackLUDense is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use LapackLUDense is: \n
@@ -58,14 +58,14 @@ namespace casadi{
 
     /// Default (empty) constructor
     LapackLUDense();
-  
+
     /// Create a linear solver given a sparsity pattern
     explicit LapackLUDense(const Sparsity& sparsity, int nrhs=1);
-    
+
     /// Access functions of the node
     LapackLUDenseInternal* operator->();
     const LapackLUDenseInternal* operator->() const;
-  
+
     /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");
@@ -100,16 +100,16 @@ namespace casadi{
 
     // Clone
     virtual LapackLUDenseInternal* clone() const;
-    
+
     // Destructor
     virtual ~LapackLUDenseInternal();
-    
+
     // Initialize the solver
     virtual void init();
 
     // Prepare the solution of the linear system
     virtual void prepare();
-    
+
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
 
@@ -117,31 +117,31 @@ namespace casadi{
 
     // Scale columns
     void colScaling(double* x, int nrhs);
-    
+
     // Scale rows
     void rowScaling(double* x, int nrhs);
-    
+
     // Matrix
     std::vector<double> mat_;
-    
+
     // Pivoting elements
     std::vector<int> ipiv_;
 
     // Col and row scaling
     std::vector<double> r_, c_;
-    
+
     // Type of scaling during the last equilibration
     char equed_;
-    
+
     // Equilibriate?
     bool equilibriate_;
 
     // Allow the equilibration to fail
     bool allow_equilibration_failure_;
-        
+
     // Dimensions
     int ncol_, nrow_;
-    
+
   };
 
 #endif // SWIG

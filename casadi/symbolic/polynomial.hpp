@@ -28,14 +28,14 @@
 namespace casadi{
 
   /** \brief Helper class for differentiating and integrating polynomials
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2014
   */
   class CASADI_SYMBOLIC_EXPORT Polynomial : public PrintableObject{
   public:
     /// Floating point type
     typedef long double real_t;
-    
+
     /// Construct a constant polynomial
     Polynomial(real_t scalar=1);
 
@@ -63,7 +63,7 @@ namespace casadi{
       }
       return ret;
     }
-    
+
     /// Degree of the polynomial
     int degree() const;
 
@@ -75,7 +75,7 @@ namespace casadi{
 
     /// Create a new polynomial for the anti-derivative (primitive function)
     Polynomial anti_derivative() const;
-    
+
     /// Remove excess zeros
     void trim();
 

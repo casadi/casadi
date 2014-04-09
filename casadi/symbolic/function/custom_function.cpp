@@ -62,9 +62,9 @@ CustomFunctionInternal* CustomFunction::operator->(){
 }
 
 const CustomFunctionInternal* CustomFunction::operator->() const{
-   return static_cast<const CustomFunctionInternal*>(Function::operator->()); 
+   return static_cast<const CustomFunctionInternal*>(Function::operator->());
 }
-  
+
 bool CustomFunction::checkNode() const{
   return dynamic_cast<const CustomFunctionInternal*>(get())!=0;
 }

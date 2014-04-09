@@ -29,25 +29,25 @@
 using namespace std;
 
 namespace casadi{
-  
+
   Sparsity reshape(const Sparsity& a, int nrow, int ncol){
     return a.reshape(nrow,ncol);
   }
 
-  Sparsity vec(const Sparsity& a){ 
+  Sparsity vec(const Sparsity& a){
     return reshape(a,a.numel(),1);
   }
 
   Sparsity mul(const Sparsity& a, const Sparsity &b) {
     return b.patternProduct(a.T());
   }
-    
+
   int rank(const Sparsity& a) {
     std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     a.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
     return coarse_colblock.at(3);
   }
-  
+
   Sparsity horzcat(const std::vector<Sparsity> & sp) {
     if(sp.empty()){
       return Sparsity();
@@ -59,7 +59,7 @@ namespace casadi{
       return ret;
     }
   }
-  
+
   Sparsity horzcat(const Sparsity & a, const Sparsity & b) {
     Sparsity ret = a;
     ret.appendColumns(b);
@@ -83,7 +83,7 @@ namespace casadi{
       return ret.T();
     }
   }
-  
+
   Sparsity vertcat(const Sparsity & a, const Sparsity & b) {
     if(a.isVector()){
       Sparsity ret = a;
@@ -95,14 +95,14 @@ namespace casadi{
       return ret.T();
     }
   }
-  
+
   Sparsity blkdiag(const std::vector< Sparsity > &v) {
     int n = 0;
     int m = 0;
-    
+
     std::vector<int> colind(1,0);
     std::vector<int> row;
-    
+
     int nz = 0;
     for (int i=0;i<v.size();++i) {
       const std::vector<int> &colind_ = v[i].colind();
@@ -117,16 +117,16 @@ namespace casadi{
       m+= v[i].size1();
       nz+= v[i].size();
     }
-    
+
     return Sparsity(m,n,colind,row);
   }
-  
+
   Sparsity blkdiag(const Sparsity &a, const Sparsity &b) {
-    
+
     std::vector<Sparsity> v;
     v.push_back(a);
     v.push_back(b);
-    
+
     return blkdiag(v);
   }
 
@@ -143,7 +143,7 @@ namespace casadi{
     // Get the sparsity of the input
     const vector<int>& colind_x = sp.colind();
     const vector<int>& row_x = sp.row();
-    
+
     // Allocate result
     std::vector<Sparsity> ret;
     ret.reserve(n);
@@ -165,7 +165,7 @@ namespace casadi{
       colind[0] = 0;
       row.resize(colind.back());
       copy(row_x.begin()+colind_x[first_col],row_x.begin()+colind_x[last_col],row.begin());
-      
+
       // Append to the list
       ret.push_back(Sparsity(nrow,ncol,colind,row));
     }

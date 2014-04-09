@@ -31,7 +31,7 @@
 #include "casadi_common.hpp"
 
 namespace casadi{
-  
+
   /// Forward declarations
   class SXElement;
   class MX;
@@ -63,18 +63,18 @@ namespace casadi{
   class SOCPSolver;
   class SDQPSolver;
   class ImplicitFunction;
-  
+
   class DerivativeGenerator;
   class Callback;
   class CustomEvaluate;
   class CustomFunction;
-  
+
   /// Function pointer to a nonlinear solver creator function
   typedef NLPSolver (*NLPSolverCreator)(const Function& nlp);
 
   /// Function pointer to a linear solver creator function
   typedef LinearSolver (*linearSolverCreator)(const Sparsity& sparsity, int nrhs);
-  
+
   /// Function pointer to a LP solver creator function
   typedef LPSolver (*LPSolverCreator)(const LPStructure& st);
 
@@ -83,7 +83,7 @@ namespace casadi{
 
   /// Function pointer to a QP solver creator function
   typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
-  
+
   /// Function pointer to a Stabilized QP solver creator function
   typedef StabilizedQPSolver (*StabilizedQPSolverCreator)(const QPStructure& st);
 
@@ -95,18 +95,18 @@ namespace casadi{
 
   /// Function pointer to an SDQP solver creator function
   typedef SDQPSolver (*SDQPSolverCreator)(const SDQPStructure& st);
-  
+
   /// Function pointer to an SOCP solver creator function
   typedef SOCPSolver (*SOCPSolverCreator)(const SOCPStructure& st);
-  
+
   /// Function pointer to an implicit function creator
   typedef ImplicitFunction (*implicitFunctionCreator)(const Function& f, const Function& jac, const LinearSolver& linsol);
-  
-  
+
+
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized
   const int optimized_num_dir = 64;
-  
+
   // Type with a size corresponding to that of double (or smaller) that can be used to hold a set of booleans
   // If the compiler supports C99 or has defined __SIZEOF_LONG_LONG__, we shall use the long long datatype, which is 64 bit, otherwise long
   #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L || defined(__SIZEOF_LONG_LONG__))
@@ -120,8 +120,8 @@ namespace casadi{
 
   // Make sure that the integer datatype is indeed smaller or equal to the double
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
-#endif // SWIG  
-  
+#endif // SWIG
+
 } // namespace casadi
 
 #endif // CASADI_TYPES_HPP

@@ -29,7 +29,7 @@
 
 namespace casadi{
   /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T
-      
+
       Forward derivatives:
       x_dot = (r_dot - x * A_dot) * A^-1
 
@@ -43,7 +43,7 @@ namespace casadi{
   template<bool Tr>
   class CASADI_SYMBOLIC_EXPORT Solve : public MXNode{
   public:
-    
+
     /** \brief  Constructor */
     Solve(const MX& r, const MX& A, const LinearSolver& linear_solver);
 

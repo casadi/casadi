@@ -30,17 +30,17 @@
 /// \cond INTERNAL
 
 namespace casadi{
- 
+
 /** \brief  Internal node class for OCPSolver
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT OCPSolverInternal : public FunctionInternal{
   friend class OCPSolver;
   public:
-  
+
     /** \brief Constructor
-    *  
+    *
     *
     * \param ffcn Continuous time dynamics
     * \param mfcn Mayer term
@@ -48,7 +48,7 @@ class CASADI_SYMBOLIC_EXPORT OCPSolverInternal : public FunctionInternal{
     * \param rfcn Initial value constraints
     *
     * The signatures (number and order of inputs/outputs) of these functions are not restricted at this stage.
-    * 
+    *
     * Only ffcn has a general requirement for input interface: { DAE_T, DAE_Y, DAE_P, DAE_YDOT } from casadi::DAEInput
     *
     * For example:
@@ -61,22 +61,22 @@ class CASADI_SYMBOLIC_EXPORT OCPSolverInternal : public FunctionInternal{
 
     /// Destructor
     virtual ~OCPSolverInternal();
-    
+
     /// Initialize
     virtual void init();
-  
+
     /// Discrete time dynamics
     Function ffcn_;
-    
+
     /// Mayer term
     Function mfcn_;
-    
+
     /// Path constraints
     Function cfcn_;
-    
+
     /// Initial value constraints
     Function rfcn_;
-    
+
     /// Number of grid points
     int nk_;
 
@@ -85,19 +85,19 @@ class CASADI_SYMBOLIC_EXPORT OCPSolverInternal : public FunctionInternal{
 
     /// Number of parameters
     int np_;
-    
+
     /// Number of controls
     int nu_;
-    
+
     /// Number of point constraints
     int nh_;
-    
+
     /// Number of point coupling constraints
     int ng_;
-    
+
     /// Final time
     double tf_;
-    
+
 };
 
 

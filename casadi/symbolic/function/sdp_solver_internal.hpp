@@ -36,49 +36,49 @@ class CASADI_SYMBOLIC_EXPORT SDPSolverInternal : public FunctionInternal{
 
     // Constructor
     SDPSolverInternal(const std::vector<Sparsity>& st);
-    
+
     // Destructor
     virtual ~SDPSolverInternal() = 0;
-    
+
     // Initialize
     virtual void init();
-    
+
     // Solve the system of equations
     virtual void evaluate();
-    
+
     // Solve the system of equations
     virtual void solve();
-    
+
     /// Set options that make the SDP solver more suitable for solving SOCPs
     virtual void setSOCPOptions() { };
-    
+
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
-    
+
     /// Print out problem statement for debugging
     void printProblem(std::ostream &stream=std::cout) const;
-    
+
   protected:
-  
+
     /// Problem structure
     std::vector<Sparsity> st_;
-    
+
     /// Size of decision variable vector
     int n_;
-    
+
     /// The number of matrices F
     int m_;
-    
+
     /// Number of identified blocks
     int nb_;
-    
+
     /// Number of linear constraints
     int nc_;
-    
+
     /// Block decomposition details
     std::vector<int> block_boundaries_;
     std::vector<int> block_sizes_;
-    
+
     /** A mapping from (G,F) -> (G[p,p]_j,F_i[p,p]j)
     *  input(0) = G
     *  input(1) = F
@@ -86,22 +86,22 @@ class CASADI_SYMBOLIC_EXPORT SDPSolverInternal : public FunctionInternal{
     *  output((1+i)*nb_+j) = Fj
     */
     Function mapping_;
-    
+
     /** Make a mapping function from dense blocks to inversely-permuted block diagonal P
-    ** block_j(Pmapper.output()[p,p]) = Pmapper_.input(j) 
+    ** block_j(Pmapper.output()[p,p]) = Pmapper_.input(j)
     */
     Function Pmapper_;
-    
+
     /** \brief Indicate if dual should be allocated and calculated.
     * You may want to avoid calculating the dual variable for problems with n large, as the dual (n x n) is always dense.
     */
     bool calc_dual_;
-    
+
     /* \brief indicate if P part of primal solution should be allocated and calculated
     * You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).
     */
     bool calc_p_;
-    
+
     /// Indicates wether problem is printed before solving
     bool print_problem_;
 };

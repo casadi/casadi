@@ -30,19 +30,19 @@
 
   Solves an SDP problem in standard form.
   See http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
-  
+
   Primal:
 
   \verbatim
-  min          c' x 
-   x 
+  min          c' x
+   x
   subject to
-                P = Sum_i^m F_i x_i - G 
-                P negative semidefinite                   
-              
+                P = Sum_i^m F_i x_i - G
+                P negative semidefinite
+
               LBA <= A x <= UBA
               LBX <= x   <= UBX
-              
+
       with x ( n x 1)
            c ( n x 1 )
            G, F_i  sparse symmetric (m x m)
@@ -52,64 +52,64 @@
            LBX, UBX dense vector (n x 1)
 
   \endverbatim
-  
+
   This formulation is chosen as primal, because it does not call for a large decision variable space.
-  
+
   Dual:
-  
+
   \verbatim
   max          trace(G Y)
-   Y 
-  
+   Y
+
   subject to
               trace(F_i Y) = c_i
               Y positive semidefinite
-              
+
       with Y dense symmetric ( m x m)
 
   \endverbatim
-  
+
   On generality: you might have formulation with block partitioning:
-  
+
   Primal:
-  
+
   \verbatim
-  min          c' x 
-   x 
+  min          c' x
+   x
   subject to
                 Pj = Sum_i^m F_ij x_i - gj   for all j
                 Pj negative semidefinite   for all j
-              
+
       with x ( n x 1)
            c ( n x 1 )
            G, F_i  sparse symmetric (m x m)
            X dense symmetric ( m x m )
-      
+
   \endverbatim
-  
+
   Dual:
   \verbatim
   max          Sum_j trace(Gj Yj)
-   Yj 
-  
+   Yj
+
   subject to
               Sum_j trace(F_ij Yj) = c_i   for all j
               Yj positive semidefinite     for all j
-              
+
       with Y dense symmetric ( m x m)
 
   \endverbatim
-  
+
   You can cast this into the standard form with:
     G  = blkdiag(Gj for all j)
     Fi = blkdiag(F_ij for all j)
-    
+
   Implementations of SDPSolver are encouraged to exploit this block structure.
-  
+
 */
-      
+
 namespace casadi{
-  
+
 /// Input arguments of a SDP problem [sdpIn]
 enum SDPInput{
   /// The horizontal stack of all matrices F_i: ( m x nm) [f]
@@ -147,7 +147,7 @@ enum SDPOutput{
   /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
   SDP_SOLVER_LAM_X,
   SDP_SOLVER_NUM_OUT};
-  
+
 /// Structure specification of an SDP [sdpStruct]
 enum SDPStruct{
   /// The horizontal stack of all matrices F_i: ( m x nm) [f]
@@ -157,7 +157,7 @@ enum SDPStruct{
   /// The matrix A: ( nc x n) [a]
   SDP_STRUCT_A,
   SDP_STRUCT_NUM};
-  
+
 // Forward declaration of internal class
 class SDPSolverInternal;
 
@@ -166,7 +166,7 @@ class SDPSolverInternal;
 
 @copydoc SDPSolver_doc
 
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT SDPSolver : public Function{
@@ -174,14 +174,14 @@ class CASADI_SYMBOLIC_EXPORT SDPSolver : public Function{
 
   /// Default constructor
   SDPSolver();
-  
+
   /// Access functions of the node
   SDPSolverInternal* operator->();
   const SDPSolverInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Set options that make the SDP solver more suitable for solving SOCPs
   void setSOCPOptions();
 };

@@ -41,10 +41,10 @@ namespace casadi{
 
     /// Clone function
     virtual Assertion* clone() const{ return new Assertion(*this);}
-      
+
     /// Destructor
     virtual ~Assertion(){}
-    
+
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
@@ -53,18 +53,18 @@ namespace casadi{
 
     /// Evaluate the function symbolically (SX)
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
-    
+
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-            
+
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_ASSERTION;}  
-    
+    virtual int getOp() const{ return OP_ASSERTION;}
+
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
-    
+
   private:
-    std::string fail_message_;  
+    std::string fail_message_;
   };
 
 

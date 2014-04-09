@@ -47,6 +47,6 @@ void SDPSolver::setSOCPOptions() {
 
 } // namespace casadi
 
-  
+
 
 

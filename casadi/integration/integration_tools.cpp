@@ -43,7 +43,7 @@ namespace casadi{
   const long double legendre_points8[] = { 0.00000000000000000000, 0.01985507175123157886, 0.10166676129318691357, 0.23723379504183561561, 0.40828267875217505445, 0.59171732124782483453, 0.76276620495816449541, 0.89833323870681347501, 0.98014492824876797705 };
   const long double legendre_points9[] = { 0.00000000000000000000, 0.01591988024618706810, 0.08198444633668211523, 0.19331428364970504319, 0.33787328829809543107, 0.49999999999999988898, 0.66212671170190451342, 0.80668571635029517886, 0.91801555366331766272, 0.98408011975381259884 };
   const long double* legendre_points[] =  { 0, legendre_points1, legendre_points2, legendre_points3, legendre_points4, legendre_points5, legendre_points6, legendre_points7, legendre_points8, legendre_points9};
-  
+
   // Radau collocation points
   const long double radau_points1[] = { 0.00000000000000000000, 1.00000000000000000000 };
   const long double radau_points2[] = { 0.00000000000000000000, 0.33333333333333337034, 1.00000000000000000000 };
@@ -57,7 +57,7 @@ namespace casadi{
   const long double* radau_points[] =  { 0, radau_points1, radau_points2, radau_points3, radau_points4, radau_points5, radau_points6, radau_points7, radau_points8, radau_points9};
 
   const long double** collocation_points[] = {legendre_points,radau_points};
-  
+
   template<typename RealT>
   std::vector<RealT> collocationPointsGen(int order, const std::string& scheme) {
     if (scheme=="radau") {
@@ -78,7 +78,7 @@ namespace casadi{
   std::vector<long double> collocationPointsL(int order, const std::string& scheme) {
     return collocationPointsGen<long double>(order,scheme);
   }
-  
+
   Function explicitRK(Function& f, const MX& tf, int order, int ne) {
     casadi_assert_message(ne>=1,"Parameter ne (number of elements must be at least 1), but got " << ne << ".");
     casadi_assert_message(order==4,"Only RK order 4 is supported now.");
@@ -91,20 +91,20 @@ namespace casadi{
     MX X0 = X;
     MX t = 0;
     MX dt = tf/ne;
-    
+
     std::vector<double> b(order);
     b[0]=1.0/6;b[1]=1.0/3;b[2]=1.0/3;b[3]=1.0/6;
 
     std::vector<double> c(order);
     c[0]=0;c[1]=1.0/2;c[2]=1.0/2;c[3]=1;
-    
+
     std::vector< std::vector<double> > A(order-1);
     A[0].resize(1);A[0][0]=1.0/2;
     A[1].resize(2);A[1][0]=0;A[1][1]=1.0/2;
     A[2].resize(3);A[2][0]=0;A[2][1]=0;A[2][2]=1;
-    
+
     std::vector<MX> k(order);
-    
+
     for (int i=0;i<ne;++i) {
       for (int j=0;j<order;++j) {
         MX XL = 0;
@@ -114,25 +114,25 @@ namespace casadi{
         //std::cout << "help: " << A.at(j-1) << "," << c.at(j) << std::endl;
         k[j] = dt*f.call(daeIn("x",X+XL,"p",P,"t",t+dt*c.at(j)))[DAE_ODE];
       }
-      
+
       for (int j=0;j<order;++j) {
         X += b.at(j)*k.at(j);
- 
+
       }
       t+= dt;
     }
 
     MXFunction ret(integratorIn("x0",X0,"p",P),integratorOut("xf",X));
-    
+
     return ret;
   }
-  
+
   void collocationInterpolators(const std::vector<double> & tau_root, std::vector< std::vector<double> > &C, std::vector< double > &D) {
-  
+
     // Find the degree of the interpolation
     int deg = tau_root.size()-1;
-    
-    
+
+
     // Allocate storage space for resulting coefficients
     C.resize(deg+1);
     for (int i=0;i<deg+1;++i) {
@@ -152,10 +152,10 @@ namespace casadi{
           L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
         }
       }
-    
+
       SXFunction lfcn(tau,L);
       lfcn.init();
-  
+
       // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
       lfcn.setInput(1.0);
       lfcn.evaluate();
@@ -165,47 +165,47 @@ namespace casadi{
       Function tfcn = lfcn.tangent();
       tfcn.init();
       for(int j2=0; j2<deg+1; ++j2){
-        tfcn.setInput(tau_root[j2]);        
+        tfcn.setInput(tau_root[j2]);
         tfcn.evaluate();
         C[j2][j] = tfcn.output().at(0);
       }
     }
 
   }
-  
+
   Function implicitRK(Function& f, implicitFunctionCreator impl, const Dictionary& impl_options, const MX& tf, int order, const std::string& scheme, int ne) {
     casadi_assert_message(ne>=1,"Parameter ne (number of elements must be at least 1), but got " << ne << ".");
     casadi_assert_message(order==4,"Only RK order 4 is supported now.");
     casadi_assert_message(f.getNumInputs()==DAE_NUM_IN && f.getNumOutputs()==DAE_NUM_OUT,"Supplied function must adhere to dae scheme.");
     casadi_assert_message(f.output(DAE_QUAD).isEmpty(),"Supplied function cannot have quadrature states.");
-    
+
     // Obtain collocation points
     std::vector<double> tau_root = collocationPoints(order,"legendre");
-    
+
     // Retrieve collocation interpolating matrices
     std::vector < std::vector <double> > C;
     std::vector < double > D;
     collocationInterpolators(tau_root,C,D);
-    
+
     // Retrieve problem dimensions
     int nx = f.input(DAE_X).size();
     int nz = f.input(DAE_Z).size();
     int np = f.input(DAE_P).size();
-    
+
     //Variables for one finite element
     MX X = MX::sym("X",nx);
     MX P = MX::sym("P",np);
     MX V = MX::sym("V",order*(nx+nz)); // Unknowns
-    
+
     MX X0 = X;
-    
+
     // Components of the unknowns that correspond to states at collocation points
     std::vector<MX> Xc;Xc.reserve(order);
     Xc.push_back(X0);
-    
+
     // Components of the unknowns that correspond to algebraic states at collocation points
     std::vector<MX> Zc;Zc.reserve(order);
-    
+
     // Splitting the unknowns
     std::vector<int> splitPositions = range(0,order*nx,nx);
     if (nz>0) {
@@ -215,7 +215,7 @@ namespace casadi{
       splitPositions.push_back(order*nx);
     }
     std::vector<MX> Vs = vertsplit(V,splitPositions);
-    
+
     // Extracting unknowns from Z
     for (int i=0;i<order;++i) {
       Xc.push_back(X0+Vs[i]);
@@ -225,10 +225,10 @@ namespace casadi{
         Zc.push_back(Vs[order+i]);
       }
     }
-    
+
     // Get the collocation Equations (that define V)
     std::vector<MX> V_eq;
-    
+
     // Local start time
     MX t0_l=MX::sym("t0");
     MX h = MX::sym("h");
@@ -249,7 +249,7 @@ namespace casadi{
       }
       V_eq.push_back(h*f_out[DAE_ODE]-xp_j);
       V_eq.push_back(f_out[DAE_ALG]);
-      
+
     }
 
     // Root-finding function, implicitly defines V as a function of X0 and P
@@ -259,10 +259,10 @@ namespace casadi{
     vfcn_inputs.push_back(P);
     vfcn_inputs.push_back(t0_l);
     vfcn_inputs.push_back(h);
-    
+
     Function vfcn = MXFunction(vfcn_inputs,vertcat(V_eq));
     vfcn.init();
-    
+
     try {
       // Attempt to convert to SXFunction to decrease overhead
       vfcn = SXFunction(vfcn);
@@ -270,34 +270,34 @@ namespace casadi{
     } catch (CasadiException & e) {
       //
     }
-    
+
     // Create a implicit function instance to solve the system of equations
     ImplicitFunction ifcn = impl(vfcn,Function(),LinearSolver());
     ifcn.setOption(impl_options);
     ifcn.init();
-    
+
     // Get an expression for the state at the end of the finite element
     std::vector<MX> ifcn_call_in(5);
-    ifcn_call_in[0] = MX::zeros(V.sparsity()); 
+    ifcn_call_in[0] = MX::zeros(V.sparsity());
     std::copy(vfcn_inputs.begin()+1,vfcn_inputs.end(),ifcn_call_in.begin()+1);
     std::vector<MX> ifcn_call_out = ifcn.call(ifcn_call_in,true);
     Vs = vertsplit(ifcn_call_out[0],splitPositions);
-    
+
     MX XF = 0;
     for (int i=0;i<order+1;++i) {
       XF += D[i]*(i==0? X : X + Vs[i-1]);
     }
-    
-    
+
+
     // Get the discrete time dynamics
     ifcn_call_in.erase(ifcn_call_in.begin());
     MXFunction F = MXFunction(ifcn_call_in,XF);
     F.init();
-    
+
     // Loop over all finite elements
     MX h_ = tf/ne;
     MX t0_ = 0;
-    
+
     for (int i=0;i<ne;++i) {
       std::vector<MX> F_in;
       F_in.push_back(X);
@@ -308,13 +308,13 @@ namespace casadi{
       std::vector<MX> F_out = F.call(F_in);
       X = F_out[0];
     }
-    
+
     // Create a ruturn function with Integrator signature
     MXFunction ret = MXFunction(integratorIn("x0",X0,"p",P),integratorOut("xf",X));
     ret.init();
-    
+
     return ret;
-  
+
   }
 
 } // namespace casadi

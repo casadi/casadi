@@ -42,10 +42,10 @@ namespace casadi{
 
     /// Clone function
     virtual Transpose* clone() const{ return new Transpose(*this);}
-      
+
     /// Destructor
     virtual ~Transpose(){}
-    
+
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
@@ -60,16 +60,16 @@ namespace casadi{
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-    
+
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
-        
+
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_TRANSPOSE;}    
+    virtual int getOp() const{ return OP_TRANSPOSE;}
 
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr){ ni=size2()+1; nr=0;}
@@ -96,10 +96,10 @@ namespace casadi{
 
     /// Clone function
     virtual DenseTranspose* clone() const{ return new DenseTranspose(*this);}
-      
+
     /// Destructor
     virtual ~DenseTranspose(){}
-    
+
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
@@ -113,9 +113,9 @@ namespace casadi{
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
-        
+
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=0;}
   };

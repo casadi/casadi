@@ -35,35 +35,35 @@ QPLPInternal* QPLPInternal::clone() const{
     node->init();
   return node;
 }
-  
+
 QPLPInternal::QPLPInternal(const std::vector<Sparsity> &st) : LPSolverInternal(st) {
 
   addOption("qp_solver",       OT_QPSOLVER, GenericType(), "The QPSOlver used to solve the LPs.");
   addOption("qp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the QPSOlver");
-  
+
 }
 
-QPLPInternal::~QPLPInternal(){ 
+QPLPInternal::~QPLPInternal(){
 }
 
 void QPLPInternal::evaluate(){
 
-  // Pass inputs of LP to QP form 
+  // Pass inputs of LP to QP form
   qpsolver_.input(QP_SOLVER_A).set(input(LP_SOLVER_A));
   qpsolver_.input(QP_SOLVER_G).set(input(LP_SOLVER_C));
-  
+
   qpsolver_.input(QP_SOLVER_LBX).set(input(LP_SOLVER_LBX));
   qpsolver_.input(QP_SOLVER_UBX).set(input(LP_SOLVER_UBX));
-  
+
   qpsolver_.input(QP_SOLVER_LBA).set(input(LP_SOLVER_LBA));
   qpsolver_.input(QP_SOLVER_UBA).set(input(LP_SOLVER_UBA));
-  
+
   // Delegate computation to NLP Solver
   qpsolver_.evaluate();
-  
+
   // Pass the stats
   stats_["qp_solver_stats"] = qpsolver_.getStats();
-  
+
   // Read the outputs from Ipopt
   output(QP_SOLVER_X).set(qpsolver_.output(LP_SOLVER_X));
   output(QP_SOLVER_COST).set(qpsolver_.output(LP_SOLVER_COST));
@@ -83,10 +83,10 @@ void QPLPInternal::init(){
   if(hasSetOption("qp_solver_options")){
     qpsolver_.setOption(getOption("qp_solver_options"));
   }
-  
+
   // Initialize the NLP solver
   qpsolver_.init();
- 
+
 }
 
 } // namespace casadi

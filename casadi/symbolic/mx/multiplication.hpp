@@ -29,13 +29,13 @@
 
 namespace casadi{
   /** \brief An MX atomic for matrix-matrix product, note that the first factor must be provided transposed
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   template<bool TrX, bool TrY>
   class CASADI_SYMBOLIC_EXPORT Multiplication : public MXNode{
   public:
-    
+
     /** \brief  Constructor */
     Multiplication(const MX& z, const MX& x, const MX& y);
 
@@ -52,7 +52,7 @@ namespace casadi{
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Evaluate the function numerically
@@ -66,13 +66,13 @@ namespace casadi{
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
-    
+
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_MATMUL;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 1;}
-    
+
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth) && dynamic_cast<const Multiplication<TrX,TrY>*>(node)!=0;}
 
@@ -83,13 +83,13 @@ namespace casadi{
 
 
   /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   template<bool TrX, bool TrY>
   class CASADI_SYMBOLIC_EXPORT DenseMultiplication : public Multiplication<TrX,TrY>{
   public:
-    
+
     /** \brief  Constructor */
     DenseMultiplication(const MX& z, const MX& x, const MX& y) : Multiplication<TrX,TrY>(z,x,y){}
 

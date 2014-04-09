@@ -194,7 +194,7 @@ CASADI_SYMBOLIC_EXPORT void profileWriteSourceLine(std::ofstream &f,T *a,int lin
   s.length = sourceline.size();
   s.opcode = opcode;
   s.dependency = ptrToLong(dependency);
-  profileWrite(f,s); 
+  profileWrite(f,s);
   //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode << ":" << s.dependency << std::endl;
   f << sourceline;
 }
@@ -208,7 +208,7 @@ CASADI_SYMBOLIC_EXPORT void profileWriteSourceLine(std::ofstream &f,T *a,int lin
   s.opcode = opcode;
   s.dependency = 0;
   //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode << ":" << s.dependency << std::endl;
-  profileWrite(f,s); 
+  profileWrite(f,s);
   f << sourceline;
 }
 

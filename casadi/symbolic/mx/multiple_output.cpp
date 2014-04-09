@@ -41,7 +41,7 @@ namespace casadi{
 
   OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind){
     setDependencies(parent);
-  
+
     // Save the sparsity pattern
     setSparsity(dep(0)->sparsity(oind));
   }

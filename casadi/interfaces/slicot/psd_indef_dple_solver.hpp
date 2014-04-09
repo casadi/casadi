@@ -34,34 +34,34 @@ namespace casadi{
   /** \brief An efficient solver for Discrete Periodic Lyapunov Eaauqtions using SLICOT
    *
    * @copydoc DPLE_doc
-  
+
        Uses Periodic Schur Decomposition (psd) and does not assume positive definiteness.
-       Based on Periodic Lyapunov equations: some applications and new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997. 
-  
+       Based on Periodic Lyapunov equations: some applications and new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
+
        \author Joris gillis
       \date 2014
-      
+
   */
   class CASADI_SLICOT_INTERFACE_EXPORT PsdIndefDpleSolver : public DpleSolver {
   public:
     /// Default constructor
     PsdIndefDpleSolver();
-    
+
     /** \brief  Constructor
-     *  \param[in] A  List of sparsities of A_i 
-     *  \param[in] V  List of sparsities of V_i 
+     *  \param[in] A  List of sparsities of A_i
+     *  \param[in] V  List of sparsities of V_i
      */
     explicit PsdIndefDpleSolver(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V);
-    
+
     /// Access functions of the node
     PsdIndefDpleInternal* operator->();
 
     /// Access functions of the node
     const PsdIndefDpleInternal* operator->() const;
- 
+
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
+
     /// Static creator function
     #ifdef SWIG
     %callback("%s_cb");
@@ -70,7 +70,7 @@ namespace casadi{
     #ifdef SWIG
     %nocallback;
     #endif
-  
+
   };
 
 } // namespace casadi

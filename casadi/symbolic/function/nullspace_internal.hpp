@@ -31,18 +31,18 @@
 namespace casadi{
 
   /** @copydoc Nullspace_doc
-      \author Joris Gillis 
+      \author Joris Gillis
       \date 2014
   */
   class CASADI_SYMBOLIC_EXPORT NullspaceInternal : public FunctionInternal{
   public:
-  
+
     /** \brief  Constructor */
     NullspaceInternal(const Sparsity & A_sp);
-  
+
     /** \brief  Destructor */
     virtual ~NullspaceInternal();
-  
+
     /** \brief  Clone */
     virtual NullspaceInternal* clone() const{ return new NullspaceInternal(A_sp_);}
 
@@ -51,23 +51,23 @@ namespace casadi{
 
     /** \brief  Integrate */
     virtual void evaluate();
-    
+
   protected:
-  
+
     /// Should the suspace be dense?
     bool dense_;
-    
+
     /// Storage for input structure
     Sparsity A_sp_;
 
     /// number of rows
     int m_;
-    
+
     /// number of columns
     int n_;
-  
+
   };
-  
+
 } // namespace casadi
 
 /// \endcond

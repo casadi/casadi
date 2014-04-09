@@ -42,7 +42,7 @@ namespace casadi{
 
     /// Clone function
     virtual InnerProd* clone() const{ return new InnerProd(*this);}
-      
+
     /// Destructor
     virtual ~InnerProd(){}
 
@@ -53,12 +53,12 @@ namespace casadi{
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /// Evaluate the function (template)
-    template<typename T, typename MatV, typename MatVV> 
+    template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
-    
+
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
@@ -67,9 +67,9 @@ namespace casadi{
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-            
+
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_INNER_PROD;}    
+    virtual int getOp() const{ return OP_INNER_PROD;}
   };
 
 

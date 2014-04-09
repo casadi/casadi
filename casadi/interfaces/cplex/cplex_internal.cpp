@@ -45,7 +45,7 @@ namespace casadi{
     addOption("barrier_maxiter", OT_INTEGER,       2100000000, "Maximum number of barrier iterations.");
     addOption("warm_start",      OT_BOOLEAN,            false, "Use warm start with simplex methods (affects only the simplex methods).");
     addOption("convex",          OT_BOOLEAN,             true, "Indicates if the QP is convex or not (affects only the barrier method).");
-  
+
     // Setting warm-start flag
     is_warm_ = false;
 
@@ -59,12 +59,12 @@ namespace casadi{
 
     // Call the init method of the base class
     QPSolverInternal::init();
-  
+
     qp_method_     = getOptionEnumValue("qp_method");
     dump_to_file_  = getOption("dump_to_file");
     tol_           = getOption("tol");
     //  dump_filename_ = getOption("dump_filename");
-  
+
     int status;
     casadi_assert(env_==0);
     env_ = CPXopenCPLEX (&status);
@@ -119,7 +119,7 @@ namespace casadi{
     //status = CPXsetintparam(env_, CPX_PARAM_SCAIND, 1);
     // Set Markowitz tolerance
     //status = CPXsetdblparam(env_, CPX_PARAM_EPMRK, 0.9);
- 
+
     // Doing allocation of CPLEX data
     // Objective is to be minimized
     objsen_ = CPX_MIN;
@@ -138,13 +138,13 @@ namespace casadi{
     // Matrix A, count the number of elements per column
     const Sparsity& A_sp = input(QP_SOLVER_A).sparsity();
     matcnt_.resize(A_sp.size2());
-    transform(A_sp.colind().begin()+1,A_sp.colind().end(),A_sp.colind().begin(),matcnt_.begin(),minus<int>());  
+    transform(A_sp.colind().begin()+1,A_sp.colind().end(),A_sp.colind().begin(),matcnt_.begin(),minus<int>());
 
     // Matrix H, count the number of elements per column
     const Sparsity& H_sp = input(QP_SOLVER_H).sparsity();
     qmatcnt_.resize(H_sp.size2());
-    transform(H_sp.colind().begin()+1,H_sp.colind().end(),H_sp.colind().begin(),qmatcnt_.begin(),minus<int>());  
-    
+    transform(H_sp.colind().begin()+1,H_sp.colind().end(),H_sp.colind().begin(),qmatcnt_.begin(),minus<int>());
+
     casadi_assert(lp_==0);
     lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
   }
@@ -166,7 +166,7 @@ namespace casadi{
 
     for(int i = 0; i < nc_; ++i){
       // CPX_INFBOUND
-  
+
       // Equality
       if(uba[i] - lba[i] < 1e-20){
         sense_[i] = 'E';
@@ -201,8 +201,8 @@ namespace casadi{
     const double* obj = input(QP_SOLVER_G).ptr();
     const double* lb = input(QP_SOLVER_LBX).ptr();
     const double* ub = input(QP_SOLVER_UBX).ptr();
-    status = CPXcopylp (env_, lp_, n_, nc_, objsen_, obj, rhs_.data(), sense_.data(), 
-                        matbeg, getPtr(matcnt_), matind, matval, lb, ub, rngval_.data()); 
+    status = CPXcopylp (env_, lp_, n_, nc_, objsen_, obj, rhs_.data(), sense_.data(),
+                        matbeg, getPtr(matcnt_), matind, matval, lb, ub, rngval_.data());
 
     // Preparing coefficient matrix Q
     const Sparsity& H_sp = input(QP_SOLVER_H).sparsity();
@@ -234,21 +234,21 @@ namespace casadi{
       casadi_error("CPLEX: Failed to solve QP...");
     }
     // Retrieving solution
-    int solstat; 
-  
+    int solstat;
+
     std::vector<double> slack;
     slack.resize(nc_);
     status = CPXsolution (env_, lp_, &solstat,
-                          output(QP_SOLVER_COST).ptr(), 
-                          output(QP_SOLVER_X).ptr(), 
+                          output(QP_SOLVER_COST).ptr(),
+                          output(QP_SOLVER_X).ptr(),
                           output(QP_SOLVER_LAM_A).ptr(),
                           getPtr(slack),
                           output(QP_SOLVER_LAM_X).ptr()
-                          ); 
-  
+                          );
+
     if(status){
       cout << "CPLEX: Failed to get solution.\n";
-    } 
+    }
     // Retrieving the basis
     if (qp_method_ != 0 && qp_method_ != 4){
       status = CPXgetbase(env_, lp_, getPtr(cstat_), getPtr(rstat_));
@@ -327,13 +327,13 @@ namespace casadi{
       }
       lp_ = 0;
     }
-  
+
     // Closing down license
     if(env_!=0){
       status = CPXcloseCPLEX(&env_);
       if(status!=0){
         std::cerr << "CPXcloseCPLEX failed, error code " << status << ".\n";
-      }        
+      }
       env_ = 0;
     }
   }

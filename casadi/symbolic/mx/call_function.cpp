@@ -92,7 +92,7 @@ namespace casadi {
   void CallFunction::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
     fcn_->generateOperation(this,stream,arg,res,gen);
   }
-  
+
   void CallFunction::nTmp(size_t& ni, size_t& nr){
     fcn_->nTmp(this,ni,nr);
   }

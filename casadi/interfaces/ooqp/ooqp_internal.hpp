@@ -30,7 +30,7 @@
 namespace casadi{
 
   /** \brief Internal class for OOQPSolver
-   * 
+   *
    @copydoc QPSolver_doc
    * */
   class CASADI_OOQP_INTERFACE_EXPORT OOQPInternal : public QPSolverInternal {
@@ -42,7 +42,7 @@ namespace casadi{
 
     /** \brief  Clone */
     virtual OOQPInternal* clone() const{ return new OOQPInternal(*this);}
-  
+
     /** \brief  Create a new Solver */
     explicit OOQPInternal(const std::vector<Sparsity>& st);
 
@@ -51,10 +51,10 @@ namespace casadi{
 
     /** \brief  Initialize */
     virtual void init();
-  
+
     /// Solve the QP
     virtual void evaluate();
-      
+
     /// Throw error
     static const char* errFlag(int flag);
 
@@ -66,10 +66,10 @@ namespace casadi{
 
     /// Type of bounds
     std::vector<char> ixlow_, ixupp_, iclow_, icupp_;
-    
+
     /// Problem data (matrices)
     std::vector<double> dQ_, dA_, dC_;
-    
+
     /// Sparsities of matrices
     std::vector<int> irowQ_, jcolQ_, irowA_, jcolA_, irowC_, jcolC_;
 
@@ -85,7 +85,7 @@ namespace casadi{
 
     // Print level
     int print_level_;
-    
+
     // Tolerances
     double mutol_, artol_;
   };

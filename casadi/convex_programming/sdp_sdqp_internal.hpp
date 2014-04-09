@@ -33,7 +33,7 @@
 namespace casadi{
 
   /** \brief Internal class for SDPSDQPInternal
-   * 
+   *
    @copydoc SDQPSolver_doc
    * */
   class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSDQPInternal : public SDQPSolverInternal {
@@ -45,7 +45,7 @@ namespace casadi{
 
     /** \brief Clone */
     virtual SDPSDQPInternal* clone() const{ return new SDPSDQPInternal(*this);}
-  
+
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
@@ -54,16 +54,16 @@ namespace casadi{
 
     /** \brief Initialize */
     virtual void init();
-  
+
     /** \brief Solve the SDQP */
     virtual void evaluate();
-  
+
     /// Underlying SDP solver
     SDPSolver sdpsolver_;
-    
+
     /// Cholseky Decomposition
     CSparseCholesky cholesky_;
-    
+
     /// Mapping
     Function mapping_;
   };

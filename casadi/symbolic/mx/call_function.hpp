@@ -30,8 +30,8 @@
 
 namespace casadi{
 
-  /** 
-      \author Joel Andersson 
+  /**
+      \author Joel Andersson
       \date 2010-2013
   */
   class CASADI_SYMBOLIC_EXPORT CallFunction : public MultipleOutput{
@@ -39,10 +39,10 @@ namespace casadi{
 
     /** \brief  Constructor */
     explicit CallFunction(const Function& fcn, std::vector<MX> arg);
-    
+
     /** \brief  Destructor */
     virtual ~CallFunction(){}
-  
+
     /** \brief  Clone function */
     virtual CallFunction* clone() const;
 
@@ -78,13 +78,13 @@ namespace casadi{
 
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const;
-        
+
     /** \brief  Get the sparsity of output oind */
     virtual const Sparsity& sparsity(int oind) const;
 
     /** \brief Get the operation */
     virtual int getOp() const{ return OP_CALL;}
-    
+
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr);
 

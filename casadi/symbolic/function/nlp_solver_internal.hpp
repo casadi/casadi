@@ -29,11 +29,11 @@
 
 /// \cond INTERNAL
 namespace casadi{
-    
+
 /** \brief NLP solver storage class
 
   @copydoc NLPSolver_doc
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010-2013
 */
   class CASADI_SYMBOLIC_EXPORT NLPSolverInternal : public FunctionInternal{
@@ -50,22 +50,22 @@ namespace casadi{
 
     /// Prints out a human readable report about possible constraint violations - all constraints
     void reportConstraints(std::ostream &stream=std::cout);
-    
+
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const;
-  
+
     /// Warns the user about inital bounds, if option 'warn_initial_bounds' is true
     virtual void checkInitialBounds();
-  
+
     /// Set options that make the NLP solver more suitable for solving QPs
     virtual void setQPOptions() { };
 
     /// Get or generate a function to calculate the gradient of the objective function
     virtual Function getGradF();
-    
+
     /// Get or generate a function to calculate the jacobian of the objective function
     virtual Function getJacF();
-  
+
     /// Get or generate a function to calculate the Jacobian of the constraint function
     virtual Function getJacG();
 
@@ -77,10 +77,10 @@ namespace casadi{
 
     /// Get or generate the sparsity pattern of the Hessian of the Lagrangian
     virtual Sparsity getSpHessLag();
-    
+
     // Access the objective gradient function
     Function& gradF();
-    
+
     // Access the objective jacobian function (sparse)
     Function& jacF();
 
@@ -98,31 +98,31 @@ namespace casadi{
 
     /// Number of variables
     int nx_;
-  
+
     /// Number of constraints
     int ng_;
-  
+
     /// Number of parameters
     int np_;
-  
+
     /// callback function, executed at each iteration
     Callback callback_;
-  
+
     /// Execute the callback function only after this amount of iterations
     int callback_step_;
-  
+
     /// The NLP
     Function nlp_;
 
     // Gradient of the objective
     Function gradF_;
-    
+
     // Gradient of the objective
     Function jacF_;
-    
+
     // Jacobian of the constraints
     Function jacG_;
-    
+
     // Hessian of the Lagrangian
     Function hessLag_;
 
@@ -131,10 +131,10 @@ namespace casadi{
 
     // Sparsity pattern of the Hessian of the Lagrangian
     Sparsity spHessLag_;
-    
+
     /// A reference to this object to be passed to the user functions
     Function ref_;
-    
+
   };
 
 } // namespace casadi

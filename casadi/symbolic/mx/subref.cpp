@@ -29,7 +29,7 @@ namespace casadi{
   SubRef::SubRef(const MX& x, const Slice& i, const Slice& j) : i_(i), j_(j) {
     setDependencies(x);
   }
-  
+
   SubRef* SubRef::clone() const{
     return new SubRef(*this);
   }
@@ -50,7 +50,7 @@ namespace casadi{
   void SubRef::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
     casadi_error("not ready");
   }
-  
+
   void SubRef::printPart(std::ostream &stream, int part) const{
     if(part==0){
       stream << "(";
@@ -64,7 +64,7 @@ namespace casadi{
   }
 
   void SubRef::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    casadi_error("not ready");  
+    casadi_error("not ready");
   }
 
 } // namespace casadi

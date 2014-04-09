@@ -28,12 +28,12 @@
 
 namespace casadi{
 
-  
+
 /** \brief  Forward declaration of internal class */
 class ExternalFunctionInternal;
 
 /** \brief  Interface for a function that is not implemented by CasADi symbolics
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2011
   */
 class CASADI_SYMBOLIC_EXPORT ExternalFunction : public Function{
@@ -49,10 +49,10 @@ public:
 
   /** \brief  Access functions of the node */
   ExternalFunctionInternal* operator->();
-  
+
   /** \brief  Const access functions of the node */
   const ExternalFunctionInternal* operator->() const;
-    
+
   /** \brief  Check if the pointer points towards a valid object */
   virtual bool checkNode() const;
 

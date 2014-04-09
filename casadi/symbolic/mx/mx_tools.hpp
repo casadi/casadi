@@ -34,7 +34,7 @@ namespace casadi{
 
 /**
 \ingroup expression_tools
-@{ 
+@{
 */
 
   /** \brief  concatenate vertically
@@ -46,7 +46,7 @@ namespace casadi{
   /** \brief  split vertically, retaining groups of cols
   * \param output_offset List of all start cols for each group
   *      the last col group will run to the end.
-  * 
+  *
   *   horzcat(horzsplit(x,...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> horzsplit(const MX& x, const std::vector<int>& output_offset);
@@ -57,13 +57,13 @@ namespace casadi{
   *  horzcat(horzsplit(x,...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> horzsplit(const MX& x, int incr=1);
-  
-  /** \brief  concatenate horizontally 
+
+  /** \brief  concatenate horizontally
   *
   *   vertcat(vertsplit(x,...)) = x
   */
   CASADI_SYMBOLIC_EXPORT MX vertcat(const std::vector<MX>& comp);
-  
+
   /** \brief  split horizontally, retaining groups of rows
   * \param output_offset List of all start rows for each group
   *      the last row group will run to the end.
@@ -78,13 +78,13 @@ namespace casadi{
   *   vertcat(vertsplit(x,...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> vertsplit(const MX& x, int incr=1);
-  
+
   /** \brief Construct a matrix from a list of list of blocks.
   *
   *   blockcat(blocksplit(x,...,...)) = x
   */
   CASADI_SYMBOLIC_EXPORT MX blockcat(const std::vector< std::vector<MX > > &v);
-  
+
   /** \brief  chop up into blocks
   * \brief vert_offset Defines the boundaries of the block cols
   * \brief horz_offset Defines the boundaries of the block rows
@@ -138,7 +138,7 @@ namespace casadi{
   /** \brief  Take the matrix product of 2 MX objects
   *
   * With optional sp_z you can specify the sparsity of the result
-  * A typical use case might be where the product is only constructed to 
+  * A typical use case might be where the product is only constructed to
   * inspect the trace of it. sp_z diagonal will be more efficient then.
   *
   */
@@ -147,7 +147,7 @@ namespace casadi{
   /** \brief  Take the matrix product of n MX objects */
   CASADI_SYMBOLIC_EXPORT MX mul(const std::vector< MX > &x);
 
-  /** \brief  Take the inner product of two vectors 
+  /** \brief  Take the inner product of two vectors
       Equals
       \code
       trans(x)*y
@@ -156,7 +156,7 @@ namespace casadi{
   */
   CASADI_SYMBOLIC_EXPORT MX inner_prod(const MX &x, const MX &y);
 
-  /** \brief  Take the outer product of two vectors 
+  /** \brief  Take the outer product of two vectors
       Equals
       \code
       x*trans(y)
@@ -168,7 +168,7 @@ namespace casadi{
   /** \brief Branching on MX nodes
       Ternary operator, "cond ? if_true : if_false"
   */
-  CASADI_SYMBOLIC_EXPORT MX if_else(const MX &cond, const MX &if_true, const MX &if_false); 
+  CASADI_SYMBOLIC_EXPORT MX if_else(const MX &cond, const MX &if_true, const MX &if_false);
 
 #ifndef SWIG
   //! \brief Returns a reshaped version of the MX
@@ -183,20 +183,20 @@ namespace casadi{
 
   /** \brief Returns a vectorized version of the MX
       Same as reshape(x, x.numel(),1)
-    
+
       a c
-      b d 
-    
+      b d
+
       turns into
-    
+
       a
       b
       c
       d
-    
+
   */
   CASADI_SYMBOLIC_EXPORT MX vec(const MX &x);
-  
+
   /** \brief Returns a vectorized version of the MX, prseverving only nonzeros
   */
   CASADI_SYMBOLIC_EXPORT MX vecNZ(const MX &x);
@@ -211,13 +211,13 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT MX trace(const MX& A);
 
   /** \brief Repeat matrix A n times vertically and m times horizontally */
-  CASADI_SYMBOLIC_EXPORT MX repmat(const MX &A, int n, int m); 
+  CASADI_SYMBOLIC_EXPORT MX repmat(const MX &A, int n, int m);
 
   /** \brief create a clipped view into a matrix
       Create a sparse matrix from a dense matrix A, with sparsity pattern sp
   **/
   //MX clip(const MX& A, const Sparsity& sp);
-  
+
 #ifndef SWIGOCTAVE
   /** \brief  Make the matrix dense if not already */
   CASADI_SYMBOLIC_EXPORT MX dense(const MX& x);
@@ -225,8 +225,8 @@ namespace casadi{
 
   /** \brief  Create a parent MX on which all given MX's will depend.
 
-      In some sense, this function is the inverse of 
- 
+      In some sense, this function is the inverse of
+
       \param deps  Must all be symbolic matrices.
   */
   CASADI_SYMBOLIC_EXPORT MX createParent(std::vector<MX> &deps);
@@ -265,7 +265,7 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT MX sumRows(const MX &x);
 
   /// Return summation of all elements
-  CASADI_SYMBOLIC_EXPORT MX sumAll(const MX &x); 
+  CASADI_SYMBOLIC_EXPORT MX sumAll(const MX &x);
 
   /** \brief  Evaluate a polynomial with coefficeints p in x */
   CASADI_SYMBOLIC_EXPORT MX polyval(const MX& p, const MX& x);
@@ -278,7 +278,7 @@ namespace casadi{
 
   /** \brief  Substitute variable var with expression expr in multiple expressions */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
-  
+
   /** \brief  Substitute variable v with expression vdef in an expression ex, preserving nodes */
   CASADI_SYMBOLIC_EXPORT MX graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
 
@@ -286,7 +286,7 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
 
   /** \brief Inplace substitution
-   * Substitute variables v out of the expressions vdef sequentially 
+   * Substitute variables v out of the expressions vdef sequentially
    */
 #ifndef SWIG
   CASADI_SYMBOLIC_EXPORT void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse=false);
@@ -303,8 +303,8 @@ namespace casadi{
 #endif // SWIG
 
   /** \brief Extract shared subexpressions from an set of expressions */
-  CASADI_SYMBOLIC_EXPORT void extractShared(std::vector<MX>& ex, 
-                     std::vector<MX>& v, std::vector<MX>& vdef, 
+  CASADI_SYMBOLIC_EXPORT void extractShared(std::vector<MX>& ex,
+                     std::vector<MX>& v, std::vector<MX>& vdef,
                      const std::string& v_prefix="v_", const std::string& v_suffix="");
 
   /** \brief Print compact, introducing new variables for shared subexpressions */
@@ -319,10 +319,10 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT MX gradient(const MX &ex, const MX &arg);
   CASADI_SYMBOLIC_EXPORT MX tangent(const MX &ex, const MX &arg);
   //@}
-  
+
   /** \brief Computes the nullspace of a matrix A
   *
-  * Finds Z m-by-(m-n) such that AZ = 0 
+  * Finds Z m-by-(m-n) such that AZ = 0
   * with A n-by-m with m > n
   *
   * Assumes A is full rank
@@ -342,18 +342,18 @@ namespace casadi{
   * \see MXFunction::getFree()
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> getSymbols(const MX& e);
-  
+
   /** \brief Get all symbols contained in the supplied expression
   * Get all symbols on which the supplied expression depends
   * \see MXFunction::getFree()
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> getSymbols(const std::vector<MX>& e);
-  
+
   /** \brief Check if expression depends on any of the arguments
     The arguments must be symbolic
   */
   CASADI_SYMBOLIC_EXPORT bool dependsOn(const MX& ex, const std::vector<MX> &arg);
-  
+
   /** \brief Expand MX graph to SXFunction call
   *
   *  Expand the given expression e, optionally
@@ -372,16 +372,16 @@ namespace casadi{
 
   /** \brief Kronecker tensor product
   *
-  * Creates a block matrix in which each element (i,j) is a_ij*b 
+  * Creates a block matrix in which each element (i,j) is a_ij*b
   */
   CASADI_SYMBOLIC_EXPORT MX kron(const MX& a, const MX& b);
 
-  /** \brief Solve a system of equations: A*x = b 
+  /** \brief Solve a system of equations: A*x = b
   */
   CASADI_SYMBOLIC_EXPORT MX solve(const MX& A, const MX& b, linearSolverCreator lsolver = SymbolicQR::creator, const Dictionary& dict = Dictionary());
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
-  * 
+  *
   * If the matrix A is fat (size1>size2), mul(A,pinv(A)) is unity.
   * If the matrix A is slender (size2<size1), mul(pinv(A),A) is unity.
   *

@@ -8,7 +8,7 @@ status = CPXcopylp(CPXCENVptr env, CPXLPptr lp, int numcols, int numrows, int ob
   associated names.
   The arguments passed to CPXcopylp define a linear program. Since these arguments are copied into local arrays maintained by CPLEX, the LP problem data
   passed via CPXcopylp may be modified or freed after the call to CPXcopylp without affecting the state of the CPLEX problem object.
- 
+
   Arguments:
     env: A pointer to the CPLEX environment as returned by CPXopenCPLEX.
     lp: A pointer to a CPLEX problem object as returned by CPXcreateprob.
@@ -46,7 +46,7 @@ status = CPXcopyquad(CPXCENVptr env, CPXLPptr lp, const int * qmatbeg, const int
   Q must be symmetric when copied by this function. Therefore, if the quadratic coefficient in algebraic form is 2x1x2, then x2 should be in the list
   for x1, and x1 should be in the list for x2, and the coefficient would be 1.0 in each of those entries. See the corresponding example C program to
   review how the symmetry requirement is implemented.
-  
+
   Arguments:
     env: A pointer to the CPLEX environment as returned by CPXopenCPLEX.
     lp: A pointer to a CPLEX problem object as returned by CPXcreateprob.
@@ -63,7 +63,7 @@ status = CPXcopyquad(CPXCENVptr env, CPXLPptr lp, const int * qmatbeg, const int
 status = CPXaddqconstr(CPXCENVptr env, CPXLPptr lp, int linnzcnt, int quadnzcnt, double rhs, int sense, const int * linind, const double * linval, const int * quadrow,
                         const int * quadcol, const double * quadval, const char * lname_str)
   The routine CPXaddqconstr adds a quadratic constraint to a specified CPLEX problem object. This routine may be called any time after a call to CPXcreateprob.
-  
+
   Arguments:
     env: A pointer to the CPLEX environment as returned by CPXopenCPLEX.
     lp: A pointer to a CPLEX problem object as returned by CPXcreateprob.

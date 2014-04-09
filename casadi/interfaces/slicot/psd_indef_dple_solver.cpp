@@ -28,9 +28,9 @@ using namespace std;
 namespace casadi{
 
   PsdIndefDpleSolver::PsdIndefDpleSolver(){
-  
+
   }
-  
+
   PsdIndefDpleSolver::PsdIndefDpleSolver(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) {
     assignNode(new PsdIndefDpleInternal(A,V));
   }
@@ -40,12 +40,12 @@ namespace casadi{
   }
 
   const PsdIndefDpleInternal* PsdIndefDpleSolver::operator->() const{
-    return static_cast<const PsdIndefDpleInternal*>(Function::operator->()); 
+    return static_cast<const PsdIndefDpleInternal*>(Function::operator->());
   }
-  
+
   bool PsdIndefDpleSolver::checkNode() const{
     return dynamic_cast<const PsdIndefDpleInternal*>(get())!=0;
   }
- 
+
 } // namespace casadi
 

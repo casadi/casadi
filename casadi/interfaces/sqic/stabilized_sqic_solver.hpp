@@ -27,9 +27,9 @@
 #include <casadi/interfaces/sqic/casadi_sqic_interface_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class StabilizedSQICInternal;
 
 class CASADI_SQIC_INTERFACE_EXPORT StabilizedSQICSolver : public StabilizedQPSolver {
@@ -37,20 +37,20 @@ public:
 
   /** \brief  Default constructor */
   StabilizedSQICSolver();
-  
+
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_QPStruct
   */
   StabilizedSQICSolver(const QPStructure &st);
-  
+
   /** \brief  Access functions of the node */
   StabilizedSQICInternal* operator->();
   const StabilizedSQICInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
@@ -60,7 +60,7 @@ public:
   %nocallback;
   #endif
 
-  
+
 };
 
 

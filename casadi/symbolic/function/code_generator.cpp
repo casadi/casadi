@@ -29,14 +29,14 @@
 
 using namespace std;
 namespace casadi{
-  
+
   void CodeGenerator::flush(std::ostream& s) const{
     s << includes_.str();
     s << endl;
 
     // Space saving macro
     s << "#define d double" << endl << endl;
-    
+
     s << auxiliaries_.str();
 
     // Print integer constants
@@ -58,34 +58,34 @@ namespace casadi{
     s << function_.str();
     s << finalization_.str();
   }
-  
+
   std::string CodeGenerator::numToString(int n){
     stringstream ss;
     ss << n;
     return ss.str();
   }
-  
+
   int CodeGenerator::addDependency(const Function& f){
     // Get the current number of functions before looking for it
     size_t num_f_before = added_dependencies_.size();
-    
+
     // Get index of the pattern
     const void* h = static_cast<const void*>(f.get());
     int& ind = added_dependencies_[h];
-    
+
     // Generate it if it does not exist
     if(added_dependencies_.size() > num_f_before){
       // Add at the end
       ind = num_f_before;
-      
+
       // Give it a name
       stringstream name;
       name << "f" << ind;
-      
+
       // Print to file
       f->generateFunction(dependencies_, name.str(), "const d*","d*","d",*this);
     }
-    
+
     return ind;
   }
 
@@ -121,7 +121,7 @@ namespace casadi{
       includes_ << "#include <" << new_include << ">" << endl;
     }
   }
-  
+
   int CodeGenerator::addSparsity(const Sparsity& sp){
     // Get the current number of patterns before looking for it
     size_t num_patterns_before = added_sparsities_.size();
@@ -139,7 +139,7 @@ namespace casadi{
       // Codegen vector
       ind = getConstant(sp_compact,true);
     }
-    
+
     return ind;
   }
 
@@ -147,7 +147,7 @@ namespace casadi{
     const void* h = static_cast<const void*>(sp.get());
     PointerMap::const_iterator it=added_sparsities_.find(h);
     casadi_assert(it!=added_sparsities_.end());
-    return it->second;  
+    return it->second;
   }
 
   size_t CodeGenerator::hash(const std::vector<double>& v){
@@ -162,7 +162,7 @@ namespace casadi{
       }
     }
     return seed;
-  }  
+  }
 
   size_t CodeGenerator::hash(const std::vector<int>& v){
     size_t seed=0;
@@ -173,13 +173,13 @@ namespace casadi{
   int CodeGenerator::getConstant(const std::vector<double>& v, bool allow_adding){
     // Hash the vector
     size_t h = hash(v);
-    
+
     // Try to locate it in already added constants
     pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq = added_double_constants_.equal_range(h);
     for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i){
       if(equal(v,double_constants_[i->second])) return i->second;
     }
-    
+
     if(allow_adding){
       // Add to constants
       int ind = double_constants_.size();
@@ -195,13 +195,13 @@ namespace casadi{
   int CodeGenerator::getConstant(const std::vector<int>& v, bool allow_adding){
     // Hash the vector
     size_t h = hash(v);
-    
+
     // Try to locate it in already added constants
     pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq = added_integer_constants_.equal_range(h);
     for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i){
       if(equal(v,integer_constants_[i->second])) return i->second;
     }
-    
+
     if(allow_adding){
       // Add to constants
       int ind = integer_constants_.size();
@@ -224,54 +224,54 @@ namespace casadi{
   void CodeGenerator::addAuxiliary(Auxiliary f){
     // Register the new auxiliary
     bool added = added_auxiliaries_.insert(f).second;
-    
+
     // Quick return if it already exists
     if(!added) return;
 
     // Add the appropriate function
     switch(f){
-    case AUX_COPY: 
-      auxiliaries_ << codegen_str_copy << endl; 
+    case AUX_COPY:
+      auxiliaries_ << codegen_str_copy << endl;
       break;
-    case AUX_SWAP: 
-      auxiliaries_ << codegen_str_swap << endl; 
+    case AUX_SWAP:
+      auxiliaries_ << codegen_str_swap << endl;
       break;
-    case AUX_SCAL: 
-      auxiliaries_ << codegen_str_scal << endl; 
+    case AUX_SCAL:
+      auxiliaries_ << codegen_str_scal << endl;
       break;
-    case AUX_AXPY: 
-      auxiliaries_ << codegen_str_axpy << endl; 
+    case AUX_AXPY:
+      auxiliaries_ << codegen_str_axpy << endl;
       break;
-    case AUX_DOT: 
-      auxiliaries_ << codegen_str_dot << endl; 
+    case AUX_DOT:
+      auxiliaries_ << codegen_str_dot << endl;
       break;
-    case AUX_ASUM: 
-      auxiliaries_ << codegen_str_asum << endl; 
+    case AUX_ASUM:
+      auxiliaries_ << codegen_str_asum << endl;
       break;
-    case AUX_IAMAX: 
-      auxiliaries_ << codegen_str_iamax << endl; 
+    case AUX_IAMAX:
+      auxiliaries_ << codegen_str_iamax << endl;
       break;
-    case AUX_NRM2: 
-      auxiliaries_ << codegen_str_nrm2 << endl; 
+    case AUX_NRM2:
+      auxiliaries_ << codegen_str_nrm2 << endl;
       break;
-    case AUX_FILL: 
-      auxiliaries_ << codegen_str_fill << endl; 
+    case AUX_FILL:
+      auxiliaries_ << codegen_str_fill << endl;
       break;
-    case AUX_MM_TN_SPARSE: 
-      auxiliaries_ << codegen_str_mm_tn_sparse << endl; 
+    case AUX_MM_TN_SPARSE:
+      auxiliaries_ << codegen_str_mm_tn_sparse << endl;
       break;
-    case AUX_SQ: 
-      auxSq(); 
+    case AUX_SQ:
+      auxSq();
       break;
     case AUX_SIGN:
-      auxSign(); 
+      auxSign();
       break;
     case AUX_COPY_SPARSE:
       addAuxiliary(AUX_COPY);
-      auxiliaries_ << codegen_str_copy_sparse << endl; 
+      auxiliaries_ << codegen_str_copy_sparse << endl;
       break;
-    case AUX_TRANS: 
-      auxiliaries_ << codegen_str_trans << endl; 
+    case AUX_TRANS:
+      auxiliaries_ << codegen_str_trans << endl;
       break;
     }
   }
@@ -313,7 +313,7 @@ namespace casadi{
     } else {
       // For loop
       s << "for(" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res << "[" << it << "]=" << arg << "[" << it << "];" << endl;
-    }    
+    }
   }
 
   std::string CodeGenerator::casadi_dot(int n, const std::string& x, int inc_x, const std::string& y, int inc_y){

@@ -31,30 +31,30 @@
 /** \defgroup QPSolver_doc
 
   Solves the following strictly convex problem:
-  
+
   \verbatim
-  min          1/2 x' H x + g' x 
+  min          1/2 x' H x + g' x
    x
-  
+
   subject to
               LBA <= A x <= UBA
               LBX <= x   <= UBX
-              
+
       with :
         H sparse (n x n) positive definite
         g dense  (n x 1)
-              
+
       n: number of decision variables (x)
       nc: number of constraints (A)
-      
+
   \endverbatim
-  
+
   If H is not positive-definite, the solver should throw an error.
-  
+
 */
-      
+
 namespace casadi{
-  
+
   /// Input arguments of a QP problem [qpIn]
   enum QPSolverInput{
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
@@ -97,7 +97,7 @@ namespace casadi{
     /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
     QP_STRUCT_A,
     QP_STRUCT_NUM};
-  
+
   // Forward declaration of internal class
   class QPSolverInternal;
 
@@ -106,7 +106,7 @@ namespace casadi{
 
       @copydoc QPSolver_doc
 
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT QPSolver : public Function{
@@ -114,23 +114,23 @@ namespace casadi{
 
     /// Default constructor
     QPSolver();
-  
+
     /// Access functions of the node
     QPSolverInternal* operator->();
     const QPSolverInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
+
     /// Set options that make the QP solver more suitable for solving LPs
     void setLPOptions();
-  
+
     /** Generate native code in the interfaced language for debugging */
     virtual void generateNativeCode(const std::string &filename) const;
-  
+
     /** Generate native code in the interfaced language for debugging */
     virtual void generateNativeCode(std::ostream &file) const;
-  
+
   };
 
 } // namespace casadi

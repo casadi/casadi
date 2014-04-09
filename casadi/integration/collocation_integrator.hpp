@@ -26,17 +26,17 @@
 #include "implicit_fixed_step_integrator.hpp"
 
 namespace casadi{
-  
+
   class CollocationIntegratorInternal;
-  
+
   /**
      \brief Fixed-step implicit Runge-Kutta integrator
      ODE/DAE integrator based on collocation schemes
-  
+
      The method is still under development
-  
+
      @copydoc DAE_doc
-  
+
      \author Joel Andersson
      \date 2014
   */
@@ -44,7 +44,7 @@ namespace casadi{
   public:
     /** \brief  Default constructor */
     CollocationIntegrator();
-    
+
     /** \brief  Create an integrator for explicit ODEs
      *   \param f dynamical system
      * \copydoc scheme_DAEInput
@@ -72,7 +72,7 @@ namespace casadi{
 #ifdef SWIG
     %nocallback;
 #endif
-    
+
   };
 
 } // namespace casadi

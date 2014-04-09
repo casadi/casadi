@@ -27,21 +27,21 @@
 #include <casadi/interfaces/dsdp/casadi_dsdp_interface_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class DSDPInternal;
 
   /** \brief Interface to DSDP Solver for semi definite programming
 
    @copydoc SDPSolver_doc
-   
+
    Warning: The solver DSDP is not good at handling linear equalities.
       There are several options if you notice difficulties:
         * play around with the parameter "_penalty"
-        * leave a gap manually 
+        * leave a gap manually
         * switch to another SDP Solver
-      
+
    \author Joris Gillis
    \date 2013
 
@@ -51,16 +51,16 @@ public:
 
   /** \brief  Default constructor */
   DSDPSolver();
-  
+
   explicit DSDPSolver(const SDPStructure &st);
-  
+
   /** \brief  Access functions of the node */
   DSDPInternal* operator->();
   const DSDPInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");

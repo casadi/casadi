@@ -27,9 +27,9 @@
 #include <casadi/interfaces/ooqp/casadi_ooqp_interface_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class OOQPInternal;
 
 /** \brief Interface to the OOQP Solver for quadratic programming:
@@ -37,7 +37,7 @@ class OOQPInternal;
       @copydoc QPSolver_doc
 
       The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.
-      
+
       NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
 */
 class CASADI_OOQP_INTERFACE_EXPORT OOQPSolver : public QPSolver {
@@ -45,20 +45,20 @@ public:
 
   /** \brief  Default constructor */
   OOQPSolver();
-  
+
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_QPStruct
   */
   OOQPSolver(const QPStructure &st);
-  
+
   /** \brief  Access functions of the node */
   OOQPInternal* operator->();
   const OOQPInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
@@ -68,7 +68,7 @@ public:
   %nocallback;
   #endif
 
-  
+
 };
 
 

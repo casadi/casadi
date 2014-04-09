@@ -28,12 +28,12 @@
 
 namespace casadi{
   /** \brief Represents a general unary operation on an MX
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT UnaryMX : public MXNode{
   public:
-    
+
     /** \brief  Constructor is private, use "create" below */
     UnaryMX(Operation op, MX x);
 
@@ -63,7 +63,7 @@ namespace casadi{
 
     /** \brief Get the operation */
     virtual int getOp() const{ return op_;}
-    
+
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
 

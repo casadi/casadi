@@ -31,11 +31,11 @@
 
 /// \cond INTERNAL
 namespace casadi{
-    
+
   class CASADI_INTEGRATION_EXPORT OldCollocationIntegratorInternal : public IntegratorInternal{
-  
+
   public:
-  
+
     /// Constructor
     explicit OldCollocationIntegratorInternal(const Function& f, const Function& g);
 
@@ -47,13 +47,13 @@ namespace casadi{
 
     /// Create a new integrator
     virtual OldCollocationIntegratorInternal* create(const Function& f, const Function& g) const{ return new OldCollocationIntegratorInternal(f,g);}
-  
+
     /// Destructor
     virtual ~OldCollocationIntegratorInternal();
 
     /// Initialize stage
     virtual void init();
-  
+
     /// Reset the forward problem and bring the time back to t0
     virtual void reset();
 
@@ -68,19 +68,19 @@ namespace casadi{
 
     // Startup integrator (generates an initial trajectory guess)
     Integrator startup_integrator_;
-  
+
     // Implicit function solver
     ImplicitFunction implicit_solver_;
-  
+
     // With hotstart
     bool hotstart_;
-  
+
     // Has the system been integrated once
     bool integrated_once_;
-  
+
     // Collocated times
     std::vector<std::vector<double> > coll_time_;
-  
+
   };
 
 } // namespace casadi

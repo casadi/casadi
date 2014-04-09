@@ -38,11 +38,11 @@ void slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int ilo
 
 
 void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z, std::vector<double> &eig_real, std::vector<double> &eig_imag);
-  
+
 void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z, std::vector<double> &dwork, std::vector<double> &eig_real, std::vector<double> &eig_imag);
 #endif // SWIG
 /// \endcond
-  
+
 /** \brief Obtain Periodic Schur Form of a set of matrices
 *
 *  Finds Z_i such that
@@ -52,14 +52,14 @@ void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::v
           Z_2' * H_2 * Z_3 = T_2,
                  ...
           Z_K' * H_K * Z_1 = T_K,
-\endverbatim      
+\endverbatim
 *
 *  with T_1 in Hessenberg form (upper triangular + one band below the diagonal)
 *   and T_2..T_K  upper diagonal
 *
 */
 CASADI_SLICOT_INTERFACE_EXPORT void slicot_periodic_schur(const std::vector< Matrix<double> > & A, std::vector< Matrix<double> > & SWIG_OUTPUT(T),  std::vector< Matrix<double> > & SWIG_OUTPUT(Z), std::vector<double> &eig_real, std::vector<double> &SWIG_OUTPUT(eig_imag));
-  
+
 } // namespace casadi
 
 #endif // SLICOT_TOOLS_HPP

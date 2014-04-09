@@ -35,28 +35,28 @@ namespace casadi{
 
   /** \brief Weak reference type
       A weak reference to a SharedObject
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2013
   */
   class CASADI_SYMBOLIC_EXPORT WeakRef : public SharedObject{
   public:
     friend class SharedObjectNode;
-    
+
     /** \brief Default constructor */
     WeakRef(int dummy=0);
-    
+
     /** \brief Construct from a shared object (also implicit type conversion) */
     WeakRef(SharedObject shared);
-    
+
     /** \brief Get a shared (owning) reference */
     SharedObject shared();
 
     /** \brief Check if alive */
     bool alive() const;
-    
+
     /** \brief  Access functions of the node */
     WeakRefInternal* operator->();
-    
+
     /** \brief  Const access functions of the node */
     const WeakRefInternal* operator->() const;
 
@@ -67,9 +67,9 @@ namespace casadi{
 
     /** \brief The shared object has been deleted */
     void kill();
-#endif // SWIG    
+#endif // SWIG
  };
-  
+
 #ifndef SWIG
   class CASADI_SYMBOLIC_EXPORT WeakRefInternal : public SharedObjectNode{
   public:
@@ -78,16 +78,16 @@ namespace casadi{
 
     // Destructor
     ~WeakRefInternal();
-    
+
     // Clone (should never be used)
     virtual WeakRefInternal* clone() const{ return new WeakRefInternal(*this);}
 
     // Raw pointer to the cached object
-    SharedObjectNode* raw_;    
+    SharedObjectNode* raw_;
   };
 
 #endif // SWIG
-    
+
 } // namespace casadi
 
 

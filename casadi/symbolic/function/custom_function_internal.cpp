@@ -33,18 +33,18 @@ using namespace std;
 CustomFunctionInternal::CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<casadi::Sparsity> &inputscheme, const std::vector<casadi::Sparsity> &outputscheme) : evaluate_(c_fcn){
   setNumInputs(inputscheme.size());
   setNumOutputs(outputscheme.size());
-  
+
   for (int k=0;k<inputscheme.size();k++) {
     input(k) = DMatrix(inputscheme[k],0);
   }
-  
+
   for (int k=0;k<outputscheme.size();k++) {
     output(k) = DMatrix(outputscheme[k],0);
   }
-  
+
   // Make the ref object a non-refence counted pointer to this (as reference counting would prevent deletion of the object)
   ref_.assignNodeNoCount(this);
-  
+
 }
 
 CustomFunctionInternal::~CustomFunctionInternal(){
@@ -54,7 +54,7 @@ CustomFunctionInternal::~CustomFunctionInternal(){
 
 void CustomFunctionInternal::evaluate(){
   casadi_assert_message(!evaluate_.isNull(), "CustomFunctionInternal::evaluate: pointer is null");
-  evaluate_(ref_,user_data_);  
+  evaluate_(ref_,user_data_);
 }
 
 void CustomFunctionInternal::init(){

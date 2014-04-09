@@ -38,7 +38,7 @@ namespace casadi{
   template<class T>
   std::vector<T*> ptrVec(std::vector<T>& v){
     std::vector<T*> ret(v.size());
-    for(int i=0; i<v.size(); ++i) 
+    for(int i=0; i<v.size(); ++i)
       ret[i] = &v[i];
     return ret;
   }
@@ -46,41 +46,41 @@ namespace casadi{
   template<class T>
   const std::vector<T*> ptrVec(const std::vector<T>& v){
     std::vector<T*> ret(v.size());
-    for(int i=0; i<v.size(); ++i) 
+    for(int i=0; i<v.size(); ++i)
       ret[i] = const_cast<T*>(&v[i]);
     return ret;
   }
-  
+
   template<class T>
   std::vector<std::vector<T*> > ptrVec(std::vector<std::vector<T> >& v){
     std::vector<std::vector<T*> > ret(v.size());
-    for(int i=0; i<v.size(); ++i) 
+    for(int i=0; i<v.size(); ++i)
       ret[i] = ptrVec(v[i]);
     return ret;
   }
-  
+
   template<class T>
   const std::vector<std::vector<T*> > ptrVec(const std::vector<std::vector<T> >& v){
     std::vector<std::vector<T*> > ret(v.size());
-    for(int i=0; i<v.size(); ++i) 
+    for(int i=0; i<v.size(); ++i)
       ret[i] = ptrVec(v[i]);
     return ret;
   }
   //@}
 
-  
+
   /** \brief Node class for MX objects
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
       Internal class.
   */
   class CASADI_SYMBOLIC_EXPORT MXNode : public SharedObjectNode{
     friend class MX;
-  
+
   public:
     /// Constructor
     MXNode();
-  
+
     /** \brief  Destructor */
     virtual ~MXNode()=0;
 
@@ -90,7 +90,7 @@ namespace casadi{
     /** \brief Check the truth value of this node
      */
     virtual bool __nonzero__() const;
-    
+
     /** \brief Check if identically zero */
     virtual bool isZero() const{ return false;}
 
@@ -111,13 +111,13 @@ namespace casadi{
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-    
+
     /** \brief  Print a representation */
     virtual void repr(std::ostream &stream) const;
-    
+
     /** \brief  Print a description */
     virtual void print(std::ostream &stream) const;
-    
+
     /** \brief  Print expression (make sure number of calls is not exceeded) */
     virtual void print(std::ostream &stream, long& remaining_calls) const;
 
@@ -126,7 +126,7 @@ namespace casadi{
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
-    
+
     /** \brief  Evaluate numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
 
@@ -134,19 +134,19 @@ namespace casadi{
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
-    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, 
-                            const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, 
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output,
+                            const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
                             const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /** \brief  Evaluate symbolically (MX), no derivatives */
     void evaluateMX(const MXPtrV& input, MXPtrV& output);
-    
+
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){ propagateSparsity(input,output,fwd);}
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
-    
+
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const{return false;}
 
@@ -170,7 +170,7 @@ namespace casadi{
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const{ return false;}
-    
+
     /** \brief Get equality checking depth */
     inline static bool maxDepth(){ return MX::getEqualityCheckingDepth();}
 
@@ -180,16 +180,16 @@ namespace casadi{
     /** \brief  dependencies - functions that have to be evaluated before this one */
     const MX& dep(int ind=0) const;
     MX& dep(int ind=0);
-    
+
     /** \brief  Number of dependencies */
     int ndep() const;
-    
+
     /** \brief  Does the node depend on other nodes*/
     virtual bool hasDep() const{return ndep()>0; }
-    
+
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const{ return 1;}
-    
+
     /** \brief  Get an output */
     virtual MX getOutput(int oind) const;
 
@@ -205,34 +205,34 @@ namespace casadi{
     int size1() const{ return sparsity().size1(); }
     int size2() const{ return sparsity().size2(); }
     std::pair<int,int> shape() const{ return sparsity().shape();}
-    
+
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear(){return false;}
-    
+
     /// Set the sparsity
     void setSparsity(const Sparsity& sparsity);
-    
+
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=0;}
 
     /// Set unary dependency
     void setDependencies(const MX& dep);
-    
+
     /// Set binary dependencies
     void setDependencies(const MX& dep1, const MX& dep2);
-    
+
     /// Set ternary dependencies
     void setDependencies(const MX& dep1, const MX& dep2, const MX& dep3);
-    
+
     /// Set multiple dependencies
     void setDependencies(const std::vector<MX>& dep);
-        
+
     /// Add a dependency
     int addDependency(const MX& dep);
-    
+
     /// Assign nonzeros (mapping matrix)
     virtual void assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add=false);
-    
+
     /// Assign nonzeros (mapping matrix), output indices sequential
     virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
@@ -247,10 +247,10 @@ namespace casadi{
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const;
-    
+
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const;
-    
+
     /// Can the operation be performed inplace (i.e. overwrite the result)
     virtual int numInplace() const{ return 0;}
 
@@ -285,9 +285,9 @@ namespace casadi{
 
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;
-    
+
     /** \brief Matrix multiplication
-    *  
+    *
     *  The optinal argument sp_z will be used as the sparsity pattern of the result
     */
     virtual MX getMultiplication(const MX& y, const Sparsity& sp_z=Sparsity()) const;
@@ -296,7 +296,7 @@ namespace casadi{
     *
     *      For system Ax = b:
     *
-    *      A->getSolve(b)         
+    *      A->getSolve(b)
     *
     */
     virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const;
@@ -311,14 +311,14 @@ namespace casadi{
     virtual MX getAddNonzeros(const MX& y, const std::vector<int>& nz) const;
 
     /// Get submatrix reference
-    virtual MX getSubRef(const Slice& i, const Slice& j) const;    
+    virtual MX getSubRef(const Slice& i, const Slice& j) const;
 
     /// Get submatrix assignment
-    virtual MX getSubAssign(const MX& y, const Slice& i, const Slice& j) const;    
+    virtual MX getSubAssign(const MX& y, const Slice& i, const Slice& j) const;
 
     /// Create set sparse
     virtual MX getSetSparse(const Sparsity& sp) const;
-    
+
     /// Get a unary operation
     virtual MX getUnary(int op) const;
 
@@ -348,19 +348,19 @@ namespace casadi{
 
     /// 1-norm
     virtual MX getNorm1() const;
-    
+
     /// Assertion
     MX getAssertion(const MX& y, const std::string & fail_message="") const;
 
-    /** Temporary variables to be used in user algorithms like sorting, 
+    /** Temporary variables to be used in user algorithms like sorting,
         the user is resposible of making sure that use is thread-safe
         The variable is initialized to zero
     */
     int temp;
-    
+
     /** \brief  dependencies - functions that have to be evaluated before this one */
     std::vector<MX> dep_;
-    
+
     /** \brief  The sparsity pattern */
     Sparsity sparsity_;
 
@@ -370,7 +370,7 @@ namespace casadi{
     /** \brief Free adjoint memory (MX) */
     static void clearVector(const std::vector<std::vector<MX*> > v);
   };
-  
+
 
   // Implementations
 

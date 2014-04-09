@@ -30,28 +30,28 @@ namespace casadi{
   // Forward declaration of internal class
   class ImplicitFunctionInternal;
 
-  /** 
+  /**
       \defgroup ImplicitFunction_doc
 
       The equation:
-  
+
       F(z, x1, x2, ..., xn) == 0
-  
+
       where d_F/dz is invertable, implicitly defines the equation:
-  
+
       z := G(x1, x2, ..., xn)
-  
-  
-  
+
+
+
       F should be an Function mapping from (n+1) inputs to m outputs.
       The first output is the residual that should be zero.
-  
-      ImplicitFunction (G) is an Function mapping from n inputs to m outputs. 
+
+      ImplicitFunction (G) is an Function mapping from n inputs to m outputs.
       n may be zero.
       The first output is the solved for z.
-  
+
       You can provide an initial guess for z by setting output(0) of ImplicitFunction.
-  
+
 
   */
   /** \brief  Abstract base class for the implicit function classes
@@ -63,7 +63,7 @@ namespace casadi{
   */
   class CASADI_SYMBOLIC_EXPORT ImplicitFunction : public Function{
   public:
-  
+
     /// Access functions of the node
     ImplicitFunctionInternal* operator->();
 
@@ -72,7 +72,7 @@ namespace casadi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
+
     /// Access F
     Function& getF();
 

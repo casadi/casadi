@@ -26,7 +26,7 @@
 using namespace std;
 namespace casadi{
 
-  NLPImplicitSolver::NLPImplicitSolver(){ 
+  NLPImplicitSolver::NLPImplicitSolver(){
   }
 
   NLPImplicitSolver::NLPImplicitSolver(const Function& f, const Function& jac, const LinearSolver& linsol)  {

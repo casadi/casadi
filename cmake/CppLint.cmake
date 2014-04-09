@@ -23,13 +23,17 @@
 
 find_package(PythonInterp)
 
+# start with no filters
 set(STYLE_FILTER "-,")
 
-# c-style casts
-set(STYLE_FILTER ${STYLE_FILTER}+readability/casting,)
+# trailing whitespace
+set(STYLE_FILTER ${STYLE_FILTER}+whitespace/end_of_line,)
 
 # tabs
 set(STYLE_FILTER ${STYLE_FILTER}+whitespace/tab,)
+
+# c-style casts
+set(STYLE_FILTER ${STYLE_FILTER}+readability/casting,)
 
 # Yes it is!
 #set(STYLE_FILTER ${STYLE_FILTER}-whitespace/blank_line,)

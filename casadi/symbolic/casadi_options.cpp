@@ -32,7 +32,7 @@ namespace casadi {
   bool CasadiOptions::profilingBinary = true;
   bool CasadiOptions::purgeSeeds = false;
   bool CasadiOptions::allowed_internal_api = false;
-  
+
   void CasadiOptions::startProfiling(const std::string &filename) {
     profilingLog.open (filename.c_str(),std::ofstream::out);
     if (profilingLog.is_open()) {
@@ -41,12 +41,12 @@ namespace casadi {
       casadi_error("Did not manage to open file " << filename << " for logging.");
     }
   }
-  
+
   void CasadiOptions::stopProfiling() {
     if (profiling) {
       profilingLog.close();
     }
     profiling = false;
   }
-  
+
 }

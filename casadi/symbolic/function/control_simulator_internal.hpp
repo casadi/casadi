@@ -32,18 +32,18 @@
 namespace casadi{
 
   /** \brief ControlSimulator data storage classs
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT ControlSimulatorInternal : public FunctionInternal{
   public:
-  
+
     /** \brief  Constructor */
     ControlSimulatorInternal(const Function& dae, const Function& output_fcn, const std::vector<double>& gridc);
-  
+
     /** \brief  Destructor */
     virtual ~ControlSimulatorInternal();
-  
+
     /** \brief  Clone */
     virtual ControlSimulatorInternal* clone() const{ return new ControlSimulatorInternal(deepcopy(dae_),deepcopy(output_fcn_),gridc_);}
 
@@ -52,58 +52,58 @@ namespace casadi{
 
     /** \brief  Integrate */
     virtual void evaluate();
-  
+
     /// Get the parameters that change on a coarse time scale, sampled on the fine timescale
-    Matrix<double> getVFine() const; 
-         
-    /** \brief Get the index i such that gridfine[i] == gridcoarse 
+    Matrix<double> getVFine() const;
+
+    /** \brief Get the index i such that gridfine[i] == gridcoarse
      */
-    std::vector< int > getCoarseIndex() const; 
-         
+    std::vector< int > getCoarseIndex() const;
+
 
     Integrator integrator_;
     Function dae_;
     Function control_dae_;
     Simulator simulator_;
-  
+
     // original output function
     Function orig_output_fcn_;
-  
+
     // adapted output function
     Function output_fcn_;
-  
+
     /** \brief The hart of this class, a casadi of simulator calls */
     Function all_output_;
-  
+
     /** grid */
     std::vector<double> grid_;
-  
+
     /** Coarse grid */
     std::vector<double> gridc_;
-  
+
     /** The local non-dimensional time grid */
     std::vector<double> gridlocal_;
 
     /** \brief Number of states */
     int ny_;
-  
+
     /** \brief Number of static parameters */
     int np_;
-  
+
     /** \brief Number of controls */
     int nu_;
-  
+
     /** \brief Number of interpolated controls */
     int nu_interp_;
-  
+
     /** \brief Number of coarse time steps */
     int ns_;
-  
+
     /** \brief Number of fine-grained time steps */
     int nf_;
-  
+
   };
-  
+
 } // namespace casadi
 /// \endcond
 

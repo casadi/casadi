@@ -39,33 +39,33 @@ class SymbolicNLPInternal;
 */
 class CASADI_NONLINEAR_PROGRAMMING_EXPORT SymbolicNLP : public PrintableObject{
   public:
-    
+
     /** @name Symbolic representation of the NLP
     *  Data members
     */
     //@{
-      
+
       /// Variables
       SX x;
-    
+
       /// Objective functions
       SX f;
-    
+
       /// Constraint functions
       SX g;
-      
+
       /// Bounds on x
       DMatrix x_lb, x_ub;
-      
+
       /// Bounds on g
       DMatrix g_lb, g_ub;
-      
+
       /// Primal initial guess
       DMatrix x_init;
-      
+
       /// Dual initial guess
       DMatrix lambda_init;
-      
+
     //@}
 
     /// Parse an AMPL och PyOmo NL-file
@@ -79,17 +79,17 @@ class CASADI_NONLINEAR_PROGRAMMING_EXPORT SymbolicNLP : public PrintableObject{
     virtual void repr(std::ostream &stream=std::cout) const;
 
   protected:
-    
+
     /// Read an expression from an NL-file (Polish infix format)
     static SXElement readExpressionNL(std::istream &stream, const std::vector<SXElement>& v);
 
-#endif // SWIG 
+#endif // SWIG
 
-    
-  
-    
+
+
+
 };
-    
+
 } // namespace casadi
 
 #endif //SYMBOLIC_NLP_HPP

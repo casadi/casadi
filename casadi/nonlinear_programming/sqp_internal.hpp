@@ -30,17 +30,17 @@
 
 /// \cond INTERNAL
 namespace casadi{
-    
+
 class CASADI_NONLINEAR_PROGRAMMING_EXPORT SQPInternal : public NLPSolverInternal{
 
 public:
   explicit SQPInternal(const Function& nlp);
   virtual ~SQPInternal();
   virtual SQPInternal* clone() const{ return new SQPInternal(*this);}
-  
+
   virtual void init();
   virtual void evaluate();
-  
+
   /// QP solver for the subproblems
   QPSolver qp_solver_;
 
@@ -48,7 +48,7 @@ public:
   bool exact_hessian_;
 
   /// maximum number of sqp iterations
-  int max_iter_; 
+  int max_iter_;
 
   /// Memory size of L-BFGS method
   int lbfgs_memory_;
@@ -56,7 +56,7 @@ public:
   double tol_pr_;
   /// Tolerance of dual infeasibility
   double tol_du_;
-  
+
   /// Minimum step size allowed
   double min_step_size_;
 
@@ -71,38 +71,38 @@ public:
 
   /// Hessian regularization
   double reg_;
-  
+
   /// Access QPSolver
   const QPSolver getQPSolver() const { return qp_solver_;}
-  
+
   /// Lagrange multipliers of the NLP
   std::vector<double> mu_, mu_x_;
-  
+
   /// Current cost function value
   double fk_;
-  
+
   /// Current and previous linearization point and candidate
   std::vector<double> x_, x_old_, x_cand_;
-  
+
   /// Lagrange gradient in the next iterate
   std::vector<double> gLag_, gLag_old_;
-  
+
   /// Constraint function value
   std::vector<double> gk_, gk_cand_;
-  
+
   /// Gradient of the objective function
   std::vector<double> gf_;
 
   /// BFGS update function
-  enum BFGSMdoe{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
+  enum BFGSMdoe{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};
   Function bfgs_;
-  
+
   /// Initial Hessian approximation (BFGS)
   DMatrix B_init_;
-  
+
   /// Current Hessian approximation
   DMatrix Bk_;
-  
+
   // Current Jacobian
   DMatrix Jk_;
 
@@ -120,9 +120,9 @@ public:
 
   /// Print iteration header
   void printIteration(std::ostream &stream);
-  
+
   /// Print iteration
-  void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
+  void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf,
                       double dx_norm, double reg, int ls_trials, bool ls_success);
 
   // Reset the Hessian or Hessian approximation
@@ -130,10 +130,10 @@ public:
 
   // Evaluate the gradient of the objective
   virtual void eval_f(const std::vector<double>& x, double& f);
-  
+
   // Evaluate the gradient of the objective
   virtual void eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f);
-  
+
   // Evaluate the constraints
   virtual void eval_g(const std::vector<double>& x, std::vector<double>& g);
 
@@ -142,26 +142,26 @@ public:
 
   // Evaluate the Hessian of the Lagrangian
   virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H);
-  
+
   // Calculate the regularization parameter using Gershgorin theorem
   double getRegularization(const Matrix<double>& H);
-  
+
   // Regularize by adding a multiple of the identity
   void regularize(Matrix<double>& H, double reg);
-  
+
   // Solve the QP subproblem
   virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
                         const std::vector<double>& lbx, const std::vector<double>& ubx,
                         const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
                         std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt);
-  
+
   // Calculate the L1-norm of the primal infeasibility
   double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
                              const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg);
-  
+
   /// Calculates inner_prod(x,mul(A,x))
   static double quad_form(const std::vector<double>& x, const DMatrix& A);
-  
+
   // Accummulated time since last reset:
   double t_eval_f_; // time spent in eval_f
   double t_eval_grad_f_; // time spent in eval_grad_f
@@ -178,7 +178,7 @@ public:
   int n_eval_g_; // number of calls to eval_g
   int n_eval_jac_g_; // number of calls to eval_jac_g
   int n_eval_h_; // number of calls to eval_h
-  
+
 };
 
 } // namespace casadi

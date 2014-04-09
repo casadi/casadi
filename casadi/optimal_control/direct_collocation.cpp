@@ -23,10 +23,10 @@
 #include "direct_collocation_internal.hpp"
 
 namespace casadi{
-    
+
 DirectCollocation::DirectCollocation(){
 }
-    
+
 DirectCollocation::DirectCollocation(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn){
   assignNode(new DirectCollocationInternal(ffcn,mfcn,cfcn,rfcn));
 }
@@ -42,11 +42,11 @@ DirectCollocationInternal* DirectCollocation::operator->(){
 void DirectCollocation::getGuess(std::vector<double>& V_init) const{
   (*this)->getGuess(V_init);
 }
-    
+
 void DirectCollocation::getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const{
   (*this)->getVariableBounds(V_min,V_max);
 }
-    
+
 void DirectCollocation::getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const{
   (*this)->getConstraintBounds(G_min,G_max);
 }
@@ -56,8 +56,8 @@ void DirectCollocation::setOptimalSolution( const std::vector<double> &V_opt ){
 }
 
   NLPSolver DirectCollocation::getNLPSolver() const { return isNull() ? NLPSolver(): (*this)->nlp_solver_; }
-  
-void DirectCollocation::reportConstraints(std::ostream &stream) { 
+
+void DirectCollocation::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();
 }
 

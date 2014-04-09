@@ -29,15 +29,15 @@
 /// \cond INTERNAL
 
 namespace casadi{
-  
+
   class CASADI_SYMBOLIC_EXPORT SymbolicQRInternal : public LinearSolverInternal{
   public:
     // Constructor
     SymbolicQRInternal(const Sparsity& sparsity, int nrhs);
-        
+
     // Destructor
     virtual ~SymbolicQRInternal();
-    
+
     /** \brief  Clone */
     virtual SymbolicQRInternal* clone() const{ return new SymbolicQRInternal(*this);}
 
@@ -46,7 +46,7 @@ namespace casadi{
 
     // Initialize
     virtual void init();
-    
+
     // Prepare the factorization
     virtual void prepare();
 
@@ -70,7 +70,7 @@ namespace casadi{
 
     // Storage for QR factorization
     DMatrix Q_, R_;
-  };  
+  };
 
 } // namespace casadi
 

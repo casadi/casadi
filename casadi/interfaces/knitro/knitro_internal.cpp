@@ -35,7 +35,7 @@ namespace casadi{
 
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
-  
+
     // Not yet ready
     //addOption("algorithm",                OT_STRING, GenericType(), "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
     //addOption("bar_directinterval",       OT_INTEGER, GenericType(), "When using the Interior/Direct algorithm, this parameter controls the maximum number of consecutive CG steps before trying to force the algorithm to take a direct step again. See KNITRO documentation.");
@@ -44,8 +44,8 @@ namespace casadi{
     //addOption("bar_initmu",               OT_INTEGER, GenericType(), "Initial value for the barrier parameter. See KNITRO documentation.");
     //addOption("bar_initpt",               OT_STRING, GenericType(), "Whether to use the initial point strategy with barrier algorithms.  See KNITRO documentation.", "auto|yes|no");
     //addOption("bar_maxbacktrack",         OT_INTEGER, GenericType(), "Maximum allowable number of backtracks during the linesearch of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.");
-    //addOption("bar_maxrefactor",          OT_INTEGER, GenericType(), "Maximum number of refactorizations of the KKT system per iteration of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation."); 
-  
+    //addOption("bar_maxrefactor",          OT_INTEGER, GenericType(), "Maximum number of refactorizations of the KKT system per iteration of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.");
+
     //addOption("Alg",OT_INTEGER,0,"Algorithm");
     addOption("BarRule",OT_INTEGER,0,"Barrier Rule");
     addOption("NewPoint",OT_BOOLEAN,0,"Select new-point feature");
@@ -82,7 +82,7 @@ namespace casadi{
 
 
     kc_handle_ = 0;
-  
+
     addOption("contype", OT_INTEGERVECTOR);
   }
 
@@ -143,7 +143,7 @@ namespace casadi{
     // Allocate KNITRO memory block
     /*  casadi_assert(kc_handle_==0);
 	kc_handle_ = KTR_new();*/
-  
+
   }
 
   void KnitroInternal::evaluate(){
@@ -152,7 +152,7 @@ namespace casadi{
     kc_handle_ = KTR_new();
     casadi_assert(kc_handle_!=0);
     int status;
-  
+
     // Jacobian sparsity
     vector<int> Jcol = jacG_.output().sparsity().getCol();
     vector<int> Jrow = jacG_.output().row();
@@ -172,7 +172,7 @@ namespace casadi{
 	}
       }
       casadi_assert(nz==nnzH);
-    
+
       status = KTR_set_int_param_by_name(kc_handle_, "hessopt", KTR_HESSOPT_EXACT);
       casadi_assert_message(status==0, "KTR_set_int_param failed");
     } else {
@@ -187,7 +187,7 @@ namespace casadi{
 	throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
       }
     }
-  
+
     for(std::map<std::string, int>::iterator it=int_param_.begin(); it!=int_param_.end(); ++it){
       status = KTR_set_int_param_by_name(kc_handle_, it->first.c_str(), it->second);
       if(status!=0){
@@ -209,7 +209,7 @@ namespace casadi{
       casadi_assert(contype.size()==cType.size());
       copy(contype.begin(),contype.end(),cType.begin());
     }
-  
+
     // "Correct" upper and lower bounds
     for(vector<double>::iterator it=input(NLP_SOLVER_LBX).begin(); it!=input(NLP_SOLVER_LBX).end(); ++it)
       if(isinf(*it)) *it = -KTR_INFBOUND;
@@ -219,7 +219,7 @@ namespace casadi{
       if(isinf(*it)) *it = -KTR_INFBOUND;
     for(vector<double>::iterator it=input(NLP_SOLVER_UBG).begin(); it!=input(NLP_SOLVER_UBG).end(); ++it)
       if(isinf(*it)) *it =  KTR_INFBOUND;
-  
+
     // Initialize KNITRO
     status = KTR_init_problem(kc_handle_, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                               &input(NLP_SOLVER_LBX).front(), &input(NLP_SOLVER_UBX).front(),
@@ -231,14 +231,14 @@ namespace casadi{
                               &input(NLP_SOLVER_X0).front(),
                               0); // initial lambda
     casadi_assert_message(status==0, "KTR_init_problem failed");
-  
+
     // Register callback functions
     status = KTR_set_func_callback(kc_handle_, &callback);
     casadi_assert_message(status==0, "KTR_set_func_callback failed");
-  
+
     status = KTR_set_grad_callback(kc_handle_, &callback);
     casadi_assert_message(status==0, "KTR_set_grad_callbackfailed");
-  
+
     if(nnzH>0){
       status = KTR_set_hess_callback(kc_handle_, &callback);
       casadi_assert_message(status==0, "KTR_set_hess_callbackfailed");
@@ -260,7 +260,7 @@ namespace casadi{
 		       0,  // not used
 		       this); // to be retrieved in the callback function
     casadi_assert(status<=0); // make sure the NLP finished solving
-    
+
     // Copy lagrange multipliers
     output(NLP_SOLVER_LAM_G).set(getPtr(lambda));
     output(NLP_SOLVER_LAM_X).set(&lambda[ng_]);
@@ -278,7 +278,7 @@ namespace casadi{
     try{
       // Get a pointer to the calling object
       KnitroInternal* this_ = static_cast<KnitroInternal*>(userParams);
-    
+
       // Direct to the correct function
       switch(evalRequestCode){
       case KTR_RC_EVALFC: this_->evalfc(x,*obj,c); break;
@@ -286,7 +286,7 @@ namespace casadi{
       case KTR_RC_EVALH:  this_->evalh(x,lambda,hessian); break;
       default: casadi_assert_message(0,"KnitroInternal::callback: unknown method");
       }
-    
+
       return 0;
     } catch (exception& ex){
       cerr << "KnitroInternal::callback caugth exception: " << ex.what() << endl;
@@ -305,7 +305,7 @@ namespace casadi{
     // Get the result
     nlp_.output(NL_F).get(obj);
     nlp_.output(NL_G).get(c,DENSE);
-    
+
     // Printing
     if(monitored("eval_f")){
       cout << "x = " << nlp_.input(NL_X) << endl;
@@ -333,17 +333,17 @@ namespace casadi{
       cout << "x = " << gradF_.input(NL_X) << endl;
       cout << "grad_f = " << gradF_.output() << endl;
     }
-    
+
     // Pass the argument to the Jacobian function
     jacG_.setInput(x,NL_X);
     jacG_.setInput(input(NLP_SOLVER_P),NL_P);
-  
+
     // Evaluate the Jacobian function
     jacG_.evaluate();
-  
+
     // Get the result
     jacG_.output().get(jac);
-  
+
     // Printing
     if(monitored("eval_jac_g")){
       cout << "x = " << jacG_.input(NL_X) << endl;
@@ -357,13 +357,13 @@ namespace casadi{
     hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
     hessLag_.setInput(1.0,NL_NUM_IN+NL_F);
     hessLag_.setInput(lambda,NL_NUM_IN+NL_G);
-    
+
     // Evaluate
     hessLag_.evaluate();
-    
+
     // Get results
     hessLag_.output().get(hessian,SPARSESYM);
-  
+
     // Printing
     if(monitored("eval_h")){
       cout << "eval_h" << endl;
@@ -371,7 +371,7 @@ namespace casadi{
       cout << "lambda = " << hessLag_.input(1) << endl;
       cout << "scale = " << hessLag_.input(2) << endl;
       cout << "H = " << hessLag_ << endl;
-    }      
+    }
   }
 
 

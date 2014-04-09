@@ -35,16 +35,16 @@ SundialsInternal* SundialsIntegrator::operator->(){
 }
 
 const SundialsInternal* SundialsIntegrator::operator->() const{
-   return (const SundialsInternal*)(Function::operator->()); 
+   return (const SundialsInternal*)(Function::operator->());
 }
-  
+
 bool SundialsIntegrator::checkNode() const{
   return dynamic_cast<const SundialsInternal*>(get())!=0;
 }
-  
+
 void SundialsIntegrator::setStopTime(double tf){
   (*this)->setStopTime(tf);
 }
-  
+
 } // namespace casadi
 

@@ -33,7 +33,7 @@ namespace casadi{
   /** \brief Internal storage for integrator related data
 
       @copydoc DAE_doc
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT IntegratorInternal : public FunctionInternal{
@@ -49,10 +49,10 @@ namespace casadi{
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-  
+
     /** \brief  Create a new integrator */
     virtual IntegratorInternal* create(const Function& f, const Function& g) const = 0;
-  
+
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}
 
@@ -79,7 +79,7 @@ namespace casadi{
 
     /// Is the class able to propate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
-    
+
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual Function getDerivative(int nfwd, int nadj);
 
@@ -96,7 +96,7 @@ namespace casadi{
 
     /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
     virtual std::pair<Function,Function> getAugmented(int nfwd, int nadj, AugOffset& offset);
-  
+
     // Get offsets in augmented problem
     AugOffset getAugOffset(int nfwd, int nadj);
 
@@ -105,7 +105,7 @@ namespace casadi{
 
     // Create sparsity pattern of the extended Jacobian (backward problem)
     Sparsity spJacG();
-  
+
     //@{
     // Shorthands
     DMatrix&  x0(){ return input(INTEGRATOR_X0 );}
@@ -124,7 +124,7 @@ namespace casadi{
 
     /// Number of states for the forward integration
     int nx_, nz_, nq_;
-  
+
     /// Number of states for the backward integration
     int nrx_, nrz_, nrq_;
 
@@ -136,10 +136,10 @@ namespace casadi{
 
     // Current time
     double t_;
-  
+
     /// ODE/DAE forward integration function
     Function f_;
-  
+
     /// ODE/DAE backward integration function, if any
     Function g_;
 
@@ -150,7 +150,7 @@ namespace casadi{
     bool print_stats_;
 
   };
-  
+
 } // namespace casadi
 /// \endcond
 

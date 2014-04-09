@@ -26,16 +26,16 @@
 #include "function.hpp"
 
 /** \defgroup Nullspace_doc
-   
+
       Constructs a basis for the null-space of a fat matrix A.
       i.e. finds Z such that AZ = 0 holds.
 
       The nullspace is also known as the orthogonal complement of the rowspace of a matrix.
-      
+
       It is assumed that the matrix A is of full rank.
-      
+
       Implementations are not required to construct an orthogonal or orthonormal basis
-    
+
 */
 
 namespace casadi{
@@ -44,18 +44,18 @@ namespace casadi{
   class NullspaceInternal;
 
   /** \brief Base class for nullspace construction
-  
+
       @copydoc Nullspace_doc
-      \author Joris Gillis 
+      \author Joris Gillis
       \date 2014
   */
 
   class CASADI_SYMBOLIC_EXPORT Nullspace : public Function{
   public:
 
-    /// Default constructor 
+    /// Default constructor
     Nullspace();
-  
+
     /// Access functions of the node.
     NullspaceInternal* operator->();
 
@@ -64,9 +64,9 @@ namespace casadi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-         
+
   };
-  
+
 } // namespace casadi
 
 #endif //NULLSPACE_HPP

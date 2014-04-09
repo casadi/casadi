@@ -43,6 +43,6 @@ bool LPSolver::checkNode() const{
 
 } // namespace casadi
 
-  
+
 
 

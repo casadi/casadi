@@ -54,7 +54,7 @@ namespace casadi{
 #endif // SWIG
 
     NonZero<DataType>& operator*();
-    
+
     NonZeroIterator<DataType> begin();
     NonZeroIterator<DataType> end();
     bool operator==(const NonZeroIterator<DataType>& rhs);
@@ -64,7 +64,7 @@ namespace casadi{
     NonZero<DataType> nz;
   };
 /// \endcond
-    
+
 /// \cond CLUTTER
   //@{
   /** \brief Get typename */
@@ -75,56 +75,56 @@ namespace casadi{
 /// \endcond
 
   /** \brief Sparse matrix class. SX and DMatrix are specializations.
-  
+
       General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
       This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
-  
+
       Index starts with 0.\n
       Index vec happens as follows: (rr,cc) -> k = rr+cc*size1()\n
       Vectors are column vectors.\n
-  
+
       The storage format is Compressed Column Storage (CCS), similar to that used for sparse matrices in Matlab, \n
       but unlike this format, we do allow for elements to be structurally non-zero but numerically zero.\n
-  
+
       Matrix<DataType> is polymorphic with a std::vector<DataType> that contain all non-identical-zero elements.\n
       The sparsity can be accessed with Sparsity& sparsity()\n
-  
-      \author Joel Andersson 
+
+      \author Joel Andersson
       \date 2010-2014
   */
   template<typename DataType>
   class CASADI_SYMBOLIC_EXPORT Matrix : public GenericExpression<Matrix<DataType> >, public GenericMatrix<Matrix<DataType> >, public PrintableObject{
   public:
-    
+
     /** \brief  constructors */
     /// empty 0-by-0 matrix constructor
     Matrix();
-    
+
     /// Copy constructor
     Matrix(const Matrix<DataType>& m);
-    
+
 #ifndef SWIG
     /// Assignment (normal)
     Matrix<DataType>& operator=(const Matrix<DataType>& m);
 #endif // SWIG
-    
+
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<DataType> >& m);
-    
+
     //@{
     /// Sparse matrix with a given sparsity
     explicit Matrix(const Sparsity& sparsity, const DataType& val=DataType(0));
     //@}
-    
+
     /// Sparse matrix with a given sparsity and non-zero elements.
     Matrix(const Sparsity& sparsity, const std::vector<DataType>& d);
-    
+
     /** \brief Check if the dimensions and colind,row vectors are compatible.
      * \param complete  set to true to also check elementwise
      * throws an error as possible result
      */
     void sanityCheck(bool complete=false) const;
-    
+
     /// This constructor enables implicit type conversion from a numeric type
     Matrix(double val);
 
@@ -134,16 +134,16 @@ namespace casadi{
      * Note: above remark applies only to C++, not python or octave interfaces
      */
     Matrix(const std::vector<DataType>& x);
-    
+
     /// Construct dense matrix from a vector with the elements in column major ordering
     Matrix(const std::vector<DataType>& x, int nrow, int ncol);
 
     /// Convert to scalar type
     const DataType toScalar() const;
-    
+
     /// Scalar type
     typedef DataType ScalarType;
-    
+
 #ifndef SWIG
     /// Base class
     typedef GenericMatrix<Matrix<DataType> > B;
@@ -176,11 +176,11 @@ namespace casadi{
     typedef typename std::vector<DataType>::const_iterator const_iterator;
     typedef typename std::vector<DataType>::reverse_iterator reverse_iterator;
     typedef typename std::vector<DataType>::const_reverse_iterator const_reverse_iterator;
-    
+
     /// References
     typedef DataType& reference;
     typedef const DataType& const_reference;
-    
+
     /// Get iterators to beginning and end
     iterator begin(){ return data().begin();}
     const_iterator begin() const{ return data().begin();}
@@ -190,7 +190,7 @@ namespace casadi{
     const_iterator end() const{ return data().end();}
     reverse_iterator rend(){ return data().rend();}
     const_reverse_iterator rend() const{ return data().rend();}
-    
+
     /// Get references to beginning and end
     reference front(){ return data().front();}
     const_reference front() const { return data().front();}
@@ -224,11 +224,11 @@ namespace casadi{
     inline const DataType& at(int k) const{
       return const_cast<Matrix<DataType>*>(this)->at(k);
     }
-    
+
     /// Access a non-zero element
     inline DataType& at(int k){
       try{
-        if (k<0) k+=size(); 
+        if (k<0) k+=size();
         return data().at(k);
       } catch(std::out_of_range& ex){
         std::stringstream ss;
@@ -240,7 +240,7 @@ namespace casadi{
     /// Access a non-zero element
     DataType at(int k){
       try{
-        if (k<0) k+=size(); 
+        if (k<0) k+=size();
         return data().at(k);
       } catch(std::out_of_range& ex){
         std::stringstream ss;
@@ -249,11 +249,11 @@ namespace casadi{
       }
     }
 #endif // SWIG
-    
+
 #ifndef SWIG
     /// get an element
     const DataType& elem(int rr, int cc=0) const;
-    
+
     /// get a reference to an element
     DataType& elem(int rr, int cc=0);
 #else // SWIG
@@ -263,7 +263,7 @@ namespace casadi{
 
     /// get an element, do not allocate
     const DataType getElement(int rr, int cc=0) const{ return elem(rr,cc);}
-    
+
     /// Returns true if the matrix has a non-zero at location rr,cc
     bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr,cc); }
 
@@ -309,8 +309,8 @@ namespace casadi{
     void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy);
 
     //@}
-    
-    
+
+
 
     //@{
     /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
@@ -332,7 +332,7 @@ namespace casadi{
     const Matrix<DataType> getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
     const Matrix<DataType> getNZ(const Matrix<int>& k) const;
     //@}
-    
+
     //@{
     /// Set a set of nonzeros
     void setNZ(int k, const Matrix<DataType>& m);
@@ -340,7 +340,7 @@ namespace casadi{
     void setNZ(const Slice& k, const Matrix<DataType>& m){ setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const Matrix<DataType>& m);
     //@}
-    
+
     /// \cond INTERNAL
     /// Append a matrix vertically (NOTE: only efficient if vector)
     void append(const Matrix<DataType>& y);
@@ -348,7 +348,7 @@ namespace casadi{
     /// Append a matrix horizontally
     void appendColumns(const Matrix<DataType>& y);
     /// \endcond
-    
+
     /// \cond INTERNAL
     //@{
     /// Indexing for interfaced languages
@@ -363,23 +363,23 @@ namespace casadi{
     const Matrix<DataType> nz_indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
-    
+
     /// get a matrix element
     const Matrix<DataType> indexed_one_based(int rr, int cc) const{ return (*this)(rr-1,cc-1);}
     const Matrix<DataType> indexed_zero_based(int rr, int cc) const{ return (*this)(rr,cc);}
     const Matrix<DataType> indexed(const Slice &rr, const Slice &cc) const{ return (*this)(rr,cc); }
-    const Matrix<DataType> indexed(const IndexList &rr, const IndexList &cc) const{ 
+    const Matrix<DataType> indexed(const IndexList &rr, const IndexList &cc) const{
       return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
     const Matrix<DataType> indexed(const Slice &rr, const Matrix<int>& cc) const{ return (*this)(rr,cc); }
-    const Matrix<DataType> indexed(const Matrix<int>& rr, const IndexList &cc) const{ 
+    const Matrix<DataType> indexed(const Matrix<int>& rr, const IndexList &cc) const{
       return (*this)(rr,cc.getAll(size2()));
     }
     const Matrix<DataType> indexed(const Matrix<int>& rr, const Slice &cc) const{ return (*this)(rr,cc); }
-    const Matrix<DataType> indexed(const IndexList& rr, const Matrix<int> &cc) const{ 
+    const Matrix<DataType> indexed(const IndexList& rr, const Matrix<int> &cc) const{
       return (*this)(rr.getAll(size1()),cc);
     }
-    const Matrix<DataType> indexed(const Matrix<int>& rr, const Matrix<int>& cc) const{ 
+    const Matrix<DataType> indexed(const Matrix<int>& rr, const Matrix<int>& cc) const{
       return (*this)(rr,cc);
     }
     const Matrix<DataType> indexed(const Sparsity &sp) const{ return (*this)(sp); }
@@ -388,10 +388,10 @@ namespace casadi{
     const Matrix<DataType> indexed_one_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr-1);}
     const Matrix<DataType> indexed_zero_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr);}
     const Matrix<DataType> indexed(const Slice &rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr); }
-    const Matrix<DataType> indexed(const IndexList &rr) const{ 
+    const Matrix<DataType> indexed(const IndexList &rr) const{
       casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ; return (*this)(rr.getAll(size1()));
     }
-    
+
     /// set a non-zero
     void nz_indexed_one_based_assignment(int k, const DataType & m){ at(k-1) = m;}
     void nz_indexed_zero_based_assignment(int k, const DataType & m){ at(k) = m;}
@@ -403,7 +403,7 @@ namespace casadi{
     void nz_indexed_assignment(const IndexList &k, const Matrix<DataType>& m){
       (*this)[k.getAll(size())] = m;
     }
-    
+
     /// set a matrix element
     void indexed_one_based_assignment(int rr, int cc, const DataType & m){ elem(rr-1,cc-1) = m;}
     void indexed_zero_based_assignment(int rr, int cc, const DataType & m){ elem(rr,cc) = m;}
@@ -422,17 +422,17 @@ namespace casadi{
     }
     void indexed_assignment( const IndexList& rr, const Matrix<int> &cc, const Matrix<DataType>& m){
       (*this)(rr.getAll(size1()),cc) = m;
-    } 
+    }
     void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const Matrix<DataType>& m){
       (*this)(rr,cc) = m;
-    } 
+    }
     void indexed_assignment(const Sparsity &sp,const Matrix<DataType>& m){
       // (*this)(sp) = m;   // VC2010 compiler errors
           SubMatrix<Matrix<DataType>,Sparsity,int> temp(*this,sp,0);
           temp = m;
     }
     //@}
-    
+
     /// set a vector element
     void indexed_one_based_assignment(int rr, const DataType & m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;elem(rr-1) = m;}
     void indexed_zero_based_assignment(int rr, const DataType & m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;elem(rr) = m;}
@@ -441,10 +441,10 @@ namespace casadi{
       (*this)(rr.getAll(size1()),0) = m;
     }
     /// \endcond
-    
+
     /// Set all elements to zero
     void setZero();
-    
+
     /// Set all elements to a value
     void setAll(const DataType& val);
 
@@ -470,7 +470,7 @@ namespace casadi{
     static Matrix<DataType> matrix_matrix(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
     //@}
     /// \endcond
-    
+
     /// \cond INTERNAL
     //@{
     /// Elementwise operations -- Octave/Python naming
@@ -488,46 +488,46 @@ namespace casadi{
     Matrix<DataType> __mpower__(const Matrix<DataType> &y) const;
     Matrix<DataType> __mrdivide__  (const Matrix<DataType> &y) const;
     //@}
-    
+
     /// Matrix-matrix product
     Matrix<DataType> mul_full(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
 
     /// Matrix-matrix product
     Matrix<DataType> mul(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
-    
+
     /// Matrix-matrix product, no memory allocation: z += mul(x,y)
     static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y, Matrix<DataType>& z);
-    
+
     /// Matrix-matrix product, no memory allocation: z += mul(trans(x),y)
     static void mul_no_alloc_tn(const Matrix<DataType> &trans_x, const Matrix<DataType> &y, Matrix<DataType>& z);
 
     /// Matrix-matrix product, no memory allocation: z += mul(x,trans(y))
     static void mul_no_alloc_nt(const Matrix<DataType>& x, const Matrix<DataType> &trans_y, Matrix<DataType>& z);
-  
+
     /// Matrix-vector product, no memory allocation: z += mul(trans(x),y)
     static void mul_no_alloc_tn(const Matrix<DataType>& trans_x, const std::vector<DataType> &y, std::vector<DataType>& z);
 
     /// vector-matrix product, no memory allocation: z += mul(x,y)
     static void mul_no_alloc_nn(const Matrix<DataType>& x, const std::vector<DataType> &y, std::vector<DataType>& z);
-  
+
     /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(trans(x),y)
     template<bool Fwd>
     static void mul_sparsity(Matrix<DataType> &x_trans, Matrix<DataType> &y, Matrix<DataType>& z);
-  
+
     /// Calculates inner_prod(x,mul(A,x)) without memory allocation
     static DataType quad_form(const Matrix<DataType>& A, const std::vector<DataType>& x);
     /// \endcond
-  
+
     /// Transpose the matrix
     Matrix<DataType> trans() const;
-    
+
 #ifndef SWIG
     /// Transpose the matrix (shorthand)
     Matrix<DataType> T() const{ return trans();}
 #endif
 
     //@{
-    
+
     //@{
     /// Operations defined in the standard namespace for unambigous access and Numpy compatibility
     Matrix<DataType> sin() const;
@@ -562,13 +562,13 @@ namespace casadi{
     Matrix<DataType> logic_or(const Matrix<DataType>& y) const;
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
     //@}
-    
+
     /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
 
     /** \brief Get the maximum number of calls to the printing function when printing an expression */
     static long getMaxNumCallsInPrint();
-    
+
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
     static void setEqualityCheckingDepth(int eq_depth=1);
 
@@ -587,7 +587,7 @@ namespace casadi{
     void printDense(std::ostream &stream=std::cout) const; // Print dense matrix-stype
     void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
     //@}
-  
+
     // Get the sparsity pattern
     const std::vector<int>& row() const;
     const std::vector<int>& colind() const;
@@ -597,43 +597,43 @@ namespace casadi{
     void resize(int nrow, int ncol);
     void reserve(int nnz);
     void reserve(int nnz, int ncol);
-    
+
     /** \brief Erase a submatrix
         Erase rows and/or columns of a matrix */
     void erase(const std::vector<int>& rr, const std::vector<int>& cc);
-    
+
     /** \brief Remove cols or rows
         Rremove/delete rows and/or columns of a matrix */
     void remove(const std::vector<int>& rr, const std::vector<int>& cc);
-    
+
     /** \brief Enlarge matrix
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc);
-    
+
     /// Access the non-zero elements
     std::vector<DataType>& data();
-    
+
     /// Const access the non-zero elements
     const std::vector<DataType>& data() const;
-    
+
     /// \cond INTERNAL
     /// Get a pointer to the data
     DataType* ptr(){ return isEmpty() ? static_cast<DataType*>(0) : &front();}
-    
+
     /// Get a const pointer to the data
     const DataType* ptr() const{ return isEmpty() ? static_cast<const DataType*>(0) : &front();}
     /// \endcond
-        
+
     /// Const access the sparsity - reference to data member
     const Sparsity& sparsity() const{ return sparsity_; }
-    
+
     /// Access the sparsity, make a copy if there are multiple references to it
     Sparsity& sparsityRef();
-    
+
     /// \cond INTERNAL
     /** \brief  Set the non-zero elements, scalar */
     void set(DataType val, SparsityType sp=SPARSE);
-    
+
     /** \brief  Get the non-zero elements, scalar */
     void get(DataType& val, SparsityType sp=SPARSE) const;
 
@@ -665,10 +665,10 @@ namespace casadi{
 
     /** \brief  Set the non-zero elements, array, sparse and correct length */
     void setArray(const DataType* val);
-    
+
     /** \brief  Get the non-zero elements, strided array */
     void getStridedArray(DataType* val, int len, int stride1, int stride2, SparsityType sp=SPARSE) const;
-    
+
 #ifndef SWIG
     /** \brief  Legacy - use getArray instead */
     void get(DataType* val, SparsityType sp=SPARSE) const;
@@ -700,13 +700,13 @@ namespace casadi{
 #endif
 /// \endcond
 
-    /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation 
-        kl:    The number of subdiagonals in res 
-        ku:    The number of superdiagonals in res 
-        ldres: The leading dimension in res 
+    /** \brief  Save the result to the LAPACK banded format -- see LAPACK documentation
+        kl:    The number of subdiagonals in res
+        ku:    The number of superdiagonals in res
+        ldres: The leading dimension in res
         res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, DataType *res) const;
-        
+
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
      */
@@ -715,14 +715,14 @@ namespace casadi{
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<DataType>& d, int nrow, int ncol);
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<DataType>& d, const std::pair<int,int>& rc);
     //@}
-    
+
     //@{
     /** \brief  create a matrix with all inf */
     static Matrix<DataType> inf(const Sparsity& sp);
     static Matrix<DataType> inf(int nrow=1, int ncol=1);
     static Matrix<DataType> inf(const std::pair<int,int>& rc);
     //@}
-    
+
     //@{
     /** \brief  create a matrix with all nan */
     static Matrix<DataType> nan(const Sparsity& sp);
@@ -740,7 +740,7 @@ namespace casadi{
 
     /** \brief  create an n-by-n identity matrix */
     static Matrix<DataType> eye(int ncol);
-    
+
     /// Checks if expression does not contain NaN or Inf
     bool isRegular() const;
 
@@ -748,7 +748,7 @@ namespace casadi{
     bool isSmooth() const;
 
     /** \brief Check if symbolic (Dense)
-        Sparse matrices invariable return false 
+        Sparse matrices invariable return false
     */
     bool isSymbolic() const;
 
@@ -797,19 +797,19 @@ namespace casadi{
     static void setWidth(int width) { stream_width_ = width; }
     static void setScientific(bool scientific) { stream_scientific_ = scientific; }
     // @}
-    
+
   private:
     /// Sparsity of the matrix in a compressed column storage (CCS) format
     Sparsity sparsity_;
-    
+
     /// Nonzero elements
     std::vector<DataType> data_;
-    
+
     /// Precision used in streams
     static int stream_precision_;
     static int stream_width_;
     static bool stream_scientific_;
-    
+
   };
 
 } // namespace casadi

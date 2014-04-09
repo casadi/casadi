@@ -35,36 +35,36 @@ QCQPQPInternal* QCQPQPInternal::clone() const{
     node->init();
   return node;
 }
-  
+
 QCQPQPInternal::QCQPQPInternal(const std::vector<Sparsity> &st) : QPSolverInternal(st) {
 
   addOption("qcqp_solver",       OT_QCQPSOLVER, GenericType(), "The QCQPSolver used to solve the QPs.");
   addOption("qcqp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the QCQPSOlver");
-  
+
 }
 
-QCQPQPInternal::~QCQPQPInternal(){ 
+QCQPQPInternal::~QCQPQPInternal(){
 }
 
 void QCQPQPInternal::evaluate() {
 
-  // Pass inputs of QP to QCQP form 
+  // Pass inputs of QP to QCQP form
   qcqpsolver_.input(QCQP_SOLVER_A).set(input(QP_SOLVER_A));
   qcqpsolver_.input(QCQP_SOLVER_G).set(input(QP_SOLVER_G));
   qcqpsolver_.input(QCQP_SOLVER_H).set(input(QP_SOLVER_H));
-  
+
   qcqpsolver_.input(QCQP_SOLVER_LBX).set(input(QP_SOLVER_LBX));
   qcqpsolver_.input(QCQP_SOLVER_UBX).set(input(QP_SOLVER_UBX));
-  
+
   qcqpsolver_.input(QCQP_SOLVER_LBA).set(input(QP_SOLVER_LBA));
   qcqpsolver_.input(QCQP_SOLVER_UBA).set(input(QP_SOLVER_UBA));
-  
+
   // Delegate computation to QCQP Solver
   qcqpsolver_.evaluate();
-  
+
   // Pass the stats
   stats_["qcqp_solver_stats"] = qcqpsolver_.getStats();
-  
+
   // Read the outputs from Ipopt
   output(QCQP_SOLVER_X).set(qcqpsolver_.output(QP_SOLVER_X));
   output(QCQP_SOLVER_COST).set(qcqpsolver_.output(QP_SOLVER_COST));
@@ -84,10 +84,10 @@ void QCQPQPInternal::init(){
   if(hasSetOption("qcqp_solver_options")){
     qcqpsolver_.setOption(getOption("qcqp_solver_options"));
   }
-  
+
   // Initialize the NLP solver
   qcqpsolver_.init();
- 
+
 }
 
 } // namespace casadi

@@ -39,15 +39,15 @@ namespace casadi{
   void Integrator::printStats(ostream &stream) const{
     (*this)->printStats(stream);
   }
-  
+
   IntegratorInternal* Integrator::operator->(){
     return static_cast<IntegratorInternal*>(Function::operator->());
   }
 
   const IntegratorInternal* Integrator::operator->() const{
-    return static_cast<const IntegratorInternal*>(Function::operator->()); 
+    return static_cast<const IntegratorInternal*>(Function::operator->());
   }
-  
+
   void Integrator::reset(){
     (*this)->reset();
   }
@@ -55,7 +55,7 @@ namespace casadi{
   void Integrator::integrate(double t_out){
     (*this)->integrate(t_out);
   }
-    
+
   bool Integrator::checkNode() const{
     return dynamic_cast<const IntegratorInternal*>(get())!=0;
   }
@@ -76,6 +76,6 @@ namespace casadi{
     IntegratorInternal::AugOffset offset;
     return (*this)->getAugmented(nfwd,nadj,offset);
   }
- 
+
 } // namespace casadi
 

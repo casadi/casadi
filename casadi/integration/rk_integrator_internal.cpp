@@ -50,18 +50,18 @@ namespace casadi{
     MX x0 = MX::sym("x0",f_.input(DAE_X).sparsity());
     MX p = MX::sym("p",f_.input(DAE_P).sparsity());
     MX t = MX::sym("t",f_.input(DAE_T).sparsity());
-    
+
     // Intermediate variables (does not enter in F_, only in G_)
     MX v = MX::sym("v",x0.size1(),x0.size2()*3);
     vector<MX> x = horzsplit(v,x0.size2());
     casadi_assert(x.size()==3);
-    
+
     // Definitions of x
     vector<MX> x_def(3);
-    
+
     // Time points
     vector<MX> tt(3);
-    
+
     // Forward integration
     {
       // Arguments when calling f
@@ -82,21 +82,21 @@ namespace casadi{
       f_res = f_.call(f_arg);
       MX k2 = f_res[DAE_ODE];
       MX k2q = f_res[DAE_QUAD];
-    
+
       // k3
       tt[1] = tt[0];
       x_def[1] = f_arg[DAE_X] = x0 + (h_/2) * k2;
       f_res = f_.call(f_arg);
       MX k3 = f_res[DAE_ODE];
       MX k3q = f_res[DAE_QUAD];
-    
+
       // k4
       tt[2] = f_arg[DAE_T] = t + h_;
       x_def[2] = f_arg[DAE_X] = x0 + h_ * k3;
       f_res = f_.call(f_arg);
       MX k4 = f_res[DAE_ODE];
       MX k4q = f_res[DAE_QUAD];
-    
+
       // Take step
       MX xf = x0 + (h_/6)*(k1 + 2*k2 + 2*k3 + k4);
       MX qf = (h_/6)*(k1q + 2*k2q + 2*k3q + k4q);
@@ -180,5 +180,5 @@ namespace casadi{
       G_.init();
     }
   }
-  
+
 } // namespace casadi

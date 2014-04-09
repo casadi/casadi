@@ -28,7 +28,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 #include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
 #include <cvodes/cvodes_dense.h>
-#include <cvodes/cvodes_band.h> 
+#include <cvodes/cvodes_band.h>
 #include <cvodes/cvodes_spgmr.h>
 #include <cvodes/cvodes_spbcgs.h>
 #include <cvodes/cvodes_sptfqmr.h>
@@ -37,7 +37,7 @@
 
 /// \cond INTERNAL
 namespace casadi{
-  
+
 /** \brief Interface to the Sundials CVodes integrators
 
   @copydoc DAE_doc
@@ -53,7 +53,7 @@ public:
 
   /** \brief  Clone */
   virtual CVodesInternal* clone() const;
-  
+
   /** \brief  Create a new integrator */
   virtual CVodesInternal* create(const Function& f, const Function& g) const{ return new CVodesInternal(f,g);}
 
@@ -83,24 +83,24 @@ public:
 
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);
-  
-  /** \brief  Print solver statistics */  
+
+  /** \brief  Print solver statistics */
   virtual void printStats(std::ostream &stream) const;
-  
+
   /** \brief  Get the integrator Jacobian for the forward problem (generic) */
   template<typename FunctionType>
   FunctionType getJacGen();
-  
+
   /** \brief  Get the integrator Jacobian for the backward problem (generic) */
   template<typename FunctionType>
   FunctionType getJacGenB();
-  
+
   /** \brief  Get the integrator Jacobian for the forward problem */
   virtual Function getJac();
-  
+
   /** \brief  Get the integrator Jacobian for the backward problem */
   virtual Function getJacB();
-  
+
   protected:
 
   // Sundials callback functions
@@ -131,7 +131,7 @@ public:
   /// b = M^(-1).b
   void lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
   void lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x, N_Vector xB, N_Vector xdotB);
-  
+
   // Static wrappers to be passed to Sundials
   static int rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data);
   static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *user_data);
@@ -156,13 +156,13 @@ public:
   static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
   static int lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
-  
+
   // CVodes memory block
   void* mem_;
-  
+
   // For timings
   clock_t time1, time2;
-  
+
   // Accummulated time since last reset:
   double t_res; // time spent in the DAE residual
   double t_fres; // time spent in the forward sensitivity residual
@@ -170,10 +170,10 @@ public:
   double t_lsolve; // preconditioner/linear solver solve function
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
-  
+
   // N-vectors for the forward integration
   N_Vector x0_, x_, q_;
-  
+
   // N-vectors for the backward integration
   N_Vector rx0_, rx_, rq_;
 
@@ -183,13 +183,13 @@ public:
   bool isInitAdj_;
 
   int ism_;
-  
+
   // Calculate the error message map
   static std::map<int,std::string> calc_flagmap();
-  
+
     // Error message map
   static std::map<int,std::string> flagmap;
- 
+
   // Throw error
   static void cvodes_error(const std::string& module, int flag);
 
@@ -198,25 +198,25 @@ public:
 
   // Initialize the dense linear solver
   void initDenseLinearSolver();
-  
+
   // Initialize the banded linear solver
   void initBandedLinearSolver();
-  
+
   // Initialize the iterative linear solver
   void initIterativeLinearSolver();
-  
+
   // Initialize the user defined linear solver
   void initUserDefinedLinearSolver();
-  
+
   // Initialize the dense linear solver (backward integration)
   void initDenseLinearSolverB();
-  
+
   // Initialize the banded linear solver (backward integration)
   void initBandedLinearSolverB();
-  
+
   // Initialize the iterative linear solver (backward integration)
   void initIterativeLinearSolverB();
-  
+
   // Initialize the user defined linear solver (backward integration)
   void initUserDefinedLinearSolverB();
 
@@ -226,9 +226,9 @@ public:
   bool monitor_rhsB_;
   bool monitor_rhs_;
   bool monitor_rhsQB_;
-  
+
   bool disable_internal_warnings_;
-    
+
 };
 
 } // namespace casadi

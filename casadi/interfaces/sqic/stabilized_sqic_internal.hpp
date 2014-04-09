@@ -30,7 +30,7 @@
 namespace casadi{
 
 /** \brief Internal class for StabilizedSQICSolver
- * 
+ *
     @copydoc StabilizedQPSolver_doc
  * */
 class CASADI_SQIC_INTERFACE_EXPORT StabilizedSQICInternal : public StabilizedQPSolverInternal {
@@ -42,7 +42,7 @@ public:
 
   /** \brief  Clone */
   virtual StabilizedSQICInternal* clone() const;
-  
+
   /** \brief  Create a new Solver */
   explicit StabilizedSQICInternal(const std::vector<Sparsity>& st);
 
@@ -51,27 +51,27 @@ public:
 
   /** \brief  Initialize */
   virtual void init();
-  
+
   /** \brief Generate native code for debugging */
   virtual void generateNativeCode(std::ostream& file) const;
-  
 
-  
+
+
   virtual void evaluate();
-  
+
     /// Throw error
     static void sqic_error(const std::string& module, int flag);
-    
+
     /// Calculate the error message map
     static std::map<int,std::string> calc_flagmap();
-    
+
     /// Error message map
     static std::map<int,std::string> flagmap;
   protected:
-  
+
     /// Flag: is already initialized
     bool is_init_;
-  
+
     /// Storage space for sqic bl variable
     std::vector<double> bl_;
     /// Storage space for sqic bu variable
@@ -96,14 +96,14 @@ public:
     std::vector<double> pi_;
     /// Storage space for sqic piE variable
     std::vector<double> piE_;
-    
+
     /// Helper function to bring A into correct format
     Function formatA_;
-    
+
     /// SQIC inf
     double inf_;
-    
-    
+
+
 };
 
 

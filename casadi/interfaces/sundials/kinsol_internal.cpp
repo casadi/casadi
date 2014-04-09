@@ -45,7 +45,7 @@ namespace casadi{
     addOption("strategy",                 OT_STRING, "none", "Globalization strategy","none|linesearch");
     addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable KINSOL internal warning messages");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
-    
+
     mem_ = 0;
     u_ = 0;
     u_scale_ = 0;
@@ -68,7 +68,7 @@ namespace casadi{
 
   void KinsolInternal::init(){
     ImplicitFunctionInternal::init();
-  
+
     // Read options
     if(getOption("strategy")=="linesearch"){
       strategy_ = KIN_LINESEARCH;
@@ -79,10 +79,10 @@ namespace casadi{
 
     // Return flag
     int flag;
-  
+
     // Use exact Jacobian?
     bool exact_jacobian = getOption("exact_jacobian");
-  
+
     // Allocate N_Vectors
     if(u_) N_VDestroy_Serial(u_);
     if(u_scale_) N_VDestroy_Serial(u_scale_);
@@ -90,7 +90,7 @@ namespace casadi{
     u_ = N_VNew_Serial(n_);
     u_scale_ = N_VNew_Serial(n_);
     f_scale_ = N_VNew_Serial(n_);
-  
+
     // Set scaling factors on variables
     if(hasSetOption("u_scale")){
       const vector<double>& u_scale = getOption("u_scale");
@@ -99,7 +99,7 @@ namespace casadi{
     } else {
       N_VConst(1.0,u_scale_);
     }
-  
+
     // Set scaling factors on equations
     if(hasSetOption("f_scale")){
       const vector<double>& f_scale = getOption("f_scale");
@@ -108,26 +108,26 @@ namespace casadi{
     } else {
       N_VConst(1.0,f_scale_);
     }
-  
+
     // Create KINSOL memory block
     if(mem_) KINFree(&mem_);
     mem_ = KINCreate();
-  
+
     // KINSOL bugfix
     KINMem kin_mem = KINMem(mem_);
     kin_mem->kin_inexact_ls = FALSE;
-    
+
     // Set optional inputs
     flag = KINSetUserData(mem_, this);
     casadi_assert_message(flag==KIN_SUCCESS, "KINSetUserData");
 
     // Disable internal warning messages?
     disable_internal_warnings_ = getOption("disable_internal_warnings");
-  
+
     // Set error handler function
     flag = KINSetErrHandlerFn(mem_, ehfun_wrapper, this);
     casadi_assert_message(flag==KIN_SUCCESS, "KINSetErrHandlerFn");
-  
+
     // Initialize KINSOL
     flag = KINInit(mem_,func_wrapper, u_);
     casadi_assert(flag==KIN_SUCCESS);
@@ -141,11 +141,11 @@ namespace casadi{
       // Copy to a temporary N_Vector
       N_Vector constraints = N_VNew_Serial(n_);
       copy(u_c_.begin(),u_c_.end(),NV_DATA_S(constraints));
-    
+
       // Pass to KINSOL
       flag = KINSetConstraints(mem_, constraints);
       casadi_assert(flag==KIN_SUCCESS);
-    
+
       // Free the temporary vector
       N_VDestroy_Serial(constraints);
     }
@@ -155,28 +155,28 @@ namespace casadi{
       // Dense jacobian
       flag = KINDense(mem_, n_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
-    
+
       if(exact_jacobian){
         flag = KINDlsSetDenseJacFn(mem_, djac_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
       }
-    
+
     } else if(getOption("linear_solver_type")=="banded") {
       // Banded jacobian
       flag = KINBand(mem_, n_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
-    
+
       if(exact_jacobian){
         flag = KINDlsSetBandJacFn(mem_, bjac_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
       }
-    
+
     } else if(getOption("linear_solver_type")=="iterative") {
-      // Sparse (iterative) solver  
+      // Sparse (iterative) solver
       // Max dimension of the Krylov space
       int maxl = getOption("max_krylov").toInt();
 
-      // Attach the sparse solver  
+      // Attach the sparse solver
       if(getOption("iterative_solver")=="gmres"){
         flag = KINSpgmr(mem_, maxl);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpgmr");
@@ -189,7 +189,7 @@ namespace casadi{
       } else {
         throw CasadiException("KINSOL: Unknown sparse solver");
       }
-    
+
       // Attach functions for jacobian information
       if(exact_jacobian){
         // Form the Jacobian-times-vector function
@@ -198,7 +198,7 @@ namespace casadi{
         flag = KINSpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINSpilsSetJacTimesVecFn");
       }
-    
+
       // Add a preconditioner
       if(bool(getOption("use_preconditioner"))){
         // Make sure that a Jacobian has been provided
@@ -211,7 +211,7 @@ namespace casadi{
         flag = KINSpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
         casadi_assert(flag==KIN_SUCCESS);
       }
-    
+
     } else if(getOption("linear_solver_type")=="user_defined") {
       // Make sure that a Jacobian has been provided
       casadi_assert(!jac_.isNull());
@@ -225,11 +225,11 @@ namespace casadi{
       kin_mem->kin_lsetup = lsetup_wrapper;
       kin_mem->kin_lsolve = lsolve_wrapper;
       kin_mem->kin_setupNonNull = TRUE;
-    
+
     } else {
       throw CasadiException("Unknown linear solver ");
     }
-  
+
     // Set stop criterion
     if(hasSetOption("abstol")){
       flag = KINSetFuncNormTol(mem_,getOption("abstol"));
@@ -245,14 +245,14 @@ namespace casadi{
     if(verbose()){
       cout << "KinsolInternal::solveNonLinear: Initial guess = " << output(0).data() << endl;
     }
-  
+
     // Get the initial guess
     output(iout_).get(NV_DATA_S(u_));
-  
+
     // Solve the nonlinear system of equations
     int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
     if (flag<KIN_SUCCESS) kinsol_error("KINSol",flag);
-  
+
     // Warn if not successful return
     if(verbose()){
       if(flag!=KIN_SUCCESS) kinsol_error("KINSol",flag,false);
@@ -271,11 +271,11 @@ namespace casadi{
         if(i!=iout_) f_.getOutput(output(i),i);
       }
     }
-    
+
     // Print solution
     if(verbose()){
       cout << "KinsolInternal::solveNonLinear: solution = " << output(iout_).data() << endl;
-    }  
+    }
   }
 
   void KinsolInternal::func(N_Vector u, N_Vector fval){
@@ -289,17 +289,17 @@ namespace casadi{
 
     // Evaluate
     f_.evaluate();
-    
+
     if(monitored("eval_f")){
       cout << "f = " << f_.output(iout_) << endl;
     }
-    
+
     // Get results
     f_.getOutput(NV_DATA_S(fval),iout_);
 
     // Get a referebce to the nonzeros of the function
     const vector<double>& fdata = f_.output(iout_).data();
-  
+
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<fdata.size(); ++k){
       try{
@@ -310,7 +310,7 @@ namespace casadi{
         ss << ex.what() << endl;
         if(verbose()){
           ss << "u = " << f_.input(iin_) << endl;
-                
+
           // Print the expression for f[Jcol] if f is an SXFunction instance
           SXFunction f_sx = shared_cast<SXFunction>(f_);
           if(!f_sx.isNull()){
@@ -323,7 +323,7 @@ namespace casadi{
         throw CasadiException(ss.str());
       }
     }
-  
+
     // Log time
     time2_ = clock();
     t_func_ += double(time2_-time1_)/CLOCKS_PER_SEC;
@@ -368,7 +368,7 @@ namespace casadi{
     if(monitored("eval_djac")){
       cout << "djac = " << jac_.output() << endl;
     }
-  
+
     // Get sparsity and non-zero elements
     const vector<int>& colind = jac_.output().colind();
     const vector<int>& row = jac_.output().row();
@@ -380,17 +380,17 @@ namespace casadi{
       for(int el=colind[cc]; el<colind[cc+1]; ++el){
         // Get row
         int rr = row[el];
-      
+
         // Set the element
         DENSE_ELEM(J,rr,cc) = val[el];
       }
     }
-  
+
     if(monitored("eval_djac")){
       cout << "djac = ";
       PrintMat(J);
     }
-  
+
     // Log time duration
     time2_ = clock();
     t_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
@@ -419,7 +419,7 @@ namespace casadi{
 
     // Evaluate
     jac_.evaluate();
-  
+
     // Get sparsity and non-zero elements
     const vector<int>& colind = jac_.output().colind();
     const vector<int>& row = jac_.output().row();
@@ -431,13 +431,13 @@ namespace casadi{
       for(int el=colind[cc]; el<colind[cc+1]; ++el){
         // Get row
         int rr = row[el];
-      
+
         // Set the element
         if(rr-cc>=-mupper && rr-cc<=mlower)
           BAND_ELEM(J,rr,cc) = val[el];
       }
     }
-  
+
     // Log time duration
     time2_ = clock();
     t_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
@@ -468,13 +468,13 @@ namespace casadi{
     f_fwd_.setInput(NV_DATA_S(v),getNumInputs()+iin_);
     for(int i=0; i<getNumInputs(); ++i)
       if(i!=iin_) f_fwd_.setInput(0.0, getNumInputs()+i);
-  
+
     // Evaluate
     f_fwd_.evaluate();
 
     // Get the output seeds
     f_fwd_.getOutput(NV_DATA_S(Jv),getNumOutputs());
-  
+
     // Log time duration
     time2_ = clock();
     t_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
@@ -506,7 +506,7 @@ namespace casadi{
 
     // Get a reference to the nonzeros of Jacobian
     const vector<double>& Jdata = jac_.output().data();
-  
+
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<Jdata.size(); ++k){
       try{
@@ -515,28 +515,28 @@ namespace casadi{
       } catch(exception& ex){
         stringstream ss;
         ss << ex.what() << endl;
-          
+
         if(verbose()){
-          
+
           // Print inputs
           ss << "Input vector is " << jac_.input().data() << endl;
-                
+
           // Get the column
           int Jcol = jac_.output().sparsity().getCol().at(k);
 
           // Get the row
           int Jrow = jac_.output().sparsity().row(k);
-                
+
           // Which equation
           ss << "This corresponds to the derivative of equation " << Jrow << " with respect to the variable " << Jcol << "." << endl;
-                
+
           // Print the expression for f[Jrow] if f is an SXFunction instance
           SXFunction f_sx = shared_cast<SXFunction>(f_);
           if(!f_sx.isNull()){
             ss << "Variable " << Jcol << " = " << f_sx.inputExpr(0).at(Jcol) << endl;
             ss << "Equation " << Jrow << " = " << f_sx.outputExpr(0).at(Jrow) << endl;
           }
-                
+
           // Print the expression for J[k] if J is an SXFunction instance
           SXFunction jac_sx = shared_cast<SXFunction>(jac_);
           if(!jac_sx.isNull()){
@@ -547,7 +547,7 @@ namespace casadi{
         throw CasadiException(ss.str());
       }
     }
-  
+
     // Log time duration
     time2_ = clock();
     t_lsetup_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
@@ -579,9 +579,9 @@ namespace casadi{
     // Get time
     time1_ = clock();
 
-    // Solve the factorized system 
+    // Solve the factorized system
     linsol_.solve(NV_DATA_S(v),1,false);
-  
+
     // Log time duration
     time2_ = clock();
     t_lsolve_ += double(time2_-time1_)/CLOCKS_PER_SEC;
@@ -630,7 +630,7 @@ namespace casadi{
     N_Vector fscale = kin_mem->kin_fscale;
     N_Vector tmp1 = kin_mem->kin_vtemp1;
     N_Vector tmp2 = kin_mem->kin_vtemp2;
-  
+
     // Solve the linear system
     N_VScale(1.0, b, x);
     psolve(u,uscale,fval,fscale,x,tmp1);
@@ -647,12 +647,12 @@ namespace casadi{
     try{
       casadi_assert(eh_data);
       KinsolInternal *this_ = (KinsolInternal*)eh_data;
-      this_->ehfun(error_code,module,function,msg);        
+      this_->ehfun(error_code,module,function,msg);
     } catch(exception& e){
       cerr << "ehfun failed: " << e.what() << endl;
     }
   }
-  
+
   void KinsolInternal::ehfun(int error_code, const char *module, const char *function, char *msg){
     if(!disable_internal_warnings_){
       cerr << msg << endl;
@@ -664,7 +664,7 @@ namespace casadi{
   void KinsolInternal::kinsol_error(const string& module, int flag, bool fatal){
     // Find the error
     map<int,Message>::const_iterator it = flagmap.find(flag);
-  
+
     stringstream ss;
     if(it == flagmap.end()){
       ss << "Unknown " << (fatal? "error" : "warning") <<" (" << flag << ") from module \"" << module << "\".";
@@ -683,7 +683,7 @@ namespace casadi{
 
 
   map<int,Message> KinsolInternal::calc_flagmap(){
-  
+
     map<int, Message > f;
     f[KIN_SUCCESS] = Message("KIN_SUCCES","KINSol succeeded; the scaled norm of F(u) is less than fnormtol");
     f[KIN_INITIAL_GUESS_OK] = Message("KIN_INITIAL_GUESS_OK","The guess u = u0 satisfied the system F(u) = 0 within the tolerances specified.");

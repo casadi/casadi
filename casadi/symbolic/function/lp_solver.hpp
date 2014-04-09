@@ -29,31 +29,31 @@
 /** \defgroup LPSolver_doc
 
   Solves the following linear problem:
-  
+
   \verbatim
-  min          c' x 
+  min          c' x
    x
-  
+
   subject to
               LBA <= A x <= UBA
               LBX <= x   <= UBX
-              
+
       with x ( n x 1)
            c ( n x 1 )
            A sparse matrix ( nc x n)
            LBA, UBA dense vector (nc x 1)
            LBX, UBX dense vector (n x 1)
-              
+
       n: number of decision variables (x)
       nc: number of constraints (A)
-      
+
   \endverbatim
-  
+
 
 */
-      
+
 namespace casadi{
-  
+
 /// Input arguments of a LP problem [lpIn]
 enum LPSolverInput{
   /// The vector c: dense (n x 1) [c]
@@ -81,7 +81,7 @@ enum LPSolverOutput{
   /// The dual solution corresponding to simple bounds [lam_x]
   LP_SOLVER_LAM_X,
   LP_SOLVER_NUM_OUT};
-  
+
 /// Structure specification of an LP [lpStruct]
 enum LPStruct{
   /// The matrix A: sparse [a]
@@ -96,7 +96,7 @@ class LPSolverInternal;
 
 @copydoc LPSolver_doc
 
-  \author Joris Gillis 
+  \author Joris Gillis
   \date 2013
 */
 class CASADI_SYMBOLIC_EXPORT LPSolver : public Function{
@@ -104,7 +104,7 @@ class CASADI_SYMBOLIC_EXPORT LPSolver : public Function{
 
   /// Default constructor
   LPSolver();
-  
+
   /// Access functions of the node
   LPSolverInternal* operator->();
   const LPSolverInternal* operator->() const;

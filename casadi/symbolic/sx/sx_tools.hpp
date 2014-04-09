@@ -38,10 +38,10 @@ namespace casadi{
 
 /**
 \ingroup expression_tools
-@{ 
+@{
 */
 
-  /** \brief  Expand the expression as a weighted sum (with constant weights)  
+  /** \brief  Expand the expression as a weighted sum (with constant weights)
   */
   CASADI_SYMBOLIC_EXPORT void expand(const SX& ex, SX &weights, SX& terms);
 
@@ -50,7 +50,7 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT void simplify(SXElement& ex);
   /// \endcond
 
-  /** \brief Create a piecewise constant function 
+  /** \brief Create a piecewise constant function
       Create a piecewise constant function with n=val.size() intervals
 
       Inputs:
@@ -60,7 +60,7 @@ namespace casadi{
   */
   CASADI_SYMBOLIC_EXPORT SX pw_const(const SX &t, const SX &tval, const SX &val);
 
-  /** Create a piecewise linear function 
+  /** Create a piecewise linear function
       Create a piecewise linear function:
 
       Inputs:
@@ -83,12 +83,12 @@ namespace casadi{
    */
   CASADI_SYMBOLIC_EXPORT SX heaviside(const SX &x);
 
-  /** 
+  /**
    * \brief rectangle function
    *
    * \f[
    * \begin{cases}
-   * \Pi(x) = 1     & |x| < 1/2 \\ 
+   * \Pi(x) = 1     & |x| < 1/2 \\
    * \Pi(x) = 1/2   & |x| = 1/2  \\
    * \Pi(x) = 0     & |x| > 1/2  \\
    * \end{cases}
@@ -98,23 +98,23 @@ namespace casadi{
    */
   CASADI_SYMBOLIC_EXPORT SX rectangle(const SX &x);
 
-  /** 
+  /**
    * \brief triangle function
    *
    * \f[
    * \begin{cases}
    * \Lambda(x) = 0 &    |x| >= 1  \\
-   * \Lambda(x) = 1-|x| &  |x| < 1 
+   * \Lambda(x) = 1-|x| &  |x| < 1
    * \end{cases}
    * \f]
    *
    */
   CASADI_SYMBOLIC_EXPORT SX triangle(const SX &x);
 
-  /** 
+  /**
    * \brief ramp function
    *
-   * 
+   *
    * \f[
    * \begin{cases}
    *  R(x) = 0   & x <= 1 \\
@@ -133,7 +133,7 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT void simplify(SX &ex);
 
   /** \brief  Remove identical calculations */
-  CASADI_SYMBOLIC_EXPORT void compress(SX &ex, int level=5); 
+  CASADI_SYMBOLIC_EXPORT void compress(SX &ex, int level=5);
 
   /** \brief  Substitute variable v with expression vdef in an expression ex */
   CASADI_SYMBOLIC_EXPORT SX substitute(const SX& ex, const SX& v, const SX& vdef);
@@ -182,12 +182,12 @@ namespace casadi{
     for(int i=0; i<n; ++i){
       /** \brief  Create a col */
       SX col;
-    
+
       /** \brief  append components to the col */
       for(int j=0; j<m; ++j){
         col.appendColumns(array[i][j]);
       }
-    
+
       /** \brief  append col to matrix */
       ret.appendColumns(col.T());
     }
@@ -243,13 +243,13 @@ namespace casadi{
   */
   CASADI_SYMBOLIC_EXPORT SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v, bool transpose_jacobian=false);
 
-  /** 
+  /**
    * \brief univariate taylor series expansion
    *
    * Calculate the taylor expansion of expression 'ex' up to order 'order' with repsect to variable 'x' around the point 'a'
    *
    * \f$(x)=f(a)+f'(a)(x-a)+f''(a)\frac{(x-a)^2}{2!}+f'''(a)\frac{(x-a)^3}{3!}+\ldots\f$
-   * 
+   *
    * Example usage:
    * \code
    * taylor(sin(x),x)
@@ -266,12 +266,12 @@ namespace casadi{
    *
    */
   CASADI_SYMBOLIC_EXPORT SX mtaylor(const SX& ex,const SX& x, const SX& a,int order=1);
-  /** 
+  /**
    * \brief multivariate taylor series expansion
    *
    * Do taylor expansions until the aggregated order of a term is equal to 'order'.
    * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
-   * 
+   *
    * The argument order_contributions can denote how match each variable contributes to the aggregated order.
    * If x=[x,y] and order_contributions=[1,2], then the aggregated order of \f$x^n y^m\f$ equals \f$1n+2m\f$.
    *
@@ -303,31 +303,31 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT SX getFree(const SX& ex);
 
   /** \brief Extract shared subexpressions from an set of expressions */
-  CASADI_SYMBOLIC_EXPORT void extractShared(std::vector<SXElement>& ex, 
-                     std::vector<SXElement>& v, std::vector<SXElement>& vdef, 
+  CASADI_SYMBOLIC_EXPORT void extractShared(std::vector<SXElement>& ex,
+                     std::vector<SXElement>& v, std::vector<SXElement>& vdef,
                      const std::string& v_prefix="v_", const std::string& v_suffix="");
-  
+
   /** \brief Print compact, introducing new variables for shared subexpressions */
   CASADI_SYMBOLIC_EXPORT void printCompact(const SX& ex, std::ostream &stream=std::cout);
-  
+
   /** \brief extracts polynomial coefficients from an expression
    *
    * \parameter ex Scalar expression that represents a polynomial
    * \paramater x  Scalar symbol that th epolynomial is build up with
-   */  
+   */
   CASADI_SYMBOLIC_EXPORT SX poly_coeff(const SX& ex, const SX&x);
 
   /** \brief Attempts to find the roots of a polynomial
    *
    *  This will only work for polynomials up to order 3
    *  It is assumed that the roots are real.
-   *  
-   */  
+   *
+   */
   CASADI_SYMBOLIC_EXPORT SX poly_roots(const SX& p);
 
   /** \brief Attempts to find the eigenvalues of a symbolic matrix
    *  This will only work for up to 3x3 matrices
-   */  
+   */
   CASADI_SYMBOLIC_EXPORT SX eig_symbolic(const SX& m);
 
 /*

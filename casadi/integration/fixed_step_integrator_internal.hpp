@@ -29,10 +29,10 @@
 
 /// \cond INTERNAL
 namespace casadi{
-    
+
   class CASADI_INTEGRATION_EXPORT FixedStepIntegratorInternal : public IntegratorInternal{
   public:
-  
+
     /// Constructor
     explicit FixedStepIntegratorInternal(const Function& f, const Function& g);
 
@@ -44,13 +44,13 @@ namespace casadi{
 
     /// Create a new integrator
     virtual FixedStepIntegratorInternal* create(const Function& f, const Function& g) const = 0;
-  
+
     /// Destructor
     virtual ~FixedStepIntegratorInternal();
 
     /// Initialize stage
     virtual void init();
-  
+
     /// Setup F and G
     virtual void setupFG() = 0;
 
@@ -63,7 +63,7 @@ namespace casadi{
     /// Reset the forward problem and bring the time back to t0
     virtual void reset();
 
-    /// Reset the backward problem and take time to tf 
+    /// Reset the backward problem and take time to tf
     virtual void resetB();
 
     /// Get initial guess for the algebraic variable
@@ -81,7 +81,7 @@ namespace casadi{
     // Discrete time dynamics
     Function F_, G_;
 
-    // Number of finite elements 
+    // Number of finite elements
     int nk_;
 
     // Discrete time

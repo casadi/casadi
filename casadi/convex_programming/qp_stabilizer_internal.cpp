@@ -33,7 +33,7 @@ namespace casadi {
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver instance");
   }
 
-  QPStabilizerInternal::~QPStabilizerInternal(){ 
+  QPStabilizerInternal::~QPStabilizerInternal(){
   }
 
   void QPStabilizerInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
@@ -55,8 +55,8 @@ namespace casadi {
     if(hasSetOption("qp_solver_options")){
       Dictionary qp_solver_options = getOption("qp_solver_options");
       qp_solver_.setOption(qp_solver_options);
-    } 
-    
+    }
+
     // Initialize the QP solver
     qp_solver_.init();
   }
@@ -76,14 +76,14 @@ namespace casadi {
       // Upper and lower bounds
       qp_solver_.setInput(input(STABILIZED_QP_SOLVER_LBA),QP_SOLVER_LBA);
       qp_solver_.setInput(input(STABILIZED_QP_SOLVER_UBA),QP_SOLVER_UBA);
-      
+
       // Matrix term in the linear constraint
       DMatrix& A_qp = qp_solver_.input(QP_SOLVER_A);
       DMatrix& A = input(STABILIZED_QP_SOLVER_A);
       std::copy(A.begin(),A.end(),A_qp.begin());
       std::fill(A_qp.begin()+A.size(),A_qp.end(),-muR);
-            
-      // Add constant to linear inequality 
+
+      // Add constant to linear inequality
       for(int i=0; i<mu.size(); ++i) {
         double extra = muR*(mu[i]-muE[i]);
         qp_solver_.input(QP_SOLVER_LBA).at(i) += extra;
@@ -96,7 +96,7 @@ namespace casadi {
     std::copy(input(STABILIZED_QP_SOLVER_UBX).begin(),input(STABILIZED_QP_SOLVER_UBX).end(),qp_solver_.input(QP_SOLVER_UBX).begin());
     std::fill(qp_solver_.input(QP_SOLVER_LBX).begin()+n_,qp_solver_.input(QP_SOLVER_LBX).end(),-numeric_limits<double>::infinity());
     std::fill(qp_solver_.input(QP_SOLVER_UBX).begin()+n_,qp_solver_.input(QP_SOLVER_UBX).end(),numeric_limits<double>::infinity());
-    
+
     // Gradient term in the objective
     DMatrix &g = input(STABILIZED_QP_SOLVER_G);
     std::copy(g.begin(),g.end(),qp_solver_.input(QP_SOLVER_G).begin());
@@ -112,7 +112,7 @@ namespace casadi {
 
     // Pass the stats
     stats_["qp_solver_stats"] = qp_solver_.getStats();
-  
+
     // Get the optimal solution
     std::copy(qp_solver_.output(QP_SOLVER_X).begin(),qp_solver_.output(QP_SOLVER_X).begin()+n_,output(QP_SOLVER_X).begin());
     std::copy(qp_solver_.output(QP_SOLVER_LAM_X).begin(),qp_solver_.output(QP_SOLVER_LAM_X).begin()+n_,output(QP_SOLVER_LAM_X).begin());

@@ -37,23 +37,23 @@ namespace casadi{
 
   IntegratorInternal::IntegratorInternal(const Function& f, const Function& g) : f_(f), g_(g){
     // set default options
-    setOption("name","unnamed_integrator"); // name of the function 
-  
+    setOption("name","unnamed_integrator"); // name of the function
+
     // Additional options
     addOption("print_stats",              OT_BOOLEAN,     false, "Print out statistics after integration");
-    addOption("t0",                       OT_REAL,        0.0, "Beginning of the time horizon"); 
+    addOption("t0",                       OT_REAL,        0.0, "Beginning of the time horizon");
     addOption("tf",                       OT_REAL,        1.0, "End of the time horizon");
     addOption("augmented_options",        OT_DICTIONARY,  GenericType(), "Options to be passed down to the augmented integrator, if one is constructed.");
     addOption("expand_augmented",         OT_BOOLEAN,     true, "If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.");
-  
+
     // Negative number of parameters for consistancy checking
     np_ = -1;
-  
+
     input_.scheme = SCHEME_IntegratorInput;
     output_.scheme = SCHEME_IntegratorOutput;
   }
 
-  IntegratorInternal::~IntegratorInternal(){ 
+  IntegratorInternal::~IntegratorInternal(){
   }
 
   void IntegratorInternal::evaluate(){
@@ -65,23 +65,23 @@ namespace casadi{
 
     // If backwards integration is needed
     if(nrx_>0){
-      
+
       // Re-initialize backward problem
       resetB();
-      
+
       // Integrate backwards to the beginning
       integrateB(t0_);
     }
-      
+
     // Print statistics
     if(print_stats_) printStats(std::cout);
   }
 
   void IntegratorInternal::init(){
-  
+
     // Initialize the functions
     casadi_assert(!f_.isNull());
-  
+
     // Initialize and get dimensions for the forward integration
     if(!f_.isInit()) f_.init();
     casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,"Wrong number of inputs for the DAE callback function");
@@ -115,7 +115,7 @@ namespace casadi{
       rp()  = DMatrix::zeros(g_.input(RDAE_RP).sparsity());
       rz0()  = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
     }
-  
+
     // Allocate space for outputs
     setNumOutputs(INTEGRATOR_NUM_OUT);
     xf() = x0();
@@ -142,7 +142,7 @@ namespace casadi{
       casadi_assert(g_.output(RDAE_ODE).sparsity()==rx0().sparsity());
       casadi_assert(g_.output(RDAE_ALG).sparsity()==rz0().sparsity());
     }
-  
+
     // Call the base class method
     FunctionInternal::init();
 
@@ -151,7 +151,7 @@ namespace casadi{
       ss << "Integrator dimensions: nx=" << nx_ << ", nz="<< nz_ << ", nq=" << nq_ << ", np=" << np_;
       log("IntegratorInternal::init",ss.str());
     }
-  
+
     // read options
     t0_ = getOption("t0");
     tf_ = getOption("tf");
@@ -230,7 +230,7 @@ namespace casadi{
     // Call d
     vector<MX> res = d.call(f_arg);
     vector<MX>::const_iterator res_it = res.begin();
-    
+
     // Collect right-hand-sides
     tmp.resize(DAE_NUM_OUT);
     fill(tmp.begin(),tmp.end(),MX());
@@ -245,7 +245,7 @@ namespace casadi{
     // Consistency check
     casadi_assert(res_it==res.end());
 
-    vector<MX> g_arg;    
+    vector<MX> g_arg;
     if(!g_.isNull()){
 
       // Forward derivatives of g
@@ -253,12 +253,12 @@ namespace casadi{
       g_arg.reserve(d.getNumInputs());
       tmp.resize(RDAE_NUM_IN);
       fill(tmp.begin(),tmp.end(),MX());
-      
+
       // Reset iterators
       aug_x_split_it = aug_x_split.begin();
       aug_z_split_it = aug_z_split.begin();
       aug_p_split_it = aug_p_split.begin();
-      
+
       // Collect arguments for calling d
       for(int dir=-1; dir<nfwd; ++dir){
         tmp[RDAE_T] = dir<0 ? aug_t : zero_t;
@@ -270,7 +270,7 @@ namespace casadi{
         if(nrp_>0) tmp[RDAE_RP] = *aug_rp_split_it++;
         g_arg.insert(g_arg.end(),tmp.begin(),tmp.end());
       }
-      
+
       // Call d
       res = d.call(g_arg);
       res_it = res.begin();
@@ -285,7 +285,7 @@ namespace casadi{
         if(nrz_>0) g_alg.push_back(tmp[RDAE_ALG]);
         if(nrq_>0) g_quad.push_back(tmp[RDAE_QUAD]);
       }
-      
+
       // Consistency check
       casadi_assert(res_it==res.end());
     }
@@ -315,7 +315,7 @@ namespace casadi{
       int g_ode_ind = g_ode.size();
       int g_alg_ind = g_alg.size();
       int g_quad_ind = g_quad.size();
-    
+
       // Collect right-hand-sides
       tmp.resize(DAE_NUM_IN);
       for(int dir=0; dir<nadj; ++dir){
@@ -345,11 +345,11 @@ namespace casadi{
           if(nrq_>0) tmp[RDAE_QUAD] = *aug_p_split_it++;
           g_arg.insert(g_arg.end(),tmp.begin(),tmp.end());
         }
-        
+
         // Call der
         res = d.call(g_arg);
         res_it = res.begin() + RDAE_NUM_OUT;
-    
+
         // Collect right-hand-sides
         tmp.resize(RDAE_NUM_IN);
         for(int dir=0; dir<nadj; ++dir){
@@ -373,7 +373,7 @@ namespace casadi{
         // Call der again
         res = d.call(g_arg);
         res_it = res.begin() + RDAE_NUM_OUT;
-        
+
         // Collect right-hand-sides and add contribution to the forward integration
         tmp.resize(RDAE_NUM_IN);
         for(int dir=0; dir<nadj; ++dir){
@@ -388,7 +388,7 @@ namespace casadi{
         casadi_assert(res_it==res.end());
       }
     }
-    
+
     // Do we want to expand MXFunction->SXFunction?
     bool expand = getOption("expand_augmented");
 
@@ -408,7 +408,7 @@ namespace casadi{
       if(!f_alg.empty()) f_out[DAE_ALG] = dense(horzcat(f_alg));
       if(!f_quad.empty()) f_out[DAE_QUAD] = dense(horzcat(f_quad));
       MXFunction f_mx(f_in,f_out);
-      
+
       // Expand to SXFuncion?
       if(expand){
         f_mx.init();
@@ -449,14 +449,14 @@ namespace casadi{
     casadi_assert(aug_rx_split_it == aug_rx_split.end());
     casadi_assert(aug_rz_split_it == aug_rz_split.end());
     casadi_assert(aug_rp_split_it == aug_rp_split.end());
-    
+
     // Return functions
     return ret;
   }
 
   void IntegratorInternal::spEvaluate(bool fwd){
     log("IntegratorInternal::spEvaluate","begin");
-    
+
     // Temporary vectors
     bvec_t *tmp_f1, *tmp_f2, *tmp_g1= NULL, *tmp_g2=NULL;
     casadi_assert(!linsol_f_.isNull());
@@ -502,7 +502,7 @@ namespace casadi{
 
       // Propagate through g
       if(!g_.isNull()){
-        
+
         // Propagate through the backward DAE
         g_.input(RDAE_T).setZeroBV();
         g_.input(RDAE_X).setBV(xf());
@@ -514,7 +514,7 @@ namespace casadi{
         g_.spEvaluate(true);
         g_.output(RDAE_ODE).getArrayBV(tmp_g1,nrx_);
         g_.output(RDAE_ALG).getArrayBV(tmp_g1+nrx_,nrz_);
-        
+
         // Propagate interdependencies
         rx0().getArrayBV(tmp_g2,nrx_);
         std::fill(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,0);
@@ -531,7 +531,7 @@ namespace casadi{
         }
       }
     } else { // reverse mode
-      
+
       // Clear adjoint sensitivities
       x0().setBV(xf());
       p().setZeroBV();
@@ -539,7 +539,7 @@ namespace casadi{
       rx0().setBV(rxf());
       rp().setZeroBV();
       rz0().setBV(rzf());
-      
+
       // Propagate through g
       if(!g_.isNull()){
 
@@ -584,13 +584,13 @@ namespace casadi{
         x0().borBV(f_.input(DAE_X));
         z0().borBV(f_.input(DAE_Z));
       }
-      
+
       // Propagate interdependencies
       x0().getArrayBV(tmp_f2,nx_);
       z0().getArrayBV(tmp_f2+nx_,nz_);
       std::fill(tmp_f1,tmp_f1+nx_+nz_,0);
       linsol_f_.spSolve(tmp_f1,tmp_f2,false);
-      
+
       // Propagate through the DAE
       f_.output(DAE_ODE).setArrayBV(tmp_f1,nx_);
       f_.output(DAE_ODE).borBV(x0());
@@ -599,7 +599,7 @@ namespace casadi{
       f_.spEvaluate(false);
       x0().borBV(f_.input(DAE_X));
       p().borBV(f_.input(DAE_P));
-      
+
       // No dependency on initial guess
       z0().setZeroBV();
     }
@@ -619,7 +619,7 @@ namespace casadi{
     ret.rq.resize(1,0);
     ret.rp.resize(1,0);
 
-    // Count nondifferentiated and forward sensitivities 
+    // Count nondifferentiated and forward sensitivities
     for(int dir=-1; dir<nfwd; ++dir){
       if( nx_>0) ret.x.push_back(x0().size2());
       if( nz_>0) ret.z.push_back(z0().size2());
@@ -642,7 +642,7 @@ namespace casadi{
       if(nrp_>0) ret.q.push_back(rp().size2());
       if(nrq_>0) ret.p.push_back(rqf().size2());
     }
-    
+
     // Get cummulative offsets
     for(int i=1; i<ret.x.size(); ++i) ret.x[i] += ret.x[i-1];
     for(int i=1; i<ret.z.size(); ++i) ret.z[i] += ret.z[i-1];
@@ -652,7 +652,7 @@ namespace casadi{
     for(int i=1; i<ret.rz.size(); ++i) ret.rz[i] += ret.rz[i-1];
     for(int i=1; i<ret.rq.size(); ++i) ret.rq[i] += ret.rq[i-1];
     for(int i=1; i<ret.rp.size(); ++i) ret.rp[i] += ret.rp[i-1];
-    
+
     // Return the offsets
     return ret;
   }
@@ -663,38 +663,38 @@ namespace casadi{
     // Form the augmented DAE
     AugOffset offset;
     std::pair<Function,Function> aug_dae = getAugmented(nfwd,nadj,offset);
-    
+
     // Create integrator for augmented DAE
     Integrator integrator;
     integrator.assignNode(create(aug_dae.first,aug_dae.second));
 
     // Set solver specific options
     setDerivativeOptions(integrator,offset);
-    
+
     // Pass down specific options if provided
     if (hasSetOption("augmented_options"))
       integrator.setOption(getOption("augmented_options"));
-  
+
     // Initialize the integrator since we will call it below
     integrator.init();
-  
+
     // All inputs of the return function
     vector<MX> ret_in;
     ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT*nadj);
-  
+
     // Augmented state
     MX x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
-  
+
     // Temp stringstream
     stringstream ss;
-    
+
     // Inputs or forward/adjoint seeds in one direction
     vector<MX> dd;
-  
+
     // Add nondifferentiated inputs and forward seeds
     dd.resize(INTEGRATOR_NUM_IN);
     for(int dir=-1; dir<nfwd; ++dir){
-    
+
       // Differential state
       ss.clear();
       ss << "x0";
@@ -715,7 +715,7 @@ namespace casadi{
       if(dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_Z0] = MX::sym(ss.str(),z0().sparsity());
       z0_aug.appendColumns(dd[INTEGRATOR_Z0]);
-    
+
       // Backward state
       ss.clear();
       ss << "rx0";
@@ -736,15 +736,15 @@ namespace casadi{
       if(dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_RZ0] = MX::sym(ss.str(),rz0().sparsity());
       rz0_aug.appendColumns(dd[INTEGRATOR_RZ0]);
-    
+
       // Add to input vector
       ret_in.insert(ret_in.end(),dd.begin(),dd.end());
     }
-    
+
     // Add adjoint seeds
     dd.resize(INTEGRATOR_NUM_OUT);
     for(int dir=0; dir<nadj; ++dir){
-    
+
       // Differential states become backward differential state
       ss.clear();
       ss << "xf" << "_" << dir;
@@ -768,7 +768,7 @@ namespace casadi{
       ss << "rxf" << "_" << dir;
       dd[INTEGRATOR_RXF] = MX::sym(ss.str(),rxf().sparsity());
       x0_aug.appendColumns(dd[INTEGRATOR_RXF]);
-    
+
       // Backward quadratures becomes (forward) parameters
       ss.clear();
       ss << "rqf" << "_" << dir;
@@ -780,11 +780,11 @@ namespace casadi{
       ss << "rzf" << "_" << dir;
       dd[INTEGRATOR_RZF] = MX::sym(ss.str(),rzf().sparsity());
       z0_aug.appendColumns(dd[INTEGRATOR_RZF]);
-    
+
       // Add to input vector
       ret_in.insert(ret_in.end(),dd.begin(),dd.end());
     }
-  
+
     // Call the integrator
     vector<MX> integrator_in(INTEGRATOR_NUM_IN);
     integrator_in[INTEGRATOR_X0] = x0_aug;
@@ -794,7 +794,7 @@ namespace casadi{
     integrator_in[INTEGRATOR_RP] = rp_aug;
     integrator_in[INTEGRATOR_RZ0] = rz0_aug;
     vector<MX> integrator_out = integrator.call(integrator_in);
-  
+
     // Augmented results
     vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF],offset.x);
     vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF],offset.q);
@@ -825,7 +825,7 @@ namespace casadi{
       if(nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
       ret_out.insert(ret_out.end(),dd.begin(),dd.end());
     }
-  
+
     // Collect the adjoint sensitivities
     dd.resize(INTEGRATOR_NUM_IN);
     fill(dd.begin(),dd.end(),MX());
@@ -839,7 +839,7 @@ namespace casadi{
       ret_out.insert(ret_out.end(),dd.begin(),dd.end());
     }
     log("IntegratorInternal::getDerivative","end");
-  
+
     // Create derivative function and return
     return MXFunction(ret_in,ret_out);
   }
@@ -858,11 +858,11 @@ namespace casadi{
 
     // Go to the start time
     t_ = t0_;
-    
+
     // Initialize output
     xf().set(x0());
     zf().set(z0());
-    
+
     // Reset summation states
     qf().set(0.0);
 
@@ -878,10 +878,10 @@ namespace casadi{
     // Initialize output
     rxf().set(rx0());
     rzf().set(rz0());
-    
+
     // Reset summation states
     rqf().set(0.0);
-    
+
     log("IntegratorInternal::resetB","end");
   }
 
@@ -893,7 +893,7 @@ namespace casadi{
   Sparsity IntegratorInternal::spJacF(){
     // Start with the sparsity pattern of the ODE part
     Sparsity ret = f_.jacSparsity(DAE_X,DAE_ODE).T();
-    
+
     // Add diagonal to get interdependencies
     ret = ret.patternUnion(Sparsity::diag(nx_));
 
@@ -912,7 +912,7 @@ namespace casadi{
   Sparsity IntegratorInternal::spJacG(){
     // Start with the sparsity pattern of the ODE part
     Sparsity ret = g_.jacSparsity(RDAE_RX,RDAE_ODE).T();
-    
+
     // Add diagonal to get interdependencies
     ret = ret.patternUnion(Sparsity::diag(nrx_));
 

@@ -35,7 +35,7 @@ namespace casadi{
     setDependencies(x,y);
     setSparsity(Sparsity::scalar());
   }
-  
+
   void InnerProd::printPart(std::ostream &stream, int part) const{
     if(part==0){
       stream << "inner_prod(";

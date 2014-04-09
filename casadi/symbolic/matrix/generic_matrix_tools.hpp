@@ -34,7 +34,7 @@ namespace casadi{
 
 /**
 \ingroup expression_tools
-@{ 
+@{
 */
 
   /** \brief Matlab's linspace command
@@ -69,7 +69,7 @@ namespace casadi{
 
   /** \brief Check if two expressions are equal, assuming that they are comparible */
   template<typename MatType>
-  bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y){ 
+  bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y){
     return static_cast<const MatType&>(x).isEqual(static_cast<const MatType&>(y));
   }
 
@@ -84,7 +84,7 @@ namespace casadi{
 
     for(int i=1; i<nsteps-1; ++i)
       ret[i] = ret[i-1] + step;
-  
+
     ret[nsteps-1] = b;
     return vertcat(ret);
   }
@@ -94,19 +94,19 @@ namespace casadi{
   template<typename MatType>
   MatType cross(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int dim) {
     casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),"cross(a,b): Inconsistent dimensions. Dimension of a (" << a.dimString() << " ) must equal that of b (" << b.dimString() << ").");
-  
+
     casadi_assert_message(a.size1()==3 || a.size2()==3,"cross(a,b): One of the dimensions of a should have length 3, but got " << a.dimString() << ".");
     casadi_assert_message(dim==-1 || dim==1 || dim==2,"cross(a,b,dim): Dim must be 1, 2 or -1 (automatic).");
-  
-  
+
+
     std::vector<MatType> ret(3);
-  
-  
+
+
     bool t = a.size1()==3;
-  
+
     if (dim==1) t = true;
     if (dim==2) t = false;
-  
+
     MatType a1 = t ? a(0,ALL) : a(ALL,0);
     MatType a2 = t ? a(1,ALL) : a(ALL,1);
     MatType a3 = t ? a(2,ALL) : a(ALL,2);
@@ -114,16 +114,16 @@ namespace casadi{
     MatType b1 = t ? b(0,ALL) : b(ALL,0);
     MatType b2 = t ? b(1,ALL) : b(ALL,1);
     MatType b3 = t ? b(2,ALL) : b(ALL,2);
-    
+
     ret[0] = a2*b3-a3*b2;
     ret[1] = a3*b1-a1*b3;
     ret[2] = a1*b2-a2*b1;
-    
+
     return t ? vertcat(ret) : horzcat(ret);
-  
+
   }
 
-  template<typename MatType> 
+  template<typename MatType>
   MatType tril2symm(const GenericMatrix<MatType> &a_) {
     const MatType& a = static_cast<const MatType&>(a_);
     casadi_assert_message(a.isSquare(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
@@ -132,7 +132,7 @@ namespace casadi{
   }
 
 
-  template<typename MatType> 
+  template<typename MatType>
   MatType triu2symm(const GenericMatrix<MatType> &a_) {
     const MatType& a = static_cast<const MatType&>(a_);
     casadi_assert_message(a.isSquare(),"Shape error in triu2symm. Expecting square shape but got " << a.dimString());

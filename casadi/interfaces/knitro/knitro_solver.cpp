@@ -40,7 +40,7 @@ namespace casadi{
   const KnitroInternal* KnitroSolver::operator->() const{
     return static_cast<const KnitroInternal*>(NLPSolver::operator->());
   }
-    
+
   bool KnitroSolver::checkNode() const{
     return dynamic_cast<const KnitroInternal*>(get());
   }
@@ -48,7 +48,7 @@ namespace casadi{
   void KnitroSolver::setIntParam(const std::string& name, int val){
     (*this)->int_param_[name] = val;
   }
-    
+
   void KnitroSolver::setDoubleParam(const std::string& name, double val){
     (*this)->double_param_[name] = val;
   }

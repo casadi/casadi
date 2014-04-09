@@ -31,7 +31,7 @@
 /// \cond INTERNAL
 
 namespace casadi{
-  
+
   class CodeGenerator{
   public:
 
@@ -55,7 +55,7 @@ namespace casadi{
 
     /** \brief Get the index of an existing dependency */
     int getDependency(const Function& f) const;
-    
+
     /** \brief Print a constant in a lossless but compact manner */
     static void printConstant(std::ostream& s, double v);
 
@@ -82,13 +82,13 @@ namespace casadi{
       AUX_COPY_SPARSE,
       AUX_TRANS
     };
-    
+
     /** \brief Add a built-in axiliary function */
     void addAuxiliary(Auxiliary f);
 
     /// Flush generated file to a stream
     void flush(std::ostream& s) const;
-    
+
     /** Convert in integer to a string */
     static std::string numToString(int n);
 
@@ -111,14 +111,14 @@ namespace casadi{
 
     //  private:
   public:
-    
+
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes_;
     std::stringstream auxiliaries_;
     std::stringstream dependencies_;
     std::stringstream function_;
     std::stringstream finalization_;
-    
+
     // Set of already included header files
     typedef std::map<const void*,int> PointerMap;
     std::set<std::string> added_includes_;
@@ -146,8 +146,8 @@ namespace casadi{
       return true;
     }
   };
-  
-  
+
+
 } // namespace casadi
 
 /// \endcond

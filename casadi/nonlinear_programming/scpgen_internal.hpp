@@ -31,14 +31,14 @@
 /// \cond INTERNAL
 
 namespace casadi{
-    
+
 class CASADI_NONLINEAR_PROGRAMMING_EXPORT SCPgenInternal : public NLPSolverInternal{
 
 public:
   explicit SCPgenInternal(const Function& nlp);
   virtual ~SCPgenInternal();
   virtual SCPgenInternal* clone() const{ return new SCPgenInternal(*this);}
-  
+
   virtual void init();
   virtual void evaluate();
 
@@ -50,9 +50,9 @@ public:
 
   // Print iteration header
   void printIteration(std::ostream &stream);
-  
+
   // Print iteration
-  void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
+  void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf,
                       double reg, int ls_trials, bool ls_success);
 
   // Evaluate the matrices in the condensed QP
@@ -75,18 +75,18 @@ public:
 
   // Evaluate the step expansion
   void eval_exp();
-  
+
   // Timings
   double t_eval_mat_, t_eval_res_, t_eval_vec_, t_eval_exp_, t_solve_qp_, t_mainloop_;
-  
+
   /// QP solver for the subproblems
   QPSolver qp_solver_;
 
   /// use Gauss-Newton Hessian
-  bool gauss_newton_; 
+  bool gauss_newton_;
 
   /// maximum number of sqp iterations
-  int max_iter_; 
+  int max_iter_;
 
   /// Memory size of L-BFGS method
   int lbfgs_memory_;
@@ -102,7 +102,7 @@ public:
 
   /// stopping criterion for the stepsize
   double tol_pr_step_;
-  
+
   /// stopping criterion for the lagrangian gradient
   double tol_gl_;
 
@@ -122,13 +122,13 @@ public:
 
   /// Access QPSolver
   const QPSolver getQPSolver() const { return qp_solver_;}
-  
+
   /// Regularization
   bool regularize_;
 
   // Options
   double reg_threshold_;
-  
+
   /// Print timers
   bool print_time_;
 
@@ -137,7 +137,7 @@ public:
 
   /// Residual function
   Function res_fcn_;
- 
+
   // Function to calculate the matrices in the reduced QP
   Function mat_fcn_;
   int mat_jac_, mat_hes_;
@@ -148,7 +148,7 @@ public:
 
   /// Step expansion
   Function exp_fcn_;
-  
+
   // Objective value
   double f_;
   std::vector<double> gf_, gL_, b_gn_;
@@ -184,7 +184,7 @@ public:
 
     std::vector<double> step, init, opt, lam, dlam;
     std::vector<double> res, resL;
-    
+
   };
 
   std::vector<Var> v_;
@@ -194,13 +194,13 @@ public:
 
   // 1-norm of last primal step
   double pr_step_;
-  
+
   // 1-norm of last dual step
   double du_step_;
 
   // Regularization
   double reg_;
-  
+
   // Names of the components
   std::vector<std::string> name_x_;
 
@@ -209,7 +209,7 @@ public:
 
   // Message applying to a particular iteration
   std::string iteration_note_;
-  
+
   // QP
   DMatrix qpH_, qpA_;
   std::vector<double> qpB_;

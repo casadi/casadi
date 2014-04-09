@@ -29,11 +29,11 @@
 /** \defgroup SDQPSolver_doc
 
   Same as an SDPSolver, but with a quadratic objective 1/2 x' H x
-  
+
 */
-      
+
 namespace casadi{
-  
+
 /// Input arguments of a SDQP problem [sdqpIn]
 enum SDQPInput{
   /// The matrix H: sparse ( n x n) [h]
@@ -73,7 +73,7 @@ enum SDQPOutput{
   /// The dual solution corresponding to simple bounds  (n x 1) [lam_x]
   SDQP_SOLVER_LAM_X,
   SDQP_SOLVER_NUM_OUT};
-  
+
 /// Structure specification of an SDQP [sdqpStruct]
 enum SDQPStruct{
   /// The matrix H: sparse ( n x n) [h]
@@ -85,7 +85,7 @@ enum SDQPStruct{
   /// The matrix A: ( nc x n) [a]
   SDQP_STRUCT_A,
   SDQP_STRUCT_NUM};
-  
+
 // Forward declaration of internal class
 class SDQPSolverInternal;
 
@@ -94,7 +94,7 @@ class SDQPSolverInternal;
 
 @copydoc SDQPSolver_doc
 
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT SDQPSolver : public Function{
@@ -102,17 +102,17 @@ class CASADI_SYMBOLIC_EXPORT SDQPSolver : public Function{
 
   /// Default constructor
   SDQPSolver();
-  
+
   /// Access functions of the node
   SDQPSolverInternal* operator->();
   const SDQPSolverInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Set options that make the SDQP solver more suitable for solving SOCPs
   void setSOCQPOptions();
-  
+
 };
 
 } // namespace casadi

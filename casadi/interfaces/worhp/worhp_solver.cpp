@@ -29,7 +29,7 @@ namespace casadi{
 
   WorhpSolver::WorhpSolver(){
   }
-  
+
   WorhpSolver::WorhpSolver(const Function& nlp){
     assignNode(new WorhpInternal(nlp));
   }
@@ -41,11 +41,11 @@ namespace casadi{
   const WorhpInternal* WorhpSolver::operator->() const{
     return static_cast<const WorhpInternal*>(NLPSolver::operator->());
   }
-    
+
   bool WorhpSolver::checkNode() const{
     return dynamic_cast<const WorhpInternal*>(get());
   }
-  
+
   void WorhpSolver::setOptionsFromFile(const std::string & file) {
     dynamic_cast<WorhpInternal*>(get())->setOptionsFromFile(file);
   }

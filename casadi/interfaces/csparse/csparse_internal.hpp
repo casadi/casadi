@@ -39,7 +39,7 @@ namespace casadi{
   */
   class CASADI_CSPARSE_INTERFACE_EXPORT CSparseInternal : public LinearSolverInternal{
   public:
-    
+
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     CSparseInternal(const Sparsity& sp, int nrhs);
 
@@ -48,35 +48,35 @@ namespace casadi{
 
     // Destructor
     virtual ~CSparseInternal();
-    
+
     // Initialize the solver
     virtual void init();
 
     // Factorize the matrix
     virtual void prepare();
-    
+
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
-    
+
     // Clone
     virtual CSparseInternal* clone() const;
-    
+
     // Has the solve function been called once
     bool called_once_;
-    
+
     // The linear system CSparse form (CCS)
     cs A_;
 
     // The symbolic factorization
     css *S_;
-    
+
     // The numeric factorization
     csn *N_;
-    
+
     // Temporary
     std::vector<double> temp_;
 
-    
+
   };
 
 } // namespace casadi

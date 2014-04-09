@@ -26,14 +26,14 @@
 #include "fixed_step_integrator.hpp"
 
 namespace casadi{
-  
+
   class RKIntegratorInternal;
-  
+
   /** \brief Fixed-step explicit Runge-Kutta integrator for ODEs
       Currently implements RK4.
 
       The method is still under development
-  
+
       \author Joel Andersson
       \date 2011-2014
   */
@@ -41,7 +41,7 @@ namespace casadi{
   public:
     /** \brief  Default constructor */
     RKIntegrator();
-    
+
     /** \brief  Create an integrator for explicit ODEs
      *   \param f dynamical system
      * \copydoc scheme_DAEInput

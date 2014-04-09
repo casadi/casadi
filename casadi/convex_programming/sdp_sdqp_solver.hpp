@@ -28,9 +28,9 @@
 #include <casadi/convex_programming/casadi_convex_programming_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class SDPSDQPInternal;
 
   /** \brief SDP SDQP Solver for quadratic programming
@@ -43,7 +43,7 @@ class SDPSDQPInternal;
    *
    *
    @copydoc SDQPSolver_doc
-      
+
    \author Joris Gillis
    \date 2013
   */
@@ -52,20 +52,20 @@ public:
 
   /** \brief  Default constructor */
   SDPSDQPSolver();
-  
+
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_SDQPStruct
   */
   explicit SDPSDQPSolver(const SDQPStructure & st);
-  
+
   /** \brief  Access functions of the node */
   SDPSDQPInternal* operator->();
   const SDPSDQPInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
@@ -74,7 +74,7 @@ public:
   #ifdef SWIG
   %nocallback;
   #endif
-  
+
   /// Access underlying SDP solver
   SDPSolver & getSolver();
 

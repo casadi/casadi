@@ -31,19 +31,19 @@
 /// \cond INTERNAL
 
 namespace casadi{
-  
+
   /** \brief  Internal class for CustomFunction
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
   A regular user should never work with any Node class. Use CustomFunction directly.
   */
 class CASADI_SYMBOLIC_EXPORT CustomFunctionInternal : public FunctionInternal{
   friend class CustomFunction;
   public:
-    
+
     /** \brief  Create a function */
     explicit CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<casadi::Sparsity> &inputscheme, const std::vector<casadi::Sparsity> &outputscheme);
-    
+
     /** \brief  Destructor */
     virtual ~CustomFunctionInternal();
 
@@ -52,17 +52,17 @@ class CASADI_SYMBOLIC_EXPORT CustomFunctionInternal : public FunctionInternal{
 
     /** \brief  Evaluate */
     virtual void evaluate();
-  
+
     /** \brief  Initialize */
     virtual void init();
-  
+
     CustomEvaluate evaluate_;
-  
+
     /// A reference to this object to be passed to the user functions
     CustomFunction ref_;
-    
-}; // class CustomFunctionInternal 
-  
+
+}; // class CustomFunctionInternal
+
 
 
 } // namespace casadi

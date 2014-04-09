@@ -32,7 +32,7 @@ namespace casadi{
   const ImplicitFunctionInternal* ImplicitFunction::operator->() const{
     return static_cast<const ImplicitFunctionInternal*>(Function::operator->());
   }
- 
+
   bool ImplicitFunction::checkNode() const{
     return dynamic_cast<const ImplicitFunctionInternal*>(get())!=0;
   }

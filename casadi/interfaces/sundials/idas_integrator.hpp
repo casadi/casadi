@@ -27,9 +27,9 @@
 
 /**
 * \defgroup IdasIntegrator_doc
-  
+
   @copydoc DAE_doc
-  
+
 */
 
 namespace casadi{
@@ -40,7 +40,7 @@ class IdasInternal;
 /** \brief Interface to IDAS from the Sundials suite.
 
    @copydoc IdasIntegrator_doc
-  
+
    \author Joel Andersson
    \date 2010
 */
@@ -49,11 +49,11 @@ public:
 
   /// Default constructor
   IdasIntegrator();
-  
+
   /// Create an integrator for a fully implicit DAE with quadrature states (nz is the number of states not to be included in the state vector)
-  
-    
-  /** \brief  Create an integrator for a fully implicit DAE with quadrature states 
+
+
+  /** \brief  Create an integrator for a fully implicit DAE with quadrature states
   * (nz is the number of states not to be included in the state vector)
   *   \param f dynamical system
   * \copydoc scheme_DAEInput
@@ -69,10 +69,10 @@ public:
 
   /// Const access functions of the node
   const IdasInternal* operator->() const;
-  
+
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Correct the initial value for yp and z after resetting the solver
   void correctInitialConditions();
 

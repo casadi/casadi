@@ -1,16 +1,16 @@
-module SQICModule 
- use snModulePrecision, only : ip, rp                            
- use SQIC,              only : qpProb 
+module SQICModule
+ use snModulePrecision, only : ip, rp
+ use SQIC,              only : qpProb
  type(qpProb)              :: QP
- 
+
  character(8), allocatable :: Names(:)
  real(rp),     allocatable :: cObj(:)
- 
+
 end module
 
 subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, nnzH, indH, locH, valH) bind ( C, name="sqic" )
 
-  use SQICModule                    
+  use SQICModule
 
   implicit none
 
@@ -20,7 +20,7 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
 
   real(rp)                  :: ObjAdd, sInf
 
-  
+
   real(rp):: bl(n+m), bu(n+m), x(n+m), valA(nnzA), valH(nnzH) ,pi(m), rc(n+m)
   integer(ip):: indA(nnzA), locA(n+1), indH(nnzH), locH(n+1), hEtype(n+m), hs(n+m)
 
@@ -38,7 +38,7 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
 
   if ( allocated(cObj) )   deallocate ( cObj )
   if ( allocated(Names) )  deallocate ( Names )
-  
+
   ! Allocate space for problem.
   allocate ( cObj(ncObj) )
   allocate ( Names(nNames) )
@@ -50,7 +50,7 @@ subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, n
 
   ! Initialize SQIC.
   call QP%begin ( iPrint, iSumm )
-  
+
   !print *, 'Reading params.spc'
   !iSpecs = 4
   !open ( iSpecs, file='params.spc',   status='unknown'     )
@@ -68,49 +68,49 @@ end subroutine wsqic
 
 subroutine sqicSolve (Obj)  bind ( C, name="sqicSolve" )
   use snModulePrecision, only : ip, rp
-  use SQICModule 
-  
+  use SQICModule
+
   implicit none
 
   integer                   :: INFO
   integer(ip)               :: nS, nInf
 
   real(rp)                  :: Obj, sInf
-  
-  
+
+
   ! Solve the QP.
   call QP%solve ( 'Cold', INFO, nS, nInf, sInf, Obj )
-  
+
 end subroutine sqicSolve
 
 
 subroutine sqicSolveStabilized (Obj,mu,lenpi,piE)  bind ( C, name="sqicSolveStabilized" )
   use snModulePrecision, only : ip, rp
-  use SQICModule 
-  
+  use SQICModule
+
   implicit none
 
   integer                   :: INFO
   integer(ip)               :: nS, nInf, lenpi
 
   real(rp)                  :: Obj, sInf, mu, piE(lenpi)
-  
+
   ! Solve the QP.
   call QP%solveR ( 'Cold', mu, lenpi, piE, INFO, nS, nInf, sInf, Obj )
-  
+
 end subroutine sqicSolveStabilized
 
 
 subroutine sqicDestroy ()  bind ( C, name="sqicDestroy" )
-  use SQICModule 
-  
+  use SQICModule
+
   implicit none
-    
+
   call QP%end
 
   if ( allocated(cObj) )   deallocate ( cObj )
   if ( allocated(Names) )  deallocate ( Names )
 
   !close       ( iPrint )
-  
+
 end subroutine sqicDestroy

@@ -27,37 +27,37 @@
 #include <casadi/interfaces/sqic/casadi_sqic_interface_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class SQICInternal;
 
   /**  \brief Interface to the SQIC solver for quadratic programming
-     
+
      @copydoc QPSolver_doc
        \author Joris gillis
       \date 2013
-      
+
   */
 class CASADI_SQIC_INTERFACE_EXPORT SQICSolver : public QPSolver {
 public:
 
   /** \brief  Default constructor */
   SQICSolver();
-  
+
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_QPStruct
   */
   SQICSolver(const QPStructure &st);
-  
+
   /** \brief  Access functions of the node */
   SQICInternal* operator->();
   const SQICInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
@@ -67,7 +67,7 @@ public:
   %nocallback;
   #endif
 
-  
+
 };
 
 

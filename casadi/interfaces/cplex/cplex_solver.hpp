@@ -47,14 +47,14 @@ public:
   *  \copydoc scheme_QPStruct
   */
   CplexSolver(const QPStructure &st);
-  
+
   CplexInternal* operator->();
   const CplexInternal* operator->() const;
 
- 
+
   virtual bool checkNode() const;
 
-  /// Static creator function 
+  /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
   #endif

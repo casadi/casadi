@@ -61,7 +61,7 @@ enum OCPInput{
   /// Controls upper bounds (nu x ns) [ubu]
   OCP_UBU,
   /// Controls initial guess (nu x ns) [u_init]
-  OCP_U_INIT,     
+  OCP_U_INIT,
   /// Parameters lower bounds (np x 1) [lbp]
   OCP_LBP,
   /// Parameters upper bounds (np x 1) [ubp]
@@ -83,17 +83,17 @@ enum OCPInput{
 /// Output arguments of an OCP Solver [ocpOut]
 enum OCPOutput{
   /// Optimal state trajectory [x_opt]
-  OCP_X_OPT, 
+  OCP_X_OPT,
   /// Optimal control trajectory [u_opt]
-  OCP_U_OPT, 
+  OCP_U_OPT,
   /// Optimal parameters [p_opt]
-  OCP_P_OPT, 
+  OCP_P_OPT,
   /// Objective/cost function for optimal solution (1 x 1) [cost]
   OCP_COST,
   /// Number of outputs to an OCP solver
   OCP_NUM_OUT
 };
-    
+
   // Forward declaration of internal class
   class OCPSolverInternal;
 
@@ -102,7 +102,7 @@ enum OCPOutput{
    *
       \author Joel Andersson
       \date 2011-2013
-  */ 
+  */
   class CASADI_SYMBOLIC_EXPORT OCPSolver : public Function{
   public:
 
@@ -114,20 +114,20 @@ enum OCPOutput{
 
     /// Const access functions of the node
     const OCPSolverInternal* operator->() const;
-    
+
     // Access the underlying ffcn
     Function getFfcn() const;
-    
+
     // Access the underlying mfcn
     Function getMfcn() const;
-    
+
     // Access the underlying cfcn
     Function getCfcn() const;
-    
+
     // Access the underlying rfcn
     Function getRfcn() const;
-    
-    
+
+
   };
 
 } // namespace casadi

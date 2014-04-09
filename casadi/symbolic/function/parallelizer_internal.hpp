@@ -30,31 +30,31 @@
 /// \cond INTERNAL
 
 namespace casadi{
- 
+
   /** \brief  Internal node class for Parallelizer
-      \author Joel Andersson 
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT ParallelizerInternal : public FunctionInternal{
     friend class Parallelizer;
-  
+
   protected:
     /// Constructor
     explicit ParallelizerInternal(const std::vector<Function>& funcs);
 
   public:
     /// clone
-    virtual ParallelizerInternal* clone() const{ 
+    virtual ParallelizerInternal* clone() const{
       ParallelizerInternal* ret = new ParallelizerInternal(*this);
       for(std::vector<Function>::iterator it=ret->funcs_.begin(); it!=ret->funcs_.end(); ++it){
         it->makeUnique();
       }
       return ret;
     }
-    
+
     /// Destructor
     virtual ~ParallelizerInternal();
-    
+
     /// Evaluate the all the tasks
     virtual void evaluate();
 
@@ -63,19 +63,19 @@ namespace casadi{
 
     /// Reset the sparsity propagation
     virtual void spInit(bool use_fwd);
-    
+
     /// Propagate the sparsity pattern through a set of directional derivatives forward or backward
     virtual void spEvaluate(bool use_fwd);
-    
+
     /// Propagate the sparsity pattern through a set of directional derivatives forward or backward, one task only
     void spEvaluateTask(bool use_fwd, int task);
 
     /// Is the class able to propate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
-    
+
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual Function getDerivative(int nfwd, int nadj);
-    
+
     /// Generate a function that calculates a Jacobian function
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
 
@@ -90,19 +90,19 @@ namespace casadi{
 
     /// Functions
     std::vector<Function> funcs_;
-    
+
     /// Input argument indices
     std::vector<int> inind_;
-    
+
     /// Output argument indices
     std::vector<int> outind_;
-    
+
     /// Is a function a copy of another
     std::vector<int> copy_of_;
-    
+
     /// Parallelization modes
     enum Mode{SERIAL,OPENMP,MPI};
-    
+
     /// Mode
     Mode mode_;
   };

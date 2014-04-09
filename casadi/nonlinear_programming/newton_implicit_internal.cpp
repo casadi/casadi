@@ -39,21 +39,21 @@ namespace casadi {
     addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
   }
 
-  NewtonImplicitInternal::~NewtonImplicitInternal(){ 
+  NewtonImplicitInternal::~NewtonImplicitInternal(){
   }
 
   void NewtonImplicitInternal::solveNonLinear() {
     casadi_log("NewtonImplicitInternal::solveNonLinear:begin");
-    
+
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
     double time_stop=0;
     if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
       time_zero = getRealTime();
-      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl; 
+      CasadiOptions::profilingLog  << "start " << this << ":" <<getOption("name") << std::endl;
     }
-    
+
     // Pass the inputs to J
     for(int i=0; i<getNumInputs(); ++i){
       if(i!=iin_) jac_.setInput(input(i),i);
@@ -63,12 +63,12 @@ namespace casadi {
     DMatrix &u = output(iout_);
     DMatrix &J = jac_.output(0);
     DMatrix &F = jac_.output(1+iout_);
-  
+
     // Perform the Newton iterations
     int iter=0;
-    
+
     bool success = true;
-    
+
     while(true){
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
@@ -83,30 +83,30 @@ namespace casadi {
 
       // Print progress
       if (monitored("step") || monitored("stepsize")) {
-        std::cout << "Step " << iter << "." << std::endl; 
+        std::cout << "Step " << iter << "." << std::endl;
       }
-    
+
       if (monitored("step")) {
         std::cout << "  u = " << u << std::endl;
       }
-    
+
       // Use u to evaluate J
       jac_.setInput(u,iin_);
       for(int i=0; i<getNumInputs(); ++i)
         if(i!=iin_) jac_.setInput(input(i),i);
-      
+
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
       }
-    
+
       jac_.evaluate();
-      
+
       // Write out profiling information
       if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
         CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << jac_.get() << ":" << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
       }
-    
+
       if (monitored("F")) std::cout << "  F = " << F << std::endl;
       if (monitored("normF")) std::cout << "  F (min, max, 1-norm, 2-norm) = " << (*std::min_element(F.data().begin(),F.data().end())) << ", " << (*std::max_element(F.data().begin(),F.data().end())) << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
       if (monitored("J")) std::cout << "  J = " << J << std::endl;
@@ -117,11 +117,11 @@ namespace casadi {
           casadi_log("Converged to acceptable tolerance - abstol: " << abstol_);
           break;
         }
-      } 
-    
+      }
+
       // Prepare the linear solver with J
       linsol_.setInput(J,LINSOL_A);
-      
+
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
       }
@@ -141,11 +141,11 @@ namespace casadi {
         time_stop = getRealTime(); // Stop timer
         CasadiOptions::profilingLog  << double(time_stop-time_start)*1e6 << " ns | " << double(time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;
       }
-      
+
       if (monitored("step")) {
         std::cout << "  step = " << F << std::endl;
       }
-    
+
       if ( numeric_limits<double>::infinity() != abstolStep_ ) {
         double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
         if (monitored("stepsize")) {
@@ -155,8 +155,8 @@ namespace casadi {
           casadi_log("Converged to acceptable tolerance - abstolStep: " << abstolStep_);
           break;
         }
-      } 
-    
+      }
+
       // Update Xk+1 = Xk - J^(-1) F
       std::transform(u.begin(), u.end(), F.begin(), u.begin(), std::minus<double>());
 
@@ -165,35 +165,35 @@ namespace casadi {
         if(i!=iout_) jac_.getOutput(output(i),1+i);
       }
     }
-  
+
     // Store the iteration count
-    if (gather_stats_) stats_["iter"] = iter; 
-    
+    if (gather_stats_) stats_["iter"] = iter;
+
     if (success) stats_["return_status"] = "success";
-  
+
     // Factorization up-to-date
     fact_up_to_date_ = true;
-    
+
     casadi_log("NewtonImplicitInternal::solveNonLinear():end after " << iter << " steps");
   }
 
   void NewtonImplicitInternal::init(){
-    
+
     // Call the base class initializer
     ImplicitFunctionInternal::init();
 
-    casadi_assert_message(f_.getNumInputs()>0,"NewtonImplicitInternal: the supplied f must have at least one input.");  
+    casadi_assert_message(f_.getNumInputs()>0,"NewtonImplicitInternal: the supplied f must have at least one input.");
     casadi_assert_message(!linsol_.isNull(),"NewtonImplicitInternal::init: linear_solver must be supplied");
-  
+
     if (hasSetOption("max_iter"))
       max_iter_ = getOption("max_iter");
-    
+
     if (hasSetOption("abstol"))
       abstol_ = getOption("abstol");
 
     if (hasSetOption("abstolStep"))
       abstolStep_ = getOption("abstolStep");
-    
+
   }
 
 } // namespace casadi

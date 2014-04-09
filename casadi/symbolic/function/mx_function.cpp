@@ -45,7 +45,7 @@ MXFunction::MXFunction(const Function& function) {
   if (!temp) casadi_error("MXFunction(Function)::input Function cannot be cast into MXFunction");
   assignNode(temp->clone());
 }
-  
+
 MXFunction::MXFunction(const MX& inputm, const MX& outputm){
   vector<MX> inputv(1);
   inputv[0] = inputm;
@@ -102,11 +102,11 @@ const MX& MXFunction::inputExpr(int ind) const{
 const MX& MXFunction::outputExpr(int ind) const{
   return (*this)->outputv_.at(ind);
 }
-  
+
 const std::vector<MX>& MXFunction::inputExpr() const{
   return (*this)->inputv_;
 }
-  
+
 const std::vector<MX> & MXFunction::outputExpr() const{
   return (*this)->outputv_;
 }

@@ -32,37 +32,37 @@ class SimulatorInternal;
 
 /** \brief Integrator class
 
-  An "simulator" integrates an IVP, stopping at a (fixed) number of grid points and 
+  An "simulator" integrates an IVP, stopping at a (fixed) number of grid points and
   evaluates a set of output functions at these points.
   The internal stepsizes of the integrator need not coincide with the gridpoints.
-  
-  
+
+
   Simulator is an casadi::Function mapping from casadi::IntegratorInput to n. \\
-  
+
   The output function needs to be a mapping from casadi::DAEInput to n. The default output has n=1 and the output is the (vectorized) differential state for each time step.
-  
-  \author Joel Andersson 
+
+  \author Joel Andersson
   \date 2010
 */
 
 class CASADI_SYMBOLIC_EXPORT Simulator : public Function{
 public:
 
-  /// Default constructor 
+  /// Default constructor
   Simulator();
-  
+
   /** \brief Constructor
   * \param output_fcn output function which maps to n outputs.
   * \copydoc scheme_DAEInput
-  * 
+  *
   */
   Simulator(const Integrator& integrator, const Function& output_fcn, const std::vector<double>& grid);
   Simulator(const Integrator& integrator, const Function& output_fcn, const Matrix<double>& grid);
-  
+
   /// Output function equal to the state
   Simulator(const Integrator& integrator, const std::vector<double>& grid);
   Simulator(const Integrator& integrator, const Matrix<double>& grid);
-  
+
   /// Access functions of the node.
   SimulatorInternal* operator->();
 
@@ -72,7 +72,7 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 };
-  
+
 } // namespace casadi
 
 #endif //SIMULATOR_HPP

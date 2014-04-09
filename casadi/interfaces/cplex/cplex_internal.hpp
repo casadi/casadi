@@ -40,16 +40,16 @@ namespace casadi{
   public:
     /** \brief Default constructor */
     explicit CplexInternal();
-  
+
     /// Clone
     virtual CplexInternal* clone() const;
-  
+
     /// Constructor using sparsity patterns
     explicit CplexInternal(const std::vector<Sparsity>& st);
 
     /// Destructor
     virtual ~CplexInternal();
-  
+
     /// Free Cplex memory
     void freeCplex();
 
@@ -58,14 +58,14 @@ namespace casadi{
 
     // Solve the QP
     virtual void evaluate();
-    
-    // OPTIONS 
+
+    // OPTIONS
     /** Which algorithm to use
      * 0 -> Automatic (default)
      * 1 -> Primal simplex
      * 2 -> Dual simplex
      * 3 -> Network optimizer
-     * 4 -> Barrier 
+     * 4 -> Barrier
      * 5 -> Sifting
      * 6 -> Concurent
      * 7 -> Crossover
@@ -84,7 +84,7 @@ namespace casadi{
 
     /// Nature of problem (always minimization)
     int objsen_;
-  
+
     /// Determines relation >,<,= in the lin. constraints
     std::vector<char> sense_;
 
@@ -96,10 +96,10 @@ namespace casadi{
 
     /// Range of constraints
     std::vector<double> rngval_;
-  
+
     /// Coefficients of matrix H (objective Hessian)
     std::vector<int> qmatcnt_;
-  
+
     /// Storage for basis info of primal variables
     std::vector<int> cstat_;
 

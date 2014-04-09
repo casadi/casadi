@@ -32,11 +32,11 @@ namespace casadi{
 using namespace std;
 
 ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) : bin_name_(bin_name){
-#ifdef WITH_DL 
+#ifdef WITH_DL
 
   // Load the dll
 #ifdef _WIN32
-  handle_ = LoadLibrary(TEXT(bin_name_.c_str()));  
+  handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
   casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
   initPtr init = (initPtr)GetProcAddress(handle_,TEXT("init"));
@@ -47,11 +47,11 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   if(evaluate_==0) throw CasadiException("ExternalFunctionInternal: no \"evaluateWrap\" found");
 
 #else // _WIN32
-  handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);  
+  handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
   casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code: "<< dlerror());
 
   // reset error
-  dlerror(); 
+  dlerror();
 
   // Load symbols
   initPtr init = (initPtr)dlsym(handle_, "init");
@@ -66,11 +66,11 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   int n_in=-1, n_out=-1;
   int flag = init(&n_in, &n_out);
   if(flag) throw CasadiException("ExternalFunctionInternal: \"init\" failed");
-  
+
   // Pass to casadi
   setNumInputs(n_in);
   setNumOutputs(n_out);
-  
+
   // Get the sparsity pattern
   for(int i=0; i<n_in+n_out; ++i){
     // Get sparsity from file
@@ -80,16 +80,16 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 
     // Col offsets
     vector<int> colindv(colind,colind+ncol+1);
-    
+
     // Number of nonzeros
     int nnz = colindv.back();
-    
+
     // Rows
     vector<int> rowv(row,row+nnz);
-    
+
     // Sparsity
     Sparsity sp = Sparsity(nrow,ncol,colindv,rowv);
-    
+
     // Save to inputs/outputs
     if(i<n_in){
       input(i) = Matrix<double>(sp,0);
@@ -97,35 +97,35 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
       output(i-n_in) = Matrix<double>(sp,0);
     }
   }
-    
-#else // WITH_DL 
+
+#else // WITH_DL
   throw CasadiException("WITH_DL  not activated");
-#endif // WITH_DL 
-  
+#endif // WITH_DL
+
 }
-    
+
 ExternalFunctionInternal* ExternalFunctionInternal::clone() const{
   throw CasadiException("Error ExternalFunctionInternal cannot be cloned");
 }
 
 ExternalFunctionInternal::~ExternalFunctionInternal(){
-#ifdef WITH_DL 
+#ifdef WITH_DL
   // close the dll
 #ifdef _WIN32
   if(handle_) FreeLibrary(handle_);
 #else // _WIN32
   if(handle_) dlclose(handle_);
 #endif // _WIN32
-#endif // WITH_DL 
+#endif // WITH_DL
 }
 
 void ExternalFunctionInternal::evaluate(){
-#ifdef WITH_DL 
+#ifdef WITH_DL
   int flag = evaluate_(getPtr(input_array_),getPtr(output_array_));
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");
-#endif // WITH_DL 
+#endif // WITH_DL
 }
-  
+
 void ExternalFunctionInternal::init(){
   // Call the init function of the base class
   FunctionInternal::init();

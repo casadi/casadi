@@ -30,9 +30,9 @@
 using namespace std;
 
 namespace casadi{
-  
+
   ParallelizerInternal::ParallelizerInternal(const std::vector<Function>& funcs) : funcs_(funcs){
-    addOption("parallelization", OT_STRING, "serial","","serial|openmp|mpi"); 
+    addOption("parallelization", OT_STRING, "serial","","serial|openmp|mpi");
   }
 
   ParallelizerInternal::~ParallelizerInternal(){
@@ -57,7 +57,7 @@ namespace casadi{
       mode_ = SERIAL;
     }
 #endif // WITH_OPENMP
-    
+
     // Check if a node is a copy of another
     copy_of_.resize(funcs_.size(),-1);
     map<void*,int> is_copy_of;
@@ -70,22 +70,22 @@ namespace casadi{
         is_copy_of[funcs_[i].get()] = i;
       }
     }
-  
+
     // Initialize the dependend functions
     for(vector<Function>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
       // Initialize
       it->init(false);
-    
+
       // Make sure that the functions are unique if we are using OpenMP
       if(mode_==OPENMP && it!=funcs_.begin())
         it->makeUnique();
-    
+
     }
-  
+
     // Clear the indices
     inind_.clear();   inind_.push_back(0);
     outind_.clear();  outind_.push_back(0);
-  
+
     // Add the inputs and outputs
     for(vector<Function>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
       inind_.push_back(inind_.back()+it->getNumInputs());
@@ -93,7 +93,7 @@ namespace casadi{
     }
     setNumInputs(inind_.back());
     setNumOutputs(outind_.back());
-  
+
     // Copy inputs and output dimensions and structure
     for(int i=0; i<funcs_.size(); ++i){
       for(int j=inind_[i]; j<inind_[i+1]; ++j)
@@ -101,7 +101,7 @@ namespace casadi{
       for(int j=outind_[i]; j<outind_[i+1]; ++j)
         output(j) = funcs_[i].output(j-outind_[i]);
     }
-  
+
     // Call the init function of the base class
     FunctionInternal::init();
   }
@@ -131,10 +131,10 @@ namespace casadi{
         }
         task_allocation[task] = omp_get_thread_num();
         task_starttime[task] = omp_get_wtime();
-      
+
         // Do the actual work
         evaluateTask(task);
-      
+
         task_endtime[task] = omp_get_wtime();
         task_cputime[task] =  task_endtime[task] - task_starttime[task];
         task_order[task] = cnt++;
@@ -154,7 +154,7 @@ namespace casadi{
         stats_["task_starttime"] = task_starttime;
         stats_["task_endtime"] = task_endtime;
       }
-    
+
 #endif //WITH_OPENMP
 #ifndef WITH_OPENMP
       casadi_error("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
@@ -165,18 +165,18 @@ namespace casadi{
   }
 
   void ParallelizerInternal::evaluateTask(int task){
-  
+
     // Get a reference to the function
     Function& fcn = funcs_[task];
-  
+
     // Copy inputs to functions
     for(int j=inind_[task]; j<inind_[task+1]; ++j){
       fcn.input(j-inind_[task]).set(input(j));
     }
-  
+
     // Evaluate
     fcn.evaluate();
-    
+
     // Get the results
     for(int j=outind_[task]; j<outind_[task+1]; ++j){
       fcn.output(j-outind_[task]).get(output(j));
@@ -186,21 +186,21 @@ namespace casadi{
   Sparsity ParallelizerInternal::getJacSparsity(int iind, int oind, bool symmetric){
     // Number of tasks
     int ntask = inind_.size()-1;
-  
+
     // Find out which task corresponds to the iind
     int task;
     for(task=0; task<ntask && iind>=inind_[task+1]; ++task);
-  
+
     // Check if the output index is also in this task
     if(oind>=outind_[task] && oind<outind_[task+1]){
 
       // Get the Jacobian index
       int iind_f = iind-inind_[task];
       int oind_f = oind-outind_[task];
-    
+
       // Get the local sparsity patterm
       return funcs_.at(task).jacSparsity(iind_f,oind_f);
-    
+
     } else {
       // All-zero jacobian
       return Sparsity();
@@ -210,18 +210,18 @@ namespace casadi{
   Function ParallelizerInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
     // Number of tasks
     int ntask = inind_.size()-1;
-  
+
     // Find out which task corresponds to the iind
     int task;
     for(task=0; task<ntask && iind>=inind_[task+1]; ++task);
-  
+
     // Check if the output index is also in this task
     if(oind>=outind_[task] && oind<outind_[task+1]){
-    
+
       // Get the Jacobian index
       int iind_f = iind-inind_[task];
       int oind_f = oind-outind_[task];
-    
+
       // Get the local jacobian
       return funcs_.at(task).jacobian(iind_f,oind_f, compact, symmetric);
     } else {
@@ -260,10 +260,10 @@ namespace casadi{
         bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
         copy(p_v,p_v+nv,f_v);
       }
-    
+
       // Propagate
       fcn.spEvaluate(use_fwd);
-    
+
       // Get output dependence
       for(int j=outind_[task]; j<outind_[task+1]; ++j){
         int nv = output(j).size();
@@ -271,9 +271,9 @@ namespace casadi{
         const bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
         copy(f_v,f_v+nv, p_v);
       }
-  
+
     } else {
-    
+
       // Set output influence
       for(int j=outind_[task]; j<outind_[task+1]; ++j){
         int nv = output(j).size();
@@ -281,10 +281,10 @@ namespace casadi{
         bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
         copy(p_v,p_v+nv,f_v);
       }
-    
+
       // Propagate
       fcn.spEvaluate(use_fwd);
-    
+
       // Get input dependence
       for(int j=inind_[task]; j<inind_[task+1]; ++j){
         int nv = input(j).size();
@@ -305,27 +305,27 @@ namespace casadi{
         der_funcs[i] = funcs_[i].derivative(nfwd,nadj);
       }
     }
-  
+
     // Create a new parallelizer for the derivatives
     Parallelizer par(der_funcs);
-  
+
     // Set options and initialize
     par.setOption(dictionary());
     par.init();
-  
+
     // Create a function call to the parallelizer
     vector<MX> par_arg = par.symbolicInput();
     vector<MX> par_res = par.call(par_arg);
-  
+
     // Get the offsets: copy to allow being used as a counter
     std::vector<int> par_inind = par->inind_;
     std::vector<int> par_outind = par->outind_;
-  
+
     // Arguments and results of the return function
     vector<MX> ret_arg, ret_res;
     ret_arg.reserve(par_arg.size());
     ret_res.reserve(par_res.size());
-  
+
     // Loop over all nondifferentiated inputs/outputs and forward seeds/sensitivities
     for(int dir=-1; dir<nfwd; ++dir){
       for(int i=0; i<funcs_.size(); ++i){
@@ -333,7 +333,7 @@ namespace casadi{
         for(int j=outind_[i]; j<outind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
       }
     }
-  
+
     // Loop over adjoint seeds/sensitivities
     for(int dir=0; dir<nadj; ++dir){
       for(int i=0; i<funcs_.size(); ++i){
@@ -341,7 +341,7 @@ namespace casadi{
         for(int j=inind_[i]; j<inind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
       }
     }
-  
+
     // Assemble the return function
     return MXFunction(ret_arg,ret_res);
   }

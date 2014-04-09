@@ -30,7 +30,7 @@
 
 /// \cond INTERNAL
 namespace casadi{
-    
+
 /** \brief Homotopy NLP solver storage class
   \internal
   @copydoc HomotopyNLPSolver_doc
@@ -48,14 +48,14 @@ namespace casadi{
 
     /// Initialize
     virtual void init();
-    
+
     /// The Homotopy NLP
     Function hnlp_;
-    
+
     int nx_;
     int np_;
     int ng_;
-    
+
   };
 
 } // namespace casadi

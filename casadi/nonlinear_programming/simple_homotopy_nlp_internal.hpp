@@ -29,22 +29,22 @@
 
 /// \cond INTERNAL
 namespace casadi{
-    
+
 class CASADI_NONLINEAR_PROGRAMMING_EXPORT SimpleHomotopyNLPInternal : public HomotopyNLPInternal{
 
 public:
   explicit SimpleHomotopyNLPInternal(const Function& hnlp);
   virtual ~SimpleHomotopyNLPInternal();
   virtual SimpleHomotopyNLPInternal* clone() const{ return new SimpleHomotopyNLPInternal(*this);}
-  
+
   virtual void init();
   virtual void evaluate();
-  
+
   NLPSolver nlpsolver_;
-  
+
   /// Take this many steps to go from tau=0 to tau=1
   int num_steps_;
-  
+
 };
 /// \endcond
 } // namespace casadi

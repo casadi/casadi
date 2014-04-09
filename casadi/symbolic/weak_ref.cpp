@@ -25,15 +25,15 @@
 using namespace std;
 
 namespace casadi{
-  
+
   WeakRef::WeakRef(int dummy){
     casadi_assert(dummy==0);
   }
-    
+
   bool WeakRef::alive() const{
     return !isNull() && (*this)->raw_ != 0;
   }
-    
+
   SharedObject WeakRef::shared(){
     SharedObject ret;
     if(alive()){
@@ -64,9 +64,9 @@ namespace casadi{
 
   WeakRefInternal::WeakRefInternal(SharedObjectNode* raw) : raw_(raw){
   }
-  
+
   WeakRefInternal::~WeakRefInternal(){
   }
-  
+
 } // namespace casadi
 

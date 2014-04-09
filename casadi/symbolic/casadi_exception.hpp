@@ -34,7 +34,7 @@
 namespace casadi{
 
 /** \brief  Casadi exception class
-        \author Joel Andersson 
+        \author Joel Andersson
         \date 2010
         Example for simple exception throwing:
         \code
@@ -54,18 +54,18 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
   //! \brief Default constructor
   CasadiException(){
   }
-    
-  //! \brief Form message string    
+
+  //! \brief Form message string
   explicit CasadiException(const std::string& msg) : msg_(msg){}
 
   //! \brief Destructor
   ~CasadiException() throw(){}
-    
+
   //! \brief Display error
   virtual const char* what() const throw(){
     return msg_.c_str();
   }
-  
+
   //! \brief Append a message
   CasadiException& operator<<(const std::string& msg){
     msg_ += msg;
@@ -91,7 +91,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
 #define casadi_assert_warning(x,msg)
 #define casadi_warning(msg)
 #define casadi_error(msg)
- 
+
 #else // CASADI_NDEBUG
 // Debug mode
 // Convert to string
@@ -107,7 +107,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
     ss_internal_ << msg; \
     std::cout << "CasADi log message: " << ss_internal_.str() << std::endl; \
   }
-  
+
 #define casadi_error(msg) \
  {\
   std::stringstream ss_internal_; \

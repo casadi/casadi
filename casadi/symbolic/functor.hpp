@@ -37,15 +37,15 @@ namespace casadi{
 
   /// Wrapper around callback
   typedef int (*CallbackCPtr)(Function &f, void* user_data);
-  
+
   /** \brief  Functor
-      \author Joris Gillis 
+      \author Joris Gillis
       \date 2013
   */
   class CASADI_SYMBOLIC_EXPORT Functor : public SharedObject {
     //Callback();
-    
-  };    
+
+  };
 
 
   /** \brief Derivative Generator Functor
@@ -54,7 +54,7 @@ namespace casadi{
   *
   * In python, supply a callable, annotated with derivativegenerator decorator
   * \code
-  *  
+  *
   *   @derivativegenerator
   *   def c(f,nadj,nadir):
   *     print f
@@ -71,15 +71,15 @@ namespace casadi{
       DerivativeGenerator(DerivativeGeneratorCPtr ptr);
       /// Call
       virtual Function operator() (Function& fcn, int nfwd, int nadj, void* user_data);
-  }; 
-    
+  };
+
   /** \brief CustomEvaluate
   *
   * In C++, supply a CustomEvaluateCPtr function pointer
   *
   * In python, supply a callable, annotated with pyevaluate decorator
   * \code
-  *  
+  *
   *   @pyevaluate
   *   def c(f,nfdir,nadir):
   *     print f
@@ -99,14 +99,14 @@ namespace casadi{
   };
 
   /** \brief Callback
-  * 
+  *
   * In C++, supply a CallbackCPtr function pointer
   * When the callback function returns a non-zero integer, the host is signalled of a problem.
   * E.g. an NLPSolver may halt iterations if the Callback is something else than 0
   *
   * In python, supply a callable, annotated with pycallback decorator
   * \code
-  *  
+  *
   *   @pycallback
   *   def c(f):
   *     print f

@@ -31,16 +31,16 @@
 
 
     Given matrices A_k and symmetric V_k,  k = 0..K-1
-    
+
     A_k in R^(n x n)
     V_k in R^n
-    
+
     provides all of P_k that satisfy:
 
     P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
     P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
-    
-    
+
+
 
 */
 namespace casadi{
@@ -66,33 +66,33 @@ namespace casadi{
   class DpleInternal;
 
   /**  \brief Base class for Discrete Periodic Lyapunov Equation Solvers
-     
+
      @copydoc DPLE_doc
        \author Joris gillis
       \date 2014
-      
+
   */
   class CASADI_CONTROL_EXPORT DpleSolver : public Function {
   public:
     /// Default constructor
     DpleSolver();
-    
+
     /// Clone
     DpleSolver clone() const;
-  
+
     /// Print solver statistics
     void printStats(std::ostream &stream=std::cout) const;
-  
+
     /// Access functions of the node
     DpleInternal* operator->();
 
     /// Access functions of the node
     const DpleInternal* operator->() const;
- 
+
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
- 
+
+
   };
 
 } // namespace casadi

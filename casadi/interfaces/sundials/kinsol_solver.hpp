@@ -28,8 +28,8 @@
 #include <casadi/interfaces/sundials/casadi_sundials_interface_export.h>
 
 namespace casadi{
-  
-  // Forward declaration of internal class 
+
+  // Forward declaration of internal class
   class KinsolInternal;
 
   /** \brief Kinsol solver class
@@ -40,7 +40,7 @@ namespace casadi{
    * A good initial guess may be needed to avoid errors like "The linear solver's setup function failed in an unrecoverable manner."
    *
    The constraints option expects an integer entry for each variable u:\n
-    
+
    0 then no constraint is imposed on ui. \n
    1 then ui will be constrained to be ui >= 0.0. \n
    −1 then ui will be constrained to be ui <= 0.0. \n
@@ -49,21 +49,21 @@ namespace casadi{
 
    *
    * \see ImplicitFunction for more information
-   * 
+   *
    */
   class CASADI_SUNDIALS_INTERFACE_EXPORT KinsolSolver : public ImplicitFunction{
   public:
 
     /** \brief  Default constructor */
     KinsolSolver();
-  
+
     /** \brief  Create an KINSOL instance
-     *  
+     *
      * \param f Function mapping from (n+1) inputs to 1 output
      *
      */
     explicit KinsolSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
-  
+
     /** \brief  Access functions of the node */
     KinsolInternal* operator->();
 
@@ -72,7 +72,7 @@ namespace casadi{
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
-  
+
     /// Static creator function
 #ifdef SWIG
     %callback("%s_cb");

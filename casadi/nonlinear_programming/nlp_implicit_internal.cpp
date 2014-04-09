@@ -27,13 +27,13 @@
 
 using namespace std;
 namespace casadi {
-  
+
   NLPImplicitInternal::NLPImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "The NLPSolver used to solve the implicit system.");
     addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
   }
 
-  NLPImplicitInternal::~NLPImplicitInternal(){ 
+  NLPImplicitInternal::~NLPImplicitInternal(){
   }
 
   void NLPImplicitInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
@@ -46,7 +46,7 @@ namespace casadi {
     // Equality nonlinear constraints
     nlp_solver_.input(NLP_SOLVER_LBG).set(0.);
     nlp_solver_.input(NLP_SOLVER_UBG).set(0.);
-    
+
     // Simple constraints
     vector<double>& lbx = nlp_solver_.input(NLP_SOLVER_LBX).data();
     vector<double>& ubx = nlp_solver_.input(NLP_SOLVER_UBX).data();
@@ -54,10 +54,10 @@ namespace casadi {
       lbx[k] = u_c_[k] <= 0 ? -std::numeric_limits<double>::infinity() : 0;
       ubx[k] = u_c_[k] >= 0 ?  std::numeric_limits<double>::infinity() : 0;
     }
-    
+
     // Pass initial guess
     nlp_solver_.input(NLP_SOLVER_X0).set(output(iout_));
-  
+
     // Add auxiliary inputs
     vector<double>::iterator nlp_p = nlp_solver_.input(NLP_SOLVER_P).begin();
     for(int i=0; i<getNumInputs(); ++i){
@@ -66,7 +66,7 @@ namespace casadi {
         nlp_p += input(i).size();
       }
     }
-  
+
     // Solve the NLP
     nlp_solver_.evaluate();
     stats_["nlp_solver_stats"] = nlp_solver_.getStats();
@@ -93,16 +93,16 @@ namespace casadi {
 
     // Free variable in the NLP
     MX u = MX::sym("u",input(iin_).sparsity());
-    
+
     // So that we can pass it on to createParent
     std::vector<Sparsity> sps;
     for(int i=0; i<getNumInputs(); ++i)
       if(i!=iin_) sps.push_back(input(i).sparsity());
-      
+
     // u groups all parameters in an MX
     std::vector< MX > inputs;
     MX p = createParent(sps,inputs);
-    
+
     // Dummy NLP objective
     MX nlp_f = 0;
 
@@ -115,14 +115,14 @@ namespace casadi {
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
     MXFunction nlp(nlpIn("x",u,"p",p),nlpOut("f",nlp_f,"g",nlp_g));
-  
+
     // Create an nlpsolver instance
     NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
     nlp_solver_ = nlp_solvercreator(nlp);
     if(hasSetOption("nlp_solver_options")){
       nlp_solver_.setOption(getOption("nlp_solver_options"));
     }
-  
+
     // Initialize the NLP solver
     nlp_solver_.init();
   }

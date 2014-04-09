@@ -26,93 +26,93 @@
 #include "io_interface.hpp"
 
 namespace casadi{
-  
+
   /** Forward declaration of internal class */
   class FunctionInternal;
-  
+
   /** \brief General function
-      
+
       A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
       Number of inputs:  nin    getNumInputs()\n
       Number of outputs: nout   getNumOutputs()\n
-  
+
       We can view this function as a being composed of a (nin, nout) grid of single-input, single-output primitive functions.\n
-      Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$, 
+      Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$,
       in which n,m,p,q can take different values for every (i,j) pair.\n
-  
+
       When passing input, you specify which partition i is active.     You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
       When requesting output, you specify which partition j is active. You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
-  
+
       To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
-  
+
       Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
-  
+
       Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
       Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
-  
+
       Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
       Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
-  
+
       We have the following relationships for function mapping from a row vector to a row vector:
-  
+
       \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
       \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
-  
-      Some quantities is these formulas must be transposed: \n 
+
+      Some quantities is these formulas must be transposed: \n
       input  col: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
       output col: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
-    
+
       NOTE: Function's are allowed to modify their input arguments when evaluating: implicitFunction, IDAS solver
       Futher releases may disallow this.
-    
+
       \internal
       \section Notes for developers
-  
+
       Each function consists of 4 files:\n
       1. public class header file: imported in python\n
       2. public class implementation\n
       3. internal class header file: should only be used by derived classes\n
       4. internal class implementation\n
-  
+
       python and c++ should be 1-to-1\n
       There should be no extra features in 1.\n
       All the functionality should exist in 1.\n
       If it means that c++ will be more "pythonic", so be it.
       \endinternal
-      
-      \author Joel Andersson 
+
+      \author Joel Andersson
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT Function : public OptionsFunctionality, public IOInterface<Function>{
-    
+
   public:
-  
+
     /// \cond CLUTTER
     /** \brief  default constructor */
-    Function(); 
+    Function();
 
     /** \brief  Destructor */
     ~Function();
     /// \endcond
-    
+
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node */
     static Function create(FunctionInternal* node);
 #endif // SWIG
     /// \endcond
-    
+
     /// \cond INTERNAL
     //@{
     /** \brief Access input/output scheme */
     const casadi::IOScheme& inputScheme() const;
     const casadi::IOScheme& outputScheme() const;
-    
+
     casadi::IOScheme& inputScheme();
     casadi::IOScheme& outputScheme();
     //@}
     /// \endcond
-    
+
     /// \cond INTERNAL
     //@{
     /// Input/output structures of the function */
@@ -122,7 +122,7 @@ namespace casadi{
     IOSchemeVector<DMatrix>& output_struct();
     //@}
     /// \endcond
-    
+
     /** \brief  Get total number of nonzeros in all of the matrix-valued inputs */
     int getNumInputNonzeros() const;
 
@@ -134,7 +134,7 @@ namespace casadi{
 
     /** \brief  Get total number of elements in all of the matrix-valued outputs */
     int getNumOutputElements() const;
-  
+
     /** \brief Set input scheme */
     void setInputScheme(const casadi::IOScheme &scheme);
 
@@ -146,13 +146,13 @@ namespace casadi{
 
     /** \brief Get output scheme */
     casadi::IOScheme getOutputScheme() const;
-    
+
     /** \brief  Evaluate */
     void evaluate();
-  
+
     /// the same as evaluate()
     void solve();
-    
+
     //@{
     /** \brief Generate a Jacobian function of output oind with respect to input iind
      * \param iind The index of the input
@@ -162,9 +162,9 @@ namespace casadi{
      * If compact is set to true, only the nonzeros of the input and output expressions are considered.
      * If symmetric is set to true, the Jacobian being calculated is known to be symmetric (usually a Hessian),
      * which can be exploited by the algorithm.
-     * 
+     *
      * The generated Jacobian has one more output than the calling function corresponding to the Jacobian and the same number of inputs.
-     * 
+     *
      */
     Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     Function jacobian(const std::string& iind,  int oind=0, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iind),oind,compact,symmetric); }
@@ -175,7 +175,7 @@ namespace casadi{
     /** Set the Jacobian function of output oind with respect to input iind
      NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
     void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);
-    
+
     //@{
     /** \brief Generate a gradient function of output oind with respect to input iind
      * \param iind The index of the input
@@ -183,7 +183,7 @@ namespace casadi{
      *
      * The default behavior of this class is defined by the derived class.
      * Note that the output must be scalar. In other cases, use the Jacobian instead.
-     * 
+     *
      */
     Function gradient(int iind=0, int oind=0);
     Function gradient(const std::string& iind, int oind=0) { return gradient(inputSchemeEntry(iind),oind); }
@@ -198,22 +198,22 @@ namespace casadi{
      *
      * The default behavior of this class is defined by the derived class.
      * Note that the input must be scalar. In other cases, use the Jacobian instead.
-     * 
+     *
      */
     Function tangent(int iind=0, int oind=0);
     Function tangent(const std::string& iind, int oind=0) { return tangent(inputSchemeEntry(iind),oind); }
     Function tangent(int iind, const std::string& oind) { return tangent(iind,outputSchemeEntry(oind)); }
     Function tangent(const std::string& iind, const std::string& oind) { return tangent(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
     //@}
-    
+
     //@{
-    /** \brief Generate a Hessian function of output oind with respect to input iind 
+    /** \brief Generate a Hessian function of output oind with respect to input iind
      * \param iind The index of the input
      * \param oind The index of the output
      *
      * The generated Hessian has two more outputs than the calling function corresponding to the Hessian
      * and the gradients.
-     * 
+     *
      */
     Function hessian(int iind=0, int oind=0);
     Function hessian(const std::string& iind, int oind=0) { return hessian(inputSchemeEntry(iind),oind); }
@@ -258,7 +258,7 @@ namespace casadi{
     std::vector<MX> operator()(const MX& arg0, const MX& arg1){ return call(toVector(arg0,arg1));}
     //@}
 #endif // SWIG
-  
+
     /// \cond INTERNAL
     //@{
    /** \brief Evaluate the function symbolically or numerically with directional derivatives
@@ -268,28 +268,28 @@ namespace casadi{
      * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
      * the length of the vector being the number of adjoint directions.
      */
-    void callDerivative(const DMatrixVector& arg, DMatrixVector& SWIG_OUTPUT(res), 
-                        const DMatrixVectorVector& fseed, DMatrixVectorVector& SWIG_OUTPUT(fsens), 
+    void callDerivative(const DMatrixVector& arg, DMatrixVector& SWIG_OUTPUT(res),
+                        const DMatrixVectorVector& fseed, DMatrixVectorVector& SWIG_OUTPUT(fsens),
                         const DMatrixVectorVector& aseed, DMatrixVectorVector& SWIG_OUTPUT(asens),
                         bool always_inline=false, bool never_inline=false);
 
-    void callDerivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res), 
-                        const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens), 
+    void callDerivative(const SXVector& arg, SXVector& SWIG_OUTPUT(res),
+                        const SXVectorVector& fseed, SXVectorVector& SWIG_OUTPUT(fsens),
                         const SXVectorVector& aseed, SXVectorVector& SWIG_OUTPUT(asens),
                         bool always_inline=false, bool never_inline=false);
 
-    void callDerivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res), 
-                        const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens), 
+    void callDerivative(const MXVector& arg, MXVector& SWIG_OUTPUT(res),
+                        const MXVectorVector& fseed, MXVectorVector& SWIG_OUTPUT(fsens),
                         const MXVectorVector& aseed, MXVectorVector& SWIG_OUTPUT(asens),
                         bool always_inline=false, bool never_inline=false);
     //@}
     /// \endcond
-      
+
     /** \brief  Evaluate symbolically in parallel (matrix graph)
         paropt: Set of options to be passed to the Parallelizer
     */
     std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
-  
+
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
      *
      *         Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
@@ -319,7 +319,7 @@ namespace casadi{
     Sparsity& jacSparsity(int iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
     Sparsity& jacSparsity(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
     //@}
-    
+
     //@{
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
@@ -327,7 +327,7 @@ namespace casadi{
     void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
     void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
     //@}
-    
+
     /** \brief Export / Generate C code for the function */
     void generateCode(const std::string& filename);
 
@@ -336,7 +336,7 @@ namespace casadi{
 
     /** \brief Generate C code for the function */
     void generateCode(std::ostream& filename);
-    
+
     /// \cond INTERNAL
     /** \brief  Access functions of the node */
     FunctionInternal* operator->();
@@ -347,7 +347,7 @@ namespace casadi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
     /// \endcond
-    
+
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary& getStats() const;
 
@@ -355,11 +355,11 @@ namespace casadi{
     GenericType getStat(const std::string& name) const;
 
     /** \brief  Get a vector of symbolic variables with the same dimensions as the inputs
-     * 
+     *
      * There is no guarantee that consecutive calls return identical objects
      */
     std::vector<MX> symbolicInput() const;
-  
+
     /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
      *
      * There is no guarantee that consecutive calls return identical objects
@@ -375,15 +375,15 @@ namespace casadi{
 
     /** \brief Propagate the sparsity pattern through a set of directional derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
     void spEvaluate(bool fwd);
-    
+
     /// \endcond
 
     /** \brief Add modules to be monitored */
     void addMonitor(const std::string& mon);
-  
+
     /** \brief Remove modules to be monitored */
     void removeMonitor(const std::string& mon);
-    
+
     /// \cond INTERNAL
     /** \brief Check if the numerical values of the supplied bounds make sense */
     void checkInputs() const;

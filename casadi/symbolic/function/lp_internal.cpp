@@ -33,12 +33,12 @@ namespace casadi{
 // Constructor
 LPSolverInternal::LPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
   casadi_assert_message(st_.size()==LP_STRUCT_NUM,"Problem structure mismatch");
-  
+
   const Sparsity& A = st_[LP_STRUCT_A];
- 
+
   n_ = A.size2();
   nc_ = A.size1();
-  
+
 
   // Input arguments
   setNumInputs(LP_SOLVER_NUM_IN);
@@ -48,18 +48,18 @@ LPSolverInternal::LPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
   input(LP_SOLVER_UBA) = DMatrix::inf(nc_);
   input(LP_SOLVER_LBX) = -DMatrix::inf(n_);
   input(LP_SOLVER_UBX) = DMatrix::inf(n_);
-  
+
   // Output arguments
   setNumOutputs(LP_SOLVER_NUM_OUT);
   output(LP_SOLVER_X) = DMatrix::zeros(n_);
   output(LP_SOLVER_COST) = 0.0;
   output(LP_SOLVER_LAM_X) = DMatrix::zeros(n_);
   output(LP_SOLVER_LAM_A) = DMatrix::zeros(nc_);
-  
+
   input_.scheme = SCHEME_LPSolverInput;
   output_.scheme = SCHEME_LPSolverOutput;
 }
-    
+
 void LPSolverInternal::init() {
   // Call the init method of the base class
   FunctionInternal::init();
@@ -67,11 +67,11 @@ void LPSolverInternal::init() {
 
 LPSolverInternal::~LPSolverInternal(){
 }
- 
+
 void LPSolverInternal::evaluate(){
   throw CasadiException("LPSolverInternal::evaluate: Not implemented");
 }
- 
+
 void LPSolverInternal::solve(){
   throw CasadiException("LPSolverInternal::solve: Not implemented");
 }
@@ -84,9 +84,9 @@ void LPSolverInternal::checkInputs() const {
     casadi_assert_message(input(LP_SOLVER_LBA).at(i)<=input(LP_SOLVER_UBA).at(i),"LBA[i] <= UBA[i] was violated for i=" << i << ". Got LBA[i] " << input(LP_SOLVER_LBA).at(i) << " and UBA[i] " << input(LP_SOLVER_UBA).at(i));
   }
 }
- 
+
 } // namespace casadi
 
-  
+
 
 

@@ -28,7 +28,7 @@ namespace casadi{
 
   SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver(){
   }
-  
+
   SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver(const Function& nlp){
     assignNode(new SimpleHomotopyNLPInternal(nlp));
   }
@@ -40,7 +40,7 @@ namespace casadi{
   const SimpleHomotopyNLPInternal* SimpleHomotopyNLPSolver::operator->() const{
     return static_cast<const SimpleHomotopyNLPInternal*>(HomotopyNLPSolver::operator->());
   }
-    
+
   bool SimpleHomotopyNLPSolver::checkNode() const{
     return dynamic_cast<const SimpleHomotopyNLPInternal*>(get())!=0;
   }

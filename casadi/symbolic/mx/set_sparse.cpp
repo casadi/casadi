@@ -51,7 +51,7 @@ namespace casadi{
     }
   }
 
-  template<typename T, typename MatV, typename MatVV> 
+  template<typename T, typename MatV, typename MatVV>
   void SetSparse::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
     output[0]->set(*input[0]);
   }
@@ -69,7 +69,7 @@ namespace casadi{
     if(!output_given){
       *output[0] = input[0]->setSparse(sparsity());
     }
-  
+
     // Propagate forward seeds
     int nfwd = fwdSens.size();
     for(int d=0; d<nfwd; ++d){

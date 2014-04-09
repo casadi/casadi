@@ -43,13 +43,13 @@ namespace casadi{
   enum Operation{
     // Simple assignment
     OP_ASSIGN,
-  
+
     // Standard unary and binary functions
     OP_ADD,  OP_SUB,  OP_MUL,  OP_DIV,
     OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
     OP_SQRT,  OP_SQ,  OP_TWICE,
-    OP_SIN,  OP_COS,  OP_TAN,  
-    OP_ASIN,  OP_ACOS,  OP_ATAN,  
+    OP_SIN,  OP_COS,  OP_TAN,
+    OP_ASIN,  OP_ACOS,  OP_ATAN,
     OP_LT, OP_LE, OP_EQ, OP_NE, OP_NOT, OP_AND, OP_OR,
     OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, OP_COPYSIGN, OP_IF_ELSE_ZERO,
     OP_ERF,  OP_FMIN,  OP_FMAX,
@@ -57,25 +57,25 @@ namespace casadi{
     OP_SINH,  OP_COSH,  OP_TANH,
     OP_ASINH, OP_ACOSH, OP_ATANH,
     OP_ATAN2,
-  
+
     // Double constant
     OP_CONST,
-  
+
     // Function input and output
     OP_INPUT, OP_OUTPUT,
-  
+
     // Free parameter
     OP_PARAMETER,
-  
+
     // Embedded function call
     OP_CALL,
-  
+
     // Matrix multiplication
     OP_MATMUL,
-  
+
     // Solve linear system of equations
     OP_SOLVE,
-  
+
     // Matrix transpose
     OP_TRANSPOSE,
 
@@ -102,13 +102,13 @@ namespace casadi{
 
     // Reshape an expression
     OP_RESHAPE,
-  
+
     // Submatrix reference
     OP_SUBREF,
-  
+
     // Submatrix assignment
     OP_SUBASSIGN,
-  
+
     // Nonzero reference
     OP_GETNONZEROS,
 
@@ -120,13 +120,13 @@ namespace casadi{
 
     // Set sparse
     OP_SET_SPARSE,
-    
+
     // Assertion
     OP_ASSERTION,
-  
+
     // Norms
     OP_NORM2, OP_NORM1, OP_NORMINF, OP_NORMF,
-  
+
     OP_ERFINV,
     OP_PRINTME,
     OP_LIFT,
@@ -163,7 +163,7 @@ namespace casadi{
 
   template<class T> T sin(const T &x){return x.sin();}
   using std::sin;
-  
+
   template<class T> T cos(const T &x){return x.cos();}
   using std::cos;
 
@@ -200,17 +200,17 @@ namespace casadi{
 
   template<class T> T log10(const T &x){return x.log10();}
   using std::log10;
-  
+
   inline double atanh(double x) throw(){
     if (x==-1) return -std::numeric_limits<double>::infinity();
     if (x==1) return std::numeric_limits<double>::infinity();
     return 0.5*log((1+x)/(1-x));
-  } 
+  }
 
   inline double asinh(double x) throw(){
     return log(x + sqrt(1+x*x));
-  } 
-  
+  }
+
   inline double acosh(double x) throw(){
     return log(x + sqrt(1+x)*sqrt(x-1));
   }
@@ -222,13 +222,13 @@ namespace casadi{
 
   template<class T> T abs(const T &x){return x.fabs();}
   using std::abs;
-    
+
   template<class T> T fabs(const T &x){return x.fabs();}
   using std::fabs;
-  
+
   template<class T> T floor(const T &x){return x.floor();}
   using std::floor;
-  
+
   template<class T> T ceil(const T &x){return x.ceil();}
   using std::ceil;
 
@@ -255,7 +255,7 @@ namespace casadi{
                                                                                                                       t*(-0.82215223+t*0.17087277))))))))));
   }
 #endif // HAS ERF
-  
+
   template<class T> T fmin(const T &x, const T &n){ return x.fmin(n);}
   template<class T> T fmin(const T &x,   double n){ return x.fmin(n);}
   template<class T> T fmin(double   x, const T &n){ return T(x).fmin(n);}
@@ -274,29 +274,29 @@ namespace casadi{
 
   //@{
   /** \brief  CasADi additions */
-  template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}  
+  template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}
   template<class T> T printme(const T &x, const T &y){ return x.printme(y);}
-  inline double printme(double x, double y){ 
+  inline double printme(double x, double y){
     std::cout << "|> " << y << " : " << x << std::endl;
     return x;
   }
-  
+
   /// Sign function, note that sign(nan) == nan
   template<class T> T sign(const T &x){return x.sign();}
 
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}
-  
+
   /// __copysign__ function
   template<class T> T copysign(const T &x, const T &y) {return x.__copysign__(y);}
-  
+
   #ifdef HAS_COPYSIGN
   using std::copysign;
   #else
   /// copysign function
   inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
   #endif //HAS_COPYSIGN
-  
+
   /// Conditional assignment
   template<class T> T if_else_zero(const T &x, const T &y){return x.if_else_zero(y);}
 
@@ -326,7 +326,7 @@ namespace casadi{
         double z = sqrt(-log((1.0-x)/2.0));
         y = (((1.641345311*z+3.429567803)*z-1.624906493)*z-1.970840454)/((1.637067800*z+3.543889200)*z+1.0);
       }
-      
+
       //polish x to full accuracy
       y = y - (erf(y) - x) / (2.0/sqrt(M_PI) * exp(-y*y));
       y = y - (erf(y) - x) / (2.0/sqrt(M_PI) * exp(-y*y));
@@ -343,17 +343,17 @@ namespace casadi{
   T twice(const T& x){
     return x+x;
   }
-  
+
   template<typename T>
   T sq(const T& x){
     return x*x;
   }
-  
+
   template<int I>
   struct UnaryOperation{
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, T& f);
-    
+
     /// Partial derivatives
     template<typename T> static inline void der(const T& x, const T& f, T* d);
   };
@@ -362,7 +362,7 @@ namespace casadi{
   struct BinaryOperation{
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ UnaryOperation<I>::fcn(x,f);}
-  
+
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ UnaryOperation<I>::der(x,f,d); d[1]=0; }
   };
@@ -370,7 +370,7 @@ namespace casadi{
   template<int I>
   struct BinaryOperationE{
     /// Function evaluation
-    template<typename T> static inline T fcn(const T& x, const T& y){ 
+    template<typename T> static inline T fcn(const T& x, const T& y){
       T ret;
       BinaryOperation<I>::fcn(x,y,ret);
       return ret;
@@ -385,13 +385,13 @@ namespace casadi{
 
       /// First save to temp since f might have the same address as x or y, in which case it will be incorrect in the second call
       T tmp;
-    
+
       /// Evaluate the function
       BinaryOperation<I>::fcn(x,y,tmp);
-    
+
       /// Evaluate the partial derivatives
       BinaryOperation<I>::der(x,y,tmp,d);
-    
+
       /// Now save f
       f = tmp;
     }
@@ -401,12 +401,12 @@ namespace casadi{
   template<int I>
   struct BinaryOperationSS{
     /// Function evaluation
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f, int n){ 
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f, int n){
       BinaryOperation<I>::fcn(x,y,f);
     }
-    
+
     /// Partial derivatives - binary function
-    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d, int n){ 
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d, int n){
       BinaryOperation<I>::der(x,y,f,d);
     }
   };
@@ -416,14 +416,14 @@ namespace casadi{
   template<int I>
   struct BinaryOperationVV{
     /// Function evaluation
-    template<typename T> static inline void fcn(const T* x, const T* y, T* f, int n){ 
+    template<typename T> static inline void fcn(const T* x, const T* y, T* f, int n){
       for(int i=0; i<n; ++i){
         BinaryOperation<I>::fcn(*x++,*y++,*f++);
       }
     }
-  
+
     /// Partial derivatives - binary function
-    template<typename T> static inline void der(const T* x, const T* y, const T* f, T* d, int n){ 
+    template<typename T> static inline void der(const T* x, const T* y, const T* f, T* d, int n){
       for(int i=0; i<n; ++i, d+=2){
         BinaryOperation<I>::der(*x++,*y++,*f++,d);
       }
@@ -434,14 +434,14 @@ namespace casadi{
   template<int I>
   struct BinaryOperationVS{
     /// Function evaluation
-    template<typename T> static inline void fcn(const T* x, const T& y, T* f, int n){ 
+    template<typename T> static inline void fcn(const T* x, const T& y, T* f, int n){
       for(int i=0; i<n; ++i){
         BinaryOperation<I>::fcn(*x++,y,*f++);
       }
     }
-  
+
     /// Partial derivatives - binary function
-    template<typename T> static inline void der(const T* x, const T& y, const T* f, T* d, int n){ 
+    template<typename T> static inline void der(const T* x, const T& y, const T* f, T* d, int n){
       for(int i=0; i<n; ++i, d+=2){
         BinaryOperation<I>::der(*x++,y,*f++,d);
       }
@@ -452,14 +452,14 @@ namespace casadi{
   template<int I>
   struct BinaryOperationSV{
     /// Function evaluation
-    template<typename T> static inline void fcn(const T& x, const T* y, T* f, int n){ 
+    template<typename T> static inline void fcn(const T& x, const T* y, T* f, int n){
       for(int i=0; i<n; ++i){
         BinaryOperation<I>::fcn(x,*y++,*f++);
       }
     }
-  
+
     /// Partial derivatives - binary function
-    template<typename T> static inline void der(const T& x, const T* y, const T* f, T* d, int n){ 
+    template<typename T> static inline void der(const T& x, const T* y, const T* f, T* d, int n){
       for(int i=0; i<n; ++i, d+=2){
         BinaryOperation<I>::der(x,*y++,*f++,d);
       }
@@ -821,7 +821,7 @@ namespace casadi{
     template<typename T> static inline void fcn(const T& x, T& f){ f = sign(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=0;}
   };
-  
+
   /// Copysign
   template<>
   struct BinaryOperation<OP_COPYSIGN>{

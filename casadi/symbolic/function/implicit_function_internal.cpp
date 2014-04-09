@@ -57,7 +57,7 @@ namespace casadi{
     // Which input/output correspond to the root-finding problem?
     iin_ = getOption("implicit_input");
     iout_ = getOption("implicit_output");
-  
+
     // Get the number of equations and check consistency
     casadi_assert_message(iin_>=0 && iin_<f_.getNumInputs() && f_.getNumInputs()>0,"Implicit input not in range");
     casadi_assert_message(iout_>=0 && iout_<f_.getNumOutputs() && f_.getNumOutputs()>0,"Implicit output not in range");
@@ -71,7 +71,7 @@ namespace casadi{
     for(int i=0; i<getNumInputs(); ++i){
       input(i) = f_.input(i);
     }
-  
+
     // Allocate output
     setNumOutputs(f_.getNumOutputs());
     for(int i=0; i<getNumOutputs(); ++i){
@@ -84,28 +84,28 @@ namespace casadi{
 
     // Call the base class initializer
     FunctionInternal::init();
-  
+
     // Generate Jacobian if not provided
     if(jac_.isNull()) jac_ = f_.jacobian(iin_,iout_);
     jac_.init(false);
-  
+
     // Check for structural singularity in the Jacobian
     casadi_assert_message(!jac_.output().sparsity().isSingular(),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
-  
+
     // Get the linear solver creator function
     if(linsol_.isNull()){
       if(hasSetOption("linear_solver")){
         linearSolverCreator linear_solver_creator = getOption("linear_solver");
-        
+
         // Allocate an NLP solver
         linsol_ = linear_solver_creator(jac_.output().sparsity(),1);
-        
+
         // Pass options
         if(hasSetOption("linear_solver_options")){
           const Dictionary& linear_solver_options = getOption("linear_solver_options");
           linsol_.setOption(linear_solver_options);
         }
-        
+
         // Initialize
         linsol_.init();
       }
@@ -114,13 +114,13 @@ namespace casadi{
       linsol_.init(false);
       casadi_assert(linsol_.input().sparsity()==jac_.output().sparsity());
     }
-    
+
     // No factorization yet;
     fact_up_to_date_ = false;
-    
+
     // Constraints
     if (hasSetOption("constraints")) u_c_ = getOption("constraints");
-    
+
     casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),"Constraint vector if supplied, must be of length n, but got " << u_c_.size() << " and n = " << n_);
   }
 
@@ -165,7 +165,7 @@ namespace casadi{
     v.reserve(getNumInputs()*(1+nfwd) + nadj);
     v.insert(v.end(),argv.begin(),argv.end());
     v[iin_] = z;
-    
+
     // Get an expression for the Jacobian
     MX J = jac_.call(v).front();
 
@@ -205,7 +205,7 @@ namespace casadi{
       col_offset.resize(1);
       rhs.clear();
     }
-  
+
     // Propagate through the implicit function
     v = f_der.call(v);
     vector<MX>::const_iterator v_it = v.begin();
@@ -220,7 +220,7 @@ namespace casadi{
           if(i==iout_){
             // Collect the arguments
             rhs.push_back(*v_it++);
-            col_offset.push_back(col_offset.back()+1);        
+            col_offset.push_back(col_offset.back()+1);
           } else {
             // Auxiliary output
             if(fsens[d][i]!=0){
@@ -229,7 +229,7 @@ namespace casadi{
           }
         }
       }
-        
+
       // Solve for all the forward derivatives at once
       rhs = horzsplit(J->getSolve(horzcat(rhs),false,linsol_),col_offset);
       for(int d=0; d<nfwd; ++d){
@@ -237,7 +237,7 @@ namespace casadi{
           *fsens[d][iout_] = -rhs[d];
         }
       }
-      
+
       col_offset.resize(1);
       rhs.clear();
     }
@@ -268,11 +268,11 @@ namespace casadi{
 
       // Propagate dependencies through the function
       f_.spEvaluate(true);
-      
+
       // "Solve" in order to propagate to z
       output(iout_).setZeroBV();
       linsol_.spSolve(output(iout_),f_.output(iout_),false);
-      
+
       // Propagate to auxiliary outputs
       if(getNumOutputs()>1){
         f_.output(iout_).setBV(output(iout_));
@@ -283,7 +283,7 @@ namespace casadi{
       }
 
     } else {
-      
+
       // Propagate dependencies from auxiliary outputs
       if(getNumOutputs()>1){
         f_.output(iout_).setZeroBV();
@@ -299,14 +299,14 @@ namespace casadi{
           input(i).setZeroBV();
         }
       }
-      
+
       // Add dependency on implicitly defined variable
-      input(iin_).borBV(output(iout_));      
+      input(iin_).borBV(output(iout_));
 
       // "Solve" in order to get seed
       f_.output(iout_).setZeroBV();
       linsol_.spSolve(f_.output(iout_),input(iin_),true);
-      
+
       // Propagate dependencies through the function
       f_.spEvaluate(false);
 
@@ -314,15 +314,15 @@ namespace casadi{
       for(int i=0; i<getNumInputs(); ++i){
         if(i!=iin_) input(i).borBV(f_.input(i));
       }
-      
+
       // No dependency on the initial guess
       input(iin_).setZeroBV();
     }
   }
 
- 
+
 } // namespace casadi
 
-  
+
 
 

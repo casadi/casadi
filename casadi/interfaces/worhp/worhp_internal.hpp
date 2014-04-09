@@ -59,16 +59,16 @@ namespace casadi{
 
     // (Re)initialize
     virtual void init();
-    
+
     // Solve the NLP
     virtual void evaluate();
 
-    
+
     virtual void setQPOptions();
 
     /// Read options from worhp parameter xml
     void setOptionsFromFile(const std::string & file);
-  
+
     /// Exact Hessian?
     bool exact_hessian_;
 
@@ -76,7 +76,7 @@ namespace casadi{
     Workspace worhp_w_;
     Params    worhp_p_;
     Control   worhp_c_;
-  
+
     std::map<int,std::string> status_;
     std::map<std::string,opt_type> ops_;
 
@@ -86,7 +86,7 @@ namespace casadi{
     bool eval_g(const double* x, double* g);
     bool eval_jac_g(const double* x, double* values);
     bool eval_h(const double* x, double obj_factor, const double* lambda, double* values);
-  
+
     // Accummulated time since last reset:
     double t_eval_f_; // time spent in eval_f
     double t_eval_grad_f_; // time spent in eval_grad_f
@@ -96,16 +96,16 @@ namespace casadi{
     double t_callback_fun_;  // time spent in callback function
     double t_callback_prepare_; // time spent in callback preparation
     double t_mainloop_; // time spent in the main loop of the solver
-  
+
     // Accummulated counts since last reset:
     int n_eval_f_; // number of calls to eval_f
     int n_eval_grad_f_; // number of calls to eval_grad_f
     int n_eval_g_; // number of calls to eval_g
     int n_eval_jac_g_; // number of calls to eval_jac_g
     int n_eval_h_; // number of calls to eval_h
-    
+
     std::string formatStatus(int status) const;
-  
+
     /// Pass the supplied options to Worhp
     void passOptions();
 
@@ -114,7 +114,7 @@ namespace casadi{
 
     // Error status map
     static std::map<int,std::string> flagmap;
-  
+
   };
 
 } // namespace casadi

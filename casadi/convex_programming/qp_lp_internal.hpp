@@ -32,7 +32,7 @@
 namespace casadi{
 
   /** \brief Internal class for QPLPInternal
-   * 
+   *
       @copydoc LPSolver_doc
    * */
 class CASADI_CONVEX_PROGRAMMING_EXPORT QPLPInternal : public LPSolverInternal {
@@ -41,7 +41,7 @@ public:
 
   /** \brief  Clone */
   virtual QPLPInternal* clone() const;
-  
+
   /** \brief  Create a new Solver */
   explicit QPLPInternal(const std::vector<Sparsity> &st);
 
@@ -50,9 +50,9 @@ public:
 
   /** \brief  Initialize */
   virtual void init();
-  
+
   virtual void evaluate();
-  
+
   protected:
     QPSolver qpsolver_;
 

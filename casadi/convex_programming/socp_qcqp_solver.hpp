@@ -28,9 +28,9 @@
 #include <casadi/convex_programming/casadi_convex_programming_export.h>
 
 namespace casadi {
-  
-  
-// Forward declaration of internal class 
+
+
+// Forward declaration of internal class
 class SOCPQCQPInternal;
 
   /** \brief SOCP QCQP Solver for quadratic programming
@@ -45,7 +45,7 @@ class SOCPQCQPInternal;
    * This implementation makes use of the epigraph reformulation:
    *   min f(x)
    *    x
-   * 
+   *
    *   min  t
    *    x,t  f(x) <= t
    *
@@ -60,7 +60,7 @@ class SOCPQCQPInternal;
    *    and e==0 for all other qc.
 
    @copydoc QCQPSolver_doc
-      
+
    \author Joris Gillis
    \date 2013
   */
@@ -69,21 +69,21 @@ public:
 
   /** \brief  Default constructor */
   SOCPQCQPSolver();
-  
-  
+
+
   /** \brief Constructor
   *  \param st Problem structure
   *  \copydoc scheme_QCQPStruct
   */
   explicit SOCPQCQPSolver(const QCQPStructure & st);
-  
+
   /** \brief  Access functions of the node */
   SOCPQCQPInternal* operator->();
   const SOCPQCQPInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-  
+
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");
@@ -92,7 +92,7 @@ public:
   #ifdef SWIG
   %nocallback;
   #endif
-  
+
   /// Access underlying SOCP solver
   SOCPSolver & getSolver();
 

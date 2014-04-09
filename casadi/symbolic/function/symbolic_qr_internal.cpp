@@ -24,9 +24,9 @@
 #include "../sx/sx_tools.hpp"
 #include "sx_function.hpp"
 
-#ifdef WITH_DL 
+#ifdef WITH_DL
 #include <cstdlib>
-#endif // WITH_DL 
+#endif // WITH_DL
 
 using namespace std;
 namespace casadi{
@@ -38,7 +38,7 @@ namespace casadi{
 
   SymbolicQRInternal::~SymbolicQRInternal(){
   }
-  
+
   void SymbolicQRInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
     LinearSolverInternal::deepCopyMembers(already_copied);
     fact_fcn_ = deepcopy(fact_fcn_,already_copied);
@@ -56,12 +56,12 @@ namespace casadi{
 
     // Make sure that command processor is available
     if(codegen){
-#ifdef WITH_DL 
+#ifdef WITH_DL
       int flag = system(static_cast<const char*>(0));
       casadi_assert_message(flag!=0, "No command procesor available");
-#else // WITH_DL 
+#else // WITH_DL
       casadi_error("Codegen requires CasADi to be compiled with option \"WITH_DL\" enabled");
-#endif // WITH_DL 
+#endif // WITH_DL
     }
 
     // Symbolic expression for A
@@ -76,7 +76,7 @@ namespace casadi{
     std::vector<int> inv_rowperm(rowperm_.size());
     for(int k=0; k<rowperm_.size(); ++k)
       inv_rowperm[rowperm_[k]] = k;
-    
+
     // Permute the linear system
     SX Aperm = A(rowperm_,colperm_);
 
@@ -102,7 +102,7 @@ namespace casadi{
     SX Q = SX::sym("Q",QR[0].sparsity());
     SX R = SX::sym("R",QR[1].sparsity());
     SX b = SX::sym("b",input(1).size1(),1);
-    
+
     // Solve non-transposed
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
 
@@ -137,7 +137,7 @@ namespace casadi{
 
     // Solve transposed
     // We have (Pb' * Q * R * Px)' * x = b
-    // <=> Px' * R' * Q' * Pb * x = b 
+    // <=> Px' * R' * Q' * Pb * x = b
     // <=> x = Pb' * Q * inv(R') * Px * b
 
     // Permute the right hand side
@@ -167,7 +167,7 @@ namespace casadi{
 
     // Allocate storage for QR factorization
     Q_ = DMatrix::zeros(Q.sparsity());
-    R_ = DMatrix::zeros(R.sparsity());      
+    R_ = DMatrix::zeros(R.sparsity());
   }
 
   void SymbolicQRInternal::prepare(){
@@ -202,7 +202,7 @@ namespace casadi{
     SX r = *input.at(0);
     casadi_assert(input.at(1)!=0);
     SX A = *input.at(1);
-    
+
     // Number of right hand sides
     int nrhs = r.size2();
 
@@ -211,7 +211,7 @@ namespace casadi{
 
     // Select solve function
     Function& solv = tr ? solv_fcn_T_ : solv_fcn_N_;
-    
+
     // Solve for every right hand side
     vector<SX> resv;
     v.resize(3);
@@ -224,7 +224,7 @@ namespace casadi{
     casadi_assert(output[0]!=0);
     *output.at(0) = horzcat(resv);
   }
-  
+
   void SymbolicQRInternal::generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
 
     // Generate code for the embedded functions
@@ -233,7 +233,7 @@ namespace casadi{
     gen.addDependency(solv_fcn_T_);
   }
 
-  void SymbolicQRInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{ 
+  void SymbolicQRInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
     casadi_warning("Code generation for SymbolicQR still experimental");
 
     // Data structures to hold A, Q and R
@@ -266,6 +266,6 @@ namespace casadi{
 
 } // namespace casadi
 
-  
+
 
 

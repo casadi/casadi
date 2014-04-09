@@ -26,18 +26,18 @@
 #include "external_function.hpp"
 #include "function_internal.hpp"
 
-#ifdef WITH_DL 
+#ifdef WITH_DL
 #ifdef _WIN32 // also for 64-bit
 #include <windows.h>
 #else // _WIN32
 #include <dlfcn.h>
 #endif // _WIN32
-#endif // WITH_DL 
+#endif // WITH_DL
 
 /// \cond INTERNAL
 
 namespace casadi{
-  
+
 class CASADI_SYMBOLIC_EXPORT ExternalFunctionInternal : public FunctionInternal{
   friend class ExternalFunction;
   public:
@@ -53,7 +53,7 @@ class CASADI_SYMBOLIC_EXPORT ExternalFunctionInternal : public FunctionInternal{
 
     /** \brief  Evaluate */
     virtual void evaluate();
-  
+
     /** \brief  Initialize */
     virtual void init();
 
@@ -71,7 +71,7 @@ class CASADI_SYMBOLIC_EXPORT ExternalFunctionInternal : public FunctionInternal{
 
   /** \brief  Function pointers */
   evaluatePtr evaluate_;
-    
+
 #if defined(WITH_DL) && defined(_WIN32) // also for 64-bit
   typedef HINSTANCE handle_t;
 #else
@@ -80,13 +80,13 @@ class CASADI_SYMBOLIC_EXPORT ExternalFunctionInternal : public FunctionInternal{
 
   /** \brief  handle to the dll */
   handle_t handle_;
-  
+
   /** \brief  Array of pointers to the input */
   std::vector<const double*> input_array_;
-  
+
   /** \brief  Array of pointers to the output */
   std::vector<double*> output_array_;
-  
+
 };
 
 } // namespace casadi

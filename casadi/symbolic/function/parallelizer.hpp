@@ -35,7 +35,7 @@ namespace casadi{
   /** \brief Parallelizer execution of functions
       \author Joel Andersson
       \date 2011
-  */ 
+  */
   class CASADI_SYMBOLIC_EXPORT Parallelizer : public Function{
   public:
 
@@ -50,7 +50,7 @@ namespace casadi{
 
     /// Const access functions of the node
     const ParallelizerInternal* operator->() const;
-  
+
   };
 
 } // namespace casadi

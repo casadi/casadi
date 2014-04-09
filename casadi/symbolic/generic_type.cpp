@@ -48,7 +48,7 @@ namespace casadi{
 opt_type GenericType::getType() const {
   return type_;
 }
-    
+
 bool GenericType::can_cast_to(opt_type other) const {
   switch(other)
     {
@@ -134,10 +134,10 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_VOIDPTR";
       default:
               return "OT_UNKNOWN";
-              
+
     }
 };
-    
+
 
 bool GenericType::isBool() const{
   return is_a<bool>();
@@ -146,11 +146,11 @@ bool GenericType::isBool() const{
 bool GenericType::isInt() const{
   return is_a<int>();
 }
-    
+
 bool GenericType::isDouble() const{
   return is_a<double>();
 }
-    
+
 bool GenericType::isString() const{
   return is_a<string>();
 }
@@ -162,19 +162,19 @@ bool GenericType::isEmptyVector() const{
 bool GenericType::isIntVector() const{
   return is_a<vector<int> >();
 }
-    
+
 bool GenericType::isDoubleVector() const{
   return is_a<vector<double> >();
 }
-  
+
 bool GenericType::isStringVector() const{
   return is_a<vector<string> >();
 }
-  
+
 bool GenericType::isSharedObject() const{
   return is_a<SharedObject>();
 }
-  
+
 bool GenericType::isFunction() const{
   return is_a<Function>();
 }
@@ -231,7 +231,7 @@ GenericType::GenericType(const string& s) : type_(OT_STRING) {
   assignNode(new StringType(s));
 }
 
-GenericType::GenericType(const char s[])  : type_(OT_STRING) { 
+GenericType::GenericType(const char s[])  : type_(OT_STRING) {
   assignNode(new StringType(s));
 }
 
@@ -251,7 +251,7 @@ GenericType::GenericType(const Function& f) : type_(OT_Function) {
   GenericType::GenericType(const DerivativeGenerator& f) : type_(OT_DERIVATIVEGENERATOR) {
     assignNode(new GenericTypeInternal<DerivativeGenerator>(f));
   }
- 
+
 GenericType::GenericType(const Callback& f) : type_(OT_CALLBACK) {
   assignNode(new GenericTypeInternal<Callback>(f));
 }
@@ -373,11 +373,11 @@ bool GenericType::operator!=(const GenericType& op2) const{
       if(v1[i] != v2[i]) return true;
     return false;
   }
-  
+
   // Different types
   return true;
 }
-  
+
 GenericType::GenericType(NLPSolverCreator ptr)  : type_(OT_NLPSOLVER) {
   assignNode(new GenericTypeInternal<NLPSolverCreator>(ptr));
 }
@@ -507,7 +507,7 @@ GenericType::operator GenericType::Dictionary& () {
 
 void * GenericType::toVoidPointer() const {
   casadi_assert_message(is_a<void*>(),"type mismatch");
-  return static_cast<const GenericTypeInternal<void*>*>(get())->d_; 
+  return static_cast<const GenericTypeInternal<void*>*>(get())->d_;
 }
 
 GenericType::GenericType(void* ptr) : type_(OT_VOIDPTR){

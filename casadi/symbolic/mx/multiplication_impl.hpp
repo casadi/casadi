@@ -87,7 +87,7 @@ namespace casadi{
     for(int d=0; d<nfwd; ++d){
       *fwdSens[d][0] = *fwdSeed[d][0] + mul(tr<TrX>(*input[1]),tr<TrY>(*fwdSeed[d][2]),(*input[0]).sparsity()) + mul(tr<TrX>(*fwdSeed[d][1]),tr<TrY>(*input[2]),(*input[0]).sparsity());
     }
-  
+
     // Adjoint sensitivities
     int nadj = adjSeed.size();
     for(int d=0; d<nadj; ++d){
@@ -125,7 +125,7 @@ namespace casadi{
     bool inplace = arg.at(0).compare(res.front())==0;
 
     // Copy first argument if not inplace
-    if(!inplace){      
+    if(!inplace){
       stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
@@ -143,7 +143,7 @@ namespace casadi{
     bool inplace = arg.at(0).compare(res.front())==0;
 
     // Copy first argument if not inplace
-    if(!inplace){      
+    if(!inplace){
       stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 

@@ -31,10 +31,10 @@
 
 /// \cond INTERNAL
 namespace casadi{
-    
+
   class CASADI_INTEGRATION_EXPORT CollocationIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
   public:
-  
+
     /// Constructor
     explicit CollocationIntegratorInternal(const Function& f, const Function& g);
 
@@ -46,7 +46,7 @@ namespace casadi{
 
     /// Create a new integrator
     virtual CollocationIntegratorInternal* create(const Function& f, const Function& g) const{ return new CollocationIntegratorInternal(f,g);}
-  
+
     /// Destructor
     virtual ~CollocationIntegratorInternal();
 
@@ -55,7 +55,7 @@ namespace casadi{
 
     /// Setup F and G
     virtual void setupFG();
-  
+
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
 

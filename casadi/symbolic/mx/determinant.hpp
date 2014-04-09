@@ -42,18 +42,18 @@ namespace casadi{
 
     /// Clone function
     virtual Determinant* clone() const{ return new Determinant(*this);}
-      
+
     /// Destructor
     virtual ~Determinant(){}
-    
+
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
-            
+
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_DETERMINANT;}    
+    virtual int getOp() const{ return OP_DETERMINANT;}
   };
 
 

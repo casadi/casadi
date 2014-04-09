@@ -33,7 +33,7 @@ namespace casadi{
     setDependencies(x);
     setSparsity(Sparsity::dense(1,1));
   }
-  
+
   void Determinant::printPart(std::ostream &stream, int part) const{
     if(part==0){
       stream << "det(";
@@ -43,7 +43,7 @@ namespace casadi{
   }
 
   void Determinant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-    int nfwd = fwdSens.size();    
+    int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
     // Non-differentiated output
@@ -52,10 +52,10 @@ namespace casadi{
     if(!output_given){
       det_X = det(X);
     }
-    
+
     // Quick return
     if(nfwd==0 && nadj==0) return;
-    
+
     // Create only once
     MX trans_inv_X = inv(X).T();
 

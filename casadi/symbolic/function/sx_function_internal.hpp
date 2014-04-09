@@ -46,7 +46,7 @@ namespace casadi{
   public:
     // Default constructor
     SparsityPropagationKernel();
-    
+
     // Destructor
     ~SparsityPropagationKernel();
 
@@ -66,12 +66,12 @@ namespace casadi{
 
 /** \brief  Internal node class for SXFunction
   A regular user should never work with any Node class. Use SXFunction directly.
-  \author Joel Andersson 
+  \author Joel Andersson
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SXElement>,SXNode>{
   friend class SXFunction;
-  
+
   protected:
     /** \brief  Constructor (only to be called from SXFunction, therefore protected) */
     SXFunctionInternal(const std::vector<Matrix<SXElement> >& inputv, const std::vector<Matrix<SXElement> >& outputv);
@@ -80,7 +80,7 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
 
   /** \brief  Make a deep copy */
   virtual SXFunctionInternal* clone() const;
-    
+
   /** \brief  Destructor */
   virtual ~SXFunctionInternal();
 
@@ -92,18 +92,18 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
     const int value;
     int_runtime(int v) : value(v){}
   };
-  
+
   /** \brief  Helper class to be plugged into evaluateGen when working with a value known already at compiletime */
   template<int v>
   struct int_compiletime{
     static const int value = v;
   };
-    
+
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res, 
-                      const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens, 
+  virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res,
+                      const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens,
                       const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
-                          
+
   /** \brief  Check if smooth */
   bool isSmooth() const;
 
@@ -112,18 +112,18 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
 
   /** \brief Hessian (forward over adjoint) via source code transformation */
   SX hess(int iind=0, int oind=0);
-  
+
   /** \brief  DATA MEMBERS */
-  
+
   /** \brief  An elemenent of the algorithm, namely a binary operation */
   typedef ScalarAtomic AlgEl;
-  
+
   /** \brief  An elemenent of the tape */
   template<typename T>
   struct TapeEl{
     T d[2];
   };
-  
+
   /** \brief  all binary nodes of the tree in the order of execution */
   std::vector<AlgEl> algorithm_;
 
@@ -133,13 +133,13 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
   /// work vector for symbolic calculations (allocated first time)
   std::vector<SXElement> s_work_;
   std::vector<SXElement> free_vars_;
-  
+
   /// The expressions corresponding to each binary operation
   std::vector<SXElement> operations_;
-  
+
   /// The expressions corresponding to each constant
   std::vector<SXElement> constants_;
-  
+
   /** \brief  Initialize */
   virtual void init();
 
@@ -151,7 +151,7 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
 
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
-  
+
   /// Propagate a sparsity pattern through the algorithm
   virtual void spEvaluate(bool fwd);
 
@@ -160,7 +160,7 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
 
   /// Reset the sparsity propagation
   virtual void spInit(bool fwd);
-  
+
   /** \brief Return Jacobian of all input elements with respect to all output elements */
   virtual Function getFullJacobian();
 
@@ -169,7 +169,7 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
 
   /// With just-in-time compilation for the sparsity propagation
   bool just_in_time_sparsity_;
-  
+
 #ifdef WITH_OPENCL
   // Initialize sparsity propagation using OpenCL
   void allocOpenCL();

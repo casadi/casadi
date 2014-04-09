@@ -34,105 +34,105 @@ class SharedObjectNode;
 namespace casadi{
 
 class CASADI_SYMBOLIC_EXPORT IOSchemeInternal : public SharedObjectNode{
-  public:    
-    
+  public:
+
     /// Name of the scheme
     virtual std::string name() const=0;
-    
+
     /// List available entries
     virtual std::string entryNames() const=0;
-    
+
     /// Get index by entry name
     virtual int index(const std::string &name) const=0;
-    
+
     /// Number of entries
     virtual int size() const=0;
-    
+
     /// Get the entry name by index
     virtual std::string entry(int i) const=0;
 
     /// Get the entry enum name by index
     virtual std::string entryEnum(int i) const=0;
-    
+
     /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const=0;
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const=0;
-    
+
     /// Describe the index
     virtual std::string describe(int i) const=0;
-    
+
 };
 
 class CASADI_SYMBOLIC_EXPORT IOSchemeBuiltinInternal : public IOSchemeInternal {
-  public:    
-  
+  public:
+
     /// Default constructor
     IOSchemeBuiltinInternal(InputOutputScheme scheme);
-    
+
     /// Name of the scheme
     virtual std::string name() const;
-    
+
     /// List available entries
     virtual std::string entryNames() const;
-    
+
     /// Get index by entry name
     virtual int index(const std::string &name) const;
-    
+
     /// Number of entries
     virtual int size() const;
-    
+
     /// Get the entry name by index
     virtual std::string entry(int i) const;
 
     /// Get the entry enum name by index
     virtual std::string entryEnum(int i) const;
-    
+
     /// Describe the index
     virtual std::string describe(int i) const;
-    
+
     /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object
     virtual void repr(std::ostream &stream=std::cout) const;
-    
+
     /// Clone
     virtual IOSchemeBuiltinInternal* clone() const{ return new IOSchemeBuiltinInternal(scheme_); }
-    
+
   private:
     InputOutputScheme scheme_;
-    
+
 };
 
 class CASADI_SYMBOLIC_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
-  public:    
-  
+  public:
+
     /// Default constructor
     IOSchemeCustomInternal(const std::vector<std::string> &entries, const std::vector<std::string> &descriptions=std::vector<std::string>());
-    
+
     /// Name of the scheme
     virtual std::string name() const;
-    
+
     /// List available entries
     virtual std::string entryNames() const;
-    
+
     /// Get index by entry name
     virtual int index(const std::string &name) const;
-    
+
     /// Number of entries
     virtual int size() const;
-    
+
     /// Get the entry name by index
     virtual std::string entry(int i) const;
 
     /// Get the entry enum name by index
     virtual std::string entryEnum(int i) const;
-    
+
     /// Describe the index
     virtual std::string describe(int i) const;
-    
+
     /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
@@ -141,7 +141,7 @@ class CASADI_SYMBOLIC_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
 
     /// Clone
     virtual IOSchemeCustomInternal* clone() const{ return new IOSchemeCustomInternal(entries_,descriptions_); }
-    
+
   private:
     std::vector<std::string> entries_;
     std::vector<std::string> descriptions_;

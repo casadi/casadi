@@ -36,36 +36,36 @@ class CASADI_SYMBOLIC_EXPORT QCQPSolverInternal : public FunctionInternal{
 
     // Constructor
     QCQPSolverInternal(const std::vector<Sparsity> &st);
-    
+
     // Destructor
     virtual ~QCQPSolverInternal() = 0;
-    
+
     // Initialize
     virtual void init();
-    
+
     // Solve the system of equations
     virtual void evaluate();
-    
+
     // Solve the system of equations
     virtual void solve();
-    
+
     /// Set options that make the QP solver more suitable for solving LPs
     virtual void setQPOptions() { };
-    
+
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
-    
+
   protected:
 
     /// Problem structure
     std::vector<Sparsity> st_;
-    
+
     /// Number of decision variables
     int n_;
-    
+
     /// The number of linear constraints (counting both equality and inequality) == A.size1()
-    int nc_; 
-    
+    int nc_;
+
     /// The number of quadratic constraints
     int nq_;
 };
