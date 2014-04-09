@@ -163,7 +163,7 @@ namespace casadi{
 #ifndef SWIG
   // "operator?:" can not be overloaded
   template<typename T>
-  T if_else(const SXElement& cond, const T& if_true, const T &if_false){
+  CASADI_SYMBOLIC_EXPORT T if_else(const SXElement& cond, const T& if_true, const T &if_false){
     return if_false + (if_true-if_false)*cond;
   }
 #endif
@@ -174,7 +174,7 @@ namespace casadi{
 #ifndef SWIG
   /** \brief  Create a block matrix */
   template<int n, int m>
-  SX blockmatrix(SX array[n][m]){
+  CASADI_SYMBOLIC_EXPORT SX blockmatrix(SX array[n][m]){
     /** \brief  Return matrix */
     SX ret;
 
@@ -197,7 +197,7 @@ namespace casadi{
 
   /** \brief  Create a block matrix (vector) */
   template<int n>
-  SX blockmatrix(SX array[n]){
+  CASADI_SYMBOLIC_EXPORT SX blockmatrix(SX array[n]){
     /** \brief  Return matrix */
     SX ret;
 
