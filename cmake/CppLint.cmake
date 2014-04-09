@@ -94,7 +94,7 @@ function(add_style_check_target TARGET_NAME SOURCES_LIST0)# PROJECT)
             "${PYTHON_EXECUTABLE}"
             "${CMAKE_SOURCE_DIR}/misc/cpplint.py"
             "--filter=${STYLE_FILTER}"
-            "--counting=toplevel"
+            "--counting=detailed"
             "--extensions=cpp,hpp,h"
 #            "--project=${PROJECT}"
             ${SOURCES_LIST}
