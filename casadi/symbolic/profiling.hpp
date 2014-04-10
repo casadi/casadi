@@ -213,6 +213,6 @@ CASADI_SYMBOLIC_EXPORT void profileWriteSourceLine(std::ofstream &f,T *a,int lin
 }
 
 /// \endcond
-}
+} // namespace casadi
 
 #endif //PROFILING_HPP

@@ -85,6 +85,6 @@ namespace casadi{
   /*
   @}
   */
-}
+} // namespace casadi
 
 #endif // SPARSITY_TOOLS_HPP

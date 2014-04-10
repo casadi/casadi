@@ -32,4 +32,4 @@ namespace casadi {
   const std::string CasadiMeta::compiler = "${CMAKE_CXX_COMPILER}";
   const std::string CasadiMeta::compiler_flags ="${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_CMAKE_BUILD_TYPE}}";
   const std::string CasadiMeta::modules ="${CASADI_MODULES}";
-}
+} // namespace casadi

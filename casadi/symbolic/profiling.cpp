@@ -121,4 +121,4 @@ double getRealTime( )
  double getRealTime( ) { return 0; }
 #endif
 
-}
+} // namespace casadi
