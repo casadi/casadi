@@ -18,7 +18,6 @@ python_install
 *.so
 octave-core
 *.edited
-*~
 *.bak
 *.gz
 *.tar
