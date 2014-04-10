@@ -315,7 +315,12 @@ namespace casadi{
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::resort_breadth_first(std::vector<NodeType*>& algnodes){
 
-    // We shall assign a "level" to each element of the algorithm. A node which does not depend on other binary nodes are assigned level 0 and for nodes that depend on other nodes of the algorithm, the level will be the maximum level of any of the children plus 1. Note that all nodes of a level can be evaluated in parallel. The level will be saved in the temporary variable
+    // We shall assign a "level" to each element of the algorithm.
+    // A node which does not depend on other binary nodes are assigned
+    // level 0 and for nodes that depend on other nodes of the algorithm,
+    // the level will be the maximum level of any of the children plus 1.
+    // Note that all nodes of a level can be evaluated in parallel.
+    // The level will be saved in the temporary variable
 
     // Total number of levels
     int nlevels = 0;

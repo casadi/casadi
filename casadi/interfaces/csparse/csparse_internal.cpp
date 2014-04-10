@@ -114,7 +114,11 @@ namespace casadi{
       temp.sparsify();
       if(temp.sparsity().isSingular()){
         stringstream ss;
-        ss << "CSparseInternal::prepare: factorization failed due to matrix being singular. Matrix contains numerical zeros which are structurally non-zero. Promoting these zeros to be structural zeros, the matrix was found to be structurally rank deficient. sprank: " << rank(temp.sparsity()) << " <-> " << temp.size2() << endl;
+        ss << "CSparseInternal::prepare: factorization failed due to matrix"
+          " being singular. Matrix contains numerical zeros which are "
+            "structurally non-zero. Promoting these zeros to be structural "
+            "zeros, the matrix was found to be structurally rank deficient."
+            " sprank: " << rank(temp.sparsity()) << " <-> " << temp.size2() << endl;
         if(verbose()){
           ss << "Sparsity of the linear system: " << endl;
           input(LINSOL_A).sparsity().print(ss); // print detailed

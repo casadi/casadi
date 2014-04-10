@@ -36,7 +36,18 @@ namespace casadi{
     assignNode(new IOSchemeCustomInternal(entries,descriptions));
   }
 
-  IOScheme::IOScheme(const std::string &arg_s0,const std::string &arg_s1,const std::string &arg_s2,const std::string &arg_s3,const std::string &arg_s4,const std::string &arg_s5,const std::string &arg_s6,const std::string &arg_s7,const std::string &arg_s8,const std::string &arg_s9,const std::string &arg_s10,const std::string &arg_s11,const std::string &arg_s12,const std::string &arg_s13,const std::string &arg_s14,const std::string &arg_s15,const std::string &arg_s16,const std::string &arg_s17,const std::string &arg_s18,const std::string &arg_s19) {
+  IOScheme::IOScheme(
+      const std::string &arg_s0, const std::string &arg_s1,
+      const std::string &arg_s2, const std::string &arg_s3,
+      const std::string &arg_s4, const std::string &arg_s5,
+      const std::string &arg_s6, const std::string &arg_s7,
+      const std::string &arg_s8, const std::string &arg_s9,
+      const std::string &arg_s10, const std::string &arg_s11,
+      const std::string &arg_s12, const std::string &arg_s13,
+      const std::string &arg_s14, const std::string &arg_s15,
+      const std::string &arg_s16, const std::string &arg_s17,
+      const std::string &arg_s18, const std::string &arg_s19)
+  {
     std::vector<std::string> k;
     if (arg_s0!="") { k.push_back(arg_s0);}
     if (arg_s1!="") { k.push_back(arg_s1);}

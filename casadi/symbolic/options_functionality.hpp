@@ -250,7 +250,12 @@ virtual ~OptionsFunctionalityNode();
 protected:
 
 
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val=GenericType(), const std::string& desc="n/a", const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(), bool inherit = false, std::vector<int> enum_values= std::vector<int>(), std::vector<std::string> enum_descr= std::vector<std::string>());
+  void addOption(
+    const std::string &str, const opt_type& type,
+    const GenericType &def_val=GenericType(), const std::string& desc="n/a",
+    const std::vector<GenericType> &allowed_vals = std::vector<GenericType>(),
+    bool inherit = false, std::vector<int> enum_values= std::vector<int>(),
+    std::vector<std::string> enum_descr= std::vector<std::string>());
   /** \brief Add an option
   *
   *  allowed_vals can taken multiple forms:

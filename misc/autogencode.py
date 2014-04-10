@@ -117,8 +117,8 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s+= "template<class M>" + "\n"
     s+= self.enum + "IOSchemeVector<M> " + self.name + "("
     for i, (name, doc, enum) in enumerate(self.entries):
-      s+="""const std::string &arg_s%d ="",const M &arg_m%d =M()""" % (i,i) + ","
-    s=s[:-1] + "){" + "\n"
+      s+="""\n    const std::string &arg_s%d ="",const M &arg_m%d =M()""" % (i,i) + ","
+    s=s[:-1] + ")\n{\n"
     s+= "  std::vector<M> ret(%d);\n" % len(self.entries)
 
 
@@ -138,8 +138,8 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s+= "template<class M>" + "\n"
     s+= "std::vector<M> " + self.name + "(const std::vector<M>& args,"
     for i, (name, doc, enum) in enumerate(self.entries):
-      s+='const std::string &arg_s%d=""' % i + ","
-    s=s[:-1] + "){" + "\n"
+      s+='\n    const std::string &arg_s%d=""' % i + ","
+    s=s[:-1] + ")\n{\n"
     s+= "  std::vector<M> ret;\n"
     for i,_ in enumerate(self.entries):
       s+="""  if (arg_s%d!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_%s,arg_s%d)));\n""" % (i,self.enum,i)
@@ -323,7 +323,7 @@ for h in locate("*.hpp",os.path.join(os.curdir,"..")):
       p.checkconsistency()
       schemes.append(p)
 
-autogenmetadatahpp.write("enum InputOutputScheme { %s };\n" % ", ".join(["SCHEME_"+p.enum for p in schemes]) )
+autogenmetadatahpp.write("enum InputOutputScheme {\n  %s };\n\n" % ",\n  ".join(["SCHEME_"+p.enum for p in schemes]) )
 
 autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);\n")
 autogenmetadatahpp.write("CASADI_SYMBOLIC_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);\n")

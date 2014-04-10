@@ -92,7 +92,13 @@ namespace casadi{
     nu_ = control_dae_.input(CONTROL_DAE_U).size();
 
     if (!control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty() && nu_!=0) {
-      casadi_assert_message(control_dae_.input(CONTROL_DAE_U).sparsity()==control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),"You specfified both U and U_INTERP, but the sparsities do not match: " << control_dae_.input(CONTROL_DAE_U).dimString() << "  <-> " << control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
+      casadi_assert_message(
+        control_dae_.input(CONTROL_DAE_U).sparsity() ==
+        control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),
+        "You specfified both U and U_INTERP, but the sparsities do not match: "
+        << control_dae_.input(CONTROL_DAE_U).dimString()
+        << "  <-> "
+        << control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
     }
 
     int nu_end   = control_dae_.input(CONTROL_DAE_U_INTERP).size();

@@ -379,7 +379,13 @@ namespace casadi{
 
   }
 
-  bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials,bool full_callback) {
+  bool IpoptInternal::intermediate_callback(
+    const double* x, const double* z_L, const double* z_U, const double* g,
+    const double* lambda, double obj_value, int iter,
+    double inf_pr, double inf_du,double mu,double d_norm,
+    double regularization_size,double alpha_du,double alpha_pr,int ls_trials,
+    bool full_callback)
+  {
     n_iter_ += 1;
     try {
       log("intermediate_callback started");

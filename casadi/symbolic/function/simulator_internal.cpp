@@ -101,9 +101,19 @@ namespace casadi{
 
     casadi_assert_message( output_fcn_.input(DAE_T).numel() <=1, "SimulatorInternal::init: output_fcn DAE_T argument must be scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
 
-    casadi_assert_message( output_fcn_.input(DAE_P).isEmpty() || integrator_.input(INTEGRATOR_P).sparsity()== output_fcn_.input(DAE_P).sparsity(), "SimulatorInternal::init: output_fcn DAE_P argument must be empty or have dimension " << integrator_.input(INTEGRATOR_P).dimString() << ", but got " << output_fcn_.input(DAE_P).dimString());
+    casadi_assert_message(
+        output_fcn_.input(DAE_P).isEmpty() ||
+        integrator_.input(INTEGRATOR_P).sparsity() == output_fcn_.input(DAE_P).sparsity(),
+        "SimulatorInternal::init: output_fcn DAE_P argument must be empty or"
+        << " have dimension " << integrator_.input(INTEGRATOR_P).dimString()
+        << ", but got " << output_fcn_.input(DAE_P).dimString());
 
-    casadi_assert_message( output_fcn_.input(DAE_X).isEmpty() || integrator_.input(INTEGRATOR_X0).sparsity()== output_fcn_.input(DAE_X).sparsity(), "SimulatorInternal::init: output_fcn DAE_X argument must be empty or have dimension " << integrator_.input(INTEGRATOR_X0).dimString() << ", but got " << output_fcn_.input(DAE_X).dimString());
+    casadi_assert_message(
+        output_fcn_.input(DAE_X).isEmpty() ||
+        integrator_.input(INTEGRATOR_X0).sparsity() == output_fcn_.input(DAE_X).sparsity(),
+        "SimulatorInternal::init: output_fcn DAE_X argument must be empty or have dimension "
+        << integrator_.input(INTEGRATOR_X0).dimString()
+        << ", but got " << output_fcn_.input(DAE_X).dimString());
 
     // Call base class method
     FunctionInternal::init();

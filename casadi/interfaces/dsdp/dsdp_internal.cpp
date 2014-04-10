@@ -51,7 +51,11 @@ namespace casadi {
     addOption("stepTol",OT_REAL,5e-2,"Terminate the solver if the step length in the primal is below this tolerance. ");
     addOption("infinity",OT_REAL,1e30,"Treat numbers higher than this as infinity");
     addOption("_use_penalty", OT_BOOLEAN, true, "Modifies the algorithm to use a penality gamma on r.");
-    addOption("_penalty", OT_REAL, 1e5, "Penality parameter lambda. Must exceed the trace of Y. This parameter heavily influences the ability of DSDP to treat linear equalities. The DSDP standard default (1e8) will make a problem with linear equality return unusable solutions.");
+    addOption("_penalty", OT_REAL, 1e5,
+              "Penality parameter lambda. Must exceed the trace of Y. This "
+              "parameter heavily influences the ability of DSDP to treat "
+              "linear equalities. The DSDP standard default (1e8) will make "
+              "a problem with linear equality return unusable solutions.");
     addOption("_rho", OT_REAL,4.0,"Potential parameter. Must be >=1");
     addOption("_zbar", OT_REAL,1e10,"Initial upper bound on the objective of the dual problem.");
     addOption("_reuse",OT_INTEGER,4,"Maximum on the number of times the Schur complement matrix is reused");

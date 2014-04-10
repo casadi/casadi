@@ -627,7 +627,12 @@ namespace casadi{
 
 
   MX MXNode::getInnerProd(const MX& y) const{
-    casadi_assert_message(size2()==y.size2() && size1()==y.size1(),"MXNode::inner_prod: Dimension mismatch. inner_prod requires its two arguments to have equal shapes, but got (" << size2() << "," << size1() << ") and (" << y.size2() << "," << y.size1() << ").");
+    casadi_assert_message(
+      size2()==y.size2() && size1()==y.size1(),
+      "MXNode::inner_prod: Dimension mismatch. inner_prod requires its "
+      "two arguments to have equal shapes, but got ("
+      << size2() << "," << size1() << ") and ("
+      << y.size2() << "," << y.size1() << ").");
     if(sparsity()==y.sparsity()){
       if(sparsity().size()==0){
         return 0;

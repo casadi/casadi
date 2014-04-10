@@ -53,7 +53,17 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
     IOScheme(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions=std::vector<std::string>());
 
     #ifndef SWIGPYTHON
-    IOScheme(const std::string &arg_s0,const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8="",const std::string &arg_s9="",const std::string &arg_s10="",const std::string &arg_s11="",const std::string &arg_s12="",const std::string &arg_s13="",const std::string &arg_s14="",const std::string &arg_s15="",const std::string &arg_s16="",const std::string &arg_s17="",const std::string &arg_s18="",const std::string &arg_s19="");
+    IOScheme(
+        const std::string &arg_s0,const std::string &arg_s1="",
+        const std::string &arg_s2="",const std::string &arg_s3="",
+        const std::string &arg_s4="",const std::string &arg_s5="",
+        const std::string &arg_s6="",const std::string &arg_s7="",
+        const std::string &arg_s8="",const std::string &arg_s9="",
+        const std::string &arg_s10="",const std::string &arg_s11="",
+        const std::string &arg_s12="",const std::string &arg_s13="",
+        const std::string &arg_s14="",const std::string &arg_s15="",
+        const std::string &arg_s16="",const std::string &arg_s17="",
+        const std::string &arg_s18="",const std::string &arg_s19="");
    #endif // SWIG
 
     /** \brief  Access functions of the node */
@@ -112,7 +122,28 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
 
     #ifndef SWIGPYTHON
     template<class M>
-    IOSchemeVector<M> operator()(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M(),const std::string arg_s13="",M arg_m13=M(),const std::string arg_s14="",M arg_m14=M(),const std::string arg_s15="",M arg_m15=M(),const std::string arg_s16="",M arg_m16=M(),const std::string arg_s17="",M arg_m17=M(),const std::string arg_s18="",M arg_m18=M(),const std::string arg_s19="",M arg_m19=M()){
+    IOSchemeVector<M> operator()(
+        const std::string arg_s0="",M arg_m0=M(),
+        const std::string arg_s1="",M arg_m1=M(),
+        const std::string arg_s2="",M arg_m2=M(),
+        const std::string arg_s3="",M arg_m3=M(),
+        const std::string arg_s4="",M arg_m4=M(),
+        const std::string arg_s5="",M arg_m5=M(),
+        const std::string arg_s6="",M arg_m6=M(),
+        const std::string arg_s7="",M arg_m7=M(),
+        const std::string arg_s8="",M arg_m8=M(),
+        const std::string arg_s9="",M arg_m9=M(),
+        const std::string arg_s10="",M arg_m10=M(),
+        const std::string arg_s11="",M arg_m11=M(),
+        const std::string arg_s12="",M arg_m12=M(),
+        const std::string arg_s13="",M arg_m13=M(),
+        const std::string arg_s14="",M arg_m14=M(),
+        const std::string arg_s15="",M arg_m15=M(),
+        const std::string arg_s16="",M arg_m16=M(),
+        const std::string arg_s17="",M arg_m17=M(),
+        const std::string arg_s18="",M arg_m18=M(),
+        const std::string arg_s19="",M arg_m19=M())
+    {
       std::vector<std::string> k;
       std::vector<M> v;
       if (arg_s0!="") { k.push_back(arg_s0);  v.push_back(arg_m0); }
@@ -141,7 +172,19 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
 
   #ifndef SWIGPYTHON
   template<class M>
-  std::vector<M> operator()(const std::vector<M> arg_m0,const std::string &arg_s0="",const std::string &arg_s1="",const std::string &arg_s2="",const std::string &arg_s3="",const std::string &arg_s4="",const std::string &arg_s5="",const std::string &arg_s6="",const std::string &arg_s7="",const std::string &arg_s8="",const std::string &arg_s9="",const std::string &arg_s10="",const std::string &arg_s11="",const std::string &arg_s12="",const std::string &arg_s13="",const std::string &arg_s14="",const std::string &arg_s15="",const std::string &arg_s16="",const std::string &arg_s17="",const std::string &arg_s18="",const std::string &arg_s19=""){
+  std::vector<M> operator()(
+      const std::vector<M> arg_m0,
+      const std::string &arg_s0="", const std::string &arg_s1="",
+      const std::string &arg_s2="", const std::string &arg_s3="",
+      const std::string &arg_s4="", const std::string &arg_s5="",
+      const std::string &arg_s6="", const std::string &arg_s7="",
+      const std::string &arg_s8="", const std::string &arg_s9="",
+      const std::string &arg_s10="", const std::string &arg_s11="",
+      const std::string &arg_s12="", const std::string &arg_s13="",
+      const std::string &arg_s14="", const std::string &arg_s15="",
+      const std::string &arg_s16="", const std::string &arg_s17="",
+      const std::string &arg_s18="", const std::string &arg_s19="")
+  {
     std::vector<std::string> k;
     if (arg_s0!="") { k.push_back(arg_s0);}
     if (arg_s1!="") { k.push_back(arg_s1);}

@@ -23,13 +23,13 @@
 #include "casadi_meta.hpp"
 
 namespace casadi {
-  const std::string CasadiMeta::version = "${PACKAGE_VERSION}";
-  const std::string CasadiMeta::git_revision = "${git_revision}";
-  const std::string CasadiMeta::git_describe = "${git_describe}";
-  const std::string CasadiMeta::feature_list = "${feature_list}";
-  const std::string CasadiMeta::build_type = "${CMAKE_BUILD_TYPE}";
-  const std::string CasadiMeta::compiler_id = "${CMAKE_CXX_COMPILER_ID}";
-  const std::string CasadiMeta::compiler = "${CMAKE_CXX_COMPILER}";
-  const std::string CasadiMeta::compiler_flags ="${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_CMAKE_BUILD_TYPE}}";
-  const std::string CasadiMeta::modules ="${CASADI_MODULES}";
+  const std::string CasadiMeta::version = "${PACKAGE_VERSION}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::git_revision = "${git_revision}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::git_describe = "${git_describe}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::feature_list = "${feature_list}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::build_type = "${CMAKE_BUILD_TYPE}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::compiler_id = "${CMAKE_CXX_COMPILER_ID}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::compiler = "${CMAKE_CXX_COMPILER}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::compiler_flags ="${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_CMAKE_BUILD_TYPE}}";  // NOLINT(whitespace/line_length)
+  const std::string CasadiMeta::modules ="${CASADI_MODULES}";  // NOLINT(whitespace/line_length)
 } // namespace casadi

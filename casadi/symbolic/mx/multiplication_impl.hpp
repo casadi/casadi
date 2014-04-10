@@ -38,7 +38,11 @@ namespace casadi{
     casadi_assert_message(TrX || !TrY, "Illegal combination");
     casadi_assert_message(TrX, "Not implemented");
     casadi_assert_message(!TrY,"Not implemented");
-    casadi_assert_message(x.size1() == y.size1() && x.size2() == z.size1() && y.size2() == z.size2(),"Multiplication::Multiplication: dimension mismatch. Attempting to multiply trans(" << x.dimString() << ") with " << y.dimString() << " and add the result to " << z.dimString());
+    casadi_assert_message(
+      x.size1() == y.size1() && x.size2() == z.size1() && y.size2() == z.size2(),
+      "Multiplication::Multiplication: dimension mismatch. Attempting to multiply trans("
+      << x.dimString() << ") with " << y.dimString()
+      << " and add the result to " << z.dimString());
     setDependencies(z,x,y);
     setSparsity(z.sparsity());
   }

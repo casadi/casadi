@@ -265,8 +265,12 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
 }
 
 
-void OptionsFunctionalityNode::addOption(const string &name, const opt_type& type, const GenericType &def_val, const string& desc, const std::vector<GenericType> &allowed_vals, bool inherit, std::vector<int> enum_values, std::vector<std::string> enum_descr) {
-
+void OptionsFunctionalityNode::addOption(
+    const string &name, const opt_type& type, const GenericType &def_val,
+    const string& desc, const std::vector<GenericType> &allowed_vals,
+    bool inherit, std::vector<int> enum_values,
+    std::vector<std::string> enum_descr)
+ {
   // If inheriting, check if the type matches
   if (inherit && allowed_options.find(name)!=allowed_options.end()) {
      casadi_assert_message(allowed_options[name] == type,

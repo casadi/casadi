@@ -532,7 +532,12 @@ namespace casadi{
 
     */
 
-    int dulmageMendelsohn(std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm), std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock), std::vector<int>& SWIG_OUTPUT(coarse_rowblock), std::vector<int>& SWIG_OUTPUT(coarse_colblock), int seed=0) const;
+    int dulmageMendelsohn(
+        std::vector<int>& SWIG_OUTPUT(rowperm), std::vector<int>& SWIG_OUTPUT(colperm),
+        std::vector<int>& SWIG_OUTPUT(rowblock), std::vector<int>& SWIG_OUTPUT(colblock),
+        std::vector<int>& SWIG_OUTPUT(coarse_rowblock),
+        std::vector<int>& SWIG_OUTPUT(coarse_colblock),
+        int seed=0) const;
 
     /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix
         A : DenseMatrix  4 x 3

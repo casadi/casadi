@@ -685,23 +685,67 @@ namespace casadi{
   map<int,Message> KinsolInternal::calc_flagmap(){
 
     map<int, Message > f;
-    f[KIN_SUCCESS] = Message("KIN_SUCCES","KINSol succeeded; the scaled norm of F(u) is less than fnormtol");
-    f[KIN_INITIAL_GUESS_OK] = Message("KIN_INITIAL_GUESS_OK","The guess u = u0 satisfied the system F(u) = 0 within the tolerances specified.");
-    f[KIN_STEP_LT_STPTOL] = Message("KIN_STEP_LT_STPTOL","KINSol stopped based on scaled step length. This means that the current iterate may be an approximate solution of the given nonlinear system, but it is also quite possible that the algorithm is 'stalled' (making insufficient progress) near an invalid solution, or that the scalar scsteptol is too large.");
-    f[KIN_MEM_NULL] = Message("KIN_MEM_NULL","The kinsol memory block pointer was NULL.");
-    f[KIN_ILL_INPUT] = Message("KIN_ILL_INPUT","An input parameter was invalid.");
-    f[KIN_NO_MALLOC] = Message("KIN_NO_MALLOC","The kinsol memory was not allocated by a call to KINCreate.");
-    f[KIN_LINESEARCH_NONCONV] = Message("KIN_LINESEARCH_NONCONV","The line search algorithm was unable to find an iterate sufficiently distinct from the current iterate, or could not find an iterate satisfying the sufficient decrease condition. Failure to satisfy the sufficient decrease condition could mean the current iterate is 'close' to an approximate solution of the given nonlinear system, the difference approximation of the matrix-vector product J(u)v is inaccurate, or the real scalar scsteptol is too large.");
-    f[KIN_MAXITER_REACHED] = Message("KIN_MAXITER_REACHED","The maximum number of nonlinear iterations has been reached.");
-    f[KIN_MXNEWT_5X_EXCEEDED] = Message("KIN_MXNEWT_5X_EXCEEDED","Five consecutive steps have been taken that satisfy the inequality  || D_u p ||_L2 > 0.99 mxnewtstep, where p denotes the current step and mxnewtstep is a scalar upper bound on the scaled step length. Such a failure may mean that || D_F F(u)||_L2 asymptotes from above to a positive value, or the real scalar mxnewtstep is too small.");
-    f[KIN_LINESEARCH_BCFAIL] = Message("KIN_LINESEARCH_BCFAIL","The line search algorithm was unable to satisfy the “beta-condition” for MXNBCF +1 nonlinear iterations (not necessarily consecutive), which may indicate the algorithm is making poor progress.");
-    f[KIN_LINSOLV_NO_RECOVERY] = Message("KIN_LINSOLV_NO_RECOVERY","The user-supplied routine psolve encountered a recoverable error, but the preconditioner is already current.");
-    f[KIN_LINIT_FAIL] = Message("KIN_LINIT_FAIL","The linear solver initialization routine (linit) encountered an error.");
-    f[KIN_LSETUP_FAIL] = Message("KIN_LSETUP_FAIL","The user-supplied routine pset (used to set up the preconditioner data) encountered an unrecoverable error.");
-    f[KIN_LSOLVE_FAIL] = Message("KIN_LSOLVE_FAIL","Either the user-supplied routine psolve (used to to solve the preconditioned linear system) encountered an unrecoverable error, or the linear solver routine (lsolve) encountered an error condition.");
-    f[KIN_SYSFUNC_FAIL] = Message("KIN_SYSFUNC_FAIL","The system function failed in an unrecoverable manner.");
-    f[KIN_FIRST_SYSFUNC_ERR] = Message("KIN_FIRST_SYSFUNC_ERR","The system function failed recoverably at the first call.");
-    f[KIN_REPTD_SYSFUNC_ERR] = Message("KIN_REPTD_SYSFUNC_ERR","The system function had repeated recoverable errors. No recovery is possible.");
+    f[KIN_SUCCESS] = Message(
+      "KIN_SUCCES","KINSol succeeded; the scaled norm of F(u) "
+      "is less than fnormtol");
+    f[KIN_INITIAL_GUESS_OK] = Message(
+      "KIN_INITIAL_GUESS_OK","The guess u = u0 satisfied the system F(u) = 0 "
+      "within the tolerances specified.");
+    f[KIN_STEP_LT_STPTOL] = Message(
+      "KIN_STEP_LT_STPTOL","KINSol stopped based on scaled step length. This "
+      "means that the current iterate may be an approximate solution of the "
+      "given nonlinear system, but it is also quite possible that the algorithm"
+      " is 'stalled' (making insufficient progress) near an invalid solution, "
+      "or that the scalar scsteptol is too large.");
+    f[KIN_MEM_NULL] = Message(
+      "KIN_MEM_NULL","The kinsol memory block pointer was NULL.");
+    f[KIN_ILL_INPUT] = Message(
+      "KIN_ILL_INPUT","An input parameter was invalid.");
+    f[KIN_NO_MALLOC] = Message(
+      "KIN_NO_MALLOC","The kinsol memory was not allocated by a call to KINCreate.");
+    f[KIN_LINESEARCH_NONCONV] = Message(
+      "KIN_LINESEARCH_NONCONV","The line search algorithm was unable to find "
+      "an iterate sufficiently distinct from the current iterate, or could not"
+      " find an iterate satisfying the sufficient decrease condition. Failure"
+      " to satisfy the sufficient decrease condition could mean the current "
+      "iterate is 'close' to an approximate solution of the given nonlinear "
+      "system, the difference approximation of the matrix-vector product J(u)v"
+      " is inaccurate, or the real scalar scsteptol is too large.");
+    f[KIN_MAXITER_REACHED] = Message(
+      "KIN_MAXITER_REACHED","The maximum number of nonlinear iterations "
+      "has been reached.");
+    f[KIN_MXNEWT_5X_EXCEEDED] = Message(
+      "KIN_MXNEWT_5X_EXCEEDED","Five consecutive steps have been taken that "
+      "satisfy the inequality  || D_u p ||_L2 > 0.99 mxnewtstep, where p "
+      "denotes the current step and mxnewtstep is a scalar upper bound on the "
+      "scaled step length. Such a failure may mean that || D_F F(u)||_L2 "
+      "asymptotes from above to a positive value, or the real scalar "
+      "mxnewtstep is too small.");
+    f[KIN_LINESEARCH_BCFAIL] = Message(
+      "KIN_LINESEARCH_BCFAIL","The line search algorithm was unable to satisfy "
+      "the “beta-condition” for MXNBCF +1 nonlinear iterations (not necessarily "
+      "consecutive), which may indicate the algorithm is making poor progress.");
+    f[KIN_LINSOLV_NO_RECOVERY] = Message(
+      "KIN_LINSOLV_NO_RECOVERY","The user-supplied routine psolve encountered a"
+      " recoverable error, but the preconditioner is already current.");
+    f[KIN_LINIT_FAIL] = Message(
+      "KIN_LINIT_FAIL","The linear solver initialization routine (linit) "
+      "encountered an error.");
+    f[KIN_LSETUP_FAIL] = Message(
+      "KIN_LSETUP_FAIL","The user-supplied routine pset (used to set up the "
+      "preconditioner data) encountered an unrecoverable error.");
+    f[KIN_LSOLVE_FAIL] = Message(
+      "KIN_LSOLVE_FAIL","Either the user-supplied routine psolve "
+      "(used to to solve the preconditioned linear system) encountered an "
+      "unrecoverable error, or the linear solver routine (lsolve) "
+      "encountered an error condition.");
+    f[KIN_SYSFUNC_FAIL] = Message(
+      "KIN_SYSFUNC_FAIL","The system function failed in an unrecoverable manner.");
+    f[KIN_FIRST_SYSFUNC_ERR] = Message(
+      "KIN_FIRST_SYSFUNC_ERR","The system function failed recoverably at the first call.");
+    f[KIN_REPTD_SYSFUNC_ERR] = Message(
+      "KIN_REPTD_SYSFUNC_ERR","The system function had repeated recoverable "
+      "errors. No recovery is possible.");
     return f;
   }
 

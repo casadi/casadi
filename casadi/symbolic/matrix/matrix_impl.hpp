@@ -143,7 +143,12 @@ namespace casadi{
 
   template<typename DataType>
   const Matrix<DataType> Matrix<DataType>::sub(const Sparsity& sp, int dummy) const {
-    casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"sub(Sparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+    casadi_assert_message(
+      size1()==sp.size1() && size2()==sp.size2(),
+      "sub(Sparsity sp): shape mismatch. This matrix has shape "
+      << size1() << " x " << size2()
+      << ", but supplied sparsity index has shape "
+      << sp.size1() << " x " << sp.size2() << "." );
     Matrix<DataType> ret(sp);
 
     std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
@@ -219,14 +224,22 @@ namespace casadi{
     }
 
     if (!inBounds(jj,size1())) {
-      casadi_error("setSub[.,i,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+      casadi_error(
+        "setSub[.,i,jj] out of bounds. Your jj contains "
+        << *std::min_element(jj.begin(),jj.end()) << " up to "
+        << *std::max_element(jj.begin(),jj.end())
+        << ", which is outside of the matrix shape " << dimString() << ".");
     }
 
     Sparsity result_sparsity = repmat(i,jj.size(),1).sparsity();
 
-
-    casadi_assert_message(result_sparsity == m.sparsity(),"setSub(Imatrix" << i.dimString() << ",Ivector(length=" << jj.size() << "),Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(IMatrix," << jj.size() << ",1) = " << result_sparsity.dimString()  << " must match the sparsity of Matrix<DataType> = "  << m.dimString() << ".");
-
+    casadi_assert_message(
+      result_sparsity == m.sparsity(),
+      "setSub(Imatrix" << i.dimString() << ",Ivector(length=" << jj.size()
+      << "),Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(IMatrix,"
+      << jj.size() << ",1) = " << result_sparsity.dimString()
+      << " must match the sparsity of Matrix<DataType> = "  << m.dimString()
+      << ".");
 
     std::vector<int> slice_i = range(i.size2());
 
@@ -255,7 +268,12 @@ namespace casadi{
     Sparsity result_sparsity = repmat(j,1,ii.size()).sparsity();
 
 
-    casadi_assert_message(result_sparsity == m.sparsity(),"setSub(Ivector(length=" << ii.size() << "),Imatrix" << j.dimString() << ",Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(Imatrix,1," << ii.size() << ") = " << result_sparsity.dimString() << " must match the sparsity of Matrix<DataType> = " << m.dimString() << ".");
+    casadi_assert_message(
+        result_sparsity == m.sparsity(),
+        "setSub(Ivector(length=" << ii.size() << "),Imatrix" << j.dimString()
+        << ",Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(Imatrix,1,"
+        << ii.size() << ") = " << result_sparsity.dimString()
+        << " must match the sparsity of Matrix<DataType> = " << m.dimString() << ".");
 
     std::vector<int> slice_j = range(j.size1());
 
@@ -279,7 +297,10 @@ namespace casadi{
       return;
     }
 
-    casadi_assert_message(m.sparsity()==i.sparsity(),"setSub(Matrix m, Imatrix i, Imatrix j): sparsities must match. Got " << m.dimString() << " for m and " << j.dimString() << " for i and j.");
+    casadi_assert_message(
+      m.sparsity()==i.sparsity(),
+      "setSub(Matrix m, Imatrix i, Imatrix j): sparsities must match. Got "
+      << m.dimString() << " for m and " << j.dimString() << " for i and j.");
 
     for(int k=0; k<i.size(); ++k) {
       elem(j.at(k),i.at(k)) = m.at(k);
@@ -288,7 +309,12 @@ namespace casadi{
 
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy) {
-    casadi_assert_message(size2()==sp.size2() && size1()==sp.size1(),"sub(Sparsity sp): shape mismatch. This matrix has shape " << size2() << " x " << size1() << ", but supplied sparsity index has shape " << sp.size2() << " x " << sp.size1() << "." );
+    casadi_assert_message(
+      size2()==sp.size2() && size1()==sp.size1(),
+      "sub(Sparsity sp): shape mismatch. This matrix has shape "
+      << size2() << " x " << size1()
+      << ", but supplied sparsity index has shape "
+      << sp.size2() << " x " << sp.size1() << "." );
     // TODO(Joel): optimize this for speed
     Matrix<DataType> elm;
     if (m.isScalar()) {

@@ -108,7 +108,11 @@ namespace casadi {
       }
 
       if (monitored("F")) std::cout << "  F = " << F << std::endl;
-      if (monitored("normF")) std::cout << "  F (min, max, 1-norm, 2-norm) = " << (*std::min_element(F.data().begin(),F.data().end())) << ", " << (*std::max_element(F.data().begin(),F.data().end())) << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
+      if (monitored("normF"))
+        std::cout << "  F (min, max, 1-norm, 2-norm) = "
+                  << (*std::min_element(F.data().begin(),F.data().end()))
+                  << ", " << (*std::max_element(F.data().begin(),F.data().end()))
+                  << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
       if (monitored("J")) std::cout << "  J = " << J << std::endl;
 
       if ( numeric_limits<double>::infinity() != abstol_ ) {

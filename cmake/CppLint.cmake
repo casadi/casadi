@@ -34,7 +34,6 @@ set(STYLE_FILTER ${STYLE_FILTER}-whitespace/operators,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/parens,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/indent,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/comments,)
-set(STYLE_FILTER ${STYLE_FILTER}-whitespace/line_length,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/newline,)
 
 set(STYLE_FILTER ${STYLE_FILTER}-build/include_order,)
@@ -82,6 +81,7 @@ function(add_style_check_target TARGET_NAME SOURCES_LIST0)# PROJECT)
             "--filter=${STYLE_FILTER}"
             "--counting=detailed"
             "--extensions=cpp,hpp,h"
+            "--linelength=250"
 #            "--project=${PROJECT}"
             ${SOURCES_LIST}
     DEPENDS ${SOURCES_LIST}

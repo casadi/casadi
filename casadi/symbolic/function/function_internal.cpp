@@ -53,7 +53,10 @@ namespace casadi{
     addOption("regularity_check",         OT_BOOLEAN,             true,           "Throw exceptions when NaN or Inf appears during evaluation");
     addOption("inputs_check",             OT_BOOLEAN,             true,           "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,          "Flag to indicate wether statistics must be gathered");
-    addOption("derivative_generator",     OT_DERIVATIVEGENERATOR,   GenericType(),  "Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.");
+    addOption("derivative_generator",     OT_DERIVATIVEGENERATOR,   GenericType(),
+              "Function that returns a derivative function given a number of forward "
+              "and reverse directional derivative, overrides internal routines. "
+              "Check documentation of DerivativeGenerator.");
 
     verbose_ = false;
     user_data_ = 0;

@@ -68,7 +68,10 @@ QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QPSolverInte
   addOption("finalRamping",           OT_REAL, static_cast<double>(ops.finalRamping), "Final value for ramping strategy.");
   addOption("initialFarBounds",       OT_REAL, static_cast<double>(ops.initialFarBounds), "Initial size for far bounds.");
   addOption("growFarBounds",          OT_REAL, static_cast<double>(ops.growFarBounds), "Factor to grow far bounds.");
-  addOption("initialStatusBounds",    OT_STRING, SubjectToStatus_to_string(ops.initialStatusBounds), "Initial status of bounds at first iteration.","inactive::all bounds inactive|lower::all bounds active at their lower bound|upper::all bounds active at their upper bound");
+  addOption("initialStatusBounds",    OT_STRING, SubjectToStatus_to_string(ops.initialStatusBounds),
+            "Initial status of bounds at first iteration.",
+            "inactive::all bounds inactive|lower::all bounds active at their "
+            "lower bound|upper::all bounds active at their upper bound");
   addOption("epsFlipping",            OT_REAL, static_cast<double>(ops.epsFlipping), "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound.");
   addOption("numRegularisationSteps", OT_INTEGER, static_cast<int>(ops.numRegularisationSteps), "Maximum number of successive regularisation steps.");
   addOption("epsRegularisation",      OT_REAL, static_cast<double>(ops.epsRegularisation), "Scaling factor of identity matrix used for  Hessian regularisation.");
