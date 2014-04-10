@@ -2,30 +2,26 @@
 set(LINT_TARGETS)
 
 macro(casadi_library name)
-if(ENABLE_STATIC)
-add_library(${name} STATIC ${ARGN})
-endif()
-if(ENABLE_SHARED)
-set(WIN32_BACKUP "${WIN32}")
-set(WIN32)
-if(WIN32)
-message("weird")
-endif()
-add_compiler_export_flags()
-set(WIN32 "${WIN32_BACKUP}")
-add_library(${name} SHARED ${ARGN})
-generate_export_header(${name})
-endif()
-if(NOT "${name}" STREQUAL "casadi_symbolic")
-target_link_libraries(${name} casadi_symbolic)
-endif()
-set(CASADI_MODULES ${CASADI_MODULES} ${name} PARENT_SCOPE)
-install(TARGETS ${name}
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-add_style_check_target(${name} "${ARGN}")
-set(LINT_TARGETS ${LINT_TARGETS} "lint_${name}" PARENT_SCOPE)
+  if(ENABLE_STATIC)
+    add_library(${name} STATIC ${ARGN})
+  endif()
+  if(ENABLE_SHARED)
+    if(NOT ENABLE_EXPORT_ALL)
+      add_compiler_export_flags()
+    endif()
+    add_library(${name} SHARED ${ARGN})
+  endif()
+  generate_export_header(${name})
+  if(NOT "${name}" STREQUAL "casadi_symbolic")
+    target_link_libraries(${name} casadi_symbolic)
+  endif()
+  set(CASADI_MODULES ${CASADI_MODULES} ${name} PARENT_SCOPE)
+  install(TARGETS ${name}
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+  )
+  add_style_check_target(${name} "${ARGN}")
+  set(LINT_TARGETS ${LINT_TARGETS} "lint_${name}" PARENT_SCOPE)
 endmacro()
 
 add_subdirectory(symbolic)  # needed by all except external_packages
