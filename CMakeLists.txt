@@ -353,7 +353,7 @@ find_package(SWIG)
   if(SWIG_FOUND)
     add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
     add_custom_target(python DEPENDS _python_modules)
-    add_custom_target(haskell DEPENDS _haskell_modules)
+    add_custom_target(json DEPENDS _json_modules)
 endif()
 
 if(WITH_DOC)

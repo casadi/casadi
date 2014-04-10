@@ -113,11 +113,11 @@ foreach(my_module ${CASADI_MODULES})
   list(APPEND modules_python _${my_module})
 endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
-set(modules_haskell)
+set(modules_json)
 foreach(my_module ${CASADI_MODULES})
-  list(APPEND modules_haskell ${my_module}_tree.hs)
+  list(APPEND modules_json ${my_module}_tree.json)
 endforeach()
-add_custom_target(_haskell_modules DEPENDS ${modules_haskell}) # the haskell interface is created with the command "make haskell"
+add_custom_target(_json_modules DEPENDS ${modules_json}) # the json interface is created with the command "make json"
 
 # Workaround bug in cmake 2.8.3 and lower. See #704.
 add_custom_command(
@@ -228,23 +228,23 @@ foreach(my_module ${CASADI_MODULES})
 add_dependencies(install_python DEPENDS _${my_module})
 endforeach()
 
-# haskell interface
+# json interface
 foreach(my_module ${CASADI_MODULES})
-  swig_add_module_xml(${my_module}_haskell ${my_module}.i)
+  swig_add_module_xml(${my_module}_json ${my_module}.i)
 endforeach()
 
 foreach(my_module ${CASADI_MODULES})
 add_custom_command(
-  OUTPUT ${my_module}_tree.hs
-  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
-  DEPENDS ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/haskell/generate.py
+  OUTPUT ${my_module}_tree.json
+  COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
+  DEPENDS ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py
 )
 endforeach()
 
 foreach(my_module ${CASADI_MODULES})
-install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}_tree.hs ${PROJECT_BINARY_DIR}/swig/${my_module}_classes.hs ${PROJECT_BINARY_DIR}/swig/${my_module}_swiginclude.hpp
+install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}_tree.json ${PROJECT_BINARY_DIR}/swig/${my_module}_classes.json ${PROJECT_BINARY_DIR}/swig/${my_module}_swiginclude.hpp
   DESTINATION share/casadi
-  COMPONENT componenthaskell
+  COMPONENT componentjson
 )
 endforeach()
 
@@ -252,12 +252,12 @@ endforeach()
 #set(CPACK_MONOLITHIC_INSTALL FALSE)
 set(CPACK_TGZ_COMPONENT_INSTALL TRUE)
 
-set(CPACK_COMPONENT_COMPONENTHASKELL_DISPLAY_NAME "Haskell headers")
-set(CPACK_COMPONENT_COMPONENTHASKELL_DESCRIPTION
-  "Necessary headers to install a Haskell interface to CasADi")
+set(CPACK_COMPONENT_COMPONENTJSON_DISPLAY_NAME "Json meta-data")
+set(CPACK_COMPONENT_COMPONENTJSON_DESCRIPTION
+  "Installs meta-data about CasADi in json form.")
 
 set(CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
-set(CPACK_COMPONENTS_ALL Unspecified componenthaskell)
+set(CPACK_COMPONENTS_ALL Unspecified componentjson)
 # This will not actually work since we are in a EXCLUDE_FROM_ALL
 # http://cmake.3232098.n2.nabble.com/Yet-another-install-vs-exclude-from-all-thread-td4967491.html
 
