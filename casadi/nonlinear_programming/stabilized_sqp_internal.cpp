@@ -661,15 +661,16 @@ namespace casadi{
             transform(gsk_cand_.begin(),gsk_cand_.end(),dualpen_.begin(),dualpen_.begin(),plus<double>());
             Merit_mu_cand_ = fk_cand_+inner_prod(mu_e_,gsk_cand_)+.5*(1/muR_)*(normcs_cand_*normcs_cand_+nu_*std::pow(norm_2(dualpen_),2));
 
-          }
+          } // while (true)
           if (ls_success) {
             TRDelta_=gamma3_*t*std::max(norm_inf(dx_),norm_inf(ds_));
 
-          } else
-            TRDelta_ = TRDelta_/25.;
           } else {
-            TRDelta_ = TRDelta_ / 10;
+            TRDelta_ = TRDelta_/25.;
           }
+        } else { // if(max_iter_ls_>0)
+          TRDelta_ = TRDelta_ / 10;
+        }
       }
 
       // Candidate accepted, update dual variables

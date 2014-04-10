@@ -50,7 +50,7 @@ class CASADI_SYMBOLIC_EXPORT SDQPSolverInternal : public FunctionInternal{
     virtual void solve();
 
     /// Set options that make the SDQP solver more suitable for solving SOCPs
-    virtual void setSOCQPOptions() { };
+    virtual void setSOCQPOptions() {}
 
     /// Print out problem statement for debugging
     void printProblem(std::ostream &stream=std::cout) const;

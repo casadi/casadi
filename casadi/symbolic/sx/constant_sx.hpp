@@ -54,7 +54,7 @@ class CASADI_SYMBOLIC_EXPORT ConstantSX : public SXNode{
 public:
 
 // Destructor
-virtual ~ConstantSX(){};
+virtual ~ConstantSX(){}
 
 /** \brief  Get the value must be defined */
 virtual double getValue() const = 0;

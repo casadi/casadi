@@ -204,7 +204,7 @@ namespace casadi{
     using GenericExpression<SXElement>::__gt__;
     using GenericExpression<SXElement>::__ge__;
     using GenericExpression<SXElement>::__mldivide__;
-    SXElement __truediv__(const SXElement &y) const {return __div__(y);};
+    SXElement __truediv__(const SXElement &y) const {return __div__(y);}
     SXElement __pow__(const SXElement& b) const;
     SXElement __constpow__(const SXElement& b) const;
 

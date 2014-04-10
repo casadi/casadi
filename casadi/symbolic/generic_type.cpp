@@ -136,7 +136,7 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_UNKNOWN";
 
     }
-};
+}
 
 
 bool GenericType::isBool() const{

@@ -66,7 +66,7 @@ namespace casadi{
   class CASADI_SYMBOLIC_EXPORT DerivativeGenerator : public Functor {
     public:
       /// Default constructor
-      DerivativeGenerator() {};
+      DerivativeGenerator() {}
       /// Construct from C pointer
       DerivativeGenerator(DerivativeGeneratorCPtr ptr);
       /// Call
@@ -91,7 +91,7 @@ namespace casadi{
   class CASADI_SYMBOLIC_EXPORT CustomEvaluate : public Functor {
     public:
       /// Default constructor
-      CustomEvaluate() {};
+      CustomEvaluate() {}
       /// Construct from C pointer
       CustomEvaluate(CustomEvaluateCPtr ptr);
       /// Call
@@ -119,7 +119,7 @@ namespace casadi{
   class CASADI_SYMBOLIC_EXPORT Callback : public Functor {
     public:
       /// Default constructor
-      Callback() {};
+      Callback() {}
       /// Construct from C pointer
       Callback(CallbackCPtr ptr);
       /// Call

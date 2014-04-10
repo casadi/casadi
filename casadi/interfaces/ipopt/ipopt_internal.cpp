@@ -105,7 +105,7 @@ namespace casadi{
         setDefault(opt_name,it->second->DefaultInteger());
       } else if (casadi_type == OT_STRING) {
         setDefault(opt_name,it->second->DefaultString());
-      };
+      }
 
       // Save to map containing IPOPT specific options
       ops_[opt_name] = casadi_type;
@@ -291,7 +291,7 @@ namespace casadi{
 
         // Get the dimensions
         int N;
-        for(N=0; N*N<red_hess.size(); ++N) {};
+        for(N=0; N*N<red_hess.size(); ++N) {}
         casadi_assert(N*N==red_hess.size());
 
         // Store to statistics

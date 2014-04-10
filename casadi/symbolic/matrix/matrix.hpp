@@ -482,7 +482,7 @@ namespace casadi{
     Matrix<DataType> __le__(const Matrix<DataType> &y) const;
     Matrix<DataType> __eq__(const Matrix<DataType> &y) const;
     Matrix<DataType> __ne__(const Matrix<DataType> &y) const;
-    Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return __div__(y);};
+    Matrix<DataType> __truediv__(const Matrix<DataType> &y) const {return __div__(y);}
     Matrix<DataType> __pow__(const Matrix<DataType> &y) const;
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
     Matrix<DataType> __mpower__(const Matrix<DataType> &y) const;

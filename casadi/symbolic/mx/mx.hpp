@@ -430,7 +430,7 @@ namespace casadi{
     MX __le__(const MX& y) const;
     MX __eq__(const MX& y) const;
     MX __ne__(const MX& y) const;
-    MX __truediv__(const MX& y) const { return __div__(y);};
+    MX __truediv__(const MX& y) const { return __div__(y);}
     MX __pow__(const MX& b) const;
     MX __constpow__(const MX& b) const;
     MX __mrdivide__  (const MX& b) const;

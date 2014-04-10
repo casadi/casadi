@@ -58,7 +58,7 @@ namespace casadi{
     virtual void checkInitialBounds();
 
     /// Set options that make the NLP solver more suitable for solving QPs
-    virtual void setQPOptions() { };
+    virtual void setQPOptions() {}
 
     /// Get or generate a function to calculate the gradient of the objective function
     virtual Function getGradF();

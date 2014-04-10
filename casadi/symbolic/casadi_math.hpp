@@ -85,7 +85,7 @@ bool operation_checker(unsigned int op){
 
   // False by default
   return false;
-};
+}
 
 
 /// Easy access to all the functions for a particular type

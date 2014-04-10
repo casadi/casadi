@@ -189,7 +189,7 @@ namespace casadi{
 
     // Find out which task corresponds to the iind
     int task;
-    for(task=0; task<ntask && iind>=inind_[task+1]; ++task) {};
+    for(task=0; task<ntask && iind>=inind_[task+1]; ++task) {}
 
     // Check if the output index is also in this task
     if(oind>=outind_[task] && oind<outind_[task+1]){
@@ -213,7 +213,7 @@ namespace casadi{
 
     // Find out which task corresponds to the iind
     int task;
-    for(task=0; task<ntask && iind>=inind_[task+1]; ++task) {};
+    for(task=0; task<ntask && iind>=inind_[task+1]; ++task) {}
 
     // Check if the output index is also in this task
     if(oind>=outind_[task] && oind<outind_[task+1]){

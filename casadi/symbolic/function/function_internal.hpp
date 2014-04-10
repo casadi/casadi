@@ -209,7 +209,7 @@ namespace casadi{
     virtual void repr(std::ostream &stream) const;
 
     /** \brief Check if the numerical values of the supplied bounds make sense */
-    virtual void checkInputs() const {};
+    virtual void checkInputs() const {}
 
     /** \brief Get the unidirectional or bidirectional partition */
     void getPartition(int iind, int oind, Sparsity& D1, Sparsity& D2, bool compact, bool symmetric);

@@ -122,7 +122,9 @@ void SundialsInternal::init(){
       itsol_f_ = SD_BCGSTAB;
     } else if(getOption("iterative_solver")=="tfqmr") {
       itsol_f_ = SD_TFQMR;
-    } else throw CasadiException("Unknown sparse solver for forward integration");
+    } else {
+      throw CasadiException("Unknown sparse solver for forward integration");
+    }
 
     // Preconditioning type
     if(getOption("pretype")=="none")               pretype_f_ = PREC_NONE;
@@ -132,7 +134,9 @@ void SundialsInternal::init(){
     else                                           throw CasadiException("Unknown preconditioning type for forward integration");
   } else if(getOption("linear_solver_type")=="user_defined") {
     linsol_f_ = SD_USER_DEFINED;
-  } else throw CasadiException("Unknown linear solver for forward integration");
+  } else {
+    throw CasadiException("Unknown linear solver for forward integration");
+  }
 
 
   std::string linear_solver_typeB = hasSetOption("linear_solver_typeB") ? getOption("linear_solver_typeB") : getOption("linear_solver_type");
@@ -154,7 +158,9 @@ void SundialsInternal::init(){
       itsol_g_ = SD_BCGSTAB;
     } else if(iterative_solverB=="tfqmr") {
       itsol_g_ = SD_TFQMR;
-    } else throw CasadiException("Unknown sparse solver for backward integration");
+    } else {
+      throw CasadiException("Unknown sparse solver for backward integration");
+    }
 
     // Preconditioning type
     if(pretypeB=="none")               pretype_g_ = PREC_NONE;

@@ -50,13 +50,13 @@ class CASADI_SYMBOLIC_EXPORT StabilizedQPSolverInternal : public FunctionInterna
     virtual void solve();
 
     /// Set options that make the QP solver more suitable for solving LPs
-    virtual void setLPOptions() { };
+    virtual void setLPOptions() {}
 
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
 
     /** Generate native code in the interfaced language for debugging */
-    virtual void generateNativeCode(std::ostream& file) const {};
+    virtual void generateNativeCode(std::ostream& file) const {}
 
   protected:
 

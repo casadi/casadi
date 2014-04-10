@@ -41,7 +41,7 @@ namespace casadi{
   template<typename P>
   class FunctorCInternal {
     public:
-      FunctorCInternal(P ptr) : ptr_(ptr) {};
+      FunctorCInternal(P ptr) : ptr_(ptr) {}
     protected:
       P ptr_;
   };

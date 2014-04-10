@@ -412,7 +412,9 @@ namespace casadi{
             addVariable(ss.str(),v);
             this->path.append(v.v);
           }
-        } else throw CasadiException(string("SymbolicOCP::addOptimization: Unknown node ")+onode.getName());
+        } else {
+          throw CasadiException(string("SymbolicOCP::addOptimization: Unknown node ")+onode.getName());
+        }
       }
     }
 

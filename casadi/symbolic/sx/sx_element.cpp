@@ -689,15 +689,15 @@ namespace casadi{
     if(n->isConstant()) {
       if (n->isInteger()){
         int nn = n->getIntValue();
-        if(nn == 0)
+        if(nn == 0) {
           return 1;
-        else if(nn>100 || nn<-100) // maximum depth
+        } else if(nn>100 || nn<-100) { // maximum depth
           return BinarySX::create(OP_CONSTPOW,*this,nn);
-        else if(nn<0) // negative power
+        } else if(nn<0) { // negative power
           return 1/pow(*this,-nn);
-        else if(nn%2 == 1) // odd power
+        } else if(nn%2 == 1) { // odd power
           return *this*pow(*this,nn-1);
-        else{ // even power
+        } else { // even power
           SXElement rt = pow(*this,nn/2);
           return rt*rt;
         }

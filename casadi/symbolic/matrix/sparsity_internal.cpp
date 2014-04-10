@@ -1274,7 +1274,7 @@ namespace casadi{
     // while (selecting pivots) do
     while(nel < n){
       // --- Select node of minimum approximate degree --------------------
-      for(k = -1 ; mindeg < n && (k = head [mindeg]) == -1; mindeg++) {};
+      for(k = -1 ; mindeg < n && (k = head [mindeg]) == -1; mindeg++) {}
 
       if(next [k] != -1) last [next [k]] = -1 ;
 
@@ -2115,7 +2115,7 @@ namespace casadi{
           int j=row_[el];
 
           // Continue to the next row to skip
-          for(; je!=jj.end() && *je<j; ++je) {};
+          for(; je!=jj.end() && *je<j; ++je) {}
 
           // Remove row if necessary
           if(je!=jj.end() && *je==j){
@@ -2180,8 +2180,9 @@ namespace casadi{
         // Add the non-zero element, if there was an element in the location exists
         if(el<colind_[it+1] && row_[el]== jt) {
           ret[i*stride+jj_sorted_index[j]] = el;
-        } else
+        } else {
           ret[i*stride+jj_sorted_index[j]] = -1;
+        }
       }
     }
     return ret;
