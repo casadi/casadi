@@ -1274,10 +1274,11 @@ namespace casadi{
         clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
 
         // Allocate memory for the log
-        char log[log_size];
+        std::vector<char> log;
+        log.resize(log_size);
 
         // Print the log
-        clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
+        clGetProgramBuildInfo(program, sparsity_propagation_kernel_.device_id, CL_PROGRAM_BUILD_LOG, log_size, &(log[0]), NULL);
         cerr << log << endl;
         break;
       }
