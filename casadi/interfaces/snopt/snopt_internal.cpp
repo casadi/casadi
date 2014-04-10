@@ -588,7 +588,7 @@ namespace casadi {
       getPtr(snopt_cw_), &clen,
       getPtr(snopt_iw_), &ilen,
       getPtr(snopt_rw_), &rlen);
-    t_mainloop_ = double(clock()-time0)/CLOCKS_PER_SEC;
+    t_mainloop_ = static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
 
     stats_["return_status"] = info;
 
@@ -618,7 +618,7 @@ namespace casadi {
     const int w_ms = 7;
     const int p_ms = 2;
     const int w_n = 5;
-    if (hasOption("print_time") && bool(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       std::cout << std::endl;
 
       std::cout << "time spent in eval_grad_f       "
@@ -726,7 +726,7 @@ namespace casadi {
       jacF_.output().sparsity().sanityCheck(false);
 
       // timing and counters
-      t_eval_grad_f_ += double(clock()-time0)/CLOCKS_PER_SEC;
+      t_eval_grad_f_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
 
 
@@ -779,7 +779,7 @@ namespace casadi {
         }
 
         // timing and counters
-        t_eval_jac_g_ += double(clock()-time0)/CLOCKS_PER_SEC;
+        t_eval_jac_g_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
         n_eval_jac_g_ += 1;
 
         if (monitored("eval_nlp")) {
@@ -804,7 +804,7 @@ namespace casadi {
         }
 
         *mode = callback_(ref_, user_data_);
-        t_callback_fun_ += double(clock()-time0)/CLOCKS_PER_SEC;
+        t_callback_fun_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
         n_callback_fun_ += 1;
       }
     } catch (std::exception& ex) {

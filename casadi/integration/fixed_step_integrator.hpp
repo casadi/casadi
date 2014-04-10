@@ -24,7 +24,6 @@
 #define FIXED_STEP_INTEGRATOR_HPP
 
 #include "casadi/symbolic/function/integrator.hpp"
-#include "casadi/symbolic/function/integrator.hpp"
 
 #include <casadi/integration/casadi_integration_export.h>
 

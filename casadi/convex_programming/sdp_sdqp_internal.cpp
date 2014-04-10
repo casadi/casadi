@@ -67,7 +67,7 @@ namespace casadi {
     for (int k=0;k<n_;++k) {
       MX gk = vertcat(g_socp(ALL,k),DMatrix::sparse(1,1));
       MX fk = -blockcat(znp,gk,gk.T(),DMatrix::sparse(1,1));
-      // TODO: replace with ALL
+      // TODO(Joel): replace with ALL
       fi.push_back(blkdiag(f_sdqp(ALL,Slice(f_sdqp.size1()*k,f_sdqp.size1()*(k+1))),fk));
     }
     MX fin = en_socp*DMatrix::eye(n_+2);

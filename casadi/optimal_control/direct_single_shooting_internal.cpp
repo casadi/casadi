@@ -118,7 +118,7 @@ void DirectSingleShootingInternal::init(){
 
     // Add path constraints
     if(path_constraints){
-      vector<MX> cfcn_out = cfcn_.call(daeIn("x",X,"p",U[k])); // TODO: Change signature of cfcn_: remove algebraic variable, add control
+      vector<MX> cfcn_out = cfcn_.call(daeIn("x",X,"p",U[k])); // TODO(Joel): Change signature of cfcn_: remove algebraic variable, add control
       nlp_g.push_back(cfcn_out.at(0));
     }
   }

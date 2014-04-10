@@ -99,9 +99,9 @@ namespace casadi{
     fact_fcn_.init();
 
     // Symbolic expressions for solve function
-    SX Q = SX::sym("Q",QR[0].sparsity());
-    SX R = SX::sym("R",QR[1].sparsity());
-    SX b = SX::sym("b",input(1).size1(),1);
+    SX Q = SX::sym("Q", QR[0].sparsity());
+    SX R = SX::sym("R", QR[1].sparsity());
+    SX b = SX::sym("b", input(1).size1(), 1);
 
     // Solve non-transposed
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b

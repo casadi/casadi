@@ -222,7 +222,7 @@ namespace casadi{
         casadi_assert_message(flag == IDA_SUCCESS, "IDASetQuadErrCon");
 
         // Quadrature error tolerances
-        flag = IDAQuadSStolerances(mem_, reltol_, abstol_); // TODO: vector absolute tolerances
+        flag = IDAQuadSStolerances(mem_, reltol_, abstol_); // TODO(Joel): vector absolute tolerances
         if(flag != IDA_SUCCESS) idas_error("IDAQuadSStolerances",flag);
       }
     }
@@ -1772,7 +1772,7 @@ namespace casadi{
       int flag;
 
       // Current time
-      double t = IDA_mem->ida_tn; // TODO: is this correct?
+      double t = IDA_mem->ida_tn; // TODO(Joel): is this correct?
       // Multiple of df_dydot to be added to the matrix
       double cj = IDA_mem->ida_cj;
 
@@ -1819,7 +1819,7 @@ namespace casadi{
       int flag;
 
       // Current time
-      double t = IDA_mem->ida_tn; // TODO: is this correct?
+      double t = IDA_mem->ida_tn; // TODO(Joel): is this correct?
       // Multiple of df_dydot to be added to the matrix
       double cj = IDA_mem->ida_cj;
       double cjratio = IDA_mem->ida_cjratio;

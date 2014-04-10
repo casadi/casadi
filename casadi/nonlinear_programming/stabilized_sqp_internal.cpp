@@ -32,7 +32,6 @@
 #include <fstream>
 #include <cmath>
 #include <cfloat>
-#include <ctime>
 
 using namespace std;
 namespace casadi{
@@ -1032,7 +1031,7 @@ namespace casadi{
     // Hot-starting if possible
     stabilized_qp_solver_.setInput(x_opt, STABILIZED_QP_SOLVER_X0);
 
-    //TODO: Fix hot-starting of dual variables
+    //TODO(Joel): Fix hot-starting of dual variables
     //qp_solver_.setInput(lambda_A_opt, QP_SOLVER_LAMBDA_INIT);
 
     // Pass simple bounds

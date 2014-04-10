@@ -167,7 +167,7 @@ namespace casadi{
         if(flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrCon",flag);
 
         // Quadrature error tolerances
-        flag = CVodeQuadSStolerances(mem_, reltol_, abstol_); // TODO: vector absolute tolerances
+        flag = CVodeQuadSStolerances(mem_, reltol_, abstol_); // TODO(Joel): vector absolute tolerances
         if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerances",flag);
       }
     }
@@ -1527,7 +1527,7 @@ namespace casadi{
       int flag;
 
       // Current time
-      double t = cv_mem->cv_tn; // TODO: is this correct?
+      double t = cv_mem->cv_tn; // TODO(Joel): is this correct?
       double gamma = cv_mem->cv_gamma;
 
       cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
@@ -1604,7 +1604,7 @@ namespace casadi{
       int flag;
 
       // Current time
-      double t = cv_mem->cv_tn; // TODO: is this correct?
+      double t = cv_mem->cv_tn; // TODO(Joel): is this correct?
       double gamma = cv_mem->cv_gamma;
 
       cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);

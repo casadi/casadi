@@ -26,7 +26,7 @@
 /// \cond INTERNAL
 
 extern "C"{
-#include "cs.h"
+#include "external_packages/CSparse/Include/cs.h"
 }
 
 #include "csparse.hpp"

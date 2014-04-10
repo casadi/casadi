@@ -2949,7 +2949,7 @@ namespace casadi{
   Sparsity SparsityInternal::starColoring2(int ordering, int cutoff) const{
     casadi_assert_warning(ncol_==nrow_,"StarColoring requires a square matrix, but got " << dimString() << ".");
 
-    // TODO What we need here, is a distance-2 smallest last ordering
+    // TODO(Joel): What we need here, is a distance-2 smallest last ordering
     // Reorder, if necessary
     if(ordering!=0){
       casadi_assert(ordering==1);

@@ -618,7 +618,7 @@ namespace casadi{
               wref = *this;
 
               // Recache the old sparsity pattern
-              // TODO: recache "ref"
+              // TODO(Joel): recache "ref"
               return;
 
             } else { // There is a hash rowision (unlikely, but possible)

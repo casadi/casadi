@@ -289,7 +289,7 @@ namespace casadi{
   template<typename DataType>
   void Matrix<DataType>::setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy) {
     casadi_assert_message(size2()==sp.size2() && size1()==sp.size1(),"sub(Sparsity sp): shape mismatch. This matrix has shape " << size2() << " x " << size1() << ", but supplied sparsity index has shape " << sp.size2() << " x " << sp.size1() << "." );
-    // TODO: optimize this for speed
+    // TODO(Joel): optimize this for speed
     Matrix<DataType> elm;
     if (m.isScalar()) {
       elm = Matrix<DataType>(sp,m.at(0));
@@ -2010,7 +2010,7 @@ namespace casadi{
 
   template<typename DataType>
   bool Matrix<DataType>::isEqual(const Matrix<DataType> &ex2) const{
-    // TODO: Very inefficient, refactor
+    // TODO(Joel): Very inefficient, refactor
     if((size()!=0 || ex2.size()!=0) && shape()!=ex2.shape()) return false;
     Matrix<DataType> difference = *this - ex2;
     return difference.isZero();

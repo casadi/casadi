@@ -23,7 +23,6 @@
 #ifndef X_FUNCTION_INTERNAL_HPP
 #define X_FUNCTION_INTERNAL_HPP
 
-#include <map>
 #include <stack>
 #include "function_internal.hpp"
 #include "../matrix/sparsity_tools.hpp"

@@ -30,7 +30,7 @@
 
 #ifdef WITH_IPOPT_CALLBACK
 #define private public
-#include <IpIpoptData.hpp>
+#include <IpIpoptData.hpp> // NOLINT(build/include)
 #include <IpOrigIpoptNLP.hpp>
 #include <IpTNLPAdapter.hpp>
 #include <IpDenseVector.hpp>

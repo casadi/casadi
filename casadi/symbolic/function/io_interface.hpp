@@ -313,12 +313,12 @@ namespace casadi{
     void setOutput(T val, const std::string &oname)            { setOutput(val,outputSchemeEntry(oname)); } \
 
 #ifndef DOXYGENPROC
-    SETTERS(double);
+    SETTERS(double) // NOLINT(readability/casting) - false positive
 #ifndef SWIG
-    SETTERS(const double*);
+    SETTERS(const double*)
 #endif // SWIG
-    SETTERS(const std::vector<double>&);
-    SETTERS(const Matrix<double>&);
+    SETTERS(const std::vector<double>&)
+    SETTERS(const Matrix<double>&)
 #endif // DOXYGENPROC
 
 #undef SETTERS
@@ -331,10 +331,10 @@ namespace casadi{
 
 #ifndef DOXYGENPROC
 #ifndef SWIG
-GETTERS(double&);
-GETTERS(double*);
-GETTERS(std::vector<double>&);
-GETTERS(Matrix<double>&);
+GETTERS(double&)
+GETTERS(double*) // NOLINT(readability/casting) - false positive
+GETTERS(std::vector<double>&)
+GETTERS(Matrix<double>&)
 #endif // SWIG
 #endif // DOXYGENPROC
 #undef GETTERS

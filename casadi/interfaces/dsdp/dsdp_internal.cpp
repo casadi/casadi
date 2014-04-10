@@ -166,7 +166,7 @@ namespace casadi {
     if (inputs_check_) checkInputs();
     if (print_problem_) printProblem();
 
-    // TODO: Return flag from DSDP functions not checked!
+    // TODO(Joris): Return flag from DSDP functions not checked!
     // Seems unavoidable to do DSDPCreate here
 
     // Destroy existing DSDP instance if already allocated
@@ -226,7 +226,7 @@ namespace casadi {
       mappingA_.setInput(input(SDP_SOLVER_UBA),2);
       mappingA_.evaluate();
 
-      // TODO: this can be made non-allocating bu hacking into DSDP source code
+      // TODO(Joris): this can be made non-allocating bu hacking into DSDP source code
       LPConeSetDataC(lpcone_, nc_*2, mappingA_.output().ptr());
 
     }

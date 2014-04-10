@@ -862,7 +862,7 @@ namespace casadi{
     // Hot-starting if possible
     qp_solver_.setInput(x_opt, QP_SOLVER_X0);
 
-    //TODO: Fix hot-starting of dual variables
+    //TODO(Joel): Fix hot-starting of dual variables
     //qp_solver_.setInput(lambda_A_opt, QP_SOLVER_LAMBDA_INIT);
 
     // Pass simple bounds
