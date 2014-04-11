@@ -132,8 +132,8 @@ def locate(pattern, root=os.curdir):
         for filename in fnmatch.filter(files, pattern):
             yield os.path.join(path, filename)
             
-# locate the namespaceCasADi.xml
-xmlNS = etree.parse(list(locate('namespaceCasADi.xml',root=xml))[0])
+# locate the namespacecasadi.xml
+xmlNS = etree.parse(list(locate('namespacecasadi.xml',root=xml))[0])
 
 # construct a table with enum info
 enums = {}
