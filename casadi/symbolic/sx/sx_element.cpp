@@ -171,7 +171,8 @@ namespace casadi{
   }
 
   template<>
-  bool Matrix<SXElement>::__nonzero__() const { 
+  bool Matrix<SXElement>::__nonzero__() const {
+    if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you provided a shape" << dimString());}
     return at(0).__nonzero__();
   }
 
