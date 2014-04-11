@@ -162,12 +162,12 @@ namespace casadi{
 
   /** \brief  Get the sparsity pattern of a matrix */
   CASADI_SYMBOLIC_EXPORT SX spy(const SX& A);
-  
+
 #ifndef SWIG
   // "operator?:" can not be overloaded
   template<typename T>
   T if_else(const SXElement& cond, const T& if_true, const T &if_false);
-  
+
   /** \brief  Create a block matrix */
   template<int n, int m>
   SX blockmatrix(SX array[n][m]);
@@ -185,7 +185,7 @@ namespace casadi{
   SX if_else(const SXElement& cond, const T& if_true, const T &if_false){
     return if_false + (if_true-if_false)*cond;
   }
-  
+
   template<int n, int m>
   SX blockmatrix(SX array[n][m]){
     /** \brief  Return matrix */
