@@ -160,8 +160,14 @@ for enum in xmlNS.findall("//memberdef[@kind='enum']"):
     
 from pyparsing import *
 
-parse_quoted_string = dblQuotedString.copy().setParseAction(removeQuotes)
-parse_quoted_string_keep = dblQuotedString.copy().setParseAction(lambda x:x)
+
+multiline_string = OneOrMore(dblQuotedString.copy())
+
+def removequotes(s):
+  return s[1:-1]
+  
+parse_quoted_string = multiline_string.setParseAction(lambda x: "".join(map(removequotes,x)))
+parse_quoted_string_keep = multiline_string.setParseAction(lambda x: '"' + ("".join(map(removequotes,x)))+'"')
 parse_type = Word( srange("[A-Z]") + "_").setResultsName("type")
 
 comma = Suppress(Literal(","))
@@ -172,6 +178,7 @@ parse_allowed = parse_quoted_string.setResultsName("allowed")
 parse_inherit = Word(alphanums).setResultsName("inherit").setParseAction(lambda x: x)
 
 parse_match = Literal("addOption(") + parse_quoted_string.setResultsName("name") + comma + parse_type + Optional(comma + parse_default + Optional(comma + parse_quoted_string.setResultsName("description") +Optional(comma + parse_allowed + Optional(comma + parse_inherit )) )) +  Literal(")") + Optional(";" + Optional("//" + restOfLine.setResultsName("afterdescription")))
+
     
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
@@ -187,10 +194,18 @@ for name,meta in metadata.items():
   meta['stats']={}
   meta['monitors']={}
   f =file(source,"r")
-  for l in f:
+  lines = f.readlines()
+  linec = 0
+  while linec<len(lines):
+    l = lines[linec]
+    linec+=1
     if 'addOption' in l:
       if ('//' in l and (l.find('addOption') > l.find('//'))) or '->first' in l or '::addOption' in l or 'allowed_vals_vec' in l:
         continue
+      while ";" not in l:
+        linec+=1
+        l+=lines[linec]
+        
       try:
         result = parse_match.parseString(l).asDict()
         for k,v in result.iteritems():
