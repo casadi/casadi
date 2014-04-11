@@ -381,8 +381,8 @@ namespace casadi{
     const MX sub(const std::vector<int>& rr, int cc) const;
     const MX sub(int rr, const std::vector<int>& cc) const;
     const MX sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
-    const MX sub(const Matrix<int>& k, int dummy=0) const;
     const MX sub(const Sparsity& sp, int dummy=0) const;
+    const MX sub(const Matrix<int>& rr, int cc) const { return sub(rr,Slice(cc));}
     const MX sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
     const MX sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
     const MX sub(int rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
@@ -391,14 +391,17 @@ namespace casadi{
     const MX sub(const Matrix<int>& rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
     const MX sub(const Slice& rr, const Matrix<int>& cc) const {return sub(rr.getAll(size1()),cc);}
     const MX sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
+    const MX sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr),cc);}
 
     void setSub(const MX& m, int rr, int cc);
     void setSub(const MX& m, const std::vector<int>& rr, int cc);
     void setSub(const MX& m, int rr, const std::vector<int>& cc);
     void setSub(const MX& m, const std::vector<int>& rr, const std::vector<int>& cc);
-    void setSub(const MX& m, const Matrix<int>& k);
+    void setSub(const MX& m, const std::vector<int>& rr, Slice cc) { setSub(m,rr,cc.getAll(size2()));}
     void setSub(const MX& m, const Matrix<int>& rr, const std::vector<int>& cc);
+    void setSub(const MX& m, const Matrix<int>& rr, int cc) { setSub(m,rr,std::vector<int>(1,cc)); }
     void setSub(const MX& m, const std::vector<int>& rr, const Matrix<int>& cc);
+    void setSub(const MX& m, int rr, const Matrix<int>& cc) { setSub(m,std::vector<int>(1,rr),cc); }
     void setSub(const MX& m, const Slice& rr, const Slice& cc);
     void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc);
     void setSub(const MX& m, const Sparsity& sp, int dummy);

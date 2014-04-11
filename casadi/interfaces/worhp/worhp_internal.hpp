@@ -26,6 +26,9 @@
 #include "casadi/symbolic/function/nlp_solver_internal.hpp"
 #include "worhp_solver.hpp"
 
+
+
+
 // GCC_VERSION is defined in worhp.h
 #ifdef GCC_VERSION
 #undef GCC_VERSION
@@ -35,6 +38,9 @@
 #define _Bool bool
 
 #include "worhp.h"
+
+// MACROs that polute our code
+#undef Q
 
 /// \cond INTERNAL
 namespace casadi{

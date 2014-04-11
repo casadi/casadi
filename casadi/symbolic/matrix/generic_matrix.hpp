@@ -211,6 +211,7 @@ namespace casadi{
   };
 
 #ifndef SWIG
+#ifdef casadi_symbolic_implementation
   // Implementations
 
   template<typename MatType>
@@ -321,9 +322,10 @@ namespace casadi{
     }
   }
 
-
+#endif
 #endif // SWIG
 
+#ifdef casadi_symbolic_implementation
   template<typename MatType>
   std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp, int p){
     std::vector<MatType> ret(p);
@@ -351,6 +353,7 @@ namespace casadi{
   MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp){
     throw CasadiException("\"sym\" not defined for instantiation");
   }
+#endif
 
 } // namespace casadi
 

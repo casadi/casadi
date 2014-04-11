@@ -131,13 +131,6 @@ class CASADI_SYMBOLIC_EXPORT GenericExpression{
 
 };
 
-template<class T>
-CASADI_SYMBOLIC_EXPORT bool __nonzero__(const T &val) { return val!=0;}
-
-#ifndef SWIG
-// Implementations
-#endif // SWIG
-
 
 } // namespace casadi
 

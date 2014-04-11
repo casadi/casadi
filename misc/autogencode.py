@@ -147,7 +147,7 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s+="\n}\n"
 
     return s
-
+    
   def cppcode(self):
 
     return ""
@@ -261,6 +261,9 @@ class LazyFile(object):
     f = file(self._path,'w')
     f.write(''.join(self._lines))
     f.close()
+    
+  def __del__(self):
+    self.close()
 
 autogenmetadatahpp = LazyFile(os.path.join(os.curdir,"..","casadi","symbolic","function","schemes_metadata.hpp"))
 autogenhelpershpp = LazyFile(os.path.join(os.curdir,"..","casadi","symbolic","function","schemes_helpers.hpp"))
@@ -367,6 +370,11 @@ for p in schemes:
   autogenpy.write(p.swigcode())
   autogenpy.write("#endif //SWIGPYTHON\n")
   autogenpy.write(p.pureswigcode())
+  
+autogenhelpershpp.write("#define INSTANTIATE_IOSCHEME_HELPERS(T) \\\n")
+for p in schemes:
+  autogenhelpershpp.write("template class %sIOSchemeVector<T>;\\\n" % p.enum)
+autogenhelpershpp.write("\n")
 
 autogencpp.write("std::string getSchemeName(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
@@ -439,8 +447,3 @@ autogenmetadatahpp.write("\n\n")
 autogenhelpershpp.write("\n\n")
 autogencpp.write("\n\n")
 autogenpy.write("\n")
-
-autogenmetadatahpp.close()
-autogenhelpershpp.close()
-autogencpp.close()
-autogenpy.close()

@@ -2391,6 +2391,53 @@ std::vector<M> stabilizedQpIn(const std::vector<M>& args,
   return ret;
 
 }
+#define INSTANTIATE_IOSCHEME_HELPERS(T) \
+template class DPLEInputIOSchemeVector<T>;\
+template class DPLEOutputIOSchemeVector<T>;\
+template class ControlledDAEInputIOSchemeVector<T>;\
+template class ControlSimulatorInputIOSchemeVector<T>;\
+template class HNLPInputIOSchemeVector<T>;\
+template class DAEInputIOSchemeVector<T>;\
+template class DAEOutputIOSchemeVector<T>;\
+template class RDAEInputIOSchemeVector<T>;\
+template class RDAEOutputIOSchemeVector<T>;\
+template class IntegratorInputIOSchemeVector<T>;\
+template class IntegratorOutputIOSchemeVector<T>;\
+template class LinsolInputIOSchemeVector<T>;\
+template class LinsolOutputIOSchemeVector<T>;\
+template class LPSolverInputIOSchemeVector<T>;\
+template class LPSolverOutputIOSchemeVector<T>;\
+template class LPStructIOSchemeVector<T>;\
+template class NLPInputIOSchemeVector<T>;\
+template class NLPOutputIOSchemeVector<T>;\
+template class GradFInputIOSchemeVector<T>;\
+template class GradFOutputIOSchemeVector<T>;\
+template class JacGInputIOSchemeVector<T>;\
+template class JacGOutputIOSchemeVector<T>;\
+template class HessLagInputIOSchemeVector<T>;\
+template class HessLagOutputIOSchemeVector<T>;\
+template class NLPSolverInputIOSchemeVector<T>;\
+template class NLPSolverOutputIOSchemeVector<T>;\
+template class MayerInputIOSchemeVector<T>;\
+template class OCPInputIOSchemeVector<T>;\
+template class OCPOutputIOSchemeVector<T>;\
+template class QCQPSolverInputIOSchemeVector<T>;\
+template class QCQPSolverOutputIOSchemeVector<T>;\
+template class QCQPStructIOSchemeVector<T>;\
+template class QPSolverInputIOSchemeVector<T>;\
+template class QPSolverOutputIOSchemeVector<T>;\
+template class QPStructIOSchemeVector<T>;\
+template class SDPInputIOSchemeVector<T>;\
+template class SDPOutputIOSchemeVector<T>;\
+template class SDPStructIOSchemeVector<T>;\
+template class SDQPInputIOSchemeVector<T>;\
+template class SDQPOutputIOSchemeVector<T>;\
+template class SDQPStructIOSchemeVector<T>;\
+template class SOCPInputIOSchemeVector<T>;\
+template class SOCPOutputIOSchemeVector<T>;\
+template class SOCPStructIOSchemeVector<T>;\
+template class StabilizedQPSolverInputIOSchemeVector<T>;\
+
 } // namespace casadi
 #endif //SCHEMES_HELPERS_HPP
 

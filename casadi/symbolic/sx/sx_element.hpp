@@ -302,10 +302,11 @@ namespace casadi{
 #ifndef SWIG
   // Template specializations
   template<>
-  bool __nonzero__(const SXElement& val);
+  CASADI_SYMBOLIC_EXPORT bool Matrix<SXElement>::__nonzero__() const;
+  
 
   template<>
-  class casadi_limits<SXElement>{
+  class CASADI_SYMBOLIC_EXPORT casadi_limits<SXElement>{
   public:
     static bool isZero(const SXElement& val);
     static bool isAlmostZero(const SXElement& val, double tol);
@@ -370,7 +371,7 @@ namespace casadi{
 
 namespace std{
   template<>
-  class numeric_limits<casadi::SXElement>{
+  class CASADI_SYMBOLIC_EXPORT numeric_limits<casadi::SXElement>{
   public:
     static const bool is_specialized = true;
     static casadi::SXElement min() throw();

@@ -57,6 +57,7 @@ class CASADI_SYMBOLIC_EXPORT NonZeros : public M{
     K k_;
 };
 
+#ifdef casadi_symbolic_implementation
 // Implementation
 template<typename M, typename K>
 const M& NonZeros<M,K>::operator=(const NonZeros<M,K> &y){
@@ -98,7 +99,13 @@ M NonZeros<M,K>::operator/=(const M &y){
   mat_.setNZ(k_,s);
   return s;
 }
+#endif
 
+#define INSTANTIATE_NONZEROS(Mt) \
+template class NonZeros< Mt , std::vector<int> >;\
+template class NonZeros< Mt , int >;\
+template class NonZeros< Mt , Matrix<int> >;\
+template class NonZeros< Mt , Slice >;
 
 } // namespace casadi
 

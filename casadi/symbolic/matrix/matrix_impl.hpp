@@ -62,7 +62,7 @@ namespace casadi{
   template<typename DataType>
   bool Matrix<DataType>::__nonzero__() const {
     if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you provided a shape" << dimString());}
-    return casadi::__nonzero__(at(0));
+    return at(0)!=0;
   }
 
   template<typename DataType>

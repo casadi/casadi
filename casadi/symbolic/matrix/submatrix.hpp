@@ -58,6 +58,7 @@ namespace casadi{
     J j_;
   };
 
+#ifdef casadi_symbolic_implementation
   // Implementation
   template<typename M, typename I, typename J>
   const M& SubMatrix<M,I,J>::operator=(const SubMatrix<M,I,J> &y) {
@@ -99,7 +100,23 @@ namespace casadi{
     mat_.setSub(s,i_,j_);
     return s;
   }
+#endif
 
+#define INSTANTIATE_SUBMATRIX(Mt)\
+template class SubMatrix< Mt , int, int >;\
+template class SubMatrix< Mt , int, std::vector<int> >;\
+template class SubMatrix< Mt , int, Slice >;\
+template class SubMatrix< Mt , std::vector<int> , int >;\
+template class SubMatrix< Mt , std::vector<int> , std::vector<int> >;\
+template class SubMatrix< Mt , std::vector<int> , Matrix<int> >;\
+template class SubMatrix< Mt , std::vector<int> , Slice >;\
+template class SubMatrix< Mt , int , Matrix<int> >;\
+template class SubMatrix< Mt , Slice, int >;\
+template class SubMatrix< Mt , Slice, Slice >;\
+template class SubMatrix< Mt , Matrix<int> , int >;\
+template class SubMatrix< Mt , Matrix<int> , std::vector<int> >;\
+template class SubMatrix< Mt , Matrix<int> , Matrix<int> >;\
+template class SubMatrix< Mt , Sparsity , int >;
 
 } // namespace casadi
 

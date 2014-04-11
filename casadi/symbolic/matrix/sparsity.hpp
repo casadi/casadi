@@ -617,16 +617,16 @@ namespace casadi{
   /// \cond INTERNAL
   /** \brief Hash value of an integer */
   template<typename T>
-  CASADI_SYMBOLIC_EXPORT inline size_t hash_value(T v){ return size_t(v);}
+  inline size_t hash_value(T v){ return size_t(v);}
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
   template<typename T>
-  CASADI_SYMBOLIC_EXPORT inline void hash_combine(std::size_t& seed, T v){
+  inline void hash_combine(std::size_t& seed, T v){
     seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
   }
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
-  CASADI_SYMBOLIC_EXPORT inline void hash_combine(std::size_t& seed, const std::vector<int>& v){
+  inline void hash_combine(std::size_t& seed, const std::vector<int>& v){
     for(std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed,*i);
   }
 

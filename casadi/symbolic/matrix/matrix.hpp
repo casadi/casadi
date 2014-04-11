@@ -283,7 +283,9 @@ namespace casadi{
     const Matrix<DataType> sub(const Slice& rr, int cc) const{ return sub(rr.getAll(size1()),std::vector<int>(1,cc));}
     const Matrix<DataType> sub(int rr, const Slice& cc) const{ return sub(std::vector<int>(1,rr),cc.getAll(size2()));}
     const Matrix<DataType> sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
+    const Matrix<DataType> sub(const Matrix<int>& rr, int cc) const { return sub(rr,Slice(cc));}
     const Matrix<DataType> sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
+    const Matrix<DataType> sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr),cc);}
     const Matrix<DataType> sub(const Matrix<int>& rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
     const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc) const {return sub(rr.getAll(size1()),cc);}
     const Matrix<DataType> sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
@@ -300,7 +302,9 @@ namespace casadi{
     void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Slice& cc){ setSub(m,rr,cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc){ setSub(m,rr.getAll(size1()),cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const std::vector<int>& cc);
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, int cc) { setSub(m,rr,std::vector<int>(1,cc)); }
     void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Matrix<int>& cc);
+    void setSub(const Matrix<DataType>& m, int rr, const Matrix<int>& cc) { setSub(m,std::vector<int>(1,rr),cc); }
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc) {setSub(m,rr,cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc) {setSub(m,rr.getAll(size1()),cc);}
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc);
@@ -816,6 +820,7 @@ namespace casadi{
 
 // Typedefs/template initializations
 namespace casadi{
+
   typedef Matrix<int> IMatrix;
   typedef Matrix<double> DMatrix;
   typedef std::vector<Matrix<double> > DMatrixVector;
@@ -828,7 +833,9 @@ namespace casadi{
   /// \endcond
 } // namespace casadi
 
+#ifdef casadi_symbolic_implementation
 #include "matrix_impl.hpp"
+#endif
 
 #endif // MATRIX_HPP
 

@@ -129,6 +129,7 @@ namespace casadi{
 
   };
 
+#ifdef casadi_symbolic_implementation
   // Template implementations
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
@@ -1048,6 +1049,7 @@ namespace casadi{
 
   }
 
+#endif
 
 } // namespace casadi
 /// \endcond

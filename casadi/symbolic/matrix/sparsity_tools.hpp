@@ -37,7 +37,7 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT Sparsity reshape(const Sparsity& a, int nrow, int ncol);
 
   /** \brief Transpose the pattern */
-  CASADI_SYMBOLIC_EXPORT inline Sparsity transpose(const Sparsity& a){ return a.transpose();}
+  inline Sparsity transpose(const Sparsity& a){ return a.transpose();}
 
   /** \brief Vectorize the pattern */
   CASADI_SYMBOLIC_EXPORT Sparsity vec(const Sparsity& a);
@@ -77,10 +77,10 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT int rank(const Sparsity& a);
 
   /// Get upper triangular part
-  CASADI_SYMBOLIC_EXPORT inline Sparsity triu(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTriu(includeDiagonal);}
+  inline Sparsity triu(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTriu(includeDiagonal);}
 
   /// Get lower triangular part
-  CASADI_SYMBOLIC_EXPORT inline Sparsity tril(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTril(includeDiagonal);}
+  inline Sparsity tril(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTril(includeDiagonal);}
 
   /*
   @}

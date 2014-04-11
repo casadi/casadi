@@ -36,6 +36,9 @@ namespace casadi{
     mysolver.setInput(b,LINSOL_B);
     mysolver.prepare();
     mysolver.solve(false);
+    
+    //Matrix<int> a(std::vector<int>(1,0), 1, 1);
+    
     return mysolver.output(LINSOL_X);
   }
 

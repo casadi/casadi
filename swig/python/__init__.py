@@ -33,13 +33,16 @@ except:
 
 import sys
 import ctypes
-flags0 = sys.getdlopenflags() # get the original flags
-sys.setdlopenflags( flags0 | ctypes.RTLD_GLOBAL ) # set our workaround flags
+
+if hasattr(sys,"getdlopenflags"):
+  flags0 = sys.getdlopenflags() # get the original flags
+  sys.setdlopenflags( flags0 | ctypes.RTLD_GLOBAL ) # set our workaround flags
 
 from casadi import *    # import everything
 import casadi as casadi # import everything
 
-sys.setdlopenflags( flags0 ) # set the old flags back
+if hasattr(sys,"getdlopenflags"):
+  sys.setdlopenflags( flags0 ) # set the old flags back
 
 import types
   

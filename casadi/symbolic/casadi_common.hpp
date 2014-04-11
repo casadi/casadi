@@ -25,5 +25,13 @@
 
 #include <casadi/symbolic/casadi_symbolic_export.h>
 
+#ifdef casadi_symbolic_EXPORTS
+#define casadi_symbolic_implementation
+#endif
+
+#ifndef SHARED_LIBRARY
+#define casadi_symbolic_implementation
+#endif
+
 #endif // CASADI_COMMON_HPP
 

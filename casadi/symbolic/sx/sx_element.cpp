@@ -168,7 +168,12 @@ namespace casadi{
   bool SXElement::__nonzero__() const {
     if (isConstant()) return !isZero();
     casadi_error("Cannot compute the truth value of a CasADi SXElement symbolic expression.")
-      }
+  }
+
+  template<>
+  bool Matrix<SXElement>::__nonzero__() const { 
+    return at(0).__nonzero__();
+  }
 
   SXElement SXElement::__add__(const SXElement& y) const{
     // NOTE: Only simplifications that do not result in extra nodes area allowed
@@ -506,9 +511,6 @@ namespace casadi{
     if (!node) return 0;
     return (long) node;
   }
-
-  template<>
-  bool __nonzero__<SXElement>(const SXElement& val) { return val.__nonzero__();}
 
   const SXElement casadi_limits<SXElement>::zero(new ZeroSX(),false); // node corresponding to a constant 0
   const SXElement casadi_limits<SXElement>::one(new OneSX(),false); // node corresponding to a constant 1
@@ -896,7 +898,33 @@ namespace casadi{
 
 using namespace casadi;
 namespace std{
+/**
+  const bool numeric_limits<casadi::SXElement>::is_specialized = true;
+  const int  numeric_limits<casadi::SXElement>::digits = 0;
+  const int  numeric_limits<casadi::SXElement>::digits10 = 0;
+  const bool numeric_limits<casadi::SXElement>::is_signed = false;
+  const bool numeric_limits<casadi::SXElement>::is_integer = false;
+  const bool numeric_limits<casadi::SXElement>::is_exact = false;
+  const int numeric_limits<casadi::SXElement>::radix = 0;
+  const int  numeric_limits<casadi::SXElement>::min_exponent = 0;
+  const int  numeric_limits<casadi::SXElement>::min_exponent10 = 0;
+  const int  numeric_limits<casadi::SXElement>::max_exponent = 0;
+  const int  numeric_limits<casadi::SXElement>::max_exponent10 = 0;
 
+  const bool numeric_limits<casadi::SXElement>::has_infinity = true;
+  const bool numeric_limits<casadi::SXElement>::has_quiet_NaN = true;
+  const bool numeric_limits<casadi::SXElement>::has_signaling_NaN = false;
+  const float_denorm_style has_denorm = denorm absent;
+  const bool numeric_limits<casadi::SXElement>::has_denorm_loss = false;
+
+  const bool numeric_limits<casadi::SXElement>::is_iec559 = false;
+  const bool numeric_limits<casadi::SXElement>::is_bounded = false;
+  const bool numeric_limits<casadi::SXElement>::is_modulo = false;
+
+  const bool numeric_limits<casadi::SXElement>::traps = false;
+  const bool numeric_limits<casadi::SXElement>::tinyness_before = false;
+  const float_round_style numeric_limits<casadi::SXElement>::round_style = round_toward_zero;
+*/
   SXElement numeric_limits<SXElement>::infinity() throw(){
     return casadi::casadi_limits<SXElement>::inf;
   }

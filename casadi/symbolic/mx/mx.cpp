@@ -34,6 +34,8 @@
 
 using namespace std;
 namespace casadi{
+  
+  template class GenericMatrix< MX >;
 
   MX::~MX(){
   }
@@ -127,15 +129,6 @@ namespace casadi{
 
     // Create return MX
     return (*this)->getGetNonzeros(sp,mapping);
-  }
-
-  const MX MX::sub(const Matrix<int>& k, int dummy) const {
-    int s = size();
-    const std::vector<int> & d = k.data();
-    for (int i=0;i< k.size();i++) {
-      if (d[i]>=s) casadi_error("MX::sub: a non-zero element at position " << d[i] << " was requested, but MX is only " << dimString());
-    }
-    return (*this)->getGetNonzeros(k.sparsity(),k.data());
   }
 
   const MX MX::sub(int j, int i) const{
@@ -236,24 +229,9 @@ namespace casadi{
     setSub(m,std::vector<int>(1,j),i);
   }
 
-  void MX::setSub(const MX& m, const Matrix<int>& k){
-    // Allow m to be a 1x1
-    if (m.isDense() && m.isScalar()) {
-      if (k.numel()>1) {
-        setSub(MX(k.sparsity(),m),k);
-        return;
-      }
-    }
-
-    casadi_assert_message(k.sparsity()==m.sparsity(),"Sparsity mismatch." << "lhs is " << k.dimString() << ", while rhs is " << m.dimString());
-
-    casadi_error("MX::setSub not implemented yet");
-  }
-
   void MX::setSub(const MX& m, const Slice& j, const Slice& i){
     setSub(m,j.getAll(size1()),i.getAll(size2()));
   }
-
 
   void MX::setSub(const MX& m, const std::vector<int>& rr, const std::vector<int>& cc){
     // Allow m to be a 1x1
@@ -329,8 +307,6 @@ namespace casadi{
 
   }
 
-
-
   void MX::setSub(const MX& m, const Matrix<int>& j, const std::vector<int>& ii) {
     // If m is scalar
     if(m.isScalar() && (ii.size() > 1 || j.size() > 1)){
@@ -341,7 +317,7 @@ namespace casadi{
     if (!inBounds(ii,size2())) {
       casadi_error("setSub[.,ii,j] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
-
+    
     //Sparsity result_sparsity = repmat(j,ii.size(),1).sparsity();
     Sparsity result_sparsity = horzcat(std::vector< Matrix<int> >(ii.size(),j)).sparsity();
 
@@ -444,8 +420,7 @@ namespace casadi{
   }
 
   MX MX::getNZ(const Matrix<int>& k) const{
-    Sparsity sp = Sparsity::dense(k.size());
-    MX ret = (*this)->getGetNonzeros(sp,k.data());
+    MX ret = (*this)->getGetNonzeros(k.sparsity(),k.data());
     return ret;
   }
 

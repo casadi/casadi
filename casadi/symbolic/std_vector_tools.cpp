@@ -20,6 +20,7 @@
  *
  */
 
+#include "mx/mx.hpp"
 
 #include "std_vector_tools.hpp"
 

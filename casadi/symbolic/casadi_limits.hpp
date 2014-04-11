@@ -57,18 +57,6 @@ class CASADI_SYMBOLIC_EXPORT casadi_limits{
     static const T minus_one;
 };
 
-template<class T>
-const T casadi_limits<T>::zero = T(0);
-
-template<class T>
-const T casadi_limits<T>::one = 1;
-
-template<class T>
-const T casadi_limits<T>::two = 2;
-
-template<class T>
-const T casadi_limits<T>::minus_one = -1;
-
 } // namespace casadi
 #endif // CASADI_LIMITS_HPP
 
