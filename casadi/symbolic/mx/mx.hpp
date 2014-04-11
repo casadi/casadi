@@ -112,7 +112,10 @@ namespace casadi{
     const MX nz_indexed(const Slice &k) const{
       return (*this)[k.getAll(size())];
     }
-
+    const MX nz_indexed(const Matrix<int> &k) const{
+      return (*this)[k];
+    }
+    
     /// get a matrix element
     const MX indexed_one_based(int rr, int cc) const{ return (*this)(rr-1,cc-1);}
     const MX indexed_zero_based(int rr, int cc) const{ return (*this)(rr,cc);}
@@ -159,7 +162,10 @@ namespace casadi{
     void nz_indexed_assignment(const Slice &k, const MX &m){
       (*this)[k.getAll(size())] = m;
     }
-
+    void nz_indexed_assignment(const Matrix<int> &k, const MX &m){
+      (*this)[k] = m;
+    }
+    
     /// set a matrix element
     void indexed_one_based_assignment(int rr, int cc, const MX &m){ (*this)(rr-1,cc-1) = m;}
     void indexed_zero_based_assignment(int rr, int cc, const MX &m){ (*this)(rr,cc) = m;}

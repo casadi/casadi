@@ -693,7 +693,7 @@ class MXtests(casadiTestCase):
   def test_imatrix_index(self):
     self.message("IMatrix indexing")
     X = MX.sym("x",2,2)
-    Y = X[IMatrix([[0,2],[1,1],[3,3]])]
+    Y = X.nz[IMatrix([[0,2],[1,1],[3,3]])]
     
     f = MXFunction([X],[Y])
     f.init()
@@ -703,7 +703,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f.getOutput(),array([[1,3],[2,2],[4,4]]),"IMatrix indexing")
     
     Y = X[:,:]
-    Y[IMatrix([[0,2]])] = DMatrix([[9,8]])
+    Y.nz[IMatrix([[0,2]])] = DMatrix([[9,8]])
     
     f = MXFunction([X],[Y])
     f.init()
