@@ -115,7 +115,7 @@ endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
 set(modules_json)
 foreach(my_module ${CASADI_MODULES})
-  list(APPEND modules_json ${my_module}_tree.json)
+  list(APPEND modules_json ${my_module}.json)
 endforeach()
 add_custom_target(_json_modules DEPENDS ${modules_json}) # the json interface is created with the command "make json"
 
@@ -243,14 +243,14 @@ endforeach()
 
 foreach(my_module ${CASADI_MODULES})
 add_custom_command(
-  OUTPUT ${my_module}_tree.json
+  OUTPUT ${my_module}.json
   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
   DEPENDS ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py
 )
 endforeach()
 
 foreach(my_module ${CASADI_MODULES})
-install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}_tree.json ${PROJECT_BINARY_DIR}/swig/${my_module}_classes.json ${PROJECT_BINARY_DIR}/swig/${my_module}_swiginclude.hpp
+install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.json ${PROJECT_BINARY_DIR}/swig/${my_module}_swiginclude.hpp
   DESTINATION share/casadi
   COMPONENT componentjson
 )

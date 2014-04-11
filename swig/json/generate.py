@@ -1,5 +1,3 @@
-
-
 try:
   from lxml import etree
 except:
@@ -62,7 +60,7 @@ for c in r.findall('*//class'):
 
      rettype = d.find('attributelist/attribute[@name="type"]').attrib["value"]
      storage = getAttribute(d,"storage")
-     
+
      access = getAttribute(d,"access")
      if access=="private": continue
 
@@ -79,7 +77,7 @@ for c in r.findall('*//class'):
      rettype = name
      access = getAttribute(d,"access")
      if access=="private": continue
-     
+
      docs = getAttribute(d,"feature_docstring")
      data["methods"].append((dname,params,rettype,"Constructor",docs))
 
@@ -107,8 +105,7 @@ for d in r.findall('*//namespace/cdecl'):
 
 
 
-classesdata = {}
-treedata = {"classes": [],"functions": []}
+treedata = {"moduleClasses": [],"moduleFunctions": [], "moduleEnums": {}}
 
 
 finclude  = file(my_module+'_swiginclude.hpp','w')
@@ -126,7 +123,7 @@ def getAllMethods(name,base=None):
   ret = c["methods"]
   return ret
   if name!=base:
-    #ret = [(dname,params,base if mtype=="Constructor" else rettype,mtype) for (dname,params,rettype,mtype) in ret]
+    #ret = [(dname,params,base if mkind=="Constructor" else rettype,mkind) for (dname,params,rettype,mkind) in ret]
     # Omit baseclass constructors
     ret = filter(lambda x: x[3]!="Constructor", ret)
 
@@ -139,40 +136,29 @@ myclasses = []
 for k,v in classes.items():
   methods = []
   if "methods" in v:
-    for (name,pars,rettype,mtype,docs) in getAllMethods(k): # v["methods"]:
-      methods.append({"name": name, "return": rettype, "params": pars, "type": mtype,"docs":docs,"docslink":""})
+    for (name,pars,rettype,mkind,docs) in getAllMethods(k): # v["methods"]:
+      methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":docs,"methodDocslink":""})
 
-  treedata["classes"].append({"name": k, "methods": methods, "docs": v["docs"],"docslink":""})
+  treedata["moduleClasses"].append({"classType": k, "classMethods": methods, "classDocs": v["docs"],"classDocslink":""})
 
 tools = []
 ioschemehelpers = []
 
 for (name,pars,rettype,docs) in functions:
-  treedata["functions"].append({"name": name, "return": rettype, "params": pars, "docs":docs,"docslink":""})
+  treedata["moduleFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":""})
 
 enumslist = []
 
-treedata["enums"] = {}
-
 for k,v in enums.items():
-  treedata["enums"][k] = {
-    "docs": v['docs'],
-    "docslink": "",
-    "entries": dict( 
-       (kk , {"docs": vv["docs"],"docslink":"","val": vv["ev"]})
+  treedata["moduleEnums"][k] = {
+    "enumDocs": v['docs'],
+    "enumDocslink": "",
+    "enumEntries": dict(
+       (kk , {"enumEntryDocs": vv["docs"],"enumEntryDocslink":"","enumEntryVal": vv["ev"]})
           for kk,vv in v["entries"].items())
   }
 
 
-classesdata["classes"] = [k for k,v in classes.items()]
-classesdata["enums"] = enums.keys()
-              
-classesdata["inheritance"] = dict(
-            (
-                    k,
-                    [k for i in v["bases"]]
-              ) for k,v in classes.items())
+treedata["moduleInheritance"] = dict((k, [k for i in v["bases"]]) for k,v in classes.items())
 
-json.dump(classesdata,file(my_module+'_classes.json','w'),indent=True)
-json.dump(treedata,file(my_module+'_tree.json','w'),indent=True)
-
+json.dump(treedata,file(my_module+'.json','w'),indent=True)
