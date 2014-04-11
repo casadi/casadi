@@ -24,7 +24,7 @@
 #define KNITRO_INTERNAL_HPP
 
 #include "knitro_solver.hpp"
-#include "knitro.h"
+#include <knitro.h>
 #include "casadi/symbolic/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
@@ -49,9 +49,11 @@ namespace casadi{
     void evalh(const double* x, const double* lambda, double* hessian);
 
     // KNITRO callback wrapper
-    static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double * const x,
-			const double * const lambda,double * const obj, double * const c, double * const objGrad,
-			double * const jac, double * const hessian, double * const hessVector, void *userParams);
+    static int callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
+                        const int nnzH, const double * const x, const double * const lambda,
+                        double * const obj, double * const c, double * const objGrad,
+                        double * const jac, double * const hessian,
+                        double * const hessVector, void *userParams);
 
     // KNITRO context pointer
     KTR_context_ptr kc_handle_;

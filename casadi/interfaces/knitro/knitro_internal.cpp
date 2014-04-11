@@ -38,7 +38,8 @@ namespace casadi{
 
     // Not yet ready
     //addOption("algorithm",                OT_STRING, GenericType(), "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
-    //addOption("bar_directinterval",       OT_INTEGER, GenericType(), "When using the Interior/Direct algorithm, this parameter controls the maximum number of consecutive CG steps before trying to force the algorithm to take a direct step again. See KNITRO documentation.");
+    //addOption("bar_directinterval",       OT_INTEGER, GenericType(), "When using the Interior/Direct algorithm, this parameter controls the
+    // maximum number of consecutive CG steps before trying to force the algorithm to take a direct step again. See KNITRO documentation.");
     //addOption("bar_feasible",             OT_STRING, GenericType(), "Whether feasibility is given special emphasis. See KNITRO documentation.", "no|stay|get|get_stay");
     //addOption("bar_feasmodetol",          OT_REAL, GenericType(), "Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.");
     //addOption("bar_initmu",               OT_INTEGER, GenericType(), "Initial value for the barrier parameter. See KNITRO documentation.");
@@ -91,7 +92,7 @@ namespace casadi{
     // Free KNITRO memory
     if(kc_handle_){
       /*    KTR_free(&kc_handle_);
-	    kc_handle_ = 0;*/
+            kc_handle_ = 0;*/
     }
   }
 
@@ -142,7 +143,7 @@ namespace casadi{
     // Commented out since I have not found out how to change the bounds
     // Allocate KNITRO memory block
     /*  casadi_assert(kc_handle_==0);
-	kc_handle_ = KTR_new();*/
+        kc_handle_ = KTR_new();*/
 
   }
 
@@ -165,11 +166,11 @@ namespace casadi{
       const vector<int> &row = hessLag_.output().row();
       int nz=0;
       for(int cc=0; cc<colind.size()-1; ++cc){
-	for(int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el){
-	  Hcol[nz] = cc;
-	  Hrow[nz] = row[el];
-	  nz++;
-	}
+        for(int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el){
+          Hcol[nz] = cc;
+          Hrow[nz] = row[el];
+          nz++;
+        }
       }
       casadi_assert(nz==nnzH);
 
@@ -184,21 +185,21 @@ namespace casadi{
     for(std::map<std::string, double>::iterator it=double_param_.begin(); it!=double_param_.end(); ++it){
       status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
       if(status!=0){
-	throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
+        throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
       }
     }
 
     for(std::map<std::string, int>::iterator it=int_param_.begin(); it!=int_param_.end(); ++it){
       status = KTR_set_int_param_by_name(kc_handle_, it->first.c_str(), it->second);
       if(status!=0){
-	throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
+        throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
       }
     }
 
     for(std::map<std::string, std::string>::iterator it=string_param_.begin(); it!=string_param_.end(); ++it){
       status = KTR_set_char_param_by_name(kc_handle_, it->first.c_str(), it->second.c_str());
       if(status!=0){
-	throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
+        throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
       }
     }
 
@@ -249,16 +250,16 @@ namespace casadi{
 
     // Solve NLP
     status = KTR_solve(kc_handle_,
-		       &output(NLP_SOLVER_X).front(),
-		       getPtr(lambda),
-		       0,  // not used
-		       &output(NLP_SOLVER_F).front(),
-		       0,  // not used
-		       0,  // not used
-		       0,  // not used
-		       0,  // not used
-		       0,  // not used
-		       this); // to be retrieved in the callback function
+                       &output(NLP_SOLVER_X).front(),
+                       getPtr(lambda),
+                       0,  // not used
+                       &output(NLP_SOLVER_F).front(),
+                       0,  // not used
+                       0,  // not used
+                       0,  // not used
+                       0,  // not used
+                       0,  // not used
+                       this); // to be retrieved in the callback function
     casadi_assert(status<=0); // make sure the NLP finished solving
 
     // Copy lagrange multipliers
@@ -273,8 +274,8 @@ namespace casadi{
 
 
   int KnitroInternal::callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double* const x,
-			       const double* const lambda, double* const obj, double* const c, double* const objGrad,
-			       double* const jac, double* const hessian, double* const hessVector, void *userParams){
+                               const double* const lambda, double* const obj, double* const c, double* const objGrad,
+                               double* const jac, double* const hessian, double* const hessVector, void *userParams){
     try{
       // Get a pointer to the calling object
       KnitroInternal* this_ = static_cast<KnitroInternal*>(userParams);

@@ -714,7 +714,7 @@ namespace casadi{
 
 //#endif
 #endif // SWIG
-  
+
 #ifdef SWIG
 
 // map the template name to the instantiated name

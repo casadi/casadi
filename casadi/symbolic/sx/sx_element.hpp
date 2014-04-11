@@ -303,7 +303,6 @@ namespace casadi{
   // Template specializations
   template<>
   CASADI_SYMBOLIC_EXPORT bool Matrix<SXElement>::__nonzero__() const;
-  
 
   template<>
   class CASADI_SYMBOLIC_EXPORT casadi_limits<SXElement>{

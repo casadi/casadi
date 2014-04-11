@@ -34,7 +34,7 @@
 
 using namespace std;
 namespace casadi{
-  
+
   template class GenericMatrix< MX >;
 
   MX::~MX(){
@@ -317,7 +317,7 @@ namespace casadi{
     if (!inBounds(ii,size2())) {
       casadi_error("setSub[.,ii,j] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
     }
-    
+
     //Sparsity result_sparsity = repmat(j,ii.size(),1).sparsity();
     Sparsity result_sparsity = horzcat(std::vector< Matrix<int> >(ii.size(),j)).sparsity();
 

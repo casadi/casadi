@@ -36,24 +36,24 @@ namespace casadi{
 
   INSTANTIATE_SUBMATRIX(Matrix<SXElement>)
   INSTANTIATE_NONZEROS(Matrix<SXElement>)
-  
+
   template class GenericMatrix< Matrix<SXElement> >;
   template class Matrix< SXElement >;
-  
+
   INSTANTIATE_SUBMATRIX(MX)
   INSTANTIATE_NONZEROS(MX)
-  
+
   INSTANTIATE_SUBMATRIX(Matrix<int>)
   INSTANTIATE_SUBMATRIX(Matrix<double>)
   INSTANTIATE_NONZEROS(Matrix<int>)
   INSTANTIATE_NONZEROS(Matrix<double>)
-  
+
   template class GenericMatrix< Matrix<double> >;
   template class GenericMatrix< Matrix<int> >;
-  
+
   template class Matrix<double>;
   template class Matrix<int>;
-  
+
   template<class T>
   const T casadi_limits<T>::zero = T(0);
 
@@ -65,19 +65,19 @@ namespace casadi{
 
   template<class T>
   const T casadi_limits<T>::minus_one = -1;
-  
+
   template class casadi_limits<double>;
   template class casadi_limits<int>;
 
   // Becuase we use Matrix<Sparsity>, Matrix<WeakRef> ...
   template const Sparsity  casadi_limits<Sparsity>::zero;
   template const WeakRef   casadi_limits<WeakRef>::zero;
-  
+
   template class std::numeric_limits<SXElement>;
-  
+
   INSTANTIATE_IOSCHEME_HELPERS(SX)
   INSTANTIATE_IOSCHEME_HELPERS(MX)
   INSTANTIATE_IOSCHEME_HELPERS(Sparsity)
-  
-}
+
+} // namespace casadi
 
