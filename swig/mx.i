@@ -43,7 +43,8 @@
   
   %pythoncode %{
   def __array_custom__(self,*args,**kwargs):
-    raise Exception("MX cannot be converted to an array. MX.__array__ purely exists to allow ufunc/numpy goodies")
+    # workaround for #1083
+    return numpy.array(numpy.nan)
     
   def __iter__(self):
     for i in range(self.size()):
