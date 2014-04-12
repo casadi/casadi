@@ -108,36 +108,21 @@
 <tr><td>RDAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
 </table>
 */
+/** \defgroup scheme_DAEOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::DAEOutput  (DAE_NUM_OUT = 4) [daeOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>DAE_ODE</td><td>ode</td><td>Right hand side of the implicit ODE .</td></tr>
+<tr><td>DAE_ALG</td><td>alg</td><td>Right hand side of algebraic equations .</td></tr>
+<tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations .</td></tr>
+</table>
+*/
 /** \defgroup scheme_DPLEInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::DPLEInput  (DPLE_NUM_IN = 3) [dpleIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>DPLE_A</td><td>a</td><td>A matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
 <tr><td>DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
-</table>
-*/
-/** \defgroup scheme_NLPOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::NLPOutput  (NL_NUM_OUT = 3) [nlpOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NL_F</td><td>f</td><td>Objective function .</td></tr>
-<tr><td>NL_G</td><td>g</td><td>Constraint function .</td></tr>
-</table>
-*/
-/** \defgroup scheme_SOCPInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::SOCPInput  (SOCP_SOLVER_NUM_IN = 11) [socpIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SOCP_SOLVER_G</td><td>g</td><td>The horizontal stack of all matrices Gi: ( n x N) .</td></tr>
-<tr><td>SOCP_SOLVER_H</td><td>h</td><td>The vertical stack of all vectors hi: ( N x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_E</td><td>e</td><td>The vertical stack of all vectors ei: ( nm x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_F</td><td>f</td><td>The vertical stack of all scalars fi: ( m x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_C</td><td>c</td><td>The vector c: ( n x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
-<tr><td>SOCP_SOLVER_LBA</td><td>lba</td><td>Lower bounds on Ax ( nc x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_UBA</td><td>uba</td><td>Upper bounds on Ax ( nc x 1) .</td></tr>
-<tr><td>SOCP_SOLVER_LBX</td><td>lbx</td><td>Lower bounds on x ( n x 1 ) .</td></tr>
-<tr><td>SOCP_SOLVER_UBX</td><td>ubx</td><td>Upper bounds on x ( n x 1 ) .</td></tr>
 </table>
 */
 /** \defgroup scheme_SDPOutput
@@ -167,23 +152,20 @@
 <tr><td>NLP_SOLVER_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_DAEInput
+/** \defgroup scheme_NLPInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::DAEInput  (DAE_NUM_IN = 5) [daeIn]</caption>
+<caption>Input scheme: casadi::NLPInput  (NL_NUM_IN = 3) [nlpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DAE_X</td><td>x</td><td>Differential state .</td></tr>
-<tr><td>DAE_Z</td><td>z</td><td>Algebraic state .</td></tr>
-<tr><td>DAE_P</td><td>p</td><td>Parameter .</td></tr>
-<tr><td>DAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
+<tr><td>NL_X</td><td>x</td><td>Decision variable .</td></tr>
+<tr><td>NL_P</td><td>p</td><td>Fixed parameter .</td></tr>
 </table>
 */
-/** \defgroup scheme_DAEOutput
+/** \defgroup scheme_NLPOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::DAEOutput  (DAE_NUM_OUT = 4) [daeOut]</caption>
+<caption>Output scheme: casadi::NLPOutput  (NL_NUM_OUT = 3) [nlpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DAE_ODE</td><td>ode</td><td>Right hand side of the implicit ODE .</td></tr>
-<tr><td>DAE_ALG</td><td>alg</td><td>Right hand side of algebraic equations .</td></tr>
-<tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations .</td></tr>
+<tr><td>NL_F</td><td>f</td><td>Objective function .</td></tr>
+<tr><td>NL_G</td><td>g</td><td>Constraint function .</td></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
@@ -310,12 +292,14 @@
 <tr><td>CONTROL_DAE_TF</td><td>tf</td><td>Time at end of control interval (1-by-1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_NLPInput
+/** \defgroup scheme_DAEInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::NLPInput  (NL_NUM_IN = 3) [nlpIn]</caption>
+<caption>Input scheme: casadi::DAEInput  (DAE_NUM_IN = 5) [daeIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NL_X</td><td>x</td><td>Decision variable .</td></tr>
-<tr><td>NL_P</td><td>p</td><td>Fixed parameter .</td></tr>
+<tr><td>DAE_X</td><td>x</td><td>Differential state .</td></tr>
+<tr><td>DAE_Z</td><td>z</td><td>Algebraic state .</td></tr>
+<tr><td>DAE_P</td><td>p</td><td>Parameter .</td></tr>
+<tr><td>DAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
@@ -402,6 +386,22 @@
 <tr><td>CONTROLSIMULATOR_U</td><td>u</td><td>Parameters that change over the integration intervals (dimension nu-by-(ns-1)) .</td></tr>
 </table>
 */
+/** \defgroup scheme_SOCPInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::SOCPInput  (SOCP_SOLVER_NUM_IN = 11) [socpIn]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>SOCP_SOLVER_G</td><td>g</td><td>The horizontal stack of all matrices Gi: ( n x N) .</td></tr>
+<tr><td>SOCP_SOLVER_H</td><td>h</td><td>The vertical stack of all vectors hi: ( N x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_E</td><td>e</td><td>The vertical stack of all vectors ei: ( nm x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_F</td><td>f</td><td>The vertical stack of all scalars fi: ( m x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_C</td><td>c</td><td>The vector c: ( n x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_A</td><td>a</td><td>The matrix A: ( nc x n) .</td></tr>
+<tr><td>SOCP_SOLVER_LBA</td><td>lba</td><td>Lower bounds on Ax ( nc x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_UBA</td><td>uba</td><td>Upper bounds on Ax ( nc x 1) .</td></tr>
+<tr><td>SOCP_SOLVER_LBX</td><td>lbx</td><td>Lower bounds on x ( n x 1 ) .</td></tr>
+<tr><td>SOCP_SOLVER_UBX</td><td>ubx</td><td>Upper bounds on x ( n x 1 ) .</td></tr>
+</table>
+*/
 /** \defgroup scheme_JacGInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::JacGInput  (JACG_NUM_IN = 3) [jacGIn]</caption>
@@ -447,67 +447,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::NLPSolverInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
-/** \class casadi::NLPSolver
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::QPOasesInternal
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class casadi::QPOasesSolver
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::CSparseInternal
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \endcond
-/** \class casadi::CSparse
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SimulatorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-*/
-/// \endcond
-/** \class casadi::Simulator
-\n
-\par
-@copydoc scheme_IntegratorInput
-*/
-/// \cond INTERNAL
-/** \class casadi::CollocationIntegratorInternal
+/** \class casadi::RKIntegratorInternal
 \n
 \par
 @copydoc scheme_IntegratorInput
@@ -515,60 +455,12 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \endcond
-/** \class casadi::CollocationIntegrator
+/** \class casadi::RKIntegrator
 \n
 \par
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::PsdIndefDpleInternal
-\n
-\par
-@copydoc scheme_DPLEInput
-<br/>
-@copydoc scheme_DPLEOutput
-*/
-/// \endcond
-/** \class casadi::PsdIndefDpleSolver
-\n
-\par
-@copydoc scheme_DPLEInput
-<br/>
-@copydoc scheme_DPLEOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::QPLPInternal
-\n
-\par
-@copydoc scheme_LPSolverInput
-<br/>
-@copydoc scheme_LPSolverOutput
-*/
-/// \endcond
-/** \class casadi::QPLPSolver
-\n
-\par
-@copydoc scheme_LPSolverInput
-<br/>
-@copydoc scheme_LPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SDPSDQPInternal
-\n
-\par
-@copydoc scheme_SDQPInput
-<br/>
-@copydoc scheme_SDQPOutput
-*/
-/// \endcond
-/** \class casadi::SDPSDQPSolver
-\n
-\par
-@copydoc scheme_SDQPInput
-<br/>
-@copydoc scheme_SDQPOutput
 */
 /// \cond INTERNAL
 /** \class casadi::LapackLUDenseInternal
@@ -603,7 +495,7 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \cond INTERNAL
-/** \class casadi::QPSolverInternal
+/** \class casadi::OOQPInternal
 \n
 \par
 @copydoc scheme_QPSolverInput
@@ -611,12 +503,260 @@
 @copydoc scheme_QPSolverOutput
 */
 /// \endcond
-/** \class casadi::QPSolver
+/** \class casadi::OOQPSolver
 \n
 \par
 @copydoc scheme_QPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::QPLPInternal
+\n
+\par
+@copydoc scheme_LPSolverInput
+<br/>
+@copydoc scheme_LPSolverOutput
+*/
+/// \endcond
+/** \class casadi::QPLPSolver
+\n
+\par
+@copydoc scheme_LPSolverInput
+<br/>
+@copydoc scheme_LPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::PsdIndefDpleInternal
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/// \endcond
+/** \class casadi::PsdIndefDpleSolver
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::IntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/** \class casadi::Integrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::LapackQRDenseInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/// \endcond
+/** \class casadi::LapackQRDense
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::StabilizedQPSolverInternal
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \endcond
+/** \class casadi::StabilizedQPSolver
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::ControlSimulatorInternal
+\n
+\par
+@copydoc scheme_ControlSimulatorInput
+*/
+/// \endcond
+/** \class casadi::ControlSimulator
+\n
+\par
+@copydoc scheme_ControlSimulatorInput
+*/
+/// \cond INTERNAL
+/** \class casadi::SOCPQCQPInternal
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
+*/
+/// \endcond
+/** \class casadi::SOCPQCQPSolver
+\n
+\par
+@copydoc scheme_QCQPSolverInput
+<br/>
+@copydoc scheme_QCQPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SimulatorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+*/
+/// \endcond
+/** \class casadi::Simulator
+\n
+\par
+@copydoc scheme_IntegratorInput
+*/
+/// \cond INTERNAL
+/** \class casadi::SOCPSolverInternal
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
+*/
+/// \endcond
+/** \class casadi::SOCPSolver
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SimpleHomotopyNLPInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::SimpleHomotopyNLPSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SDQPSolverInternal
+\n
+\par
+@copydoc scheme_SDQPInput
+<br/>
+@copydoc scheme_SDQPOutput
+*/
+/// \endcond
+/** \class casadi::SDQPSolver
+\n
+\par
+@copydoc scheme_SDQPInput
+<br/>
+@copydoc scheme_SDQPOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::StabilizedSQPInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::StabilizedSQPMethod
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SymbolicQRInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/// \endcond
+/** \class casadi::SymbolicQR
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::QPStabilizerInternal
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \endcond
+/** \class casadi::QPStabilizer
+\n
+\par
+@copydoc scheme_StabilizedQPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::KnitroInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::KnitroSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SnoptInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::SnoptSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::DSDPInternal
@@ -651,100 +791,36 @@
 @copydoc scheme_OCPOutput
 */
 /// \cond INTERNAL
-/** \class casadi::HomotopyNLPInternal
+/** \class casadi::DirectMultipleShootingInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_OCPInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_OCPOutput
 */
 /// \endcond
-/** \class casadi::HomotopyNLPSolver
+/** \class casadi::DirectMultipleShooting
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_OCPInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_OCPOutput
 */
 /// \cond INTERNAL
-/** \class casadi::SCPgenInternal
+/** \class casadi::SDPSDQPInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_SDQPInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_SDQPOutput
 */
 /// \endcond
-/** \class casadi::SCPgen
+/** \class casadi::SDPSDQPSolver
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_SDQPInput
 <br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SQICInternal
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class casadi::SQICSolver
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SnoptInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
-/** \class casadi::SnoptSolver
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::IpoptInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
-/** \class casadi::IpoptSolver
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::QPStabilizerInternal
-\n
-\par
-@copydoc scheme_StabilizedQPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class casadi::QPStabilizer
-\n
-\par
-@copydoc scheme_StabilizedQPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_SDQPOutput
 */
 /// \cond INTERNAL
 /** \class casadi::IdasInternal
@@ -779,118 +855,6 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \cond INTERNAL
-/** \class casadi::SimpleIndefDpleInternal
-\n
-\par
-@copydoc scheme_DPLEInput
-<br/>
-@copydoc scheme_DPLEOutput
-*/
-/// \endcond
-/** \class casadi::SimpleIndefDpleSolver
-\n
-\par
-@copydoc scheme_DPLEInput
-<br/>
-@copydoc scheme_DPLEOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SDPSolverInternal
-\n
-\par
-@copydoc scheme_SDPInput
-<br/>
-@copydoc scheme_SDPOutput
-*/
-/// \endcond
-/** \class casadi::SDPSolver
-\n
-\par
-@copydoc scheme_SDPInput
-<br/>
-@copydoc scheme_SDPOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SimpleHomotopyNLPInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
-/** \class casadi::SimpleHomotopyNLPSolver
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::StabilizedQPSolverInternal
-\n
-\par
-@copydoc scheme_StabilizedQPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class casadi::StabilizedQPSolver
-\n
-\par
-@copydoc scheme_StabilizedQPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::KnitroInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
-/** \class casadi::KnitroSolver
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::StabilizedSQPInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
-/** \class casadi::StabilizedSQPMethod
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SundialsInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \endcond
-/** \class casadi::SundialsIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \cond INTERNAL
 /** \class casadi::QCQPSolverInternal
 \n
 \par
@@ -907,39 +871,7 @@
 @copydoc scheme_QCQPSolverOutput
 */
 /// \cond INTERNAL
-/** \class casadi::SOCPSolverInternal
-\n
-\par
-@copydoc scheme_SOCPInput
-<br/>
-@copydoc scheme_SOCPOutput
-*/
-/// \endcond
-/** \class casadi::SOCPSolver
-\n
-\par
-@copydoc scheme_SOCPInput
-<br/>
-@copydoc scheme_SOCPOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::CSparseCholeskyInternal
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \endcond
-/** \class casadi::CSparseCholesky
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::CplexInternal
+/** \class casadi::QPSolverInternal
 \n
 \par
 @copydoc scheme_QPSolverInput
@@ -947,247 +879,7 @@
 @copydoc scheme_QPSolverOutput
 */
 /// \endcond
-/** \class casadi::CplexSolver
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::LapackQRDenseInternal
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \endcond
-/** \class casadi::LapackQRDense
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::DirectCollocationInternal
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/// \endcond
-/** \class casadi::DirectCollocation
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::WorhpInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
-/** \class casadi::WorhpSolver
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::IntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \endcond
-/** \class casadi::Integrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::StabilizedSQICInternal
-\n
-\par
-@copydoc scheme_StabilizedQPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class casadi::StabilizedSQICSolver
-\n
-\par
-@copydoc scheme_StabilizedQPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SQPInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
-/** \class casadi::SQPMethod
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SOCPQCQPInternal
-\n
-\par
-@copydoc scheme_QCQPSolverInput
-<br/>
-@copydoc scheme_QCQPSolverOutput
-*/
-/// \endcond
-/** \class casadi::SOCPQCQPSolver
-\n
-\par
-@copydoc scheme_QCQPSolverInput
-<br/>
-@copydoc scheme_QCQPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::DirectMultipleShootingInternal
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/// \endcond
-/** \class casadi::DirectMultipleShooting
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SymbolicQRInternal
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \endcond
-/** \class casadi::SymbolicQR
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::OldCollocationIntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \endcond
-/** \class casadi::OldCollocationIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::SDQPSolverInternal
-\n
-\par
-@copydoc scheme_SDQPInput
-<br/>
-@copydoc scheme_SDQPOutput
-*/
-/// \endcond
-/** \class casadi::SDQPSolver
-\n
-\par
-@copydoc scheme_SDQPInput
-<br/>
-@copydoc scheme_SDQPOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::QCQPQPInternal
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class casadi::QCQPQPSolver
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::RKIntegratorInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \endcond
-/** \class casadi::RKIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::DpleInternal
-\n
-\par
-@copydoc scheme_DPLEInput
-<br/>
-@copydoc scheme_DPLEOutput
-*/
-/// \endcond
-/** \class casadi::DpleSolver
-\n
-\par
-@copydoc scheme_DPLEInput
-<br/>
-@copydoc scheme_DPLEOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::NLPQPInternal
-\n
-\par
-@copydoc scheme_QPSolverInput
-<br/>
-@copydoc scheme_QPSolverOutput
-*/
-/// \endcond
-/** \class casadi::NLPQPSolver
+/** \class casadi::QPSolver
 \n
 \par
 @copydoc scheme_QPSolverInput
@@ -1211,39 +903,55 @@
 @copydoc scheme_OCPOutput
 */
 /// \cond INTERNAL
-/** \class casadi::LPSolverInternal
+/** \class casadi::HomotopyNLPInternal
 \n
 \par
-@copydoc scheme_LPSolverInput
+@copydoc scheme_NLPSolverInput
 <br/>
-@copydoc scheme_LPSolverOutput
+@copydoc scheme_NLPSolverOutput
 */
 /// \endcond
-/** \class casadi::LPSolver
+/** \class casadi::HomotopyNLPSolver
 \n
 \par
-@copydoc scheme_LPSolverInput
+@copydoc scheme_NLPSolverInput
 <br/>
-@copydoc scheme_LPSolverOutput
+@copydoc scheme_NLPSolverOutput
 */
 /// \cond INTERNAL
-/** \class casadi::OOQPInternal
+/** \class casadi::StabilizedSQICInternal
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_StabilizedQPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
 */
 /// \endcond
-/** \class casadi::OOQPSolver
+/** \class casadi::StabilizedSQICSolver
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_StabilizedQPSolverInput
 <br/>
 @copydoc scheme_QPSolverOutput
 */
 /// \cond INTERNAL
-/** \class casadi::ImplicitFixedStepIntegratorInternal
+/** \class casadi::SimpleIndefDpleInternal
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/// \endcond
+/** \class casadi::SimpleIndefDpleSolver
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::CollocationIntegratorInternal
 \n
 \par
 @copydoc scheme_IntegratorInput
@@ -1251,7 +959,7 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \endcond
-/** \class casadi::ImplicitFixedStepIntegrator
+/** \class casadi::CollocationIntegrator
 \n
 \par
 @copydoc scheme_IntegratorInput
@@ -1259,16 +967,148 @@
 @copydoc scheme_IntegratorOutput
 */
 /// \cond INTERNAL
-/** \class casadi::ControlSimulatorInternal
+/** \class casadi::SQICInternal
 \n
 \par
-@copydoc scheme_ControlSimulatorInput
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
 */
 /// \endcond
-/** \class casadi::ControlSimulator
+/** \class casadi::SQICSolver
 \n
 \par
-@copydoc scheme_ControlSimulatorInput
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SundialsInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/** \class casadi::SundialsIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::DpleInternal
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/// \endcond
+/** \class casadi::DpleSolver
+\n
+\par
+@copydoc scheme_DPLEInput
+<br/>
+@copydoc scheme_DPLEOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::WorhpInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::WorhpSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::CSparseInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/// \endcond
+/** \class casadi::CSparse
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::OldCollocationIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/** \class casadi::OldCollocationIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::NLPQPInternal
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \endcond
+/** \class casadi::NLPQPSolver
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SDPSolverInternal
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/// \endcond
+/** \class casadi::SDPSolver
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SCPgenInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::SCPgen
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::LinearSolverInternal
@@ -1287,6 +1127,86 @@
 @copydoc scheme_LinsolOutput
 */
 /// \cond INTERNAL
+/** \class casadi::IpoptInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::IpoptSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::LPSolverInternal
+\n
+\par
+@copydoc scheme_LPSolverInput
+<br/>
+@copydoc scheme_LPSolverOutput
+*/
+/// \endcond
+/** \class casadi::LPSolver
+\n
+\par
+@copydoc scheme_LPSolverInput
+<br/>
+@copydoc scheme_LPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::NLPSolverInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::NLPSolver
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::CplexInternal
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \endcond
+/** \class casadi::CplexSolver
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::DirectCollocationInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/// \endcond
+/** \class casadi::DirectCollocation
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/// \cond INTERNAL
 /** \class casadi::SDPSOCPInternal
 \n
 \par
@@ -1301,4 +1221,84 @@
 @copydoc scheme_SOCPInput
 <br/>
 @copydoc scheme_SOCPOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::CSparseCholeskyInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/// \endcond
+/** \class casadi::CSparseCholesky
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::ImplicitFixedStepIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/** \class casadi::ImplicitFixedStepIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SQPInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
+/** \class casadi::SQPMethod
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::QPOasesInternal
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \endcond
+/** \class casadi::QPOasesSolver
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::QCQPQPInternal
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
+*/
+/// \endcond
+/** \class casadi::QCQPQPSolver
+\n
+\par
+@copydoc scheme_QPSolverInput
+<br/>
+@copydoc scheme_QPSolverOutput
 */

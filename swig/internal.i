@@ -733,19 +733,22 @@
 %exception  casadi::MX::setNZ(int k, const MX &el) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::MX::setSub(const MX &m, const Matrix< int > &k) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
 %exception  casadi::MX::setSub(const MX &m, const Matrix< int > &rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::MX::setSub(const MX &m, const Matrix< int > &rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::MX::setSub(const MX &m, const Matrix< int > &rr, int cc) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::MX::setSub(const MX &m, const Slice &rr, const Slice &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::MX::setSub(const MX &m, const Sparsity &sp, int dummy) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::MX::setSub(const MX &m, const std::vector< int > &rr, Slice cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::MX::setSub(const MX &m, const std::vector< int > &rr, const Matrix< int > &cc) {
@@ -757,6 +760,9 @@
 %exception  casadi::MX::setSub(const MX &m, const std::vector< int > &rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::MX::setSub(const MX &m, int rr, const Matrix< int > &cc) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::MX::setSub(const MX &m, int rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -766,9 +772,6 @@
 %exception  casadi::MX::setTemp(int t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::MX::sub(const Matrix< int > &k, int dummy=0) const  {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
 %exception  casadi::MX::sub(const Matrix< int > &rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -776,6 +779,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::MX::sub(const Matrix< int > &rr, const std::vector< int > &cc) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::MX::sub(const Matrix< int > &rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::MX::sub(const Slice &rr, const Matrix< int > &cc) const  {
@@ -797,6 +803,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::MX::sub(const std::vector< int > &rr, int cc) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::MX::sub(int rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::MX::sub(int rr, const Slice &cc) const  {
@@ -1615,6 +1624,9 @@
 %exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, const Slice &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Matrix< int > &rr, int cc) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const Slice &rr, const Matrix< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -1636,10 +1648,16 @@
 %exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, const std::vector< int > &rr, int cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, int rr, const Matrix< int > &cc) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::Matrix< T >::setSub(const Matrix< DataType > &m, int rr, const std::vector< int > &cc) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Matrix< T >::sub(const Matrix< int > &rr, const Slice &cc) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Matrix< T >::sub(const Matrix< int > &rr, int cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Matrix< T >::sub(const Slice &rr, const Matrix< int > &cc) const  {
@@ -1658,6 +1676,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Matrix< T >::sub(const std::vector< int > &rr, int cc) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::Matrix< T >::sub(int rr, const Matrix< int > &cc) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::Matrix< T >::sub(int rr, const Slice &cc) const  {
@@ -1919,6 +1940,27 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::PrintableObject::repr(std::ostream &stream=std::cout) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ProfilingType() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ProfilingType< ProfilingData_ENTRY >() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ProfilingType< ProfilingData_EXIT >() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ProfilingType< ProfilingData_IO >() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ProfilingType< ProfilingData_NAME >() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ProfilingType< ProfilingData_SOURCE >() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::ProfilingType< ProfilingData_TIMELINE >() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::RealtypeSX::getIntValue() const  {
@@ -2671,6 +2713,15 @@
 %exception  casadi::atanh(double x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::blkdiag(const MX &A, const MX &B) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::blkdiag(const Sparsity &a, const Sparsity &b) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::blockcat(const MX &A, const MX &B, const MX &C, const MX &D) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::blockcat(const Matrix< DataType > &A, const Matrix< DataType > &B, const Matrix< DataType > &C, const Matrix< DataType > &D) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2684,6 +2735,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::collocationInterpolators(const std::vector< double > &tau_root, std::vector< std::vector< double > > &C, std::vector< double > &D) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::collocationPointsL(int order, const std::string &scheme) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::constpow(const T &x, const T &n) {
@@ -2770,13 +2824,22 @@
 %exception  casadi::getPtr(std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::getRealTime() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::getRepresentation(const std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::get_bvec_t(const std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::get_bvec_t(const std::vector< double > &v) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::get_bvec_t(std::vector< T > &v) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::get_bvec_t(std::vector< double > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::hash_combine(std::size_t &seed, T v) {
@@ -2785,10 +2848,19 @@
 %exception  casadi::hash_combine(std::size_t &seed, const std::vector< int > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::hash_sparsity(int nrow, int ncol, const std::vector< int > &colind, const std::vector< int > &row) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::hash_value(T v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::horzcat(const MX &a, const MX &b) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::horzcat(const Matrix< DataType > &x, const Matrix< DataType > &y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::horzcat(const Sparsity &a, const Sparsity &b) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::if_else(const SXElement &cond, const T &if_true, const T &if_false) {
@@ -2801,9 +2873,6 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::inner_prod(const std::vector< T > &a, const std::vector< T > &b) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  casadi::isEqual(const MX &ex1, const MX &ex2) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::is_a(const SharedObject &A) {
@@ -2860,6 +2929,12 @@
 %exception  casadi::printme(double x, double y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::profileWrite(std::ofstream &f, const T &s) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::profileWriteBare(std::ofstream &f, const T &s) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::ptrVec(const std::vector< T > &v) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2875,7 +2950,16 @@
 %exception  casadi::qr(const Matrix< DataType > &A, Matrix< DataType > &Q, Matrix< DataType > &R) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::range(int start, int stop, int step, int len) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::range(int stop) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::repr(const std::vector< T > &v, std::ostream &stream=std::cout) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::reshape(const MX &x, int nrow, int ncol) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::shared_cast(SharedObject &A) {
@@ -2888,6 +2972,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::sign(double x) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::simplify(SXElement &ex) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::sin(const T &x) {
@@ -2935,34 +3022,13 @@
 %exception  casadi::twice(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::vertcat(const MX &a, const MX &b) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::vertcat(const Matrix< DataType > &x, const Matrix< DataType > &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  ProfilingType() {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  ProfilingType< ProfilingData_ENTRY >() {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  ProfilingType< ProfilingData_EXIT >() {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  ProfilingType< ProfilingData_IO >() {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  ProfilingType< ProfilingData_NAME >() {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  ProfilingType< ProfilingData_SOURCE >() {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  ProfilingType< ProfilingData_TIMELINE >() {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  profileWrite(std::ofstream &f, const T &s) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception  profileWriteBare(std::ofstream &f, const T &s) {
+%exception  casadi::vertcat(const Sparsity &a, const Sparsity &b) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  sqicDestroy() {
