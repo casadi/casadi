@@ -37,7 +37,7 @@
 // Workaround for Clang, but should not be a problem for other compilers, #771
 #define _Bool bool
 
-#include "worhp.h"
+#include <worhp.h>
 
 // MACROs that polute our code
 #undef Q

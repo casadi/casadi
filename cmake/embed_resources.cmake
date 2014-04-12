@@ -9,7 +9,7 @@ macro (embed_resource symbol inputfile resultfile)
   set(${resultfile} "${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}.hpp" "${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}.cpp")
   add_custom_command(
       OUTPUT ${${resultfile}}
-      COMMAND ${CMAKE_COMMAND} -D "OUTPUT=${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}" -D "INPUT=${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}" -D "SYMBOL=${symbol}" -P ${CMAKE_SOURCE_DIR}/cmake/embed_resource.cmake 
+      COMMAND ${CMAKE_COMMAND} -D "OUTPUT=${CMAKE_CURRENT_BINARY_DIR}/resource_${symbol}" -D "INPUT=${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}" -D "LICENSE_FILE=${CMAKE_SOURCE_DIR}/misc/license_header.txt" -D "SYMBOL=${symbol}" -P ${CMAKE_SOURCE_DIR}/cmake/embed_resource.cmake 
       DEPENDS
         ${CMAKE_SOURCE_DIR}/cmake/embed_resource.cmake
         ${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}

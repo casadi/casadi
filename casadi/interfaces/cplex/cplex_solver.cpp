@@ -33,10 +33,10 @@ CplexSolver::CplexSolver(const QPStructure &st){
 }
 
 CplexInternal* CplexSolver::operator->() {
-  return (CplexInternal*)(Function::operator->());
+  return reinterpret_cast<CplexInternal*>(Function::operator->());
 }
 const CplexInternal* CplexSolver::operator->() const{
-  return (const CplexInternal*) (Function::operator->());
+  return reinterpret_cast<const CplexInternal*>(Function::operator->());
 }
 
 bool CplexSolver::checkNode() const{

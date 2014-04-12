@@ -35,11 +35,11 @@ SQICSolver::SQICSolver(const QPStructure& st)  {
 }
 
 SQICInternal* SQICSolver::operator->(){
-  return (SQICInternal*)(Function::operator->());
+  return reinterpret_cast<SQICInternal*>(Function::operator->());
 }
 
 const SQICInternal* SQICSolver::operator->() const{
-  return (const SQICInternal*)(Function::operator->());
+  return reinterpret_cast<const SQICInternal*>(Function::operator->());
 
 }
 

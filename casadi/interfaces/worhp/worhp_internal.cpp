@@ -76,35 +76,69 @@ namespace casadi{
     addOption("qp_ipBarrier",OT_REAL,worhp_p_.qp.ipBarrier,"IP barrier parameter.");
     addOption("qp_ipComTol",OT_REAL,worhp_p_.qp.ipComTol,"IP complementarity tolerance.");
     addOption("qp_ipFracBound",OT_REAL,worhp_p_.qp.ipFracBound,"IP fraction-to-the-boundary parameter.");
-    addOption("qp_ipLsMethod",OT_STRING,GenericType(),"Select the direct linear solver used by the IP method.","LAPACK::0|MA57: only available if provided by the user:1|SuperLU::2|PARDISO: only available if provided by the user, subject to license availability:3|MUMPS: currently Linux platforms only:5|WSMP: subject to license availability:6|MA86: experimental, only available if provided by the user:7|MA97:experimental, only available if provided by the user:8");
+    addOption("qp_ipLsMethod",OT_STRING,GenericType(),
+      "Select the direct linear solver used by the IP method.",
+      "LAPACK::0|MA57: only available if provided by the user:1|"
+      "SuperLU::2|PARDISO: only available if provided by the user,"
+      "subject to license availability:3|"
+      "MUMPS: currently Linux platforms only:5|"
+      "WSMP: subject to license availability:6|"
+      "MA86: experimental, only available if provided by the user:7|"
+      "MA97:experimental, only available if provided by the user:8");
     setOptionByEnumValue("qp_ipLsMethod",worhp_p_.qp.ipLsMethod);
     addOption("qp_ipMinAlpha",OT_REAL,worhp_p_.qp.ipMinAlpha,"IP line search minimum step size.");
-    addOption("qp_ipTryRelax",OT_BOOLEAN,worhp_p_.qp.ipTryRelax,"Enable relaxation strategy when encountering an error.");
-    addOption("qp_ipRelaxDiv",OT_REAL,worhp_p_.qp.ipRelaxDiv,"The relaxation term is divided by this value if successful.");
-    addOption("qp_ipRelaxMult",OT_REAL,worhp_p_.qp.ipRelaxMult,"The relaxation term is multiplied by this value if unsuccessful.");
+    addOption("qp_ipTryRelax",OT_BOOLEAN,worhp_p_.qp.ipTryRelax,
+      "Enable relaxation strategy when encountering an error.");
+    addOption("qp_ipRelaxDiv",OT_REAL,worhp_p_.qp.ipRelaxDiv,
+      "The relaxation term is divided by this value if successful.");
+    addOption("qp_ipRelaxMult",OT_REAL,worhp_p_.qp.ipRelaxMult,
+      "The relaxation term is multiplied by this value if unsuccessful.");
     addOption("qp_ipRelaxMax",OT_REAL,worhp_p_.qp.ipRelaxMax,"Maximum relaxation value.");
     addOption("qp_ipRelaxMin",OT_REAL,worhp_p_.qp.ipRelaxMin,"Mimimum relaxation value.");
     addOption("qp_ipResTol",OT_REAL,worhp_p_.qp.ipResTol,"IP residuals tolerance.");
-    addOption("qp_lsItMaxIter",OT_INTEGER,worhp_p_.qp.lsItMaxIter,"Maximum number of iterations of the iterative linear solvers.");
-    addOption("qp_lsItMethod",OT_STRING,GenericType(),"Select the iterative linear solver.","none:Deactivate; use a direct linear solver.:0|CGNR::1|CGNE::2|CGS::3|BiCGSTAB::4");
+    addOption("qp_lsItMaxIter",OT_INTEGER,worhp_p_.qp.lsItMaxIter,
+      "Maximum number of iterations of the iterative linear solvers.");
+    addOption("qp_lsItMethod",OT_STRING,GenericType(),
+      "Select the iterative linear solver.",
+      "none:Deactivate; use a direct linear solver.:0|CGNR::1|CGNE::2|CGS::3|BiCGSTAB::4");
     setOptionByEnumValue("qp_lsItMethod",worhp_p_.qp.lsItMethod);
-    addOption("qp_lsItPrecondMethod",OT_STRING,GenericType(),"Select preconditioner for the iterative linear solver.","none:No preconditioner.:0|static:Static preconditioner (KKT-matrix with constant lower-right block).:1|full:Full KKT-matrix.:2");
+    addOption("qp_lsItPrecondMethod",OT_STRING,GenericType(),
+      "Select preconditioner for the iterative linear solver.",
+      "none:No preconditioner.:0|"
+      "static:Static preconditioner (KKT-matrix with constant lower-right block).:1|"
+      "full:Full KKT-matrix.:2");
     setOptionByEnumValue("qp_lsItPrecondMethod",worhp_p_.qp.lsItPrecondMethod);
-    addOption("qp_lsRefineMaxIter",OT_INTEGER,worhp_p_.qp.lsRefineMaxIter,"Maximum number of iterative refinement steps of the direct linear solvers.");
+    addOption("qp_lsRefineMaxIter",OT_INTEGER,worhp_p_.qp.lsRefineMaxIter,
+      "Maximum number of iterative refinement steps of the direct linear solvers.");
     addOption("qp_lsScale",OT_BOOLEAN,worhp_p_.qp.lsScale,"Enables scaling on linear solver level.");
-    addOption("qp_lsTrySimple",OT_BOOLEAN,worhp_p_.qp.lsTrySimple,"Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported. Non-diagonal matrices will besolved with the chosen linear equation solver.");
+    addOption("qp_lsTrySimple",OT_BOOLEAN,worhp_p_.qp.lsTrySimple,
+      "Some matrices can be solved without calling a linear equation solver."
+      "Currently only diagonal matrices are supported."
+      "Non-diagonal matrices will besolved with the chosen linear equation solver.");
     addOption("qp_lsTol",OT_REAL,worhp_p_.qp.lsTol,"Tolerance for the linear solver.");
-    addOption("qp_maxIter",OT_INTEGER,worhp_p_.qp.maxIter,"Imposes an upper limit on the number of minor solver iterations, i.e. for thequadratic subproblem solver. If the limit is reached before convergence,WORHP will activate QP recovery strategies to prevent a solver breakdown.");
-    addOption("qp_method",OT_STRING,GenericType(),"Select the solution method used by the QP solver.","ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|automatic: Prefer IP and fall back to NSN on error.:12");
+    addOption("qp_maxIter",OT_INTEGER,worhp_p_.qp.maxIter,
+      "Imposes an upper limit on the number of minor solver iterations,"
+      " i.e. for the quadratic subproblem solver."
+      "If the limit is reached before convergence,"
+      "WORHP will activate QP recovery strategies to prevent a solver breakdown.");
+    addOption("qp_method",OT_STRING,GenericType(),
+      "Select the solution method used by the QP solver.",
+      "ip:Interior-Point method.:1|nsn:Nonsmooth-Newton method.:2|"
+      "automatic: Prefer IP and fall back to NSN on error.:12");
     setOptionByEnumValue("qp_method",worhp_p_.qp.method);
     addOption("qp_nsnBeta",OT_REAL,worhp_p_.qp.nsnBeta,"NSN stepsize decrease factor.");
-    addOption("qp_nsnGradStep",OT_BOOLEAN,worhp_p_.qp.nsnGradStep,"Enable gradient steps in the NSN method.");
+    addOption("qp_nsnGradStep",OT_BOOLEAN,worhp_p_.qp.nsnGradStep,
+      "Enable gradient steps in the NSN method.");
     addOption("qp_nsnKKT",OT_REAL,worhp_p_.qp.nsnKKT,"NSN KKT tolerance.");
-    addOption("qp_nsnLsMethod",OT_STRING,GenericType(),"Select the direct linear solver used by the NSN method.","SuperLU::2|MA48: only available if provided by the user:4");
+    addOption("qp_nsnLsMethod",OT_STRING,GenericType(),
+      "Select the direct linear solver used by the NSN method.",
+      "SuperLU::2|MA48: only available if provided by the user:4");
     setOptionByEnumValue("qp_nsnLsMethod",worhp_p_.qp.nsnLsMethod);
     addOption("qp_nsnMinAlpha",OT_REAL,worhp_p_.qp.nsnMinAlpha,"NSN line search minimum step size.");
     addOption("qp_nsnSigma",OT_REAL,worhp_p_.qp.nsnSigma,"NSN line search slope parameter.");
-    addOption("qp_printLevel",OT_STRING,GenericType(),"Controls the amount of QP solver output.","none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2");
+    addOption("qp_printLevel",OT_STRING,GenericType(),
+      "Controls the amount of QP solver output.",
+      "none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2");
     setOptionByEnumValue("qp_printLevel",worhp_p_.qp.printLevel);
     addOption("qp_scaleIntern",OT_BOOLEAN,worhp_p_.qp.scaleIntern,"Enable scaling on QP level.");
     addOption("qp_strict",OT_BOOLEAN,worhp_p_.qp.strict,"Use strict termination criteria in IP method.");
@@ -409,11 +443,17 @@ namespace casadi{
     double inf = numeric_limits<double>::infinity();
 
     for (int i=0;i<nx_;++i) {
-      casadi_assert_message(lbx.at(i)!=ubx.at(i),"WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX. You have that case at non-zero " << i << " , which has value " << ubx.at(i) << ". Reformulate your problem by using a parameter for the corresponding variable.");
+      casadi_assert_message(lbx.at(i)!=ubx.at(i),
+      "WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX."
+      "You have that case at non-zero " << i << " , which has value " << ubx.at(i) << "."
+      "Reformulate your problem by using a parameter for the corresponding variable.");
     }
 
     for (int i=0;i<lbg.size();++i) {
-      casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),"WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite. You have that case at non-zero " << i << ". Reformulate your problem eliminating the corresponding constraint.");
+      casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),
+      "WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
+      "You have that case at non-zero " << i << "."
+      "Reformulate your problem eliminating the corresponding constraint.");
     }
 
     // Pass inputs to WORHP data structures
@@ -480,11 +520,11 @@ namespace casadi{
             stats_["iteration"] = iteration;
 
             double time2 = clock();
-            t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+            t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
             time1 = clock();
             int ret = callback_(ref_,user_data_);
             time2 = clock();
-            t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
+            t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
 
             if(ret) worhp_c_.status = TerminatedByUser;
 
@@ -527,7 +567,7 @@ namespace casadi{
     }
 
     double time2 = clock();
-    t_mainloop_ += double(time2-time1)/CLOCKS_PER_SEC;
+    t_mainloop_ += (time2-time1)/CLOCKS_PER_SEC;
 
     // Copy outputs
     output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n,DENSE);
@@ -538,7 +578,7 @@ namespace casadi{
 
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
 
-    if (hasOption("print_time") && bool(getOption("print_time"))) {
+    if (hasOption("print_time") && static_cast<bool>(getOption("print_time"))) {
       // Write timings
       cout << "time spent in eval_f: " << t_eval_f_ << " s.";
       if (n_eval_f_>0)
@@ -643,7 +683,7 @@ namespace casadi{
       if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
 
       double time2 = clock();
-      t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_h_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_h_ += 1;
       log("eval_h ok");
       return true;
@@ -689,7 +729,7 @@ namespace casadi{
       }
 
       double time2 = clock();
-      t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
@@ -726,7 +766,7 @@ namespace casadi{
       if (regularity_check_ && !isRegular(nlp_.output().data())) casadi_error("WorhpInternal::eval_f: NaN or Inf detected.");
 
       double time2 = clock();
-      t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_f_ += 1;
       log("eval_f ok");
       return true;
@@ -763,7 +803,7 @@ namespace casadi{
       if (regularity_check_ && !isRegular(nlp_.output(NL_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
 
       double time2 = clock();
-      t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_g_ += 1;
       log("eval_g ok");
       return true;
@@ -802,7 +842,7 @@ namespace casadi{
       if (regularity_check_ && !isRegular(gradF_.output().data())) casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
 
       double time2 = clock();
-      t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
+      t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
       // Check the result for regularity
       for(int i=0; i<nx_; ++i){

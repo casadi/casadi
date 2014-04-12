@@ -35,11 +35,11 @@ StabilizedSQICSolver::StabilizedSQICSolver(const QPStructure& st)  {
 }
 
 StabilizedSQICInternal* StabilizedSQICSolver::operator->(){
-  return (StabilizedSQICInternal*)(Function::operator->());
+  return reinterpret_cast<StabilizedSQICInternal*>(Function::operator->());
 }
 
 const StabilizedSQICInternal* StabilizedSQICSolver::operator->() const{
-  return (const StabilizedSQICInternal*)(Function::operator->());
+  return reinterpret_cast<const StabilizedSQICInternal*>(Function::operator->());
 
 }
 

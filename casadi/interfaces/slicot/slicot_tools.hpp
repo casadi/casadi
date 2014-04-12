@@ -58,7 +58,12 @@ void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::v
 *   and T_2..T_K  upper diagonal
 *
 */
-CASADI_SLICOT_INTERFACE_EXPORT void slicot_periodic_schur(const std::vector< Matrix<double> > & A, std::vector< Matrix<double> > & SWIG_OUTPUT(T),  std::vector< Matrix<double> > & SWIG_OUTPUT(Z), std::vector<double> &eig_real, std::vector<double> &SWIG_OUTPUT(eig_imag));
+CASADI_SLICOT_INTERFACE_EXPORT void slicot_periodic_schur(
+    const std::vector< Matrix<double> > & A,
+    std::vector< Matrix<double> > & SWIG_OUTPUT(T),
+    std::vector< Matrix<double> > & SWIG_OUTPUT(Z),
+    std::vector<double> &eig_real,
+    std::vector<double> &SWIG_OUTPUT(eig_imag));
 
 } // namespace casadi
 

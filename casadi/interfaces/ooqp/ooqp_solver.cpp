@@ -35,11 +35,11 @@ OOQPSolver::OOQPSolver(const QPStructure& st)  {
 }
 
 OOQPInternal* OOQPSolver::operator->(){
-  return (OOQPInternal*)(Function::operator->());
+  return reinterpret_cast<OOQPInternal*>(Function::operator->());
 }
 
 const OOQPInternal* OOQPSolver::operator->() const{
-  return (const OOQPInternal*)(Function::operator->());
+  return reinterpret_cast<const OOQPInternal*>(Function::operator->());
 
 }
 

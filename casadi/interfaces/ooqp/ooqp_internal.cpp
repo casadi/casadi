@@ -294,7 +294,7 @@ namespace casadi {
 
     int ierr;
     if(false){ // Use C interface
-      // TODO: Change to qpsolvehb, see OOQP users guide
+      // TODO(jgillis): Change to qpsolvehb, see OOQP users guide
       qpsolvesp(getPtr(c_), nx,
                 getPtr(irowQ_),  nnzQ, getPtr(jcolQ_), getPtr(dQ_),
                 getPtr(xlow_), getPtr(ixlow_),

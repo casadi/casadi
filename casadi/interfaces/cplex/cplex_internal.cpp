@@ -73,8 +73,7 @@ namespace casadi{
     // Turn on some debug messages if requested
     if (verbose()){
       CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_ON);
-    }
-    else{
+    } else{
       CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_OFF);
     }
     if (status){
@@ -91,9 +90,7 @@ namespace casadi{
       status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 4);
       // Warm-start is default with this algorithm
       setOption("warm_start", true);
-    }
-    // Otherwise we just chose the algorithm
-    else{
+    } else { // Otherwise we just chose the algorithm
       status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, qp_method_);
     }
     // Setting dependency check option
@@ -106,7 +103,7 @@ namespace casadi{
       // Setting crossover algorithm
       status = CPXsetintparam(env_, CPX_PARAM_BARCROSSALG, 1);
     }
-    if(!bool(getOption("convex"))){
+    if(!static_cast<bool>(getOption("convex"))){
       // Enabling non-convex QPs
       status = CPXsetintparam(env_, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
     }
@@ -172,21 +169,17 @@ namespace casadi{
         sense_[i] = 'E';
         rhs_[i] = lba[i];
         rngval_[i] = 0.;
-      }
-      // Ineq - no lower bound
-      else if (lba[i] < -CPX_INFBOUND){
+      } else if (lba[i] < -CPX_INFBOUND) {
+        // Ineq - no lower bound
         sense_[i] = 'L';
         rhs_[i] = uba[i];
         rngval_[i] = 0.;
-      }
-      // Ineq - no upper bound
-      else if (uba[i] > CPX_INFBOUND){
+      } else if (uba[i] > CPX_INFBOUND) {
+        // Ineq - no upper bound
         sense_[i] = 'G';
         rhs_[i] = lba[i];
         rngval_[i] = 0.;
-      }
-      // Inew both upper and lower bounds
-      else{
+      } else { // Inew both upper and lower bounds
         sense_[i] = 'R';
         rhs_[i] = lba[i];
         rngval_[i] = uba[i] - lba[i];
@@ -222,8 +215,7 @@ namespace casadi{
     if (qp_method_ != 0 && qp_method_ != 4 && is_warm_){
       // TODO: Initialize slacks and dual variables of bound constraints
       CPXcopystart(env_, lp_, getPtr(cstat_), getPtr(rstat_), x0, NULL, NULL, lam_x0);
-    }
-    else{
+    } else {
       status = CPXcopystart(env_, lp_, NULL, NULL, x0, NULL, NULL, lam_x0);
     }
 
@@ -261,28 +253,21 @@ namespace casadi{
     int solnstat = CPXgetstat (env_, lp_);
     stringstream errormsg; // NOTE: Why not print directly to cout and cerr?
     if(verbose()){
-      if      (solnstat == CPX_STAT_OPTIMAL){
+      if (solnstat == CPX_STAT_OPTIMAL){
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
-      }
-      else if (solnstat == CPX_STAT_UNBOUNDED) {
+      } else if (solnstat == CPX_STAT_UNBOUNDED) {
         errormsg << "CPLEX: solution status: Model is unbounded\n";
-      }
-      else if (solnstat == CPX_STAT_INFEASIBLE) {
+      } else if (solnstat == CPX_STAT_INFEASIBLE) {
         errormsg << "CPLEX: solution status: Model is infeasible\n";
-      }
-      else if (solnstat == CPX_STAT_INForUNBD) {
+      } else if (solnstat == CPX_STAT_INForUNBD) {
         errormsg << "CPLEX: solution status: Model is infeasible or unbounded\n";
-      }
-      else if (solnstat == CPX_STAT_OPTIMAL_INFEAS){
+      } else if (solnstat == CPX_STAT_OPTIMAL_INFEAS){
         errormsg << "CPLEX: solution status: Optimal solution is available but with infeasibilities\n";
-      }
-      else if (solnstat == CPX_STAT_NUM_BEST){
+      } else if (solnstat == CPX_STAT_NUM_BEST){
         errormsg << "CPLEX: solution status: Solution available, but not proved optimal due to numeric difficulties.\n";
-      }
-      else if (solnstat == CPX_STAT_FIRSTORDER){
+      } else if (solnstat == CPX_STAT_FIRSTORDER){
         errormsg << "CPLEX: solution status: Solution satisfies first-order optimality conditions, but is not necessarily globally optimal.\n";
-      }
-      else{
+      } else {
         errormsg << "CPLEX: solution status: " <<  solnstat << "\n";
       }
       cout << errormsg.str();
@@ -297,7 +282,7 @@ namespace casadi{
     }
 
     // Next time we warm start
-    if (bool(getOption("warm_start"))){
+    if (static_cast<bool>(getOption("warm_start"))){
       is_warm_ = true;
     }
 
