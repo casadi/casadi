@@ -73,9 +73,6 @@ namespace casadi{
   template const Sparsity  casadi_limits<Sparsity>::zero;
   template const WeakRef   casadi_limits<WeakRef>::zero;
 
-  #ifndef _MSC_VER
-  template class std::numeric_limits<SXElement>;
-  #endif
 
   INSTANTIATE_IOSCHEME_HELPERS(SX)
   INSTANTIATE_IOSCHEME_HELPERS(MX)
@@ -83,3 +80,9 @@ namespace casadi{
 
 } // namespace casadi
 
+namespace std {
+  #ifndef _MSC_VER
+  template struct std::numeric_limits<casadi::SXElement>;
+  #endif
+
+} // namespace std
