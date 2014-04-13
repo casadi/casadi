@@ -28,23 +28,26 @@ def getAttribute(e,name,default=""):
   return d.attrib["value"]
 
 classes = {}
+def getDocstring(e):
+  #return ""
+  return getAttribute(e,"feature_docstring")
 
 for d in r.findall('*//enum'):
   name = getAttribute(d,"name")
   sym_name = getAttribute(d,"sym_name")
-  docs = getAttribute(d,"feature_docstring")
+  docs = getDocstring(d)
   dt = enums[sym_name] = {"sym_name": sym_name, "docs": docs,"entries":{}}
   for e in d.findall('enumitem'):
     name = getAttribute(e,"name")
     ev = getAttribute(e,"enumvalueex")
-    docs = getAttribute(d,"feature_docstring")
+    docs = getDocstring(d)
     ev = eval(ev,dict((k,v["ev"]) for k,v in dt["entries"].items()))
 
     dt["entries"][name] = {"docs": docs, "ev": ev}
 
 for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
-  docs = getAttribute(c,"feature_docstring")
+  docs = getDocstring(c)
   data = classes[name] = {'methods': [],"constructors":[],"docs": docs}
 
 
@@ -64,7 +67,7 @@ for c in r.findall('*//class'):
      access = getAttribute(d,"access")
      if access=="private": continue
 
-     docs = getAttribute(d,"feature_docstring")
+     docs = getDocstring(d)
 
      data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal",docs))
 
@@ -78,7 +81,7 @@ for c in r.findall('*//class'):
      access = getAttribute(d,"access")
      if access=="private": continue
 
-     docs = getAttribute(d,"feature_docstring")
+     docs = getDocstring(d)
      data["methods"].append((dname,params,rettype,"Constructor",docs))
 
   data["bases"] = []
@@ -99,7 +102,7 @@ for d in r.findall('*//namespace/cdecl'):
     params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
 
   rettype = getAttribute(d,"type")
-  docs = getAttribute(d,"feature_docstring")
+  docs = getDocstring(d)
 
   functions.append((dname,params,rettype,docs))
 
