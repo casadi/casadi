@@ -195,6 +195,6 @@ for k,v in enums.items():
 #print "%5d enums" % len(treedata['treeEnums'])
 
 
-treedata["treeInheritance"] = dict((k, [k for i in v["bases"]]) for k,v in classes.items())
+treedata["treeInheritance"] = dict((k, [i for i in v["bases"]]) for k,v in classes.items())
 
 json.dump(treedata,file(my_module+'.json','w'),indent=True)
