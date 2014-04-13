@@ -82,40 +82,40 @@ for c in r.findall('*//class'):
   data = classes[name] = {'methods': [],"constructors":[],"docs": docs}
 
   for d in c.findall('cdecl'):
-     dname = d.find('attributelist/attribute[@name="name"]').attrib["value"]
-     module = c.find('attributelist/attribute[@name="module"]').attrib["value"]
-     if module != classModule:
-       raise ValueError("method module",module,"!= class module",classModule)
+    dname = d.find('attributelist/attribute[@name="name"]').attrib["value"]
+    module = c.find('attributelist/attribute[@name="module"]').attrib["value"]
+    if module != classModule:
+      raise ValueError("method module",module,"!= class module",classModule)
 
-     if (d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function"): continue
+    if (d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function"): continue
 
-     if d.find('attributelist/parmlist') is None:
-       params = []
-     else:
-       params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
+    if d.find('attributelist/parmlist') is None:
+      params = []
+    else:
+      params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
 
-     rettype = d.find('attributelist/attribute[@name="type"]').attrib["value"]
-     storage = getAttribute(d,"storage")
+    rettype = d.find('attributelist/attribute[@name="type"]').attrib["value"]
+    storage = getAttribute(d,"storage")
 
-     access = getAttribute(d,"access")
-     if access=="private": continue
+    access = getAttribute(d,"access")
+    if access=="private": continue
 
-     docs = getDocstring(d)
+    docs = getDocstring(d)
 
-     data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal",docs))
+    data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal",docs))
 
   for d in itertools.chain(c.findall('constructor'),c.findall('extend/constructor')):
-     if d.find('attributelist/parmlist') is None:
-       params = []
-     else:
-       params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
+    if d.find('attributelist/parmlist') is None:
+      params = []
+    else:
+      params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
 
-     rettype = name
-     access = getAttribute(d,"access")
-     if access=="private": continue
+    rettype = name
+    access = getAttribute(d,"access")
+    if access=="private": continue
 
-     docs = getDocstring(d)
-     data["methods"].append((dname,params,rettype,"Constructor",docs))
+    docs = getDocstring(d)
+    data["methods"].append((dname,params,rettype,"Constructor",docs))
 
   data["bases"] = []
   for d in c.findall('attributelist/baselist/base'):
