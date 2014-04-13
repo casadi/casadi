@@ -14,9 +14,6 @@ my_module = sys.argv[2]
 e = etree.parse(sys.argv[1])
 r = e.getroot()
 
-classes = {}
-enums = {}
-
 def ucfirst(s):
   if len(s)==0: return s
   return s[0].upper()+s[1:]
@@ -27,13 +24,36 @@ def getAttribute(e,name,default=""):
     return default
   return d.attrib["value"]
 
-classes = {}
 def getDocstring(e):
   #return ""
   return getAttribute(e,"feature_docstring")
 
+def getModules(x,k=0):
+  elemName = x.find('attributelist/attribute[@name="name"]').attrib['value']
+  #print k,x.tag,elemName
+
+  # schemes is included in all modules - pretend it's always casadi_symbolic
+  fake_module = []
+  if x.tag == 'include' and elemName.endswith('casadi/symbolic/function/schemes_metadata.hpp'):
+    fake_module = ['casadi_symbolic']
+
+
+  if x.tag == 'top': return []
+  modname = x.find('module/attributelist/attribute[@name="name"]')
+  if modname is None:
+    return fake_module + getModules(x.getparent(),k+1)
+  else:
+    #print "  ",x,modname.attrib['value']
+    return fake_module + [modname.attrib['value']] + getModules(x.getparent(),k+1)
+
+def getModule(x):
+  return getModules(x)[0]
+
+
+# get all the enums
+enums = {}
 for d in r.findall('*//enum'):
-  name = getAttribute(d,"name")
+  if getModule(d) != my_module: continue
   sym_name = getAttribute(d,"sym_name")
   docs = getDocstring(d)
   dt = enums[sym_name] = {"sym_name": sym_name, "docs": docs,"entries":{}}
@@ -45,15 +65,28 @@ for d in r.findall('*//enum'):
 
     dt["entries"][name] = {"docs": docs, "ev": ev}
 
+
+# get all the classes
+classes = {}
 for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
   docs = getDocstring(c)
+
+  classModule = c.find('attributelist/attribute[@name="module"]').attrib["value"]
+  if name.startswith("std::vector<"): continue
+  if name.startswith("std::pair<"): continue
+  if classModule is None: raise ValueError("class module information missing")
+  if classModule != getModule(c): raise ValueError("class module information different than getModule()")
+  if classModule != my_module: continue
+
   data = classes[name] = {'methods': [],"constructors":[],"docs": docs}
-
-
 
   for d in c.findall('cdecl'):
      dname = d.find('attributelist/attribute[@name="name"]').attrib["value"]
+     module = c.find('attributelist/attribute[@name="module"]').attrib["value"]
+     if module != classModule:
+       raise ValueError("method module",module,"!= class module",classModule)
+
      if (d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function"): continue
 
      if d.find('attributelist/parmlist') is None:
@@ -89,6 +122,8 @@ for c in r.findall('*//class'):
     base = d.attrib["name"]
     data["bases"].append(base)
 
+
+# get all the functions
 functions = []
 for d in r.findall('*//namespace/cdecl'):
   if d.find('attributelist/attribute[@name="sym_name"]') is None: continue
@@ -96,6 +131,8 @@ for d in r.findall('*//namespace/cdecl'):
 
   dname = d.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
   if dname == "dummy": continue
+  if my_module != getModule(d): continue
+
   if d.find('attributelist/parmlist') is None:
     params = []
   else:
@@ -114,8 +151,6 @@ treedata = {"treeClasses": [],"treeFunctions": [], "treeEnums": {}}
 finclude  = file(my_module+'_swiginclude.hpp','w')
 code = sum([filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n")) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
 finclude.write("\n".join(sorted(set(map(lambda x: x.rstrip(), filter(lambda y: re.search("^\s*#include ",y),code))))))
-
-ioschemeclasses = []
 
 def getAllMethods(name,base=None):
   if base is None:
@@ -144,13 +179,8 @@ for k,v in classes.items():
 
   treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": v["docs"],"classDocslink":""})
 
-tools = []
-ioschemehelpers = []
-
 for (name,pars,rettype,docs) in functions:
   treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":""})
-
-enumslist = []
 
 for k,v in enums.items():
   treedata["treeEnums"][k] = {
@@ -160,6 +190,9 @@ for k,v in enums.items():
        (kk , {"enumEntryDocs": vv["docs"],"enumEntryDocslink":"","enumEntryVal": vv["ev"]})
           for kk,vv in v["entries"].items())
   }
+#print "%5d classes" % len(treedata['treeClasses'])
+#print "%5d functions" % len(treedata['treeFunctions'])
+#print "%5d enums" % len(treedata['treeEnums'])
 
 
 treedata["treeInheritance"] = dict((k, [k for i in v["bases"]]) for k,v in classes.items())
