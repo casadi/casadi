@@ -105,7 +105,7 @@ for d in r.findall('*//namespace/cdecl'):
 
 
 
-treedata = {"moduleClasses": [],"moduleFunctions": [], "moduleEnums": {}}
+treedata = {"treeClasses": [],"treeFunctions": [], "treeEnums": {}}
 
 
 finclude  = file(my_module+'_swiginclude.hpp','w')
@@ -139,18 +139,18 @@ for k,v in classes.items():
     for (name,pars,rettype,mkind,docs) in getAllMethods(k): # v["methods"]:
       methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":docs,"methodDocslink":""})
 
-  treedata["moduleClasses"].append({"classType": k, "classMethods": methods, "classDocs": v["docs"],"classDocslink":""})
+  treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": v["docs"],"classDocslink":""})
 
 tools = []
 ioschemehelpers = []
 
 for (name,pars,rettype,docs) in functions:
-  treedata["moduleFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":""})
+  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":""})
 
 enumslist = []
 
 for k,v in enums.items():
-  treedata["moduleEnums"][k] = {
+  treedata["treeEnums"][k] = {
     "enumDocs": v['docs'],
     "enumDocslink": "",
     "enumEntries": dict(
@@ -159,6 +159,6 @@ for k,v in enums.items():
   }
 
 
-treedata["moduleInheritance"] = dict((k, [k for i in v["bases"]]) for k,v in classes.items())
+treedata["treeInheritance"] = dict((k, [k for i in v["bases"]]) for k,v in classes.items())
 
 json.dump(treedata,file(my_module+'.json','w'),indent=True)
