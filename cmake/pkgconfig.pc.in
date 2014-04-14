@@ -1,0 +1,7 @@
+Name: @PC_NAME@
+Description: @PACKAGE_DESCRIPTION@ ( module @PC_NAME@ )
+URL: @PACKAGE_URL@
+Version: @PACKAGE_VERSION_FULL@
+Requires: @PC_REQUIRES@
+Libs: @PC_LIBRARIES_LIST@
+
