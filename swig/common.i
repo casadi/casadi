@@ -37,6 +37,8 @@
 #endif
 %}
 
+%ignore *::operator->;
+
 %begin %{
 #define SWIG_PYTHON_OUTPUT_TUPLE
 %}
