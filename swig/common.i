@@ -584,8 +584,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 // typemap meta implementations
 %include "meta.i"
 
-%include "casadi/symbolic/function/schemes_metadata.hpp"
-
 // common typemaps
 %include "commontypemaps.i"
 

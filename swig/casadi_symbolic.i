@@ -25,6 +25,8 @@
 //  The things needed to make each casadi_*.i  compilable by itself: typemaps
 %include "common.i"
 
+%include "casadi/symbolic/function/schemes_metadata.hpp"
+
 //  init hooks
 %include "casadi_runtime.i"
 

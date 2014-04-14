@@ -28,27 +28,8 @@ def getDocstring(e):
   #return ""
   return getAttribute(e,"feature_docstring")
 
-def getModules(x,k=0):
-  elemName = x.find('attributelist/attribute[@name="name"]').attrib['value']
-  #print k,x.tag,elemName
-
-  # schemes is included in all modules - pretend it's always casadi_symbolic
-  fake_module = []
-  if x.tag == 'include' and elemName.endswith('casadi/symbolic/function/schemes_metadata.hpp'):
-    fake_module = ['casadi_symbolic']
-
-
-  if x.tag == 'top': return []
-  modname = x.find('module/attributelist/attribute[@name="name"]')
-  if modname is None:
-    return fake_module + getModules(x.getparent(),k+1)
-  else:
-    #print "  ",x,modname.attrib['value']
-    return fake_module + [modname.attrib['value']] + getModules(x.getparent(),k+1)
-
 def getModule(x):
-  return getModules(x)[0]
-
+  return x.xpath('ancestor-or-self::*/module/attributelist/attribute[@name="name"]')[-1].attrib['value']
 
 # get all the enums
 enums = {}
@@ -190,9 +171,9 @@ for k,v in enums.items():
        (kk , {"enumEntryDocs": vv["docs"],"enumEntryDocslink":"","enumEntryVal": vv["ev"]})
           for kk,vv in v["entries"].items())
   }
-#print "%5d classes" % len(treedata['treeClasses'])
-#print "%5d functions" % len(treedata['treeFunctions'])
-#print "%5d enums" % len(treedata['treeEnums'])
+print "%5d classes %5d functions %5d enums" % (len(treedata['treeClasses']),
+                                               len(treedata['treeFunctions']),
+                                               len(treedata['treeEnums']))
 
 
 treedata["treeInheritance"] = dict((k, [i for i in v["bases"]]) for k,v in classes.items())
