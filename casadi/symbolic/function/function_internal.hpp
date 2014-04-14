@@ -28,6 +28,7 @@
 #include "../weak_ref.hpp"
 #include <set>
 #include "code_generator.hpp"
+#include "../matrix/sparse_storage.hpp"
 
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)
@@ -354,10 +355,10 @@ namespace casadi{
     WeakRef full_jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
-    Matrix<Sparsity> jac_sparsity_, jac_sparsity_compact_;
+    SparseStorage<Sparsity> jac_sparsity_, jac_sparsity_compact_;
 
     /// Cache for Jacobians
-    Matrix<WeakRef> jac_, jac_compact_;
+    SparseStorage<WeakRef> jac_, jac_compact_;
 
     /// User-set field
     void* user_data_;

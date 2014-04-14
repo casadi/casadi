@@ -41,3 +41,57 @@ add_custom_target(lint
 
 
 set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)
+foreach(name ${CASADI_MODULES})
+  set(PC_NAME "${name}")
+  #set(PC_CXX_FLAGS "{CXX_FLAGS}")
+  
+  function(join VALUES GLUE OUTPUT)
+    string (REPLACE ";" "${GLUE}" _TMP_STR "${VALUES}")
+    set (${OUTPUT} "${_TMP_STR}" PARENT_SCOPE)
+  endfunction()
+  
+  function(obtain_interface_link_libraries TARGET OUTPUT)
+    set(LIBLIST)
+    get_target_property(TEMP_INTERFACE_LINK_LIBRARIES ${TARGET} "INTERFACE_LINK_LIBRARIES")
+    foreach(LIB ${TEMP_INTERFACE_LINK_LIBRARIES})
+      list(APPEND LIBLIST ${LIB})
+      if(TARGET ${LIB})
+        obtain_interface_link_libraries(${LIB} OUTPUT2)
+        if(OUTPUT2)
+          list(APPEND LIBLIST ${OUTPUT2})
+        endif()
+      endif()
+    endforeach()
+    set(${OUTPUT} ${LIBLIST} PARENT_SCOPE)
+  endfunction()
+  
+  obtain_interface_link_libraries(${name} OUTPUT)
+  
+  set(PC_REQUIRES)
+  set(PC_LIBRARIES)
+  
+  foreach(LIB ${OUTPUT})
+    if(TARGET ${LIB})
+      list(FIND CASADI_MODULES ${LIB} FOUND)
+      if (FOUND EQUAL -1 )
+        list(APPEND PC_LIBRARIES ${LIB})
+      else()
+        list(APPEND PC_REQUIRES "${LIB}")
+      endif()
+    else()
+      list(APPEND PC_LIBRARIES ${LIB})
+    endif()
+  endforeach()
+  join("${PC_REQUIRES}" "," PC_REQUIRES)
+
+  set(PC_LIBRARIES_LIST)
+  foreach(LIB ${PC_LIBRARIES})
+    set(PC_LIBRARIES_LIST "${PC_LIBRARIES_LIST} -l${LIB}")
+  endforeach()
+  get_target_property(PC_LINK_LIBRARIES ${name} "LINK_LIBRARIES")
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/cmake/pkgconfig.pc.in
+    ${CMAKE_BINARY_DIR}/lib/pkgconfig/${name}.pc
+    ESCAPE_QUOTES
+    @ONLY)
+endforeach()
