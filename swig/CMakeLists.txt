@@ -115,7 +115,7 @@ endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
 set(modules_json)
 foreach(my_module ${CASADI_MODULES})
-  list(APPEND modules_json ${my_module}.json)
+  list(APPEND modules_json ${my_module}_json)
 endforeach()
 add_custom_target(_json_modules DEPENDS ${modules_json}) # the json interface is created with the command "make json"
 
@@ -238,16 +238,15 @@ endforeach()
 
 # json interface
 foreach(my_module ${CASADI_MODULES})
-  swig_add_module_xml(${my_module}_json ${my_module}.i)
+  swig_add_module_xml(${my_module}_xml ${my_module}.i)
 endforeach()
 
 foreach(my_module ${CASADI_MODULES})
-add_custom_command(
-  OUTPUT ${my_module}.json
+add_custom_target(${my_module}_json
   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
   COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml
-  DEPENDS ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py
 )
+add_dependencies(${my_module}_json ${my_module}_xml DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml)
 endforeach()
 
 foreach(my_module ${CASADI_MODULES})
