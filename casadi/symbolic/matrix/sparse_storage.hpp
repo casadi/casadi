@@ -173,7 +173,7 @@ namespace casadi{
 
     /// Returns true if the matrix has a non-zero at location rr,cc
     bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr,cc); }
-    
+
     // Get the sparsity pattern
     const std::vector<int>& row() const;
     const std::vector<int>& colind() const;
