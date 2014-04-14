@@ -89,8 +89,8 @@ namespace casadi{
     casadi_assert_warning(getNumOutputs()<10000, "Function " << getOption("name") << " has a large number of outputs. Changing the problem formulation is strongly encouraged.");
 
     // Resize the matrix that holds the sparsity of the Jacobian blocks
-    jac_sparsity_ = jac_sparsity_compact_ = Matrix<Sparsity>::sparse(getNumOutputs(),getNumInputs());
-    jac_ = jac_compact_ = Matrix<WeakRef>::sparse(getNumOutputs(),getNumInputs());
+    jac_sparsity_ = jac_sparsity_compact_ = SparseStorage<Sparsity>(Sparsity::sparse(getNumOutputs(),getNumInputs()));
+    jac_ = jac_compact_ = SparseStorage<WeakRef>(Sparsity::sparse(getNumOutputs(),getNumInputs()));
 
     if(hasSetOption("user_data")){
       user_data_ = getOption("user_data").toVoidPointer();
