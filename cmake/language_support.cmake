@@ -35,18 +35,21 @@ enable_language(${language} OPTIONAL)
     COMMAND ${CMAKE_COMMAND} .
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/language_tests/${language}
     RESULT_VARIABLE return_code
-    OUTPUT_QUIET
+    OUTPUT_VARIABLE variable
     ERROR_QUIET)
 
-  if(return_code EQUAL 0)
+  string(FIND ${variable} "The Fortran compiler identification is unknown" find_loc)
+
+  if(return_code EQUAL 0 AND find_loc EQUAL -1)
     # Second run
     execute_process(
       COMMAND ${CMAKE_COMMAND} .
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/language_tests/${language}
       RESULT_VARIABLE return_code
-      OUTPUT_QUIET
+      OUTPUT_VARIABLE variable
       ERROR_QUIET)
-    if(return_code EQUAL 0)
+    string(FIND ${variable} "The Fortran compiler identification is unknown" find_loc)
+    if(return_code EQUAL 0 AND find_loc EQUAL -1)
       set(${language_works} ON PARENT_SCOPE)
     else()
       set(${language_works} OFF PARENT_SCOPE)
