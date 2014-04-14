@@ -22,6 +22,12 @@ ERROR_QUIET
 string(REPLACE "+-" "+" git_describe "${git_describe}")
 string(REPLACE "-g" "." git_describe "${git_describe}")
 
+set(PACKAGE_VERSION_FULL "${git_describe}")
+if((PACKAGE_VERSION_FULL STREQUAL "") OR (NOT PACKAGE_VERSION MATCHES "\\+"))
+  set(PACKAGE_VERSION_FULL "${PACKAGE_VERSION}")
+endif()
+
+
 # begin workaround for
 # http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
