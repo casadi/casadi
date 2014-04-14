@@ -341,9 +341,6 @@ add_feature_info(dsdp-interface DSDP_FOUND "Interface to the interior point SDP 
 
 if(WITH_PROFILING)
   find_library(RT rt)
-  if(RT)
-    list(APPEND CASADI_DEPENDENCIES ${RT})
-  endif()
   add_definitions(-DWITH_PROFILING)
 endif()
 

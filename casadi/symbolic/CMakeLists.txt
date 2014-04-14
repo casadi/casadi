@@ -131,6 +131,11 @@ if(WITH_OPENCL)
   target_link_libraries(casadi_symbolic ${OPENCL_LIBRARIES})
 endif()
 
+if(RT)
+  # Realtime library
+  target_link_libraries(casadi_symbolic ${RT})
+endif()
+
 install(DIRECTORY ./
   DESTINATION include/casadi/symbolic
   FILES_MATCHING PATTERN "*.hpp"
