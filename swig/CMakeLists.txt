@@ -250,7 +250,7 @@ add_dependencies(${my_module}_json ${my_module}_xml DEPENDS ${CMAKE_CURRENT_SOUR
 endforeach()
 
 foreach(my_module ${CASADI_MODULES})
-install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.json ${PROJECT_BINARY_DIR}/swig/${my_module}_swiginclude.hpp
+install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.json
   DESTINATION share/casadi
   COMPONENT componentjson
 )

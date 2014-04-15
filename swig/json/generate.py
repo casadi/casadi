@@ -14,10 +14,6 @@ my_module = sys.argv[2]
 e = etree.parse(sys.argv[1])
 r = e.getroot()
 
-def ucfirst(s):
-  if len(s)==0: return s
-  return s[0].upper()+s[1:]
-
 def getAttribute(e,name,default=""):
   d = e.find('attributelist/attribute[@name="' + name + '"]')
   if d is None:
@@ -37,6 +33,7 @@ for d in r.findall('*//enum'):
   if getModule(d) != my_module: continue
   sym_name = getAttribute(d,"sym_name")
   docs = getDocstring(d)
+  assert sym_name not in enums, "overwriting an enum"
   dt = enums[sym_name] = {"sym_name": sym_name, "docs": docs,"entries":{}}
   for e in d.findall('enumitem'):
     name = getAttribute(e,"name")
@@ -44,6 +41,7 @@ for d in r.findall('*//enum'):
     docs = getDocstring(d)
     ev = eval(ev,dict((k,v["ev"]) for k,v in dt["entries"].items()))
 
+    assert name not in dt["entries"], "overwriting an enum entry"
     dt["entries"][name] = {"docs": docs, "ev": ev}
 
 
@@ -60,6 +58,7 @@ for c in r.findall('*//class'):
   if classModule != getModule(c): raise ValueError("class module information different than getModule()")
   if classModule != my_module: continue
 
+  assert name not in classes, "overwriting a class"
   data = classes[name] = {'methods': [],"constructors":[],"docs": docs}
 
   for d in c.findall('cdecl'):
@@ -69,6 +68,10 @@ for c in r.findall('*//class'):
       raise ValueError("method module",module,"!= class module",classModule)
 
     if (d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function"): continue
+    if (d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function"): continue
+    featureIgnore = d.find('attributelist/attribute[@name="feature_ignore"]')
+    if featureIgnore is not None and featureIgnore.attrib['value'] == '1':
+      continue
 
     if d.find('attributelist/parmlist') is None:
       params = []
@@ -103,6 +106,16 @@ for c in r.findall('*//class'):
     base = d.attrib["name"]
     data["bases"].append(base)
 
+for n,c in classes.items():
+  new_bases = []
+  for base in c['bases']:
+    assert not base.startswith('std::'), "baseclass rename fail"
+    if base.startswith('casadi::'):
+      new_bases.append(base)
+    else:
+      new_bases.append('casadi::'+base)
+  classes[n]['bases'] = new_bases
+
 
 # get all the functions
 functions = []
@@ -128,10 +141,8 @@ for d in r.findall('*//namespace/cdecl'):
 
 treedata = {"treeClasses": [],"treeFunctions": [], "treeEnums": {}}
 
-
-finclude  = file(my_module+'_swiginclude.hpp','w')
 code = sum([filter(lambda i: len(i.rstrip())> 0 ,x.attrib["value"].split("\n")) for x in r.findall("*//insert/attributelist/attribute[@name='code']")],[])
-finclude.write("\n".join(sorted(set(map(lambda x: x.rstrip(), filter(lambda y: re.search("^\s*#include ",y),code))))))
+treedata['treeIncludes'] = sorted(set(map(lambda x: x.rstrip(), filter(lambda y: re.search("^\s*#include ",y),code))))
 
 def getAllMethods(name,base=None):
   if base is None:
