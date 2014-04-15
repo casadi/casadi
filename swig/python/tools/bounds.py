@@ -56,7 +56,7 @@ def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolati
   # Loop over the elements of value
   for i in range(value.size()):
     violated =  (v[i] > (ub[i] + tol) or v[i] < (lb[i] - tol))
-    nonregular = not isRegular(v[i])
+    nonregular = not isRegular([v[i]])
 
     if not(showNonViolating) and not(violated) and not(nonregular):
       continue
