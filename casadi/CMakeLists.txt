@@ -13,6 +13,13 @@ macro(casadi_library name)
     add_library(${name} SHARED ${ARGN})
   endif()
   generate_export_header(${name})
+  
+  # Make sure the exported header is installed
+  file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
+  get_filename_component(RELPATH ${RELPATH} PATH)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h
+  DESTINATION include/${RELPATH})
+  
   if(NOT "${name}" STREQUAL "casadi_symbolic")
     target_link_libraries(${name} casadi_symbolic)
   endif()
