@@ -106918,14 +106918,8 @@ np: number of parameters
 |              |              |              | TRING</td><t |              |
 |              |              |              | d>GenericTyp |              |
 |              |              |              | e()</td><td> |              |
-|              |              |              | \"Select the  |              |
-|              |              |              | direct       |              |
-|              |              |              | linear       |              |
-|              |              |              | solver used  |              |
-|              |              |              | by the IP    |              |
-|              |              |              | method.\" (\"L |              |
-|              |              |              | APACK::0|MA5 |              |
-|              |              |              | 7: only      |              |
+|              |              |              | \"LAPACK::0|M |              |
+|              |              |              | A57: only    |              |
 |              |              |              | available if |              |
 |              |              |              | provided by  |              |
 |              |              |              | the user:1|S |              |
@@ -106933,11 +106927,11 @@ np: number of parameters
 |              |              |              | RDISO: only  |              |
 |              |              |              | available if |              |
 |              |              |              | provided by  |              |
-|              |              |              | the user,    |              |
-|              |              |              | subject to   |              |
-|              |              |              | license avai |              |
-|              |              |              | lability:3|M |              |
-|              |              |              | UMPS:        |              |
+|              |              |              | the          |              |
+|              |              |              | user,subject |              |
+|              |              |              | to license a |              |
+|              |              |              | vailability: |              |
+|              |              |              | 3|MUMPS:     |              |
 |              |              |              | currently    |              |
 |              |              |              | Linux        |              |
 |              |              |              | platforms    |              |
@@ -106954,11 +106948,11 @@ np: number of parameters
 |              |              |              | ntal, only   |              |
 |              |              |              | available if |              |
 |              |              |              | provided by  |              |
-|              |              |              | the user:8\") |              |
-|              |              |              | </td><td>cas |              |
-|              |              |              | adi::WorhpIn |              |
-|              |              |              | ternal</td>< |              |
-|              |              |              | /tr>         |              |
+|              |              |              | the user:8\"< |              |
+|              |              |              | /td><td>casa |              |
+|              |              |              | di::WorhpInt |              |
+|              |              |              | ernal</td></ |              |
+|              |              |              | tr>          |              |
 |              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | ipMinAlpha\"< |              |
 |              |              |              | /td><td>OT_R |              |
@@ -106972,22 +106966,6 @@ np: number of parameters
 |              |              |              | td>casadi::W |              |
 |              |              |              | orhpInternal |              |
 |              |              |              | </td></tr>   |              |
-|              |              |              | <tr><td>\"qp_ |              |
-|              |              |              | ipRelaxDiv\"< |              |
-|              |              |              | /td><td>OT_R |              |
-|              |              |              | EAL</td><td> |              |
-|              |              |              | worhp_p_.qp. |              |
-|              |              |              | ipRelaxDiv</ |              |
-|              |              |              | td><td>\"The  |              |
-|              |              |              | relaxation   |              |
-|              |              |              | term is      |              |
-|              |              |              | divided by   |              |
-|              |              |              | this value   |              |
-|              |              |              | if successfu |              |
-|              |              |              | l.\"</td><td> |              |
-|              |              |              | casadi::Worh |              |
-|              |              |              | pInternal</t |              |
-|              |              |              | d></tr>      |              |
 |              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | ipRelaxMax\"< |              |
 |              |              |              | /td><td>OT_R |              |
@@ -107015,23 +106993,6 @@ np: number of parameters
 |              |              |              | orhpInternal |              |
 |              |              |              | </td></tr>   |              |
 |              |              |              | <tr><td>\"qp_ |              |
-|              |              |              | ipRelaxMult\" |              |
-|              |              |              | </td><td>OT_ |              |
-|              |              |              | REAL</td><td |              |
-|              |              |              | >worhp_p_.qp |              |
-|              |              |              | .ipRelaxMult |              |
-|              |              |              | </td><td>\"Th |              |
-|              |              |              | e relaxation |              |
-|              |              |              | term is      |              |
-|              |              |              | multiplied   |              |
-|              |              |              | by this      |              |
-|              |              |              | value if uns |              |
-|              |              |              | uccessful.\"< |              |
-|              |              |              | /td><td>casa |              |
-|              |              |              | di::WorhpInt |              |
-|              |              |              | ernal</td></ |              |
-|              |              |              | tr>          |              |
-|              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | ipResTol\"</t |              |
 |              |              |              | d><td>OT_REA |              |
 |              |              |              | L</td><td>wo |              |
@@ -107045,107 +107006,27 @@ np: number of parameters
 |              |              |              | nal</td></tr |              |
 |              |              |              | >            |              |
 |              |              |              | <tr><td>\"qp_ |              |
-|              |              |              | ipTryRelax\"< |              |
-|              |              |              | /td><td>OT_B |              |
-|              |              |              | OOLEAN</td>< |              |
-|              |              |              | td>worhp_p_. |              |
-|              |              |              | qp.ipTryRela |              |
-|              |              |              | x</td><td>\"E |              |
-|              |              |              | nable        |              |
-|              |              |              | relaxation   |              |
-|              |              |              | strategy     |              |
-|              |              |              | when         |              |
-|              |              |              | encountering |              |
-|              |              |              | an error.\"</ |              |
-|              |              |              | td><td>casad |              |
-|              |              |              | i::WorhpInte |              |
-|              |              |              | rnal</td></t |              |
-|              |              |              | r>           |              |
-|              |              |              | <tr><td>\"qp_ |              |
-|              |              |              | lsItMaxIter\" |              |
-|              |              |              | </td><td>OT_ |              |
-|              |              |              | INTEGER</td> |              |
-|              |              |              | <td>worhp_p_ |              |
-|              |              |              | .qp.lsItMaxI |              |
-|              |              |              | ter</td><td> |              |
-|              |              |              | \"Maximum     |              |
-|              |              |              | number of    |              |
-|              |              |              | iterations   |              |
-|              |              |              | of the       |              |
-|              |              |              | iterative    |              |
-|              |              |              | linear solve |              |
-|              |              |              | rs.\"</td><td |              |
-|              |              |              | >casadi::Wor |              |
-|              |              |              | hpInternal</ |              |
-|              |              |              | td></tr>     |              |
-|              |              |              | <tr><td>\"qp_ |              |
-|              |              |              | lsItMethod\"< |              |
-|              |              |              | /td><td>OT_S |              |
-|              |              |              | TRING</td><t |              |
-|              |              |              | d>GenericTyp |              |
-|              |              |              | e()</td><td> |              |
-|              |              |              | \"Select the  |              |
-|              |              |              | iterative    |              |
-|              |              |              | linear       |              |
-|              |              |              | solver.\" (\"n |              |
-|              |              |              | one:Deactiva |              |
-|              |              |              | te; use a    |              |
-|              |              |              | direct       |              |
-|              |              |              | linear solve |              |
-|              |              |              | r.:0|CGNR::1 |              |
-|              |              |              | |CGNE::2|CGS |              |
-|              |              |              | ::3|BiCGSTAB |              |
-|              |              |              | ::4\")</td><t |              |
-|              |              |              | d>casadi::Wo |              |
-|              |              |              | rhpInternal< |              |
-|              |              |              | /td></tr>    |              |
-|              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | lsItPrecondM |              |
 |              |              |              | ethod\"</td>< |              |
 |              |              |              | td>OT_STRING |              |
 |              |              |              | </td><td>Gen |              |
 |              |              |              | ericType()</ |              |
-|              |              |              | td><td>\"Sele |              |
-|              |              |              | ct precondit |              |
-|              |              |              | ioner for    |              |
-|              |              |              | the          |              |
-|              |              |              | iterative    |              |
-|              |              |              | linear       |              |
-|              |              |              | solver.\"     |              |
-|              |              |              | (\"none:No pr |              |
-|              |              |              | econditioner |              |
-|              |              |              | .:0|static:S |              |
-|              |              |              | tatic precon |              |
-|              |              |              | ditioner     |              |
-|              |              |              | (KKT-matrix  |              |
-|              |              |              | with         |              |
+|              |              |              | td><td>\"none |              |
+|              |              |              | :No precondi |              |
+|              |              |              | tioner.:0|st |              |
+|              |              |              | atic:Static  |              |
+|              |              |              | precondition |              |
+|              |              |              | er (KKT-     |              |
+|              |              |              | matrix with  |              |
 |              |              |              | constant     |              |
 |              |              |              | lower-right  |              |
 |              |              |              | block).:1|fu |              |
 |              |              |              | ll:Full KKT- |              |
-|              |              |              | matrix.:2\")< |              |
-|              |              |              | /td><td>casa |              |
-|              |              |              | di::WorhpInt |              |
-|              |              |              | ernal</td></ |              |
-|              |              |              | tr>          |              |
-|              |              |              | <tr><td>\"qp_ |              |
-|              |              |              | lsRefineMaxI |              |
-|              |              |              | ter\"</td><td |              |
-|              |              |              | >OT_INTEGER< |              |
-|              |              |              | /td><td>worh |              |
-|              |              |              | p_p_.qp.lsRe |              |
-|              |              |              | fineMaxIter< |              |
-|              |              |              | /td><td>\"Max |              |
-|              |              |              | imum number  |              |
-|              |              |              | of iterative |              |
-|              |              |              | refinement   |              |
-|              |              |              | steps of the |              |
-|              |              |              | direct       |              |
-|              |              |              | linear solve |              |
-|              |              |              | rs.\"</td><td |              |
-|              |              |              | >casadi::Wor |              |
-|              |              |              | hpInternal</ |              |
-|              |              |              | td></tr>     |              |
+|              |              |              | matrix.:2\"</ |              |
+|              |              |              | td><td>casad |              |
+|              |              |              | i::WorhpInte |              |
+|              |              |              | rnal</td></t |              |
+|              |              |              | r>           |              |
 |              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | lsScale\"</td |              |
 |              |              |              | ><td>OT_BOOL |              |
@@ -107179,19 +107060,13 @@ np: number of parameters
 |              |              |              | <td>worhp_p_ |              |
 |              |              |              | .qp.lsTrySim |              |
 |              |              |              | ple</td><td> |              |
-|              |              |              | \"Some        |              |
-|              |              |              | matrices can |              |
-|              |              |              | be solved    |              |
-|              |              |              | without      |              |
-|              |              |              | calling a    |              |
-|              |              |              | linear       |              |
-|              |              |              | equation sol |              |
-|              |              |              | ver.Currentl |              |
-|              |              |              | y only       |              |
+|              |              |              | \"Currently   |              |
+|              |              |              | only         |              |
 |              |              |              | diagonal     |              |
 |              |              |              | matrices are |              |
-|              |              |              | supported.   |              |
-|              |              |              | Non-diagonal |              |
+|              |              |              | supported    |              |
+|              |              |              | .Non-        |              |
+|              |              |              | diagonal     |              |
 |              |              |              | matrices     |              |
 |              |              |              | will         |              |
 |              |              |              | besolved     |              |
@@ -107209,16 +107084,11 @@ np: number of parameters
 |              |              |              | GER</td><td> |              |
 |              |              |              | worhp_p_.qp. |              |
 |              |              |              | maxIter</td> |              |
-|              |              |              | <td>\"Imposes |              |
-|              |              |              | an upper     |              |
-|              |              |              | limit on the |              |
-|              |              |              | number of    |              |
-|              |              |              | minor solver |              |
-|              |              |              | iterations,  |              |
-|              |              |              | i.e. for     |              |
-|              |              |              | thequadratic |              |
+|              |              |              | <td>\" i.e.   |              |
+|              |              |              | for the      |              |
+|              |              |              | quadratic    |              |
 |              |              |              | subproblem   |              |
-|              |              |              | solver. If   |              |
+|              |              |              | solver.If    |              |
 |              |              |              | the limit is |              |
 |              |              |              | reached      |              |
 |              |              |              | before conve |              |
@@ -107238,13 +107108,7 @@ np: number of parameters
 |              |              |              | <td>OT_STRIN |              |
 |              |              |              | G</td><td>Ge |              |
 |              |              |              | nericType()< |              |
-|              |              |              | /td><td>\"Sel |              |
-|              |              |              | ect the      |              |
-|              |              |              | solution     |              |
-|              |              |              | method used  |              |
-|              |              |              | by the QP    |              |
-|              |              |              | solver.\"     |              |
-|              |              |              | (\"ip         |              |
+|              |              |              | /td><td>\"ip  |              |
 |              |              |              | :Interior-   |              |
 |              |              |              | Point method |              |
 |              |              |              | .:1|nsn      |              |
@@ -107255,10 +107119,10 @@ np: number of parameters
 |              |              |              | IP and fall  |              |
 |              |              |              | back to NSN  |              |
 |              |              |              | on error.:12 |              |
-|              |              |              | \")</td><td>c |              |
-|              |              |              | asadi::Worhp |              |
-|              |              |              | Internal</td |              |
-|              |              |              | ></tr>       |              |
+|              |              |              | \"</td><td>ca |              |
+|              |              |              | sadi::WorhpI |              |
+|              |              |              | nternal</td> |              |
+|              |              |              | </tr>        |              |
 |              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | nsnBeta\"</td |              |
 |              |              |              | ><td>OT_REAL |              |
@@ -107272,21 +107136,6 @@ np: number of parameters
 |              |              |              | d>casadi::Wo |              |
 |              |              |              | rhpInternal< |              |
 |              |              |              | /td></tr>    |              |
-|              |              |              | <tr><td>\"qp_ |              |
-|              |              |              | nsnGradStep\" |              |
-|              |              |              | </td><td>OT_ |              |
-|              |              |              | BOOLEAN</td> |              |
-|              |              |              | <td>worhp_p_ |              |
-|              |              |              | .qp.nsnGradS |              |
-|              |              |              | tep</td><td> |              |
-|              |              |              | \"Enable      |              |
-|              |              |              | gradient     |              |
-|              |              |              | steps in the |              |
-|              |              |              | NSN method.\" |              |
-|              |              |              | </td><td>cas |              |
-|              |              |              | adi::WorhpIn |              |
-|              |              |              | ternal</td>< |              |
-|              |              |              | /tr>         |              |
 |              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | nsnKKT\"</td> |              |
 |              |              |              | <td>OT_REAL< |              |
@@ -107304,21 +107153,15 @@ np: number of parameters
 |              |              |              | STRING</td>< |              |
 |              |              |              | td>GenericTy |              |
 |              |              |              | pe()</td><td |              |
-|              |              |              | >\"Select the |              |
-|              |              |              | direct       |              |
-|              |              |              | linear       |              |
-|              |              |              | solver used  |              |
-|              |              |              | by the NSN   |              |
-|              |              |              | method.\" (\"S |              |
-|              |              |              | uperLU::2|MA |              |
-|              |              |              | 48: only     |              |
+|              |              |              | >\"SuperLU::2 |              |
+|              |              |              | |MA48: only  |              |
 |              |              |              | available if |              |
 |              |              |              | provided by  |              |
-|              |              |              | the user:4\") |              |
-|              |              |              | </td><td>cas |              |
-|              |              |              | adi::WorhpIn |              |
-|              |              |              | ternal</td>< |              |
-|              |              |              | /tr>         |              |
+|              |              |              | the user:4\"< |              |
+|              |              |              | /td><td>casa |              |
+|              |              |              | di::WorhpInt |              |
+|              |              |              | ernal</td></ |              |
+|              |              |              | tr>          |              |
 |              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | nsnMinAlpha\" |              |
 |              |              |              | </td><td>OT_ |              |
@@ -107352,21 +107195,17 @@ np: number of parameters
 |              |              |              | TRING</td><t |              |
 |              |              |              | d>GenericTyp |              |
 |              |              |              | e()</td><td> |              |
-|              |              |              | \"Controls    |              |
-|              |              |              | the amount   |              |
-|              |              |              | of QP solver |              |
-|              |              |              | output.\"     |              |
-|              |              |              | (\"none:No ou |              |
-|              |              |              | tput.:0|warn |              |
-|              |              |              | :Print       |              |
+|              |              |              | \"none:No out |              |
+|              |              |              | put.:0|warn: |              |
+|              |              |              | Print        |              |
 |              |              |              | warnings and |              |
 |              |              |              | errors.:1|it |              |
 |              |              |              | erations:Pri |              |
 |              |              |              | nt iteration |              |
-|              |              |              | s.:2\")</td>< |              |
-|              |              |              | td>casadi::W |              |
-|              |              |              | orhpInternal |              |
-|              |              |              | </td></tr>   |              |
+|              |              |              | s.:2\"</td><t |              |
+|              |              |              | d>casadi::Wo |              |
+|              |              |              | rhpInternal< |              |
+|              |              |              | /td></tr>    |              |
 |              |              |              | <tr><td>\"qp_ |              |
 |              |              |              | scaleIntern\" |              |
 |              |              |              | </td><td>OT_ |              |
@@ -108489,8 +108328,9 @@ np: number of parameters
 |              |              |              | y only       |              |
 |              |              |              | diagonal     |              |
 |              |              |              | matrices are |              |
-|              |              |              | supported.   |              |
-|              |              |              | Non-diagonal |              |
+|              |              |              | supported    |              |
+|              |              |              | .Non-        |              |
+|              |              |              | diagonal     |              |
 |              |              |              | matrices     |              |
 |              |              |              | will         |              |
 |              |              |              | besolved     |              |
@@ -108506,10 +108346,10 @@ np: number of parameters
 |              |              |              | number of    |              |
 |              |              |              | minor solver |              |
 |              |              |              | iterations,  |              |
-|              |              |              | i.e. for     |              |
-|              |              |              | thequadratic |              |
+|              |              |              | i.e. for the |              |
+|              |              |              | quadratic    |              |
 |              |              |              | subproblem   |              |
-|              |              |              | solver. If   |              |
+|              |              |              | solver.If    |              |
 |              |              |              | the limit is |              |
 |              |              |              | reached      |              |
 |              |              |              | before conve |              |
