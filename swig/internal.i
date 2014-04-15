@@ -2323,6 +2323,54 @@
 %exception  casadi::Solve< Tr >::propagateSparsity(DMatrixPtrV &input, DMatrixPtrV &output, std::vector< int > &itmp, std::vector< double > &rtmp, bool fwd) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::SparseStorage< DataType >::at(int k) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::at(int k) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::back() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::back() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::begin() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::begin() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::elem(int rr, int cc=0) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::elem(int rr, int cc=0) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::end() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::end() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::front() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::front() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::rbegin() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::rbegin() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::rend() const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::SparseStorage< DataType >::rend() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::Sparsity::T() const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
