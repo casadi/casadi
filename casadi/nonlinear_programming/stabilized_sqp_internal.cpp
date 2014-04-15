@@ -598,78 +598,74 @@ namespace casadi{
         // Line-search
         log("Starting line-search");
 
-        if(max_iter_ls_>0){ // max_iter_ls_== 0 disables line-search
+        casadi_assert_message( max_iter_ls_ > 0, "max line search iterations should be > 0");
 
-          // Line-search loop
-          while (true){
+        // Line-search loop
+        while (true){
 
-            ls_iter++;
-            // Calculating maximal merit function value so far
-            if (Merit_cand_ <= Merit_ + c1_*t * rhsmerit){
+          ls_iter++;
+          // Calculating maximal merit function value so far
+          if (Merit_cand_ <= Merit_ + c1_*t * rhsmerit){
 
-              // Accepting candidate
-              log("Line-search completed, candidate accepted");
-              break;
-            }
-
-
-            // Line-search not successful, but we accept it.
-            //do mu merit comparison as per flexible penalty
-
-            if (Merit_mu_cand_ <= Merit_mu_+c1_*t*rhsmerit) {
-              sigma_ = std::min(std::min(2*sigma_,1/muR_),sigmaMax_);
-              break;
-            }
-
-            if(ls_iter == max_iter_ls_){
-              ls_success = false;
-              log("Line-search completed, maximum number of iterations");
-              break;
-            }
-
-            // Backtracking
-            t = beta_ * t;
-
-            for(int i=0; i<nx_; ++i) {
-              x_cand_[i] = x_[i] + t * dx_[i];
-            }
-
-            // Evaluating objective and constraints
-            eval_f(x_cand_,fk_cand_);
-            eval_g(x_cand_,gk_cand_);
-
-            for(int i=0;i<ng_;++i) {
-              mu_cand_[i] = mu_[i]+t*(dy_[i]);
-              s_cand_[i] = s_[i]+t*ds_[i];//std::min(ubg[i],std::max(lbg[i],gk_cand_[i]));//
-              gsk_cand_[i] = gk_cand_[i]-s_cand_[i];
-            }
-
-            // Calculating merit-function in candidate
-
-            normc_cand_ = norm_2(gk_cand_);
-            normcs_cand_ = norm_2(gsk_cand_);
-
-            transform(mu_cand_.begin(),mu_cand_.end(),mu_e_.begin(),dualpen_.begin(),minus<double>());
-            for (int i=0;i<ng_;++i)
-                   dualpen_[i] = -dualpen_[i]*(1/sigma_);
-            transform(gsk_cand_.begin(),gsk_cand_.end(),dualpen_.begin(),dualpen_.begin(),plus<double>());
-            Merit_cand_ = fk_cand_+inner_prod(mu_e_,gsk_cand_)+.5*sigma_*(normcs_cand_*normcs_cand_+nu_*std::pow(norm_2(dualpen_),2));
-
-            transform(mu_cand_.begin(),mu_cand_.end(),mu_e_.begin(),dualpen_.begin(),minus<double>());
-            for (int i=0;i<ng_;++i)
-                   dualpen_[i] = -dualpen_[i]*(muR_);
-            transform(gsk_cand_.begin(),gsk_cand_.end(),dualpen_.begin(),dualpen_.begin(),plus<double>());
-            Merit_mu_cand_ = fk_cand_+inner_prod(mu_e_,gsk_cand_)+.5*(1/muR_)*(normcs_cand_*normcs_cand_+nu_*std::pow(norm_2(dualpen_),2));
-
-          } // while (true)
-          if (ls_success) {
-            TRDelta_=gamma3_*t*std::max(norm_inf(dx_),norm_inf(ds_));
-
-          } else {
-            TRDelta_ = TRDelta_/25.;
+            // Accepting candidate
+            log("Line-search completed, candidate accepted");
+            break;
           }
-        } else { // if(max_iter_ls_>0)
-          TRDelta_ = TRDelta_ / 10;
+
+
+          // Line-search not successful, but we accept it.
+          //do mu merit comparison as per flexible penalty
+
+          if (Merit_mu_cand_ <= Merit_mu_+c1_*t*rhsmerit) {
+            sigma_ = std::min(std::min(2*sigma_,1/muR_),sigmaMax_);
+            break;
+          }
+
+          if(ls_iter == max_iter_ls_){
+            ls_success = false;
+            log("Line-search completed, maximum number of iterations");
+            break;
+          }
+
+          // Backtracking
+          t = beta_ * t;
+
+          for(int i=0; i<nx_; ++i) {
+            x_cand_[i] = x_[i] + t * dx_[i];
+          }
+
+          // Evaluating objective and constraints
+          eval_f(x_cand_,fk_cand_);
+          eval_g(x_cand_,gk_cand_);
+
+          for(int i=0;i<ng_;++i) {
+            mu_cand_[i] = mu_[i]+t*(dy_[i]);
+            s_cand_[i] = s_[i]+t*ds_[i];//std::min(ubg[i],std::max(lbg[i],gk_cand_[i]));//
+            gsk_cand_[i] = gk_cand_[i]-s_cand_[i];
+          }
+
+          // Calculating merit-function in candidate
+
+          normc_cand_ = norm_2(gk_cand_);
+          normcs_cand_ = norm_2(gsk_cand_);
+
+          transform(mu_cand_.begin(),mu_cand_.end(),mu_e_.begin(),dualpen_.begin(),minus<double>());
+          for (int i=0;i<ng_;++i)
+                 dualpen_[i] = -dualpen_[i]*(1/sigma_);
+          transform(gsk_cand_.begin(),gsk_cand_.end(),dualpen_.begin(),dualpen_.begin(),plus<double>());
+          Merit_cand_ = fk_cand_+inner_prod(mu_e_,gsk_cand_)+.5*sigma_*(normcs_cand_*normcs_cand_+nu_*std::pow(norm_2(dualpen_),2));
+
+          transform(mu_cand_.begin(),mu_cand_.end(),mu_e_.begin(),dualpen_.begin(),minus<double>());
+          for (int i=0;i<ng_;++i)
+                 dualpen_[i] = -dualpen_[i]*(muR_);
+          transform(gsk_cand_.begin(),gsk_cand_.end(),dualpen_.begin(),dualpen_.begin(),plus<double>());
+          Merit_mu_cand_ = fk_cand_+inner_prod(mu_e_,gsk_cand_)+.5*(1/muR_)*(normcs_cand_*normcs_cand_+nu_*std::pow(norm_2(dualpen_),2));
+
+        } // while (true)
+        if (ls_success) {
+          TRDelta_ = gamma3_*t*std::max(norm_inf(dx_),norm_inf(ds_));
+        } else {
+          TRDelta_ = TRDelta_/25.;
         }
       }
 
