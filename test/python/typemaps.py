@@ -368,7 +368,7 @@ class typemaptests(casadiTestCase):
         self.assertTrue(type(r) is type(SXElement()))
         
 
-      self.assertTrue(type(r) in ztype,"Expected %s but got %s (%s)" % (str(ztype),str(type(r)),str(r)))
+      self.assertTrue(type(r) in ztype,"Expected %s but got %s" % (str(ztype),str(type(r))))
       
     def tests(z,s):
       doit(z,s,lambda z,s: s>=z)
@@ -392,7 +392,7 @@ class typemaptests(casadiTestCase):
       for z in [MX.sym("x",2,2)]:
         print "z = %s, s = %s" % (str(z),str(s))
         print "  z = %s, s = %s" % (type(z),type(s))
-        #tests(z,s) # TODO disabled unittests cfr #1083
+        tests(z,s)
         
     # SXElement & SX
     for s in [SXElement.sym("x"), SX.sym("x"), SX.sym("x",2,2)]:
