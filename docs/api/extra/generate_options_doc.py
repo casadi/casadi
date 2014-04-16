@@ -161,13 +161,13 @@ for enum in xmlNS.findall("//memberdef[@kind='enum']"):
 from pyparsing import *
 
 
-multiline_string = OneOrMore(dblQuotedString.copy())
+multiline_string = OneOrMore(dblQuotedString)
 
 def removequotes(s):
   return s[1:-1]
   
-parse_quoted_string = multiline_string.setParseAction(lambda x: "".join(map(removequotes,x)))
-parse_quoted_string_keep = multiline_string.setParseAction(lambda x: '"' + ("".join(map(removequotes,x)))+'"')
+parse_quoted_string = multiline_string.copy().setParseAction(lambda x: "".join(map(removequotes,x)))
+parse_quoted_string_keep = multiline_string.copy().setParseAction(lambda x: '"' + ("".join(map(removequotes,x)))+'"')
 parse_type = Word( srange("[A-Z]") + "_").setResultsName("type")
 
 comma = Suppress(Literal(","))
