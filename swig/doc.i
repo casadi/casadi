@@ -1361,7 +1361,9 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::Callback "[INTERNAL]   Callback.
+%feature("docstring") casadi::Callback "
+
+Callback.
 
 In C++, supply a CallbackCPtr function pointer When the callback function
 returns a non-zero integer, the host is signalled of a problem. E.g. an
@@ -1944,8 +1946,9 @@ IMatrix representation of a GetNonzeros or SetNonzeros node.
 
 
 // File: classcasadi_1_1casadi__limits.xml
-%feature("docstring") casadi::casadi_limits "[INTERNAL]   casadi_limits
-class
+%feature("docstring") casadi::casadi_limits "
+
+casadi_limits class
 
 The following class, which acts as a complements to the standard
 numeric_limits class, allows to specify certain properties of scalar
@@ -1994,8 +1997,9 @@ Form message string.
 
 ";
 
-%feature("docstring") casadi::CasadiException "[INTERNAL]  Casadi exception
-class.
+%feature("docstring") casadi::CasadiException "
+
+Casadi exception class.
 
 Joel Andersson
 
@@ -2008,8 +2012,9 @@ Destructor.
 
 
 // File: classcasadi_1_1CasadiMeta.xml
-%feature("docstring") casadi::CasadiMeta "[INTERNAL]  Collects global
-CasADi meta information.
+%feature("docstring") casadi::CasadiMeta "
+
+Collects global CasADi meta information.
 
 Joris Gillis
 
@@ -2017,8 +2022,9 @@ C++ includes: casadi_meta.hpp ";
 
 
 // File: classcasadi_1_1CasadiOptions.xml
-%feature("docstring") casadi::CasadiOptions "[INTERNAL]  Collects global
-CasADi options.
+%feature("docstring") casadi::CasadiOptions "
+
+Collects global CasADi options.
 
 Note to developers: use sparingly. Global options are - in general - a
 rather bad idea
@@ -2608,9 +2614,10 @@ Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::CollocationIntegrator "[INTERNAL]  Fixed-step
-implicit Runge-Kutta integrator ODE/DAE integrator based on collocation
-schemes.
+%feature("docstring") casadi::CollocationIntegrator "
+
+Fixed-step implicit Runge-Kutta integrator ODE/DAE integrator based on
+collocation schemes.
 
 The method is still under development
 
@@ -5570,8 +5577,9 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::ControlSimulator "[INTERNAL]  Piecewise
-Simulation class.
+%feature("docstring") casadi::ControlSimulator "
+
+Piecewise Simulation class.
 
 A ControlSimulator can be seen as a chain of Simulators whereby some
 parameters change from one Simulator to the next.
@@ -6703,8 +6711,9 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::CplexSolver "[INTERNAL]  Interface to Cplex
-solver for sparse Quadratic Programs.
+%feature("docstring") casadi::CplexSolver "
+
+Interface to Cplex solver for sparse Quadratic Programs.
 
 Solves the following strictly convex problem:
 
@@ -7727,8 +7736,9 @@ sparsity propagation (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::CSparse "[INTERNAL]   LinearSolver with
-CSparse Interface.
+%feature("docstring") casadi::CSparse "
+
+LinearSolver with CSparse Interface.
 
 Solves the linear system A*X = B or A^T*X = B for X with A square and non-
 singular
@@ -9008,8 +9018,9 @@ the same as evaluate()
 
 ";
 
-%feature("docstring") casadi::CSparseCholesky "[INTERNAL]   LinearSolver
-with CSparseCholesky Interface.
+%feature("docstring") casadi::CSparseCholesky "
+
+LinearSolver with CSparseCholesky Interface.
 
 Solves the linear system A*X = B or A^T*X = B for X with A square and non-
 singular
@@ -9609,7 +9620,9 @@ destription of the object.
 
 ";
 
-%feature("docstring") casadi::CustomEvaluate "[INTERNAL]   CustomEvaluate.
+%feature("docstring") casadi::CustomEvaluate "
+
+CustomEvaluate.
 
 In C++, supply a CustomEvaluateCPtr function pointer
 
@@ -10040,8 +10053,9 @@ Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::CustomFunction "[INTERNAL]  Interface to a
-custom function.
+%feature("docstring") casadi::CustomFunction "
+
+Interface to a custom function.
 
 Joel Andersson
 
@@ -10625,8 +10639,9 @@ check if there is an option str
 
 ";
 
-%feature("docstring") casadi::CVodesIntegrator "[INTERNAL]  Interface to
-CVodes from the Sundials suite.
+%feature("docstring") casadi::CVodesIntegrator "
+
+Interface to CVodes from the Sundials suite.
 
 Base class for integrators. Solves an initial value problem (IVP) coupled to
 a terminal value problem with differential equation given as an implicit ODE
@@ -13106,8 +13121,9 @@ Assert that the node is pointing to the right type of object
 
 ";
 
-%feature("docstring") casadi::DerivativeGenerator "[INTERNAL]  Derivative
-Generator Functor.
+%feature("docstring") casadi::DerivativeGenerator "
+
+Derivative Generator Functor.
 
 In C++, supply a DerivativeGeneratorCPtr function pointer
 
@@ -13924,8 +13940,9 @@ adjoint directions.
 
 ";
 
-%feature("docstring") casadi::DirectCollocation "[INTERNAL]  Direct
-collocation.
+%feature("docstring") casadi::DirectCollocation "
+
+Direct collocation.
 
 Joel Andersson
 
@@ -15165,8 +15182,9 @@ Print a destription of the object.
 
 ";
 
-%feature("docstring") casadi::DirectMultipleShooting "[INTERNAL]  Direct
-Multiple Shooting.
+%feature("docstring") casadi::DirectMultipleShooting "
+
+Direct Multiple Shooting.
 
 ns: Number of shooting nodes: from option number_of_grid_points  nx: Number
 of differential states: from ffcn.input(INTEGRATOR_X0).size()  nc: Number of
@@ -16281,8 +16299,9 @@ copy.
 
 ";
 
-%feature("docstring") casadi::DirectSingleShooting "[INTERNAL]  Direct
-Single Shooting.
+%feature("docstring") casadi::DirectSingleShooting "
+
+Direct Single Shooting.
 
 ns: Number of shooting nodes: from option number_of_grid_points  nx: Number
 of differential states: from ffcn.input(INTEGRATOR_X0).size()  nc: Number of
@@ -17702,8 +17721,9 @@ Access input argument
 
 ";
 
-%feature("docstring") casadi::DpleSolver "[INTERNAL]  Base class for
-Discrete Periodic Lyapunov Equation Solvers.
+%feature("docstring") casadi::DpleSolver "
+
+Base class for Discrete Periodic Lyapunov Equation Solvers.
 
 Given matrices A_k and symmetric V_k, k = 0..K-1
 
@@ -18466,8 +18486,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::DSDPSolver "[INTERNAL]  Interface to DSDP
-Solver for semi definite programming.
+%feature("docstring") casadi::DSDPSolver "
+
+Interface to DSDP Solver for semi definite programming.
 
 Solves an SDP problem in standard form.
 Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -20196,8 +20217,9 @@ Evaluate.
 
 ";
 
-%feature("docstring") casadi::ExternalFunction "[INTERNAL]  Interface for a
-function that is not implemented by CasADi symbolics.
+%feature("docstring") casadi::ExternalFunction "
+
+Interface for a function that is not implemented by CasADi symbolics.
 
 Joel Andersson
 
@@ -21480,8 +21502,9 @@ Clone.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator "[INTERNAL]  Base class
-for fixed step integrators.
+%feature("docstring") casadi::FixedStepIntegrator "
+
+Base class for fixed step integrators.
 
 Joel Andersson
 
@@ -22643,7 +22666,9 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::Function "[INTERNAL]  General function.
+%feature("docstring") casadi::Function "
+
+General function.
 
 A general function $f$ in casadi can be multi-input, multi-output. Number of
 inputs: nin getNumInputs() Number of outputs: nout getNumOutputs()  We can
@@ -23034,7 +23059,9 @@ representation of the object.
 
 ";
 
-%feature("docstring") casadi::Functor "[INTERNAL]   Functor.
+%feature("docstring") casadi::Functor "
+
+Functor.
 
 Joris Gillis
 
@@ -23161,8 +23188,9 @@ Division (with future.division in effect)
 
 ";
 
-%feature("docstring") casadi::GenericExpression "[INTERNAL]  Expression
-interface.
+%feature("docstring") casadi::GenericExpression "
+
+Expression interface.
 
 This is a common base class for SX, MX and Matrix<>, introducing a uniform
 syntax and implementing common functionality using the curiously recurring
@@ -23282,8 +23310,9 @@ Get the number if non-zeros for a given sparsity pattern.
 
 ";
 
-%feature("docstring") casadi::GenericMatrix "[INTERNAL]   Matrix base
-class.
+%feature("docstring") casadi::GenericMatrix "
+
+Matrix base class.
 
 This is a common base class for MX and Matrix<>, introducing a uniform
 syntax and implementing common functionality using the curiously recurring
@@ -23482,7 +23511,9 @@ Is a vector of doubles?
 
 ";
 
-%feature("docstring") casadi::GenericType "[INTERNAL]  Generic data type.
+%feature("docstring") casadi::GenericType "
+
+Generic data type.
 
 Joel Andersson
 
@@ -26240,8 +26271,9 @@ Generate the sparsity of a Jacobian block.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver "[INTERNAL]  Base class for
-Homotopy NLP Solvers.
+%feature("docstring") casadi::HomotopyNLPSolver "
+
+Base class for Homotopy NLP Solvers.
 
 Solves the following parametric nonlinear program (NLP):min
 F(x,p,tau)  x  subject to             LBX <=   x    <= UBX             LBG
@@ -28210,8 +28242,9 @@ Access output argument
 
 ";
 
-%feature("docstring") casadi::IdasIntegrator "[INTERNAL]  Interface to IDAS
-from the Sundials suite.
+%feature("docstring") casadi::IdasIntegrator "
+
+Interface to IDAS from the Sundials suite.
 
 Base class for integrators. Solves an initial value problem (IVP) coupled to
 a terminal value problem with differential equation given as an implicit ODE
@@ -29343,8 +29376,9 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator "[INTERNAL]  Base
-class for implicit fixed step integrators.
+%feature("docstring") casadi::ImplicitFixedStepIntegrator "
+
+Base class for implicit fixed step integrators.
 
 Joel Andersson
 
@@ -30537,8 +30571,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::ImplicitFunction "[INTERNAL]  Abstract base
-class for the implicit function classes.
+%feature("docstring") casadi::ImplicitFunction "
+
+Abstract base class for the implicit function classes.
 
 The equation:
 
@@ -32208,8 +32243,9 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring") casadi::Integrator "[INTERNAL]  Base class for
-integrators.
+%feature("docstring") casadi::Integrator "
+
+Base class for integrators.
 
 Integrator abstract base class
 
@@ -33653,8 +33689,9 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::IOInterface "[INTERNAL]  Interface for
-accessing input and output data structures.
+%feature("docstring") casadi::IOInterface "
+
+Interface for accessing input and output data structures.
 
 Joel Andersson
 
@@ -33852,8 +33889,9 @@ Get index by entry name.
 
 ";
 
-%feature("docstring") casadi::IOScheme "[INTERNAL]  Class with mapping
-between names and indices.
+%feature("docstring") casadi::IOScheme "
+
+Class with mapping between names and indices.
 
 Joris Gillis
 
@@ -34023,8 +34061,9 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::IOSchemeVector "[INTERNAL]  A vector
-container with associated IOScheme A class.
+%feature("docstring") casadi::IOSchemeVector "
+
+A vector container with associated IOScheme A class.
 
 C++ includes: io_scheme_vector.hpp ";
 
@@ -34293,8 +34332,9 @@ Access output argument
 
 ";
 
-%feature("docstring") casadi::IpoptSolver "[INTERNAL]  interface to IPOPT
-NLP solver
+%feature("docstring") casadi::IpoptSolver "
+
+interface to IPOPT NLP solver
 
 Solves the following parametric nonlinear program (NLP):min          F(x,p)
 x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
@@ -39312,8 +39352,9 @@ derivatives are kept internally
 
 ";
 
-%feature("docstring") casadi::KinsolSolver "[INTERNAL]  Kinsol solver
-class.
+%feature("docstring") casadi::KinsolSolver "
+
+Kinsol solver class.
 
 The equation:
 
@@ -39972,8 +40013,9 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::KnitroSolver "[INTERNAL]  Interface to the
-Knitro NLP solver.
+%feature("docstring") casadi::KnitroSolver "
+
+Interface to the Knitro NLP solver.
 
 Solves the following parametric nonlinear program (NLP):min          F(x,p)
 x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
@@ -41880,8 +41922,9 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::LapackLUDense "[INTERNAL]  LU LinearSolver
-with Lapack Interface.
+%feature("docstring") casadi::LapackLUDense "
+
+LU LinearSolver with Lapack Interface.
 
 Solves the linear system A*X = B or A^T*X = B for X with A square and non-
 singular
@@ -42538,8 +42581,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::LapackQRDense "[INTERNAL]  QR LinearSolver
-with Lapack Interface.
+%feature("docstring") casadi::LapackQRDense "
+
+QR LinearSolver with Lapack Interface.
 
 Solves the linear system A*X = B or A^T*X = B for X with A square and non-
 singular
@@ -43744,8 +43788,9 @@ Check if the node is pointing to the right type of object.
 
 ";
 
-%feature("docstring") casadi::LinearSolver "[INTERNAL]  Base class for the
-linear solver classes.
+%feature("docstring") casadi::LinearSolver "
+
+Base class for the linear solver classes.
 
 Solves the linear system A*X = B or A^T*X = B for X with A square and non-
 singular
@@ -45127,7 +45172,9 @@ the same as evaluate()
 
 ";
 
-%feature("docstring") casadi::LPSolver "[INTERNAL]   LPSolver.
+%feature("docstring") casadi::LPSolver "
+
+LPSolver.
 
 Solves the following linear problem:
 
@@ -46037,8 +46084,9 @@ Check if the matrix expression is scalar.
 
 ";
 
-%feature("docstring") casadi::Matrix "[INTERNAL]  Sparse matrix class. SX
-and DMatrix are specializations.
+%feature("docstring") casadi::Matrix "
+
+Sparse matrix class. SX and DMatrix are specializations.
 
 General sparse matrix class that is designed with the idea that \"everything
 is a matrix\", that is, also scalars and vectors. This philosophy makes it
@@ -47905,7 +47953,9 @@ Get the number of non-zeros in the lower triangular half.
 
 ";
 
-%feature("docstring") casadi::MX "[INTERNAL]   MX - Matrix expression.
+%feature("docstring") casadi::MX "
+
+MX - Matrix expression.
 
 The MX class is used to build up trees made up from MXNodes. It is a more
 general graph representation than the scalar expression, SX, and much less
@@ -49441,8 +49491,9 @@ Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring") casadi::MXFunction "[INTERNAL]  General function
-mapping from/to MX.
+%feature("docstring") casadi::MXFunction "
+
+General function mapping from/to MX.
 
 Joel Andersson
 
@@ -50731,8 +50782,9 @@ of adjoint directions.
 
 ";
 
-%feature("docstring") casadi::NewtonImplicitSolver "[INTERNAL]  Implements
-simple newton iterations to solve an implicit function.
+%feature("docstring") casadi::NewtonImplicitSolver "
+
+Implements simple newton iterations to solve an implicit function.
 
 The equation:
 
@@ -52233,8 +52285,9 @@ content with another instance.
 
 ";
 
-%feature("docstring") casadi::NLPImplicitSolver "[INTERNAL]  Use an
-NLPSolver as ImplicitFunction solver.
+%feature("docstring") casadi::NLPImplicitSolver "
+
+Use an NLPSolver as ImplicitFunction solver.
 
 The equation:
 
@@ -53304,8 +53357,9 @@ Get the type name of a certain option.
 
 ";
 
-%feature("docstring") casadi::NLPQPSolver "[INTERNAL]  IPOPT QP Solver for
-quadratic programming.
+%feature("docstring") casadi::NLPQPSolver "
+
+IPOPT QP Solver for quadratic programming.
 
 Solves the following strictly convex problem:
 
@@ -53884,7 +53938,9 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::NLPSolver "[INTERNAL]   NLPSolver.
+%feature("docstring") casadi::NLPSolver "
+
+NLPSolver.
 
 Solves the following parametric nonlinear program (NLP):min          F(x,p)
 x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
@@ -55174,8 +55230,9 @@ Constructor.
 
 ";
 
-%feature("docstring") casadi::NonZeros "[INTERNAL]  Access to a set of
-nonzeros.
+%feature("docstring") casadi::NonZeros "
+
+Access to a set of nonzeros.
 
 NonZeros class for Matrix NonZeros is the return type for operator[] of the
 Matrix class, it allows access to the value as well as changing the parent
@@ -58165,8 +58222,9 @@ Remove modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::Nullspace "[INTERNAL]  Base class for
-nullspace construction.
+%feature("docstring") casadi::Nullspace "
+
+Base class for nullspace construction.
 
 Constructs a basis for the null-space of a fat matrix A. i.e. finds Z such
 that AZ = 0 holds.
@@ -58542,8 +58600,9 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::OCPSolver "[INTERNAL]  Base class for OCP
-solvers.
+%feature("docstring") casadi::OCPSolver "
+
+Base class for OCP solvers.
 
 Joel Andersson
 
@@ -59768,7 +59827,8 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::OldCollocationIntegrator "[INTERNAL]
+%feature("docstring") casadi::OldCollocationIntegrator "
+
 Collocation integrator ODE/DAE integrator based on collocation.
 
 The method is still under development
@@ -61531,8 +61591,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::OOQPSolver "[INTERNAL]  Interface to the OOQP
-Solver for quadratic programming:
+%feature("docstring") casadi::OOQPSolver "
+
+Interface to the OOQP Solver for quadratic programming:
 
 Solves the following strictly convex problem:
 
@@ -61965,8 +62026,9 @@ Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::OptionsFunctionality "[INTERNAL]  Provides
-options setting/getting functionality.
+%feature("docstring") casadi::OptionsFunctionality "
+
+Provides options setting/getting functionality.
 
 Gives a derived class the ability to set and retrieve options in a
 convenient way. It also contains error checking, making sure that the option
@@ -63253,8 +63315,9 @@ representation of the object.
 
 ";
 
-%feature("docstring") casadi::Parallelizer "[INTERNAL]   Parallelizer
-execution of functions.
+%feature("docstring") casadi::Parallelizer "
+
+Parallelizer execution of functions.
 
 Joel Andersson
 
@@ -63652,8 +63715,9 @@ Generate the sparsity of a Jacobian block.
 
 
 // File: classcasadi_1_1Polynomial.xml
-%feature("docstring") casadi::Polynomial "[INTERNAL]  Helper class for
-differentiating and integrating polynomials.
+%feature("docstring") casadi::Polynomial "
+
+Helper class for differentiating and integrating polynomials.
 
 Joel Andersson
 
@@ -63758,8 +63822,9 @@ representation of the object.
 
 ";
 
-%feature("docstring") casadi::PrintableObject "[INTERNAL]  Base class for
-objects that have a natural string representation.
+%feature("docstring") casadi::PrintableObject "
+
+Base class for objects that have a natural string representation.
 
 Joel Andersson
 
@@ -64571,8 +64636,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::PsdIndefDpleSolver "[INTERNAL]  An efficient
-solver for Discrete Periodic Lyapunov Eaauqtions using SLICOT.
+%feature("docstring") casadi::PsdIndefDpleSolver "
+
+An efficient solver for Discrete Periodic Lyapunov Eaauqtions using SLICOT.
 
 Given matrices A_k and symmetric V_k, k = 0..K-1
 
@@ -65271,8 +65337,9 @@ reference to the object.
 
 ";
 
-%feature("docstring") casadi::QCQPQPSolver "[INTERNAL]  Use a QCQP solver
-to solve q QP.
+%feature("docstring") casadi::QCQPQPSolver "
+
+Use a QCQP solver to solve q QP.
 
 Solves the following strictly convex problem:
 
@@ -66618,7 +66685,9 @@ the output elements).
 
 ";
 
-%feature("docstring") casadi::QCQPSolver "[INTERNAL]   QCQPSolver.
+%feature("docstring") casadi::QCQPSolver "
+
+QCQPSolver.
 
 Solves the following strictly convex problem:
 
@@ -67089,8 +67158,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::QPLPSolver "[INTERNAL]  IPOPT QP Solver for
-quadratic programming.
+%feature("docstring") casadi::QPLPSolver "
+
+IPOPT QP Solver for quadratic programming.
 
 Solves the following linear problem:
 
@@ -68211,8 +68281,9 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::QPOasesSolver "[INTERNAL]  Interface to
-QPOases Solver for quadratic programming.
+%feature("docstring") casadi::QPOasesSolver "
+
+Interface to QPOases Solver for quadratic programming.
 
 Solves the following strictly convex problem:
 
@@ -69274,7 +69345,9 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::QPSolver "[INTERNAL]   QPSolver.
+%feature("docstring") casadi::QPSolver "
+
+QPSolver.
 
 Solves the following strictly convex problem:
 
@@ -70298,8 +70371,9 @@ Set the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::QPStabilizer "[INTERNAL]  IPOPT QP Solver for
-quadratic programming.
+%feature("docstring") casadi::QPStabilizer "
+
+IPOPT QP Solver for quadratic programming.
 
 Solves the following strictly convex problem:
 
@@ -72443,8 +72517,10 @@ if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::RKIntegrator "[INTERNAL]  Fixed-step explicit
-Runge-Kutta integrator for ODEs Currently implements RK4.
+%feature("docstring") casadi::RKIntegrator "
+
+Fixed-step explicit Runge-Kutta integrator for ODEs Currently implements
+RK4.
 
 The method is still under development
 
@@ -74849,9 +74925,10 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::SCPgen "[INTERNAL]  A structure-exploiting
-sequential quadratic programming (to be come sequential convex programming)
-method for nonlinear programming.
+%feature("docstring") casadi::SCPgen "
+
+A structure-exploiting sequential quadratic programming (to be come
+sequential convex programming) method for nonlinear programming.
 
 Joel Andersson, Attila Kozma and Joris Gillis
 
@@ -76601,8 +76678,9 @@ forward or backward (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::SDPSDQPSolver "[INTERNAL]  SDP SDQP Solver
-for quadratic programming.
+%feature("docstring") casadi::SDPSDQPSolver "
+
+SDP SDQP Solver for quadratic programming.
 
 Note: this implementation relies on Cholesky decomposition: Chol(H) = L -> H
 = LL' with L lower triangular This requires Pi, H to be positive definite.
@@ -77584,8 +77662,9 @@ Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::SDPSOCPSolver "[INTERNAL]  SOCP Solver for
-quadratic programming.
+%feature("docstring") casadi::SDPSOCPSolver "
+
+SOCP Solver for quadratic programming.
 
 Solves an Second Order Cone Programming (SOCP) problem in standard form.
 
@@ -78187,7 +78266,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::SDPSolver "[INTERNAL]   SDPSolver.
+%feature("docstring") casadi::SDPSolver "
+
+SDPSolver.
 
 Solves an SDP problem in standard form.
 Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -79501,7 +79582,9 @@ with another instance.
 
 ";
 
-%feature("docstring") casadi::SDQPSolver "[INTERNAL]   SDQPSolver.
+%feature("docstring") casadi::SDQPSolver "
+
+SDQPSolver.
 
 Same as an SDPSolver, but with a quadratic objective 1/2 x' H x
 
@@ -82819,9 +82902,10 @@ Destructor.
 
 ";
 
-%feature("docstring") casadi::SharedObject "[INTERNAL]   SharedObject
-implements a reference counting framework simular for effient and easily-
-maintained memory management.
+%feature("docstring") casadi::SharedObject "
+
+SharedObject implements a reference counting framework simular for effient
+and easily-maintained memory management.
 
 To use the class, both the SharedObject class (the public class), and the
 SharedObjectNode class (the internal class) must be inherited from. It can
@@ -83278,8 +83362,9 @@ Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::SimpleHomotopyNLPSolver "[INTERNAL]  Solving
-an NLP homotopy with regular NLP solvers.
+%feature("docstring") casadi::SimpleHomotopyNLPSolver "
+
+Solving an NLP homotopy with regular NLP solvers.
 
 Joris Gillis
 
@@ -84188,8 +84273,10 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::SimpleIndefDpleSolver "[INTERNAL]  Solving
-the Discrete Periodic Lyapunov Equations with regular Linear Solvers.
+%feature("docstring") casadi::SimpleIndefDpleSolver "
+
+Solving the Discrete Periodic Lyapunov Equations with regular Linear
+Solvers.
 
 Given matrices A_k and symmetric V_k, k = 0..K-1
 
@@ -85118,7 +85205,9 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::Simulator "[INTERNAL]   Integrator class.
+%feature("docstring") casadi::Simulator "
+
+Integrator class.
 
 An \"simulator\" integrates an IVP, stopping at a (fixed) number of grid
 points and evaluates a set of output functions at these points. The internal
@@ -85938,8 +86027,9 @@ representation of the object to a stream.
 
 ";
 
-%feature("docstring") casadi::Slice "[INTERNAL]  Class representing a
-Slice.
+%feature("docstring") casadi::Slice "
+
+Class representing a Slice.
 
 Note that Python or Octave do not need to use this class. They can just use
 slicing utility from the host language ( M[0:6] in Python, M(1:7) )
@@ -86654,8 +86744,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::SnoptSolver "[INTERNAL]  interface to SNOPT
-NLP solver
+%feature("docstring") casadi::SnoptSolver "
+
+interface to SNOPT NLP solver
 
 Solves the following parametric nonlinear program (NLP):min          F(x,p)
 x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
@@ -87629,8 +87720,9 @@ casadi::SOCPQCQPSolver::spInit " [INTERNAL]  Reset the sparsity propagation
 
 ";
 
-%feature("docstring") casadi::SOCPQCQPSolver "[INTERNAL]  SOCP QCQP Solver
-for quadratic programming.
+%feature("docstring") casadi::SOCPQCQPSolver "
+
+SOCP QCQP Solver for quadratic programming.
 
 Note: this implementation relies on Cholesky decomposition: Chol(H) = L -> H
 = LL' with L lower triangular This requires Pi, H to be positive definite.
@@ -89213,7 +89305,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::SOCPSolver "[INTERNAL]   SOCPSolver.
+%feature("docstring") casadi::SOCPSolver "
+
+SOCPSolver.
 
 Solves an Second Order Cone Programming (SOCP) problem in standard form.
 
@@ -90255,7 +90349,7 @@ Convert to scalar type.
 
 ";
 
-%feature("docstring") casadi::SparseStorage "[INTERNAL] C++ includes:
+%feature("docstring") casadi::SparseStorage "C++ includes:
 sparse_storage.hpp ";
 
 %feature("docstring") casadi::SparseStorage::data "
@@ -90376,7 +90470,9 @@ Enlarge the matrix along the first dimension (i.e. insert rows)
 
 ";
 
-%feature("docstring") casadi::Sparsity "[INTERNAL]  General sparsity class.
+%feature("docstring") casadi::Sparsity "
+
+General sparsity class.
 
 The storage format is a compressed column storage (CCS) format.  In this
 format, the structural non-zero elements are stored in column-major order,
@@ -92283,8 +92379,9 @@ derivatives are kept internally
 
 ";
 
-%feature("docstring") casadi::SQICSolver "[INTERNAL]  Interface to the SQIC
-solver for quadratic programming.
+%feature("docstring") casadi::SQICSolver "
+
+Interface to the SQIC solver for quadratic programming.
 
 Solves the following strictly convex problem:
 
@@ -93338,8 +93435,9 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::SQPMethod "[INTERNAL]  Sequential Quadratic
-Programming method.
+%feature("docstring") casadi::SQPMethod "
+
+Sequential Quadratic Programming method.
 
 The algorithm is a classical SQP method with either exact (may be also
 provided) or damped BFGS Lagrange Hessian approximation. Two different line-
@@ -94334,7 +94432,9 @@ Set the number of function outputs.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::StabilizedQPSolver " [INTERNAL]   StabilizedQPSolver.
+casadi::StabilizedQPSolver "
+
+StabilizedQPSolver.
 
 Solves the following strictly convex problem:
 
@@ -95365,7 +95465,7 @@ Return a string with a destription (for SWIG)
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::StabilizedSQICSolver " [INTERNAL]
+casadi::StabilizedSQICSolver "
 
 >Input scheme: casadi::StabilizedQPSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]
 +------------------------+------------------------+------------------------+
@@ -96997,8 +97097,9 @@ Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::StabilizedSQPMethod "[INTERNAL]  Stabilized
-Sequential Quadratic Programming method.
+%feature("docstring") casadi::StabilizedSQPMethod "
+
+Stabilized Sequential Quadratic Programming method.
 
 Slava Kung
 
@@ -98579,7 +98680,9 @@ Check if a multiple output node.
 
 
 // File: classcasadi_1_1SubMatrix.xml
-%feature("docstring") casadi::SubMatrix "[INTERNAL]  submatrix
+%feature("docstring") casadi::SubMatrix "
+
+submatrix
 
 SubMatrix class for Matrix SubMatrix is the return type for operator() of
 the Matrix class, it allows access to the value as well as changing the
@@ -99562,8 +99665,9 @@ Set the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::SundialsIntegrator "[INTERNAL]  Interface to
-the Sundials integrators.
+%feature("docstring") casadi::SundialsIntegrator "
+
+Interface to the Sundials integrators.
 
 Base class for integrators. Solves an initial value problem (IVP) coupled to
 a terminal value problem with differential equation given as an implicit ODE
@@ -100530,8 +100634,9 @@ stream, limited
 
 %feature("docstring") casadi::SXElement::log10 "";
 
-%feature("docstring") casadi::SXElement "[INTERNAL]  The basic scalar
-symbolic class of CasADi.
+%feature("docstring") casadi::SXElement "
+
+The basic scalar symbolic class of CasADi.
 
 Joel Andersson
 
@@ -101593,8 +101698,10 @@ reference count.
 
 ";
 
-%feature("docstring") casadi::SXFunction "[INTERNAL]  Dynamically created
-function that can be expanded into a series of scalar operations.
+%feature("docstring") casadi::SXFunction "
+
+Dynamically created function that can be expanded into a series of scalar
+operations.
 
 Joel Andersson
 
@@ -102412,8 +102519,9 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::SymbolicNLP "[INTERNAL]  A symbolic NLP
-representation.
+%feature("docstring") casadi::SymbolicNLP "
+
+A symbolic NLP representation.
 
 Joel Andersson
 
@@ -102807,8 +102915,9 @@ Eliminate interdependencies amongst the outputs.
 
 ";
 
-%feature("docstring") casadi::SymbolicOCP "[INTERNAL]  A flat OCP
-representation coupled to an XML file.
+%feature("docstring") casadi::SymbolicOCP "
+
+A flat OCP representation coupled to an XML file.
 
 Variables:
 
@@ -103686,9 +103795,10 @@ Evaluate.
 
 ";
 
-%feature("docstring") casadi::SymbolicQR "[INTERNAL]   LinearSolver based
-on QR factorization with sparsity pattern based reordering without partial
-pivoting.
+%feature("docstring") casadi::SymbolicQR "
+
+LinearSolver based on QR factorization with sparsity pattern based
+reordering without partial pivoting.
 
 Solves the linear system A*X = B or A^T*X = B for X with A square and non-
 singular
@@ -105294,8 +105404,10 @@ of a node
 
 
 // File: structcasadi_1_1Variable.xml
-%feature("docstring") casadi::Variable "[INTERNAL]  Holds expressions and
-meta-data corresponding to a physical quantity evolving in time.
+%feature("docstring") casadi::Variable "
+
+Holds expressions and meta-data corresponding to a physical quantity
+evolving in time.
 
 Joel Andersson
 
@@ -106484,8 +106596,9 @@ example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::WorhpSolver "[INTERNAL]  interface to WORHP
-NLP solver
+%feature("docstring") casadi::WorhpSolver "
+
+interface to WORHP NLP solver
 
 Solves the following parametric nonlinear program (NLP):min          F(x,p)
 x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
