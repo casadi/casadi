@@ -297,10 +297,13 @@ class Doxy2SWIG_X(Doxy2SWIG):
           m = list(re.finditer("\[DEPRECATED(:(.*?))?\]","".join(pieces)))
           deprecated = ("" if m[-1].group(2) is None else m[-1].group(2)) if len(m)>0 else None
           
-          internal = True
-          if publicapi is not None:
-            if publicapi.xpath(".//memberdef[translate(concat(definition,argsstring),' ','')='%s' or translate(concat(definition,argsstring),' ','')='%s']" % (origin_nostatic.replace(" ",""),'static'+origin_nostatic.replace(" ",""))):
-              internal = False
+          if origin == "huma kavula" and publicapi is not None:
+            internal = False
+          else:
+            internal = True
+            if publicapi is not None:
+              if publicapi.xpath(".//memberdef[translate(concat(definition,argsstring),' ','')='%s' or translate(concat(definition,argsstring),' ','')='%s']" % (origin_nostatic.replace(" ",""),'static'+origin_nostatic.replace(" ",""))):
+                internal = False
           if deprecated is not None: internal = False
           
           if not re.search(r"\b_\w+\(",origin_nostatic) and "(" in origin_nostatic and "~" not in origin_nostatic:
