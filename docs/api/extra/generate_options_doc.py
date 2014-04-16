@@ -255,11 +255,14 @@ for name,meta in metadata.items():
 
 addExtra(metadata)
 
+def htmlescape(h):
+  return h.replace(">","&gt;").replace("<","&lt;")
+
 def newline2br(a):
   return a.replace("\n","<br />")
   
 def optionsashtml(option):
-  return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(option['description']),newline2br(option['used']))
+  return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(htmlescape(option['description'])),newline2br(option['used']))
 
 def statsashtml(stat):
   return "<tr><td>%s</td><td>%s</td></tr>" %(stat['name'],stat['used'])
