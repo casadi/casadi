@@ -105,11 +105,13 @@ namespace casadi{
 
     if(getOption("linear_multistep_method")=="adams")  lmm_ = CV_ADAMS;
     else if(getOption("linear_multistep_method")=="bdf") lmm_ = CV_BDF;
-    else throw CasadiException("Unknown linear multistep method");
+    else
+      throw CasadiException("Unknown linear multistep method");
 
     if(getOption("nonlinear_solver_iteration")=="newton") iter_ = CV_NEWTON;
     else if(getOption("nonlinear_solver_iteration")=="functional") iter_ = CV_FUNCTIONAL;
-    else throw CasadiException("Unknown nonlinear solver iteration");
+    else
+      throw CasadiException("Unknown nonlinear solver iteration");
 
     // Create CVodes memory block
     mem_ = CVodeCreate(lmm_,iter_);
@@ -281,7 +283,8 @@ namespace casadi{
         interpType = CV_HERMITE;
       else if(getOption("interpolation_type")=="polynomial")
         interpType = CV_POLYNOMIAL;
-      else throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
+      else
+        throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
 
       // Initialize adjoint sensitivities
       flag = CVodeAdjInit(mem_, Nd, interpType);

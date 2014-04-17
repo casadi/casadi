@@ -34,19 +34,16 @@ set(STYLE_FILTER ${STYLE_FILTER}-whitespace/operators,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/parens,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/indent,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/comments,)
-set(STYLE_FILTER ${STYLE_FILTER}-whitespace/newline,)
 
 set(STYLE_FILTER ${STYLE_FILTER}-build/include_order,)
 set(STYLE_FILTER ${STYLE_FILTER}-build/namespaces,)
 set(STYLE_FILTER ${STYLE_FILTER}-build/include_what_you_use,)
 
 set(STYLE_FILTER ${STYLE_FILTER}-readability/streams,)
-set(STYLE_FILTER ${STYLE_FILTER}-readability/todo,)
 
 set(STYLE_FILTER ${STYLE_FILTER}-runtime/references,)
 set(STYLE_FILTER ${STYLE_FILTER}-runtime/int,)
 set(STYLE_FILTER ${STYLE_FILTER}-runtime/explicit,)
-set(STYLE_FILTER ${STYLE_FILTER}-runtime/printf,)
 
 # Add a target that runs cpplint.py
 #

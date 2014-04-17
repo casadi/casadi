@@ -390,7 +390,8 @@ namespace casadi{
       interpType = IDA_HERMITE;
     else if(getOption("interpolation_type")=="polynomial")
       interpType = IDA_POLYNOMIAL;
-    else throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
+    else
+      throw CasadiException("\"interpolation_type\" must be \"hermite\" or \"polynomial\"");
 
     // Initialize adjoint sensitivities
     flag = IDAAdjInit(mem_, Nd, interpType);

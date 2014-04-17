@@ -112,7 +112,8 @@ namespace casadi{
             var.variability = DISCRETE;
           else if(variability.compare("continuous")==0)
             var.variability = CONTINUOUS;
-          else throw CasadiException("Unknown variability");
+          else
+            throw CasadiException("Unknown variability");
 
           // ODE is zero for non-continuous variables
           if(var.variability!=CONTINUOUS) var.ode = 0;
@@ -124,7 +125,8 @@ namespace casadi{
             var.causality = OUTPUT;
           else if(causality.compare("internal")==0)
             var.causality = INTERNAL;
-          else throw CasadiException("Unknown causality");
+          else
+            throw CasadiException("Unknown causality");
 
           // Alias
           if(alias.compare("noAlias")==0)
@@ -133,7 +135,8 @@ namespace casadi{
             var.alias = ALIAS;
           else if(alias.compare("negatedAlias")==0)
             var.alias = NEGATED_ALIAS;
-          else throw CasadiException("Unknown alias");
+          else
+            throw CasadiException("Unknown alias");
 
           // Other properties
           if(vnode.hasChild("Real")){
@@ -171,7 +174,8 @@ namespace casadi{
               var.category = CAT_INDEPENDENT_PARAMETER;
             else if(cat.compare("algebraic")==0)
               var.category = CAT_ALGEBRAIC;
-            else throw CasadiException("Unknown variable category: " + cat);
+            else
+              throw CasadiException("Unknown variable category: " + cat);
           }
 
           // Add to list of variables

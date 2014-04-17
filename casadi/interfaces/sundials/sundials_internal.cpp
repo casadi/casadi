@@ -179,7 +179,8 @@ void SundialsInternal::init(){
     else if(getOption("pretype")=="left")          pretype_f_ = PREC_LEFT;
     else if(getOption("pretype")=="right")         pretype_f_ = PREC_RIGHT;
     else if(getOption("pretype")=="both")          pretype_f_ = PREC_BOTH;
-    else throw CasadiException("Unknown preconditioning type for forward integration");
+    else
+      throw CasadiException("Unknown preconditioning type for forward integration");
   } else if(getOption("linear_solver_type")=="user_defined") {
     linsol_f_ = SD_USER_DEFINED;
   } else {
@@ -217,7 +218,8 @@ void SundialsInternal::init(){
     else if(pretypeB=="left")          pretype_g_ = PREC_LEFT;
     else if(pretypeB=="right")         pretype_g_ = PREC_RIGHT;
     else if(pretypeB=="both")          pretype_g_ = PREC_BOTH;
-    else throw CasadiException("Unknown preconditioning type for backward integration");
+    else
+      throw CasadiException("Unknown preconditioning type for backward integration");
   } else if(linear_solver_typeB=="user_defined") {
     linsol_g_ = SD_USER_DEFINED;
   } else {
