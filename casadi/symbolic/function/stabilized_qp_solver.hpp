@@ -59,7 +59,7 @@ namespace casadi{
 /// Input arguments of a QP problem [stabilizedQpIn]
 enum StabilizedQPSolverInput{
   /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-  // The matrix is assumed to be symmetrical. [h]
+  /// The matrix is assumed to be symmetrical. [h]
   STABILIZED_QP_SOLVER_H,
   /// The vector g: dense,  (n x 1) [g]
   STABILIZED_QP_SOLVER_G,

@@ -106,7 +106,8 @@ class Enum:
 template<class M>
 class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit %sIOSchemeVector(const std::vector<M>& t) : IOSchemeVector<M>(t,SCHEME_%s){}
+    explicit %sIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t,SCHEME_%s){}
 };
 /// \endcond
 """ % (self.enum,self.enum,self.enum)
@@ -129,7 +130,9 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s+="""  for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_%s,it->first);
     if (n==-1)
-      casadi_error("Keyword error in %s: '" << it->first << "' is not recognized. Available keywords are: %s");
+      casadi_error("Keyword error in %s: '" << it->first
+        << "' is not recognized. Available keywords are: "
+        "%s");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
 """  % (self.enum,self.enum,", ".join([name for name, doc, enum in self.entries]))
@@ -142,7 +145,7 @@ class CASADI_SYMBOLIC_EXPORT %sIOSchemeVector : public IOSchemeVector<M> {
     s=s[:-1] + ")\n{\n"
     s+= "  std::vector<M> ret;\n"
     for i,_ in enumerate(self.entries):
-      s+="""  if (arg_s%d!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_%s,arg_s%d)));\n""" % (i,self.enum,i)
+      s+="""  if (arg_s%d!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_%s,arg_s%d))); // NOLINT(whitespace/line_length)\n""" % (i,self.enum,i)
     s+= "  return ret;\n"
     s+="\n}\n"
 
@@ -384,7 +387,7 @@ autogencpp.write("  }\n}\n")
 
 autogencpp.write("std::string getSchemeEntryNames(InputOutputScheme scheme) {\n  switch (scheme) {\n")
 for p in schemes:
-  autogencpp.write("""    case SCHEME_%s: return "%s";\n""" % (p.enum,", ".join([name for name, doc, enum in p.entries])))
+  autogencpp.write("""    case SCHEME_%s:\n      return "%s";\n""" % (p.enum,", ".join([name for name, doc, enum in p.entries])))
 autogencpp.write("""  default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");\n""")
 autogencpp.write("  }\n}\n")
 
@@ -395,17 +398,24 @@ for p in schemes:
     autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,name))
   autogencpp.write("      break;\n")
 autogencpp.write("  }\n")
-autogencpp.write("""  casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");\n""")
+autogencpp.write("""\
+  casadi_error( "getSchemeEntryName: supplied number is out of range. Scheme '"
+                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
+                << " entries: " << getSchemeEntryNames(scheme) << ".");
+""")
 autogencpp.write("}\n")
 
 autogencpp.write("std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
 for p in schemes:
   autogencpp.write("    case SCHEME_%s:\n" % p.enum)
   for i, (name, doc, enum) in enumerate(p.entries):
-    autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,doc))
+    autogencpp.write("""      if(i==%d) return "%s";  // NOLINT(whitespace/line_length)\n""" % (i,doc))
   autogencpp.write("      break;\n")
 autogencpp.write("  }\n")
-autogencpp.write("""  casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");\n""")
+autogencpp.write("""\
+  casadi_error( "getSchemeEntryDoc: supplied number is out of range. Scheme '"
+                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
+                << " entries: " << getSchemeEntryNames(scheme) << ".");\n""")
 autogencpp.write("}\n")
 
 autogencpp.write("std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {\n  switch (scheme) {\n")
@@ -415,7 +425,11 @@ for p in schemes:
     autogencpp.write("""      if(i==%d) return "%s";\n""" % (i,enum))
   autogencpp.write("      break;\n")
 autogencpp.write("  }\n")
-autogencpp.write("""  casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");\n""")
+autogencpp.write("""\
+  casadi_error( "getSchemeEntryEnumName: supplied number is out of range. Scheme '"
+                << getSchemeName(scheme) << "' has only "
+                << getSchemeSize(scheme) << " entries: "
+                << getSchemeEntryNames(scheme) << ".");\n""")
 autogencpp.write("}\n")
 
 autogencpp.write("int getSchemeSize(InputOutputScheme scheme) {\n  switch (scheme) {\n")
@@ -434,7 +448,11 @@ for p in schemes:
     autogencpp.write("""      if(name=="%s") return %d;\n""" % (name,i))
   autogencpp.write("      break;\n")
 autogencpp.write("  }\n")
-autogencpp.write("""  casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme) <<  "' has no entry named '" << name <<  "'. Available entries are: " << getSchemeEntryNames(scheme) << ".");\n""")
+autogencpp.write("""\
+  casadi_error( "getSchemeEntryEnum: Scheme '" << getSchemeName(scheme)
+                <<  "' has no entry named '" << name
+                <<  "'. Available entries are: "
+                << getSchemeEntryNames(scheme) << ".");\n""")
 autogencpp.write("}\n")
 autogenmetadatahpp.write("} // namespace casadi\n#endif //SCHEMES_METADATA_HPP")
 autogenhelpershpp.write("} // namespace casadi\n#endif //SCHEMES_HELPERS_HPP")

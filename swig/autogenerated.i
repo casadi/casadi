@@ -148,7 +148,7 @@ def controldaeIn(*dummy,**kwargs):
   
   Keyword arguments:
     t        -- Global physical time. (1-by-1) [CONTROL_DAE_T]
-    x        -- State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [CONTROL_DAE_X]
+    x        -- Should have same amount of non-zeros as DAEOutput:DAE_RES [CONTROL_DAE_X]
     z        -- Algebraic state vector (dimension np-by-1). [CONTROL_DAE_Z]
     p        -- Parameter vector (dimension np-by-1). [CONTROL_DAE_P]
     u        -- Control vector (dimension nu-by-1). [CONTROL_DAE_U]
@@ -1190,7 +1190,7 @@ def hessLagIn(*dummy,**kwargs):
   Keyword arguments:
     x     -- Decision variable [HESSLAG_X]
     p     -- Fixed parameter [HESSLAG_P]
-    lam_f -- Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. [HESSLAG_LAM_F]
+    lam_f -- NLP solver might use to scale the objective. [HESSLAG_LAM_F]
     lam_g -- Multiplier for g [HESSLAG_LAM_G]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagIn. Either use keywords or non-keywords ")
@@ -1630,9 +1630,9 @@ def qcqpIn(*dummy,**kwargs):
   Input arguments of a QP problem
   
   Keyword arguments:
-    h      -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_SOLVER_H]
+    h      -- The matrix is assumed to be symmetrical. [QCQP_SOLVER_H]
     g      -- The vector g: dense,  (n x 1) [QCQP_SOLVER_G]
-    p      -- The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_SOLVER_P]
+    p      -- triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_SOLVER_P]
     q      -- The vertical stack of all qi: dense,  (nq n x 1) [QCQP_SOLVER_Q]
     r      -- The vertical stack of all scalars ri (nq x 1)  [QCQP_SOLVER_R]
     a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCQP_SOLVER_A]
@@ -1770,8 +1770,8 @@ def qcqpStruct(*dummy,**kwargs):
   Structure specification of a QP
   
   Keyword arguments:
-    h -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_STRUCT_H]
-    p -- The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_STRUCT_P]
+    h -- The matrix is assumed to be symmetrical. [QCQP_STRUCT_H]
+    p -- triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_STRUCT_P]
     a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCQP_STRUCT_A]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpStruct. Either use keywords or non-keywords ")
@@ -1813,7 +1813,7 @@ def qpIn(*dummy,**kwargs):
   Input arguments of a QP problem
   
   Keyword arguments:
-    h      -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QP_SOLVER_H]
+    h      -- The matrix is assumed to be symmetrical. [QP_SOLVER_H]
     g      -- The vector g: dense,  (n x 1) [QP_SOLVER_G]
     a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_SOLVER_A]
     lba    -- dense, (nc x 1) [QP_SOLVER_LBA]
@@ -1941,7 +1941,7 @@ def qpStruct(*dummy,**kwargs):
   Structure specification of a QP
   
   Keyword arguments:
-    h -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QP_STRUCT_H]
+    h -- The matrix is assumed to be symmetrical. [QP_STRUCT_H]
     a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_STRUCT_A]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpStruct. Either use keywords or non-keywords ")
@@ -2517,7 +2517,7 @@ def stabilizedQpIn(*dummy,**kwargs):
   Input arguments of a QP problem
   
   Keyword arguments:
-    h      -- The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [STABILIZED_QP_SOLVER_H]
+    h      -- The matrix is assumed to be symmetrical. [STABILIZED_QP_SOLVER_H]
     g      -- The vector g: dense,  (n x 1) [STABILIZED_QP_SOLVER_G]
     a      -- The matrix A: sparse, (nc x n) - product with x must be dense. [STABILIZED_QP_SOLVER_A]
     lba    -- dense, (nc x 1) [STABILIZED_QP_SOLVER_LBA]

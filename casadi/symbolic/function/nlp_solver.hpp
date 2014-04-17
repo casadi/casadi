@@ -118,7 +118,7 @@ namespace casadi{
     /// Fixed parameter [p]
     HESSLAG_P,
     /// Multiplier for f. Just a scalar factor for the objective that the
-    // NLP solver might use to scale the objective. [lam_f]
+    /// NLP solver might use to scale the objective. [lam_f]
     HESSLAG_LAM_F,
     /// Multiplier for g [lam_g]
     HESSLAG_LAM_G,

@@ -58,7 +58,7 @@ namespace casadi{
   /// Input arguments of a QP problem [qpIn]
   enum QPSolverInput{
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-    // The matrix is assumed to be symmetrical. [h]
+    /// The matrix is assumed to be symmetrical. [h]
     QP_SOLVER_H,
     /// The vector g: dense,  (n x 1) [g]
     QP_SOLVER_G,
@@ -94,7 +94,7 @@ namespace casadi{
   /// Structure specification of a QP [qpStruct]
   enum QPStruct{
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
-    // The matrix is assumed to be symmetrical. [h]
+    /// The matrix is assumed to be symmetrical. [h]
     QP_STRUCT_H,
     /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
     QP_STRUCT_A,
@@ -138,4 +138,3 @@ namespace casadi{
 } // namespace casadi
 
 #endif // QP_SOLVER_HPP
-

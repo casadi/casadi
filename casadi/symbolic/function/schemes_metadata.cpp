@@ -76,51 +76,96 @@ std::string getSchemeName(InputOutputScheme scheme) {
 }
 std::string getSchemeEntryNames(InputOutputScheme scheme) {
   switch (scheme) {
-    case SCHEME_DPLEInput: return "a, v";
-    case SCHEME_DPLEOutput: return "p";
-    case SCHEME_ControlledDAEInput: return "t, x, z, p, u, u_interp, x_major, t0, tf";
-    case SCHEME_ControlSimulatorInput: return "x0, p, u";
-    case SCHEME_HNLPInput: return "x, p, tau";
-    case SCHEME_DAEInput: return "x, z, p, t";
-    case SCHEME_DAEOutput: return "ode, alg, quad";
-    case SCHEME_RDAEInput: return "rx, rz, rp, x, z, p, t";
-    case SCHEME_RDAEOutput: return "ode, alg, quad";
-    case SCHEME_IntegratorInput: return "x0, p, z0, rx0, rp, rz0";
-    case SCHEME_IntegratorOutput: return "xf, qf, zf, rxf, rqf, rzf";
-    case SCHEME_LinsolInput: return "A, B";
-    case SCHEME_LinsolOutput: return "X";
-    case SCHEME_LPSolverInput: return "c, a, lba, uba, lbx, ubx";
-    case SCHEME_LPSolverOutput: return "x, cost, lam_a, lam_x";
-    case SCHEME_LPStruct: return "a";
-    case SCHEME_NLPInput: return "x, p";
-    case SCHEME_NLPOutput: return "f, g";
-    case SCHEME_GradFInput: return "x, p";
-    case SCHEME_GradFOutput: return "grad, f, g";
-    case SCHEME_JacGInput: return "x, p";
-    case SCHEME_JacGOutput: return "jac, f, g";
-    case SCHEME_HessLagInput: return "x, p, lam_f, lam_g";
-    case SCHEME_HessLagOutput: return "hess, f, g, grad_x, grad_p";
-    case SCHEME_NLPSolverInput: return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
-    case SCHEME_NLPSolverOutput: return "x, f, g, lam_x, lam_g, lam_p";
-    case SCHEME_MayerInput: return "x, p";
-    case SCHEME_OCPInput: return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
-    case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt, cost";
-    case SCHEME_QCQPSolverInput: return "h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0";
-    case SCHEME_QCQPSolverOutput: return "x, cost, lam_a, lam_x";
-    case SCHEME_QCQPStruct: return "h, p, a";
-    case SCHEME_QPSolverInput: return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
-    case SCHEME_QPSolverOutput: return "x, cost, lam_a, lam_x";
-    case SCHEME_QPStruct: return "h, a";
-    case SCHEME_SDPInput: return "f, c, g, a, lba, uba, lbx, ubx";
-    case SCHEME_SDPOutput: return "x, p, dual, cost, dual_cost, lam_a, lam_x";
-    case SCHEME_SDPStruct: return "f, g, a";
-    case SCHEME_SDQPInput: return "h, c, f, g, a, lba, uba, lbx, ubx";
-    case SCHEME_SDQPOutput: return "x, p, dual, cost, dual_cost, lam_a, lam_x";
-    case SCHEME_SDQPStruct: return "h, f, g, a";
-    case SCHEME_SOCPInput: return "g, h, e, f, c, a, lba, uba, lbx, ubx";
-    case SCHEME_SOCPOutput: return "x, cost, lam_a, lam_x";
-    case SCHEME_SOCPStruct: return "g, a";
-    case SCHEME_StabilizedQPSolverInput: return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu";
+    case SCHEME_DPLEInput:
+      return "a, v";
+    case SCHEME_DPLEOutput:
+      return "p";
+    case SCHEME_ControlledDAEInput:
+      return "t, x, z, p, u, u_interp, x_major, t0, tf";
+    case SCHEME_ControlSimulatorInput:
+      return "x0, p, u";
+    case SCHEME_HNLPInput:
+      return "x, p, tau";
+    case SCHEME_DAEInput:
+      return "x, z, p, t";
+    case SCHEME_DAEOutput:
+      return "ode, alg, quad";
+    case SCHEME_RDAEInput:
+      return "rx, rz, rp, x, z, p, t";
+    case SCHEME_RDAEOutput:
+      return "ode, alg, quad";
+    case SCHEME_IntegratorInput:
+      return "x0, p, z0, rx0, rp, rz0";
+    case SCHEME_IntegratorOutput:
+      return "xf, qf, zf, rxf, rqf, rzf";
+    case SCHEME_LinsolInput:
+      return "A, B";
+    case SCHEME_LinsolOutput:
+      return "X";
+    case SCHEME_LPSolverInput:
+      return "c, a, lba, uba, lbx, ubx";
+    case SCHEME_LPSolverOutput:
+      return "x, cost, lam_a, lam_x";
+    case SCHEME_LPStruct:
+      return "a";
+    case SCHEME_NLPInput:
+      return "x, p";
+    case SCHEME_NLPOutput:
+      return "f, g";
+    case SCHEME_GradFInput:
+      return "x, p";
+    case SCHEME_GradFOutput:
+      return "grad, f, g";
+    case SCHEME_JacGInput:
+      return "x, p";
+    case SCHEME_JacGOutput:
+      return "jac, f, g";
+    case SCHEME_HessLagInput:
+      return "x, p, lam_f, lam_g";
+    case SCHEME_HessLagOutput:
+      return "hess, f, g, grad_x, grad_p";
+    case SCHEME_NLPSolverInput:
+      return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
+    case SCHEME_NLPSolverOutput:
+      return "x, f, g, lam_x, lam_g, lam_p";
+    case SCHEME_MayerInput:
+      return "x, p";
+    case SCHEME_OCPInput:
+      return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
+    case SCHEME_OCPOutput:
+      return "x_opt, u_opt, p_opt, cost";
+    case SCHEME_QCQPSolverInput:
+      return "h, g, p, q, r, a, lba, uba, lbx, ubx, x0, lam_x0";
+    case SCHEME_QCQPSolverOutput:
+      return "x, cost, lam_a, lam_x";
+    case SCHEME_QCQPStruct:
+      return "h, p, a";
+    case SCHEME_QPSolverInput:
+      return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0";
+    case SCHEME_QPSolverOutput:
+      return "x, cost, lam_a, lam_x";
+    case SCHEME_QPStruct:
+      return "h, a";
+    case SCHEME_SDPInput:
+      return "f, c, g, a, lba, uba, lbx, ubx";
+    case SCHEME_SDPOutput:
+      return "x, p, dual, cost, dual_cost, lam_a, lam_x";
+    case SCHEME_SDPStruct:
+      return "f, g, a";
+    case SCHEME_SDQPInput:
+      return "h, c, f, g, a, lba, uba, lbx, ubx";
+    case SCHEME_SDQPOutput:
+      return "x, p, dual, cost, dual_cost, lam_a, lam_x";
+    case SCHEME_SDQPStruct:
+      return "h, f, g, a";
+    case SCHEME_SOCPInput:
+      return "g, h, e, f, c, a, lba, uba, lbx, ubx";
+    case SCHEME_SOCPOutput:
+      return "x, cost, lam_a, lam_x";
+    case SCHEME_SOCPStruct:
+      return "g, a";
+    case SCHEME_StabilizedQPSolverInput:
+      return "h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu";
   default: casadi_error("getSchemeName: Scheme '" << scheme <<  "' does not exist.");
   }
 }
@@ -434,319 +479,323 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==11) return "mu";
       break;
   }
-  casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
+  casadi_error( "getSchemeEntryName: supplied number is out of range. Scheme '"
+                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
+                << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
     case SCHEME_DPLEInput:
-      if(i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";
-      if(i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";
+      if(i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DPLEOutput:
-      if(i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def)";
+      if(i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_ControlledDAEInput:
-      if(i==0) return "Global physical time. (1-by-1)";
-      if(i==1) return "State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES";
-      if(i==2) return "Algebraic state vector (dimension np-by-1).";
-      if(i==3) return "Parameter vector (dimension np-by-1).";
-      if(i==4) return "Control vector (dimension nu-by-1).";
-      if(i==5) return "Control vector, linearly interpolated (dimension nu-by-1).";
-      if(i==6) return "State vector (dimension nx-by-1) at the last major time-step";
-      if(i==7) return "Time at start of control interval (1-by-1)";
-      if(i==8) return "Time at end of control interval (1-by-1)";
+      if(i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Should have same amount of non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Algebraic state vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Parameter vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Control vector (dimension nu-by-1).";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Control vector, linearly interpolated (dimension nu-by-1).";  // NOLINT(whitespace/line_length)
+      if(i==6) return "State vector (dimension nx-by-1) at the last major time-step";  // NOLINT(whitespace/line_length)
+      if(i==7) return "Time at start of control interval (1-by-1)";  // NOLINT(whitespace/line_length)
+      if(i==8) return "Time at end of control interval (1-by-1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_ControlSimulatorInput:
-      if(i==0) return "Differential or algebraic state at t0  (dimension nx-by-1)";
-      if(i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";
-      if(i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";
+      if(i==0) return "Differential or algebraic state at t0  (dimension nx-by-1)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_HNLPInput:
-      if(i==0) return "Decision variable";
-      if(i==1) return "Fixed parameter";
-      if(i==2) return "Homotopy parameter";
+      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Homotopy parameter";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DAEInput:
-      if(i==0) return "Differential state";
-      if(i==1) return "Algebraic state";
-      if(i==2) return "Parameter";
-      if(i==3) return "Explicit time dependence";
+      if(i==0) return "Differential state";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Algebraic state";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Parameter";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Explicit time dependence";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DAEOutput:
-      if(i==0) return "Right hand side of the implicit ODE";
-      if(i==1) return "Right hand side of algebraic equations";
-      if(i==2) return "Right hand side of quadratures equations";
+      if(i==0) return "Right hand side of the implicit ODE";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Right hand side of algebraic equations";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Right hand side of quadratures equations";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_RDAEInput:
-      if(i==0) return "Backward differential state";
-      if(i==1) return "Backward algebraic state";
-      if(i==2) return "Backward  parameter vector";
-      if(i==3) return "Forward differential state";
-      if(i==4) return "Forward algebraic state";
-      if(i==5) return "Parameter vector";
-      if(i==6) return "Explicit time dependence";
+      if(i==0) return "Backward differential state";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Backward algebraic state";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Backward  parameter vector";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Forward differential state";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Forward algebraic state";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Parameter vector";  // NOLINT(whitespace/line_length)
+      if(i==6) return "Explicit time dependence";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_RDAEOutput:
-      if(i==0) return "Right hand side of ODE.";
-      if(i==1) return "Right hand side of algebraic equations.";
-      if(i==2) return "Right hand side of quadratures.";
+      if(i==0) return "Right hand side of ODE.";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Right hand side of algebraic equations.";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Right hand side of quadratures.";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_IntegratorInput:
-      if(i==0) return "Differential state at the initial time";
-      if(i==1) return "Parameters";
-      if(i==2) return "Initial guess for the algebraic variable";
-      if(i==3) return "Backward differential state at the final time";
-      if(i==4) return "Backward parameter vector";
-      if(i==5) return "Initial guess for the backwards algebraic variable";
+      if(i==0) return "Differential state at the initial time";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Parameters";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Initial guess for the algebraic variable";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Backward differential state at the final time";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Backward parameter vector";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Initial guess for the backwards algebraic variable";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_IntegratorOutput:
-      if(i==0) return "Differential state at the final time";
-      if(i==1) return "Quadrature state at the final time";
-      if(i==2) return "Algebraic variable at the final time";
-      if(i==3) return "Backward differential state at the initial time";
-      if(i==4) return "Backward quadrature state at the initial time";
-      if(i==5) return "Backward algebraic variable at the initial time";
+      if(i==0) return "Differential state at the final time";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Quadrature state at the final time";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Algebraic variable at the final time";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Backward differential state at the initial time";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Backward quadrature state at the initial time";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Backward algebraic variable at the initial time";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LinsolInput:
-      if(i==0) return "The square matrix A: sparse, (n x n).";
-      if(i==1) return "The right-hand-side matrix b: dense,  (n x m)";
+      if(i==0) return "The square matrix A: sparse, (n x n).";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The right-hand-side matrix b: dense,  (n x m)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LinsolOutput:
-      if(i==0) return "Solution to the linear system of equations";
+      if(i==0) return "Solution to the linear system of equations";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LPSolverInput:
-      if(i==0) return "The vector c: dense (n x 1)";
-      if(i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
-      if(i==2) return "dense, (nc x 1)";
-      if(i==3) return "dense, (nc x 1)";
-      if(i==4) return "dense, (n x 1)";
-      if(i==5) return "dense, (n x 1)";
+      if(i==0) return "The vector c: dense (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if(i==2) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LPSolverOutput:
-      if(i==0) return "The primal solution";
-      if(i==1) return "The optimal cost";
-      if(i==2) return "The dual solution corresponding to linear bounds";
-      if(i==3) return "The dual solution corresponding to simple bounds";
+      if(i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LPStruct:
-      if(i==0) return "The matrix A: sparse";
+      if(i==0) return "The matrix A: sparse";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPInput:
-      if(i==0) return "Decision variable";
-      if(i==1) return "Fixed parameter";
+      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPOutput:
-      if(i==0) return "Objective function";
-      if(i==1) return "Constraint function";
+      if(i==0) return "Objective function";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Constraint function";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_GradFInput:
-      if(i==0) return "Decision variable";
-      if(i==1) return "Fixed parameter";
+      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_GradFOutput:
-      if(i==0) return "Jacobian of the constraints";
-      if(i==1) return "Objective function";
-      if(i==2) return "Constraint function";
+      if(i==0) return "Jacobian of the constraints";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Objective function";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_JacGInput:
-      if(i==0) return "Decision variable";
-      if(i==1) return "Fixed parameter";
+      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_JacGOutput:
-      if(i==0) return "Jacobian of the constraints";
-      if(i==1) return "Objective function";
-      if(i==2) return "Constraint function";
+      if(i==0) return "Jacobian of the constraints";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Objective function";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_HessLagInput:
-      if(i==0) return "Decision variable";
-      if(i==1) return "Fixed parameter";
-      if(i==2) return "Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective.";
-      if(i==3) return "Multiplier for g";
+      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
+      if(i==2) return "NLP solver might use to scale the objective.";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Multiplier for g";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_HessLagOutput:
-      if(i==0) return "Hessian of the Lagrangian";
-      if(i==1) return "Objective function";
-      if(i==2) return "Constraint function";
-      if(i==3) return "Gradient of the Lagrangian with respect to x";
-      if(i==4) return "Gradient of the Lagrangian with respect to p";
+      if(i==0) return "Hessian of the Lagrangian";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Objective function";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Gradient of the Lagrangian with respect to x";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Gradient of the Lagrangian with respect to p";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPSolverInput:
-      if(i==0) return "Decision variables, initial guess (nx x 1) ";
-      if(i==1) return "Value of fixed parameters (np x 1)";
-      if(i==2) return "Decision variables lower bound (nx x 1), default -inf";
-      if(i==3) return "Decision variables upper bound (nx x 1), default +inf";
-      if(i==4) return "Constraints lower bound (ng x 1), default -inf";
-      if(i==5) return "Constraints upper bound (ng x 1), default +inf";
-      if(i==6) return "Lagrange multipliers for bounds on X, initial guess (nx x 1)";
-      if(i==7) return "Lagrange multipliers for bounds on G, initial guess (ng x 1)";
+      if(i==0) return "Decision variables, initial guess (nx x 1) ";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Value of fixed parameters (np x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Decision variables lower bound (nx x 1), default -inf";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Decision variables upper bound (nx x 1), default +inf";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Constraints lower bound (ng x 1), default -inf";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Constraints upper bound (ng x 1), default +inf";  // NOLINT(whitespace/line_length)
+      if(i==6) return "Lagrange multipliers for bounds on X, initial guess (nx x 1)";  // NOLINT(whitespace/line_length)
+      if(i==7) return "Lagrange multipliers for bounds on G, initial guess (ng x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPSolverOutput:
-      if(i==0) return "Decision variables at the optimal solution (nx x 1)";
-      if(i==1) return "Cost function value at the optimal solution (1 x 1)";
-      if(i==2) return "Constraints function at the optimal solution (ng x 1)";
-      if(i==3) return "Lagrange multipliers for bounds on X at the solution (nx x 1)";
-      if(i==4) return "Lagrange multipliers for bounds on G at the solution (ng x 1)";
-      if(i==5) return "Lagrange multipliers for bounds on P at the solution (np x 1)";
+      if(i==0) return "Decision variables at the optimal solution (nx x 1)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Cost function value at the optimal solution (1 x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Constraints function at the optimal solution (ng x 1)";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Lagrange multipliers for bounds on X at the solution (nx x 1)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Lagrange multipliers for bounds on G at the solution (ng x 1)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Lagrange multipliers for bounds on P at the solution (np x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_MayerInput:
-      if(i==0) return "States at the end of integration (nx x 1)";
-      if(i==1) return "Problem parameters (np x 1)";
+      if(i==0) return "States at the end of integration (nx x 1)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Problem parameters (np x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_OCPInput:
-      if(i==0) return "States lower bounds (nx x (ns+1))";
-      if(i==1) return "States upper bounds (nx x (ns+1))";
-      if(i==2) return "States initial guess (nx x (ns+1))";
-      if(i==3) return "Controls lower bounds (nu x ns)";
-      if(i==4) return "Controls upper bounds (nu x ns)";
-      if(i==5) return "Controls initial guess (nu x ns)";
-      if(i==6) return "Parameters lower bounds (np x 1)";
-      if(i==7) return "Parameters upper bounds (np x 1)";
-      if(i==8) return "Parameters initial guess (np x 1)";
-      if(i==9) return "Point constraint lower bound (nh x (ns+1))";
-      if(i==10) return "Point constraint upper bound (nh x (ns+1))";
-      if(i==11) return "Lower bound for the coupling constraints";
-      if(i==12) return "Upper bound for the coupling constraints";
+      if(i==0) return "States lower bounds (nx x (ns+1))";  // NOLINT(whitespace/line_length)
+      if(i==1) return "States upper bounds (nx x (ns+1))";  // NOLINT(whitespace/line_length)
+      if(i==2) return "States initial guess (nx x (ns+1))";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Controls lower bounds (nu x ns)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Controls upper bounds (nu x ns)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Controls initial guess (nu x ns)";  // NOLINT(whitespace/line_length)
+      if(i==6) return "Parameters lower bounds (np x 1)";  // NOLINT(whitespace/line_length)
+      if(i==7) return "Parameters upper bounds (np x 1)";  // NOLINT(whitespace/line_length)
+      if(i==8) return "Parameters initial guess (np x 1)";  // NOLINT(whitespace/line_length)
+      if(i==9) return "Point constraint lower bound (nh x (ns+1))";  // NOLINT(whitespace/line_length)
+      if(i==10) return "Point constraint upper bound (nh x (ns+1))";  // NOLINT(whitespace/line_length)
+      if(i==11) return "Lower bound for the coupling constraints";  // NOLINT(whitespace/line_length)
+      if(i==12) return "Upper bound for the coupling constraints";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_OCPOutput:
-      if(i==0) return "Optimal state trajectory";
-      if(i==1) return "Optimal control trajectory";
-      if(i==2) return "Optimal parameters";
-      if(i==3) return "Objective/cost function for optimal solution (1 x 1)";
+      if(i==0) return "Optimal state trajectory";  // NOLINT(whitespace/line_length)
+      if(i==1) return "Optimal control trajectory";  // NOLINT(whitespace/line_length)
+      if(i==2) return "Optimal parameters";  // NOLINT(whitespace/line_length)
+      if(i==3) return "Objective/cost function for optimal solution (1 x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QCQPSolverInput:
-      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==1) return "The vector g: dense,  (n x 1)";
-      if(i==2) return "The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==3) return "The vertical stack of all qi: dense,  (nq n x 1)";
-      if(i==4) return "The vertical stack of all scalars ri (nq x 1) ";
-      if(i==5) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
-      if(i==6) return "dense, (nc x 1)";
-      if(i==7) return "dense, (nc x 1)";
-      if(i==8) return "dense, (n x 1)";
-      if(i==9) return "dense, (n x 1)";
-      if(i==10) return "dense, (n x 1)";
-      if(i==11) return "dense";
+      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "triangular part is actually used. The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The vertical stack of all qi: dense,  (nq n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "The vertical stack of all scalars ri (nq x 1) ";  // NOLINT(whitespace/line_length)
+      if(i==5) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if(i==6) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==7) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==8) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==9) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==10) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==11) return "dense";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QCQPSolverOutput:
-      if(i==0) return "The primal solution";
-      if(i==1) return "The optimal cost";
-      if(i==2) return "The dual solution corresponding to linear bounds";
-      if(i==3) return "The dual solution corresponding to simple bounds";
+      if(i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QCQPStruct:
-      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==1) return "The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
+      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if(i==1) return "triangular part is actually used. The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QPSolverInput:
-      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==1) return "The vector g: dense,  (n x 1)";
-      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
-      if(i==3) return "dense, (nc x 1)";
-      if(i==4) return "dense, (nc x 1)";
-      if(i==5) return "dense, (n x 1)";
-      if(i==6) return "dense, (n x 1)";
-      if(i==7) return "dense, (n x 1)";
-      if(i==8) return "dense";
+      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if(i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==6) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==7) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==8) return "dense";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QPSolverOutput:
-      if(i==0) return "The primal solution";
-      if(i==1) return "The optimal cost";
-      if(i==2) return "The dual solution corresponding to linear bounds";
-      if(i==3) return "The dual solution corresponding to simple bounds";
+      if(i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QPStruct:
-      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
+      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDPInput:
-      if(i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";
-      if(i==1) return "The vector c: ( n x 1)";
-      if(i==2) return "The matrix G: ( m x m)";
-      if(i==3) return "The matrix A: ( nc x n)";
-      if(i==4) return "Lower bounds on Ax ( nc x 1)";
-      if(i==5) return "Upper bounds on Ax  ( nc x 1)";
-      if(i==6) return "Lower bounds on x ( n x 1 )";
-      if(i==7) return "Upper bounds on x ( n x 1 )";
+      if(i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==6) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if(i==7) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDPOutput:
-      if(i==0) return "The primal solution (n x 1) - may be used as initial guess";
-      if(i==1) return "The solution P (m x m) - may be used as initial guess";
-      if(i==2) return "The dual solution (m x m) - may be used as initial guess";
-      if(i==3) return "The primal optimal cost (1 x 1)";
-      if(i==4) return "The dual optimal cost (1 x 1)";
-      if(i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";
-      if(i==6) return "The dual solution corresponding to simple bounds  (n x 1)";
+      if(i==0) return "The primal solution (n x 1) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The solution P (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The dual solution (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "The dual optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDPStruct:
-      if(i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";
-      if(i==1) return "The matrix G: ( m x m)";
-      if(i==2) return "The matrix A: ( nc x n)";
+      if(i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDQPInput:
-      if(i==0) return "The matrix H: sparse ( n x n)";
-      if(i==1) return "The vector c: ( n x 1)";
-      if(i==2) return "The horizontal stack of all matrices F_i: ( m x nm)";
-      if(i==3) return "The matrix G: ( m x m)";
-      if(i==4) return "The matrix A: ( nc x n)";
-      if(i==5) return "Lower bounds on Ax ( nc x 1)";
-      if(i==6) return "Upper bounds on Ax  ( nc x 1)";
-      if(i==7) return "Lower bounds on x ( n x 1 )";
-      if(i==8) return "Upper bounds on x ( n x 1 )";
+      if(i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==6) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==7) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if(i==8) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDQPOutput:
-      if(i==0) return "The primal solution (n x 1) - may be used as initial guess";
-      if(i==1) return "The solution P (m x m) - may be used as initial guess";
-      if(i==2) return "The dual solution (m x m) - may be used as initial guess";
-      if(i==3) return "The primal optimal cost (1 x 1)";
-      if(i==4) return "The dual optimal cost (1 x 1)";
-      if(i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";
-      if(i==6) return "The dual solution corresponding to simple bounds  (n x 1)";
+      if(i==0) return "The primal solution (n x 1) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The solution P (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The dual solution (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "The dual optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDQPStruct:
-      if(i==0) return "The matrix H: sparse ( n x n)";
-      if(i==1) return "The horizontal stack of all matrices F_i: ( m x nm)";
-      if(i==2) return "The matrix G: ( m x m)";
-      if(i==3) return "The matrix A: ( nc x n)";
+      if(i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SOCPInput:
-      if(i==0) return "The horizontal stack of all matrices Gi: ( n x N)";
-      if(i==1) return "The vertical stack of all vectors hi: ( N x 1)";
-      if(i==2) return "The vertical stack of all vectors ei: ( nm x 1)";
-      if(i==3) return "The vertical stack of all scalars fi: ( m x 1)";
-      if(i==4) return "The vector c: ( n x 1)";
-      if(i==5) return "The matrix A: ( nc x n)";
-      if(i==6) return "Lower bounds on Ax ( nc x 1)";
-      if(i==7) return "Upper bounds on Ax  ( nc x 1)";
-      if(i==8) return "Lower bounds on x ( n x 1 )";
-      if(i==9) return "Upper bounds on x ( n x 1 )";
+      if(i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The vertical stack of all vectors hi: ( N x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The vertical stack of all vectors ei: ( nm x 1)";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The vertical stack of all scalars fi: ( m x 1)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if(i==6) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==7) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==8) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if(i==9) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SOCPOutput:
-      if(i==0) return "The primal solution (n x 1)";
-      if(i==1) return "The primal optimal cost (1 x 1)";
-      if(i==2) return "The dual solution corresponding to the linear constraints  (nc x 1)";
-      if(i==3) return "The dual solution corresponding to simple bounds  (n x 1)";
+      if(i==0) return "The primal solution (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==3) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SOCPStruct:
-      if(i==0) return "The horizontal stack of all matrices Gi: ( n x N)";
-      if(i==1) return "The matrix A: ( nc x n)";
+      if(i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_StabilizedQPSolverInput:
-      if(i==0) return "The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==1) return "The vector g: dense,  (n x 1)";
-      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";
-      if(i==3) return "dense, (nc x 1)";
-      if(i==4) return "dense, (nc x 1)";
-      if(i==5) return "dense, (n x 1)";
-      if(i==6) return "dense, (n x 1)";
-      if(i==7) return "dense, (n x 1)";
-      if(i==8) return "dense";
-      if(i==9) return "dense (1 x 1)";
-      if(i==10) return "dense (nc x 1)";
-      if(i==11) return "dense (nc x 1)";
+      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if(i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if(i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==4) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==6) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==7) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if(i==8) return "dense";  // NOLINT(whitespace/line_length)
+      if(i==9) return "dense (1 x 1)";  // NOLINT(whitespace/line_length)
+      if(i==10) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
+      if(i==11) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
       break;
   }
-  casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
+  casadi_error( "getSchemeEntryDoc: supplied number is out of range. Scheme '"
+                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
+                << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
@@ -1058,7 +1107,10 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==11) return "STABILIZED_QP_SOLVER_MU";
       break;
   }
-  casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '" << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme) << " entries: " << getSchemeEntryNames(scheme) << ".");
+  casadi_error( "getSchemeEntryEnumName: supplied number is out of range. Scheme '"
+                << getSchemeName(scheme) << "' has only "
+                << getSchemeSize(scheme) << " entries: "
+                << getSchemeEntryNames(scheme) << ".");
 }
 int getSchemeSize(InputOutputScheme scheme) {
   switch (scheme) {
@@ -1510,7 +1562,10 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="mu") return 11;
       break;
   }
-  casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme) <<  "' has no entry named '" << name <<  "'. Available entries are: " << getSchemeEntryNames(scheme) << ".");
+  casadi_error( "getSchemeEntryEnum: Scheme '" << getSchemeName(scheme)
+                <<  "' has no entry named '" << name
+                <<  "'. Available entries are: "
+                << getSchemeEntryNames(scheme) << ".");
 }
 } // namespace casadi
 
