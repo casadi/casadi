@@ -105,7 +105,7 @@ namespace casadi{
     for(vector<N_Vector>::iterator it=xzF_.begin(); it != xzF_.end(); ++it)
         if(*it) { N_VDestroy_Serial(*it); *it = 0; }
     for(vector<N_Vector>::iterator it=xzdotF_.begin(); it != xzdotF_.end(); ++it)
-        { if(*it) N_VDestroy_Serial(*it); *it = 0; }
+        if(*it) { N_VDestroy_Serial(*it); *it = 0; }
     for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)
         if(*it) { N_VDestroy_Serial(*it); *it = 0; }
   }
