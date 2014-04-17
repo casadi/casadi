@@ -156,7 +156,8 @@ namespace casadi{
   /// Forward declaration of internal class
   class IntegratorInternal;
 
-  // grep "addOption" integrator_internal.cpp | perl -pe 's/addOption\((.*?),(.*?),(.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
+  // grep "addOption" integrator_internal.cpp | \
+  //   perl -pe 's/addOption\((.*?),(.*?),(.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
 
   /** Integrator abstract base class
 
