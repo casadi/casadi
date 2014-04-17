@@ -47,7 +47,8 @@ public:
   NLPImplicitSolver();
 
   /** \brief Create a new solver instance */
-  explicit NLPImplicitSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
+  explicit NLPImplicitSolver(const Function& f, const Function& jac=Function(),
+                             const LinearSolver& linsol=LinearSolver());
 
   /** \brief  Access functions of the node */
   NLPImplicitInternal* operator->();
@@ -63,7 +64,9 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static ImplicitFunction creator(const Function& f, const Function& jac, const LinearSolver& linsol){ return NLPImplicitSolver(f,jac,linsol);}
+  static ImplicitFunction creator(const Function& f, const Function& jac,
+                                  const LinearSolver& linsol)
+  { return NLPImplicitSolver(f,jac,linsol);}
   #ifdef SWIG
   %nocallback;
   #endif

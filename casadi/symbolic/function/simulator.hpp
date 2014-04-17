@@ -39,7 +39,9 @@ class SimulatorInternal;
 
   Simulator is an casadi::Function mapping from casadi::IntegratorInput to n. \\
 
-  The output function needs to be a mapping from casadi::DAEInput to n. The default output has n=1 and the output is the (vectorized) differential state for each time step.
+  The output function needs to be a mapping from casadi::DAEInput to n.
+  The default output has n=1 and the output is the (vectorized) differential
+  state for each time step.
 
   \author Joel Andersson
   \date 2010
@@ -56,8 +58,10 @@ public:
   * \copydoc scheme_DAEInput
   *
   */
-  Simulator(const Integrator& integrator, const Function& output_fcn, const std::vector<double>& grid);
-  Simulator(const Integrator& integrator, const Function& output_fcn, const Matrix<double>& grid);
+  Simulator(const Integrator& integrator, const Function& output_fcn,
+            const std::vector<double>& grid);
+  Simulator(const Integrator& integrator, const Function& output_fcn,
+            const Matrix<double>& grid);
 
   /// Output function equal to the state
   Simulator(const Integrator& integrator, const std::vector<double>& grid);

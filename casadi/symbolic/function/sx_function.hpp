@@ -82,7 +82,8 @@ namespace casadi{
 #ifndef SWIG
 
     /// Multiple (vector valued) input, multiple (vector valued) output
-    SXFunction(const std::vector< std::vector<SXElement> >& arg, const std::vector< std::vector<SXElement> >& res);
+    SXFunction(const std::vector< std::vector<SXElement> >& arg,
+               const std::vector< std::vector<SXElement> >& res);
 
     /// Single (scalar/matrix/vector valued) input, single (scalar/matrix/vector valued) output
     SXFunction(const SX& arg, const SX& res);
@@ -114,9 +115,13 @@ namespace casadi{
      * \see casadi::Jacobian for an AD approach
      */
     SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),oind,compact,symmetric); }
-    SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(iind,outputSchemeEntry(oname),compact,symmetric); }
-    SX jac(const std::string& iname, const std::string& oname, bool compact=false, bool symmetric=false) { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
+    SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false)
+    { return jac(inputSchemeEntry(iname),oind,compact,symmetric); }
+    SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false)
+    { return jac(iind,outputSchemeEntry(oname),compact,symmetric); }
+    SX jac(const std::string& iname, const std::string& oname,
+           bool compact=false, bool symmetric=false)
+    { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
     //@}
 
     //@{
@@ -124,7 +129,8 @@ namespace casadi{
     SX grad(int iind=0, int oind=0);
     SX grad(const std::string& iname, int oind=0) { return grad(inputSchemeEntry(iname),oind); }
     SX grad(int iind, const std::string& oname) { return grad(iind,outputSchemeEntry(oname)); }
-    SX grad(const std::string& iname, const std::string& oname) { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    SX grad(const std::string& iname, const std::string& oname)
+    { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
 
     //@{
@@ -132,7 +138,8 @@ namespace casadi{
     SX tang(int iind=0, int oind=0);
     SX tang(const std::string& iname, int oind=0) { return tang(inputSchemeEntry(iname),oind); }
     SX tang(int iind, const std::string& oname) { return tang(iind,outputSchemeEntry(oname)); }
-    SX tang(const std::string& iname, const std::string& oname) { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    SX tang(const std::string& iname, const std::string& oname)
+    { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
 
     //@{
@@ -140,7 +147,8 @@ namespace casadi{
     SX hess(int iind=0, int oind=0);
     SX hess(const std::string& iname, int oind=0) { return hess(inputSchemeEntry(iname),oind); }
     SX hess(int iind, const std::string& oname) { return hess(iind,outputSchemeEntry(oname)); }
-    SX hess(const std::string& iname, const std::string& oname) { return hess(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    SX hess(const std::string& iname, const std::string& oname)
+    { return hess(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
     //@}
 
     /// Check if the node is pointing to the right type of object
@@ -148,11 +156,13 @@ namespace casadi{
 
     /** \brief Get function input */
     const SX& inputExpr(int iind) const;
-    const SX& inputExpr(const std::string& iname) const { return inputExpr(inputSchemeEntry(iname)); }
+    const SX& inputExpr(const std::string& iname) const
+    { return inputExpr(inputSchemeEntry(iname)); }
 
     /** \brief Get function output */
     const SX& outputExpr(int oind) const;
-    const SX& outputExpr(const std::string& oname) const { return outputExpr(outputSchemeEntry(oname)); }
+    const SX& outputExpr(const std::string& oname) const
+    { return outputExpr(outputSchemeEntry(oname)); }
 
     /** \brief Get all function inputs */
     const std::vector<SX>& inputExpr() const;
@@ -190,7 +200,8 @@ namespace casadi{
     /** \brief Number of nodes in the algorithm */
     int countNodes() const;
 
-    /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
+    /** \brief Clear the function from its symbolic representation, to free up memory,
+     * no symbolic evaluations are possible after this */
     void clearSymbolic();
 
     /** \brief Get all the free variables of the function */

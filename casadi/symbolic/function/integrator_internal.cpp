@@ -40,11 +40,17 @@ namespace casadi{
     setOption("name","unnamed_integrator"); // name of the function
 
     // Additional options
-    addOption("print_stats",              OT_BOOLEAN,     false, "Print out statistics after integration");
-    addOption("t0",                       OT_REAL,        0.0, "Beginning of the time horizon");
-    addOption("tf",                       OT_REAL,        1.0, "End of the time horizon");
-    addOption("augmented_options",        OT_DICTIONARY,  GenericType(), "Options to be passed down to the augmented integrator, if one is constructed.");
-    addOption("expand_augmented",         OT_BOOLEAN,     true, "If DAE callback functions are SXFunction, have augmented DAE callback function also be SXFunction.");
+    addOption("print_stats",              OT_BOOLEAN,     false,
+              "Print out statistics after integration");
+    addOption("t0",                       OT_REAL,        0.0,
+              "Beginning of the time horizon");
+    addOption("tf",                       OT_REAL,        1.0,
+              "End of the time horizon");
+    addOption("augmented_options",        OT_DICTIONARY,  GenericType(),
+              "Options to be passed down to the augmented integrator, if one is constructed.");
+    addOption("expand_augmented",         OT_BOOLEAN,     true,
+              "If DAE callback functions are SXFunction, have augmented"
+              " DAE callback function also be SXFunction.");
 
     // Negative number of parameters for consistancy checking
     np_ = -1;
@@ -84,8 +90,10 @@ namespace casadi{
 
     // Initialize and get dimensions for the forward integration
     if(!f_.isInit()) f_.init();
-    casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,"Wrong number of inputs for the DAE callback function");
-    casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,"Wrong number of outputs for the DAE callback function");
+    casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,
+                          "Wrong number of inputs for the DAE callback function");
+    casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,
+                          "Wrong number of outputs for the DAE callback function");
     nx_ = f_.input(DAE_X).size();
     nz_ = f_.input(DAE_Z).size();
     nq_ = f_.output(DAE_QUAD).size();
@@ -97,8 +105,10 @@ namespace casadi{
       nrx_ = nrz_ = nrq_ = nrp_ = 0;
     } else {
       if(!g_.isInit()) g_.init();
-      casadi_assert_message(g_.getNumInputs()==RDAE_NUM_IN,"Wrong number of inputs for the backwards DAE callback function");
-      casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,"Wrong number of outputs for the backwards DAE callback function");
+      casadi_assert_message(g_.getNumInputs()==RDAE_NUM_IN,
+                            "Wrong number of inputs for the backwards DAE callback function");
+      casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,
+                            "Wrong number of outputs for the backwards DAE callback function");
       nrx_ = g_.input(RDAE_RX).size();
       nrz_ = g_.input(RDAE_RZ).size();
       nrp_ = g_.input(RDAE_RP).size();
@@ -128,12 +138,19 @@ namespace casadi{
     }
 
     // Warn if sparse inputs (was previously an error)
-    casadi_assert_warning(f_.input(DAE_X).isDense(),"Sparse states in integrators are experimental");
+    casadi_assert_warning(f_.input(DAE_X).isDense(),
+                          "Sparse states in integrators are experimental");
 
     // Consistency checks
-    casadi_assert_message(f_.output(DAE_ODE).shape()==x0().shape(),"Inconsistent dimensions. Expecting DAE_ODE output of shape " << x0().shape() << ", but got " << f_.output(DAE_ODE).shape() << " instead.");
+    casadi_assert_message(f_.output(DAE_ODE).shape()==x0().shape(),
+                          "Inconsistent dimensions. Expecting DAE_ODE output of shape "
+                          << x0().shape() << ", but got "
+                          << f_.output(DAE_ODE).shape() << " instead.");
     casadi_assert(f_.output(DAE_ODE).sparsity()==x0().sparsity());
-    casadi_assert_message(f_.output(DAE_ALG).shape()==z0().shape(),"Inconsistent dimensions. Expecting DAE_ALG output of shape " << z0().shape() << ", but got " << f_.output(DAE_ALG).shape() << " instead.");
+    casadi_assert_message(f_.output(DAE_ALG).shape()==z0().shape(),
+                          "Inconsistent dimensions. Expecting DAE_ALG output of shape "
+                          << z0().shape() << ", but got "
+                          << f_.output(DAE_ALG).shape() << " instead.");
     casadi_assert(f_.output(DAE_ALG).sparsity()==z0().sparsity());
     if(!g_.isNull()){
       casadi_assert(g_.input(RDAE_P).sparsity()==p().sparsity());
@@ -148,7 +165,8 @@ namespace casadi{
 
     {
       std::stringstream ss;
-      ss << "Integrator dimensions: nx=" << nx_ << ", nz="<< nz_ << ", nq=" << nq_ << ", np=" << np_;
+      ss << "Integrator dimensions: nx=" << nx_ << ", nz="<< nz_
+         << ", nq=" << nq_ << ", np=" << np_;
       log("IntegratorInternal::init",ss.str());
     }
 
@@ -166,7 +184,8 @@ namespace casadi{
     }
   }
 
-  void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void IntegratorInternal::deepCopyMembers(
+      std::map<SharedObjectNode*,SharedObject>& already_copied){
     FunctionInternal::deepCopyMembers(already_copied);
     f_ = deepcopy(f_,already_copied);
     g_ = deepcopy(g_,already_copied);
@@ -174,7 +193,8 @@ namespace casadi{
     linsol_g_ = deepcopy(linsol_g_,already_copied);
   }
 
-  std::pair<Function,Function> IntegratorInternal::getAugmented(int nfwd, int nadj, AugOffset& offset){
+  std::pair<Function,Function> IntegratorInternal::getAugmented(int nfwd, int nadj,
+                                                                AugOffset& offset){
     log("IntegratorInternal::getAugmented","call");
 
     //    cout << "here" << endl;
@@ -195,12 +215,18 @@ namespace casadi{
     MX aug_rp = MX::sym("aug_rp",std::max(qf().size1(),rp().size1()),offset.rp.back());
 
     // Split up the augmented vectors
-    vector<MX> aug_x_split = horzsplit(aug_x,offset.x);     vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
-    vector<MX> aug_z_split = horzsplit(aug_z,offset.z);     vector<MX>::const_iterator aug_z_split_it = aug_z_split.begin();
-    vector<MX> aug_p_split = horzsplit(aug_p,offset.p);     vector<MX>::const_iterator aug_p_split_it = aug_p_split.begin();
-    vector<MX> aug_rx_split = horzsplit(aug_rx,offset.rx);  vector<MX>::const_iterator aug_rx_split_it = aug_rx_split.begin();
-    vector<MX> aug_rz_split = horzsplit(aug_rz,offset.rz);  vector<MX>::const_iterator aug_rz_split_it = aug_rz_split.begin();
-    vector<MX> aug_rp_split = horzsplit(aug_rp,offset.rp);  vector<MX>::const_iterator aug_rp_split_it = aug_rp_split.begin();
+    vector<MX> aug_x_split = horzsplit(aug_x,offset.x);
+    vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
+    vector<MX> aug_z_split = horzsplit(aug_z,offset.z);
+    vector<MX>::const_iterator aug_z_split_it = aug_z_split.begin();
+    vector<MX> aug_p_split = horzsplit(aug_p,offset.p);
+    vector<MX>::const_iterator aug_p_split_it = aug_p_split.begin();
+    vector<MX> aug_rx_split = horzsplit(aug_rx,offset.rx);
+    vector<MX>::const_iterator aug_rx_split_it = aug_rx_split.begin();
+    vector<MX> aug_rz_split = horzsplit(aug_rz,offset.rz);
+    vector<MX>::const_iterator aug_rz_split_it = aug_rz_split.begin();
+    vector<MX> aug_rp_split = horzsplit(aug_rp,offset.rp);
+    vector<MX>::const_iterator aug_rp_split_it = aug_rp_split.begin();
 
     // Temporary vector
     vector<MX> tmp;

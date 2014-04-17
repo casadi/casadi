@@ -148,7 +148,8 @@ namespace casadi{
         MXFunction F_mx = shared_cast<MXFunction>(F);
         MXFunction G_mx = shared_cast<MXFunction>(G);
 
-        // Convert to MX if cast failed and make sure that they use the same expressions if cast was successful
+        // Convert to MX if cast failed and make sure that they
+        // use the same expressions if cast was successful
         if(!G_mx.isNull()){
           nlp_in[NL_X] = G_mx.inputExpr(0);
           if(G_mx.getNumInputs()>1){

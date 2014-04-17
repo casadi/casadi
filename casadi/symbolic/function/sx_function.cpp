@@ -45,7 +45,8 @@ SXFunction::SXFunction(const SX& arg, const SX& res){
                                     vector<SX>(1,res)));
 }
 
-SXFunction::SXFunction(const vector< vector<SXElement> >& arg, const vector< vector<SXElement> >& res){
+SXFunction::SXFunction(const vector< vector<SXElement> >& arg,
+                       const vector< vector<SXElement> >& res){
   assignNode(new SXFunctionInternal(vector<SX>(arg.begin(),arg.end()),
                                     vector<SX>(res.begin(),res.end())));
 }

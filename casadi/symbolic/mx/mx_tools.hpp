@@ -49,7 +49,8 @@ namespace casadi{
   *
   *   horzcat(horzsplit(x,...)) = x
   */
-  CASADI_SYMBOLIC_EXPORT std::vector<MX> horzsplit(const MX& x, const std::vector<int>& output_offset);
+  CASADI_SYMBOLIC_EXPORT std::vector<MX> horzsplit(const MX& x,
+                                                   const std::vector<int>& output_offset);
 
   /** \brief  split vertically, retaining fixed-sized groups of cols
   * \param incr Size of each group of cols
@@ -70,7 +71,8 @@ namespace casadi{
   *
   *   vertcat(vertsplit(x,...)) = x
   */
-  CASADI_SYMBOLIC_EXPORT std::vector<MX> vertsplit(const MX& x, const std::vector<int>& output_offset);
+  CASADI_SYMBOLIC_EXPORT std::vector<MX> vertsplit(const MX& x,
+                                                   const std::vector<int>& output_offset);
 
   /** \brief  split horizontally, retaining fixed-sized groups of rows
   * \param incr Size of each group of rows
@@ -91,7 +93,9 @@ namespace casadi{
   *
   *   blockcat(blocksplit(x,...,...)) = x
   */
-  CASADI_SYMBOLIC_EXPORT std::vector< std::vector<MX > > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
+  CASADI_SYMBOLIC_EXPORT std::vector< std::vector<MX > >
+    blocksplit(const MX& x, const std::vector<int>& vert_offset,
+               const std::vector<int>& horz_offset);
 
   /** \brief  chop up into blocks
   * \brief vert_incr Defines the increment for block boundaries in col dimension
@@ -99,7 +103,8 @@ namespace casadi{
   *
   *   blockcat(blocksplit(x,...,...)) = x
   */
-  CASADI_SYMBOLIC_EXPORT std::vector< std::vector<MX > > blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1);
+  CASADI_SYMBOLIC_EXPORT std::vector< std::vector<MX > >
+    blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1);
 
 #ifndef SWIG
   /** \brief Construct a matrix from a list of list of blocks.*/
@@ -233,12 +238,14 @@ namespace casadi{
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
-  CASADI_SYMBOLIC_EXPORT MX createParent(const std::vector<MX> &deps, std::vector<MX>& SWIG_OUTPUT(children));
+  CASADI_SYMBOLIC_EXPORT MX createParent(const std::vector<MX> &deps,
+                                         std::vector<MX>& SWIG_OUTPUT(children));
 
 
   /** \brief  Create a parent MX on which a bunch of MX's (sizes given as argument) will depend
    */
-  CASADI_SYMBOLIC_EXPORT MX createParent(const std::vector<Sparsity> &deps, std::vector<MX>& SWIG_OUTPUT(children));
+  CASADI_SYMBOLIC_EXPORT MX createParent(const std::vector<Sparsity> &deps,
+                                         std::vector<MX>& SWIG_OUTPUT(children));
 
   /** Count number of nodes */
   CASADI_SYMBOLIC_EXPORT int countNodes(const MX& A);
@@ -271,35 +278,48 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT MX polyval(const MX& p, const MX& x);
 
   /** \brief Get a string representation for a binary MX, using custom arguments */
-  CASADI_SYMBOLIC_EXPORT std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args);
+  CASADI_SYMBOLIC_EXPORT std::string
+    getOperatorRepresentation(const MX& xb, const std::vector<std::string>& args);
 
   /** \brief  Substitute variable v with expression vdef in an expression ex */
   CASADI_SYMBOLIC_EXPORT MX substitute(const MX &ex, const MX& v, const MX& vdef);
 
   /** \brief  Substitute variable var with expression expr in multiple expressions */
-  CASADI_SYMBOLIC_EXPORT std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+  CASADI_SYMBOLIC_EXPORT std::vector<MX>
+    substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
 
   /** \brief  Substitute variable v with expression vdef in an expression ex, preserving nodes */
-  CASADI_SYMBOLIC_EXPORT MX graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+  CASADI_SYMBOLIC_EXPORT MX
+     graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
 
-  /** \brief  Substitute variable var with expression expr in multiple expressions, preserving nodes  */
-  CASADI_SYMBOLIC_EXPORT std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
+  /** \brief  Substitute variable var with expression expr in
+   * multiple expressions, preserving nodes  */
+  CASADI_SYMBOLIC_EXPORT std::vector<MX>
+    graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
+                     const std::vector<MX> &vdef);
 
   /** \brief Inplace substitution
    * Substitute variables v out of the expressions vdef sequentially
    */
 #ifndef SWIG
-  CASADI_SYMBOLIC_EXPORT void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse=false);
+  CASADI_SYMBOLIC_EXPORT void
+    substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse=false);
 #else // SWIG
-  CASADI_SYMBOLIC_EXPORT void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, bool reverse=false);
+  CASADI_SYMBOLIC_EXPORT void
+    substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, bool reverse=false);
 #endif // SWIG
 
   /** \brief Inplace substitution with piggyback expressions
-   * Substitute variables v out of the expressions vdef sequentially, as well as out of a number of other expressions piggyback */
+   * Substitute variables v out of the expressions vdef sequentially,
+   * as well as out of a number of other expressions piggyback */
 #ifndef SWIG
-  CASADI_SYMBOLIC_EXPORT void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse=false);
+  CASADI_SYMBOLIC_EXPORT void
+    substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
+                      std::vector<MX>& ex, bool reverse=false);
 #else // SWIG
-  CASADI_SYMBOLIC_EXPORT void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, std::vector<MX>& INOUT, bool reverse=false);
+  CASADI_SYMBOLIC_EXPORT void
+    substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT,
+                      std::vector<MX>& INOUT, bool reverse=false);
 #endif // SWIG
 
   /** \brief Extract shared subexpressions from an set of expressions */
@@ -360,7 +380,8 @@ namespace casadi{
   *  supplying expressions contained in it at which expansion should stop.
   *
   */
-  CASADI_SYMBOLIC_EXPORT MX matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>());
+  CASADI_SYMBOLIC_EXPORT MX
+    matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>());
 
   /** \brief Expand MX graph to SXFunction call
   *
@@ -368,7 +389,8 @@ namespace casadi{
   *  supplying expressions contained in it at which expansion should stop.
   *
   */
-  CASADI_SYMBOLIC_EXPORT std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary = std::vector<MX>());
+  CASADI_SYMBOLIC_EXPORT std::vector<MX>
+    matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary = std::vector<MX>());
 
   /** \brief Kronecker tensor product
   *
@@ -378,7 +400,9 @@ namespace casadi{
 
   /** \brief Solve a system of equations: A*x = b
   */
-  CASADI_SYMBOLIC_EXPORT MX solve(const MX& A, const MX& b, linearSolverCreator lsolver = SymbolicQR::creator, const Dictionary& dict = Dictionary());
+  CASADI_SYMBOLIC_EXPORT MX
+    solve(const MX& A, const MX& b, linearSolverCreator lsolver = SymbolicQR::creator,
+          const Dictionary& dict = Dictionary());
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   *
@@ -386,7 +410,8 @@ namespace casadi{
   * If the matrix A is slender (size2<size1), mul(pinv(A),A) is unity.
   *
   */
-  CASADI_SYMBOLIC_EXPORT MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+  CASADI_SYMBOLIC_EXPORT MX pinv(const MX& A, linearSolverCreator lsolver,
+                                 const Dictionary& dict = Dictionary());
 
 /** @}
 */
@@ -397,8 +422,6 @@ namespace casadi{
 // Template instantiations
 %template(Pair_MX_MXVector) std::pair<casadi::MX, std::vector<casadi::MX> >;
 #endif // SWIG
-
-
 
 
 

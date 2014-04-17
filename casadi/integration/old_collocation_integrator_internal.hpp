@@ -43,10 +43,12 @@ namespace casadi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /// Clone
-    virtual OldCollocationIntegratorInternal* clone() const{ return new OldCollocationIntegratorInternal(*this);}
+    virtual OldCollocationIntegratorInternal* clone() const
+    { return new OldCollocationIntegratorInternal(*this);}
 
     /// Create a new integrator
-    virtual OldCollocationIntegratorInternal* create(const Function& f, const Function& g) const{ return new OldCollocationIntegratorInternal(f,g);}
+    virtual OldCollocationIntegratorInternal* create(const Function& f, const Function& g) const
+    { return new OldCollocationIntegratorInternal(f,g);}
 
     /// Destructor
     virtual ~OldCollocationIntegratorInternal();

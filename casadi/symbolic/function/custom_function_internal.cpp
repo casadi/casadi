@@ -30,7 +30,11 @@ namespace casadi{
 
 using namespace std;
 
-CustomFunctionInternal::CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<casadi::Sparsity> &inputscheme, const std::vector<casadi::Sparsity> &outputscheme) : evaluate_(c_fcn){
+CustomFunctionInternal::CustomFunctionInternal(
+    const CustomEvaluate &c_fcn,
+    const std::vector<casadi::Sparsity> &inputscheme,
+    const std::vector<casadi::Sparsity> &outputscheme) : evaluate_(c_fcn)
+{
   setNumInputs(inputscheme.size());
   setNumOutputs(outputscheme.size());
 
@@ -42,7 +46,8 @@ CustomFunctionInternal::CustomFunctionInternal(const CustomEvaluate &c_fcn, cons
     output(k) = DMatrix(outputscheme[k],0);
   }
 
-  // Make the ref object a non-refence counted pointer to this (as reference counting would prevent deletion of the object)
+  // Make the ref object a non-refence counted pointer to this (as reference counting
+  // would prevent deletion of the object)
   ref_.assignNodeNoCount(this);
 
 }

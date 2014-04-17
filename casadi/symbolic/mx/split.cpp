@@ -41,16 +41,19 @@ namespace casadi{
   Split::~Split(){
   }
 
-  void Split::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void Split::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                        std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void Split::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void Split::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                         std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Split::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void Split::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                          std::vector<T>& rtmp){
     // Number of derivatives
     int nx = offset_.size()-1;
 
@@ -84,14 +87,16 @@ namespace casadi{
     }
   }
 
-  void Split::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void Split::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                const std::vector<std::string>& res, CodeGenerator& gen) const{
     int nx = res.size();
     for(int i=0; i<nx; ++i){
       int nz_first = offset_[i];
       int nz_last = offset_[i+1];
       int nz = nz_last-nz_first;
       if(res.at(i).compare("0")!=0){
-        stream << "  for(i=0; i<" << nz << "; ++i) " << res.at(i) << "[i] = " << arg.at(0) << "[i+" << nz_first << "];" << endl;
+        stream << "  for(i=0; i<" << nz << "; ++i) " << res.at(i) << "[i] = " << arg.at(0)
+               << "[i+" << nz_first << "];" << endl;
       }
     }
   }
@@ -103,7 +108,9 @@ namespace casadi{
 
     // Have offset_ refer to the nonzero offsets instead of column offsets
     offset_.resize(1);
-    for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin(); it!=output_sparsity_.end(); ++it){
+    for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
+        it!=output_sparsity_.end();
+        ++it){
       offset_.push_back(offset_.back() + it->size());
     }
   }
@@ -116,7 +123,9 @@ namespace casadi{
     }
   }
 
-  void Horzsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Horzsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                             bool output_given){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
     int nx = offset_.size()-1;
@@ -125,7 +134,9 @@ namespace casadi{
     vector<int> col_offset;
     col_offset.reserve(offset_.size());
     col_offset.push_back(0);
-    for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin(); it!=output_sparsity_.end(); ++it){
+    for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
+        it!=output_sparsity_.end();
+        ++it){
       col_offset.push_back(col_offset.back() + it->size2());
     }
 
@@ -168,7 +179,9 @@ namespace casadi{
 
     // Have offset_ refer to the nonzero offsets instead of column offsets
     offset_.resize(1);
-    for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin(); it!=output_sparsity_.end(); ++it){
+    for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
+        it!=output_sparsity_.end();
+        ++it){
       offset_.push_back(offset_.back() + it->size());
     }
   }
@@ -181,7 +194,9 @@ namespace casadi{
     }
   }
 
-  void Vertsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Vertsplit::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                             bool output_given){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
     int nx = offset_.size()-1;
@@ -190,7 +205,9 @@ namespace casadi{
     vector<int> row_offset;
     row_offset.reserve(offset_.size());
     row_offset.push_back(0);
-    for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin(); it!=output_sparsity_.end(); ++it){
+    for(std::vector<Sparsity>::const_iterator it=output_sparsity_.begin();
+        it!=output_sparsity_.end();
+        ++it){
       row_offset.push_back(row_offset.back() + it->size1());
     }
 

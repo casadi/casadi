@@ -31,8 +31,9 @@ using namespace std;
 namespace casadi{
 
   // Constructor
-  StabilizedQPSolverInternal::StabilizedQPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
-
+  StabilizedQPSolverInternal::StabilizedQPSolverInternal(const std::vector<Sparsity> &st) :
+      st_(st)
+  {
     // Get structure
     casadi_assert_message(st_.size()==QP_STRUCT_NUM,"Problem structure mismatch");
     const Sparsity& A = st_[QP_STRUCT_A];
@@ -44,14 +45,15 @@ namespace casadi{
 
     // Check consistency
     casadi_assert_message(A.isNull() || A.size2()==n_,
-                          "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl <<
-                          "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
-                          "We need: H.size2()==A.size2()" << std::endl);
+      "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
+       << std::endl <<
+      "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
+      "We need: H.size2()==A.size2()" << std::endl);
 
     casadi_assert_message(H.isSymmetric(),
-                          "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
-                          "H: " << H.dimString() <<
-                          "We need H square & symmetric" << std::endl);
+      "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
+      "H: " << H.dimString() <<
+      "We need H square & symmetric" << std::endl);
 
     // IO sparsities
     Sparsity x_sparsity = Sparsity::dense(n_,1);
@@ -104,19 +106,21 @@ namespace casadi{
     const vector<double>& lbx = input(STABILIZED_QP_SOLVER_LBX).data();
     const vector<double>& ubx = input(STABILIZED_QP_SOLVER_UBX).data();
     for(int i=0; i<lbx.size(); ++i){
-      casadi_assert_message(lbx.at(i)<=ubx.at(i),"LBX[" << i << "]== <= UBX[" << i << "] was violated. Got LBX["<<i<<"]=" << lbx.at(i) << " and UBX[" << i << "]=" << ubx.at(i));
+      casadi_assert_message(lbx.at(i)<=ubx.at(i),
+                            "LBX[" << i << "]== <= UBX[" << i << "] was violated. "
+                            "Got LBX["<<i<<"]=" << lbx.at(i)
+                            << " and UBX[" << i << "]=" << ubx.at(i));
     }
 
     // Check linear constraint bounds
     const vector<double>& lba = input(STABILIZED_QP_SOLVER_LBA).data();
     const vector<double>& uba = input(STABILIZED_QP_SOLVER_UBA).data();
     for(int i=0; i<lba.size(); ++i){
-      casadi_assert_message(lba.at(i)<=uba.at(i),"LBA[" << i << "]== <= UBA[" << i << "] was violated. Got LBA["<<i<<"]=" << lba.at(i) << " and UBA[" << i << "]=" << uba.at(i));
+      casadi_assert_message(lba.at(i)<=uba.at(i),
+                            "LBA[" << i << "]== <= UBA[" << i << "] was violated. "
+                            "Got LBA["<<i<<"]=" << lba.at(i)
+                            << " and UBA[" << i << "]=" << uba.at(i));
     }
   }
 
 } // namespace casadi
-
-
-
-

@@ -40,7 +40,8 @@ namespace casadi{
    * This class solves the linear system A.x=b by making an LU factorization of A: \n
    * A = L.U, with L lower and U upper triangular
    *
-   * LapackLUDense is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   * LapackLUDense is an casadi::Function mapping from 2 inputs 
+   * [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use LapackLUDense is: \n
    *  -# init()
@@ -50,7 +51,8 @@ namespace casadi{
    *  -# solve()
    *  -# Repeat steps 4 and 5 to work with other b vectors.
    *
-   * The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
+   * The method evaluate() combines the prepare() and solve() step and is
+   * therefore more expensive if A is invariant.
    *
    */
   class CASADI_LAPACK_INTERFACE_EXPORT LapackLUDense : public LinearSolver{
@@ -84,13 +86,16 @@ namespace casadi{
   extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
 
   /// Solve a system of equation using an LU-factorized matrix (lapack)
-  extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *info);
+  extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a,
+                          int *lda, int *ipiv, double *b, int *ldb, int *info);
 
   /// Calculate col and row scalings
-  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c, double *colcnd, double *rowcnd, double *amax, int *info);
+  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
+                          double *colcnd, double *rowcnd, double *amax, int *info);
 
   /// Equilibriate the system
-  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c, double *colcnd, double *rowcnd, double *amax, char *equed );
+  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
+                          double *colcnd, double *rowcnd, double *amax, char *equed );
 
   /// Internal class
   class CASADI_LAPACK_INTERFACE_EXPORT LapackLUDenseInternal : public LinearSolverInternal{

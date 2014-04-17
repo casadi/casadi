@@ -27,7 +27,8 @@ using namespace std;
 namespace casadi{
 
 void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options){
-  // Note: The implementation of this function follows the "Writing .nl Files" paper by David M. Gay (2005)
+  // Note: The implementation of this function follows the
+  // "Writing .nl Files" paper by David M. Gay (2005)
 
   // Default options
   bool verbose=false;
@@ -56,7 +57,9 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   }
 
   // Assert that the file is not in binary form
-  casadi_assert_message(header.at(0).at(0)=='g',"File could not be read, or file is binary format (currently not supported)");
+  casadi_assert_message(header.at(0).at(0)=='g',
+                        "File could not be read, or file is binary format "
+                        "(currently not supported)");
 
   // Get the number of objectives and constraints
   stringstream ss(header[1]);
@@ -64,7 +67,8 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   ss >> n_var >> n_con >> n_obj >> n_eq >> n_lcon;
 
   if(verbose){
-    cout << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
+    cout << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj
+         << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
   }
 
   // Allocate variables
@@ -443,8 +447,9 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
       switch(i){
 
         // Unary operations, class 1 in Gay2005
-        case 13:  case 14:  case 15:  case 16:  case 34:  case 37:  case 38:  case 39:  case 40:  case 41:
-        case 43:  case 42:  case 44:  case 45:  case 46:  case 47:  case 49:  case 50:  case 51:  case 52:  case 53:
+        case 13:  case 14:  case 15:  case 16:  case 34:  case 37:  case 38:  case 39:  case 40:
+        case 41:  case 43:  case 42:  case 44:  case 45:  case 46:  case 47:  case 49:  case 50:
+        case 51:  case 52:  case 53:
         {
           // Read dependency
           SXElement x = readExpressionNL(stream,v);
@@ -480,8 +485,9 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
         }
 
         // Binary operations, class 2 in Gay2005
-        case 0:   case 1:   case 2:   case 3:   case 4:   case 5:   case 6:   case 20:  case 21:  case 22:
-        case 23:  case 24:  case 28:  case 29:  case 30:  case 48:  case 55:  case 56:  case 57:  case 58:  case 73:
+        case 0:   case 1:   case 2:   case 3:   case 4:   case 5:   case 6:   case 20:  case 21:
+        case 22:  case 23:  case 24:  case 28:  case 29:  case 30:  case 48:  case 55:  case 56:
+        case 57:  case 58:  case 73:
         {
           // Read dependencies
           SXElement x = readExpressionNL(stream,v);
@@ -495,7 +501,8 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
             case 3:   return x / y;
             // case 4:   return rem(x,y); FIXME
             case 5:   return pow(x,y);
-            // case 6:   return x < y; TODO: Verify this, what is the difference to 'le' == 23 below?
+            // case 6:   return x < y; // TODO(Joel): Verify this,
+                                       // what is the difference to 'le' == 23 below?
             case 20:  return logic_or(x, y);
             case 21:  return logic_and(x, y);
             case 22:  return x < y;

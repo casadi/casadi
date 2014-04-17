@@ -39,9 +39,10 @@ SDPSOCPInternal* SDPSOCPInternal::clone() const{
 }
 
 SDPSOCPInternal::SDPSOCPInternal(const std::vector<Sparsity> &st) : SOCPSolverInternal(st) {
-
-  addOption("sdp_solver",       OT_SDPSOLVER, GenericType(), "The SDPSolver used to solve the SOCPs.");
-  addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the SDPSOlver");
+  addOption("sdp_solver",       OT_SDPSOLVER, GenericType(),
+            "The SDPSolver used to solve the SOCPs.");
+  addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
+            "Options to be passed to the SDPSOlver");
 
 }
 
@@ -157,7 +158,10 @@ void SDPSOCPInternal::init(){
 
   // Create an sdpsolver instance
   SDPSolverCreator sdpsolver_creator = getOption("sdp_solver");
-  sdpsolver_ = sdpsolver_creator(sdpStruct("a",input(SOCP_SOLVER_A).sparsity(),"f",mapping_.output(0).sparsity(),"g",mapping_.output(1).sparsity()));
+  sdpsolver_ = sdpsolver_creator(
+    sdpStruct("a",input(SOCP_SOLVER_A).sparsity(),
+              "f",mapping_.output(0).sparsity(),
+              "g",mapping_.output(1).sparsity()));
 
   sdpsolver_.setSOCPOptions();
   if(hasSetOption("sdp_solver_options")){

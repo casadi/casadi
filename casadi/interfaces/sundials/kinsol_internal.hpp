@@ -55,7 +55,9 @@ namespace casadi{
     virtual KinsolInternal* clone() const;
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const { return new KinsolInternal(f,jac,linsol);}
+    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
+                                             const LinearSolver& linsol) const
+    { return new KinsolInternal(f,jac,linsol);}
 
     /** \brief  Initialize stage */
     virtual void init();
@@ -66,24 +68,32 @@ namespace casadi{
     /** \brief Residual */
     void func(N_Vector u, N_Vector fval);
     void djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
-    void bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
+    void bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
+              N_Vector tmp1, N_Vector tmp2);
     void jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u);
-    void psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector tmp1, N_Vector tmp2);
-    void psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, N_Vector tmp);
+    void psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                N_Vector tmp1, N_Vector tmp2);
+    void psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v,
+                N_Vector tmp);
     void lsetup(KINMem kin_mem);
     void lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
     void ehfun(int error_code, const char *module, const char *function, char *msg);
 
     /** \brief Wrappers */
     static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
-    static int djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2);
-    static int bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2);
+    static int djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data,
+                            N_Vector tmp1, N_Vector tmp2);
+    static int bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
+                            void *user_data, N_Vector tmp1, N_Vector tmp2);
     static int jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u, void *user_data);
-    static int psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, void* user_data, N_Vector tmp1, N_Vector tmp2);
-    static int psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp);
+    static int psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                              void* user_data, N_Vector tmp1, N_Vector tmp2);
+    static int psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                              N_Vector v, void* user_data, N_Vector tmp);
     static int lsetup_wrapper(KINMem kin_mem);
     static int lsolve_wrapper(KINMem kin_mem, N_Vector x, N_Vector b, double *res_norm);
-    static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
+    static void ehfun_wrapper(int error_code, const char *module, const char *function,
+                              char *msg, void *eh_data);
 
     /// KINSOL memory block
     void* mem_;

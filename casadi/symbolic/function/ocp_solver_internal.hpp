@@ -47,17 +47,21 @@ class CASADI_SYMBOLIC_EXPORT OCPSolverInternal : public FunctionInternal{
     * \param cfcn Path constraints
     * \param rfcn Initial value constraints
     *
-    * The signatures (number and order of inputs/outputs) of these functions are not restricted at this stage.
+    * The signatures (number and order of inputs/outputs) of these functions are
+    * not restricted at this stage.
     *
-    * Only ffcn has a general requirement for input interface: { DAE_T, DAE_Y, DAE_P, DAE_YDOT } from casadi::DAEInput
+    * Only ffcn has a general requirement for input interface: { DAE_T, DAE_Y, DAE_P, DAE_YDOT }
+    * from casadi::DAEInput
     *
     * For example:
     *
-    * When using the ACADO interface, all functions should have the same input interface: casadi::ACADO_FCN_Input \n
+    * When using the ACADO interface, all functions should have the same input interface:
+    * casadi::ACADO_FCN_Input \n
     * When using MultipleShooting, mfcn_ is a single input -> single output mapping
     *
     */
-    explicit OCPSolverInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn);
+    explicit OCPSolverInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn,
+                               const Function& rfcn);
 
     /// Destructor
     virtual ~OCPSolverInternal();

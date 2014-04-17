@@ -29,7 +29,8 @@ namespace casadi{
   NewtonImplicitSolver::NewtonImplicitSolver(){
   }
 
-  NewtonImplicitSolver::NewtonImplicitSolver(const Function& f, const Function& jac, const LinearSolver& linsol)  {
+  NewtonImplicitSolver::NewtonImplicitSolver(const Function& f, const Function& jac,
+                                             const LinearSolver& linsol) {
     assignNode(new NewtonImplicitInternal(f,jac,linsol));
   }
 

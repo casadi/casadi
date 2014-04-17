@@ -55,8 +55,11 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShooting : public OCPSolver{
     * \copydoc scheme_DAEInput
     * \copydoc scheme_DAEOutput
     * Important notes:
-    *  - In the above table, INTEGRATOR_P input is not really of shape (np x 1), but rather ( (np+nu) x 1 ).
-    *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters to be optimized but constant over the whole domain. The remainder are interpreted as controls.
+    *  - In the above table, INTEGRATOR_P input is not really of shape (np x 1),
+    *    but rather ( (np+nu) x 1 ).
+    *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters
+    *    to be optimized but constant over the whole domain.
+    *    The remainder are interpreted as controls.
     *  - BEWARE: if the right hand side of ffcn is dependent on time, the results will be incorrect.
     *
     * \param mfcn Mayer term, casadi::Function mapping to cost (1 x 1)
@@ -65,7 +68,9 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShooting : public OCPSolver{
     * @copydoc scheme_DAEInput
     * \param rfcn Initial value constraints
     */
-    explicit DirectMultipleShooting(const Function& ffcn, const Function& mfcn, const Function& cfcn=Function(), const Function& rfcn=Function());
+    explicit DirectMultipleShooting(const Function& ffcn, const Function& mfcn,
+                                    const Function& cfcn=Function(),
+                                    const Function& rfcn=Function());
 
     /// Access functions of the node
     DirectMultipleShootingInternal* operator->();
@@ -91,14 +96,11 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShooting : public OCPSolver{
     // Prints out a human readable report about possible constraint violations, after solving
     void reportConstraints(std::ostream &stream=std::cout);
 
-    std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
-
-
-
+    std::string getReportConstraints()
+    { std::stringstream s; reportConstraints(s); return s.str(); }
 
 };
 
 } // namespace casadi
-
 
 #endif // DIRECT_MULTIPLE_SHOOTING_HPP

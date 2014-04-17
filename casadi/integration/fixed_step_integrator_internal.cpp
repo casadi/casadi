@@ -31,11 +31,16 @@
 using namespace std;
 namespace casadi{
 
-  FixedStepIntegratorInternal::FixedStepIntegratorInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
+  FixedStepIntegratorInternal::FixedStepIntegratorInternal(const Function& f,
+                                                           const Function& g) :
+      IntegratorInternal(f,g)
+  {
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
-  void FixedStepIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void FixedStepIntegratorInternal::deepCopyMembers(
+    std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     IntegratorInternal::deepCopyMembers(already_copied);
     F_ = deepcopy(F_,already_copied);
     G_ = deepcopy(G_,already_copied);
@@ -88,7 +93,11 @@ namespace casadi{
       F.evaluate();
       F.output(DAE_ODE).get(output(INTEGRATOR_XF));
       F.output(DAE_ALG).get(Z_);
-      transform(F.output(DAE_QUAD).begin(),F.output(DAE_QUAD).end(),output(INTEGRATOR_QF).begin(),output(INTEGRATOR_QF).begin(),std::plus<double>());
+      transform(F.output(DAE_QUAD).begin(),
+                F.output(DAE_QUAD).end(),
+                output(INTEGRATOR_QF).begin(),
+                output(INTEGRATOR_QF).begin(),
+                std::plus<double>());
 
       // Tape
       if(nrx_>0){
@@ -128,7 +137,11 @@ namespace casadi{
       G.evaluate();
       G.output(RDAE_ODE).get(output(INTEGRATOR_RXF));
       G.output(RDAE_ALG).get(RZ_);
-      transform(G.output(RDAE_QUAD).begin(),G.output(RDAE_QUAD).end(),output(INTEGRATOR_RQF).begin(),output(INTEGRATOR_RQF).begin(),std::plus<double>());
+      transform(G.output(RDAE_QUAD).begin(),
+                G.output(RDAE_QUAD).end(),
+                output(INTEGRATOR_RQF).begin(),
+                output(INTEGRATOR_RQF).begin(),
+                std::plus<double>());
     }
   }
 
@@ -166,6 +179,5 @@ namespace casadi{
   void FixedStepIntegratorInternal::calculateInitialConditionsB(){
     RZ_.set(numeric_limits<double>::quiet_NaN());
   }
-
 
 } // namespace casadi

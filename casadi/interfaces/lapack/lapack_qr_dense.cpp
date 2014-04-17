@@ -41,7 +41,8 @@ namespace casadi{
     return static_cast<const LapackQRDenseInternal*>(Function::operator->());
   }
 
-  LapackQRDenseInternal::LapackQRDenseInternal(const Sparsity& sparsity, int nrhs) : LinearSolverInternal(sparsity,nrhs){
+  LapackQRDenseInternal::LapackQRDenseInternal(const Sparsity& sparsity, int nrhs) :
+      LinearSolverInternal(sparsity,nrhs){
   }
 
   LapackQRDenseInternal::~LapackQRDenseInternal(){
@@ -56,7 +57,8 @@ namespace casadi{
     nrow_ = nrow();
 
     // Currently only square matrices tested
-    if(ncol_!=nrow_) throw CasadiException("LapackQRDenseInternal::init: currently only square matrices implemented.");
+    if(ncol_!=nrow_) throw CasadiException("LapackQRDenseInternal::init: currently only "
+                                           "square matrices implemented.");
 
     // Allocate matrix
     mat_.resize(ncol_*ncol_);
@@ -74,7 +76,8 @@ namespace casadi{
     int info = -100;
     int lwork = work_.size();
     dgeqrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(tau_), getPtr(work_), &lwork, &info);
-    if(info != 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeqrf_ failed to factorize the jacobian");
+    if(info != 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeqrf_ "
+                                        "failed to factorize the jacobian");
 
     // Success if reached this point
     prepared_ = true;
@@ -97,22 +100,28 @@ namespace casadi{
     if(transpose){
 
       // Solve for transpose(R)
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR, getPtr(mat_), &ncol_, x, &ncol_);
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,
+             getPtr(mat_), &ncol_, x, &ncol_);
 
       // Multiply by Q
       int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x, &ncol_, getPtr(work_), &lwork, &info);
-      if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
+      dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
+              &ncol_, getPtr(work_), &lwork, &info);
+      if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed "
+                                          "to solve the linear system");
 
     } else {
 
       // Multiply by transpose(Q)
       int info = 100;
-      dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x, &ncol_, getPtr(work_), &lwork, &info);
-      if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to solve the linear system");
+      dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
+              &ncol_, getPtr(work_), &lwork, &info);
+      if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to "
+                                          "solve the linear system");
 
       // Solve for R
-      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR, getPtr(mat_), &ncol_, x, &ncol_);
+      dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,
+             getPtr(mat_), &ncol_, x, &ncol_);
     }
   }
 

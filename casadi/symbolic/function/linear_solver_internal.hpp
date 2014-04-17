@@ -69,10 +69,13 @@ namespace casadi{
     virtual void evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr);
 
     // Evaluate MX, possibly transposed
-    virtual void evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given, bool tr);
+    virtual void evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                               MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                               bool output_given, bool tr);
 
     // Propagate sparsity, possibly transposed
-    void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool transpose);
+    void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                              std::vector<double>& rtmp, bool fwd, bool transpose);
 
     //@{
     // Propagate sparsity through a linear solve

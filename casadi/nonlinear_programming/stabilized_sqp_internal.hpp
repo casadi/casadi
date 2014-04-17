@@ -154,7 +154,8 @@ public:
 
   /// Print iteration
   void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf,
-                      double dx_norm, double reg, double TRdelta, int ls_trials, bool ls_success, char info);
+                      double dx_norm, double reg, double TRdelta, int ls_trials,
+                      bool ls_success, char info);
 
   // Reset the Hessian or Hessian approximation
   void reset_h();
@@ -172,7 +173,8 @@ public:
   virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J);
 
   // Evaluate the Hessian of the Lagrangian
-  virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H);
+  virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda,
+                      double sigma, Matrix<double>& H);
 
   // Calculate the regularization parameter using Gershgorin theorem
   double getRegularization(const Matrix<double>& H);
@@ -183,12 +185,17 @@ public:
   // Solve the QP subproblem
   virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
                         const std::vector<double>& lbx, const std::vector<double>& ubx,
-                        const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
-                        std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt, double muR, const std::vector<double> & mu, const std::vector<double> & muE);
+                        const Matrix<double>& A,
+                        const std::vector<double>& lbA, const std::vector<double>& ubA,
+                        std::vector<double>& x_opt, std::vector<double>& lambda_x_opt,
+                        std::vector<double>& lambda_A_opt, double muR,
+                        const std::vector<double> & mu, const std::vector<double> & muE);
 
   // Calculate the L1-norm of the primal infeasibility
-  double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
-                             const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg);
+  double primalInfeasibility(const std::vector<double>& x,
+                             const std::vector<double>& lbx, const std::vector<double>& ubx,
+                             const std::vector<double>& g,
+                             const std::vector<double>& lbg, const std::vector<double>& ubg);
 
   /// Calculates inner_prod(x,mul(A,x))
   static double quad_form(const std::vector<double>& x, const DMatrix& A);

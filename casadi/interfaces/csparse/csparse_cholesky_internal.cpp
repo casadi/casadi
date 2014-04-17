@@ -28,14 +28,18 @@
 using namespace std;
 namespace casadi{
 
-  CSparseCholeskyInternal::CSparseCholeskyInternal(const Sparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
+  CSparseCholeskyInternal::CSparseCholeskyInternal(const Sparsity& sparsity, int nrhs) :
+      LinearSolverInternal(sparsity,nrhs){
     L_ = 0;
     S_ = 0;
 
-    casadi_assert_message(sparsity.isSymmetric(),"CSparseCholeskyInternal: supplied sparsity must be symmetric, got " << sparsity.dimString() << ".");
+    casadi_assert_message(sparsity.isSymmetric(),
+                          "CSparseCholeskyInternal: supplied sparsity must be symmetric, got "
+                          << sparsity.dimString() << ".");
   }
 
-  CSparseCholeskyInternal::CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol) : LinearSolverInternal(linsol){
+  CSparseCholeskyInternal::CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol) :
+      LinearSolverInternal(linsol){
     L_ = 0;
     S_ = 0;
   }
@@ -52,7 +56,8 @@ namespace casadi{
     AT_.nzmax = input().size();  // maximum number of entries
     AT_.m = input().size1(); // number of cols
     AT_.n = input().size2(); // number of rows
-    AT_.p = const_cast<int*>(&input().colind().front()); // row pointers (size n+1) or row indices (size nzmax)
+    AT_.p = const_cast<int*>(&input().colind().front()); // row pointers (size n+1)
+                                                         // or row indices (size nzmax)
     AT_.i = const_cast<int*>(&input().row().front()); // col indices, size nzmax
     AT_.x = &input().front(); // col indices, size nzmax
     AT_.nz = -1; // of entries in triplet matrix, -1 for compressed-row
@@ -159,7 +164,8 @@ namespace casadi{
         throw CasadiException(ss.str());
       } else {
         stringstream ss;
-        ss << "CSparseCholeskyInternal::prepare: factorization failed, check if Jacobian is singular" << endl;
+        ss << "CSparseCholeskyInternal::prepare: factorization failed, "
+            "check if Jacobian is singular" << endl;
         if(verbose()){
           ss << "Sparsity of the linear system: " << endl;
           input(LINSOL_A).sparsity().print(ss); // print detailed

@@ -29,8 +29,12 @@ using namespace std;
 
 namespace casadi{
 
-  Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message): fail_message_(fail_message){
-    casadi_assert_message(y.isScalar(),"Assertion:: assertion expression y must be scalar, but got " << y.dimString());
+  Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message):
+      fail_message_(fail_message)
+  {
+    casadi_assert_message(y.isScalar(),
+                          "Assertion:: assertion expression y must be scalar, but got "
+                          << y.dimString());
     setDependencies(x,y);
     setSparsity(x.sparsity());
   }
@@ -45,7 +49,9 @@ namespace casadi{
     }
   }
 
-  void Assertion::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Assertion::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                             bool output_given){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
@@ -66,11 +72,13 @@ namespace casadi{
     }
   }
 
-  void Assertion::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void Assertion::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                             std::vector<SXElement>& rtmp){
     *output[0] = *input[0];
   }
 
-  void Assertion::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void Assertion::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                            std::vector<double>& rtmp){
     if ((*input[1]).at(0)!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }

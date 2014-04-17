@@ -47,7 +47,8 @@ namespace casadi{
       \date 2010
       A regular user should never work with any Node class. Use Function directly.
   */
-  class CASADI_SYMBOLIC_EXPORT FunctionInternal : public OptionsFunctionalityNode, public IOInterface<FunctionInternal>{
+  class CASADI_SYMBOLIC_EXPORT FunctionInternal : public OptionsFunctionalityNode,
+                                                  public IOInterface<FunctionInternal>{
     friend class Function;
 
   protected:
@@ -65,14 +66,18 @@ namespace casadi{
     virtual void evaluate() = 0;
 
     /** \brief Initialize
-        Initialize and make the object ready for setting arguments and evaluation. This method is typically called after setting options but before evaluating.
-        If passed to another class (in the constructor), this class should invoke this function when initialized. */
+        Initialize and make the object ready for setting arguments and evaluation.
+        This method is typically called after setting options but before evaluating.
+        If passed to another class (in the constructor), this class should invoke
+        this function when initialized. */
     virtual void init();
 
-    /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
+    /** \brief  Propagate the sparsity pattern through a set of directional
+        derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
-    /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward, using the sparsity patterns */
+    /** \brief  Propagate the sparsity pattern through a set of directional derivatives
+        forward or backward, using the sparsity patterns */
     virtual void spEvaluateViaJacSparsity(bool fwd);
 
     /** \brief  Is the class able to propate seeds through the algorithm? */
@@ -83,28 +88,38 @@ namespace casadi{
 
     /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res,
-                        const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens,
-                        const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
+                        const std::vector<std::vector<SX> >& fseed,
+                        std::vector<std::vector<SX> >& fsens,
+                        const std::vector<std::vector<SX> >& aseed,
+                        std::vector<std::vector<SX> >& asens);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
-                        const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens,
-                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens);
+                        const std::vector<std::vector<MX> >& fseed,
+                        std::vector<std::vector<MX> >& fsens,
+                        const std::vector<std::vector<MX> >& aseed,
+                        std::vector<std::vector<MX> >& asens);
 
     /** \brief  Evaluate symbolically, SXElement type, matching sparsity patterns */
     virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res,
-                              const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens,
-                              const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
+                              const std::vector<std::vector<SX> >& fseed,
+                              std::vector<std::vector<SX> >& fsens,
+                              const std::vector<std::vector<SX> >& aseed,
+                              std::vector<std::vector<SX> >& asens);
 
     /** \brief  Create function call node */
     virtual void createCall(const std::vector<MX> &arg, std::vector<MX> &res,
-                            const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens,
-                            const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
+                            const std::vector<std::vector<MX> > &fseed,
+                            std::vector<std::vector<MX> > &fsens,
+                            const std::vector<std::vector<MX> > &aseed,
+                            std::vector<std::vector<MX> > &asens);
 
     /** \brief  Create derivative node */
     virtual void createCallDerivative(const std::vector<MX> &arg, std::vector<MX> &res,
-                                      const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens,
-                                      const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
+                                      const std::vector<std::vector<MX> > &fseed,
+                                      std::vector<std::vector<MX> > &fsens,
+                                      const std::vector<std::vector<MX> > &aseed,
+                                      std::vector<std::vector<MX> > &asens);
 
     /** \brief  Create a call to this */
     std::vector<MX> callSelf(const std::vector<MX> &arg);
@@ -161,7 +176,8 @@ namespace casadi{
 
     //@{
     /** \brief Return function that calculates forward derivatives
-     *    This method returns a cached instance if available, and calls Function getDerivative(int nfwd, int nadj) if no cached version is available.
+     *    This method returns a cached instance if available,
+     *    and calls Function getDerivative(int nfwd, int nadj) if no cached version is available.
      */
     Function derivative(int nfwd, int nadj);
 
@@ -171,7 +187,8 @@ namespace casadi{
     /** \brief Constructs and returns a function that calculates forward derivatives */
     virtual Function getDerivative(int nfwd, int nadj);
 
-    /** \brief Constructs and returns a function that calculates forward derivatives by creating the Jacobian then multiplying */
+    /** \brief Constructs and returns a function that calculates forward derivatives
+     *  by creating the Jacobian then multiplying */
     virtual Function getDerivativeViaJac(int nfwd, int nadj);
 
     //@}
@@ -195,13 +212,17 @@ namespace casadi{
     void generateIO(CodeGenerator& gen);
 
     /** \brief Generate code the functon */
-    virtual void generateFunction(std::ostream &stream, const std::string& fname, const std::string& input_type, const std::string& output_type, const std::string& type, CodeGenerator& gen) const;
+    virtual void generateFunction(std::ostream &stream, const std::string& fname,
+                                  const std::string& input_type, const std::string& output_type,
+                                  const std::string& type, CodeGenerator& gen) const;
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
+                                      CodeGenerator& gen) const;
 
     /** \brief Generate code for the function body */
-    virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+    virtual void generateBody(std::ostream &stream, const std::string& type,
+                              CodeGenerator& gen) const;
 
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
@@ -248,7 +269,8 @@ namespace casadi{
     /// A flavour of getJacSparsity that does hierachical block structure recognition
     Sparsity getJacSparsityHierarchical(int iind, int oind);
 
-    /// A flavour of getJacSparsity that does hierachical block structure recognition for symmetric jacobians
+    /// A flavour of getJacSparsity that does hierachical block
+    // structure recognition for symmetric jacobians
     Sparsity getJacSparsityHierarchicalSymm(int iind, int oind);
 
     /// Generate the sparsity of a Jacobian block
@@ -302,20 +324,31 @@ namespace casadi{
     void log(const std::string& fcn, const std::string& msg) const;
 
     // Codegen function
-    Function dynamicCompilation(Function f, std::string fname, std::string fdescr, std::string compiler);
+    Function dynamicCompilation(Function f, std::string fname, std::string fdescr,
+                                std::string compiler);
 
-    // The following functions are called internally from EvaluateMX. For documentation, see the MXNode class
+    // The following functions are called internally from EvaluateMX.
+    // For documentation, see the MXNode class
     //@{
-    virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp);
-    virtual void evaluateSX(MXNode* node, const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
-    virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given);
-    virtual void propagateSparsity(MXNode* node, DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
+    virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res,
+                           std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateSX(MXNode* node, const SXPtrV& arg, SXPtrV& res,
+                            std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+    virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res,
+                            const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed,
+                            MXPtrVV& asens, bool output_given);
+    virtual void propagateSparsity(MXNode* node, DMatrixPtrV& input,
+                                   DMatrixPtrV& output, std::vector<int>& itmp,
+                                   std::vector<double>& rtmp, bool fwd);
     virtual void nTmp(MXNode* node, size_t& ni, size_t& nr);
-    virtual void generateOperation(const MXNode* node, std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(const MXNode* node, std::ostream &stream,
+                                   const std::vector<std::string>& arg,
+                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
     virtual void printPart(const MXNode* node, std::ostream &stream, int part) const;
     //@}
 
-    /** \brief Prints out a human readable report about possible constraint violations - specific constraints
+    /** \brief Prints out a human readable report about possible constraint violations
+    *          - specific constraints
     *
     * Constraint visualiser strip:
     *  o-------=-------o   Indicates that the value is nicely inbetween the bounds
@@ -328,7 +361,9 @@ namespace casadi{
     *     VIOLATED         Indicates constraint violation
     *
     */
-    static void reportConstraints(std::ostream &stream, const Matrix<double> &v, const Matrix<double> &lb, const Matrix<double> &ub, const std::string &name, double tol=1e-8);
+    static void reportConstraints(std::ostream &stream, const Matrix<double> &v,
+                                  const Matrix<double> &lb, const Matrix<double> &ub,
+                                  const std::string &name, double tol=1e-8);
 
     /** \brief  Inputs of the function */
     IOSchemeVector<DMatrix> input_;

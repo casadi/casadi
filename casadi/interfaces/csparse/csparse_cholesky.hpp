@@ -36,7 +36,8 @@ class CSparseCholeskyInternal;
 *
  @copydoc LinearSolver_doc
 *
-* CSparseCholesky is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+* CSparseCholesky is an casadi::Function mapping from 2 inputs
+* [ A (matrix),b (vector)] to one output [x (vector)].
 *
 *  A = LL'
 *    Ax = b
@@ -51,7 +52,8 @@ class CSparseCholeskyInternal;
 *  -# solve()
 *  -# Repeat steps 4 and 5 to work with other b vectors.
 *
-* The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
+* The method evaluate() combines the prepare() and solve()
+* step and is therefore more expensive if A is invariant.
 *
 */
 class CASADI_CSPARSE_INTERFACE_EXPORT CSparseCholesky : public LinearSolver{
@@ -95,4 +97,3 @@ public:
 } // namespace casadi
 
 #endif //CSPARSE_CHOLESKY_HPP
-

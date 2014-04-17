@@ -34,24 +34,29 @@ namespace casadi{
     setSparsity(x.sparsity().transpose());
   }
 
-  void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                            std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
- void DenseTranspose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+ void DenseTranspose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void Transpose::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void Transpose::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                             std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
-  void DenseTranspose::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void DenseTranspose::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                                  std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Transpose::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void Transpose::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                              std::vector<T>& rtmp){
 
     // Get sparsity patterns
     //const vector<int>& x_colind = input[0]->colind();
@@ -69,7 +74,8 @@ namespace casadi{
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void DenseTranspose::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void DenseTranspose::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                                   std::vector<T>& rtmp){
 
     // Get sparsity patterns
     int x_ncol = input[0]->size2();
@@ -84,7 +90,8 @@ namespace casadi{
     }
   }
 
-  void Transpose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){
+  void Transpose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                                    std::vector<double>& rtmp, bool fwd){
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());
     //const vector<int>& x_colind = input[0]->colind();
@@ -114,7 +121,9 @@ namespace casadi{
     }
   }
 
-  void DenseTranspose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){
+  void DenseTranspose::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                         std::vector<int>& itmp,
+                                         std::vector<double>& rtmp, bool fwd){
     // Access the input
     bvec_t *x = get_bvec_t(input[0]->data());
     int x_ncol = input[0]->size2();
@@ -145,7 +154,9 @@ namespace casadi{
     }
   }
 
-  void Transpose::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Transpose::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                             bool output_given){
     if(!output_given)
       *output[0] = input[0]->T();
 
@@ -163,7 +174,10 @@ namespace casadi{
     }
   }
 
-  void Transpose::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void Transpose::generateOperation(std::ostream &stream,
+                                    const std::vector<std::string>& arg,
+                                    const std::vector<std::string>& res,
+                                    CodeGenerator& gen) const{
     gen.addAuxiliary(CodeGenerator::AUX_TRANS);
 
     stream << "  casadi_trans(";
@@ -171,10 +185,13 @@ namespace casadi{
     stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ",iii);" << endl;
   }
 
-  void DenseTranspose::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void DenseTranspose::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                         const std::vector<std::string>& res,
+                                         CodeGenerator& gen) const{
     stream << "  for(i=0; i<" << dep().size2() << "; ++i) ";
     stream << "for(j=0; j<" << dep().size1() << "; ++j) ";
-    stream << res.front() << "[i+j*" << dep().size2() << "] = " << arg.front() << "[j+i*" << dep().size1() << "];" << endl;
+    stream << res.front() << "[i+j*" << dep().size2() << "] = " << arg.front()
+           << "[j+i*" << dep().size1() << "];" << endl;
   }
 
 } // namespace casadi

@@ -156,7 +156,9 @@ bool GenericType::isString() const{
 }
 
 bool GenericType::isEmptyVector() const{
-  return (isIntVector() && toIntVector().size()==0 ) || (isDoubleVector() && toDoubleVector().size()==0 ) || (isStringVector() && toStringVector().size()==0 );
+  return (isIntVector() && toIntVector().size()==0 ) ||
+      (isDoubleVector() && toDoubleVector().size()==0 ) ||
+      (isStringVector() && toStringVector().size()==0 );
 }
 
 bool GenericType::isIntVector() const{

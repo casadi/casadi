@@ -35,11 +35,13 @@ namespace casadi{
    *
    @copydoc ImplicitFunction_doc
    * */
-  class CASADI_NONLINEAR_PROGRAMMING_EXPORT NewtonImplicitInternal : public ImplicitFunctionInternal {
+  class CASADI_NONLINEAR_PROGRAMMING_EXPORT NewtonImplicitInternal
+      : public ImplicitFunctionInternal {
     friend class NewtonImplicitSolver;
   public:
     /** \brief  Constructor */
-    explicit NewtonImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol);
+    explicit NewtonImplicitInternal(const Function& f, const Function& jac,
+                                    const LinearSolver& linsol);
 
     /** \brief  Destructor */
     virtual ~NewtonImplicitInternal();
@@ -48,7 +50,9 @@ namespace casadi{
     virtual NewtonImplicitInternal* clone() const{ return new NewtonImplicitInternal(*this);}
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const { return new NewtonImplicitInternal(f,jac,linsol);}
+    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
+                                             const LinearSolver& linsol) const
+    { return new NewtonImplicitInternal(f,jac,linsol);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -70,4 +74,3 @@ namespace casadi{
 } // namespace casadi
 /// \endcond
 #endif //NEWTON_IMPLICIT_INTERNAL_HPP
-

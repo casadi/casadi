@@ -51,16 +51,21 @@ namespace casadi{
   }
 
   template<typename DataType>
-  SparseStorage<DataType>::SparseStorage(const SparseStorage<DataType>& m) : sparsity_(m.sparsity_), data_(m.data_){
-  }
+  SparseStorage<DataType>::SparseStorage(const SparseStorage<DataType>& m) :
+    sparsity_(m.sparsity_), data_(m.data_) {}
 
   template<typename DataType>
-  SparseStorage<DataType>::SparseStorage(const std::vector<DataType>& x) : sparsity_(Sparsity::dense(x.size(),1)), data_(x){
-  }
+  SparseStorage<DataType>::SparseStorage(const std::vector<DataType>& x) :
+    sparsity_(Sparsity::dense(x.size(),1)), data_(x){}
 
   template<typename DataType>
-  SparseStorage<DataType>::SparseStorage(const std::vector<DataType>& x, int nrow, int ncol) : sparsity_(Sparsity::dense(nrow,ncol)), data_(x){
-    casadi_assert_message(x.size() == nrow*ncol, "Dimension mismatch." << std::endl << "You supplied a vector of length " << x.size() << ", but " << nrow << " x " << ncol << " = " << nrow*ncol);
+  SparseStorage<DataType>::SparseStorage(const std::vector<DataType>& x, int nrow, int ncol) :
+    sparsity_(Sparsity::dense(nrow,ncol)), data_(x)
+  {
+    casadi_assert_message(x.size() == nrow*ncol,
+                          "Dimension mismatch." << std::endl
+                          << "You supplied a vector of length " << x.size()
+                          << ", but " << nrow << " x " << ncol << " = " << nrow*ncol);
   }
 
   template<typename DataType>
@@ -121,9 +126,11 @@ namespace casadi{
     // Assert consistency
     for(int rr=0; rr<nrow; ++rr){
       casadi_assert_message(ncol==d[rr].size(),
-        "SparseStorage<DataType>::SparseStorage(const std::vector< std::vector<DataType> >& d): shape mismatch" << std::endl <<
+        "SparseStorage<DataType>::SparseStorage(const std::vector< std::vector<DataType> >& d): "
+        "shape mismatch" << std::endl <<
         "Attempting to construct a matrix from a nested list." << std::endl <<
-        "I got convinced that the desired size is ("<< nrow << " x " << ncol << " ), but now I encounter a vector of size (" <<
+        "I got convinced that the desired size is ("<< nrow << " x " << ncol << " ), "
+        "but now I encounter a vector of size (" <<
         d[rr].size() <<  " )" << std::endl);
     }
 
@@ -139,12 +146,17 @@ namespace casadi{
   }
 
   template<typename DataType>
-  SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const DataType& val) : sparsity_(sparsity), data_(sparsity.size(),val){
-  }
+  SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const DataType& val) :
+    sparsity_(sparsity), data_(sparsity.size(),val) {}
 
   template<typename DataType>
-  SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const std::vector<DataType>& d) : sparsity_(sparsity), data_(d) {
-    casadi_assert_message(sparsity.size()==d.size(),"Size mismatch." << std::endl << "You supplied a sparsity of " << sparsity_.dimString() << ", but the supplied vector is of length " << d.size());
+  SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const std::vector<DataType>& d) :
+    sparsity_(sparsity), data_(d)
+  {
+    casadi_assert_message(sparsity.size()==d.size(),
+                          "Size mismatch." << std::endl << "You supplied a sparsity of "
+                          << sparsity_.dimString()
+                          << ", but the supplied vector is of length " << d.size());
   }
 
   template<typename DataType>
@@ -168,4 +180,3 @@ namespace casadi{
 /// \endcond
 
 #endif // SPARSE_STORAGE_IMPL_HPP
-

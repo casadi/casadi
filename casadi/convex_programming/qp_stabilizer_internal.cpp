@@ -28,15 +28,21 @@
 using namespace std;
 namespace casadi {
 
-  QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st) : StabilizedQPSolverInternal(st) {
-    addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver used to solve the stabilized QPs.");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver instance");
+  QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st) :
+      StabilizedQPSolverInternal(st)
+  {
+    addOption("qp_solver",         OT_QPSOLVER,   GenericType(),
+              "The QP solver used to solve the stabilized QPs.");
+    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+              "Options to be passed to the QP solver instance");
   }
 
   QPStabilizerInternal::~QPStabilizerInternal(){
   }
 
-  void QPStabilizerInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void QPStabilizerInternal::deepCopyMembers(
+    std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     StabilizedQPSolverInternal::deepCopyMembers(already_copied);
     qp_solver_ = deepcopy(qp_solver_,already_copied);
   }
@@ -68,7 +74,9 @@ namespace casadi {
 
     // Construct stabilized H
     DMatrix& H_qp = qp_solver_.input(QP_SOLVER_H);
-    std::copy(input(STABILIZED_QP_SOLVER_H).begin(),input(STABILIZED_QP_SOLVER_H).end(),H_qp.begin());
+    std::copy(input(STABILIZED_QP_SOLVER_H).begin(),
+              input(STABILIZED_QP_SOLVER_H).end(),
+              H_qp.begin());
     std::fill(H_qp.begin()+input(STABILIZED_QP_SOLVER_H).size(),H_qp.end(),muR);
 
     // Linear constraints
@@ -92,10 +100,18 @@ namespace casadi {
     }
 
     // Bounds on x
-    std::copy(input(STABILIZED_QP_SOLVER_LBX).begin(),input(STABILIZED_QP_SOLVER_LBX).end(),qp_solver_.input(QP_SOLVER_LBX).begin());
-    std::copy(input(STABILIZED_QP_SOLVER_UBX).begin(),input(STABILIZED_QP_SOLVER_UBX).end(),qp_solver_.input(QP_SOLVER_UBX).begin());
-    std::fill(qp_solver_.input(QP_SOLVER_LBX).begin()+n_,qp_solver_.input(QP_SOLVER_LBX).end(),-numeric_limits<double>::infinity());
-    std::fill(qp_solver_.input(QP_SOLVER_UBX).begin()+n_,qp_solver_.input(QP_SOLVER_UBX).end(),numeric_limits<double>::infinity());
+    std::copy(input(STABILIZED_QP_SOLVER_LBX).begin(),
+              input(STABILIZED_QP_SOLVER_LBX).end(),
+              qp_solver_.input(QP_SOLVER_LBX).begin());
+    std::copy(input(STABILIZED_QP_SOLVER_UBX).begin(),
+              input(STABILIZED_QP_SOLVER_UBX).end(),
+              qp_solver_.input(QP_SOLVER_UBX).begin());
+    std::fill(qp_solver_.input(QP_SOLVER_LBX).begin()+n_,
+              qp_solver_.input(QP_SOLVER_LBX).end(),
+              -numeric_limits<double>::infinity());
+    std::fill(qp_solver_.input(QP_SOLVER_UBX).begin()+n_,
+              qp_solver_.input(QP_SOLVER_UBX).end(),
+              numeric_limits<double>::infinity());
 
     // Gradient term in the objective
     DMatrix &g = input(STABILIZED_QP_SOLVER_G);
@@ -105,7 +121,9 @@ namespace casadi {
     }
 
     // Hot-starting if possible
-    std::copy(input(STABILIZED_QP_SOLVER_X0).begin(),input(STABILIZED_QP_SOLVER_X0).end(),qp_solver_.input(QP_SOLVER_X0).begin());
+    std::copy(input(STABILIZED_QP_SOLVER_X0).begin(),
+              input(STABILIZED_QP_SOLVER_X0).end(),
+              qp_solver_.input(QP_SOLVER_X0).begin());
 
     // Solve the QP
     qp_solver_.evaluate();
@@ -114,9 +132,15 @@ namespace casadi {
     stats_["qp_solver_stats"] = qp_solver_.getStats();
 
     // Get the optimal solution
-    std::copy(qp_solver_.output(QP_SOLVER_X).begin(),qp_solver_.output(QP_SOLVER_X).begin()+n_,output(QP_SOLVER_X).begin());
-    std::copy(qp_solver_.output(QP_SOLVER_LAM_X).begin(),qp_solver_.output(QP_SOLVER_LAM_X).begin()+n_,output(QP_SOLVER_LAM_X).begin());
-    std::copy(qp_solver_.output(QP_SOLVER_LAM_A).begin(),qp_solver_.output(QP_SOLVER_LAM_A).begin()+nc_,output(QP_SOLVER_LAM_A).begin());
+    std::copy(qp_solver_.output(QP_SOLVER_X).begin(),
+              qp_solver_.output(QP_SOLVER_X).begin()+n_,
+              output(QP_SOLVER_X).begin());
+    std::copy(qp_solver_.output(QP_SOLVER_LAM_X).begin(),
+              qp_solver_.output(QP_SOLVER_LAM_X).begin()+n_,
+              output(QP_SOLVER_LAM_X).begin());
+    std::copy(qp_solver_.output(QP_SOLVER_LAM_A).begin(),
+              qp_solver_.output(QP_SOLVER_LAM_A).begin()+nc_,
+              output(QP_SOLVER_LAM_A).begin());
   }
 
   void QPStabilizerInternal::generateNativeCode(std::ostream &file) const {
@@ -124,4 +148,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-

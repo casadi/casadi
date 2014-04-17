@@ -31,12 +31,19 @@
 using namespace std;
 namespace casadi{
 
-  ImplicitFixedStepIntegratorInternal::ImplicitFixedStepIntegratorInternal(const Function& f, const Function& g) : FixedStepIntegratorInternal(f,g){
-    addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
+  ImplicitFixedStepIntegratorInternal::ImplicitFixedStepIntegratorInternal(const Function& f,
+                                                                           const Function& g) :
+      FixedStepIntegratorInternal(f,g)
+  {
+    addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(),
+              "An implicit function solver");
+    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
+              "Options to be passed to the NLP Solver");
   }
 
-  void ImplicitFixedStepIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void ImplicitFixedStepIntegratorInternal::deepCopyMembers(
+    std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     FixedStepIntegratorInternal::deepCopyMembers(already_copied);
     implicit_solver_ = deepcopy(implicit_solver_,already_copied);
     backward_implicit_solver_ = deepcopy(backward_implicit_solver_,already_copied);
@@ -75,7 +82,8 @@ namespace casadi{
 
       // Allocate an NLP solver
       backward_implicit_solver_ = backward_implicit_function_creator(G_,Function(),LinearSolver());
-      backward_implicit_solver_.setOption("name",string(getOption("name")) + "_backward_implicit_solver");
+      backward_implicit_solver_.setOption("name",
+                                          string(getOption("name")) + "_backward_implicit_solver");
       backward_implicit_solver_.setOption("implicit_input",RDAE_RZ);
       backward_implicit_solver_.setOption("implicit_output",RDAE_ALG);
 

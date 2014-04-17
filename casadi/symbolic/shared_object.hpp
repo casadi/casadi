@@ -38,27 +38,34 @@ namespace casadi{
   class SharedObjectNode;
   /// \endcond
 
-  /** \brief SharedObject implements a reference counting framework simular for effient and easily-maintained memory management.
+  /** \brief SharedObject implements a reference counting framework simular for effient and
+      easily-maintained memory management.
 
-      To use the class, both the SharedObject class (the public class), and the SharedObjectNode class (the internal class)
-      must be inherited from. It can be done in two different files and together with memory management, this approach
-      provides a clear destinction of which methods of the class are to be considered "public", i.e. methods for public use
-      that can be considered to remain over time with small changes, and the internal memory.
+      To use the class, both the SharedObject class (the public class), and the SharedObjectNode
+      class (the internal class) must be inherited from. It can be done in two different files
+      and together with memory management, this approach provides a clear destinction of which
+      methods of the class are to be considered "public", i.e. methods for public use that can
+      be considered to remain over time with small changes, and the internal memory.
 
-      When interfacing a software, which typically includes including some header file, this is best done only in the file
-      where the internal class is defined, to avoid polluting the global namespace and other side effects.
+      When interfacing a software, which typically includes including some header file,
+      this is best done only in the file where the internal class is defined, to avoid polluting
+      the global namespace and other side effects.
 
-      The default constructor always means creating a null pointer to an internal class only. To allocate an internal class
-      (this works only when the internal class isn't abstract), use the constructor with arguments.
+      The default constructor always means creating a null pointer to an internal class only.
+      To allocate an internal class (this works only when the internal class isn't abstract),
+      use the constructor with arguments.
 
-      The copy constructor and the assignment operator perform shallow copies only, to make a deep copy you must use the
-      clone method explictly. This will give a shared pointer instance.
+      The copy constructor and the assignment operator perform shallow copies only,
+      to make a deep copy you must use the clone method explictly.
+      This will give a shared pointer instance.
 
-      In an inheritance hierarchy, you can cast down automatically, e.g. (SXFunction is a child class of Function):
+      In an inheritance hierarchy, you can cast down automatically,
+      e.g. (SXFunction is a child class of Function):
       SXFunction derived(...);
       Function base = derived;
 
-      To cast up, use the shared_cast template function, which works analogously to dynamic_cast, static_cast, const_cast etc, e.g.:
+      To cast up, use the shared_cast template function, which works analogously to
+      dynamic_cast, static_cast, const_cast etc, e.g.:
       SXFunction derived(...);
       Function base = derived;
       SXFunction derived_from_base = shared_cast<SXFunction>(base);
@@ -95,7 +102,8 @@ namespace casadi{
     /// Assign the node to a node class pointer (or null)
     void assignNode(SharedObjectNode* node);
 
-    /// Assign the node to a node class pointer without reference counting: inproper use will cause memory leaks!
+    /// Assign the node to a node class pointer without reference counting: inproper
+    // use will cause memory leaks!
     void assignNodeNoCount(SharedObjectNode* node);
 
     /// Get a const pointer to the node
@@ -155,12 +163,14 @@ namespace casadi{
 
     //@{
     /// \cond SWIGINTERNAL
-    /// If there are other references to the object, then make a deep copy of it and point to this new object
+    /// If there are other references to the object, then make a deep copy of it
+    // and point to this new object
     void makeUnique(bool clone_members=true);
     /// \endcond SWIGINTERNAL
     /// \cond INTERNAL
 #ifndef SWIG
-    void makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied, bool clone_members=true);
+    void makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied,
+                    bool clone_members=true);
 #endif
     /// \endcond
     //@}
@@ -258,7 +268,8 @@ namespace casadi{
   /// \endcond
 
   /// \cond INTERNAL
-  /// Typecast a shared object to a base class to a shared object to a derived class, cf. dynamic_cast
+  /// Typecast a shared object to a base class to a shared object to a derived class,
+  // cf. dynamic_cast
   template<class B>
   B shared_cast(SharedObject& A){
 
@@ -278,7 +289,8 @@ namespace casadi{
     return ret;
   }
 
-  /// Typecast a shared object to a base class to a shared object to a derived class, cf. dynamic_cast (const)
+  /// Typecast a shared object to a base class to a shared object to a derived class,
+  // cf. dynamic_cast (const)
   template<class B>
   const B shared_cast(const SharedObject& A){
     SharedObject A_copy = A;
@@ -314,7 +326,8 @@ namespace casadi{
   A getcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied){
     A ret;
     if(!a.isNull()){
-      std::map<SharedObjectNode*,SharedObject>::iterator it = already_copied.find(const_cast<SharedObjectNode*>(a.get()));
+      std::map<SharedObjectNode*,SharedObject>::iterator it =
+          already_copied.find(const_cast<SharedObjectNode*>(a.get()));
       if(it!=already_copied.end()){
         ret.assignNode(it->second.get());
       }
@@ -323,7 +336,8 @@ namespace casadi{
   }
 
   template<class A>
-  std::vector<A> deepcopy(const std::vector<A>& a, std::map<SharedObjectNode*,SharedObject>& already_copied){
+  std::vector<A> deepcopy(const std::vector<A>& a,
+                          std::map<SharedObjectNode*,SharedObject>& already_copied){
     std::vector<A> ret = a;
     for(typename std::vector<A>::iterator it=ret.begin(); it!=ret.end(); ++it){
       it->makeUnique(already_copied);

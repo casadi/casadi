@@ -36,12 +36,18 @@ namespace casadi{
   LinearSolverInternal::LinearSolverInternal(const Sparsity& sparsity, int nrhs){
     // Make sure arguments are consistent
     casadi_assert(!sparsity.isNull());
-    casadi_assert_message(sparsity.size2()==sparsity.size1(),"LinearSolverInternal::init: the matrix must be square but got " << sparsity.dimString());
-    casadi_assert_message(!sparsity.isSingular(),"LinearSolverInternal::init: singularity - the matrix is structurally rank-deficient. sprank(J)=" << rank(sparsity) << " (in stead of "<< sparsity.size2() << ")");
+    casadi_assert_message(sparsity.size2()==sparsity.size1(),
+                          "LinearSolverInternal::init: the matrix must be square but got "
+                          << sparsity.dimString());
+    casadi_assert_message(!sparsity.isSingular(),
+                          "LinearSolverInternal::init: singularity - the matrix is structurally "
+                          "rank-deficient. sprank(J)=" << rank(sparsity)
+                          << " (in stead of "<< sparsity.size2() << ")");
 
     // Calculate the Dulmage-Mendelsohn decomposition
     std::vector<int> coarse_rowblock, coarse_colblock;
-    sparsity.dulmageMendelsohn(rowperm_, colperm_, rowblock_, colblock_, coarse_rowblock, coarse_colblock);
+    sparsity.dulmageMendelsohn(rowperm_, colperm_, rowblock_, colblock_,
+                               coarse_rowblock, coarse_colblock);
 
     // Allocate inputs
     setNumInputs(LINSOL_NUM_IN);
@@ -111,7 +117,10 @@ namespace casadi{
     solve(getPtr(x),nrhs,transpose);
   }
 
-  void LinearSolverInternal::evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given, bool tr){
+  void LinearSolverInternal::evaluateMXGen(const MXPtrV& input, MXPtrV& output,
+                                           const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
+                                           const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                                           bool output_given, bool tr){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
     const MX& B = *input[0];
@@ -210,7 +219,9 @@ namespace casadi{
     }
   }
 
-  void LinearSolverInternal::propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd, bool transpose){
+  void LinearSolverInternal::propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output,
+                                                  std::vector<int>& itmp, std::vector<double>& rtmp,
+                                                  bool fwd, bool transpose){
 
     // Sparsities
     const Sparsity& r_sp = input[0]->sparsity();
@@ -361,7 +372,8 @@ namespace casadi{
   }
 
   void LinearSolverInternal::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr){
-    casadi_error("LinearSolverInternal::evaluateSXGen not defined for class " << typeid(*this).name());
+    casadi_error("LinearSolverInternal::evaluateSXGen not defined for class "
+                 << typeid(*this).name());
   }
 
   MX LinearSolverInternal::solve(const MX& A, const MX& B, bool transpose){

@@ -42,7 +42,9 @@ class CASADI_SYMBOLIC_EXPORT CustomFunctionInternal : public FunctionInternal{
   public:
 
     /** \brief  Create a function */
-    explicit CustomFunctionInternal(const CustomEvaluate &c_fcn, const std::vector<casadi::Sparsity> &inputscheme, const std::vector<casadi::Sparsity> &outputscheme);
+    explicit CustomFunctionInternal(const CustomEvaluate &c_fcn,
+                                    const std::vector<casadi::Sparsity> &inputscheme,
+                                    const std::vector<casadi::Sparsity> &outputscheme);
 
     /** \brief  Destructor */
     virtual ~CustomFunctionInternal();

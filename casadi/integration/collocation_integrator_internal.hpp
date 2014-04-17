@@ -32,7 +32,8 @@
 /// \cond INTERNAL
 namespace casadi{
 
-  class CASADI_INTEGRATION_EXPORT CollocationIntegratorInternal : public ImplicitFixedStepIntegratorInternal{
+  class CASADI_INTEGRATION_EXPORT CollocationIntegratorInternal :
+        public ImplicitFixedStepIntegratorInternal{
   public:
 
     /// Constructor
@@ -42,10 +43,12 @@ namespace casadi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /// Clone
-    virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
+    virtual CollocationIntegratorInternal* clone() const
+    { return new CollocationIntegratorInternal(*this);}
 
     /// Create a new integrator
-    virtual CollocationIntegratorInternal* create(const Function& f, const Function& g) const{ return new CollocationIntegratorInternal(f,g);}
+    virtual CollocationIntegratorInternal* create(const Function& f, const Function& g) const
+    { return new CollocationIntegratorInternal(f,g);}
 
     /// Destructor
     virtual ~CollocationIntegratorInternal();

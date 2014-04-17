@@ -45,7 +45,8 @@ namespace casadi{
     //@{
     /// Access input argument
     inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind);}
-    inline const Matrix<double>& input(const std::string &iname) const{  return input(inputSchemeEntry(iname)); }
+    inline const Matrix<double>& input(const std::string &iname) const
+    { return input(inputSchemeEntry(iname)); }
 #ifdef SWIG
     %rename(inputRef) input;
 #endif
@@ -58,26 +59,32 @@ namespace casadi{
     //@{
     /// Access output argument
     inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind);}
-    inline const Matrix<double>& output(const std::string &oname) const{ return output(outputSchemeEntry(oname));}
+    inline const Matrix<double>& output(const std::string &oname) const
+    { return output(outputSchemeEntry(oname));}
 #ifdef SWIG
     %rename(outputRef) output;
 #endif
     inline Matrix<double>& output(int oind=0){ return outputS<true>(oind);}
-    inline Matrix<double>& output(const std::string &oname){ return output(outputSchemeEntry(oname));}
+    inline Matrix<double>& output(const std::string &oname)
+    { return output(outputSchemeEntry(oname));}
     //@}
     /// \endcond
 
     /// Get the number of function inputs
-    inline int getNumInputs() const{ return static_cast<const Derived*>(this)->input_struct().data.size();}
+    inline int getNumInputs() const
+    { return static_cast<const Derived*>(this)->input_struct().data.size();}
 
     /// Get the number of function outputs
-    inline int getNumOutputs() const{ return static_cast<const Derived*>(this)->output_struct().data.size();}
+    inline int getNumOutputs() const
+    { return static_cast<const Derived*>(this)->output_struct().data.size();}
 
     /// Set the number of function inputs
-    inline void setNumInputs(int num_in){ static_cast<Derived*>(this)->input_struct().data.resize(num_in); }
+    inline void setNumInputs(int num_in)
+    { static_cast<Derived*>(this)->input_struct().data.resize(num_in); }
 
     /// Set the number of function outputs
-    inline void setNumOutputs(int num_out){ static_cast<Derived*>(this)->output_struct().data.resize(num_out); }
+    inline void setNumOutputs(int num_out)
+    { static_cast<Derived*>(this)->output_struct().data.resize(num_out); }
 
     /// \cond INTERNAL
 
@@ -89,8 +96,10 @@ namespace casadi{
           return static_cast<Derived*>(this)->input_struct().data.at(i);
         } catch(std::out_of_range&){
           std::stringstream ss;
-          ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
-          if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl << "Did you forget to initialize?";
+          ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
+             << ": input " << i << " not in interval [0," << getNumInputs() << ")";
+          if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl
+                                                               << "Did you forget to initialize?";
           throw CasadiException(ss.str());
         }
       } else {
@@ -112,8 +121,10 @@ namespace casadi{
           return static_cast<Derived*>(this)->output_struct().data.at(i);
         } catch(std::out_of_range&){
           std::stringstream ss;
-          ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
-          if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl << "Did you forget to initialize?";
+          ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
+             << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
+          if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl
+                                                               << "Did you forget to initialize?";
           throw CasadiException(ss.str());
         }
       } else {
@@ -142,33 +153,49 @@ namespace casadi{
     }
 
     /** \brief Get input scheme */
-    casadi::IOScheme getInputScheme() const{ return static_cast<const Derived*>(this)->inputScheme(); }
+    casadi::IOScheme getInputScheme() const
+    { return static_cast<const Derived*>(this)->inputScheme(); }
 
     /** \brief Get output scheme */
-    casadi::IOScheme getOutputScheme() const{ return static_cast<const Derived*>(this)->outputScheme(); }
+    casadi::IOScheme getOutputScheme() const
+    { return static_cast<const Derived*>(this)->outputScheme(); }
 
     /// \cond INTERNAL
     /** \brief Find the index for a string describing a particular entry of an input scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * SCHEME_NLPINput
      */
-    int inputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->inputScheme(),name,true);}
+    int inputSchemeEntry(const std::string &name) const
+    { return schemeEntry(static_cast<const Derived*>(this)->inputScheme(),name,true);}
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * SCHEME_NLPINput
      */
-    int outputSchemeEntry(const std::string &name) const{ return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name,false);}
+    int outputSchemeEntry(const std::string &name) const
+    { return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name,false);}
 
     /** \brief Find the index for a string describing a particular entry of a scheme
      *
-     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to SCHEME_NLPINput
+     * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
+     * SCHEME_NLPINput
      */
     int schemeEntry(const casadi::IOScheme &scheme,const std::string &name,bool input) const{
-      if (scheme.isNull()) casadi_error("Unable to look up '" <<  name<< "' in " << (input? "input": "output") << "scheme, as the " <<  (input? "input": "output") << " scheme of this function is unknown. You can only index with integers.");
-      if (name=="") casadi_error("FunctionInternal::schemeEntry: you supplied an empty string as the name of a entry in " << scheme.name() << ". Available names are: " << scheme.entryNames() << ".");
+      if (scheme.isNull()) casadi_error("Unable to look up '" <<  name<< "' in "
+                                        << (input? "input": "output") << "scheme, as the "
+                                        <<  (input? "input": "output")
+                                        << " scheme of this function is unknown. "
+                                        "You can only index with integers.");
+      if (name=="") casadi_error("FunctionInternal::schemeEntry: you supplied an empty "
+                                 "string as the name of a entry in "
+                                 << scheme.name() << ". Available names are: "
+                                 << scheme.entryNames() << ".");
       int n = scheme.index(name);
-      if (n==-1) casadi_error("FunctionInternal::schemeEntry: could not find entry '" << name << "' in " << scheme.name() << ". Available names are: " << scheme.entryNames() << ".");
+      if (n==-1) casadi_error("FunctionInternal::schemeEntry: could not find entry '"
+                              << name << "' in " << scheme.name() << ". Available names are: "
+                              << scheme.entryNames() << ".");
       return n;
     }
     /// \endcond
@@ -306,11 +333,15 @@ namespace casadi{
 /// \endcond
 
 
-#define SETTERS(T)                                                        \
-    void setInput(T val, int iind=0)             { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
-    void setOutput(T val, int oind=0)            { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
-    void setInput(T val, const std::string &iname)             { setInput(val,inputSchemeEntry(iname));  } \
-    void setOutput(T val, const std::string &oname)            { setOutput(val,outputSchemeEntry(oname)); } \
+#define SETTERS(T)                                                              \
+    void setInput(T val, int iind=0)                                            \
+    { static_cast<const Derived*>(this)->assertInit(); input(iind).set(val);  } \
+    void setOutput(T val, int oind=0)                                           \
+    { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
+    void setInput(T val, const std::string &iname)                              \
+    { setInput(val,inputSchemeEntry(iname));  }                                 \
+    void setOutput(T val, const std::string &oname)                             \
+    { setOutput(val,outputSchemeEntry(oname)); }                                \
 
 #ifndef DOXYGENPROC
     SETTERS(double) // NOLINT(readability/casting) - false positive
@@ -323,11 +354,15 @@ namespace casadi{
 
 #undef SETTERS
 
-#define GETTERS(T)                                                        \
-    void getInput(T val, int iind=0) const             { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);} \
-    void getOutput(T val, int oind=0) const            { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
-    void getInput(T val, const std::string &iname) const             { getInput(val,inputSchemeEntry(iname)); } \
-    void getOutput(T val, const std::string &oname) const            { getOutput(val,outputSchemeEntry(oname)); } \
+#define GETTERS(T)                                                             \
+    void getInput(T val, int iind=0) const                                     \
+    { static_cast<const Derived*>(this)->assertInit(); input(iind).get(val);}  \
+    void getOutput(T val, int oind=0) const                                    \
+    { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
+    void getInput(T val, const std::string &iname) const                       \
+    { getInput(val,inputSchemeEntry(iname)); }                                 \
+    void getOutput(T val, const std::string &oname) const                      \
+    { getOutput(val,outputSchemeEntry(oname)); }                               \
 
 #ifndef DOXYGENPROC
 #ifndef SWIG

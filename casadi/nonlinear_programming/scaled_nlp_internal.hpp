@@ -61,4 +61,3 @@ public:
 } // namespace casadi
 /// \endcond
 #endif //NLP_QP_INTERNAL_HPP
-

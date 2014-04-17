@@ -75,9 +75,9 @@ namespace casadi{
       3. Modify/add variables, equations, optimization <BR>
       > ...
 
-      When the optimal control problem is in a suitable form, it is possible to either generate functions
-      for numeric/symbolic evaluation or exporting the OCP formulation into a new FMI conformant XML file.
-      The latter functionality is not yet available.
+      When the optimal control problem is in a suitable form, it is possible to either
+      generate functions for numeric/symbolic evaluation or exporting the OCP formulation
+      into a new FMI conformant XML file. The latter functionality is not yet available.
 
       \date 2012
       \author Joel Andersson
@@ -95,7 +95,8 @@ namespace casadi{
     /** \brief Independent variable (usually time) */
     SX t;
 
-    /** \brief Differential-algebraic equation (DAE) with corresponding state vector and initial conditions
+    /** \brief Differential-algebraic equation (DAE) with corresponding state vector and initial
+     * conditions
      * DAE in fully-implicit form and corresponding states and algebraic variables.
      * dae and s have matching dimensions and 0 == dae(der(s),s,...) implicitly defines der(s).
      * At t==0, 0 == initial(der(s),s,...) holds in addition to the dae.
@@ -125,26 +126,28 @@ namespace casadi{
     SX y;
 
     /** \brief Free controls
-     * The trajectories of the free controls are decision variables of the optimal control problem. They are chosen by
-     * the optimization algorithm in order to minimize the cost functional.
+     * The trajectories of the free controls are decision variables of the optimal control problem.
+     * They are chosen by the optimization algorithm in order to minimize the cost functional.
      */
     SX u;
 
     /** \brief Free parameters
-     * A free parameter is variables which is constant over time, but whose value is chosen by the optimization algorithm
-     * in order to minimize the cost functional.
+     * A free parameter is variables which is constant over time, but whose value is chosen by the
+     * optimization algorithm in order to minimize the cost functional.
      */
     SX p;
 
     /** \brief Independent parameters
-     * An independent parameter is a parameter whose value is determined by an expression that contains only literals.
+     * An independent parameter is a parameter whose value is determined by an expression that
+     * contains only literals.
      * An independent parameter is fixed after the DAE has been initialized.
      * The definitions can be retrieved by calling the method "beq" with pi as argument.
      */
     SX pi;
 
     /** \brief Dependent parameters and corresponding definitions
-     * A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters.
+     * A dependent parameter is a parameter whose value is determined by an expression which
+     * contains references to other parameters.
      * A dependent parameter is fixed after the DAE has been initialized.
      * Interdependencies are allowed but must be non-cyclic.
      * The definitions can be retrieved by calling the method "beq" with pd as argument.
@@ -152,13 +155,15 @@ namespace casadi{
     SX pd;
 
     /** \brief Independent constant
-     * An independent constant is a constant whose value is determined by an expression that contains only literals.
+     * An independent constant is a constant whose value is determined by an expression that
+     * contains only literals.
      * The definitions can be retrieved by calling the method "beq" with ci as argument.
      */
     SX ci;
 
     /** \brief Dependent constants and correspinding definitions
-     * A dependent constant is a constant whose value is determined by an expression which contains references to other constants.
+     * A dependent constant is a constant whose value is determined by an expression which
+     * contains references to other constants.
      * Interdependencies are allowed but must be non-cyclic.
      * The definitions can be retrieved by calling the method "beq" with cd as argument.
     */
@@ -271,7 +276,8 @@ namespace casadi{
     void sortALG();
 
     /// Generate a MUSCOD-II compatible DAT file
-    void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
+    void generateMuscodDatFile(const std::string& filename,
+                               const Dictionary& mc2_ops=Dictionary()) const;
 
     //@}
 
@@ -302,10 +308,12 @@ namespace casadi{
     /// Set an binding expression by non-differentiated expression
     void setBeq(const SX& var, const SX& val);
 
-    /// Get a derivative binding equation (i.e. ordinary differential equation, ODE) by name. Returns variable expression if unknwon.
+    /// Get a derivative binding equation (i.e. ordinary differential equation, ODE) by name.
+    // Returns variable expression if unknwon.
     SX ode(const std::string& name) const;
 
-    /// Get a derivative binding expression (i.e. ordinary differential equation, ODE) by non-differentiated expression. Returns derivative expression if unknown.
+    /// Get a derivative binding expression (i.e. ordinary differential equation, ODE)
+    // by non-differentiated expression. Returns derivative expression if unknown.
     SX ode(const SX& var) const;
 
     /// Set a derivative binding equation by name

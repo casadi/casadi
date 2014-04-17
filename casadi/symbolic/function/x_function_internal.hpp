@@ -47,7 +47,8 @@
 
 namespace casadi{
 
-  /** \brief  Internal node class for the base class of SXFunctionInternal and MXFunctionInternal (lacks a public counterpart)
+  /** \brief  Internal node class for the base class of SXFunctionInternal and MXFunctionInternal
+      (lacks a public counterpart)
       The design of the class uses the curiously recurring template pattern (CRTP) idiom
       \author Joel Andersson
       \date 2011
@@ -65,10 +66,12 @@ namespace casadi{
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
 
-    /** \brief  Topological (re)sorting of the nodes based on Breadth-First Search (BFS) (Kahn 1962) */
+    /** \brief  Topological (re)sorting of the nodes based on Breadth-First Search (BFS)
+        (Kahn 1962) */
     static void resort_breadth_first(std::vector<NodeType*>& algnodes);
 
-    /** \brief  Topological (re)sorting of the nodes with the purpose of postponing every calculation as much as possible, as long as it does not influence a dependent node */
+    /** \brief  Topological (re)sorting of the nodes with the purpose of postponing every
+        calculation as much as possible, as long as it does not influence a dependent node */
     static void resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind);
 
     /** \brief Gradient via source code transformation */
@@ -78,7 +81,8 @@ namespace casadi{
     MatType tang(int iind=0, int oind=0);
 
     /** \brief  Construct a complete Jacobian by compression */
-    MatType jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false, bool always_inline=true, bool never_inline=false);
+    MatType jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false,
+                bool always_inline=true, bool never_inline=false);
 
     /** \brief Return gradient function  */
     virtual Function getGradient(int iind, int oind);
@@ -89,10 +93,12 @@ namespace casadi{
     /** \brief Return Jacobian function  */
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
 
-    /** \brief Generate a function that calculates nfdir forward derivatives and nadir adjoint derivatives */
+    /** \brief Generate a function that calculates nfdir forward
+     * derivatives and nadir adjoint derivatives */
     virtual Function getDerivative(int nfdir, int nadir);
 
-    /** \brief Constructs and returns a function that calculates forward derivatives by creating the Jacobian then multiplying */
+    /** \brief Constructs and returns a function that calculates forward derivatives by
+     * creating the Jacobian then multiplying */
     //virtual Function getDerivativeViaJac(int nfdir, int nadir);
 
     /** \brief Symbolic expressions for the forward seeds */
@@ -102,10 +108,12 @@ namespace casadi{
     std::vector<std::vector<MatType> > symbolicAdjSeed(int nadir);
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const = 0;
+    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
+                                      CodeGenerator& gen) const = 0;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const = 0;
+    virtual void generateBody(std::ostream &stream, const std::string& type,
+                              CodeGenerator& gen) const = 0;
 
     // Data members (all public)
 
@@ -117,7 +125,8 @@ namespace casadi{
 
     /** \brief purge seeds from all-zeros
     *
-    * If all seeds in one direction are zero, the corresponding sensitivities are set to zero and the direction is removed
+    * If all seeds in one direction are zero, the corresponding sensitivities are set to zero
+    * and the direction is removed
     * \param[in] seed -- original seeds
     * \param[in] sens -- original sens
     * \param[in] forward -- boolean indicating if we are using forward mode
@@ -125,7 +134,10 @@ namespace casadi{
     * \param[out] sens_purged -- filled up with corresponding sens directions
     *
     */
-    void purgeSeeds(const std::vector<std::vector<MatType*> >& seed, const std::vector<std::vector<MatType*> >& sens,std::vector<std::vector<MatType*> >& seed_purged, std::vector<std::vector<MatType*> >& sens_purged, bool forward);
+    void purgeSeeds(const std::vector<std::vector<MatType*> >& seed,
+                    const std::vector<std::vector<MatType*> >& sens,
+                    std::vector<std::vector<MatType*> >& seed_purged,
+                    std::vector<std::vector<MatType*> >& sens_purged, bool forward);
 
   };
 
@@ -134,8 +146,11 @@ namespace casadi{
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::XFunctionInternal(
-                                                                                const std::vector<MatType>& inputv, const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv){
-    addOption("topological_sorting",OT_STRING,"depth-first","Topological sorting algorithm","depth-first|breadth-first");
+      const std::vector<MatType>& inputv,
+      const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv)
+  {
+    addOption("topological_sorting",OT_STRING,"depth-first","Topological sorting algorithm",
+              "depth-first|breadth-first");
     addOption("live_variables",OT_BOOLEAN,true,"Reuse variables in the work vector");
 
     // Make sure that inputs are symbolic
@@ -143,7 +158,8 @@ namespace casadi{
       if (inputv[i].isEmpty()) {
         // That's okay
       } else if(!inputv[i].isSymbolicSparse()){
-        casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
+        casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be"
+                     " purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
       }
     }
 
@@ -160,8 +176,9 @@ namespace casadi{
 
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes){
-
+  void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::sort_depth_first(
+    std::stack<NodeType*>& s, std::vector<NodeType*>& nodes)
+  {
     while(!s.empty()){
 
       // Get the topmost element
@@ -188,7 +205,8 @@ namespace casadi{
         // If there is any dependency which has not yet been added
         if(dep_with_max_deps>=0){
 
-          // Add to the stack the dependency with the most number of dependencies (so that constants, inputs etc are added last)
+          // Add to the stack the dependency with the most number of dependencies
+          // (so that constants, inputs etc are added last)
           s.push(static_cast<NodeType*>(t->dep(dep_with_max_deps).get()));
 
         } else {
@@ -210,8 +228,9 @@ namespace casadi{
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind){
-
+  void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::resort_postpone(
+    std::vector<NodeType*>& algnodes, std::vector<int>& lind)
+  {
     // Number of levels
     int nlevels = lind.size()-1;
 
@@ -314,8 +333,9 @@ namespace casadi{
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::resort_breadth_first(std::vector<NodeType*>& algnodes){
-
+  void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::resort_breadth_first(
+      std::vector<NodeType*>& algnodes)
+  {
     // We shall assign a "level" to each element of the algorithm.
     // A node which does not depend on other binary nodes are assigned
     // level 0 and for nodes that depend on other nodes of the algorithm,
@@ -503,10 +523,12 @@ namespace casadi{
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::grad(int iind, int oind){
-    casadi_assert_message(output(oind).isScalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
+    casadi_assert_message(output(oind).isScalar(),
+                          "Only gradients of scalar functions allowed. Use jacobian instead.");
 
     // Quick return if trivially empty
-    if(input(iind).size()==0 || output(oind).size()==0 || jacSparsity(iind,oind,true,false).size()==0){
+    if(input(iind).size()==0 || output(oind).size()==0 ||
+       jacSparsity(iind,oind,true,false).size()==0){
       return MatType::sparse(input(iind).shape());
     }
 
@@ -542,7 +564,8 @@ namespace casadi{
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
   MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::tang(int iind, int oind){
-    casadi_assert_message(input(iind).isScalar(),"Only tangent of scalar input functions allowed. Use jacobian instead.");
+    casadi_assert_message(input(iind).isScalar(),
+                          "Only tangent of scalar input functions allowed. Use jacobian instead.");
 
     // Forward seeds
     typename std::vector<std::vector<MatType> > fseed(1,std::vector<MatType>(inputv_.size()));
@@ -568,7 +591,11 @@ namespace casadi{
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
+  MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind, int oind,
+                                                                          bool compact,
+                                                                          bool symmetric,
+                                                                          bool always_inline,
+                                                                          bool never_inline){
     using namespace std;
     if(verbose()) std::cout << "XFunctionInternal::jac begin" << std::endl;
 
@@ -654,7 +681,9 @@ namespace casadi{
     int nsweep_adj = nadir/max_nadir;   // Number of sweeps needed for the adjoint mode
     if(nadir%max_nadir>0) nsweep_adj++;
     int nsweep = std::max(nsweep_fwd,nsweep_adj);
-    if(verbose())   std::cout << "XFunctionInternal::jac " << nsweep << " sweeps needed for " << nfdir << " forward and " << nadir << " adjoint directions"  << std::endl;
+    if(verbose())   std::cout << "XFunctionInternal::jac " << nsweep << " sweeps needed for "
+                              << nfdir << " forward and " << nadir << " adjoint directions"
+                              << std::endl;
 
     // Sparsity of the seeds
     vector<int> seed_col, seed_row;
@@ -880,7 +909,8 @@ namespace casadi{
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getGradient(int iind, int oind){
+  Function XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getGradient(int iind,
+                                                                                   int oind){
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -892,7 +922,8 @@ namespace casadi{
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getTangent(int iind, int oind){
+  Function XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getTangent(int iind,
+                                                                                  int oind){
     // Create expressions for the gradient
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -904,7 +935,10 @@ namespace casadi{
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getJacobian(int iind, int oind, bool compact, bool symmetric){
+  Function XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getJacobian(int iind,
+                                                                                   int oind,
+                                                                                   bool compact,
+                                                                                   bool symmetric) {
     // Return function expression
     std::vector<MatType> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -916,12 +950,15 @@ namespace casadi{
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  std::vector<std::vector<MatType> > XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::symbolicFwdSeed(int nfdir){
+  std::vector<std::vector<MatType> >
+    XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::symbolicFwdSeed(int nfdir){
     std::vector<std::vector<MatType> > fseed(nfdir,inputv_);
     for(int dir=0; dir<nfdir; ++dir){
       // Replace symbolic inputs
       int iind=0;
-      for(typename std::vector<MatType>::iterator i=fseed[dir].begin(); i!=fseed[dir].end(); ++i, ++iind){
+      for(typename std::vector<MatType>::iterator i=fseed[dir].begin();
+          i!=fseed[dir].end();
+          ++i, ++iind){
         // Name of the forward seed
         std::stringstream ss;
         ss << "f";
@@ -938,12 +975,16 @@ namespace casadi{
   }
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  std::vector<std::vector<MatType> > XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::symbolicAdjSeed(int nadir){
+  std::vector<std::vector<MatType> >
+    XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::symbolicAdjSeed(int nadir)
+  {
     std::vector<std::vector<MatType> > aseed(nadir,outputv_);
     for(int dir=0; dir<nadir; ++dir){
       // Replace symbolic inputs
       int oind=0;
-      for(typename std::vector<MatType>::iterator i=aseed[dir].begin(); i!=aseed[dir].end(); ++i, ++oind){
+      for(typename std::vector<MatType>::iterator i=aseed[dir].begin();
+          i!=aseed[dir].end();
+          ++i, ++oind){
         // Name of the adjoint seed
         std::stringstream ss;
         ss << "a";
@@ -960,8 +1001,8 @@ namespace casadi{
 
 
   template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-  Function XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getDerivative(int nfdir, int nadir){
-
+  Function XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getDerivative(int nfdir,
+                                                                                     int nadir) {
     // Seeds
     std::vector<std::vector<MatType> > fseed = symbolicFwdSeed(nfdir);
     std::vector<std::vector<MatType> > aseed = symbolicAdjSeed(nadir);

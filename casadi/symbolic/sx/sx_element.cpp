@@ -69,7 +69,8 @@ namespace casadi{
       node->count++;
     } else {
       if(isnan(val))              node = casadi_limits<SXElement>::nan.node;
-      else if(isinf(val))         node = val > 0 ? casadi_limits<SXElement>::inf.node : casadi_limits<SXElement>::minus_inf.node;
+      else if(isinf(val))         node = val > 0 ? casadi_limits<SXElement>::inf.node :
+                                      casadi_limits<SXElement>::minus_inf.node;
       else                        node = RealtypeSX::create(val);
       node->count++;
     }
@@ -172,7 +173,8 @@ namespace casadi{
 
   template<>
   bool Matrix<SXElement>::__nonzero__() const {
-    if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you provided a shape" << dimString());}
+    if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you "
+                                  "provided a shape" << dimString());}
     return at(0).__nonzero__();
   }
 
@@ -257,13 +259,16 @@ namespace casadi{
       return (*this)/y.inv();
     else if(hasDep() && getOp()==OP_INV)
       return y/inv();
-    else if(isConstant() && y.hasDep() && y.getOp()==OP_MUL && y.getDep(0).isConstant() && getValue()*y.getDep(0).getValue()==1) // 5*(0.2*x) = x
+    else if(isConstant() && y.hasDep() && y.getOp()==OP_MUL && y.getDep(0).isConstant() &&
+            getValue()*y.getDep(0).getValue()==1) // 5*(0.2*x) = x
       return y.getDep(1);
-    else if(isConstant() && y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isConstant() && getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
+    else if(isConstant() && y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isConstant() &&
+            getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
       return y.getDep(0);
     else if(hasDep() && getOp()==OP_DIV && getDep(1).isEqual(y,SXNode::eq_depth_)) // ((2/x)*x)
       return getDep(0);
-    else if(y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isEqual(*this,SXNode::eq_depth_)) // ((2/x)*x)
+    else if(y.hasDep() && y.getOp()==OP_DIV &&
+            y.getDep(1).isEqual(*this,SXNode::eq_depth_)) // ((2/x)*x)
       return y.getDep(0);
     else     // create a new branch
       return BinarySX::create(OP_MUL,*this,y);
@@ -301,15 +306,20 @@ namespace casadi{
       return (*this)*y.inv();
     else if(isDoubled() && y.isDoubled())
       return node->dep(0) / y->dep(0);
-    else if(y.isConstant() && hasDep() && getOp()==OP_DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2
+    else if(y.isConstant() && hasDep() && getOp()==OP_DIV && getDep(1).isConstant() &&
+            y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2
       return getDep(0);
-    else if(y.hasDep() && y.getOp()==OP_MUL && y.getDep(1).isEqual(*this,SXNode::eq_depth_)) // x/(2*x) = 1/2
+    else if(y.hasDep() && y.getOp()==OP_MUL &&
+            y.getDep(1).isEqual(*this,SXNode::eq_depth_)) // x/(2*x) = 1/2
       return BinarySX::create(OP_DIV,1,y.getDep(0));
-    else if(hasDep() && getOp()==OP_NEG && getDep(0).isEqual(y,SXNode::eq_depth_))      // (-x)/x = -1
+    else if(hasDep() && getOp()==OP_NEG &&
+            getDep(0).isEqual(y,SXNode::eq_depth_))      // (-x)/x = -1
       return -1;
-    else if(y.hasDep() && y.getOp()==OP_NEG && y.getDep(0).isEqual(*this,SXNode::eq_depth_))      // x/(-x) = 1
+    else if(y.hasDep() && y.getOp()==OP_NEG &&
+            y.getDep(0).isEqual(*this,SXNode::eq_depth_))      // x/(-x) = 1
       return -1;
-    else if(y.hasDep() && y.getOp()==OP_NEG && hasDep() && getOp()==OP_NEG && getDep(0).isEqual(y.getDep(0),SXNode::eq_depth_))      // (-x)/(-x) = 1
+    else if(y.hasDep() && y.getOp()==OP_NEG && hasDep() &&
+            getOp()==OP_NEG && getDep(0).isEqual(y.getDep(0),SXNode::eq_depth_))  // (-x)/(-x) = 1
       return 1;
     else if(isOp(OP_DIV) && y.isEqual(node->dep(0),SXNode::eq_depth_))
       return node->dep(1).inv();
@@ -513,10 +523,14 @@ namespace casadi{
     return (long) node;
   }
 
-  const SXElement casadi_limits<SXElement>::zero(new ZeroSX(),false); // node corresponding to a constant 0
-  const SXElement casadi_limits<SXElement>::one(new OneSX(),false); // node corresponding to a constant 1
-  const SXElement casadi_limits<SXElement>::two(IntegerSX::create(2),false); // node corresponding to a constant 2
-  const SXElement casadi_limits<SXElement>::minus_one(new MinusOneSX(),false); // node corresponding to a constant -1
+  // node corresponding to a constant 0
+  const SXElement casadi_limits<SXElement>::zero(new ZeroSX(),false);
+  // node corresponding to a constant 1
+  const SXElement casadi_limits<SXElement>::one(new OneSX(),false);
+  // node corresponding to a constant 2
+  const SXElement casadi_limits<SXElement>::two(IntegerSX::create(2),false);
+  // node corresponding to a constant -1
+  const SXElement casadi_limits<SXElement>::minus_one(new MinusOneSX(),false);
   const SXElement casadi_limits<SXElement>::nan(new NanSX(),false);
   const SXElement casadi_limits<SXElement>::inf(new InfSX(),false);
   const SXElement casadi_limits<SXElement>::minus_inf(new MinusInfSX(),false);

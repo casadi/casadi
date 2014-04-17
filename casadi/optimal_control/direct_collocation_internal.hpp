@@ -38,7 +38,8 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolver
 
   public:
     // Constructor
-    DirectCollocationInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn);
+    DirectCollocationInternal(const Function& ffcn, const Function& mfcn,
+                              const Function& cfcn, const Function& rfcn);
 
     // clone
     virtual DirectCollocationInternal* clone() const{ return new DirectCollocationInternal(*this);}

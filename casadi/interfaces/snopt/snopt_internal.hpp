@@ -75,7 +75,9 @@ namespace casadi{
     std::vector<int> snopt_iw_;
     std::vector<double> snopt_rw_;
 
-    void userfun(int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac, double* x, double* fObj, double*gObj, double* fCon, double* gCon, int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru);
+    void userfun(int* mode, int nnObj, int nnCon, int nnJac, int nnL, int neJac,
+                 double* x, double* fObj, double*gObj, double* fCon, double* gCon,
+                 int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru);
 
     int nnJac_;
     int nnObj_;
@@ -111,7 +113,10 @@ namespace casadi{
     int m_;
     int iObj_;
 
-    static void userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac, double *x, double *fObj, double *gObj, double * fCon, double* gCon, int* nState, char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru);
+    static void userfunPtr(int * mode, int* nnObj, int * nnCon, int *nJac, int *nnL, int * neJac,
+                           double *x, double *fObj, double *gObj, double * fCon, double* gCon,
+                           int* nState, char* cu, int* lencu, int* iu, int* leniu,
+                           double* ru, int *lenru);
 
     typedef std::map< std::string, std::pair< opt_type, std::string> > OptionsMap;
 

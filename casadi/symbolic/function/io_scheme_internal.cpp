@@ -66,7 +66,9 @@ namespace casadi{
       stream << "builtinIO(" << name() << ")";
     }
 
-    IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions) : entries_(entries), descriptions_(descriptions)  {
+    IOSchemeCustomInternal::IOSchemeCustomInternal(const std::vector<std::string> &entries,
+                                                   const std::vector<std::string> &descriptions) :
+        entries_(entries), descriptions_(descriptions)  {
       for (int i=0;i<entries.size();++i) {
         entrymap_[entries[i]] = i;
       }
@@ -88,7 +90,9 @@ namespace casadi{
     }
 
     std::string IOSchemeCustomInternal::entry(int i) const {
-      casadi_assert_message(i>=0 && i<entries_.size(),"customIO::entry(): requesting entry for index " << i << ", but IOScheme is only length " << entries_.size());
+      casadi_assert_message(i>=0 && i<entries_.size(),
+                            "customIO::entry(): requesting entry for index " << i
+                            << ", but IOScheme is only length " << entries_.size());
       return entries_[i];
     }
 
@@ -108,7 +112,8 @@ namespace casadi{
 
     int IOSchemeCustomInternal::index(const std::string &name) const {
       std::map<std::string, int>::const_iterator it = entrymap_.find(name);
-      casadi_assert_message(it!=entrymap_.end(),"customIO::index(): entry '" << name << "' not available. Available entries are " << entryNames());
+      casadi_assert_message(it!=entrymap_.end(),"customIO::index(): entry '" << name
+                            << "' not available. Available entries are " << entryNames());
       return it->second;
     }
 
@@ -125,5 +130,3 @@ namespace casadi{
     }
 
 } // namespace casadi
-
-

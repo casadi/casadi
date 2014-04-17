@@ -53,7 +53,8 @@ namespace casadi{
     }
   }
 
-  void UnaryMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void UnaryMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                          std::vector<int>& itmp, std::vector<double>& rtmp){
     double nan = numeric_limits<double>::quiet_NaN();
     vector<double> &outputd = output[0]->data();
     const vector<double> &inputd = input[0]->data();
@@ -63,7 +64,8 @@ namespace casadi{
     }
   }
 
-  void UnaryMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void UnaryMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                           std::vector<SXElement>& rtmp){
     // Do the operation on all non-zero elements
     const vector<SXElement> &xd = input[0]->data();
     vector<SXElement> &od = output[0]->data();
@@ -73,7 +75,9 @@ namespace casadi{
     }
   }
 
-  void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                           bool output_given){
     // Evaluate function
     MX f, dummy; // Function value, dummy second argument
     if(output_given){
@@ -127,7 +131,8 @@ namespace casadi{
     }
   }
 
-  void UnaryMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void UnaryMX::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                  const std::vector<std::string>& res, CodeGenerator& gen) const{
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
     stream << res.at(0) << "[i]=";
     casadi_math<double>::printPre(op_,stream);
@@ -188,7 +193,8 @@ namespace casadi{
       break;
     case OP_SQ:
       if(op==OP_ADD && y.getOp()==OP_SQ) /*sum of squares:*/
-        if((dep().getOp()==OP_SIN && y->dep().getOp()==OP_COS) || (dep().getOp()==OP_COS && y->dep()->getOp()==OP_SIN)) /* sin^2(x)+sin^2(y) */
+        if((dep().getOp()==OP_SIN && y->dep().getOp()==OP_COS) ||
+           (dep().getOp()==OP_COS && y->dep()->getOp()==OP_SIN)) /* sin^2(x)+sin^2(y) */
           if(dep()->dep().isEqual(y->dep()->dep(),maxDepth())) /*sin^2(x) + cos^2(x) */
             return MX::ones(y.sparsity());
       break;
@@ -200,4 +206,3 @@ namespace casadi{
   }
 
 } // namespace casadi
-

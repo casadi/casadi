@@ -48,9 +48,16 @@ namespace casadi{
  */
 CASADI_SYMBOLIC_EXPORT double getRealTime( );
 
-enum ProfilingData_Type { ProfilingData_Type_TIMELINE, ProfilingData_Type_SOURCE, ProfilingData_Type_NAME, ProfilingData_Type_ENTRY, ProfilingData_Type_EXIT, ProfilingData_Type_IO };
+enum ProfilingData_Type { ProfilingData_Type_TIMELINE,
+                          ProfilingData_Type_SOURCE,
+                          ProfilingData_Type_NAME,
+                          ProfilingData_Type_ENTRY,
+                          ProfilingData_Type_EXIT,
+                          ProfilingData_Type_IO };
 
-enum ProfilingData_FunctionType { ProfilingData_FunctionType_MXFunction, ProfilingData_FunctionType_SXFunction, ProfilingData_FunctionType_Other };
+enum ProfilingData_FunctionType { ProfilingData_FunctionType_MXFunction,
+                                  ProfilingData_FunctionType_SXFunction,
+                                  ProfilingData_FunctionType_Other };
 
 struct ProfilingHeader {
   ProfilingData_Type type;
@@ -99,17 +106,23 @@ template<typename T>
 ProfilingData_Type ProfilingType();
 
 template<>
-inline ProfilingData_Type ProfilingType<ProfilingData_TIMELINE>() { return ProfilingData_Type_TIMELINE; }
+inline ProfilingData_Type ProfilingType<ProfilingData_TIMELINE>()
+{ return ProfilingData_Type_TIMELINE; }
 template<>
-inline ProfilingData_Type ProfilingType<ProfilingData_SOURCE>() { return ProfilingData_Type_SOURCE; }
+inline ProfilingData_Type ProfilingType<ProfilingData_SOURCE>()
+{ return ProfilingData_Type_SOURCE; }
 template<>
-inline ProfilingData_Type ProfilingType<ProfilingData_NAME>() { return ProfilingData_Type_NAME; }
+inline ProfilingData_Type ProfilingType<ProfilingData_NAME>()
+{ return ProfilingData_Type_NAME; }
 template<>
-inline ProfilingData_Type ProfilingType<ProfilingData_ENTRY>() { return ProfilingData_Type_ENTRY; }
+inline ProfilingData_Type ProfilingType<ProfilingData_ENTRY>()
+{ return ProfilingData_Type_ENTRY; }
 template<>
-inline ProfilingData_Type ProfilingType<ProfilingData_EXIT>() { return ProfilingData_Type_EXIT; }
+inline ProfilingData_Type ProfilingType<ProfilingData_EXIT>()
+{ return ProfilingData_Type_EXIT; }
 template<>
-inline ProfilingData_Type ProfilingType<ProfilingData_IO>() { return ProfilingData_Type_IO; }
+inline ProfilingData_Type ProfilingType<ProfilingData_IO>()
+{ return ProfilingData_Type_IO; }
 
 
 template<typename T>
@@ -133,13 +146,15 @@ long ptrToLong(T *a) {
 }
 
 template<typename T>
-void profileWriteName(std::ofstream &f,T *a,const std::string &name, ProfilingData_FunctionType type, int algorithm_size) {
+void profileWriteName(std::ofstream &f,T *a,const std::string &name,
+                      ProfilingData_FunctionType type, int algorithm_size) {
   ProfilingData_NAME s;
   s.thisp=ptrToLong(a);
   s.length=name.size();
   s.type = type;
   s.algorithm_size = algorithm_size;
-  //std::cout << name << s.thisp << ":" << s.length << ":" << s.type << ":" << s.algorithm_size << "|" << a->getNumInputs() << "," << a->getNumOutputs() << std::endl;
+  //std::cout << name << s.thisp << ":" << s.length << ":" << s.type << ":"
+  //  << s.algorithm_size << "|" << a->getNumInputs() << "," << a->getNumOutputs() << std::endl;
   s.numin = a->getNumInputs();
   s.numout = a->getNumOutputs();
   profileWrite(f,s);
@@ -187,7 +202,8 @@ void profileWriteTime(std::ofstream &f,T *a,int line_number,double local, double
 
 
 template<typename T, typename T2>
-void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline, int opcode, T2 *dependency) {
+void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline,
+                            int opcode, T2 *dependency) {
   ProfilingData_SOURCE s;
   s.thisp = ptrToLong(a);
   s.line_number = line_number;
@@ -195,19 +211,22 @@ void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::str
   s.opcode = opcode;
   s.dependency = ptrToLong(dependency);
   profileWrite(f,s);
-  //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode << ":" << s.dependency << std::endl;
+  //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode
+  // << ":" << s.dependency << std::endl;
   f << sourceline;
 }
 
 template<typename T>
-void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline, int opcode) {
+void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,
+                            const std::string &sourceline, int opcode) {
   ProfilingData_SOURCE s;
   s.thisp = ptrToLong(a);
   s.line_number = line_number;
   s.length = sourceline.size();
   s.opcode = opcode;
   s.dependency = 0;
-  //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode << ":" << s.dependency << std::endl;
+  //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode
+  // << ":" << s.dependency << std::endl;
   profileWrite(f,s);
   f << sourceline;
 }

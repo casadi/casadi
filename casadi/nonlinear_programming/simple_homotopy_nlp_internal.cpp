@@ -36,13 +36,18 @@
 using namespace std;
 namespace casadi{
 
-  SimpleHomotopyNLPInternal::SimpleHomotopyNLPInternal(const Function& nlp) : HomotopyNLPInternal(nlp){
+  SimpleHomotopyNLPInternal::SimpleHomotopyNLPInternal(const Function& nlp)
+      : HomotopyNLPInternal(nlp)
+  {
+    addOption("nlp_solver",         OT_NLPSOLVER,   GenericType(),
+              "The NLP solver to be used by the Homotopy solver");
+    addOption("nlp_solver_options", OT_DICTIONARY, GenericType(),
+              "Options to be passed to the Homotopy solver");
 
-    addOption("nlp_solver",         OT_NLPSOLVER,   GenericType(),    "The NLP solver to be used by the Homotopy solver");
-    addOption("nlp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the Homotopy solver");
-
-    //addOption("max_step",            OT_REAL,      1.,                "The maximal homotopy step that is allowed");
-    addOption("num_steps",            OT_INTEGER,      10,                "Take this many steps to go from tau=0 to tau=1.");
+    //addOption("max_step",            OT_REAL,      1.,
+    //          "The maximal homotopy step that is allowed");
+    addOption("num_steps",            OT_INTEGER,      10,
+              "Take this many steps to go from tau=0 to tau=1.");
 
   }
 
@@ -96,7 +101,9 @@ namespace casadi{
     nlpsolver_.setInput(input(NLP_SOLVER_LAM_G0),NLP_SOLVER_LAM_G0);
     //nlpsolver_.setInput(input(NLP_SOLVER_LAM_P0),NLP_SOLVER_LAM_P0);
 
-    std::copy(input(NLP_SOLVER_P).begin(),input(NLP_SOLVER_P).end(),nlpsolver_.input(NLP_SOLVER_P).begin());
+    std::copy(input(NLP_SOLVER_P).begin(),
+              input(NLP_SOLVER_P).end(),
+              nlpsolver_.input(NLP_SOLVER_P).begin());
 
     for (int i=0;i<num_steps_;++i) {
       nlpsolver_.input(NLP_SOLVER_P)[np_] = i*1.0/(num_steps_-1);
@@ -115,7 +122,9 @@ namespace casadi{
     setOutput(nlpsolver_.output(NLP_SOLVER_LAM_G),NLP_SOLVER_LAM_G);
 
 
-    std::copy(nlpsolver_.output(NLP_SOLVER_P).begin(),nlpsolver_.output(NLP_SOLVER_P).begin()+np_,output(NLP_SOLVER_LAM_P).begin());
+    std::copy(nlpsolver_.output(NLP_SOLVER_P).begin(),
+              nlpsolver_.output(NLP_SOLVER_P).begin()+np_,
+              output(NLP_SOLVER_LAM_P).begin());
 
 
   }

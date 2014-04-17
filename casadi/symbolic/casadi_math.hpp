@@ -114,7 +114,8 @@ struct casadi_math{
   static inline int ndeps(unsigned char op);
 
   /** \brief Print */
-  static inline void print(unsigned char op, std::ostream &stream, const std::string& x, const std::string& y);
+  static inline void print(unsigned char op, std::ostream &stream, const std::string& x,
+                           const std::string& y);
   static inline void printPre(unsigned char op, std::ostream &stream);
   static inline void printSep(unsigned char op, std::ostream &stream);
   static inline void printPost(unsigned char op, std::ostream &stream);
@@ -158,7 +159,8 @@ struct casadi_math<int>{
   /** \brief Evaluate a built in derivative function */
   static inline void der(unsigned char op, const int& x, const int& y, const int& f, int* d){
     double d_real[2] = {static_cast<double>(d[0]),static_cast<double>(d[1])};
-    casadi_math<double>::der(op,static_cast<double>(x),static_cast<double>(y),static_cast<double>(f),d_real);
+    casadi_math<double>::der(op,static_cast<double>(x),static_cast<double>(y),
+                             static_cast<double>(f),d_real);
     d[0] = static_cast<int>(d_real[0]);
     d[1] = static_cast<int>(d_real[1]);
   }
@@ -177,17 +179,22 @@ struct casadi_math<int>{
   static inline int ndeps(unsigned char op){ return casadi_math<double>::ndeps(op);}
 
   /** \brief Print */
-  static inline void print(unsigned char op, std::ostream &stream, const std::string& x, const std::string& y){ casadi_math<double>::print(op,stream,x,y);}
-  static inline void printPre(unsigned char op, std::ostream &stream){ casadi_math<double>::printPre(op,stream);}
-  static inline void printSep(unsigned char op, std::ostream &stream){ casadi_math<double>::printSep(op,stream);}
-  static inline void printPost(unsigned char op, std::ostream &stream){ casadi_math<double>::printPost(op,stream);}
+  static inline void print(unsigned char op, std::ostream &stream, const std::string& x,
+                           const std::string& y){ casadi_math<double>::print(op,stream,x,y);}
+  static inline void printPre(unsigned char op, std::ostream &stream){
+      casadi_math<double>::printPre(op,stream);}
+  static inline void printSep(unsigned char op, std::ostream &stream){
+      casadi_math<double>::printSep(op,stream);}
+  static inline void printPost(unsigned char op, std::ostream &stream){
+      casadi_math<double>::printPost(op,stream);}
 };
 
 // Template implementations
 
 template<typename T>
 inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
-// NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
+// NOTE: We define the implementation in a preprocessor macro to be able to force inlining,
+//  and to allow extensions in the VM
 #define CASADI_MATH_FUN_BUILTIN_GEN(CNAME,X,Y,F,N)                                \
     case OP_ASSIGN:    CNAME<OP_ASSIGN>::fcn(X,Y,F,N);        break;\
     case OP_ADD:       CNAME<OP_ADD>::fcn(X,Y,F,N);           break;\
@@ -267,7 +274,8 @@ template<typename T>
 
 template<typename T>
 inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const T& f, T* d){
-// NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
+// NOTE: We define the implementation in a preprocessor macro to be able to force inlining,
+// and to allow extensions in the VM
 #define CASADI_MATH_DER_BUILTIN(X,Y,F,D) \
     case OP_ASSIGN:    BinaryOperation<OP_ASSIGN>::der(X,Y,F,D);     break;\
     case OP_ADD:       BinaryOperation<OP_ADD>::der(X,Y,F,D);        break;\
@@ -324,7 +332,8 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
 
 template<typename T>
 inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f, T* d){
-// NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
+// NOTE: We define the implementation in a preprocessor macro to be able to force inlining,
+// and to allow extensions in the VM
 #define CASADI_MATH_DERF_BUILTIN(X,Y,F,D) \
     case OP_ASSIGN:    DerBinaryOpertion<OP_ASSIGN>::derf(X,Y,F,D);        break;\
     case OP_ADD:       DerBinaryOpertion<OP_ADD>::derf(X,Y,F,D);        break;\
@@ -414,7 +423,8 @@ inline int casadi_math<T>::ndeps(unsigned char op){
 }
 
 template<typename T>
-inline void casadi_math<T>::print(unsigned char op, std::ostream &stream, const std::string& x, const std::string& y){
+inline void casadi_math<T>::print(unsigned char op, std::ostream &stream, const std::string& x,
+                                  const std::string& y){
   if(ndeps(op)==2){
     printPre(op,stream);
     stream << x;

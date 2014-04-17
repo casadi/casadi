@@ -83,7 +83,8 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
   std::string msg_;
 };
 
-// Assertion similar to the standard C assert statement, with the difference that it throws an exception with the same information
+// Assertion similar to the standard C assert statement, with the difference
+// that it throws an exception with the same information
 #ifdef CASADI_NDEBUG
 // Release mode
 #define casadi_assert(x)
@@ -99,7 +100,8 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
 #define CASADI_ASSERT_STR(x) CASADI_ASSERT_STR1(x)
 
 // String denoting where the assertation is situated
-#define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) " of file " CASADI_ASSERT_STR(__FILE__)
+#define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) \
+    " of file " CASADI_ASSERT_STR(__FILE__)
 
 #define casadi_log(msg) \
   if(verbose()){ \
@@ -122,22 +124,29 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
   try{ \
     is_ok = x; \
   } catch(std::exception& ex){ \
-      throw casadi::CasadiException(std::string("When trying to check the assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what());\
+      throw casadi::CasadiException(std::string("When trying to check the assertion \"" \
+        CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what()); \
   } \
  if(!is_ok) { \
   std::stringstream ss_internal_; \
-  ss_internal_ << "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed. " << std::endl << msg  <<  std::endl; \
+  ss_internal_ << "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE \
+      " failed. " << std::endl << msg  <<  std::endl;   \
   throw casadi::CasadiException(ss_internal_.str()); \
  }\
 } \
 
-// This assersion if for errors caused by bugs in CasADi, use it instead of C:s assert(), but never in destructors
-#define casadi_assert(x) casadi_assert_message(x,"(Hint for developers: CasadiOptions.setCatchErrorsPython(False) to obtain gdb stacktrace in python.)" << std::endl << "Please notify the CasADi developers.")
+// This assersion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
+// but never in destructors
+#define casadi_assert(x) casadi_assert_message(x, \
+    "(Hint for developers: CasadiOptions.setCatchErrorsPython(False)" \
+    " to obtain gdb stacktrace in python.)" \
+    << std::endl << "Please notify the CasADi developers.")
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
 #define casadi_assert_warning(x,msg) \
 if((x)==false){ \
-  std::cerr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;\
+  std::cerr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) \
+    "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;  \
 }
 
 // This is for warnings to be issued when casadi is not in release mode

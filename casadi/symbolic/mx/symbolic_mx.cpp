@@ -43,13 +43,17 @@ namespace casadi{
     stream << name_;
   }
 
-  void SymbolicMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void SymbolicMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                             std::vector<int>& itmp, std::vector<double>& rtmp){
   }
 
-  void SymbolicMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void SymbolicMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                              std::vector<SXElement>& rtmp){
   }
 
-  void SymbolicMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void SymbolicMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                              MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                              bool output_given){
   }
 
   const std::string& SymbolicMX::getName() const{
@@ -63,4 +67,3 @@ namespace casadi{
 
 
 } // namespace casadi
-

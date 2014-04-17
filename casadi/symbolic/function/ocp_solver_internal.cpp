@@ -31,7 +31,9 @@ using namespace std;
 
 namespace casadi{
 
-OCPSolverInternal::OCPSolverInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn){
+OCPSolverInternal::OCPSolverInternal(const Function& ffcn, const Function& mfcn,
+                                     const Function& cfcn, const Function& rfcn) :
+    ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn){
   addOption("number_of_parameters",  OT_INTEGER,                0);
   addOption("number_of_grid_points", OT_INTEGER,               20);
   addOption("final_time",            OT_REAL,                 1.0);
@@ -72,10 +74,17 @@ void OCPSolverInternal::init(){
   // Number of point coupling constraints
   ng_ = 0;
 
-  casadi_assert_message(mfcn_.getNumInputs()<=2, "Mayer term must map endstate [ (nx x 1) , (np x 1) ] to cost (1 x 1). So it needs to accept 2 matrix-valued inputs. You supplied " << mfcn_.getNumInputs());
+  casadi_assert_message(mfcn_.getNumInputs()<=2,
+                        "Mayer term must map endstate [ (nx x 1) , (np x 1) ] to cost (1 x 1). "
+                        "So it needs to accept 2 matrix-valued inputs. You supplied "
+                        << mfcn_.getNumInputs());
 
   if (mfcn_.getNumInputs()==2) {
-      casadi_assert_message(mfcn_.input(1).size()==np_, "Mayer term must map endstate [ (nx x 1) , (np x 1) ] to cost (1 x 1). Shape of the second input " << mfcn_.input(1).dimString() << " must match the number of parameters np " << np_);
+      casadi_assert_message(mfcn_.input(1).size()==np_,
+                            "Mayer term must map endstate [ (nx x 1) , (np x 1) ] "
+                            "to cost (1 x 1). Shape of the second input "
+                            << mfcn_.input(1).dimString()
+                            << " must match the number of parameters np " << np_);
   }
 
 

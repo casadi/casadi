@@ -30,11 +30,18 @@
 using namespace std;
 namespace casadi{
 
-DirectCollocationInternal::DirectCollocationInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
-  addOption("nlp_solver",                       OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
-  addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
-  addOption("interpolation_order",          OT_INTEGER,  3,  "Order of the interpolating polynomials");
-  addOption("collocation_scheme",           OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
+DirectCollocationInternal::DirectCollocationInternal(const Function& ffcn, const Function& mfcn,
+                                                     const Function& cfcn, const Function& rfcn) :
+    OCPSolverInternal(ffcn, mfcn, cfcn, rfcn)
+{
+  addOption("nlp_solver",                       OT_NLPSOLVER,  GenericType(),
+            "An NLPSolver creator function");
+  addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(),
+            "Options to be passed to the NLP Solver");
+  addOption("interpolation_order",          OT_INTEGER,  3,
+            "Order of the interpolating polynomials");
+  addOption("collocation_scheme",           OT_STRING,  "radau",  "Collocation scheme",
+            "radau|legendre");
   casadi_warning("casadi::DirectCollocation is still experimental");
 }
 
@@ -91,7 +98,8 @@ void DirectCollocationInternal::init(){
     D[j] = lfcn.output();
     D_num(j) = lfcn.output();
 
-    // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+    // Evaluate the time derivative of the polynomial at all collocation points
+    // to get the coefficients of the continuity equation
     Function tfcn = lfcn.tangent();
     tfcn.init();
     for(int j2=0; j2<deg_+1; ++j2){
@@ -249,7 +257,8 @@ void DirectCollocationInternal::getGuess(vector<double>& V_init) const{
   casadi_assert(el==V_init.size());
 }
 
-void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
+void DirectCollocationInternal::getVariableBounds(vector<double>& V_min,
+                                                  vector<double>& V_max) const{
   // OCP variable bounds
   const Matrix<double> &p_min = input(OCP_LBP);
   const Matrix<double> &p_max = input(OCP_UBP);
@@ -299,7 +308,8 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
 }
 
-void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min, vector<double>& G_max) const{
+void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min,
+                                                    vector<double>& G_max) const{
   // OCP constraint bounds
   const Matrix<double> &h_min = input(OCP_LBH);
   const Matrix<double> &h_max = input(OCP_UBH);
@@ -363,10 +373,12 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
 void DirectCollocationInternal::evaluate(){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
-  getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),nlp_solver_.input(NLP_SOLVER_UBX).data());
+  getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),
+                    nlp_solver_.input(NLP_SOLVER_UBX).data());
 
   // get NLP constraint bounds
-  getConstraintBounds(nlp_solver_.input(NLP_SOLVER_LBG).data(), nlp_solver_.input(NLP_SOLVER_UBG).data());
+  getConstraintBounds(nlp_solver_.input(NLP_SOLVER_LBG).data(),
+                      nlp_solver_.input(NLP_SOLVER_UBG).data());
 
   //Solve the problem
   nlp_solver_.solve();
@@ -382,9 +394,12 @@ void DirectCollocationInternal::evaluate(){
 void DirectCollocationInternal::reportConstraints(std::ostream &stream) {
   stream << "Reporting Collocation constraints" << endl;
 
-  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
-  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
-  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
+  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX),
+                                      "states");
+  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU),
+                                      "controls");
+  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP),
+                                      "parameters");
 
 }
 

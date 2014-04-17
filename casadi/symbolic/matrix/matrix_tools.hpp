@@ -43,7 +43,8 @@ namespace casadi{
    * inspect the trace of it. sp_z diagonal will be more efficient then.
    */
   template<typename DataType>
-  Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y, const Sparsity& sp_z=Sparsity());
+  Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y,
+                       const Sparsity& sp_z=Sparsity());
 
   /// Matrix product of n matrices
   template<typename DataType>
@@ -109,7 +110,8 @@ namespace casadi{
   /** \brief Construct a matrix from 4 blocks
    */
   template<typename DataType>
-  Matrix<DataType> blockcat(const Matrix<DataType> &A,const Matrix<DataType> &B,const Matrix<DataType> &C,const Matrix<DataType> &D);
+  Matrix<DataType> blockcat(const Matrix<DataType> &A,const Matrix<DataType> &B,
+                            const Matrix<DataType> &C,const Matrix<DataType> &D);
 #endif // SWIG
 
   /** \brief Concatenate a list of matrices vertically
@@ -127,7 +129,8 @@ namespace casadi{
    *   horzcat(horzsplit(x,...)) = x
    */
   template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset);
+  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v,
+                                           const std::vector<int>& offset);
 
   /** \brief  split vertically, retaining fixed-sized groups of cols
    * \param incr Size of each group of cols
@@ -152,7 +155,8 @@ namespace casadi{
    *   vertcat(vertsplit(x,...)) = x
    */
   template<typename DataType>
-  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v, const std::vector<int>& offset);
+  std::vector<Matrix<DataType> > vertsplit(const Matrix<DataType> &v,
+                                           const std::vector<int>& offset);
 
   /** \brief  split horizontally, retaining fixed-sized groups of rows
    * \param incr Size of each group of rows
@@ -170,7 +174,9 @@ namespace casadi{
    *   blockcat(blocksplit(x,...,...)) = x
    */
   template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset);
+  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
+                                                            const std::vector<int>& vert_offset,
+                                                            const std::vector<int>& horz_offset);
 
   /** \brief  chop up into blocks
    * \brief vert_incr Defines the increment for block boundaries in row dimension
@@ -179,7 +185,9 @@ namespace casadi{
    *   blockcat(blocksplit(x,...,...)) = x
    */
   template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, int vert_incr = 1, int horz_incr = 1);
+  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
+                                                            int vert_incr = 1,
+                                                            int horz_incr = 1);
 
 #ifndef SWIG
   template<typename DataType>
@@ -204,8 +212,9 @@ namespace casadi{
       \endcode
       with x and y matrices of the same dimension
   */
+  // inner product
   template<typename DataType>
-  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y); // inner product
+  Matrix<DataType> inner_prod(const Matrix<DataType> &x, const Matrix<DataType> &y);
 
   /** \brief Outer product of two vectors
       Equals
@@ -218,7 +227,8 @@ namespace casadi{
   Matrix<DataType> outer_prod(const Matrix<DataType> &x, const Matrix<DataType> &y);
 
   /** \brief  QR factorization using the modified Gram-Schmidt algorithm
-   * More stable than the classical Gram-Schmidt, but may break down if the rows of A are nearly linearly dependent
+   * More stable than the classical Gram-Schmidt, but may break down if the rows of A
+   * are nearly linearly dependent
    * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
    * Note that in SWIG, Q and R are returned by value. */
   template<typename DataType>
@@ -241,20 +251,20 @@ namespace casadi{
   Matrix<DataType> nullspace(const Matrix<DataType>& A);
 
   /** \brief  Solve a system of equations: A*x = b
-      The solve routine works similar to Matlab's backslash when A is square and nonsingular. The algorithm
-      used is the following:
+      The solve routine works similar to Matlab's backslash when A is square and nonsingular.
+      The algorithm used is the following:
       1. A simple forward or backward substitution if A is upper or lower triangular
       2. If the linear system is at most 3-by-3, form the inverse via minor expansion and multiply
-      3. Permute the variables and equations as to get a (structurally) nonzero diagonal, then perform
-      a QR factorization without pivoting and solve the factorized system.
+      3. Permute the variables and equations as to get a (structurally) nonzero diagonal,
+      then perform a QR factorization without pivoting and solve the factorized system.
 
-      Note 1: If there are entries of the linear system known to be zero, these will be removed. Elements
-      that are very small, or will evaluate to be zero, can still cause numerical errors, due to the lack
-      of pivoting (which is not possible since cannot compare the size of entries)
+      Note 1: If there are entries of the linear system known to be zero, these will be removed.
+      Elements that are very small, or will evaluate to be zero, can still cause numerical errors,
+      due to the lack of pivoting (which is not possible since cannot compare the size of entries)
 
-      Note 2: When permuting the linear system, a BLT (block lower triangular) transformation is formed.
-      Only the permutation part of this is however used. An improvement would be to solve block-by-block
-      if there are multiple BLT blocks.
+      Note 2: When permuting the linear system, a BLT (block lower triangular) transformation is
+      formed. Only the permutation part of this is however used. An improvement would be to solve
+      block-by-block if there are multiple BLT blocks.
 
   */
   template<typename DataType>
@@ -271,7 +281,9 @@ namespace casadi{
 
   /** \brief Solve a system of equations: A*x = b
   */
-  CASADI_SYMBOLIC_EXPORT Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b, linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+  CASADI_SYMBOLIC_EXPORT Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b,
+                                              linearSolverCreator lsolver,
+                                              const Dictionary& dict = Dictionary());
 
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
@@ -280,7 +292,8 @@ namespace casadi{
   * If the matrix A is slender (size2<size1), mul(pinv(A),A) is unity.
   *
   */
-  CASADI_SYMBOLIC_EXPORT Matrix<double> pinv(const Matrix<double>& A,linearSolverCreator lsolver, const Dictionary& dict = Dictionary());
+  CASADI_SYMBOLIC_EXPORT Matrix<double> pinv(const Matrix<double>& A,linearSolverCreator lsolver,
+                                             const Dictionary& dict = Dictionary());
 
   /** \brief Kronecker tensor product
   *
@@ -361,7 +374,8 @@ namespace casadi{
 
   /// same as: res += mul(A,v)
   template<typename DataType>
-  void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A=false);
+  void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v,
+                   std::vector<DataType>& res, bool trans_A=false);
 
   /// \cond INTERNAL
   /// Get a pointer to the data contained in the vector
@@ -373,7 +387,8 @@ namespace casadi{
   const DataType* getPtr(const Matrix<DataType> &v);
   /// \endcond
 
-  /** \brief Create a new matrix with a given sparsity pattern but with the nonzeros taken from an existing matrix */
+  /** \brief Create a new matrix with a given sparsity pattern but with the
+   * nonzeros taken from an existing matrix */
   template<typename DataType>
   Matrix<DataType> project(const Matrix<DataType>& A, const Sparsity& sparsity);
 
@@ -403,7 +418,9 @@ namespace casadi{
 
   template<typename DataType>
   Matrix<DataType> mul(const std::vector< Matrix<DataType> > &args){
-    casadi_assert_message(args.size()>=1,"mul(std::vector< Matrix<DataType> > &args): supplied list must not be empty.");
+    casadi_assert_message(args.size()>=1,
+                          "mul(std::vector< Matrix<DataType> > &args): "
+                          "supplied list must not be empty.");
     if (args.size()==1) return args[0];
     Matrix<DataType> ret = args[0].mul(args[1]);
     for (int i=2;i<args.size();++i) {
@@ -443,8 +460,12 @@ namespace casadi{
     // A blank col? determinant is structurally zero
     if (!row_count.isDense()) return 0;
 
-    int min_row = std::distance(row_count.data().begin(), std::min_element(row_count.data().begin(),row_count.data().end()));
-    int min_col = std::distance(col_count.data().begin(), std::min_element(col_count.data().begin(),col_count.data().end()));
+    int min_row = std::distance(row_count.data().begin(),
+                                std::min_element(row_count.data().begin(),
+                                                 row_count.data().end()));
+    int min_col = std::distance(col_count.data().begin(),
+                                std::min_element(col_count.data().begin(),
+                                                 col_count.data().end()));
 
     if (min_row <= min_col) {
       // Expand along row j
@@ -595,7 +616,10 @@ namespace casadi{
   }
 
   template<typename DataType>
-  Matrix<DataType> blockcat(const Matrix<DataType> &A,const Matrix<DataType> &B,const Matrix<DataType> &C,const Matrix<DataType> &D) {
+  Matrix<DataType> blockcat(const Matrix<DataType> &A,
+                            const Matrix<DataType> &B,
+                            const Matrix<DataType> &C,
+                            const Matrix<DataType> &D) {
     return vertcat(horzcat(A,B),horzcat(C,D));
   }
 
@@ -608,7 +632,8 @@ namespace casadi{
   }
 
   template<typename DataType>
-  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v, const std::vector<int>& offset) {
+  std::vector<Matrix<DataType> > horzsplit(const Matrix<DataType> &v,
+                                           const std::vector<int>& offset) {
     // Split up the sparsity pattern
     std::vector<Sparsity> sp = horzsplit(v.sparsity(),offset);
 
@@ -646,7 +671,8 @@ namespace casadi{
   }
 
   template<typename DataType>
-  std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x, const std::vector<int>& offset){
+  std::vector< Matrix<DataType> > vertsplit(const Matrix<DataType>& x,
+                                            const std::vector<int>& offset){
     std::vector< Matrix<DataType> > ret = horzsplit(x.T(),offset);
     Matrix<DataType> (*transposeT)(const Matrix<DataType>& x) = transpose;
     std::transform(ret.begin(),ret.end(),ret.begin(),transposeT);
@@ -662,7 +688,9 @@ namespace casadi{
   }
 
   template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
+  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
+                                                            const std::vector<int>& vert_offset,
+                                                            const std::vector<int>& horz_offset) {
     std::vector< Matrix<DataType> > rows = vertsplit(x,vert_offset);
     std::vector< std::vector< Matrix<DataType> > > ret;
     for (int i=0;i<rows.size();++i) {
@@ -672,7 +700,9 @@ namespace casadi{
   }
 
   template<typename DataType>
-  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x, int vert_incr, int horz_incr) {
+  std::vector< std::vector< Matrix<DataType> > > blocksplit(const Matrix<DataType>& x,
+                                                            int vert_incr,
+                                                            int horz_incr) {
     casadi_assert(horz_incr>=1);
     casadi_assert(vert_incr>=1);
     std::vector<int> offset1 = range(0,x.size1(),vert_incr);
@@ -770,7 +800,8 @@ namespace casadi{
     if(x.isVector()){
       return norm_F(x);
     } else {
-      casadi_error("2-norms currently only supported for vectors. Did you intend to calculate a Frobenius norms (norm_F)?");
+      casadi_error("2-norms currently only supported for vectors. "
+                   "Did you intend to calculate a Frobenius norms (norm_F)?");
     }
   }
 
@@ -792,7 +823,8 @@ namespace casadi{
 
   template<typename DataType>
   void qr(const Matrix<DataType>& A, Matrix<DataType>& Q, Matrix<DataType> &R){
-    // The following algorithm is taken from J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.)
+    // The following algorithm is taken from J. Demmel:
+    // Applied Numerical Linear Algebra (algorithm 3.1.)
     casadi_assert_message(A.size1()>=A.size2(), "qr: fewer rows than columns");
 
     // compute Q and R column by column
@@ -835,7 +867,8 @@ namespace casadi{
 
     Matrix<DataType> X = A;
 
-    casadi_assert_message(m>=n,"nullspace(A): expecting a flat matrix (more columns than rows), but got " << A.dimString() << ".");
+    casadi_assert_message(m>=n,"nullspace(A): expecting a flat matrix (more columns than rows), "
+                          "but got " << A.dimString() << ".");
 
     Matrix<DataType> seed = DMatrix::eye(m)(Slice(0,m),Slice(n,m));
 
@@ -862,7 +895,8 @@ namespace casadi{
     }
 
     for (int i=n-1;i>=0;--i) {
-      seed(Slice(i,m),Slice(0,m-n)) -= betas[i]*mul(us[i].T(),mul(us[i],seed(Slice(i,m),Slice(0,m-n))));
+      seed(Slice(i,m),Slice(0,m-n)) -=
+        betas[i]*mul(us[i].T(), mul(us[i], seed(Slice(i,m), Slice(0,m-n))));
     }
 
     return seed;
@@ -872,7 +906,8 @@ namespace casadi{
   template<typename DataType>
   Matrix<DataType> solve(const Matrix<DataType>& A, const Matrix<DataType>& b){
     // check dimensions
-    casadi_assert_message(A.size1() == b.size1(),"solve Ax=b: dimension mismatch: b has " << b.size1() << " rows while A has " << A.size1() << ".");
+    casadi_assert_message(A.size1() == b.size1(),"solve Ax=b: dimension mismatch: b has "
+                          << b.size1() << " rows while A has " << A.size1() << ".");
     casadi_assert_message(A.size1() == A.size2(),"solve: A not square but " << A.dimString());
 
     if(A.isTril()){
@@ -911,7 +946,8 @@ namespace casadi{
       return x;
     } else if(A.hasNonStructuralZeros()){
 
-      // If there are structurally nonzero entries that are known to be zero, remove these and rerun the algorithm
+      // If there are structurally nonzero entries that are known to be zero,
+      // remove these and rerun the algorithm
       Matrix<DataType> A_sparse = A;
       A_sparse.sparsify();
       return solve(A_sparse,b);
@@ -920,7 +956,8 @@ namespace casadi{
 
       // Make a BLT transformation of A
       std::vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-      A.sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
+      A.sparsity().dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+                                     coarse_rowblock, coarse_colblock);
 
       // Permute the right hand side
       Matrix<DataType> bperm = b(rowperm,ALL);
@@ -976,7 +1013,8 @@ namespace casadi{
   Matrix<DataType> kron(const Matrix<DataType>& a, const Matrix<DataType>& b) {
     const Sparsity &a_sp = a.sparsity();
     Matrix<DataType> filler = Matrix<DataType>::sparse(b.shape());
-    std::vector< std::vector< Matrix<DataType> > > blocks(a.size1(),std::vector< Matrix<DataType> >(a.size2(),filler));
+    std::vector< std::vector< Matrix<DataType> > >
+      blocks(a.size1(),std::vector< Matrix<DataType> >(a.size2(),filler));
     for (int i=0;i<a.size1();++i) {
       for (int j=0;j<a.size2();++j) {
         int k = a_sp.getNZ(i,j);
@@ -1078,7 +1116,9 @@ namespace casadi{
   }
 
   template<typename DataType>
-  void addMultiple(const Matrix<DataType>& A, const std::vector<DataType>& v, std::vector<DataType>& res, bool trans_A){
+  void addMultiple(const Matrix<DataType>& A,
+                   const std::vector<DataType>& v,
+                   std::vector<DataType>& res, bool trans_A){
     // Get dimension and sparsity
     int d1=A.size2(), d2=A.size1();
     const std::vector<int> &colind=A.colind();

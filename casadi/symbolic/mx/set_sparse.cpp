@@ -52,19 +52,24 @@ namespace casadi{
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void SetSparse::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void SetSparse::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                              std::vector<T>& rtmp){
     output[0]->set(*input[0]);
   }
 
-  void SetSparse::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void SetSparse::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                            std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void SetSparse::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void SetSparse::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                             std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
-  void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void SetSparse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                             bool output_given){
     // Evaluate function
     if(!output_given){
       *output[0] = input[0]->setSparse(sparsity());
@@ -95,14 +100,16 @@ namespace casadi{
     }
   }
 
-  void SetSparse::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void SetSparse::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                    const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Codegen "copy sparse"
     gen.addAuxiliary(CodeGenerator::AUX_COPY_SPARSE);
 
     // Codegen the operation
     int sp_arg = gen.getSparsity(dep(0).sparsity());
     int sp_res = gen.addSparsity(sparsity());
-    stream << "  casadi_copy_sparse(" << arg.front() << ",s" << sp_arg << "," << res.front() << ",s" << sp_res << ");" << std::endl;
+    stream << "  casadi_copy_sparse(" << arg.front() << ",s" << sp_arg << "," << res.front()
+           << ",s" << sp_res << ");" << std::endl;
   }
 
 

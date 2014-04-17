@@ -36,7 +36,8 @@ namespace casadi{
    *
    @copydoc LinearSolver_doc
    *
-   * CSparse is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   * CSparse is an casadi::Function mapping from 2 inputs
+   * [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use CSparse is: \n
    *  -# init()
@@ -46,7 +47,8 @@ namespace casadi{
    *  -# solve()
    *  -# Repeat steps 4 and 5 to work with other b vectors.
    *
-   * The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
+   * The method evaluate() combines the prepare() and solve()
+   * step and is therefore more expensive if A is invariant.
    *
    */
   class CASADI_CSPARSE_INTERFACE_EXPORT CSparse : public LinearSolver{

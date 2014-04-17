@@ -43,7 +43,9 @@ namespace casadi{
     SnoptSolver();
 
     /// \brief Create an NLP solver instance
-    explicit SnoptSolver(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+    explicit SnoptSolver( const Function& nlp
+                          /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto
+                           * [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                          );
 
     /// Access functions of the node

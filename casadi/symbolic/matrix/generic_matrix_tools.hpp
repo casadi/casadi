@@ -93,14 +93,18 @@ namespace casadi{
 #ifndef SWIG
   template<typename MatType>
   MatType cross(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int dim) {
-    casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),"cross(a,b): Inconsistent dimensions. Dimension of a (" << a.dimString() << " ) must equal that of b (" << b.dimString() << ").");
+    casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),
+                          "cross(a,b): Inconsistent dimensions. Dimension of a ("
+                          << a.dimString() << " ) must equal that of b ("
+                          << b.dimString() << ").");
 
-    casadi_assert_message(a.size1()==3 || a.size2()==3,"cross(a,b): One of the dimensions of a should have length 3, but got " << a.dimString() << ".");
-    casadi_assert_message(dim==-1 || dim==1 || dim==2,"cross(a,b,dim): Dim must be 1, 2 or -1 (automatic).");
-
+    casadi_assert_message(a.size1()==3 || a.size2()==3,
+                          "cross(a,b): One of the dimensions of a should have length 3, but got "
+                          << a.dimString() << ".");
+    casadi_assert_message(dim==-1 || dim==1 || dim==2,
+                          "cross(a,b,dim): Dim must be 1, 2 or -1 (automatic).");
 
     std::vector<MatType> ret(3);
-
 
     bool t = a.size1()==3;
 
@@ -126,8 +130,12 @@ namespace casadi{
   template<typename MatType>
   MatType tril2symm(const GenericMatrix<MatType> &a_) {
     const MatType& a = static_cast<const MatType&>(a_);
-    casadi_assert_message(a.isSquare(),"Shape error in tril2symm. Expecting square shape but got " << a.dimString());
-    casadi_assert_message(a.sizeU()-a.sizeD()==0,"Sparsity error in tril2symm. Found above-diagonal entries in argument: " << a.dimString());
+    casadi_assert_message(a.isSquare(),
+                          "Shape error in tril2symm. Expecting square shape but got "
+                          << a.dimString());
+    casadi_assert_message(a.sizeU()-a.sizeD()==0,
+                          "Sparsity error in tril2symm. Found above-diagonal entries in argument: "
+                          << a.dimString());
     return a +  a.T() - diag(diag(a));
   }
 
@@ -135,8 +143,12 @@ namespace casadi{
   template<typename MatType>
   MatType triu2symm(const GenericMatrix<MatType> &a_) {
     const MatType& a = static_cast<const MatType&>(a_);
-    casadi_assert_message(a.isSquare(),"Shape error in triu2symm. Expecting square shape but got " << a.dimString());
-    casadi_assert_message(a.sizeL()-a.sizeD()==0,"Sparsity error in triu2symm. Found below-diagonal entries in argument: " << a.dimString());
+    casadi_assert_message(a.isSquare(),
+                          "Shape error in triu2symm. Expecting square shape but got "
+                          << a.dimString());
+    casadi_assert_message(a.sizeL()-a.sizeD()==0,
+                          "Sparsity error in triu2symm. Found below-diagonal entries in argument: "
+                          << a.dimString());
     return a + a.T() - diag(diag(a));
   }
 
@@ -178,10 +190,6 @@ GMTT_INST(MatType,isEqual)
 #define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(MatType) \
 GMTT_INST(MatType,linspace)
 
-
 #endif //SWIG
 
-
-
 #endif // GENERIC_MATRIX_TOOLS_HPP
-

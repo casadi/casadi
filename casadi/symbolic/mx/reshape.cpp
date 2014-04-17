@@ -42,16 +42,19 @@ namespace casadi{
     return new Reshape(*this);
   }
 
-  void Reshape::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void Reshape::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                          std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void Reshape::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void Reshape::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                           std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Reshape::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void Reshape::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                            std::vector<T>& rtmp){
     // Quick return if inplace
     if(input[0]==output[0]) return;
 
@@ -85,7 +88,9 @@ namespace casadi{
     }
   }
 
-  void Reshape::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Reshape::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                           bool output_given){
     // Quick return if inplace
     if(input[0]==output[0]) return;
 
@@ -109,11 +114,13 @@ namespace casadi{
     }
   }
 
-  void Reshape::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void Reshape::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                  const std::vector<std::string>& res, CodeGenerator& gen) const{
     // Quick return if inplace
     if(arg[0].compare(res[0])==0) return;
 
-    stream << "  for(i=0; i<" << size() << "; ++i) " << res.front() << "[i] = " << arg.front() << "[i];" << endl;
+    stream << "  for(i=0; i<" << size() << "; ++i) " << res.front()
+           << "[i] = " << arg.front() << "[i];" << endl;
   }
 
   MX Reshape::getReshape(const Sparsity& sp) const{

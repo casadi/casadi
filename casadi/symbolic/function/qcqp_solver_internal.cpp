@@ -44,9 +44,10 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
 
   if (!A.isNull()) {
     casadi_assert_message(A.size2()==n_,
-      "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl <<
-      "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
-      "We need: H.size2()==A.size2()" << std::endl
+      "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
+       << std::endl
+       << "H: " << H.dimString() << " - A: " << A.dimString() << std::endl
+       << "We need: H.size2()==A.size2()" << std::endl
     );
   }
 
@@ -56,9 +57,13 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
     "We need H square & symmetric" << std::endl
   );
 
-  casadi_assert_message(P.size1()==n_,"Got incompatible dimensions. Number of rows in P (" << P.size1() << ") must match n (" << n_ << ").");
+  casadi_assert_message(P.size1()==n_,
+                        "Got incompatible dimensions. Number of rows in P (" << P.size1()
+                        << ") must match n (" << n_ << ").");
 
-  casadi_assert_message(P.size2() % n_ == 0,"Got incompatible dimensions. Number of cols in P (" << P.size2() << ") must be a multiple of n (" << n_ << ").");
+  casadi_assert_message(P.size2() % n_ == 0,
+                        "Got incompatible dimensions. Number of cols in P ("
+                        << P.size2() << ") must be a multiple of n (" << n_ << ").");
 
 
   nq_ = P.size2() / n_;
@@ -83,7 +88,9 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
 
   for (int i=0;i<nq_;++i) {
     DMatrix Pi = input(QCQP_SOLVER_P)(ALL,Slice(i*n_,(i+1)*n_));
-    casadi_assert_message(Pi.sparsity().isSymmetric(),"We need Pi square & symmetric but got " << Pi.dimString() << " for i = " << i << ".");
+    casadi_assert_message(Pi.sparsity().isSymmetric(),
+                          "We need Pi square & symmetric but got " << Pi.dimString()
+                          << " for i = " << i << ".");
   }
 
   // Output arguments
@@ -115,15 +122,17 @@ void QCQPSolverInternal::solve(){
 
 void QCQPSolverInternal::checkInputs() const {
   for (int i=0;i<input(QCQP_SOLVER_LBX).size();++i) {
-    casadi_assert_message(input(QCQP_SOLVER_LBX).at(i)<=input(QCQP_SOLVER_UBX).at(i),"LBX[i] <= UBX[i] was violated for i=" << i << ". Got LBX[i]=" << input(QCQP_SOLVER_LBX).at(i) << " and UBX[i]=" << input(QCQP_SOLVER_UBX).at(i));
+    casadi_assert_message(input(QCQP_SOLVER_LBX).at(i)<=input(QCQP_SOLVER_UBX).at(i),
+                          "LBX[i] <= UBX[i] was violated for i=" << i
+                          << ". Got LBX[i]=" << input(QCQP_SOLVER_LBX).at(i)
+                          << " and UBX[i]=" << input(QCQP_SOLVER_UBX).at(i));
   }
   for (int i=0;i<input(QCQP_SOLVER_LBA).size();++i) {
-    casadi_assert_message(input(QCQP_SOLVER_LBA).at(i)<=input(QCQP_SOLVER_UBA).at(i),"LBA[i] <= UBA[i] was violated for i=" << i << ". Got LBA[i]=" << input(QCQP_SOLVER_LBA).at(i) << " and UBA[i]=" << input(QCQP_SOLVER_UBA).at(i));
+    casadi_assert_message(input(QCQP_SOLVER_LBA).at(i)<=input(QCQP_SOLVER_UBA).at(i),
+                          "LBA[i] <= UBA[i] was violated for i=" << i
+                          << ". Got LBA[i]=" << input(QCQP_SOLVER_LBA).at(i)
+                          << " and UBA[i]=" << input(QCQP_SOLVER_UBA).at(i));
   }
 }
 
 } // namespace casadi
-
-
-
-

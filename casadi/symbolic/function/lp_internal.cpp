@@ -78,10 +78,16 @@ void LPSolverInternal::solve(){
 
 void LPSolverInternal::checkInputs() const {
   for (int i=0;i<input(LP_SOLVER_LBX).size();++i) {
-    casadi_assert_message(input(LP_SOLVER_LBX).at(i)<=input(LP_SOLVER_UBX).at(i),"LBX[i] <= UBX[i] was violated for i=" << i << ". Got LBX[i] " << input(LP_SOLVER_LBX).at(i) << " and UBX[i] " << input(LP_SOLVER_UBX).at(i));
+    casadi_assert_message(input(LP_SOLVER_LBX).at(i)<=input(LP_SOLVER_UBX).at(i),
+                          "LBX[i] <= UBX[i] was violated for i=" << i
+                          << ". Got LBX[i] " << input(LP_SOLVER_LBX).at(i)
+                          << " and UBX[i] " << input(LP_SOLVER_UBX).at(i));
   }
   for (int i=0;i<input(LP_SOLVER_LBA).size();++i) {
-    casadi_assert_message(input(LP_SOLVER_LBA).at(i)<=input(LP_SOLVER_UBA).at(i),"LBA[i] <= UBA[i] was violated for i=" << i << ". Got LBA[i] " << input(LP_SOLVER_LBA).at(i) << " and UBA[i] " << input(LP_SOLVER_UBA).at(i));
+    casadi_assert_message(input(LP_SOLVER_LBA).at(i)<=input(LP_SOLVER_UBA).at(i),
+                          "LBA[i] <= UBA[i] was violated for i=" << i
+                          << ". Got LBA[i] " << input(LP_SOLVER_LBA).at(i)
+                          << " and UBA[i] " << input(LP_SOLVER_UBA).at(i));
   }
 }
 

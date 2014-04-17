@@ -32,10 +32,16 @@
 using namespace std;
 namespace casadi {
 
-  NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
-    addOption("abstol",                      OT_REAL,1e-12,"Stopping criterion tolerance on max(|F|)");
-    addOption("abstolStep",                  OT_REAL,1e-12,"Stopping criterion tolerance on step size");
-    addOption("max_iter",  OT_INTEGER, 1000, "Maximum number of Newton iterations to perform before returning.");
+  NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac,
+                                                 const LinearSolver& linsol)
+      : ImplicitFunctionInternal(f,jac,linsol)
+  {
+    addOption("abstol",                      OT_REAL,1e-12,
+              "Stopping criterion tolerance on max(|F|)");
+    addOption("abstolStep",                  OT_REAL,1e-12,
+              "Stopping criterion tolerance on step size");
+    addOption("max_iter",  OT_INTEGER, 1000,
+              "Maximum number of Newton iterations to perform before returning.");
     addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
   }
 
@@ -104,7 +110,11 @@ namespace casadi {
       // Write out profiling information
       if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":0|" << jac_.get() << ":" << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
+        CasadiOptions::profilingLog
+            << (time_stop-time_start)*1e6 << " ns | "
+            << (time_stop-time_zero)*1e3 << " ms | "
+            << this << ":" << getOption("name") << ":0|" << jac_.get() << ":"
+            << jac_.getOption("name") << "|evaluate jacobian" << std::endl;
       }
 
       if (monitored("F")) std::cout << "  F = " << F << std::endl;
@@ -116,7 +126,10 @@ namespace casadi {
       if (monitored("J")) std::cout << "  J = " << J << std::endl;
 
       if ( numeric_limits<double>::infinity() != abstol_ ) {
-        double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
+        double maxF = std::max((*std::max_element(F.data().begin(),
+                                                  F.data().end())),
+                               -(*std::min_element(F.data().begin(),
+                                                   F.data().end())));
         if (maxF <= abstol_) {
           casadi_log("Converged to acceptable tolerance - abstol: " << abstol_);
           break;
@@ -133,7 +146,11 @@ namespace casadi {
       // Write out profiling information
       if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":1||prepare linear system" << std::endl;
+        CasadiOptions::profilingLog
+            << (time_stop-time_start)*1e6 << " ns | "
+            << (time_stop-time_zero)*1e3 << " ms | "
+            << this << ":" << getOption("name")
+            << ":1||prepare linear system" << std::endl;
       }
 
       if (CasadiOptions::profiling) {
@@ -143,7 +160,10 @@ namespace casadi {
       linsol_.solve(&F.front(),1,false);
       if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;
+        CasadiOptions::profilingLog
+            << (time_stop-time_start)*1e6 << " ns | "
+            << (time_stop-time_zero)*1e3 << " ms | "
+            << this << ":" << getOption("name") << ":2||solve linear system" << std::endl;
       }
 
       if (monitored("step")) {
@@ -151,7 +171,10 @@ namespace casadi {
       }
 
       if ( numeric_limits<double>::infinity() != abstolStep_ ) {
-        double maxF = std::max((*std::max_element(F.data().begin(),F.data().end())),-(*std::min_element(F.data().begin(),F.data().end())));
+        double maxF = std::max((*std::max_element(F.data().begin(),
+                                                  F.data().end())),
+                               -(*std::min_element(F.data().begin(),
+                                                   F.data().end())));
         if (monitored("stepsize")) {
           std::cout << "  stepsize = " << maxF << std::endl;
         }
@@ -186,8 +209,10 @@ namespace casadi {
     // Call the base class initializer
     ImplicitFunctionInternal::init();
 
-    casadi_assert_message(f_.getNumInputs()>0,"NewtonImplicitInternal: the supplied f must have at least one input.");
-    casadi_assert_message(!linsol_.isNull(),"NewtonImplicitInternal::init: linear_solver must be supplied");
+    casadi_assert_message(f_.getNumInputs()>0,
+                          "NewtonImplicitInternal: the supplied f must have at least one input.");
+    casadi_assert_message(!linsol_.isNull(),
+                          "NewtonImplicitInternal::init: linear_solver must be supplied");
 
     if (hasSetOption("max_iter"))
       max_iter_ = getOption("max_iter");
@@ -201,4 +226,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-

@@ -36,16 +36,21 @@ namespace casadi{
       Number of inputs:  nin    getNumInputs()\n
       Number of outputs: nout   getNumOutputs()\n
 
-      We can view this function as a being composed of a (nin, nout) grid of single-input, single-output primitive functions.\n
-      Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$,
+      We can view this function as a being composed of a (nin, nout) grid of single-input,
+      single-output primitive functions.\n
+      Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can
+      map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$,
       in which n,m,p,q can take different values for every (i,j) pair.\n
 
-      When passing input, you specify which partition i is active.     You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
-      When requesting output, you specify which partition j is active. You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
+      When passing input, you specify which partition i is active.
+      You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
+      When requesting output, you specify which partition j is active.
+      You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
 
       To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
 
-      Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} = \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
+      Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} =
+      \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
 
       Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
       Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
@@ -62,7 +67,8 @@ namespace casadi{
       input  col: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
       output col: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
 
-      NOTE: Function's are allowed to modify their input arguments when evaluating: implicitFunction, IDAS solver
+      NOTE: Function's are allowed to modify their input arguments when evaluating:
+            implicitFunction, IDAS solver
       Futher releases may disallow this.
 
       \internal
@@ -159,17 +165,28 @@ namespace casadi{
      * \param oind The index of the output
      *
      * The default behavior of this class is defined by the derived class.
-     * If compact is set to true, only the nonzeros of the input and output expressions are considered.
-     * If symmetric is set to true, the Jacobian being calculated is known to be symmetric (usually a Hessian),
+     * If compact is set to true, only the nonzeros of the input and output expressions are
+     * considered.
+     * If symmetric is set to true, the Jacobian being calculated is known to be symmetric
+     * (usually a Hessian),
      * which can be exploited by the algorithm.
      *
-     * The generated Jacobian has one more output than the calling function corresponding to the Jacobian and the same number of inputs.
+     * The generated Jacobian has one more output than the calling function corresponding
+     * to the Jacobian and the same number of inputs.
      *
      */
     Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    Function jacobian(const std::string& iind,  int oind=0, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iind),oind,compact,symmetric); }
-    Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) { return jacobian(iind,outputSchemeEntry(oind),compact,symmetric); }
-    Function jacobian(const std::string& iind, const std::string& oind, bool compact=false, bool symmetric=false) { return jacobian(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
+    Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
+                      bool symmetric=false) {
+        return jacobian(inputSchemeEntry(iind),oind,compact,symmetric);
+    }
+    Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) {
+        return jacobian(iind,outputSchemeEntry(oind),compact,symmetric);
+    }
+    Function jacobian(const std::string& iind, const std::string& oind, bool compact=false,
+                      bool symmetric=false) {
+        return jacobian(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric);
+    }
     //@}
 
     /** Set the Jacobian function of output oind with respect to input iind
@@ -186,9 +203,15 @@ namespace casadi{
      *
      */
     Function gradient(int iind=0, int oind=0);
-    Function gradient(const std::string& iind, int oind=0) { return gradient(inputSchemeEntry(iind),oind); }
-    Function gradient(int iind, const std::string& oind) { return gradient(iind,outputSchemeEntry(oind)); }
-    Function gradient(const std::string& iind, const std::string& oind) { return gradient(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
+    Function gradient(const std::string& iind, int oind=0) {
+        return gradient(inputSchemeEntry(iind),oind);
+    }
+    Function gradient(int iind, const std::string& oind) {
+        return gradient(iind,outputSchemeEntry(oind));
+    }
+    Function gradient(const std::string& iind, const std::string& oind) {
+        return gradient(inputSchemeEntry(iind),outputSchemeEntry(oind));
+    }
     //@}
 
     //@{
@@ -201,9 +224,12 @@ namespace casadi{
      *
      */
     Function tangent(int iind=0, int oind=0);
-    Function tangent(const std::string& iind, int oind=0) { return tangent(inputSchemeEntry(iind),oind); }
-    Function tangent(int iind, const std::string& oind) { return tangent(iind,outputSchemeEntry(oind)); }
-    Function tangent(const std::string& iind, const std::string& oind) { return tangent(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
+    Function tangent(const std::string& iind, int oind=0)
+    { return tangent(inputSchemeEntry(iind),oind); }
+    Function tangent(int iind, const std::string& oind)
+    { return tangent(iind,outputSchemeEntry(oind)); }
+    Function tangent(const std::string& iind, const std::string& oind)
+    { return tangent(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
     //@}
 
     //@{
@@ -211,17 +237,21 @@ namespace casadi{
      * \param iind The index of the input
      * \param oind The index of the output
      *
-     * The generated Hessian has two more outputs than the calling function corresponding to the Hessian
-     * and the gradients.
+     * The generated Hessian has two more outputs than the calling function corresponding
+     * to the Hessian and the gradients.
      *
      */
     Function hessian(int iind=0, int oind=0);
-    Function hessian(const std::string& iind, int oind=0) { return hessian(inputSchemeEntry(iind),oind); }
-    Function hessian(int iind, const std::string& oind) { return hessian(iind,outputSchemeEntry(oind)); }
-    Function hessian(const std::string& iind, const std::string& oind) { return hessian(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
+    Function hessian(const std::string& iind, int oind=0)
+    { return hessian(inputSchemeEntry(iind),oind); }
+    Function hessian(int iind, const std::string& oind)
+    { return hessian(iind,outputSchemeEntry(oind)); }
+    Function hessian(const std::string& iind, const std::string& oind)
+    { return hessian(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
     //@}
 
-    /** \brief Generate a Jacobian function of all the inputs elements with respect to all the output elements).
+    /** \brief Generate a Jacobian function of all the inputs elements with respect to all
+     * the output elements).
      */
     Function fullJacobian();
 
@@ -231,9 +261,12 @@ namespace casadi{
 
     //@{
     /** \brief Evaluate the function symbolically or numerically  */
-    std::vector<DMatrix> call(const std::vector<DMatrix> &arg, bool always_inline=false, bool never_inline=false);
-    std::vector<SX> call(const std::vector<SX> &arg, bool always_inline=false, bool never_inline=false);
-    std::vector<MX> call(const std::vector<MX> &arg, bool always_inline=false, bool never_inline=false);
+    std::vector<DMatrix> call(const std::vector<DMatrix> &arg, bool always_inline=false,
+                              bool never_inline=false);
+    std::vector<SX> call(const std::vector<SX> &arg, bool always_inline=false,
+                         bool never_inline=false);
+    std::vector<MX> call(const std::vector<MX> &arg, bool always_inline=false,
+                         bool never_inline=false);
     //@}
 
     //@{
@@ -253,7 +286,8 @@ namespace casadi{
 
     //@{
     /// Functor shorthand for evaluation, two arguments (only C++)
-    std::vector<DMatrix> operator()(const DMatrix& arg0, const DMatrix& arg1){ return call(toVector(arg0,arg1));}
+    std::vector<DMatrix> operator()(const DMatrix& arg0, const DMatrix& arg1)
+    { return call(toVector(arg0,arg1));}
     std::vector<SX> operator()(const SX& arg0, const SX& arg1){ return call(toVector(arg0,arg1));}
     std::vector<MX> operator()(const MX& arg0, const MX& arg1){ return call(toVector(arg0,arg1));}
     //@}
@@ -263,10 +297,10 @@ namespace casadi{
     //@{
    /** \brief Evaluate the function symbolically or numerically with directional derivatives
      * The first two arguments are the nondifferentiated inputs and results of the evaluation,
-     * the next two arguments are a set of forward directional seeds and the resulting forward directional derivatives,
-     * the length of the vector being the number of forward directions.
-     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
-     * the length of the vector being the number of adjoint directions.
+     * the next two arguments are a set of forward directional seeds and the resulting forward
+     * directional derivatives, the length of the vector being the number of forward directions.
+     * The next two arguments are a set of adjoint directional seeds and the resulting adjoint
+     * directional derivatives, the length of the vector being the number of adjoint directions.
      */
     void callDerivative(const DMatrixVector& arg, DMatrixVector& SWIG_OUTPUT(res),
                         const DMatrixVectorVector& fseed, DMatrixVectorVector& SWIG_OUTPUT(fsens),
@@ -288,23 +322,25 @@ namespace casadi{
     /** \brief  Evaluate symbolically in parallel (matrix graph)
         paropt: Set of options to be passed to the Parallelizer
     */
-    std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
+    std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg,
+                                               const Dictionary& paropt=Dictionary());
 
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
      *
      *         Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
      *         and (1+nfwd)*n_out + nadj*n_in outputs.
-     *         The first n_in inputs corresponds to nondifferentiated inputs. The next nfwd*n_in inputs
-     *         corresponds to forward seeds, one direction at a time and the last nadj*n_out inputs
-     *         corresponds to adjoint seeds, one direction at a time.
-     *         The first n_out outputs corresponds to nondifferentiated outputs. The next nfwd*n_out outputs
-     *         corresponds to forward sensitivities, one direction at a time and the last nadj*n_in outputs
-     *         corresponds to  adjoint sensitivties, one direction at a time.
+     *         The first n_in inputs corresponds to nondifferentiated inputs.
+     *         The next nfwd*n_in inputs corresponds to forward seeds, one direction at a time
+     *         and the last nadj*n_out inputs corresponds to adjoint seeds, one direction at a time.
+     *         The first n_out outputs corresponds to nondifferentiated outputs.
+     *         The next nfwd*n_out outputs corresponds to forward sensitivities,
+     *         one direction at a time and the last nadj*n_in outputs corresponds to
+     *         adjoint sensitivties, one direction at a time.
      *
      *         (n_in = getNumInputs(), n_out = getNumOutputs())
      *
-     *        The functions returned are cached, meaning that if called multiple timed with the same value,
-     *        then multiple references to the same function will be returned.
+     *        The functions returned are cached, meaning that if called multiple timed
+     *        with the same value, then multiple references to the same function will be returned.
      */
     Function derivative(int nfwd, int nadj);
 
@@ -315,17 +351,27 @@ namespace casadi{
     //@{
     /// Get, if necessary generate, the sparsity of a Jacobian block
     Sparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-    Sparsity& jacSparsity(const std::string &iind, int oind=0, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),oind,compact,symmetric); }
-    Sparsity& jacSparsity(int iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
-    Sparsity& jacSparsity(const std::string &iind, const std::string &oind, bool compact=false, bool symmetric=false) { return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
+    Sparsity& jacSparsity(const std::string &iind, int oind=0, bool compact=false,
+                          bool symmetric=false) {
+        return jacSparsity(inputSchemeEntry(iind),oind,compact,symmetric); }
+    Sparsity& jacSparsity(int iind, const std::string &oind, bool compact=false,
+                          bool symmetric=false) {
+        return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
+    Sparsity& jacSparsity(const std::string &iind, const std::string &oind,
+                          bool compact=false, bool symmetric=false) {
+        return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
     //@}
 
     //@{
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
-    void setJacSparsity(const Sparsity& sp, const std::string &iind, int oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),oind,compact); }
-    void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
-    void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind, bool compact=false) { setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
+    void setJacSparsity(const Sparsity& sp, const std::string &iind, int oind, bool compact=false) {
+        setJacSparsity(sp,inputSchemeEntry(iind),oind,compact); }
+    void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) {
+        setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
+    void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
+                        bool compact=false) {
+        setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
     //@}
 
     /** \brief Export / Generate C code for the function */
@@ -367,13 +413,16 @@ namespace casadi{
     std::vector<SX> symbolicInputSX() const;
 
     /// \cond INTERNAL
-    /** \brief Is the class able to propate seeds through the algorithm? (for usage, see the example propagating_sparsity.cpp) */
+    /** \brief Is the class able to propate seeds through the algorithm?
+     * (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);
 
-    /** \brief Reset the sparsity propagation (for usage, see the example propagating_sparsity.cpp) */
+    /** \brief Reset the sparsity propagation
+     * (for usage, see the example propagating_sparsity.cpp) */
     void spInit(bool fwd);
 
-    /** \brief Propagate the sparsity pattern through a set of directional derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
+    /** \brief Propagate the sparsity pattern through a set of directional
+     * derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
     void spEvaluate(bool fwd);
 
     /// \endcond

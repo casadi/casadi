@@ -53,7 +53,9 @@ namespace casadi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual SimpleIndefDpleInternal* create(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) const{ return new SimpleIndefDpleInternal(A,V);}
+    virtual SimpleIndefDpleInternal* create(const std::vector< Sparsity > & A,
+                                            const std::vector< Sparsity > &V) const {
+        return new SimpleIndefDpleInternal(A,V);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const{}

@@ -30,7 +30,8 @@ using namespace std;
 namespace casadi{
 
   Inverse::Inverse(const MX& x){
-    casadi_assert_message(x.size1()==x.size2(),"Inverse: matrix must be square, but you supllied " << x.dimString());
+    casadi_assert_message(x.size1()==x.size2(),
+                          "Inverse: matrix must be square, but you supllied " << x.dimString());
     setDependencies(x);
     setSparsity(Sparsity::dense(x.size1(),x.size2()));
   }
@@ -43,7 +44,9 @@ namespace casadi{
     }
   }
 
-  void Inverse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Inverse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                           bool output_given){
     const MX& X = *input[0];
     MX& inv_X = *output[0];
     if(!output_given){

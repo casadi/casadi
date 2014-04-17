@@ -40,12 +40,14 @@ namespace casadi{
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
+  class CASADI_SYMBOLIC_EXPORT MXFunctionInternal :
+        public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
     friend class MXFunction;
 
   public:
 
-    /** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction, therefore protected */
+    /** \brief  Multiple input, multiple output constructor, only to be accessed from MXFunction,
+        therefore protected */
     MXFunctionInternal(const std::vector<MX>& input, const std::vector<MX>& output);
 
     /** \brief  Make a deep copy */
@@ -67,12 +69,15 @@ namespace casadi{
     virtual void init();
 
     /** \brief Generate code for the declarations of the C function */
-    virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+    virtual void generateDeclarations(std::ostream &stream, const std::string& type,
+                                      CodeGenerator& gen) const;
 
     /** \brief Generate code for the body of the C function */
-    virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+    virtual void generateBody(std::ostream &stream, const std::string& type,
+                              CodeGenerator& gen) const;
 
-    /** \brief Extract the residual function G and the modified function Z out of an expression (see Albersmeyer2010 paper) */
+    /** \brief Extract the residual function G and the modified function Z out of an expression
+     * (see Albersmeyer2010 paper) */
     void generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn);
 
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
@@ -101,13 +106,17 @@ namespace casadi{
 
     /** \brief Evaluate symbolically, SXElement type*/
     virtual void evalSXsparse(const std::vector<SX>& input, std::vector<SX>& output,
-                        const std::vector<std::vector<SX> >& fwdSeed, std::vector<std::vector<SX> >& fwdSens,
-                        const std::vector<std::vector<SX> >& adjSeed, std::vector<std::vector<SX> >& adjSens);
+                              const std::vector<std::vector<SX> >& fwdSeed,
+                              std::vector<std::vector<SX> >& fwdSens,
+                              const std::vector<std::vector<SX> >& adjSeed,
+                              std::vector<std::vector<SX> >& adjSens);
 
     /** \brief Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output,
-                        const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens,
-                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens);
+                        const std::vector<std::vector<MX> >& fwdSeed,
+                        std::vector<std::vector<MX> >& fwdSens,
+                        const std::vector<std::vector<MX> >& adjSeed,
+                        std::vector<std::vector<MX> >& adjSens);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SX>& inputv );

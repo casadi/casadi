@@ -37,7 +37,8 @@ namespace casadi{
    *
    * @copydoc ImplicitFunction_doc
    * You can provide an initial guess by setting output(0).\n
-   * A good initial guess may be needed to avoid errors like "The linear solver's setup function failed in an unrecoverable manner."
+   * A good initial guess may be needed to avoid errors like
+   * "The linear solver's setup function failed in an unrecoverable manner."
    *
    The constraints option expects an integer entry for each variable u:\n
 
@@ -62,7 +63,8 @@ namespace casadi{
      * \param f Function mapping from (n+1) inputs to 1 output
      *
      */
-    explicit KinsolSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
+    explicit KinsolSolver(const Function& f, const Function& jac=Function(),
+                          const LinearSolver& linsol=LinearSolver());
 
     /** \brief  Access functions of the node */
     KinsolInternal* operator->();
@@ -77,7 +79,8 @@ namespace casadi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static ImplicitFunction creator(const Function& f, const Function& jac, const LinearSolver& linsol){ return KinsolSolver(f,jac,linsol);}
+    static ImplicitFunction creator(const Function& f, const Function& jac,
+                                    const LinearSolver& linsol){ return KinsolSolver(f,jac,linsol);}
 #ifdef SWIG
     %nocallback;
 #endif

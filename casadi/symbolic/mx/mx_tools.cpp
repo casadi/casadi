@@ -131,7 +131,8 @@ namespace casadi{
     return vertsplit(x,offset1);
   }
 
-  std::vector< std::vector<MX> > blocksplit(const MX& x, const std::vector<int>& vert_offset, const std::vector<int>& horz_offset) {
+  std::vector< std::vector<MX> > blocksplit(const MX& x, const std::vector<int>& vert_offset,
+                                            const std::vector<int>& horz_offset) {
     std::vector<MX> rows = vertsplit(x,vert_offset);
     std::vector< std::vector<MX> > ret;
     for (int i=0;i<rows.size();++i) {
@@ -194,7 +195,8 @@ namespace casadi{
   }
 
   MX mul(const std::vector< MX > &args){
-    casadi_assert_message(args.size()>=1,"mul(std::vector< MX > &args): supplied list must not be empty.");
+    casadi_assert_message(args.size()>=1,
+                          "mul(std::vector< MX > &args): supplied list must not be empty.");
     if (args.size()==1) return args[0];
     MX ret = args[0].mul(args[1]);
     for (int i=2;i<args.size();++i) {
@@ -350,7 +352,8 @@ namespace casadi{
   MX createParent(std::vector<MX> &deps) {
     // First check if arguments are symbolic
     for (int k=0;k<deps.size();k++) {
-      if (!deps[k].isSymbolic()) throw CasadiException("createParent: the argumenst must be pure symbolic");
+      if (!deps[k].isSymbolic())
+          throw CasadiException("createParent: the argumenst must be pure symbolic");
     }
 
     // Collect the sizes of the depenencies
@@ -490,11 +493,14 @@ namespace casadi{
     substituteInPlace(v,vdef,ex,reverse);
   }
 
-  void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse){
-    casadi_assert_message(v.size()==vdef.size(),"Mismatch in the number of expression to substitute.");
+  void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
+                         std::vector<MX>& ex, bool reverse){
+    casadi_assert_message(v.size()==vdef.size(),
+                          "Mismatch in the number of expression to substitute.");
     for(int k=0; k<v.size(); ++k){
       casadi_assert_message(v[k].isSymbolic(),"Variable " << k << " is not symbolic");
-      casadi_assert_message(v[k].sparsity() == vdef[k].sparsity(), "Inconsistent sparsity for variable " << k << ".");
+      casadi_assert_message(v[k].sparsity() == vdef[k].sparsity(),
+                            "Inconsistent sparsity for variable " << k << ".");
     }
     casadi_assert_message(reverse==false,"Not implemented");
 
@@ -558,7 +564,8 @@ namespace casadi{
     return substitute(vector<MX>(1,ex),vector<MX>(1,v),vector<MX>(1,vdef)).front();
   }
 
-  std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef){
+  std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
+                             const std::vector<MX> &vdef){
     // Assert consistent dimensions
     casadi_assert(v.size()==vdef.size());
 
@@ -582,8 +589,11 @@ namespace casadi{
     return graph_substitute(std::vector<MX>(1,ex),v,vdef).at(0);
   }
 
-  std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &expr, const std::vector<MX> &exprs) {
-    casadi_assert_message(expr.size()==exprs.size(),"Mismatch in the number of expression to substitute: " << expr.size() << " <-> " << exprs.size() << ".");
+  std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &expr,
+                                   const std::vector<MX> &exprs) {
+    casadi_assert_message(expr.size()==exprs.size(),
+                          "Mismatch in the number of expression to substitute: "
+                          << expr.size() << " <-> " << exprs.size() << ".");
 
     // Sort the expression
     MXFunction f(vector<MX>(),ex);
@@ -664,7 +674,8 @@ namespace casadi{
             int el = it->res[0];
             swork[el] = it->data;
           } else {
-            const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+            const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,
+                                                  dummy_p,dummy_p,dummy_p,dummy_p,false);
           }
         }
       }
@@ -675,13 +686,18 @@ namespace casadi{
       all_found = all_found && expr_found[i];
     }
 
-    //casadi_assert_message(all_found,"MXFunctionInternal::extractNodes(const std::vector<MX>& expr): failed to locate all input expr." << std::endl << "Here's a boolean list showing which ones where found: " << expr_found);
+    //casadi_assert_message(all_found,
+    //             "MXFunctionInternal::extractNodes(const std::vector<MX>& expr):"
+    //             " failed to locate all input expr."
+    //             << std::endl << "Here's a boolean list showing which ones where found: "
+    //             << expr_found);
 
     return f_out;
 
   }
 
-  void extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef, const std::string& v_prefix, const std::string& v_suffix){
+  void extractShared(std::vector<MX>& ex, std::vector<MX>& v, std::vector<MX>& vdef,
+                     const std::string& v_prefix, const std::string& v_suffix){
 
     // Sort the expression
     MXFunction f(vector<MX>(),ex);
@@ -783,7 +799,8 @@ namespace casadi{
           }
 
           // Evaluate atomic operation
-          const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+          const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,
+                                                dummy_p,dummy_p,dummy_p,dummy_p,false);
 
           // Possibly replace results with new variables
           for(int c=0; c<it->res.size(); ++c){

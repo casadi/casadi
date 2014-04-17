@@ -54,16 +54,20 @@ namespace casadi{
     virtual bool isBinaryOp() const { return true;}
 
     /** \brief  Evaluate the function symbolically (MX) */
-    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                            bool output_given);
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                           std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                            std::vector<SXElement>& rtmp);
 
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV>
@@ -73,7 +77,8 @@ namespace casadi{
     virtual int numInplace() const{ return 2;}
 
     /** \brief Generate code for the operation */
-    void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                           const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Get a unary operation
     virtual MX getUnary(int op) const;
@@ -89,7 +94,8 @@ namespace casadi{
           return true;
         } else {
           // If arguments are flipped
-          return operation_checker<CommChecker>(op_) && dep(1).isEqual(node->dep(0),depth-1) && dep(0).isEqual(node->dep(1),depth-1);
+          return operation_checker<CommChecker>(op_) && dep(1).isEqual(node->dep(0),depth-1) &&
+              dep(0).isEqual(node->dep(1),depth-1);
         }
       } else {
         return false;

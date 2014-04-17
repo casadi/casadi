@@ -32,18 +32,27 @@
 using namespace std;
 namespace casadi{
 
-  ImplicitFunctionInternal::ImplicitFunctionInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : f_(f), jac_(jac), linsol_(linsol){
-    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
-    addOption("constraints",              OT_INTEGERVECTOR,GenericType(),"Constrain the unknowns. 0 (default): no constraint on ui, 1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.");
-    addOption("implicit_input",           OT_INTEGER,      0, "Index of the input that corresponds to the actual root-finding");
-    addOption("implicit_output",          OT_INTEGER,      0, "Index of the output that corresponds to the actual root-finding");
+  ImplicitFunctionInternal::ImplicitFunctionInternal(const Function& f, const Function& jac,
+                                                     const LinearSolver& linsol) : f_(f), jac_(jac),
+                                                                                   linsol_(linsol){
+    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(),
+              "User-defined linear solver class. Needed for sensitivities.");
+    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+              "Options to be passed to the linear solver.");
+    addOption("constraints",              OT_INTEGERVECTOR,GenericType(),
+              "Constrain the unknowns. 0 (default): no constraint on ui, "
+              "1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.");
+    addOption("implicit_input",           OT_INTEGER,      0,
+              "Index of the input that corresponds to the actual root-finding");
+    addOption("implicit_output",          OT_INTEGER,      0,
+              "Index of the output that corresponds to the actual root-finding");
   }
 
   ImplicitFunctionInternal::~ImplicitFunctionInternal(){
   }
 
-  void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,
+                                                 SharedObject>& already_copied){
     FunctionInternal::deepCopyMembers(already_copied);
     f_ = deepcopy(f_,already_copied);
     jac_ = deepcopy(jac_,already_copied);
@@ -60,12 +69,20 @@ namespace casadi{
     iout_ = getOption("implicit_output");
 
     // Get the number of equations and check consistency
-    casadi_assert_message(iin_>=0 && iin_<f_.getNumInputs() && f_.getNumInputs()>0,"Implicit input not in range");
-    casadi_assert_message(iout_>=0 && iout_<f_.getNumOutputs() && f_.getNumOutputs()>0,"Implicit output not in range");
-    casadi_assert_message(f_.output(iout_).isDense() && f_.output(iout_).isVector(), "Residual must be a dense vector");
-    casadi_assert_message(f_.input(iin_).isDense() && f_.input(iin_).isVector(), "Unknown must be a dense vector");
+    casadi_assert_message(iin_>=0 && iin_<f_.getNumInputs() && f_.getNumInputs()>0,
+                          "Implicit input not in range");
+    casadi_assert_message(iout_>=0 && iout_<f_.getNumOutputs() && f_.getNumOutputs()>0,
+                          "Implicit output not in range");
+    casadi_assert_message(f_.output(iout_).isDense() && f_.output(iout_).isVector(),
+                          "Residual must be a dense vector");
+    casadi_assert_message(f_.input(iin_).isDense() && f_.input(iin_).isVector(),
+                          "Unknown must be a dense vector");
     n_ = f_.output(iout_).size();
-    casadi_assert_message(n_ == f_.input(iin_).size(), "Dimension mismatch. Input size is " << f_.input(iin_).size() << ", while output size is " << f_.output(iout_).size());
+    casadi_assert_message(n_ == f_.input(iin_).size(),
+                          "Dimension mismatch. Input size is "
+                          << f_.input(iin_).size()
+                          << ", while output size is "
+                          << f_.output(iout_).size());
 
     // Allocate inputs
     setNumInputs(f_.getNumInputs());
@@ -91,7 +108,10 @@ namespace casadi{
     jac_.init(false);
 
     // Check for structural singularity in the Jacobian
-    casadi_assert_message(!jac_.output().sparsity().isSingular(),"ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
+    casadi_assert_message(
+      !jac_.output().sparsity().isSingular(),
+      "ImplicitFunctionInternal::init: singularity - the jacobian is structurally rank-deficient. "
+      "sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
 
     // Get the linear solver creator function
     if(linsol_.isNull()){
@@ -122,7 +142,9 @@ namespace casadi{
     // Constraints
     if (hasSetOption("constraints")) u_c_ = getOption("constraints");
 
-    casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),"Constraint vector if supplied, must be of length n, but got " << u_c_.size() << " and n = " << n_);
+    casadi_assert_message(u_c_.size()==n_ || u_c_.empty(),
+                          "Constraint vector if supplied, must be of length n, but got "
+                          << u_c_.size() << " and n = " << n_);
   }
 
   void ImplicitFunctionInternal::evaluate(){
@@ -137,7 +159,10 @@ namespace casadi{
     solveNonLinear();
   }
 
-  void ImplicitFunctionInternal::evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
+  void ImplicitFunctionInternal::evaluateMX(
+      MXNode* node, const MXPtrV& arg, MXPtrV& res,
+      const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens,
+      bool output_given){
     // Evaluate non-differentiated
     vector<MX> argv = MXNode::getVector(arg);
     MX z; // the solution to the system of equations
@@ -323,7 +348,3 @@ namespace casadi{
 
 
 } // namespace casadi
-
-
-
-

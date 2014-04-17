@@ -83,7 +83,7 @@ function(add_style_check_target TARGET_NAME SOURCES_LIST0)# PROJECT)
             "--filter=${STYLE_FILTER}"
             "--counting=detailed"
             "--extensions=cpp,hpp,h"
-            "--linelength=200"
+            "--linelength=100"
 #            "--project=${PROJECT}"
             ${SOURCES_LIST}
     DEPENDS ${SOURCES_LIST}

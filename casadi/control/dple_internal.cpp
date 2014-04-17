@@ -35,7 +35,9 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace casadi{
 
-  DpleInternal::DpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V,int nfwd, int nadj) : A_(A), V_(V), nfwd_(nfwd), nadj_(nadj) {
+  DpleInternal::DpleInternal(const std::vector< Sparsity > & A,
+                             const std::vector< Sparsity > &V,int nfwd, int nadj) :
+      A_(A), V_(V), nfwd_(nfwd), nadj_(nadj) {
 
     // set default options
     setOption("name","unnamed_dple_solver"); // name of the function
@@ -43,7 +45,9 @@ namespace casadi{
     addOption("const_dim",OT_BOOLEAN,true,"Assume constant dimension of P");
     addOption("pos_def",OT_BOOLEAN,false,"Assume P positive definite");
 
-    addOption("error_unstable",OT_BOOLEAN,false,"Throw an exception when it is detected that Product(A_i,i=N..1) has eigenvalues greater than 1-eps_unstable");
+    addOption("error_unstable",OT_BOOLEAN,false,
+              "Throw an exception when it is detected that Product(A_i,i=N..1) "
+              "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable",OT_REAL,1e-4,"A margin for unstability detection");
 
     if (nfwd_==0 && nadj_==0) {
@@ -65,18 +69,24 @@ namespace casadi{
     eps_unstable_ = getOption("eps_unstable");
 
     // Dimension sanity checks
-    casadi_assert_message(A_.size()==V_.size(),"A and V arguments must be of same length, but got " << A_.size() << " and " << V_.size() << ".");
+    casadi_assert_message(A_.size()==V_.size(),"A and V arguments must be of same length, but got "
+                          << A_.size() << " and " << V_.size() << ".");
     K_ = A_.size();
     for (int k=0;k<K_;++k) {
-      casadi_assert_message(V_[k].isSymmetric(),"V_i must be symmetric but got " << V_[k].dimString() << " for i = " << k << ".");
+      casadi_assert_message(V_[k].isSymmetric(),"V_i must be symmetric but got "
+                            << V_[k].dimString() << " for i = " << k << ".");
 
-      casadi_assert_message(A_[k].size1()==V_[k].size1(),"First dimension of A (" << A_[k].size1() << ") must match dimension of symmetric V_i (" << V_[k].size1() << ")" << " for i = " << k << ".");
+      casadi_assert_message(A_[k].size1()==V_[k].size1(),"First dimension of A ("
+                            << A_[k].size1() << ") must match dimension of symmetric V_i ("
+                            << V_[k].size1() << ")" << " for i = " << k << ".");
     }
 
     if (const_dim_) {
       int n = A_[0].size1();
        for (int k=1;k<K_;++k) {
-         casadi_assert_message(A_[k].size1()==n,"You have set const_dim option, but found an A_i with dimension ( " << A_[k].dimString() << " ) deviating from n = " << n << " at i = " << k << ".");
+         casadi_assert_message(A_[k].size1()==n,"You have set const_dim option, but found "
+                               "an A_i with dimension ( " << A_[k].dimString()
+                               << " ) deviating from n = " << n << " at i = " << k << ".");
       }
     }
 

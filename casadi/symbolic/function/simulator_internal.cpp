@@ -32,7 +32,11 @@ using namespace std;
 namespace casadi{
 
 
-  SimulatorInternal::SimulatorInternal(const Integrator& integrator, const Function& output_fcn, const vector<double>& grid) : integrator_(integrator), output_fcn_(output_fcn), grid_(grid){
+  SimulatorInternal::SimulatorInternal(const Integrator& integrator,
+                                       const Function& output_fcn,
+                                       const vector<double>& grid) :
+      integrator_(integrator), output_fcn_(output_fcn), grid_(grid)
+  {
     setOption("name","unnamed simulator");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
 
@@ -95,11 +99,16 @@ namespace casadi{
     for(int i=0; i<getNumOutputs(); ++i){
       output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(),grid_.size());
       if (!output_fcn_.output(i).isEmpty()) {
-        casadi_assert_message(output_fcn_.output(i).isVector(),"SimulatorInternal::init: Output function output #" << i << " has shape " << output_fcn_.output(i).dimString() << ", while a column-matrix shape is expected.");
+        casadi_assert_message(output_fcn_.output(i).isVector(),
+                              "SimulatorInternal::init: Output function output #" << i
+                              << " has shape " << output_fcn_.output(i).dimString()
+                              << ", while a column-matrix shape is expected.");
       }
     }
 
-    casadi_assert_message( output_fcn_.input(DAE_T).numel() <=1, "SimulatorInternal::init: output_fcn DAE_T argument must be scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
+    casadi_assert_message( output_fcn_.input(DAE_T).numel() <=1,
+                           "SimulatorInternal::init: output_fcn DAE_T argument must be "
+                           "scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
 
     casadi_assert_message(
         output_fcn_.input(DAE_P).isEmpty() ||
@@ -188,5 +197,3 @@ namespace casadi{
   }
 
 } // namespace casadi
-
-

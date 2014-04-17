@@ -30,7 +30,9 @@
 /// \cond INTERNAL
 namespace casadi{
 
-  class CASADI_INTEGRATION_EXPORT ImplicitFixedStepIntegratorInternal : public FixedStepIntegratorInternal{
+  class CASADI_INTEGRATION_EXPORT ImplicitFixedStepIntegratorInternal :
+    public FixedStepIntegratorInternal
+  {
   public:
 
     /// Constructor
@@ -43,7 +45,8 @@ namespace casadi{
     virtual ImplicitFixedStepIntegratorInternal* clone() const = 0;
 
     /// Create a new integrator
-    virtual ImplicitFixedStepIntegratorInternal* create(const Function& f, const Function& g) const = 0;
+    virtual ImplicitFixedStepIntegratorInternal* create(const Function& f,
+                                                        const Function& g) const = 0;
 
     /// Destructor
     virtual ~ImplicitFixedStepIntegratorInternal();

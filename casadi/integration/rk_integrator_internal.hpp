@@ -42,7 +42,8 @@ namespace casadi{
     virtual RKIntegratorInternal* clone() const{ return new RKIntegratorInternal(*this);}
 
     /// Create a new integrator
-    virtual RKIntegratorInternal* create(const Function& f, const Function& g) const{ return new RKIntegratorInternal(f,g);}
+    virtual RKIntegratorInternal* create(const Function& f, const Function& g) const
+    { return new RKIntegratorInternal(f,g);}
 
     /// Destructor
     virtual ~RKIntegratorInternal();

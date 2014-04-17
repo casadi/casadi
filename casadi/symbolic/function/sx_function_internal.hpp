@@ -50,9 +50,11 @@ namespace casadi{
     // Destructor
     ~SparsityPropagationKernel();
 
-    // Copy constructor and equality operator (not implemented, declared to prevent use of the default ones)
+    // Copy constructor and equality operator
+    // (not implemented, declared to prevent use of the default ones)
     SparsityPropagationKernel(const SparsityPropagationKernel& sparsityPropagationKernel);
-    SparsityPropagationKernel& operator=(const SparsityPropagationKernel& sparsityPropagationKernel);
+    SparsityPropagationKernel&
+      operator=(const SparsityPropagationKernel& sparsityPropagationKernel);
 
     // Data members (all public)
     cl_device_id device_id;
@@ -69,12 +71,14 @@ namespace casadi{
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SXElement>,SXNode>{
+class CASADI_SYMBOLIC_EXPORT SXFunctionInternal :
+        public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SXElement>,SXNode>{
   friend class SXFunction;
 
   protected:
     /** \brief  Constructor (only to be called from SXFunction, therefore protected) */
-    SXFunctionInternal(const std::vector<Matrix<SXElement> >& inputv, const std::vector<Matrix<SXElement> >& outputv);
+    SXFunctionInternal(const std::vector<Matrix<SXElement> >& inputv,
+                       const std::vector<Matrix<SXElement> >& outputv);
 
   public:
 
@@ -87,13 +91,15 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
   /** \brief  Evaluate the function numerically */
   virtual void evaluate();
 
-  /** \brief  Helper class to be plugged into evaluateGen when working with a value known only at runtime */
+  /** \brief  Helper class to be plugged into evaluateGen when working
+   * with a value known only at runtime */
   struct int_runtime{
     const int value;
     int_runtime(int v) : value(v){}
   };
 
-  /** \brief  Helper class to be plugged into evaluateGen when working with a value known already at compiletime */
+  /** \brief  Helper class to be plugged into evaluateGen when working
+   * with a value known already at compiletime */
   template<int v>
   struct int_compiletime{
     static const int value = v;
@@ -101,8 +107,10 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
 
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void evalSXsparse(const std::vector<SX>& arg, std::vector<SX>& res,
-                      const std::vector<std::vector<SX> >& fseed, std::vector<std::vector<SX> >& fsens,
-                      const std::vector<std::vector<SX> >& aseed, std::vector<std::vector<SX> >& asens);
+                      const std::vector<std::vector<SX> >& fseed,
+                            std::vector<std::vector<SX> >& fsens,
+                      const std::vector<std::vector<SX> >& aseed,
+                            std::vector<std::vector<SX> >& asens);
 
   /** \brief  Check if smooth */
   bool isSmooth() const;
@@ -144,12 +152,15 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal : public XFunctionInternal<SXFun
   virtual void init();
 
   /** \brief Generate code for the declarations of the C function */
-  virtual void generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+  virtual void generateDeclarations(std::ostream &stream, const std::string& type,
+                                    CodeGenerator& gen) const;
 
   /** \brief Generate code for the body of the C function */
-  virtual void generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const;
+  virtual void generateBody(std::ostream &stream, const std::string& type,
+                            CodeGenerator& gen) const;
 
-  /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
+  /** \brief Clear the function from its symbolic representation, to free up memory,
+   * no symbolic evaluations are possible after this */
   void clearSymbolic();
 
   /// Propagate a sparsity pattern through the algorithm

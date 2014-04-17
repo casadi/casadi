@@ -95,7 +95,8 @@ public:
                       bool new_lambda, Index nele_hess, Index* iRow,
                       Index* jCol, Number* values);
 
-  /** This method is called when the algorithm is complete so the TNLP can store/write the solution */
+  /** This method is called when the algorithm is complete
+   * so the TNLP can store/write the solution */
   virtual void finalize_solution(SolverReturn status,
                                  Index n, const Number* x, const Number* z_L, const Number* z_U,
                                  Index m, const Number* g, const Number* lambda,
@@ -122,15 +123,19 @@ public:
 
   /** Allows setting information about variables and constraints */
   virtual bool get_var_con_metadata(Index n, StringMetaDataMapType& var_string_md,
-                                    IntegerMetaDataMapType& var_integer_md, NumericMetaDataMapType& var_numeric_md,
+                                    IntegerMetaDataMapType& var_integer_md,
+                                    NumericMetaDataMapType& var_numeric_md,
                                     Index m, StringMetaDataMapType& con_string_md,
-                                    IntegerMetaDataMapType& con_integer_md, NumericMetaDataMapType& con_numeric_md);
+                                    IntegerMetaDataMapType& con_integer_md,
+                                    NumericMetaDataMapType& con_numeric_md);
 
   /** Retrieve information about variables and constraints */
   virtual void finalize_metadata(Index n, const StringMetaDataMapType& var_string_md,
-                                 const IntegerMetaDataMapType& var_integer_md, const NumericMetaDataMapType& var_numeric_md,
+                                 const IntegerMetaDataMapType& var_integer_md,
+                                 const NumericMetaDataMapType& var_numeric_md,
                                  Index m, const StringMetaDataMapType& con_string_md,
-                                 const IntegerMetaDataMapType& con_integer_md, const NumericMetaDataMapType& con_numeric_md);
+                                 const IntegerMetaDataMapType& con_integer_md,
+                                 const NumericMetaDataMapType& con_numeric_md);
 
 private:
   IpoptUserClass(const IpoptUserClass&);

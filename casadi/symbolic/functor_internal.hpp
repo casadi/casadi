@@ -51,7 +51,8 @@ namespace casadi{
     virtual Function call(Function& fcn, int nfwd, int nadj, void* user_data)=0;
   };
 
-  class CASADI_SYMBOLIC_EXPORT DerivativeGeneratorCInternal : public DerivativeGeneratorInternal, FunctorCInternal<DerivativeGeneratorCPtr> {
+  class CASADI_SYMBOLIC_EXPORT DerivativeGeneratorCInternal :
+        public DerivativeGeneratorInternal, FunctorCInternal<DerivativeGeneratorCPtr> {
     friend class DerivativeGenerator;
 
     DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr);
@@ -64,7 +65,8 @@ namespace casadi{
     virtual void call(CustomFunction& fcn, void* user_data)=0;
   };
 
-  class CASADI_SYMBOLIC_EXPORT CustomEvaluateCInternal : public CustomEvaluateInternal, FunctorCInternal<CustomEvaluateCPtr> {
+  class CASADI_SYMBOLIC_EXPORT CustomEvaluateCInternal :
+        public CustomEvaluateInternal, FunctorCInternal<CustomEvaluateCPtr> {
     friend class CustomEvaluate;
 
     CustomEvaluateCInternal(CustomEvaluateCPtr ptr);
@@ -77,7 +79,8 @@ namespace casadi{
     virtual int call(Function& fcn, void* user_data)=0;
   };
 
-  class CASADI_SYMBOLIC_EXPORT CallbackCInternal : public CallbackInternal, FunctorCInternal<CallbackCPtr> {
+  class CASADI_SYMBOLIC_EXPORT CallbackCInternal :
+        public CallbackInternal, FunctorCInternal<CallbackCPtr> {
     friend class Callback;
 
     CallbackCInternal(CallbackCPtr ptr);

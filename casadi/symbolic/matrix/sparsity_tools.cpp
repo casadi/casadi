@@ -134,7 +134,10 @@ namespace casadi{
     // Consistency check
     casadi_assert(offset.size()>=1);
     casadi_assert(offset.front()==0);
-    casadi_assert_message(offset.back()==sp.size2(),"horzsplit(Sparsity,std::vector<int>): Last elements of offset (" << offset.back() << ") must equal the number of columns (" << sp.size2() << ")");
+    casadi_assert_message(offset.back()==sp.size2(),
+                          "horzsplit(Sparsity,std::vector<int>): Last elements of offset "
+                          "(" << offset.back() << ") must equal the number of columns "
+                          "(" << sp.size2() << ")");
     casadi_assert(isMonotone(offset));
 
     // Number of outputs
@@ -183,4 +186,3 @@ namespace casadi{
   }
 
 } // namespace casadi
-

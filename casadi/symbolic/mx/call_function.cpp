@@ -34,7 +34,8 @@ namespace casadi {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
-    casadi_assert_message(arg.size()<=num_in,"Argument list length (" << arg.size() << ") exceeds number of inputs (" << num_in << ")");
+    casadi_assert_message(arg.size()<=num_in,"Argument list length (" << arg.size()
+                          << ") exceeds number of inputs (" << num_in << ")");
 
     // Add arguments if needed
     arg.resize(num_in);
@@ -56,7 +57,8 @@ namespace casadi {
     fcn_->printPart(this,stream,part);
   }
 
-  void CallFunction::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp) {
+  void CallFunction::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp,
+                               std::vector<double>& rtmp) {
     fcn_->evaluateD(this,arg,res,itmp,rtmp);
   }
 
@@ -72,11 +74,14 @@ namespace casadi {
     return fcn_;
   }
 
-  void CallFunction::evaluateSX(const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
+  void CallFunction::evaluateSX(const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp,
+                                std::vector<SXElement>& rtmp) {
     fcn_->evaluateSX(this,arg,res,itmp,rtmp);
   }
 
-  void CallFunction::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given) {
+  void CallFunction::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                                MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                                bool output_given) {
     fcn_->evaluateMX(this,input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given);
   }
 
@@ -85,11 +90,14 @@ namespace casadi {
     fcn_ = deepcopy(fcn_, already_copied);
   }
 
-  void CallFunction::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp, std::vector<double>& rtmp, bool use_fwd) {
+  void CallFunction::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp,
+                                       std::vector<double>& rtmp, bool use_fwd) {
     fcn_->propagateSparsity(this,arg,res,itmp,rtmp,use_fwd);
   }
 
-  void CallFunction::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void CallFunction::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                       const std::vector<std::string>& res,
+                                       CodeGenerator& gen) const{
     fcn_->generateOperation(this,stream,arg,res,gen);
   }
 

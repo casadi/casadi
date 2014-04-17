@@ -117,7 +117,8 @@ namespace casadi{
     HESSLAG_X,
     /// Fixed parameter [p]
     HESSLAG_P,
-    /// Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. [lam_f]
+    /// Multiplier for f. Just a scalar factor for the objective that the
+    // NLP solver might use to scale the objective. [lam_f]
     HESSLAG_LAM_F,
     /// Multiplier for g [lam_g]
     HESSLAG_LAM_G,
@@ -204,7 +205,8 @@ namespace casadi{
     /// Prints out a human readable report about possible constraint violations, after solving
     void reportConstraints(std::ostream &stream=std::cout);
 
-    std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
+    std::string getReportConstraints()
+    { std::stringstream s; reportConstraints(s); return s.str(); }
 
     /// Set options that make the NLP solver more suitable for solving QPs
     void setQPOptions();

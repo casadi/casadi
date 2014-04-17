@@ -37,7 +37,8 @@ namespace casadi{
        @copydoc DPLE_doc
 
        Uses Periodic Schur Decomposition (simple) and does not assume positive definiteness.
-       Based on Periodic Lyapunov equations: some applications and new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
+       Based on Periodic Lyapunov equations: some applications and new algorithms.
+       Int. J. Control, vol. 67, pp. 69-87, 1997.
 
        \author Joris gillis
       \date 2014
@@ -52,7 +53,8 @@ namespace casadi{
      *  \param[in] A  List of sparsities of A_i
      *  \param[in] V  List of sparsities of V_i
      */
-    explicit SimpleIndefDpleSolver(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V);
+    explicit SimpleIndefDpleSolver(const std::vector< Sparsity > & A,
+                                   const std::vector< Sparsity > &V);
 
     /// Access functions of the node
     SimpleIndefDpleInternal* operator->();
@@ -67,7 +69,9 @@ namespace casadi{
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static DpleSolver creator(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V){ return SimpleIndefDpleSolver(A,V);}
+    static DpleSolver creator(const std::vector< Sparsity > & A,
+                              const std::vector< Sparsity > &V){
+        return SimpleIndefDpleSolver(A,V);}
     #ifdef SWIG
     %nocallback;
     #endif

@@ -29,13 +29,17 @@ namespace casadi{
   ControlSimulator::ControlSimulator(){
   }
 
-  ControlSimulator::ControlSimulator(const Function& dae, const Function& output_fcn, const vector<double>& grid){
+  ControlSimulator::ControlSimulator(const Function& dae, const Function& output_fcn,
+                                     const vector<double>& grid){
     assignNode(new ControlSimulatorInternal(dae,output_fcn,grid));
   }
 
-  ControlSimulator::ControlSimulator(const Function& dae, const Function& output_fcn, const Matrix<double>& grid){
-    casadi_assert_message(grid.isVector(),"ControlSimulator::ControlSimulator: grid must be a column vector, but got " << grid.dimString());
-    casadi_assert_message(grid.isDense(),"ControlSimulator::ControlSimulator: grid must be dense, but got " << grid.dimString());
+  ControlSimulator::ControlSimulator(const Function& dae, const Function& output_fcn,
+                                     const Matrix<double>& grid){
+    casadi_assert_message(grid.isVector(),"ControlSimulator::ControlSimulator: grid must be a "
+                          "column vector, but got " << grid.dimString());
+    casadi_assert_message(grid.isDense(),"ControlSimulator::ControlSimulator: grid must be dense, "
+                          "but got " << grid.dimString());
     assignNode(new ControlSimulatorInternal(dae,output_fcn,grid.data()));
   }
 
@@ -44,8 +48,10 @@ namespace casadi{
   }
 
   ControlSimulator::ControlSimulator(const Function& dae, const Matrix<double>& grid){
-    casadi_assert_message(grid.isVector(),"ControlSimulator::ControlSimulator: grid must be a column vector, but got " << grid.dimString());
-    casadi_assert_message(grid.isDense(),"ControlSimulator::ControlSimulator: grid must be dense, but got " << grid.dimString());
+    casadi_assert_message(grid.isVector(),"ControlSimulator::ControlSimulator: grid must be a "
+                          "column vector, but got " << grid.dimString());
+    casadi_assert_message(grid.isDense(),"ControlSimulator::ControlSimulator: grid must be dense, "
+                          "but got " << grid.dimString());
     assignNode(new ControlSimulatorInternal(dae,Function(),grid.data()));
   }
 

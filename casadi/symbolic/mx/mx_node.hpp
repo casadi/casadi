@@ -125,13 +125,16 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const = 0;
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief  Evaluate numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                           std::vector<double>& rtmp);
 
     /** \brief  Evaluate symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                            std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output,
@@ -142,7 +145,9 @@ namespace casadi{
     void evaluateMX(const MXPtrV& input, MXPtrV& output);
 
     /** \brief  Propagate sparsity */
-    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd){ propagateSparsity(input,output,fwd);}
+    virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                                   std::vector<double>& rtmp, bool fwd)
+    { propagateSparsity(input,output,fwd);}
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
@@ -174,7 +179,8 @@ namespace casadi{
     /** \brief Get equality checking depth */
     inline static bool maxDepth(){ return MX::getEqualityCheckingDepth();}
 
-    /** \brief Checks if two nodes have the same operation and have equivalent dependencies up to a given depth */
+    /** \brief Checks if two nodes have the same operation and have
+     * equivalent dependencies up to a given depth */
     bool sameOpAndDeps(const MXNode* node, int depth) const;
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
@@ -231,7 +237,8 @@ namespace casadi{
     int addDependency(const MX& dep);
 
     /// Assign nonzeros (mapping matrix)
-    virtual void assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add=false);
+    virtual void assign(const MX& d, const std::vector<int>& inz,
+                        const std::vector<int>& onz, bool add=false);
 
     /// Assign nonzeros (mapping matrix), output indices sequential
     virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);

@@ -29,8 +29,12 @@
 using namespace std;
 namespace casadi{
 
-  KinsolInternal::KinsolInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol){
-    addOption("max_iter",                 OT_INTEGER, 0, "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
+  KinsolInternal::KinsolInternal(const Function& f, const Function& jac,
+                                 const LinearSolver& linsol) :
+      ImplicitFunctionInternal(f,jac,linsol)
+  {
+    addOption("max_iter",                 OT_INTEGER, 0,
+              "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
     addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
     addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");
     addOption("upper_bandwidth",          OT_INTEGER);
@@ -42,8 +46,10 @@ namespace casadi{
     addOption("u_scale",                  OT_REALVECTOR);
     addOption("pretype",                  OT_STRING, "none","","none|left|right|both");
     addOption("use_preconditioner",       OT_BOOLEAN, false); // precondition an iterative solver
-    addOption("strategy",                 OT_STRING, "none", "Globalization strategy","none|linesearch");
-    addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable KINSOL internal warning messages");
+    addOption("strategy",                 OT_STRING, "none", "Globalization strategy",
+              "none|linesearch");
+    addOption("disable_internal_warnings",   OT_BOOLEAN,false,
+              "Disable KINSOL internal warning messages");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_djac", true);
 
     mem_ = 0;
@@ -163,7 +169,8 @@ namespace casadi{
 
     } else if(getOption("linear_solver_type")=="banded") {
       // Banded jacobian
-      flag = KINBand(mem_, n_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
+      flag = KINBand(mem_, n_, getOption("upper_bandwidth").toInt(),
+                     getOption("lower_bandwidth").toInt());
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
 
       if(exact_jacobian){
@@ -341,7 +348,8 @@ namespace casadi{
     }
   }
 
-  int KinsolInternal::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
+  int KinsolInternal::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data,
+                                   N_Vector tmp1, N_Vector tmp2){
     try{
       casadi_assert(user_data);
       KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
@@ -353,7 +361,8 @@ namespace casadi{
     }
   }
 
-  void KinsolInternal::djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2){
+  void KinsolInternal::djac(long N, N_Vector u, N_Vector fu, DlsMat J,
+                            N_Vector tmp1, N_Vector tmp2){
     // Get time
     time1_ = clock();
 
@@ -396,7 +405,9 @@ namespace casadi{
     t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
+  int KinsolInternal::bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu,
+                                   DlsMat J, void *user_data,
+                                   N_Vector tmp1, N_Vector tmp2){
     try{
       casadi_assert(user_data);
       KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
@@ -408,7 +419,8 @@ namespace casadi{
     }
   }
 
-  void KinsolInternal::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2){
+  void KinsolInternal::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J,
+                            N_Vector tmp1, N_Vector tmp2){
     // Get time
     time1_ = clock();
 
@@ -443,7 +455,8 @@ namespace casadi{
     t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u, void *user_data){
+  int KinsolInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u,
+                                     void *user_data){
     try{
       casadi_assert(user_data);
       KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
@@ -480,7 +493,8 @@ namespace casadi{
     t_jac_ += static_cast<double>(time2_-time1_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, void* user_data, N_Vector tmp1, N_Vector tmp2){
+  int KinsolInternal::psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                                     void* user_data, N_Vector tmp1, N_Vector tmp2){
     try{
       casadi_assert(user_data);
       KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
@@ -492,7 +506,8 @@ namespace casadi{
     }
   }
 
-  void KinsolInternal::psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector tmp1, N_Vector tmp2){
+  void KinsolInternal::psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale,
+                              N_Vector tmp1, N_Vector tmp2){
     // Get time
     time1_ = clock();
 
@@ -528,7 +543,8 @@ namespace casadi{
           int Jrow = jac_.output().sparsity().row(k);
 
           // Which equation
-          ss << "This corresponds to the derivative of equation " << Jrow << " with respect to the variable " << Jcol << "." << endl;
+          ss << "This corresponds to the derivative of equation " << Jrow
+             << " with respect to the variable " << Jcol << "." << endl;
 
           // Print the expression for f[Jrow] if f is an SXFunction instance
           SXFunction f_sx = shared_cast<SXFunction>(f_);
@@ -555,7 +571,8 @@ namespace casadi{
     // Pass non-zero elements, scaled by -gamma, to the linear solver
     linsol_.setInput(jac_.output(),LINSOL_A);
 
-    // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
+    // Prepare the solution of the linear system (e.g. factorize)
+    // -- only if the linear solver inherits from LinearSolver
     linsol_.prepare();
 
     // Log time duration
@@ -563,7 +580,8 @@ namespace casadi{
     t_lsetup_fac_ += static_cast<double>(time1_-time2_)/CLOCKS_PER_SEC;
   }
 
-  int KinsolInternal::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp){
+  int KinsolInternal::psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval,
+                                     N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp){
     try{
       casadi_assert(user_data);
       KinsolInternal *this_ = static_cast<KinsolInternal*>(user_data);
@@ -575,7 +593,8 @@ namespace casadi{
     }
   }
 
-  void KinsolInternal::psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, N_Vector tmp){
+  void KinsolInternal::psolve(N_Vector u, N_Vector uscale, N_Vector fval,
+                              N_Vector fscale, N_Vector v, N_Vector tmp){
     // Get time
     time1_ = clock();
 
@@ -643,7 +662,8 @@ namespace casadi{
     *res_norm = sqrt(N_VDotProd(tmp1, tmp1));
   }
 
-  void KinsolInternal::ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data){
+  void KinsolInternal::ehfun_wrapper(int error_code, const char *module, const char *function,
+                                     char *msg, void *eh_data){
     try{
       casadi_assert(eh_data);
       KinsolInternal *this_ = static_cast<KinsolInternal*>(eh_data);
@@ -667,7 +687,8 @@ namespace casadi{
 
     stringstream ss;
     if(it == flagmap.end()){
-      ss << "Unknown " << (fatal? "error" : "warning") <<" (" << flag << ") from module \"" << module << "\".";
+      ss << "Unknown " << (fatal? "error" : "warning") <<" (" << flag << ")"
+          " from module \"" << module << "\".";
     } else {
       ss << "Module \"" << module << "\" returned flag \"" << it->second.first << "\"." << endl;
       ss << "The description of this flag is: " << endl;
@@ -750,4 +771,3 @@ namespace casadi{
   }
 
 } // namespace casadi
-

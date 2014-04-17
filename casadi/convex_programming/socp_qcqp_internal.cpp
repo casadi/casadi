@@ -37,9 +37,10 @@ SOCPQCQPInternal* SOCPQCQPInternal::clone() const{
 }
 
 SOCPQCQPInternal::SOCPQCQPInternal(const std::vector<Sparsity> &st) : QCQPSolverInternal(st) {
-
-  addOption("socp_solver",       OT_SOCPSOLVER, GenericType(), "The SOCPSolver used to solve the QCQPs.");
-  addOption("socp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the SOCPSOlver");
+  addOption("socp_solver",       OT_SOCPSOLVER, GenericType(),
+            "The SOCPSolver used to solve the QCQPs.");
+  addOption("socp_solver_options",       OT_DICTIONARY, GenericType(),
+            "Options to be passed to the SOCPSOlver");
 
 }
 
@@ -50,7 +51,9 @@ void SOCPQCQPInternal::evaluate() {
   if (inputs_check_) checkInputs();
 
   // Pass inputs of QCQP to SOCP form
-  std::copy(input(QCQP_SOLVER_A).begin(),input(QCQP_SOLVER_A).end(),socpsolver_.input(SOCP_SOLVER_A).begin());
+  std::copy(input(QCQP_SOLVER_A).begin(),
+            input(QCQP_SOLVER_A).end(),
+            socpsolver_.input(SOCP_SOLVER_A).begin());
 
   // Transform QCQP_SOLVER_P to SOCP_SOLVER_G
   // G = chol(H/2)
@@ -82,7 +85,9 @@ void SOCPQCQPInternal::evaluate() {
   cholesky_[0].solveL(x,1,true);
   int x_offset = n_+1;
   for (int i=0;i<nq_;++i) {
-    std::copy(input(QCQP_SOLVER_Q).begin()+i*(n_+1),input(QCQP_SOLVER_Q).begin()+(i+1)*(n_+1)-1,x+x_offset);
+    std::copy(input(QCQP_SOLVER_Q).begin()+i*(n_+1),
+              input(QCQP_SOLVER_Q).begin()+(i+1)*(n_+1)-1,
+              x+x_offset);
     cholesky_[i+1].solveL(x+x_offset,1,true);
     x_offset += n_+1;
   }
@@ -110,16 +115,25 @@ void SOCPQCQPInternal::evaluate() {
   socpsolver_.input(SOCP_SOLVER_E)[n_] = 0.5/socpsolver_.input(SOCP_SOLVER_F)[0];
 
   // Fix the first qc arising from epigraph reformulation: we must make use of e here.
-  socpsolver_.input(SOCP_SOLVER_G)[cholesky_[0].getFactorization().size()] = socpsolver_.input(SOCP_SOLVER_E)[n_];
+  socpsolver_.input(SOCP_SOLVER_G)[cholesky_[0].getFactorization().size()] =
+      socpsolver_.input(SOCP_SOLVER_E)[n_];
 
   /// Objective of the epigraph form
   socpsolver_.input(SOCP_SOLVER_C)[n_] = 1;
 
-  std::copy(input(QCQP_SOLVER_LBX).begin(),input(QCQP_SOLVER_LBX).end(),socpsolver_.input(SOCP_SOLVER_LBX).begin());
-  std::copy(input(QCQP_SOLVER_UBX).begin(),input(QCQP_SOLVER_UBX).end(),socpsolver_.input(SOCP_SOLVER_UBX).begin());
+  std::copy(input(QCQP_SOLVER_LBX).begin(),
+            input(QCQP_SOLVER_LBX).end(),
+            socpsolver_.input(SOCP_SOLVER_LBX).begin());
+  std::copy(input(QCQP_SOLVER_UBX).begin(),
+            input(QCQP_SOLVER_UBX).end(),
+            socpsolver_.input(SOCP_SOLVER_UBX).begin());
 
-  std::copy(input(QCQP_SOLVER_LBA).begin(),input(QCQP_SOLVER_LBA).end(),socpsolver_.input(SOCP_SOLVER_LBA).begin());
-  std::copy(input(QCQP_SOLVER_UBA).begin(),input(QCQP_SOLVER_UBA).end(),socpsolver_.input(SOCP_SOLVER_UBA).begin());
+  std::copy(input(QCQP_SOLVER_LBA).begin(),
+            input(QCQP_SOLVER_LBA).end(),
+            socpsolver_.input(SOCP_SOLVER_LBA).begin());
+  std::copy(input(QCQP_SOLVER_UBA).begin(),
+            input(QCQP_SOLVER_UBA).end(),
+            socpsolver_.input(SOCP_SOLVER_UBA).begin());
 
   // Delegate computation to SOCP Solver
   socpsolver_.evaluate();
@@ -130,8 +144,12 @@ void SOCPQCQPInternal::evaluate() {
   // Read the outputs from SOCP Solver
   output(SOCP_SOLVER_COST).set(socpsolver_.output(QCQP_SOLVER_COST));
   output(SOCP_SOLVER_LAM_A).set(socpsolver_.output(QCQP_SOLVER_LAM_A));
-  std::copy(socpsolver_.output(QCQP_SOLVER_X).begin(),socpsolver_.output(QCQP_SOLVER_X).begin()+n_,output(SOCP_SOLVER_X).begin());
-  std::copy(socpsolver_.output(QCQP_SOLVER_LAM_X).begin(),socpsolver_.output(QCQP_SOLVER_LAM_X).begin()+n_,output(SOCP_SOLVER_LAM_X).begin());
+  std::copy(socpsolver_.output(QCQP_SOLVER_X).begin(),
+            socpsolver_.output(QCQP_SOLVER_X).begin()+n_,
+            output(SOCP_SOLVER_X).begin());
+  std::copy(socpsolver_.output(QCQP_SOLVER_LAM_X).begin(),
+            socpsolver_.output(QCQP_SOLVER_LAM_X).begin()+n_,
+            output(SOCP_SOLVER_LAM_X).begin());
 }
 
 void SOCPQCQPInternal::init(){
@@ -144,7 +162,8 @@ void SOCPQCQPInternal::init(){
   // Allocate Cholesky solvers
   cholesky_.push_back(CSparseCholesky(st_[QCQP_STRUCT_H]));
   for (int i=0;i<nq_;++i) {
-    cholesky_.push_back(CSparseCholesky(DMatrix(st_[QCQP_STRUCT_P])(range(i*n_,(i+1)*n_),ALL).sparsity()));
+    cholesky_.push_back(
+      CSparseCholesky(DMatrix(st_[QCQP_STRUCT_P])(range(i*n_,(i+1)*n_),ALL).sparsity()));
   }
 
   for (int i=0;i<nq_+1;++i) {
@@ -158,7 +177,9 @@ void SOCPQCQPInternal::init(){
 
   // Create an socpsolver instance
   SOCPSolverCreator socpsolver_creator = getOption("socp_solver");
-  socpsolver_ = socpsolver_creator(socpStruct("g",horzcat(socp_g),"a",horzcat(input(QCQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
+  socpsolver_ = socpsolver_creator(
+    socpStruct("g",horzcat(socp_g),
+               "a",horzcat(input(QCQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
 
   //socpsolver_.setQCQPOptions();
   if(hasSetOption("socp_solver_options")){

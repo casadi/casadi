@@ -39,7 +39,9 @@ bool XMLNode::hasAttribute(const string& attribute_name) const{
 }
 
 XMLNode& XMLNode::operator[](int i){
-  casadi_assert_message(i>=0 && i < size(), "XMLNode::operator[]: index out of bounds for element " << i << " of node " << getName());
+  casadi_assert_message(i>=0 && i < size(),
+                        "XMLNode::operator[]: index out of bounds for element " << i
+                        << " of node " << getName());
 
   return children_.at(i);
 }
@@ -84,7 +86,9 @@ void XMLNode::addNode(TiXmlNode* n){
   int type = n->Type();
   if(type == TiXmlNode::ELEMENT){
     if(n->ToElement()!=0){
-      for(TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute(); pAttrib; pAttrib=pAttrib->Next()){
+      for(TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
+          pAttrib;
+          pAttrib=pAttrib->Next()){
           setAttribute(pAttrib->Name(),pAttrib->Value());
       }
     }
@@ -192,8 +196,5 @@ void XMLNode::readString(const std::string& str, double& val){
   std::istringstream buffer(str);
   buffer >> val;
 }
-
-
-
 
 } // namespace casadi

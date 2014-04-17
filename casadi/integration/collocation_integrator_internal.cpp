@@ -32,13 +32,20 @@
 using namespace std;
 namespace casadi{
 
-  CollocationIntegratorInternal::CollocationIntegratorInternal(const Function& f, const Function& g) : ImplicitFixedStepIntegratorInternal(f,g){
-    addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
-    addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
+  CollocationIntegratorInternal::CollocationIntegratorInternal(const Function& f,
+                                                               const Function& g) :
+      ImplicitFixedStepIntegratorInternal(f,g)
+  {
+    addOption("interpolation_order",           OT_INTEGER,  3,
+              "Order of the interpolating polynomials");
+    addOption("collocation_scheme",            OT_STRING,  "radau",
+              "Collocation scheme","radau|legendre");
     setOption("name","unnamed_collocation_integrator");
   }
 
-  void CollocationIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void CollocationIntegratorInternal::deepCopyMembers(
+    std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     ImplicitFixedStepIntegratorInternal::deepCopyMembers(already_copied);
   }
 
@@ -80,10 +87,12 @@ namespace casadi{
         }
       }
 
-      // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+      // Evaluate the polynomial at the final time to get the
+      // coefficients of the continuity equation
       D[j] = zeroIfSmall(p(1.0L));
 
-      // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+      // Evaluate the time derivative of the polynomial at all collocation points to
+      // get the coefficients of the continuity equation
       Polynomial dp = p.derivative();
       for(int r=0; r<deg_+1; ++r){
         C[j][r] = zeroIfSmall(dp(tau_root[r]));
@@ -177,7 +186,8 @@ namespace casadi{
     F_.init();
 
     // Backwards dynamics
-    // NOTE: The following is derived so that it will give the exact adjoint sensitivities whenever g is the reverse mode derivative of f.
+    // NOTE: The following is derived so that it will give the exact adjoint
+    // sensitivities whenever g is the reverse mode derivative of f.
     if(!g_.isNull()){
 
       // Symbolic inputs

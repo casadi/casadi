@@ -38,7 +38,8 @@ class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode{
   private:
 
     /** \brief  Constructor is private, use "create" below */
-    BinarySX(unsigned char op, const SXElement& dep0, const SXElement& dep1) : op_(op), dep0_(dep0), dep1_(dep1){}
+    BinarySX(unsigned char op, const SXElement& dep0, const SXElement& dep1) :
+        op_(op), dep0_(dep0), dep1_(dep1){}
 
   public:
 
@@ -93,7 +94,8 @@ class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode{
               bool added_to_stack = false;
               for(int c2=0; c2<t->ndep(); ++c2){ // for all dependencies of the dependency
 
-                // Get the node of the dependency of the top element and remove it from the smart pointer
+                // Get the node of the dependency of the top element
+                // and remove it from the smart pointer
                 SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SXElement>::nan);
 
                 // Check if this is the only reference to the element
@@ -135,7 +137,8 @@ class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode{
       if(n==0) return false;
       if(n->op_ != op_) return false;
       if(n->dep0_.isEqual(dep0_,depth-1) && n->dep1_.isEqual(dep1_,depth-1)) return true;
-      if(operation_checker<CommChecker>(op_) && n->dep1_.isEqual(dep0_,depth-1) &&  n->dep0_.isEqual(dep1_,depth-1)) return true;
+      if(operation_checker<CommChecker>(op_) && n->dep1_.isEqual(dep0_,depth-1) &&
+         n->dep0_.isEqual(dep1_,depth-1)) return true;
       return false;
     }
 

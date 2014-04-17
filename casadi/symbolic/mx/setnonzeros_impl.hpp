@@ -44,7 +44,8 @@ namespace casadi{
   }
 
   template<bool Add>
-  SetNonzerosVector<Add>::SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz) : SetNonzeros<Add>(y,x), nz_(nz){
+  SetNonzerosVector<Add>::SetNonzerosVector(const MX& y, const MX& x, const std::vector<int>& nz) :
+      SetNonzeros<Add>(y,x), nz_(nz){
     // Ignore duplicate assignments
     if(!Add){
       vector<bool> already_set(this->size(),false);
@@ -65,7 +66,9 @@ namespace casadi{
   }
 
   template<bool Add>
-  void SetNonzeros<Add>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void SetNonzeros<Add>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                                    MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                                    bool output_given){
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -176,7 +179,8 @@ namespace casadi{
       for(vector<int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k){
         if(*k>=0 && nz[*k]>=0 && r_ind[nz[*k]]<0){
 
-          // Create a new pattern which includes both the the previous seed and the addition/assignment
+          // Create a new pattern which includes both the the previous seed
+          // and the addition/assignment
           Sparsity sp = res.sparsity().patternUnion(osp);
           res = res->getSetSparse(sp);
 
@@ -202,7 +206,8 @@ namespace casadi{
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
 
-      // Get an owning references to the seeds and sensitivities and clear the seeds for the next run
+      // Get an owning references to the seeds and sensitivities
+      // and clear the seeds for the next run
       MX& aseed = *adjSeed[d][0];
       MX& asens0 = *adjSens[d][0];
       MX& asens = *adjSens[d][1];
@@ -265,18 +270,21 @@ namespace casadi{
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void SetNonzerosVector<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                         std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void SetNonzerosVector<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output,
+                                          std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
   template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosVector<Add>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void SetNonzerosVector<Add>::evaluateGen(const MatV& input, MatV& output,
+                                           std::vector<int>& itmp, std::vector<T>& rtmp){
 
     const vector<T>& idata0 = input[0]->data();
     typename vector<T>::const_iterator idata_it = input[1]->begin();
@@ -294,18 +302,21 @@ namespace casadi{
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void SetNonzerosSlice<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                        std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void SetNonzerosSlice<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output,
+                                         std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
   template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosSlice<Add>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void SetNonzerosSlice<Add>::evaluateGen(const MatV& input, MatV& output,
+                                          std::vector<int>& itmp, std::vector<T>& rtmp){
 
     const vector<T>& idata0 = input[0]->data();
     vector<T>& odata = output[0]->data();
@@ -326,18 +337,21 @@ namespace casadi{
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void SetNonzerosSlice2<Add>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                         std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void SetNonzerosSlice2<Add>::evaluateSX(const SXPtrV& input, SXPtrV& output,
+                                          std::vector<int>& itmp, std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool Add>
   template<typename T, typename MatV, typename MatVV>
-  void SetNonzerosSlice2<Add>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void SetNonzerosSlice2<Add>::evaluateGen(const MatV& input, MatV& output,
+                                           std::vector<int>& itmp, std::vector<T>& rtmp){
 
     const vector<T>& idata0 = input[0]->data();
     vector<T>& odata = output[0]->data();
@@ -349,7 +363,9 @@ namespace casadi{
     T* outer_ptr = getPtr(odata) + outer_.start_;
     T* outer_stop = getPtr(odata) + outer_.stop_;
     for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
-      for(T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+      for(T* inner_ptr = outer_ptr+inner_.start_;
+          inner_ptr != outer_ptr+inner_.stop_;
+          inner_ptr += inner_.step_){
         if(Add){
           *inner_ptr += *idata_ptr++;
         } else {
@@ -577,51 +593,69 @@ namespace casadi{
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void SetNonzerosVector<Add>::generateOperation(std::ostream &stream,
+                                                 const std::vector<std::string>& arg,
+                                                 const std::vector<std::string>& res,
+                                                 CodeGenerator& gen) const{
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
     // Copy first argument if not inplace
     if(!inplace){
-      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
+      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]="
+             << arg.at(0) << "[i];" << endl;
     }
 
     // Condegen the indices
     int ind = gen.getConstant(this->nz_,true);
 
     // Perform the operation inplace
-    stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.at(1) << "; ii!=s" << ind << "+" << this->nz_.size() << "; ++ii, ++ss)";
+    stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.at(1) << "; ii!=s"
+           << ind << "+" << this->nz_.size() << "; ++ii, ++ss)";
     stream << " if(*ii>=0) rr[*ii] " << (Add?"+=":"=") << " *ss;" << endl;
   }
 
   template<bool Add>
-  void SetNonzerosSlice<Add>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void SetNonzerosSlice<Add>::generateOperation(std::ostream &stream,
+                                                const std::vector<std::string>& arg,
+                                                const std::vector<std::string>& res,
+                                                CodeGenerator& gen) const{
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
     // Copy first argument if not inplace
     if(!inplace){
-      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
+      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front()
+             << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
     // Perform the operation inplace
-    stream << "  for(rr=" << res.front() << "+" << s_.start_ << ", ss=" << arg.at(1) << "; rr!=" << res.front() << "+" << s_.stop_ << "; rr+=" << s_.step_ << ")";
+    stream << "  for(rr=" << res.front() << "+" << s_.start_ << ", ss="
+           << arg.at(1) << "; rr!=" << res.front() << "+" << s_.stop_
+           << "; rr+=" << s_.step_ << ")";
     stream << " *rr " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void SetNonzerosSlice2<Add>::generateOperation(std::ostream &stream,
+                                                 const std::vector<std::string>& arg,
+                                                 const std::vector<std::string>& res,
+                                                 CodeGenerator& gen) const{
     // Check if inplace
     bool inplace = arg.at(0).compare(res.front())==0;
 
     // Copy first argument if not inplace
     if(!inplace){
-      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
+      stream << "  for(i=0; i<" << this->size() << "; ++i) "
+             << res.front() << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
     // Perform the operation inplace
-    stream << "  for(rr=" << res.front() << "+" << outer_.start_ << ", ss=" << arg.at(1) << "; rr!=" << res.front() << "+" << outer_.stop_ << "; rr+=" << outer_.step_ << ")";
-    stream << " for(tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_ << "; tt+=" << inner_.step_ << ")";
+    stream << "  for(rr=" << res.front() << "+" << outer_.start_
+           << ", ss=" << arg.at(1) << "; rr!=" << res.front()
+           << "+" << outer_.stop_ << "; rr+=" << outer_.step_ << ")";
+    stream << " for(tt=rr+" << inner_.start_ << "; tt!=rr+" << inner_.stop_
+           << "; tt+=" << inner_.step_ << ")";
     stream << " *tt " << (Add?"+=":"=") << " *ss++;" << endl;
   }
 

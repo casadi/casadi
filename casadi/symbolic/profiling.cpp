@@ -35,7 +35,8 @@ namespace casadi{
 #if defined(_WIN32)
 #include <Windows.h>
 
-#elif defined(__unix__) || defined(__unix) || defined(unix) || (defined(__APPLE__) && defined(__MACH__))
+#elif defined(__unix__) || defined(__unix) || defined(unix) || \
+    (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h> /* POSIX flags */
 #include <time.h>   /* clock_gettime(), time() */
 #include <sys/time.h>   /* gethrtime(), gettimeofday() */
@@ -64,7 +65,9 @@ double getRealTime( )
     t = (static_cast<ULONGLONG>(tm.dwHighDateTime) << 32) | (ULONGLONG)tm.dwLowDateTime;
     return static_cast<double>(t) / 10000000.0;
 
-#elif (defined(__hpux) || defined(hpux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
+#elif (defined(__hpux) || defined(hpux)) || \
+    ((defined(__sun__) || defined(__sun) || defined(sun)) && \
+     (defined(__SVR4) || defined(__svr4__)))
     /* HP-UX, Solaris. ------------------------------------------ */
     return static_cast<double>(gethrtime()) / 1000000000.0;
 
@@ -75,7 +78,8 @@ double getRealTime( )
     {
         mach_timebase_info_data_t timeBase;
         (void)mach_timebase_info( &timeBase );
-        timeConvert = static_cast<double>(timeBase.numer)/static_cast<double>(timeBase.denom) / 1000000000.0;
+        timeConvert = static_cast<double>(timeBase.numer)/
+            static_cast<double>(timeBase.denom) / 1000000000.0;
     }
     return static_cast<double>(mach_absolute_time()) * timeConvert;
 

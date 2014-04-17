@@ -147,9 +147,12 @@ namespace casadi{
       compress(ex,level-1);
   }
 
-  std::vector<SX> substitute(const std::vector<SX> &ex, const std::vector<SX> &v, const std::vector<SX> &vdef){
+  std::vector<SX> substitute(const std::vector<SX> &ex, const std::vector<SX> &v,
+                             const std::vector<SX> &vdef){
     // Assert consistent dimensions
-    casadi_assert_warning(v.size()==vdef.size(),"subtitute: number of symbols to replace ( " << v.size() << ") must match number of expressions (" << vdef.size() << ") to replace them with.");
+    casadi_assert_warning(v.size()==vdef.size(),"subtitute: number of symbols to replace ( "
+                          << v.size() << ") must match number of expressions (" << vdef.size()
+                          << ") to replace them with.");
 
     // Quick return if all equal
     bool all_equal = true;
@@ -164,12 +167,14 @@ namespace casadi{
     // Check sparsities
     for(int k=0; k<v.size(); ++k){
       if(v[k].sparsity()!=vdef[k].sparsity()) {
-        if (vdef[k].isScalar() && vdef[k].size()==1) { // Expand vdef to sparsity of v if vdef is scalar
+        // Expand vdef to sparsity of v if vdef is scalar
+        if (vdef[k].isScalar() && vdef[k].size()==1) {
           std::vector<SX> vdef_mod = vdef;
           vdef_mod[k] = SX(v[k].sparsity(),vdef[k].at(0));
           return substitute(ex,v,vdef_mod);
         } else {
-          casadi_error("subsitute(ex,v,vdef): sparsities of v and vdef must match. Got v: " << v[k].dimString() << " and " << "vdef: " << vdef[k].dimString() << ".");
+          casadi_error("subsitute(ex,v,vdef): sparsities of v and vdef must match. Got v: "
+                       << v[k].dimString() << " and " << "vdef: " << vdef[k].dimString() << ".");
         }
       }
     }
@@ -208,7 +213,8 @@ namespace casadi{
 
   void substituteInPlace(const SX &v, SX &vdef, std::vector<SX>& ex, bool reverse){
     casadi_assert_message(v.isSymbolic(),"the variable is not symbolic");
-    casadi_assert_message(v.sparsity() == vdef.sparsity(),"the sparsity patterns of the expression and its defining expression do not match");
+    casadi_assert_message(v.sparsity() == vdef.sparsity(),"the sparsity patterns of the "
+                          "expression and its defining bexpression do not match");
     if(v.isEmpty()) return; // quick return if nothing to replace
 
     // Function inputs
@@ -463,7 +469,8 @@ namespace casadi{
       if(to_be_expanded.top()->isConstant()){ // constant nodes are seen as multiples of one
         w.push_back(to_be_expanded.top()->getValue());
         f.push_back(casadi_limits<SXElement>::one.get());
-      } else if(to_be_expanded.top()->isSymbolic()){ // symbolic nodes have weight one and itself as factor
+      } else if(to_be_expanded.top()->isSymbolic()){
+        // symbolic nodes have weight one and itself as factor
         w.push_back(1);
         f.push_back(to_be_expanded.top());
       } else { // binary node
@@ -473,7 +480,9 @@ namespace casadi{
         // Check if addition, subtracton or multiplication
         SXNode* node = to_be_expanded.top();
         // If we have a binary node that we can factorize
-        if(node->getOp() == OP_ADD || node->getOp() == OP_SUB || (node->getOp() == OP_MUL  && (node->dep(0)->isConstant() || node->dep(1)->isConstant()))){
+        if(node->getOp() == OP_ADD || node->getOp() == OP_SUB ||
+           (node->getOp() == OP_MUL  && (node->dep(0)->isConstant() ||
+                                         node->dep(1)->isConstant()))){
           // Make sure that both children are factorized, if not - add to stack
           if (indices.find(node->dep(0).get()) == indices.end()){
             to_be_expanded.push(node->dep(0).get());
@@ -592,7 +601,10 @@ namespace casadi{
   }
 
   /// \cond
-  SX mtaylor_recursive(const SX& ex,const SX& x, const SX& a,int order,const std::vector<int>&order_contributions, const SXElement & current_dx=casadi_limits<SXElement>::one, double current_denom=1, int current_order=1) {
+  SX mtaylor_recursive(const SX& ex,const SX& x, const SX& a,int order,
+                       const std::vector<int>&order_contributions,
+                       const SXElement & current_dx=casadi_limits<SXElement>::one,
+                       double current_denom=1, int current_order=1) {
     SX result = substitute(ex,x,a)*current_dx/current_denom;
     for (int i=0;i<x.size();i++) {
       if (order_contributions[i]<=order) {
@@ -609,14 +621,18 @@ namespace casadi{
   }
   /// \endcond
 
-  SX mtaylor(const SX& ex,const SX& x, const SX& a,int order,const std::vector<int>&order_contributions) {
-    casadi_assert_message(ex.size()==ex.numel() && x.size()==x.numel(),"mtaylor: not implemented for sparse matrices");
+  SX mtaylor(const SX& ex,const SX& x, const SX& a,int order,
+             const std::vector<int>&order_contributions) {
+    casadi_assert_message(ex.size()==ex.numel() && x.size()==x.numel(),
+                          "mtaylor: not implemented for sparse matrices");
 
     casadi_assert_message(x.size()==order_contributions.size(),
-                          "mtaylor: number of non-zero elements in x (" <<  x.size() << ") must match size of order_contributions (" << order_contributions.size() << ")"
-                          );
+                          "mtaylor: number of non-zero elements in x (" <<  x.size()
+                          << ") must match size of order_contributions ("
+                          << order_contributions.size() << ")");
 
-    return reshape(mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()).T();
+    return reshape(
+             mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()).T();
   }
 
   int countNodes(const SX& A){
@@ -627,8 +643,10 @@ namespace casadi{
 
 
   std::string getOperatorRepresentation(const SXElement& x, const std::vector<std::string>& args) {
-    if (!x.hasDep()) throw CasadiException("getOperatorRepresentation: SXElement must be binary operator");
-    if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2)) throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
+    if (!x.hasDep())
+        throw CasadiException("getOperatorRepresentation: SXElement must be binary operator");
+    if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2))
+        throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
     std::stringstream s;
     casadi_math<double>::print(x.getOp(),s,args[0],args[1]);
     return s.str();
@@ -705,17 +723,20 @@ namespace casadi{
         xb.push_back(xp[i]);
       }
 
-      // We shall find out which variables enter nonlinearily in the equations, for this we need a function that will depend on all the variables
+      // We shall find out which variables enter nonlinearily in the equations,
+      // for this we need a function that will depend on all the variables
       SXFunction fcnb_all(xb,inner_prod(SX(fb),SX::sym("dum1",fb.size())));
       fcnb_all.init();
 
-      // Take the gradient of this function to find out which variables enter in the function (should be all)
+      // Take the gradient of this function to find out
+      // which variables enter in the function (should be all)
       SX fcnb_dep = fcnb_all.grad();
 
       // Make sure that this expression is dense (otherwise, some variables would not enter)
       casadi_assert(fcnb_dep.isDense());
 
-      // Multiply this expression with a new dummy vector and take the jacobian to find out which variables enter nonlinearily
+      // Multiply this expression with a new dummy vector and take the jacobian to
+      // find out which variables enter nonlinearily
       SXFunction fcnb_nonlin(xb,inner_prod(fcnb_dep,SX::sym("dum2",fcnb_dep.size())));
       fcnb_nonlin.init();
       Sparsity sp_nonlin = fcnb_nonlin.jacSparsity().transpose();
@@ -776,8 +797,10 @@ namespace casadi{
         } else { // There are both linear and nonlinear variables
 
           // Make a Dulmage-Mendelsohn decomposition
-          std::vector<int> rowpermb, colpermb, rowblockb, colblockb, coarse_rowblockb, coarse_colblockb;
-          Jb.sparsity().dulmageMendelsohn(rowpermb, colpermb, rowblockb, colblockb, coarse_rowblockb, coarse_colblockb);
+          std::vector<int> rowpermb, colpermb, rowblockb, colblockb,
+              coarse_rowblockb, coarse_colblockb;
+          Jb.sparsity().dulmageMendelsohn(rowpermb, colpermb, rowblockb, colblockb,
+                                          coarse_rowblockb, coarse_colblockb);
 
           Matrix<int>(Jb.sparsity(),1).printDense();
           Jb.printDense();
@@ -844,7 +867,8 @@ namespace casadi{
     // Assemble arguments and directional derivatives
     vector<SX> argv = f.inputExpr();
     vector<SX> resv = f.outputExpr();
-    vector<vector<SX> > fseed(nfsens,argv), fsens(nfsens,resv), aseed(nasens,resv), asens(nasens,argv);
+    vector<vector<SX> > fseed(nfsens,argv), fsens(nfsens,resv),
+        aseed(nasens,resv), asens(nasens,argv);
     for(int dir=0; dir<v2; ++dir){
       if(transpose_jacobian){
         aseed[dir][0].set(v(dir,Slice(0,v1)));
@@ -868,7 +892,9 @@ namespace casadi{
     return vertcat(dirder);
   }
 
-  void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v, std::vector<SXElement>& vdef, const std::string& v_prefix, const std::string& v_suffix){
+  void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v,
+                     std::vector<SXElement>& vdef,
+                     const std::string& v_prefix, const std::string& v_suffix){
 
     // Sort the expression
     SXFunction f(vector<SX>(),vector<SX>(1,ex));
@@ -1002,7 +1028,8 @@ namespace casadi{
     }
   }
 
-  void substituteInPlace(const std::vector<SX>& v, std::vector<SX>& vdef, std::vector<SX>& ex, bool reverse){
+  void substituteInPlace(const std::vector<SX>& v, std::vector<SX>& vdef, std::vector<SX>& ex,
+                         bool reverse){
     casadi_assert(v.size()==vdef.size());
 
     // Quick return if empty or single expression
@@ -1016,7 +1043,9 @@ namespace casadi{
     // Count number of scalar variables
     int n =0;
     for(int i=0; i<v.size(); ++i){
-      casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(),"the sparsity patterns of the expression and its defining expression do not match");
+      casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(),
+                            "the sparsity patterns of the expression and its "
+                            "defining expression do not match");
       n += v[i].size();
     }
 
@@ -1083,7 +1112,9 @@ namespace casadi{
   }
 
   SX poly_roots(const SX& p) {
-    casadi_assert_message(p.size2()==1,"poly_root(): supplied paramter must be column vector but got " << p.dimString() << ".");
+    casadi_assert_message(p.size2()==1,
+                          "poly_root(): supplied paramter must be column vector but got "
+                          << p.dimString() << ".");
     casadi_assert(p.isDense());
     if (p.size1()==2) { // a*x + b
       SX a = p(0);
@@ -1165,7 +1196,8 @@ namespace casadi{
       ret.append(0);
       return ret;
     } else {
-      casadi_error("poly_root(): can only solve cases for first or second order polynomial. Got order " << p.size1()-1 << ".");
+      casadi_error("poly_root(): can only solve cases for first or second order polynomial. "
+                   "Got order " << p.size1()-1 << ".");
     }
 
   }
@@ -1194,5 +1226,3 @@ namespace casadi{
   }
 
 } // namespace casadi
-
-

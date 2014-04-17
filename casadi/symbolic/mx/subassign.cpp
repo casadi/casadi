@@ -35,16 +35,19 @@ namespace casadi{
     return new SubAssign(*this);
   }
 
-  void SubAssign::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void SubAssign::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                            std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void SubAssign::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void SubAssign::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                             std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void SubAssign::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void SubAssign::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                              std::vector<T>& rtmp){
     casadi_error("not ready");
   }
 
@@ -62,11 +65,14 @@ namespace casadi{
     }
   }
 
-  void SubAssign::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void SubAssign::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                             bool output_given){
     casadi_error("not ready");
   }
 
-  void SubAssign::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void SubAssign::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                    const std::vector<std::string>& res, CodeGenerator& gen) const{
     casadi_error("not ready");
   }
 

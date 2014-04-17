@@ -68,19 +68,23 @@ namespace casadi{
   #endif // SWIG
 
   /** \brief Split up a sparsity pattern horizontally */
-  CASADI_SYMBOLIC_EXPORT std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& output_offset);
+  CASADI_SYMBOLIC_EXPORT
+    std::vector<Sparsity> horzsplit(const Sparsity& sp, const std::vector<int>& output_offset);
 
   /** \brief Split up a sparsity pattern vertically */
-  CASADI_SYMBOLIC_EXPORT std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& output_offset);
+  CASADI_SYMBOLIC_EXPORT
+    std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& output_offset);
 
   /// Obtain the structural rank of a sparsity-pattern
   CASADI_SYMBOLIC_EXPORT int rank(const Sparsity& a);
 
   /// Get upper triangular part
-  inline Sparsity triu(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTriu(includeDiagonal);}
+  inline Sparsity triu(const Sparsity& sp, bool includeDiagonal=true)
+  { return sp.getTriu(includeDiagonal);}
 
   /// Get lower triangular part
-  inline Sparsity tril(const Sparsity& sp, bool includeDiagonal=true){ return sp.getTril(includeDiagonal);}
+  inline Sparsity tril(const Sparsity& sp, bool includeDiagonal=true)
+  { return sp.getTril(includeDiagonal);}
 
   /*
   @}

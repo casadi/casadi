@@ -31,13 +31,15 @@ namespace casadi{
 
 using namespace std;
 
-ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) : bin_name_(bin_name){
+ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) :
+    bin_name_(bin_name){
 #ifdef WITH_DL
 
   // Load the dll
 #ifdef _WIN32
   handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
-  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code (WIN32): "<< GetLastError());
+  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: "
+                        << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
   initPtr init = (initPtr)GetProcAddress(handle_,TEXT("init"));
   if(init==0) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
@@ -48,7 +50,8 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 
 #else // _WIN32
   handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
-  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: " << bin_name_ << ". error code: "<< dlerror());
+  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: "
+                        << bin_name_ << ". error code: "<< dlerror());
 
   // reset error
   dlerror();

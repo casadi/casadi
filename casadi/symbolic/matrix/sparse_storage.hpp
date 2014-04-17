@@ -106,22 +106,31 @@ namespace casadi{
     const_reference back() const { return data().back();}
     /// \endcond
 
-    /** \brief  Create a matrix from a matrix with a different type of matrix entries (assuming that the scalar conversion is valid) */
+    /** \brief  Create a matrix from a matrix with a different type of matrix entries
+     *          (assuming that the scalar conversion is valid) */
     template<typename A>
-    SparseStorage(const SparseStorage<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.size())){
+    SparseStorage(const SparseStorage<A>& x) :
+        sparsity_(x.sparsity()), data_(std::vector<DataType>(x.size()))
+    {
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
-    SparseStorage(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<DataType>(x.size())){
+    SparseStorage(const std::vector<A>& x) :
+      sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<DataType>(x.size()))
+    {
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
-    SparseStorage(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<DataType>(x.size())){
-      if(x.size() != nrow*ncol) throw CasadiException("SparseStorage::SparseStorage(const std::vector<DataType>& x,  int n, int m): dimension mismatch");
+    SparseStorage(const std::vector<A>& x,  int nrow, int ncol) :
+      sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<DataType>(x.size()))
+    {
+      if(x.size() != nrow*ncol)
+        throw CasadiException("SparseStorage::SparseStorage(const std::vector<DataType>& x, "
+                              "int n, int m): dimension mismatch");
       copy(x.begin(),x.end(),begin());
     }
 
@@ -139,7 +148,8 @@ namespace casadi{
         return data().at(k);
       } catch(std::out_of_range& ex){
         std::stringstream ss;
-        ss << "Out of range error in SparseStorage<>::at: " << k << " not in range [0," << sparsity_.size() << ")";
+        ss << "Out of range error in SparseStorage<>::at: " << k
+           << " not in range [0," << sparsity_.size() << ")";
         throw CasadiException(ss.str());
       }
     }
@@ -151,7 +161,8 @@ namespace casadi{
         return data().at(k);
       } catch(std::out_of_range& ex){
         std::stringstream ss;
-        ss << "Out of range error in SparseStorage<>::at: " << k << " not in range [0," << size() << ")";
+        ss << "Out of range error in SparseStorage<>::at: " << k
+           << " not in range [0," << size() << ")";
         throw CasadiException(ss.str());
       }
     }
@@ -208,4 +219,3 @@ namespace casadi{
 } // namespace casadi
 
 #endif // SPARSE_STORAGE_HPP
-

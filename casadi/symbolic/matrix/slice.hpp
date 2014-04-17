@@ -66,7 +66,8 @@ namespace casadi{
     std::vector<int> getAll(const Slice& outer, int len) const;
 
     /// Check equality
-    bool operator==(const Slice& other) const{ return start_==other.start_ && stop_==other.stop_ && step_==other.step_;}
+    bool operator==(const Slice& other) const
+    { return start_==other.start_ && stop_==other.stop_ && step_==other.step_;}
 
     /// Check inequality
     bool operator!=(const Slice& other) const{ return !(*this == other);}
@@ -122,4 +123,3 @@ namespace casadi{
 #endif // SWIG
 
 #endif // SLICE_HPP
-

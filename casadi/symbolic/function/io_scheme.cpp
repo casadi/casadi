@@ -32,7 +32,8 @@ namespace casadi{
     assignNode(new IOSchemeBuiltinInternal(scheme));
   }
 
-  IOScheme::IOScheme(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions) {
+  IOScheme::IOScheme(const std::vector<std::string> &entries,
+                     const std::vector<std::string> &descriptions) {
     assignNode(new IOSchemeCustomInternal(entries,descriptions));
   }
 

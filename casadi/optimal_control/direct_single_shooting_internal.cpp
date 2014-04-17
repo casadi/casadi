@@ -29,12 +29,21 @@
 using namespace std;
 namespace casadi{
 
-DirectSingleShootingInternal::DirectSingleShootingInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
+DirectSingleShootingInternal::DirectSingleShootingInternal(const Function& ffcn,
+                                                           const Function& mfcn,
+                                                           const Function& cfcn,
+                                                           const Function& rfcn) :
+    OCPSolverInternal(ffcn, mfcn, cfcn, rfcn)
+{
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to casadi::Parallelizer");
-  addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
-  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
-  addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
-  addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
+  addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(),
+            "An NLPSolver creator function");
+  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
+            "Options to be passed to the NLP Solver");
+  addOption("integrator",               OT_INTEGRATOR, GenericType(),
+            "An integrator creator function");
+  addOption("integrator_options",       OT_DICTIONARY, GenericType(),
+            "Options to be passed to the integrator");
 }
 
 DirectSingleShootingInternal::~DirectSingleShootingInternal(){
@@ -92,7 +101,8 @@ void DirectSingleShootingInternal::init(){
     offset += nu_;
   }
 
-  // Make sure that the size of the variable vector is consistent with the number of variables that we have referenced
+  // Make sure that the size of the variable vector is consistent with the number of
+  // variables that we have referenced
   casadi_assert(offset==NV);
 
   // Current state
@@ -118,7 +128,8 @@ void DirectSingleShootingInternal::init(){
 
     // Add path constraints
     if(path_constraints){
-      vector<MX> cfcn_out = cfcn_.call(daeIn("x",X,"p",U[k])); // TODO(Joel): Change signature of cfcn_: remove algebraic variable, add control
+      // TODO(Joel): Change signature of cfcn_: remove algebraic variable, add control
+      vector<MX> cfcn_out = cfcn_.call(daeIn("x",X,"p",U[k]));
       nlp_g.push_back(cfcn_out.at(0));
     }
   }
@@ -177,7 +188,8 @@ void DirectSingleShootingInternal::getGuess(vector<double>& V_init) const{
   casadi_assert(el==V_init.size());
 }
 
-void DirectSingleShootingInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
+void DirectSingleShootingInternal::getVariableBounds(vector<double>& V_min,
+                                                     vector<double>& V_max) const{
   // OCP variable bounds
   const Matrix<double> &p_min = input(OCP_LBP);
   const Matrix<double> &p_max = input(OCP_UBP);
@@ -213,7 +225,8 @@ void DirectSingleShootingInternal::getVariableBounds(vector<double>& V_min, vect
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
 }
 
-void DirectSingleShootingInternal::getConstraintBounds(vector<double>& G_min, vector<double>& G_max) const{
+void DirectSingleShootingInternal::getConstraintBounds(vector<double>& G_min,
+                                                       vector<double>& G_max) const{
   // OCP constraint bounds
   const Matrix<double> &x_min = input(OCP_LBX);
   const Matrix<double> &x_max = input(OCP_UBX);
@@ -285,10 +298,12 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
 void DirectSingleShootingInternal::evaluate(){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
-  getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),nlp_solver_.input(NLP_SOLVER_UBX).data());
+  getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),
+                    nlp_solver_.input(NLP_SOLVER_UBX).data());
 
   // get NLP constraint bounds
-  getConstraintBounds(nlp_solver_.input(NLP_SOLVER_LBG).data(), nlp_solver_.input(NLP_SOLVER_UBG).data());
+  getConstraintBounds(nlp_solver_.input(NLP_SOLVER_LBG).data(),
+                      nlp_solver_.input(NLP_SOLVER_UBG).data());
 
   //Solve the problem
   nlp_solver_.solve();
@@ -304,9 +319,12 @@ void DirectSingleShootingInternal::evaluate(){
 void DirectSingleShootingInternal::reportConstraints(std::ostream &stream) {
   stream << "Reporting DirectSingleShooting constraints" << endl;
 
-  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
-  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");
-  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP), "parameters");
+  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX),
+                                      "states");
+  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU),
+                                      "controls");
+  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP),
+                                      "parameters");
 
 }
 

@@ -32,7 +32,8 @@ namespace casadi{
 
   //Call
 
-  DerivativeGeneratorCInternal::DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr)  : FunctorCInternal(ptr) {
+  DerivativeGeneratorCInternal::DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr) :
+      FunctorCInternal(ptr) {
   }
 
   Function DerivativeGeneratorCInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
@@ -44,7 +45,8 @@ namespace casadi{
     return new DerivativeGeneratorCInternal(ptr_);
   }
 
-  CustomEvaluateCInternal::CustomEvaluateCInternal(CustomEvaluateCPtr ptr)  : FunctorCInternal<CustomEvaluateCPtr>(ptr) {
+  CustomEvaluateCInternal::CustomEvaluateCInternal(CustomEvaluateCPtr ptr) :
+      FunctorCInternal<CustomEvaluateCPtr>(ptr) {
   }
 
   void CustomEvaluateCInternal::call(CustomFunction& fcn, void* user_data) {
@@ -69,4 +71,3 @@ namespace casadi{
   }
 
 } // namespace casadi
-

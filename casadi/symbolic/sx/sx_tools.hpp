@@ -127,7 +127,8 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT SX ramp(const SX &x);
 
   /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
-  CASADI_SYMBOLIC_EXPORT SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b, int order=5, const SX& w=SX());
+  CASADI_SYMBOLIC_EXPORT SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b,
+                                             int order=5, const SX& w=SX());
 
   /** \brief  Simplify an expression */
   CASADI_SYMBOLIC_EXPORT void simplify(SX &ex);
@@ -139,16 +140,24 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT SX substitute(const SX& ex, const SX& v, const SX& vdef);
 
   /** \brief  Substitute variable var with expression expr in multiple expressions */
-  CASADI_SYMBOLIC_EXPORT std::vector<SX> substitute(const std::vector<SX>& ex, const std::vector<SX>& v, const std::vector<SX>& vdef);
+  CASADI_SYMBOLIC_EXPORT std::vector<SX> substitute(const std::vector<SX>& ex,
+                                                    const std::vector<SX>& v,
+                                                    const std::vector<SX>& vdef);
 
   /** \brief Substitute variable var out of or into an expression expr */
   CASADI_SYMBOLIC_EXPORT void substituteInPlace(const SX& v, SX &vdef, bool reverse=false);
 
-  /** \brief Substitute variable var out of or into an expression expr, with an arbitrary number of other expressions piggyback */
-  CASADI_SYMBOLIC_EXPORT void substituteInPlace(const SX& v, SX &vdef, std::vector<SX>& ex, bool reverse=false);
+  /** \brief Substitute variable var out of or into an expression expr,
+   *  with an arbitrary number of other expressions piggyback */
+  CASADI_SYMBOLIC_EXPORT void substituteInPlace(const SX& v, SX &vdef,
+                                                std::vector<SX>& ex, bool reverse=false);
 
-  /** \brief Substitute variable var out of or into an expression expr, with an arbitrary number of other expressions piggyback (vector version) */
-  CASADI_SYMBOLIC_EXPORT void substituteInPlace(const std::vector<SX>& v, std::vector<SX>& vdef, std::vector<SX>& ex, bool reverse=false);
+  /** \brief Substitute variable var out of or into an expression expr,
+   *  with an arbitrary number of other expressions piggyback (vector version) */
+  CASADI_SYMBOLIC_EXPORT void substituteInPlace(const std::vector<SX>& v,
+                                                std::vector<SX>& vdef,
+                                                std::vector<SX>& ex,
+                                                bool reverse=false);
 
   /** \brief Evaluate an SX graph numerically
    * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
@@ -158,7 +167,8 @@ namespace casadi{
   /** \brief Substitute variable v with value vdef in an expression ex, and evaluate numerically
    * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
    */
-  CASADI_SYMBOLIC_EXPORT Matrix<double> evalf(const SX &ex, const SX &v, const Matrix<double> &vdef);
+  CASADI_SYMBOLIC_EXPORT Matrix<double> evalf(const SX &ex, const SX &v,
+                                              const Matrix<double> &vdef);
 
   /** \brief  Get the sparsity pattern of a matrix */
   CASADI_SYMBOLIC_EXPORT SX spy(const SX& A);
@@ -246,20 +256,24 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT SX gradient(const SX &ex, const SX &arg);
   CASADI_SYMBOLIC_EXPORT SX tangent(const SX &ex, const SX &arg);
   CASADI_SYMBOLIC_EXPORT SX hessian(const SX &ex, const SX &arg);
-  CASADI_SYMBOLIC_EXPORT void hessian(const SX &ex, const SX &arg, SX &H, SX &g); // hessian and gradient
+  // hessian and gradient:
+  CASADI_SYMBOLIC_EXPORT void hessian(const SX &ex, const SX &arg, SX &H, SX &g);
   //@}
 
   /** \brief Calculate the Jacobian and multiply by a vector from the left
-      This is equivalent to mul(jacobian(ex,arg),v) or mul(jacobian(ex,arg).T,v) for transpose_jacobian set to false and
-      true respectively. If contrast to these expressions, it will use directional derivatives which is typically (but
+      This is equivalent to mul(jacobian(ex,arg),v) or mul(jacobian(ex,arg).T,v) for
+      transpose_jacobian set to false and true respectively. If contrast to these
+      expressions, it will use directional derivatives which is typically (but
       not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
   */
-  CASADI_SYMBOLIC_EXPORT SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v, bool transpose_jacobian=false);
+  CASADI_SYMBOLIC_EXPORT SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v,
+                                                bool transpose_jacobian=false);
 
   /**
    * \brief univariate taylor series expansion
    *
-   * Calculate the taylor expansion of expression 'ex' up to order 'order' with repsect to variable 'x' around the point 'a'
+   * Calculate the taylor expansion of expression 'ex' up to order 'order' with
+   * respect to variable 'x' around the point 'a'
    *
    * \f$(x)=f(a)+f'(a)(x-a)+f''(a)\frac{(x-a)^2}{2!}+f'''(a)\frac{(x-a)^3}{3!}+\ldots\f$
    *
@@ -269,7 +283,8 @@ namespace casadi{
    * \endcode
    * \verbatim >>   x \endverbatim
    */
-  CASADI_SYMBOLIC_EXPORT SX taylor(const SX& ex,const SX& x, const SX& a=casadi_limits<SXElement>::zero,int order=1);
+  CASADI_SYMBOLIC_EXPORT SX taylor(const SX& ex,const SX& x,
+                                   const SX& a=casadi_limits<SXElement>::zero,int order=1);
 
   /**
    * \brief multivariate taylor series expansion
@@ -285,8 +300,9 @@ namespace casadi{
    * Do taylor expansions until the aggregated order of a term is equal to 'order'.
    * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
    *
-   * The argument order_contributions can denote how match each variable contributes to the aggregated order.
-   * If x=[x,y] and order_contributions=[1,2], then the aggregated order of \f$x^n y^m\f$ equals \f$1n+2m\f$.
+   * The argument order_contributions can denote how match each variable contributes
+   * to the aggregated order. If x=[x,y] and order_contributions=[1,2], then the
+   * aggregated order of \f$x^n y^m\f$ equals \f$1n+2m\f$.
    *
    * Example usage
    *
@@ -304,13 +320,16 @@ namespace casadi{
    * \f$  (-3 x^2 y-x^3)/6+y+x \f$
    *
    */
-  CASADI_SYMBOLIC_EXPORT SX mtaylor(const SX& ex,const SX& x, const SX& a,int order,const std::vector<int>&order_contributions);
+  CASADI_SYMBOLIC_EXPORT SX mtaylor(const SX& ex,const SX& x, const SX& a,int order,
+                                    const std::vector<int>&order_contributions);
 
   /** \brief Count number of nodes */
   CASADI_SYMBOLIC_EXPORT int countNodes(const SX& A);
 
   /** \brief Get a string representation for a binary SX, using custom arguments */
-  CASADI_SYMBOLIC_EXPORT std::string getOperatorRepresentation(const SXElement& x, const std::vector<std::string>& args);
+  CASADI_SYMBOLIC_EXPORT std::string getOperatorRepresentation(
+                                       const SXElement& x,
+                                       const std::vector<std::string>& args);
 
   /** \brief Get all the free variables in an expression */
   CASADI_SYMBOLIC_EXPORT SX getFree(const SX& ex);

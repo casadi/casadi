@@ -40,7 +40,8 @@ namespace casadi{
    * This class solves the linear system A.x=b by making an QR factorization of A: \n
    * A = Q.R, with Q orthogonal and R upper triangular
    *
-   * LapackQRDense is an casadi::Function mapping from 2 inputs [ A (matrix),b (vector)] to one output [x (vector)].
+   * LapackQRDense is an casadi::Function mapping from 2 inputs
+   * [ A (matrix),b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use LapackQRDense is: \n
    *  -# init()
@@ -50,7 +51,8 @@ namespace casadi{
    *  -# solve()
    *  -# Repeat steps 4 and 5 to work with other b vectors.
    *
-   * The method evaluate() combines the prepare() and solve() step and is therefore more expensive if A is invariant.
+   * The method evaluate() combines the prepare() and solve() step and is
+   * therefore more expensive if A is invariant.
    *
    */
   class CASADI_LAPACK_INTERFACE_EXPORT LapackQRDense : public LinearSolver{
@@ -81,13 +83,17 @@ namespace casadi{
 #ifndef SWIG
 
   /// QR-factorize dense matrix (lapack)
-  extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau, double *work, int *lwork, int *info);
+  extern "C" void dgeqrf_(int *m, int *n, double *a, int *lda, double *tau,
+                          double *work, int *lwork, int *info);
 
   /// Multiply right hand side with Q-transpose (lapack)
-  extern "C" void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a, int *lda, double *tau, double *c, int *ldc, double *work, int *lwork, int *info);
+  extern "C" void dormqr_(char *side, char *trans, int *n, int *m, int *k, double *a,
+                          int *lda, double *tau, double *c, int *ldc,
+                          double *work, int *lwork, int *info);
 
   /// Solve upper triangular system (lapack)
-  extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n, double *alpha, double *a, int *lda, double *b, int *ldb);
+  extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
+                         double *alpha, double *a, int *lda, double *b, int *ldb);
 
   /// Internal class
   class CASADI_LAPACK_INTERFACE_EXPORT LapackQRDenseInternal : public LinearSolverInternal{

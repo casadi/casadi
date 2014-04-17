@@ -162,10 +162,11 @@ namespace casadi{
 
       @copydoc DAE_doc
 
-      The Integrator class provides some additional functionality, such as getting the value of the state
-      and/or sensitivities at certain time points.
+      The Integrator class provides some additional functionality, such as getting the value
+      of the state and/or sensitivities at certain time points.
 
-      The class does not specify the method used for the integration. This is defined in derived classes.
+      The class does not specify the method used for the integration.
+      This is defined in derived classes.
 
       \author Joel Andersson
       \date 2010
@@ -206,7 +207,8 @@ namespace casadi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /** \brief Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
+    /** \brief Generate a augmented DAE system with nfwd forward sensitivities and nadj
+     * adjoint sensitivities
      */
     std::pair<Function,Function> getAugmented(int nfwd, int nadj);
 

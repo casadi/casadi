@@ -98,7 +98,8 @@ namespace casadi{
     s << "};" << endl;
   }
 
-  void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<double>& v){
+  void CodeGenerator::printVector(std::ostream &s, const std::string& name,
+                                  const vector<double>& v){
     s << "d " << name << "[] = {";
     for(int i=0; i<v.size(); ++i){
       if(i!=0) s << ",";
@@ -175,7 +176,8 @@ namespace casadi{
     size_t h = hash(v);
 
     // Try to locate it in already added constants
-    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq = added_double_constants_.equal_range(h);
+    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq =
+      added_double_constants_.equal_range(h);
     for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i){
       if(equal(v,double_constants_[i->second])) return i->second;
     }
@@ -197,7 +199,8 @@ namespace casadi{
     size_t h = hash(v);
 
     // Try to locate it in already added constants
-    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq = added_integer_constants_.equal_range(h);
+    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq =
+      added_integer_constants_.equal_range(h);
     for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i){
       if(equal(v,integer_constants_[i->second])) return i->second;
     }
@@ -295,7 +298,9 @@ namespace casadi{
     }
   }
 
-  void CodeGenerator::copyVector(std::ostream &s, const std::string& arg, std::size_t n, const std::string& res, const std::string& it, bool only_if_exists) const{
+  void CodeGenerator::copyVector(std::ostream &s, const std::string& arg, std::size_t n,
+                                 const std::string& res, const std::string& it,
+                                 bool only_if_exists) const{
     // Quick return if nothing to do
     if(n==0) return;
 
@@ -312,11 +317,13 @@ namespace casadi{
       s << "*" << res << "=*" << arg << ";" << endl;
     } else {
       // For loop
-      s << "for(" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res << "[" << it << "]=" << arg << "[" << it << "];" << endl;
+      s << "for(" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res
+        << "[" << it << "]=" << arg << "[" << it << "];" << endl;
     }
   }
 
-  std::string CodeGenerator::casadi_dot(int n, const std::string& x, int inc_x, const std::string& y, int inc_y){
+  std::string CodeGenerator::casadi_dot(int n, const std::string& x, int inc_x,
+                                        const std::string& y, int inc_y){
     addAuxiliary(AUX_DOT);
     stringstream ss;
     ss << "casadi_dot(" << n << "," << x << "," << inc_x << "," << y << "," << inc_y << ")";

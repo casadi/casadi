@@ -35,23 +35,40 @@
 using namespace std;
 namespace casadi{
 
-  OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
-    addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
-    addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
-    addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
-    addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(), "An implicit function solver");
-    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the implicit solver");
-    addOption("expand_f",                      OT_BOOLEAN,  false, "Expand the ODE/DAE residual function in an SX graph");
-    addOption("expand_q",                      OT_BOOLEAN,  false, "Expand the quadrature function in an SX graph");
-    addOption("hotstart",                      OT_BOOLEAN,  true, "Initialize the trajectory at the previous solution");
-    addOption("quadrature_solver",             OT_LINEARSOLVER,  GenericType(), "An linear solver to solver the quadrature equations");
-    addOption("quadrature_solver_options",     OT_DICTIONARY, GenericType(), "Options to be passed to the quadrature solver");
-    addOption("startup_integrator",            OT_INTEGRATOR,  GenericType(), "An ODE/DAE integrator that can be used to generate a startup trajectory");
-    addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the startup integrator");
+  OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const Function& f,
+                                                                     const Function& g) :
+      IntegratorInternal(f,g)
+  {
+    addOption("number_of_finite_elements",     OT_INTEGER,  20,
+              "Number of finite elements");
+    addOption("interpolation_order",           OT_INTEGER,  3,
+              "Order of the interpolating polynomials");
+    addOption("collocation_scheme",            OT_STRING,  "radau",
+              "Collocation scheme","radau|legendre");
+    addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(),
+              "An implicit function solver");
+    addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
+              "Options to be passed to the implicit solver");
+    addOption("expand_f",                      OT_BOOLEAN,  false,
+              "Expand the ODE/DAE residual function in an SX graph");
+    addOption("expand_q",                      OT_BOOLEAN,  false,
+              "Expand the quadrature function in an SX graph");
+    addOption("hotstart",                      OT_BOOLEAN,  true,
+              "Initialize the trajectory at the previous solution");
+    addOption("quadrature_solver",             OT_LINEARSOLVER,  GenericType(),
+              "An linear solver to solver the quadrature equations");
+    addOption("quadrature_solver_options",     OT_DICTIONARY, GenericType(),
+              "Options to be passed to the quadrature solver");
+    addOption("startup_integrator",            OT_INTEGRATOR,  GenericType(),
+              "An ODE/DAE integrator that can be used to generate a startup trajectory");
+    addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(),
+              "Options to be passed to the startup integrator");
     setOption("name","unnamed_old_collocation_integrator");
   }
 
-  void OldCollocationIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void OldCollocationIntegratorInternal::deepCopyMembers(
+    std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     IntegratorInternal::deepCopyMembers(already_copied);
     startup_integrator_ = deepcopy(startup_integrator_,already_copied);
     implicit_solver_ = deepcopy(implicit_solver_,already_copied);
@@ -112,11 +129,13 @@ namespace casadi{
         }
       }
 
-      // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+      // Evaluate the polynomial at the final time to get the coefficients
+      // of the continuity equation
       D_num(j) = p(1.0);
       D[j] = D_num(j);
 
-      // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+      // Evaluate the time derivative of the polynomial at all collocation points to get
+      // the coefficients of the continuity equation
       Polynomial dp = p.derivative();
       for(int r=0; r<deg+1; ++r){
         C_num(j,r) = dp(tau_root[r]);
@@ -316,7 +335,8 @@ namespace casadi{
 
 
     // Make sure that the dimension is consistent with the number of unknowns
-    casadi_assert_message(gv.size()==V.size(),"Implicit function unknowns and equations do not match");
+    casadi_assert_message(gv.size()==V.size(),
+                          "Implicit function unknowns and equations do not match");
 
     // Implicit function
     vector<MX> ifcn_in(1+INTEGRATOR_NUM_IN);
@@ -435,7 +455,8 @@ namespace casadi{
           }
 
           // Save the differential states
-          const DMatrix& x = has_startup_integrator ? startup_integrator_.output(INTEGRATOR_XF) : input(INTEGRATOR_X0);
+          const DMatrix& x = has_startup_integrator ? startup_integrator_.output(INTEGRATOR_XF) :
+              input(INTEGRATOR_X0);
           for(int i=0; i<nx_; ++i){
             v.at(offs++) = x.at(i);
           }

@@ -37,31 +37,54 @@ namespace casadi{
 
   SCPgenInternal::SCPgenInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("SCPgen is under development");
-    addOption("qp_solver",         OT_QPSOLVER,   GenericType(),    "The QP solver to be used by the SQP method");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");
-    addOption("hessian_approximation", OT_STRING, "exact",          "gauss-newton|exact");
-    addOption("max_iter",          OT_INTEGER,      50,             "Maximum number of SQP iterations");
-    addOption("max_iter_ls",       OT_INTEGER,       1,             "Maximum number of linesearch iterations");
-    addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
-    addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
-    addOption("tol_reg",           OT_REAL,       1e-11,            "Stopping criterion for regularization");
-    addOption("tol_pr_step",       OT_REAL,       1e-6,             "Stopping criterion for the step size");
-    addOption("c1",                OT_REAL,       1e-4,             "Armijo condition, coefficient of decrease in merit");
-    addOption("beta",              OT_REAL,       0.8,              "Line-search parameter, restoration factor of stepsize");
-    addOption("merit_memsize",     OT_INTEGER,      4,              "Size of memory to store history of merit function values");
-    addOption("merit_start",       OT_REAL,      1e-8,              "Lower bound for the merit function parameter");
-    addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
-    addOption("regularize",        OT_BOOLEAN,  false,              "Automatic regularization of Lagrange Hessian.");
-    addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
-    addOption("codegen",           OT_BOOLEAN,  false,              "C-code generation");
-    addOption("reg_threshold",     OT_REAL,      1e-8,              "Threshold for the regularization.");
-    addOption("name_x",      OT_STRINGVECTOR,  GenericType(),       "Names of the variables.");
-    addOption("print_x",           OT_INTEGERVECTOR,  GenericType(), "Which variables to print.");
-    addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",    "Compiler command to be used for compiling generated code");
-    addOption("print_time",        OT_BOOLEAN, true,                 "Print information about execution time");
+    addOption("qp_solver",         OT_QPSOLVER,   GenericType(),
+              "The QP solver to be used by the SQP method");
+    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+              "Options to be passed to the QP solver");
+    addOption("hessian_approximation", OT_STRING, "exact",
+              "gauss-newton|exact");
+    addOption("max_iter",          OT_INTEGER,      50,
+              "Maximum number of SQP iterations");
+    addOption("max_iter_ls",       OT_INTEGER,       1,
+              "Maximum number of linesearch iterations");
+    addOption("tol_pr",            OT_REAL,       1e-6,
+              "Stopping criterion for primal infeasibility");
+    addOption("tol_du",            OT_REAL,       1e-6,
+              "Stopping criterion for dual infeasability");
+    addOption("tol_reg",           OT_REAL,       1e-11,
+              "Stopping criterion for regularization");
+    addOption("tol_pr_step",       OT_REAL,       1e-6,
+              "Stopping criterion for the step size");
+    addOption("c1",                OT_REAL,       1e-4,
+              "Armijo condition, coefficient of decrease in merit");
+    addOption("beta",              OT_REAL,       0.8,
+              "Line-search parameter, restoration factor of stepsize");
+    addOption("merit_memsize",     OT_INTEGER,      4,
+              "Size of memory to store history of merit function values");
+    addOption("merit_start",       OT_REAL,      1e-8,
+              "Lower bound for the merit function parameter");
+    addOption("lbfgs_memory",      OT_INTEGER,     10,
+              "Size of L-BFGS memory.");
+    addOption("regularize",        OT_BOOLEAN,  false,
+              "Automatic regularization of Lagrange Hessian.");
+    addOption("print_header",      OT_BOOLEAN,   true,
+              "Print the header with problem statistics");
+    addOption("codegen",           OT_BOOLEAN,  false,
+              "C-code generation");
+    addOption("reg_threshold",     OT_REAL,      1e-8,
+              "Threshold for the regularization.");
+    addOption("name_x",      OT_STRINGVECTOR,  GenericType(),
+              "Names of the variables.");
+    addOption("print_x",           OT_INTEGERVECTOR,  GenericType(),
+              "Which variables to print.");
+    addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",
+              "Compiler command to be used for compiling generated code");
+    addOption("print_time",        OT_BOOLEAN, true,
+              "Print information about execution time");
 
     // Monitors
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
+    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
+              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
   }
 
 
@@ -131,7 +154,8 @@ namespace casadi{
       int flag = system(static_cast<const char*>(0));
       casadi_assert_message(flag!=0, "No command procesor available");
 #else // WITH_DL
-      casadi_error("Codegen in SCPgen requires CasADi to be compiled with option \"WITH_DL\" enabled");
+      casadi_error("Codegen in SCPgen requires CasADi to be "
+                   "compiled with option \"WITH_DL\" enabled");
 #endif // WITH_DL
     }
 
@@ -220,7 +244,8 @@ namespace casadi{
         cout << "Allocated intermediate variables." << endl;
       }
 
-      // Adjoint sweep to get the definitions of the lifted dual variables (Equation 3.8 in Albersmeyer2010)
+      // Adjoint sweep to get the definitions of the lifted dual variables
+      // (Equation 3.8 in Albersmeyer2010)
       vector<vector<MX> > fseed,fsens,aseed(1),asens(1);
       aseed[0].push_back(1.0);
       aseed[0].push_back(g_lam);
@@ -459,7 +484,8 @@ namespace casadi{
     vec_fcn.setOption("name","vec_fcn");
     vec_fcn.init();
     if(verbose_){
-      cout << "Generated linearization function ( " << vec_fcn.getAlgorithmSize() << " nodes)." << endl;
+      cout << "Generated linearization function ( " << vec_fcn.getAlgorithmSize()
+           << " nodes)." << endl;
     }
 
     // Generate c code and load as DLL
@@ -516,7 +542,8 @@ namespace casadi{
     exp_fcn.setOption("name","exp_fcn");
     exp_fcn.init();
     if(verbose_){
-      cout << "Generated step expansion function ( " << exp_fcn.getAlgorithmSize() << " nodes)." << endl;
+      cout << "Generated step expansion function ( " << exp_fcn.getAlgorithmSize() << " nodes)."
+           << endl;
     }
 
     // Generate c code and load as DLL
@@ -825,7 +852,9 @@ namespace casadi{
     stream.unsetf( std::ios::floatfield);
   }
 
-  void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, double rg, int ls_trials, bool ls_success){
+  void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj,
+                                      double pr_inf, double du_inf, double rg, int ls_trials,
+                                      bool ls_success){
     stream << setw(4) << iter;
     stream << scientific;
     stream << setw(14) << setprecision(6) << obj;
@@ -993,13 +1022,16 @@ namespace casadi{
     vec_fcn_.evaluate();
 
     // Linear offset in the reduced QP
-    transform(g_.begin(),g_.end(),vec_fcn_.output(vec_g_).begin(),qpB_.begin(),std::minus<double>());
+    transform(g_.begin(),g_.end(),vec_fcn_.output(vec_g_).begin(),
+              qpB_.begin(),std::minus<double>());
 
     // Gradient of the objective in the reduced QP
     if(gauss_newton_){
-      transform(b_gn_.begin(),b_gn_.end(),vec_fcn_.output(vec_gf_).begin(),b_gn_.begin(),std::minus<double>());
+      transform(b_gn_.begin(),b_gn_.end(),vec_fcn_.output(vec_gf_).begin(),
+                b_gn_.begin(),std::minus<double>());
     } else {
-      transform(gf_.begin(),gf_.end(),vec_fcn_.output(vec_gf_).begin(),gf_.begin(),std::minus<double>());
+      transform(gf_.begin(),gf_.end(),vec_fcn_.output(vec_gf_).begin(),
+                gf_.begin(),std::minus<double>());
     }
 
     double time2 = clock();
@@ -1044,10 +1076,14 @@ namespace casadi{
     qp_solver_.setInput(qpH_,QP_SOLVER_H);
     qp_solver_.setInput(gf_,QP_SOLVER_G);
     qp_solver_.setInput(qpA_,QP_SOLVER_A);
-    std::transform(x_lb_.begin(),x_lb_.end(), x_opt_.begin(),qp_solver_.input(QP_SOLVER_LBX).begin(),std::minus<double>());
-    std::transform(x_ub_.begin(),x_ub_.end(), x_opt_.begin(),qp_solver_.input(QP_SOLVER_UBX).begin(),std::minus<double>());
-    std::transform(g_lb_.begin(),g_lb_.end(), qpB_.begin(),qp_solver_.input(QP_SOLVER_LBA).begin(),std::minus<double>());
-    std::transform(g_ub_.begin(),g_ub_.end(), qpB_.begin(),qp_solver_.input(QP_SOLVER_UBA).begin(),std::minus<double>());
+    std::transform(x_lb_.begin(),x_lb_.end(), x_opt_.begin(),
+                   qp_solver_.input(QP_SOLVER_LBX).begin(),std::minus<double>());
+    std::transform(x_ub_.begin(),x_ub_.end(), x_opt_.begin(),
+                   qp_solver_.input(QP_SOLVER_UBX).begin(),std::minus<double>());
+    std::transform(g_lb_.begin(),g_lb_.end(), qpB_.begin(),
+                   qp_solver_.input(QP_SOLVER_LBA).begin(),std::minus<double>());
+    std::transform(g_ub_.begin(),g_ub_.end(), qpB_.begin(),
+                   qp_solver_.input(QP_SOLVER_UBA).begin(),std::minus<double>());
 
     qp_solver_.evaluate();
 
@@ -1058,12 +1094,14 @@ namespace casadi{
     // Condensed dual step (simple bounds)
     const DMatrix& lam_x_new = qp_solver_.output(QP_SOLVER_LAM_X);
     copy(lam_x_new.begin(),lam_x_new.end(),x_dlam_.begin());
-    std::transform(x_dlam_.begin(),x_dlam_.end(),x_lam_.begin(),x_dlam_.begin(),std::minus<double>());
+    std::transform(x_dlam_.begin(),x_dlam_.end(),x_lam_.begin(),x_dlam_.begin(),
+                   std::minus<double>());
 
     // Condensed dual step (nonlinear bounds)
     const DMatrix& lam_g_new = qp_solver_.output(QP_SOLVER_LAM_A);
     copy(lam_g_new.begin(),lam_g_new.end(),g_dlam_.begin());
-    std::transform(g_dlam_.begin(),g_dlam_.end(),g_lam_.begin(),g_dlam_.begin(),std::minus<double>());
+    std::transform(g_dlam_.begin(),g_dlam_.end(),g_lam_.begin(),g_dlam_.begin(),
+                   std::minus<double>());
 
     double time2 = clock();
     t_solve_qp_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -1128,7 +1166,8 @@ namespace casadi{
         }
       }
 
-      // Evaluate residual function to get objective and constraints (and residuals for the next iteration)
+      // Evaluate residual function to get objective and constraints
+      // (and residuals for the next iteration)
       eval_res();
       ls_iter++;
 
@@ -1159,9 +1198,11 @@ namespace casadi{
 
     // Calculate primal step-size
     pr_step_ = 0;
-    for(vector<double>::const_iterator i=x_step_.begin(); i!=x_step_.end(); ++i) pr_step_ += fabs(*i);
+    for(vector<double>::const_iterator i=x_step_.begin(); i!=x_step_.end(); ++i)
+        pr_step_ += fabs(*i);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-      for(vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i) pr_step_ += fabs(*i);
+      for(vector<double>::const_iterator i=it->step.begin(); i!=it->step.end(); ++i)
+          pr_step_ += fabs(*i);
     }
     pr_step_ *= t;
 
@@ -1171,9 +1212,11 @@ namespace casadi{
       du_step_ += fabs(*i);
     }
 
-    for(vector<double>::const_iterator i=x_dlam_.begin(); i!=x_dlam_.end(); ++i) du_step_ += fabs(*i);
+    for(vector<double>::const_iterator i=x_dlam_.begin(); i!=x_dlam_.end(); ++i)
+        du_step_ += fabs(*i);
     for(vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it){
-      for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i) du_step_ += fabs(*i);
+      for(vector<double>::const_iterator i=it->dlam.begin(); i!=it->dlam.end(); ++i)
+          du_step_ += fabs(*i);
     }
     du_step_ *= t;
   }

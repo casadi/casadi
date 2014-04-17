@@ -43,8 +43,11 @@ namespace casadi{
     SimpleHomotopyNLPSolver();
 
     /// \brief Create an NLP solver instance
-    explicit SimpleHomotopyNLPSolver(const Function& hnlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
-                    );
+    explicit SimpleHomotopyNLPSolver(const Function& hnlp
+                                     /**< nlp function:
+                                        \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto
+                                        [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                                     );
 
     /// Access functions of the node
     SimpleHomotopyNLPInternal* operator->();

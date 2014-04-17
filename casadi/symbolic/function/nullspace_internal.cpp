@@ -34,7 +34,8 @@ namespace casadi{
 
 
   NullspaceInternal::NullspaceInternal(const Sparsity& A_sp) : A_sp_(A_sp) {
-    addOption("dense",        OT_BOOLEAN,       true, "Indicates that dense matrices can be assumed");
+    addOption("dense",        OT_BOOLEAN,       true,
+              "Indicates that dense matrices can be assumed");
 
   }
 

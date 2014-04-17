@@ -38,10 +38,12 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectSingleShootingInternal : public OCPSol
 
   public:
     // Constructor
-    DirectSingleShootingInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn);
+    DirectSingleShootingInternal(const Function& ffcn, const Function& mfcn,
+                                 const Function& cfcn, const Function& rfcn);
 
     // clone
-    virtual DirectSingleShootingInternal* clone() const{ return new DirectSingleShootingInternal(*this);}
+    virtual DirectSingleShootingInternal* clone() const
+    { return new DirectSingleShootingInternal(*this);}
 
     // Destructor
     virtual ~DirectSingleShootingInternal();

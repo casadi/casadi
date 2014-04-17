@@ -32,8 +32,10 @@ using namespace std;
 namespace casadi {
 
   SDPSDQPInternal::SDPSDQPInternal(const std::vector<Sparsity> &st) : SDQPSolverInternal(st) {
-    addOption("sdp_solver",            OT_SDPSOLVER, GenericType(), "The SDPSolver used to solve the SDQPs.");
-    addOption("sdp_solver_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the SDPSOlver");
+    addOption("sdp_solver",            OT_SDPSOLVER, GenericType(),
+              "The SDPSolver used to solve the SDQPs.");
+    addOption("sdp_solver_options",    OT_DICTIONARY, GenericType(),
+              "Options to be passed to the SDPSOlver");
   }
 
   SDPSDQPInternal::~SDPSDQPInternal(){
@@ -84,12 +86,17 @@ namespace casadi {
     IOScheme mappingIn("g_socp","h_socp","f_sdqp","g_sdqp");
     IOScheme mappingOut("f","g");
 
-    mapping_ = MXFunction(mappingIn("g_socp",g_socp,"h_socp",h_socp,"f_sdqp",f_sdqp,"g_sdqp",g_sdqp),mappingOut("f",horzcat(fi),"g",g));
+    mapping_ = MXFunction(mappingIn("g_socp",g_socp,"h_socp",h_socp,
+                                    "f_sdqp",f_sdqp,"g_sdqp",g_sdqp),
+                          mappingOut("f",horzcat(fi),"g",g));
     mapping_.init();
 
     // Create an sdpsolver instance
     SDPSolverCreator sdpsolver_creator = getOption("sdp_solver");
-    sdpsolver_ = sdpsolver_creator(sdpStruct("g",mapping_.output("g").sparsity(),"f",mapping_.output("f").sparsity(),"a",horzcat(input(SDQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
+    sdpsolver_ = sdpsolver_creator(
+      sdpStruct("g",mapping_.output("g").sparsity(),
+                "f",mapping_.output("f").sparsity(),
+                "a",horzcat(input(SDQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
 
     if(hasSetOption("sdp_solver_options")){
       sdpsolver_.setOption(getOption("sdp_solver_options"));
@@ -105,8 +112,10 @@ namespace casadi {
     output(SDQP_SOLVER_X) = DMatrix::zeros(n_,1);
 
     std::vector<int> r = range(input(SDQP_SOLVER_G).size1());
-    output(SDQP_SOLVER_P) = sdpsolver_.output(SDP_SOLVER_P).isEmpty() ? DMatrix() : sdpsolver_.output(SDP_SOLVER_P)(r,r);
-    output(SDQP_SOLVER_DUAL) = sdpsolver_.output(SDP_SOLVER_DUAL).isEmpty() ? DMatrix() : sdpsolver_.output(SDP_SOLVER_DUAL)(r,r);
+    output(SDQP_SOLVER_P) = sdpsolver_.output(SDP_SOLVER_P).isEmpty() ? DMatrix() :
+        sdpsolver_.output(SDP_SOLVER_P)(r,r);
+    output(SDQP_SOLVER_DUAL) = sdpsolver_.output(SDP_SOLVER_DUAL).isEmpty() ? DMatrix() :
+        sdpsolver_.output(SDP_SOLVER_DUAL)(r,r);
     output(SDQP_SOLVER_COST) = 0.0;
     output(SDQP_SOLVER_DUAL_COST) = 0.0;
     output(SDQP_SOLVER_LAM_X) = DMatrix::zeros(n_,1);
@@ -120,7 +129,9 @@ namespace casadi {
     }
     cholesky_.prepare();
     mapping_.setInput(cholesky_.getFactorization(true),"g_socp");
-    std::copy(input(SDQP_SOLVER_C).begin(), input(SDQP_SOLVER_C).end(),mapping_.input("h_socp").begin());
+    std::copy(input(SDQP_SOLVER_C).begin(),
+              input(SDQP_SOLVER_C).end(),
+              mapping_.input("h_socp").begin());
     cholesky_.solveL(&mapping_.input("h_socp").data().front(),1,true);
     for (int k=0;k<mapping_.input("h_socp").size();++k) {
       mapping_.input("h_socp").at(k)*= 0.5;
@@ -131,27 +142,53 @@ namespace casadi {
 
     mapping_.evaluate();
 
-    std::copy(input(SDQP_SOLVER_A).begin(),input(SDQP_SOLVER_A).end(),sdpsolver_.input(SDP_SOLVER_A).begin());
+    std::copy(input(SDQP_SOLVER_A).begin(),
+              input(SDQP_SOLVER_A).end(),
+              sdpsolver_.input(SDP_SOLVER_A).begin());
     sdpsolver_.setInput(mapping_.output("f"),SDP_SOLVER_F);
     sdpsolver_.setInput(mapping_.output("g"),SDP_SOLVER_G);
-    std::copy(input(SDQP_SOLVER_LBA).begin(),input(SDQP_SOLVER_LBA).end(),sdpsolver_.input(SDP_SOLVER_LBA).begin());
-    std::copy(input(SDQP_SOLVER_UBA).begin(),input(SDQP_SOLVER_UBA).end(),sdpsolver_.input(SDP_SOLVER_UBA).begin());
-    std::copy(input(SDQP_SOLVER_LBX).begin(),input(SDQP_SOLVER_LBX).end(),sdpsolver_.input(SDP_SOLVER_LBX).begin());
-    std::copy(input(SDQP_SOLVER_UBX).begin(),input(SDQP_SOLVER_UBX).end(),sdpsolver_.input(SDP_SOLVER_UBX).begin());
+    std::copy(input(SDQP_SOLVER_LBA).begin(),
+              input(SDQP_SOLVER_LBA).end(),
+              sdpsolver_.input(SDP_SOLVER_LBA).begin());
+    std::copy(input(SDQP_SOLVER_UBA).begin(),
+              input(SDQP_SOLVER_UBA).end(),
+              sdpsolver_.input(SDP_SOLVER_UBA).begin());
+    std::copy(input(SDQP_SOLVER_LBX).begin(),
+              input(SDQP_SOLVER_LBX).end(),
+              sdpsolver_.input(SDP_SOLVER_LBX).begin());
+    std::copy(input(SDQP_SOLVER_UBX).begin(),
+              input(SDQP_SOLVER_UBX).end(),
+              sdpsolver_.input(SDP_SOLVER_UBX).begin());
 
     sdpsolver_.evaluate();
 
     // Pass the stats
     stats_["sdp_solver_stats"] = sdpsolver_.getStats();
 
-    std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),sdpsolver_.output(SDP_SOLVER_X).begin()+n_,output(SDQP_SOLVER_X).begin());
-    setOutput(sdpsolver_.output(SDP_SOLVER_COST),SDQP_SOLVER_COST);
-    setOutput(sdpsolver_.output(SDP_SOLVER_DUAL_COST),SDQP_SOLVER_DUAL_COST);
-    if (!output(SDQP_SOLVER_DUAL).isEmpty()) std::copy(sdpsolver_.output(SDP_SOLVER_DUAL).begin(),sdpsolver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).size(),output(SDQP_SOLVER_DUAL).begin());
-    if (!output(SDQP_SOLVER_P).isEmpty()) std::copy(sdpsolver_.output(SDP_SOLVER_P).begin(),sdpsolver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).size(),output(SDQP_SOLVER_P).begin());
-    std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),sdpsolver_.output(SDP_SOLVER_X).begin()+n_,output(SDQP_SOLVER_X).begin());
-    std::copy(sdpsolver_.output(SDP_SOLVER_LAM_A).begin(),sdpsolver_.output(SDP_SOLVER_LAM_A).end(),output(SDQP_SOLVER_LAM_A).begin());
-    std::copy(sdpsolver_.output(SDP_SOLVER_LAM_X).begin(),sdpsolver_.output(SDP_SOLVER_LAM_X).begin()+n_,output(SDQP_SOLVER_LAM_X).begin());
+    std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),
+              sdpsolver_.output(SDP_SOLVER_X).begin()+n_,
+              output(SDQP_SOLVER_X).begin());
+    setOutput(sdpsolver_.output(SDP_SOLVER_COST),
+              SDQP_SOLVER_COST);
+    setOutput(sdpsolver_.output(SDP_SOLVER_DUAL_COST),
+              SDQP_SOLVER_DUAL_COST);
+    if (!output(SDQP_SOLVER_DUAL).isEmpty())
+        std::copy(sdpsolver_.output(SDP_SOLVER_DUAL).begin(),
+                  sdpsolver_.output(SDP_SOLVER_DUAL).begin()+output(SDQP_SOLVER_DUAL).size(),
+                  output(SDQP_SOLVER_DUAL).begin());
+    if (!output(SDQP_SOLVER_P).isEmpty())
+        std::copy(sdpsolver_.output(SDP_SOLVER_P).begin(),
+                  sdpsolver_.output(SDP_SOLVER_P).begin()+output(SDQP_SOLVER_P).size(),
+                  output(SDQP_SOLVER_P).begin());
+    std::copy(sdpsolver_.output(SDP_SOLVER_X).begin(),
+              sdpsolver_.output(SDP_SOLVER_X).begin()+n_,
+              output(SDQP_SOLVER_X).begin());
+    std::copy(sdpsolver_.output(SDP_SOLVER_LAM_A).begin(),
+              sdpsolver_.output(SDP_SOLVER_LAM_A).end(),
+              output(SDQP_SOLVER_LAM_A).begin());
+    std::copy(sdpsolver_.output(SDP_SOLVER_LAM_X).begin(),
+              sdpsolver_.output(SDP_SOLVER_LAM_X).begin()+n_,
+              output(SDQP_SOLVER_LAM_X).begin());
   }
 
 } // namespace casadi

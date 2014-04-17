@@ -37,16 +37,19 @@ namespace casadi{
     setDependencies(y);
   }
 
-  void GetNonzerosVector::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void GetNonzerosVector::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                    std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosVector::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void GetNonzerosVector::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                                     std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosVector::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void GetNonzerosVector::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                                      std::vector<T>& rtmp){
     const vector<T>& idata = input[0]->data();
     typename vector<T>::iterator odata_it = output[0]->begin();
     for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
@@ -54,16 +57,19 @@ namespace casadi{
     }
   }
 
-  void GetNonzerosSlice::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void GetNonzerosSlice::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                   std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosSlice::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void GetNonzerosSlice::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                                    std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosSlice::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void GetNonzerosSlice::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                                     std::vector<T>& rtmp){
 
     const vector<T>& idata = input[0]->data();
     const T* idata_ptr = getPtr(idata) + s_.start_;
@@ -74,23 +80,28 @@ namespace casadi{
     }
   }
 
-  void GetNonzerosSlice2::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void GetNonzerosSlice2::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                    std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void GetNonzerosSlice2::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void GetNonzerosSlice2::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                                     std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void GetNonzerosSlice2::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void GetNonzerosSlice2::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                                      std::vector<T>& rtmp){
 
     const vector<T>& idata = input[0]->data();
     const T* outer_ptr = getPtr(idata) + outer_.start_;
     const T* outer_stop = getPtr(idata) + outer_.stop_;
     T* odata_ptr = getPtr(output[0]->data());
     for(; outer_ptr != outer_stop; outer_ptr += outer_.step_){
-      for(const T* inner_ptr = outer_ptr+inner_.start_; inner_ptr != outer_ptr+inner_.stop_; inner_ptr += inner_.step_){
+      for(const T* inner_ptr = outer_ptr+inner_.start_;
+          inner_ptr != outer_ptr+inner_.stop_;
+          inner_ptr += inner_.step_){
         *odata_ptr++ = *inner_ptr;
       }
     }
@@ -172,7 +183,9 @@ namespace casadi{
     }
   }
 
-  void GetNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void GetNonzeros::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                               MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                               bool output_given){
     // Get all the nonzeros
     vector<int> nz = getAll();
 
@@ -257,7 +270,8 @@ namespace casadi{
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d){
 
-      // Get an owning references to the seeds and sensitivities and clear the seeds for the next run
+      // Get an owning references to the seeds and sensitivities
+      // and clear the seeds for the next run
       MX aseed = *adjSeed[d][0];
       *adjSeed[d][0] = MX();
       MX& asens = *adjSens[d][0]; // Sensitivity after addition
@@ -334,12 +348,17 @@ namespace casadi{
     return true;
   }
 
-  void GetNonzerosVector::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void GetNonzerosVector::generateOperation(std::ostream &stream,
+                                            const std::vector<std::string>& arg,
+                                            const std::vector<std::string>& res,
+                                            CodeGenerator& gen) const{
     // Condegen the indices
     int ind = gen.getConstant(nz_,true);
 
     // Codegen the assignments
-    stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front() << "; ii!=s" << ind << "+" << nz_.size() << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
+    stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front()
+           << "; ii!=s" << ind << "+" << nz_.size()
+           << "; ++ii) *rr++ = *ii>=0 ? ss[*ii] : 0;" << endl;
   }
 
   void GetNonzerosSlice::simplifyMe(MX& ex){
@@ -362,14 +381,24 @@ namespace casadi{
     return dep()->getGetNonzeros(sp,nz_new);
   }
 
-  void GetNonzerosSlice::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_ << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") ";
+  void GetNonzerosSlice::generateOperation(std::ostream &stream,
+                                           const std::vector<std::string>& arg,
+                                           const std::vector<std::string>& res,
+                                           CodeGenerator& gen) const{
+    stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << s_.start_
+           << "; ss!=" << arg.front() << "+" << s_.stop_ << "; ss+=" << s_.step_ << ") ";
     stream << "*rr++ = *ss;" << endl;
   }
 
-  void GetNonzerosSlice2::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << outer_.start_ << "; ss!=" << arg.front() << "+" << outer_.stop_ << "; ss+=" << outer_.step_ << ") ";
-    stream << "for(tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_ << "; tt+=" << inner_.step_ << ") ";
+  void GetNonzerosSlice2::generateOperation(std::ostream &stream,
+                                            const std::vector<std::string>& arg,
+                                            const std::vector<std::string>& res,
+                                            CodeGenerator& gen) const{
+    stream << "  for(rr=" << res.front() << ", ss=" << arg.front() << "+" << outer_.start_
+           << "; ss!=" << arg.front() << "+" << outer_.stop_ << "; ss+="
+           << outer_.step_ << ") ";
+    stream << "for(tt=ss+" << inner_.start_ << "; tt!=ss+" << inner_.stop_
+           << "; tt+=" << inner_.step_ << ") ";
     stream << "*rr++ = *tt;" << endl;
   }
 

@@ -50,7 +50,8 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
     IOScheme(InputOutputScheme scheme);
 
     /// Constructor with entry names
-    IOScheme(const std::vector<std::string> &entries,const std::vector<std::string> &descriptions=std::vector<std::string>());
+    IOScheme(const std::vector<std::string> &entries,
+             const std::vector<std::string> &descriptions=std::vector<std::string>());
 
     #ifndef SWIGPYTHON
     IOScheme(

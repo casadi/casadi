@@ -119,7 +119,8 @@ namespace casadi{
   }
 
   const string& MXNode::getName() const{
-    throw CasadiException(string("MXNode::getName() not defined for class ") + typeid(*this).name());
+    throw CasadiException(string("MXNode::getName() not defined for class ")
+                          + typeid(*this).name());
   }
 
   bool MXNode::__nonzero__() const {
@@ -170,7 +171,8 @@ namespace casadi{
     casadi_assert(0);
   }
 
-  void MXNode::assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add){
+  void MXNode::assign(const MX& d, const std::vector<int>& inz,
+                      const std::vector<int>& onz, bool add){
     casadi_assert(0);
   }
 
@@ -215,23 +217,30 @@ namespace casadi{
   }
 
   Function& MXNode::getFunction(){
-    throw CasadiException(string("MXNode::getFunction() not defined for class ") + typeid(*this).name());
+    throw CasadiException(string("MXNode::getFunction() not defined for class ") +
+                          typeid(*this).name());
   }
 
   int MXNode::getFunctionOutput() const{
-    throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
+    throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") +
+                          typeid(*this).name());
   }
 
   int MXNode::getFunctionInput() const{
-    throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") + typeid(*this).name());
+    throw CasadiException(string("MXNode::getFunctionOutput() not defined for class ") +
+                          typeid(*this).name());
   }
 
-  void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
-    throw CasadiException(string("MXNode::evaluateD not defined for class ") + typeid(*this).name());
+  void MXNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                         std::vector<double>& rtmp){
+    throw CasadiException(string("MXNode::evaluateD not defined for class ")
+                          + typeid(*this).name());
   }
 
-  void MXNode::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
-    throw CasadiException(string("MXNode::evaluateSX not defined for class ") + typeid(*this).name());
+  void MXNode::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                          std::vector<SXElement>& rtmp){
+    throw CasadiException(string("MXNode::evaluateSX not defined for class ")
+                          + typeid(*this).name());
   }
 
   void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output){
@@ -242,7 +251,8 @@ namespace casadi{
   void MXNode::evaluateMX(const MXPtrV& input, MXPtrV& output,
                           const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
                           const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-    throw CasadiException(string("MXNode::evaluateMX not defined for class ") + typeid(*this).name());
+    throw CasadiException(string("MXNode::evaluateMX not defined for class ")
+                          + typeid(*this).name());
   }
 
   void MXNode::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
@@ -301,7 +311,8 @@ namespace casadi{
     return shared_from_this<MX>();
   }
 
-  void MXNode::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void MXNode::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                 const std::vector<std::string>& res, CodeGenerator& gen) const{
     stream << "#error " <<  typeid(*this).name() << ": " << arg << " => " << res << endl;
   }
 
@@ -310,7 +321,8 @@ namespace casadi{
   }
 
   Matrix<double> MXNode::getMatrixValue() const{
-    throw CasadiException(string("MXNode::getMatrixValue not defined for class ") + typeid(*this).name());
+    throw CasadiException(string("MXNode::getMatrixValue not defined for class ")
+                          + typeid(*this).name());
   }
 
   MX MXNode::getTranspose() const{
@@ -338,9 +350,12 @@ namespace casadi{
     } else {
       z = MX::zeros(sp_z);
     }
-    casadi_assert_message(y.size2()==z.size2(),"Dimension error. Got y=" << y.size2() << " and z=" << z.dimString() << ".");
-    casadi_assert_message(trans_x.size2()==z.size1(),"Dimension error. Got trans_x=" << trans_x.dimString() << " and z=" << z.dimString() << ".");
-    casadi_assert_message(y.size1()==trans_x.size1(),"Dimension error. Got y=" << y.size1() << " and trans_x" << trans_x.dimString() << ".");
+    casadi_assert_message(y.size2()==z.size2(),"Dimension error. Got y=" << y.size2()
+                          << " and z=" << z.dimString() << ".");
+    casadi_assert_message(trans_x.size2()==z.size1(),"Dimension error. Got trans_x="
+                          << trans_x.dimString() << " and z=" << z.dimString() << ".");
+    casadi_assert_message(y.size1()==trans_x.size1(),"Dimension error. Got y=" << y.size1()
+                          << " and trans_x" << trans_x.dimString() << ".");
     if(trans_x.isDense() && y.isDense()){
       return MX::create(new DenseMultiplication<true,false>(z,trans_x,y));
     } else {
@@ -446,8 +461,10 @@ namespace casadi{
 
   MX MXNode::getBinarySwitch(int op, const MX& y) const{
     // Make sure that dimensions match
-    casadi_assert_message((sparsity().isScalar(false) || y.isScalar() || (sparsity().size2()==y.size2() && size1()==y.size1())),
-                          "Dimension mismatch." << "lhs is " << sparsity().dimString() << ", while rhs is " << y.dimString());
+    casadi_assert_message((sparsity().isScalar(false) || y.isScalar() ||
+                           (sparsity().size2()==y.size2() && size1()==y.size1())),
+                          "Dimension mismatch." << "lhs is " << sparsity().dimString()
+                          << ", while rhs is " << y.dimString());
 
     // Create binary node
     if(sparsity().isScalar(false)){
@@ -468,10 +485,12 @@ namespace casadi{
         // Matching sparsities
         return getBinary(op,y,false,false);
       } else {
-        // Get the sparsity pattern of the result (ignoring structural zeros giving rise to nonzero result)
+        // Get the sparsity pattern of the result
+        // (ignoring structural zeros giving rise to nonzero result)
         const Sparsity& x_sp = sparsity();
         const Sparsity& y_sp = y.sparsity();
-        Sparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op), operation_checker<Function0Checker>(op));
+        Sparsity r_sp = x_sp.patternCombine(y_sp, operation_checker<F0XChecker>(op),
+                                            operation_checker<Function0Checker>(op));
 
         // Project the arguments to this sparsity
         MX xx = shared_from_this<MX>().setSparse(r_sp);
@@ -487,7 +506,8 @@ namespace casadi{
     if (CasadiOptions::simplification_on_the_fly) {
 
       // If identically zero due to one argumebt being zero
-      if((operation_checker<F0XChecker>(op) && isZero()) ||(operation_checker<Function0Checker>(op) && y->isZero())){
+      if((operation_checker<F0XChecker>(op) && isZero()) ||
+         (operation_checker<Function0Checker>(op) && y->isZero())){
         return MX::zeros(sparsity());
       }
 
@@ -530,7 +550,8 @@ namespace casadi{
             break;
           case OP_ADD:
           case OP_SUB:
-            if(y->isZero()) return scX ? MX::repmat(shared_from_this<MX>(),y.shape()) : shared_from_this<MX>();
+            if(y->isZero())
+                return scX ? MX::repmat(shared_from_this<MX>(),y.shape()) : shared_from_this<MX>();
             break;
           case OP_MUL:
             if(y->isValue(1)) return shared_from_this<MX>();
@@ -709,13 +730,15 @@ namespace casadi{
 
   std::vector<MX> MXNode::getHorzsplit(const std::vector<int>& output_offset) const{
     if (isZero()) {
-      std::vector<MX> ret = MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
+      std::vector<MX> ret =
+          MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
       for (int i=0;i<ret.size();++i) {
         ret[i]=MX::zeros(ret[i].sparsity());
       }
       return ret;
     }
-    std::vector<MX> ret = MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
+    std::vector<MX> ret =
+        MX::createMultipleOutput(new Horzsplit(shared_from_this<MX>(),output_offset));
 
     if (CasadiOptions::simplification_on_the_fly) {
       // Simplify horzsplit(horzcat)
@@ -725,7 +748,9 @@ namespace casadi{
         for (int i=0;i<output_offset.size();++i) {
           while(offset_deps<output_offset[i]) { offset_deps+=dep(j).size2();++j; }
           if (j>=ndep()) j = ndep()-1;
-          if (output_offset[i]==offset_deps && (i+1<output_offset.size()?output_offset[i+1]:size2()) ==offset_deps +dep(j).size2()) {
+          if (output_offset[i]==offset_deps &&
+              (i+1<output_offset.size()?output_offset[i+1]:size2()) == offset_deps +dep(j).size2())
+          {
             // Aligned with vertcat dependency
             ret[i] = dep(j);
           }
@@ -737,13 +762,15 @@ namespace casadi{
 
   std::vector<MX> MXNode::getVertsplit(const std::vector<int>& output_offset) const{
     if (isZero()) {
-      std::vector<MX> ret = MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
+      std::vector<MX> ret =
+          MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
       for (int i=0;i<ret.size();++i) {
         ret[i]=MX::zeros(ret[i].sparsity());
       }
       return ret;
     }
-    std::vector<MX> ret = MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
+    std::vector<MX> ret =
+        MX::createMultipleOutput(new Vertsplit(shared_from_this<MX>(),output_offset));
 
     if (CasadiOptions::simplification_on_the_fly) {
       // Simplify vertsplit(vertcat)
@@ -753,7 +780,9 @@ namespace casadi{
         for (int i=0;i<output_offset.size();++i) {
           while(offset_deps<output_offset[i]) { offset_deps+=dep(j).size1();++j; }
           if (j>=ndep()) j = ndep()-1;
-          if (output_offset[i]==offset_deps && (i+1<output_offset.size()?output_offset[i+1]:size1()) ==offset_deps +dep(j).size1()) {
+          if (output_offset[i]==offset_deps &&
+              (i+1<output_offset.size()?output_offset[i+1]:size1()) == offset_deps +dep(j).size1())
+          {
             // Aligned with vertcat dependency
             ret[i] = dep(j);
           }
@@ -775,4 +804,3 @@ namespace casadi{
 
 
 } // namespace casadi
-

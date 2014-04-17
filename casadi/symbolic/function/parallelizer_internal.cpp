@@ -53,7 +53,8 @@ namespace casadi{
     // Switch to serial mode if OPENMP is not supported
 #ifndef WITH_OPENMP
     if(mode_ == OPENMP){
-      casadi_warning("OpenMP parallelization is not available, switching to serial mode. Recompile CasADi setting the option WITH_OPENMP to ON.");
+      casadi_warning("OpenMP parallelization is not available, switching to serial mode. "
+                     "Recompile CasADi setting the option WITH_OPENMP to ON.");
       mode_ = SERIAL;
     }
 #endif // WITH_OPENMP
@@ -157,7 +158,8 @@ namespace casadi{
 
 #endif //WITH_OPENMP
 #ifndef WITH_OPENMP
-      casadi_error("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
+      casadi_error("ParallelizerInternal::evaluate: OPENMP support was not available "
+                   "during CasADi compilation");
 #endif //WITH_OPENMP
     } else if(mode_ == MPI){
       casadi_error("ParallelizerInternal::evaluate: MPI not implemented");
@@ -230,7 +232,9 @@ namespace casadi{
     }
   }
 
-  void ParallelizerInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void ParallelizerInternal::deepCopyMembers(
+      std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     FunctionInternal::deepCopyMembers(already_copied);
     funcs_ = deepcopy(funcs_,already_copied);
   }

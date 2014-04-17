@@ -35,7 +35,8 @@ namespace casadi{
 
 // Constructor
 SOCPSolverInternal::SOCPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
-  addOption("ni",OT_INTEGERVECTOR, GenericType(), "Provide the size of each SOC constraint. Must sum up to N.");
+  addOption("ni",OT_INTEGERVECTOR, GenericType(),
+            "Provide the size of each SOC constraint. Must sum up to N.");
   addOption("print_problem",OT_BOOLEAN,false,"Print out problem statement for debugging.");
 
   input_.scheme = SCHEME_SOCPInput;
@@ -56,12 +57,19 @@ void SOCPSolverInternal::init() {
   const Sparsity& G = st_[SOCP_STRUCT_G];
 
   N_ = std::accumulate(ni_.begin(), ni_.end(), 0);
-  casadi_assert_message(N_==G.size2(),"SOCPSolverInternal: Supplied G sparsity: number of cols (" << G.size2() <<  ")  must match sum of vector provided with option 'ni' (" << N_ << ").");
+  casadi_assert_message(N_==G.size2(),
+                        "SOCPSolverInternal: Supplied G sparsity: number of cols ("
+                        << G.size2()
+                        <<  ")  must match sum of vector provided with option 'ni' ("
+                        << N_ << ").");
 
   nc_ = A.size1();
   n_ = A.size2();
 
-  casadi_assert_message(n_==G.size1(),"SOCPSolverInternal: Supplied G sparsity: number of rows (" << G.size1() <<  ")  must match number of decision variables (cols of A): " << n_ << ".");
+  casadi_assert_message(n_==G.size1(),
+                        "SOCPSolverInternal: Supplied G sparsity: number of rows ("
+                        << G.size1()
+                        <<  ") must match number of decision variables (cols of A): " << n_ << ".");
 
 
   // Input arguments
@@ -117,10 +125,16 @@ void SOCPSolverInternal::printProblem(std::ostream &stream) const {
 
 void SOCPSolverInternal::checkInputs() const {
   for (int i=0;i<input(SOCP_SOLVER_LBX).size();++i) {
-    casadi_assert_message(input(SOCP_SOLVER_LBX).at(i)<=input(SOCP_SOLVER_UBX).at(i),"LBX[i] <= UBX[i] was violated for i=" << i << ". Got LBX[i]=" << input(SOCP_SOLVER_LBX).at(i) << " and UBX[i]=" << input(SOCP_SOLVER_UBX).at(i));
+    casadi_assert_message(input(SOCP_SOLVER_LBX).at(i)<=input(SOCP_SOLVER_UBX).at(i),
+                          "LBX[i] <= UBX[i] was violated for i=" << i
+                          << ". Got LBX[i]=" << input(SOCP_SOLVER_LBX).at(i)
+                          << " and UBX[i]=" << input(SOCP_SOLVER_UBX).at(i));
   }
   for (int i=0;i<input(SOCP_SOLVER_LBA).size();++i) {
-    casadi_assert_message(input(SOCP_SOLVER_LBA).at(i)<=input(SOCP_SOLVER_UBA).at(i),"LBA[i] <= UBA[i] was violated for i=" << i << ". Got LBA[i]=" << input(SOCP_SOLVER_LBA).at(i) << " and UBA[i]=" << input(SOCP_SOLVER_UBA).at(i));
+    casadi_assert_message(input(SOCP_SOLVER_LBA).at(i)<=input(SOCP_SOLVER_UBA).at(i),
+                          "LBA[i] <= UBA[i] was violated for i=" << i
+                          << ". Got LBA[i]=" << input(SOCP_SOLVER_LBA).at(i)
+                          << " and UBA[i]=" << input(SOCP_SOLVER_UBA).at(i));
   }
 }
 

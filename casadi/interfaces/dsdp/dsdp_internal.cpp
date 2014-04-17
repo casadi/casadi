@@ -28,7 +28,8 @@
 #include "casadi/symbolic/function/mx_function.hpp"
 /**
    Some implementation details
-   "Multiple cones can be created for the same solver, but it is usually more efficient to group all blocks into the same conic structure." user manual
+   "Multiple cones can be created for the same solver, but it is usually more efficient to group
+   all blocks into the same conic structure." user manual
 */
 using namespace std;
 namespace casadi {
@@ -42,15 +43,24 @@ namespace casadi {
   }
 
   DSDPInternal::DSDPInternal(const std::vector<Sparsity> &st) : SDPSolverInternal(st){
-    casadi_assert_message(static_cast<double>(m_)*(static_cast<double>(m_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size m is too large to be handled by DSDP.");
+    casadi_assert_message(
+      static_cast<double>(m_)*(static_cast<double>(m_)+1)/2 < std::numeric_limits<int>::max(),
+      "Your problem size m is too large to be handled by DSDP.");
 
-    addOption("gapTol",OT_REAL,1e-8,"Convergence criterion based on distance between primal and dual objective");
+    addOption("gapTol",OT_REAL,1e-8,
+              "Convergence criterion based on distance between primal and dual objective");
     addOption("maxIter",OT_INTEGER,500,"Maximum number of iterations");
-    addOption("dualTol",OT_REAL,1e-4,"Tolerance for dual infeasibility (translates to primal infeasibility in dsdp terms)");
-    addOption("primalTol",OT_REAL,1e-4,"Tolerance for primal infeasibility (translates to dual infeasibility in dsdp terms)");
-    addOption("stepTol",OT_REAL,5e-2,"Terminate the solver if the step length in the primal is below this tolerance. ");
+    addOption("dualTol",OT_REAL,1e-4,
+              "Tolerance for dual infeasibility "
+              "(translates to primal infeasibility in dsdp terms)");
+    addOption("primalTol",OT_REAL,1e-4,
+              "Tolerance for primal infeasibility "
+              "(translates to dual infeasibility in dsdp terms)");
+    addOption("stepTol",OT_REAL,5e-2,
+              "Terminate the solver if the step length in the primal is below this tolerance. ");
     addOption("infinity",OT_REAL,1e30,"Treat numbers higher than this as infinity");
-    addOption("_use_penalty", OT_BOOLEAN, true, "Modifies the algorithm to use a penality gamma on r.");
+    addOption("_use_penalty", OT_BOOLEAN, true,
+              "Modifies the algorithm to use a penality gamma on r.");
     addOption("_penalty", OT_REAL, 1e5,
               "Penality parameter lambda. Must exceed the trace of Y. This "
               "parameter heavily influences the ability of DSDP to treat "
@@ -58,9 +68,13 @@ namespace casadi {
               "a problem with linear equality return unusable solutions.");
     addOption("_rho", OT_REAL,4.0,"Potential parameter. Must be >=1");
     addOption("_zbar", OT_REAL,1e10,"Initial upper bound on the objective of the dual problem.");
-    addOption("_reuse",OT_INTEGER,4,"Maximum on the number of times the Schur complement matrix is reused");
-    addOption("_printlevel",OT_INTEGER,1,"A printlevel of zero will disable all output. Another number indicates how often a line is printed.");
-    addOption("_loglevel",OT_INTEGER,0,"An integer that specifies how much logging is done on stdout.");
+    addOption("_reuse",OT_INTEGER,4,
+              "Maximum on the number of times the Schur complement matrix is reused");
+    addOption("_printlevel",OT_INTEGER,1,
+              "A printlevel of zero will disable all output. "
+              "Another number indicates how often a line is printed.");
+    addOption("_loglevel",OT_INTEGER,0,
+              "An integer that specifies how much logging is done on stdout.");
 
     // Set DSDP memory blocks to null
     dsdp_ = 0;
@@ -120,7 +134,8 @@ namespace casadi {
         const vector<int>& row = CAij.row();
         for(int cc=0; cc<colind.size()-1; ++cc) {
           int rr;
-          for(int el=colind[cc]; el<colind[cc+1] && (rr=row[el])<=cc; ++el){ // upper triangular part (= lower triangular part for row-major)
+          // upper triangular part (= lower triangular part for row-major)
+          for(int el=colind[cc]; el<colind[cc+1] && (rr=row[el])<=cc; ++el){
             pattern_[i][j][nz++] = cc*(cc + 1)/2 + rr; // DSDP is row-major --> indices swapped
           }
         }
@@ -196,7 +211,8 @@ namespace casadi {
     }
     if (nc_>0) {
       DSDPCreateLPCone( dsdp_, &lpcone_);
-      LPConeSetData(lpcone_, nc_*2, getPtr(mappingA_.output().colind()), getPtr(mappingA_.output().row()), mappingA_.output().ptr());
+      LPConeSetData(lpcone_, nc_*2, getPtr(mappingA_.output().colind()),
+                    getPtr(mappingA_.output().row()), mappingA_.output().ptr());
     }
 
     DSDPCreateBCone( dsdp_, &bcone_);
@@ -244,7 +260,8 @@ namespace casadi {
     if (nb_>0) {
       for (int i=0;i<n_+1;++i) {
         for (int j=0;j<nb_;++j) {
-          SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, getPtr(pattern_[i][j]), getPtr(values_[i][j]), pattern_[i][j].size() );
+          SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, getPtr(pattern_[i][j]),
+                                  getPtr(values_[i][j]), pattern_[i][j].size() );
         }
       }
     }
@@ -290,20 +307,26 @@ namespace casadi {
 
     if (calc_dual_) {
       for (int j=0;j<nb_;++j) {
-        info = SDPConeComputeX(sdpcone_, j, block_sizes_[j], getPtr(store_X_[j]), store_X_[j].size());
+        info = SDPConeComputeX(sdpcone_, j, block_sizes_[j],
+                               getPtr(store_X_[j]), store_X_[j].size());
         Pmapper_.input(j).set(store_X_[j],SPARSESYM);
       }
       Pmapper_.evaluate();
-      std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_SOLVER_DUAL).data().begin());
+      std::copy(Pmapper_.output().data().begin(),
+                Pmapper_.output().data().end(),
+                output(SDP_SOLVER_DUAL).data().begin());
     }
 
     if (calc_p_) {
       for (int j=0;j<nb_;++j) {
-        info = SDPConeComputeS(sdpcone_, j, 1.0,  output(SDP_SOLVER_X).ptr(), n_, 0, block_sizes_[j] , getPtr(store_P_[j]), store_P_[j].size());
+        info = SDPConeComputeS(sdpcone_, j, 1.0,  output(SDP_SOLVER_X).ptr(), n_, 0,
+                               block_sizes_[j] , getPtr(store_P_[j]), store_P_[j].size());
         Pmapper_.input(j).set(store_P_[j],SPARSESYM);
       }
       Pmapper_.evaluate();
-      std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_SOLVER_P).data().begin());
+      std::copy(Pmapper_.output().data().begin(),
+                Pmapper_.output().data().end(),
+                output(SDP_SOLVER_P).data().begin());
     }
 
     DSDPComputeX(dsdp_);
@@ -315,7 +338,8 @@ namespace casadi {
       double *lam;
 
       info = LPConeGetXArray(lpcone_, &lam, &dummy);
-      std::transform (lam + nc_, lam + 2*nc_, lam, output(SDP_SOLVER_LAM_A).ptr(), std::minus<double>());
+      std::transform (lam + nc_, lam + 2*nc_, lam,
+                      output(SDP_SOLVER_LAM_A).ptr(), std::minus<double>());
     }
 
   }

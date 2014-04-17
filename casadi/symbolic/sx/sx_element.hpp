@@ -78,7 +78,8 @@ namespace casadi{
          \param name Name of the symbolic primitive
 
         This is the name that will be used by the "operator<<" and "toString" methods.
-        The name is not used as identifier; you may construct distinct SXElement objects with non-unique names.
+        The name is not used as identifier; you may construct distinct
+        SXElement objects with non-unique names.
     */
     static SXElement sym(const std::string& name);
 
@@ -102,13 +103,15 @@ namespace casadi{
 
     // Assignment
     SXElement& operator=(const SXElement& scalar);
-    SXElement& operator=(double scalar); // needed since otherwise both a = SXElement(double) and a = Matrix(double) would be ok
+    SXElement& operator=(double scalar); // needed since otherwise both a = SXElement(double)
+                                         // and a = Matrix(double) would be ok
 
     // Convert to a 1-by-1 Matrix
     operator Matrix<SXElement>() const;
 
     /** \brief  print to stream */
-    CASADI_SYMBOLIC_EXPORT friend std::ostream& operator<<(std::ostream &stream, const SXElement &scalar);
+    CASADI_SYMBOLIC_EXPORT friend std::ostream& operator<<(std::ostream &stream,
+                                                           const SXElement &scalar);
 
     /** \brief  print to stream, limited */
     void print(std::ostream &stream, long& remaining_calls) const;
@@ -118,7 +121,8 @@ namespace casadi{
 
     /// \cond INTERNAL
     /** \brief  Get a pointer to the node */
-    SXNode* get() const; // note: constant pointer, not pointer to constant object! (to allow access to the counter)
+    SXNode* get() const; // note: constant pointer, not pointer to constant object!
+                         // (to allow access to the counter)
 
     /** \brief  Access functions of the node */
     const SXNode* operator->() const;
@@ -212,7 +216,8 @@ namespace casadi{
     SXElement __mpower__(const SXElement& b) const {return (*this).__pow__(b);}
     SXElement trans() const{ return *this;}
 
-    /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access
+    /// The following functions serves two purposes:
+    // Numpy compatibility and to allow unambigous access
     SXElement mul(const SXElement& y) const{ return __mul__(y);}
     SXElement exp() const;
     SXElement log() const;
@@ -268,10 +273,12 @@ namespace casadi{
     // Mark by flipping the sign of the temporary and decreasing by one
     void mark();
 
-    /** \brief Assign to another expression, if a duplicate. Check for equality up to a given depth */
+    /** \brief Assign to another expression, if a duplicate. 
+     * Check for equality up to a given depth */
     void assignIfDuplicate(const SXElement& scalar, int depth=1);
 
-    /** \brief Assign the node to something, without invoking the deletion of the node, if the count reaches 0 */
+    /** \brief Assign the node to something, without invoking the deletion of the node,
+     * if the count reaches 0 */
     SXNode* assignNoDelete(const SXElement& scalar);
     /// \endcond
 
@@ -284,7 +291,9 @@ namespace casadi{
     SXNode* node;
 
     /** \brief inline if-test */
-    friend SXElement if_else(const SXElement& cond, const SXElement& if_true, const SXElement& if_false); // replaces the ternary conditional operator "?:", which cannot be overloaded
+    // replaces the ternary conditional operator "?:", which cannot be overloaded
+    friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
+                             const SXElement& if_false);
 #endif // SWIG
 
   };
@@ -407,7 +416,8 @@ namespace std{
   };
 } //namespace std
 
-/** \brief  The following functions needs the class so they cannot be included in the beginning of the header */
+/** \brief  The following functions needs the class so they cannot be included
+ * in the beginning of the header */
 #include "sx_node.hpp"
 
 #endif // SWIG

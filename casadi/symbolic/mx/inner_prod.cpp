@@ -46,7 +46,9 @@ namespace casadi{
     }
   }
 
-  void InnerProd::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void InnerProd::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                             MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                             bool output_given){
     if(!output_given){
       *output[0] = (*input[0])->getInnerProd(*input[1]);
     }
@@ -54,7 +56,8 @@ namespace casadi{
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d=0; d<nfwd; ++d){
-      *fwdSens[d][0] = (*input[0])->getInnerProd(*fwdSeed[d][1]) + (*fwdSeed[d][0])->getInnerProd(*input[1]);
+      *fwdSens[d][0] = (*input[0])->getInnerProd(*fwdSeed[d][1])
+          + (*fwdSeed[d][0])->getInnerProd(*input[1]);
     }
 
     // Adjoint sensitivities
@@ -66,16 +69,19 @@ namespace casadi{
     }
   }
 
-  void InnerProd::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void InnerProd::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                            std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void InnerProd::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void InnerProd::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                             std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void InnerProd::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void InnerProd::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                              std::vector<T>& rtmp){
     // Get data
     T& res = output[0]->data().front();
     const vector<T> &arg0 = input[0]->data();
@@ -105,8 +111,10 @@ namespace casadi{
     }
   }
 
-  void InnerProd::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
-    stream << "  *" << res.front() << " = " << gen.casadi_dot(dep().size(),arg.at(0),1,arg.at(1),1) << ";" << endl;
+  void InnerProd::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                    const std::vector<std::string>& res, CodeGenerator& gen) const{
+    stream << "  *" << res.front() << " = "
+           << gen.casadi_dot(dep().size(),arg.at(0),1,arg.at(1),1) << ";" << endl;
   }
 
 } // namespace casadi

@@ -39,7 +39,8 @@ namespace casadi{
     friend class NLPImplicitSolver;
   public:
     /** \brief  Constructor */
-    explicit NLPImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol);
+    explicit NLPImplicitInternal(const Function& f, const Function& jac,
+                                 const LinearSolver& linsol);
 
     /** \brief  Destructor */
     virtual ~NLPImplicitInternal();
@@ -51,7 +52,9 @@ namespace casadi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual NLPImplicitInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const { return new NLPImplicitInternal(f,jac,linsol);}
+    virtual NLPImplicitInternal* create(const Function& f, const Function& jac,
+                                        const LinearSolver& linsol) const
+    { return new NLPImplicitInternal(f,jac,linsol);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -67,4 +70,3 @@ namespace casadi{
 } // namespace casadi
 /// \endcond
 #endif //NLP_IMPLICIT_INTERNAL_HPP
-

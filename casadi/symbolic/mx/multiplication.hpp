@@ -28,7 +28,8 @@
 /// \cond INTERNAL
 
 namespace casadi{
-  /** \brief An MX atomic for matrix-matrix product, note that the first factor must be provided transposed
+  /** \brief An MX atomic for matrix-matrix product,
+             note that the first factor must be provided transposed
       \author Joel Andersson
       \date 2010
   */
@@ -49,20 +50,25 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Evaluate the function (template)
     template<typename T, typename MatV, typename MatVV>
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Evaluate the function numerically
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                           std::vector<double>& rtmp);
 
     /// Evaluate the function symbolically (SX)
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                            std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
-    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                            bool output_given);
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
@@ -74,7 +80,8 @@ namespace casadi{
     virtual int numInplace() const{ return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth) && dynamic_cast<const Multiplication<TrX,TrY>*>(node)!=0;}
+    virtual bool isEqual(const MXNode* node, int depth) const
+    { return sameOpAndDeps(node,depth) && dynamic_cast<const Multiplication<TrX,TrY>*>(node)!=0;}
 
     /// Helper class
     template<bool Tr>
@@ -82,7 +89,8 @@ namespace casadi{
   };
 
 
-  /** \brief An MX atomic for matrix-matrix product, note that the factor must be provided transposed
+  /** \brief An MX atomic for matrix-matrix product,
+             note that the factor must be provided transposed
       \author Joel Andersson
       \date 2010
   */
@@ -100,12 +108,12 @@ namespace casadi{
     virtual DenseMultiplication* clone() const{ return new DenseMultiplication(*this);}
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
   };
 
 
 } // namespace casadi
 /// \endcond
-
 
 #endif // MULTIPLICATION_HPP

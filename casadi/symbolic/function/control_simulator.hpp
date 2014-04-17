@@ -31,7 +31,8 @@ namespace casadi{
   enum ControlledDAEInput{
     /// Global physical time. (1-by-1) [t]
     CONTROL_DAE_T,
-    /// State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [x]
+    /// State vector (dimension nx-by-1).
+    // Should have same amount of non-zeros as DAEOutput:DAE_RES [x]
     CONTROL_DAE_X,
     /// Algebraic state vector (dimension np-by-1). [z]
     CONTROL_DAE_Z,
@@ -67,15 +68,20 @@ namespace casadi{
 
   /** \brief Piecewise Simulation class
 
-      A ControlSimulator can be seen as a chain of Simulators whereby some parameters change from one Simulator to the next.
+      A ControlSimulator can be seen as a chain of Simulators whereby some parameters change
+      from one Simulator to the next.
 
-      These changing parameters can typically be interpreted as "controls" in the context of dynamic optimization.
-
+      These changing parameters can typically be interpreted as "controls" in the context
+      of dynamic optimization.
 
       We discriminate between the following time steps:
-      * Major time-steps. These are the time steps provided by the supplied grid. Controls are constant inbetween major time-steps\n
-      * Minor time-steps. These are time steps linearly interpolated from one major time-step to the next. The option 'nf' regulates how many minor time-steps are taken.\n
-      * Integration time-steps. Time steps that the supplied integrator might choose to integrate the continous dynamics. They are not important what ControlSimulator is concerned.\n
+      * Major time-steps. These are the time steps provided by the supplied grid.
+        Controls are constant inbetween major time-steps\n
+      * Minor time-steps. These are time steps linearly interpolated from one major time-step
+        to the next. The option 'nf' regulates how many minor time-steps are taken.\n
+      * Integration time-steps. Time steps that the supplied integrator might choose to
+        integrate the continous dynamics.
+        They are not important what ControlSimulator is concerned.\n
 
       np  Number of parameters
       nu  Number of controls
@@ -103,8 +109,10 @@ namespace casadi{
      * \copydoc scheme_ControlledDAEInput
      * \param grid the major time grid
      */
-    ControlSimulator(const Function& dae, const Function& output_fcn, const std::vector<double>& grid);
-    ControlSimulator(const Function& dae, const Function& output_fcn, const Matrix<double>& grid);
+    ControlSimulator(const Function& dae, const Function& output_fcn,
+                     const std::vector<double>& grid);
+    ControlSimulator(const Function& dae, const Function& output_fcn,
+                     const Matrix<double>& grid);
 
     /// Output function equal to the state
     ControlSimulator(const Function& dae, const std::vector<double>& grid);

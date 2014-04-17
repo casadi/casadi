@@ -38,24 +38,40 @@ namespace casadi{
 
   SQPInternal::SQPInternal(const Function& nlp) : NLPSolverInternal(nlp){
     casadi_warning("The SQP method is under development");
-    addOption("qp_solver",         OT_QPSOLVER,   GenericType(),    "The QP solver to be used by the SQP method");
-    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");
-    addOption("hessian_approximation", OT_STRING, "exact",          "limited-memory|exact");
-    addOption("max_iter",           OT_INTEGER,      50,            "Maximum number of SQP iterations");
-    addOption("max_iter_ls",        OT_INTEGER,       3,            "Maximum number of linesearch iterations");
-    addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
-    addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
-    addOption("c1",                OT_REAL,       1E-4,             "Armijo condition, coefficient of decrease in merit");
-    addOption("beta",              OT_REAL,       0.8,              "Line-search parameter, restoration factor of stepsize");
-    addOption("merit_memory",      OT_INTEGER,      4,              "Size of memory to store history of merit function values");
-    addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
-    addOption("regularize",        OT_BOOLEAN,  false,              "Automatic regularization of Lagrange Hessian.");
-    addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
-    addOption("min_step_size",     OT_REAL,   1e-10,                "The size (inf-norm) of the step size should not become smaller than this.");
+    addOption("qp_solver",         OT_QPSOLVER,   GenericType(),
+              "The QP solver to be used by the SQP method");
+    addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
+              "Options to be passed to the QP solver");
+    addOption("hessian_approximation", OT_STRING, "exact",
+              "limited-memory|exact");
+    addOption("max_iter",           OT_INTEGER,      50,
+              "Maximum number of SQP iterations");
+    addOption("max_iter_ls",        OT_INTEGER,       3,
+              "Maximum number of linesearch iterations");
+    addOption("tol_pr",            OT_REAL,       1e-6,
+              "Stopping criterion for primal infeasibility");
+    addOption("tol_du",            OT_REAL,       1e-6,
+              "Stopping criterion for dual infeasability");
+    addOption("c1",                OT_REAL,       1E-4,
+              "Armijo condition, coefficient of decrease in merit");
+    addOption("beta",              OT_REAL,       0.8,
+              "Line-search parameter, restoration factor of stepsize");
+    addOption("merit_memory",      OT_INTEGER,      4,
+              "Size of memory to store history of merit function values");
+    addOption("lbfgs_memory",      OT_INTEGER,     10,
+              "Size of L-BFGS memory.");
+    addOption("regularize",        OT_BOOLEAN,  false,
+              "Automatic regularization of Lagrange Hessian.");
+    addOption("print_header",      OT_BOOLEAN,   true,
+              "Print the header with problem statistics");
+    addOption("min_step_size",     OT_REAL,   1e-10,
+              "The size (inf-norm) of the step size should not become smaller than this.");
 
     // Monitors
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
-    addOption("print_time",         OT_BOOLEAN,       true,           "Print information about execution time");
+    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
+              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
+    addOption("print_time",         OT_BOOLEAN,       true,
+              "Print information about execution time");
   }
 
 
@@ -222,7 +238,8 @@ namespace casadi{
     copy(input(NLP_SOLVER_LAM_G0).begin(),input(NLP_SOLVER_LAM_G0).end(),mu_.begin());
     copy(input(NLP_SOLVER_LAM_X0).begin(),input(NLP_SOLVER_LAM_X0).end(),mu_x_.begin());
 
-    t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+    t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ =
+        t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
 
@@ -341,7 +358,8 @@ namespace casadi{
 
       if (iter > 0 && dx_norminf <= min_step_size_) {
         cout << endl;
-        cout << "casadi::SQPMethod: Search direction becomes too small without convergence criteria being met." << endl;
+        cout << "casadi::SQPMethod: Search direction becomes too small without "
+            "convergence criteria being met." << endl;
         stats_["return_status"] = "Search_Direction_Becomes_Too_Small";
         break;
       }
@@ -488,7 +506,8 @@ namespace casadi{
           const vector<int>& row = Bk_.row();            // Access sparsity (row)
           vector<double>& data = Bk_.data();             // Access nonzero elements
           for(int cc=0; cc<colind.size()-1; ++cc){          // Loop over the columns of the Hessian
-            for(int el=colind[cc]; el<colind[cc+1]; ++el){ // Loop over the nonzero elements of the column
+            for(int el=colind[cc]; el<colind[cc+1]; ++el){
+              // Loop over the nonzero elements of the column
               if(cc!=row[el]) data[el] = 0;               // Remove if off-diagonal entries
             }
           }
@@ -531,7 +550,8 @@ namespace casadi{
       cout << endl;
       cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
-        cout << " (" << n_eval_grad_f_ << " calls, " << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
+        cout << " (" << n_eval_grad_f_ << " calls, "
+             << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
       cout << endl;
       cout << "time spent in eval_g: " << t_eval_g_ << " s.";
       if (n_eval_g_>0)
@@ -539,7 +559,8 @@ namespace casadi{
       cout << endl;
       cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
-        cout << " (" << n_eval_jac_g_ << " calls, " << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
+        cout << " (" << n_eval_jac_g_ << " calls, "
+             << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
       cout << endl;
       cout << "time spent in eval_h: " << t_eval_h_ << " s.";
       if (n_eval_h_>1)
@@ -580,7 +601,8 @@ namespace casadi{
     stream << endl;
   }
 
-  void SQPInternal::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf,
+  void SQPInternal::printIteration(std::ostream &stream, int iter, double obj,
+                                   double pr_inf, double du_inf,
                                    double dx_norm, double rg, int ls_trials, bool ls_success){
     stream << setw(4) << iter;
     stream << scientific;
@@ -675,7 +697,8 @@ namespace casadi{
   }
 
 
-  void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
+  void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda,
+                           double sigma, Matrix<double>& H){
     try{
       // Get function
       Function& hessLag = this->hessLag();
@@ -744,7 +767,8 @@ namespace casadi{
     }
   }
 
-  void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
+  void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g,
+                               Matrix<double>& J){
     try{
       double time1 = clock();
 
@@ -782,7 +806,8 @@ namespace casadi{
     }
   }
 
-  void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f){
+  void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f,
+                                std::vector<double>& grad_f){
     try {
       double time1 = clock();
 
@@ -852,8 +877,10 @@ namespace casadi{
 
   void SQPInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g,
                              const std::vector<double>& lbx, const std::vector<double>& ubx,
-                             const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
-                             std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt){
+                             const Matrix<double>& A, const std::vector<double>& lbA,
+                             const std::vector<double>& ubA,
+                             std::vector<double>& x_opt, std::vector<double>& lambda_x_opt,
+                             std::vector<double>& lambda_A_opt){
 
     // Pass data to QP solver
     qp_solver_.setInput(H, QP_SOLVER_H);
@@ -900,8 +927,12 @@ namespace casadi{
     }
   }
 
-  double SQPInternal::primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
-                                          const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg){
+  double SQPInternal::primalInfeasibility(const std::vector<double>& x,
+                                          const std::vector<double>& lbx,
+                                          const std::vector<double>& ubx,
+                                          const std::vector<double>& g,
+                                          const std::vector<double>& lbg,
+                                          const std::vector<double>& ubg){
     // Linf-norm of the primal infeasibility
     double pr_inf = 0;
 

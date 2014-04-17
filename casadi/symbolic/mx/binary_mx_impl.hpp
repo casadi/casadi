@@ -64,7 +64,9 @@ namespace casadi{
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX,ScY>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void BinaryMX<ScX,ScY>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                                     MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                                     bool output_given){
     // Evaluate function
     MX f; // Function value
     if(output_given){
@@ -112,7 +114,10 @@ namespace casadi{
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX,ScY>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void BinaryMX<ScX,ScY>::generateOperation(std::ostream &stream,
+                                            const std::vector<std::string>& arg,
+                                            const std::vector<std::string>& res,
+                                            CodeGenerator& gen) const{
 
     // Print loop and right hand side
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
@@ -147,18 +152,21 @@ namespace casadi{
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX,ScY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void BinaryMX<ScX,ScY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                    std::vector<int>& itmp, std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool ScX, bool ScY>
-  void BinaryMX<ScX,ScY>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void BinaryMX<ScX,ScY>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                                     std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<bool ScX, bool ScY>
   template<typename T, typename MatV, typename MatVV>
-  void BinaryMX<ScX,ScY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void BinaryMX<ScX,ScY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                                      std::vector<T>& rtmp){
     // Get data
     vector<T>& output0 = output[0]->data();
     const vector<T> &input0 = input[0]->data();

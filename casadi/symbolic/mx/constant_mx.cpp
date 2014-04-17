@@ -38,13 +38,17 @@ namespace casadi{
   ConstantMX::~ConstantMX(){
   }
 
-  void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                             std::vector<int>& itmp, std::vector<double>& rtmp){
   }
 
-  void ConstantMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void ConstantMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                              std::vector<SXElement>& rtmp){
   }
 
-  void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                              MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                              bool output_given){
     // Evaluate nondifferentiated
     if(!output_given){
       if(output[0]){
@@ -75,7 +79,9 @@ namespace casadi{
     fill_n(outputd,output[0]->size(),0);
   }
 
-  void ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                          const std::vector<std::string>& res,
+                                          CodeGenerator& gen) const{
     // Print the constant
     int ind = gen.getConstant(x_.data(),true);
 

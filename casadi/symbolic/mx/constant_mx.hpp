@@ -60,13 +60,17 @@ namespace casadi{
     virtual ConstantMX* clone() const = 0;
 
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                           std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                            std::vector<SXElement>& rtmp);
 
     /** \brief  Evaluate the function symbolically (MX) */
-    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
+    virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                            bool output_given);
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
@@ -109,19 +113,22 @@ namespace casadi{
     }
 
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                           std::vector<double>& rtmp){
       output[0]->set(x_);
       ConstantMX::evaluateD(input,output,itmp,rtmp);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                            std::vector<SXElement>& rtmp){
       output[0]->set(SX(x_));
       ConstantMX::evaluateSX(input,output,itmp,rtmp);
     }
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const;
@@ -169,13 +176,16 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){}
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                           std::vector<double>& rtmp){}
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){}
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                            std::vector<SXElement>& rtmp){}
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{}
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                   const std::vector<std::string>& res, CodeGenerator& gen) const{}
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const{ return 0;}
@@ -237,13 +247,16 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief  Evaluate the function numerically */
-    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp);
+    virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                           std::vector<double>& rtmp);
 
     /** \brief  Evaluate the function symbolically (SX) */
-    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp);
+    virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                            std::vector<SXElement>& rtmp);
 
     /** \brief Generate code for the operation */
-    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const;
+    virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                   const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief  Check if a particular integer value */
     virtual bool isZero() const{ return v_.value==0;}
@@ -411,7 +424,8 @@ namespace casadi{
     }
 
     // Constant folding
-    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0){ // NOTE: ugly, should use a function instead of a cast
+    // NOTE: ugly, should use a function instead of a cast
+    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0){
       double y_value = y.size()>0 ? y->getValue() : 0;
       double ret;
       casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,y_value,ret);
@@ -424,30 +438,35 @@ namespace casadi{
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+                                  std::vector<int>& itmp, std::vector<double>& rtmp){
     output[0]->set(static_cast<double>(v_.value));
     ConstantMX::evaluateD(input,output,itmp,rtmp);
   }
 
   template<typename Value>
-  void Constant<Value>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void Constant<Value>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                                   std::vector<SXElement>& rtmp){
     output[0]->set(SXElement(v_.value));
     ConstantMX::evaluateSX(input,output,itmp,rtmp);
   }
 
   template<typename Value>
-  void Constant<Value>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void Constant<Value>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                          const std::vector<std::string>& res,
+                                          CodeGenerator& gen) const{
     // Copy the constant to the work vector
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
     stream << res.at(0) << "[i]=";
     std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
-    stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1); // full precision NOTE: hex better?
+    // full precision NOTE: hex better?
+    stream << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1);
     stream << v_.value << ";" << std::endl;
     stream.flags(fmtfl); // reset current format flags
   }
 
   template<typename Value>
-  MX Constant<Value>::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const{
+  MX Constant<Value>::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
     if(v_.value!=0){
       // Check if any "holes"
       for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k){

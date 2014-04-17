@@ -231,7 +231,8 @@ namespace casadi{
 
     #ifndef SWIG
     //! \brief Print
-    CASADI_SYMBOLIC_EXPORT friend std::ostream& operator<<(std::ostream &stream, const GenericType& ref);
+    CASADI_SYMBOLIC_EXPORT friend std::ostream& operator<<(std::ostream &stream,
+                                                           const GenericType& ref);
     #endif
 
     /// Check if it is of a certain type (implementation in generic_type_internal.hpp)

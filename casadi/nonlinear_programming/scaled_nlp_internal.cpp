@@ -38,8 +38,10 @@ NLPQPInternal* NLPQPInternal::clone() const{
 
 NLPQPInternal::NLPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInternal(st) {
 
-  addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSOlver used to solve the QPs.");
-  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSOlver");
+  addOption("nlp_solver",       OT_NLPSOLVER, GenericType(),
+            "The NLPSOlver used to solve the QPs.");
+  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
+            "Options to be passed to the NLPSOlver");
 
 }
 
@@ -47,7 +49,9 @@ NLPQPInternal::~NLPQPInternal(){
 }
 
 void NLPQPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("NLPQPInternal::evaluate() not implemented for forward or backward mode");
+  if (nfdir!=0 || nadir!=0)
+      throw CasadiException("NLPQPInternal::evaluate() not implemented "
+                            "for forward or backward mode");
 
   if (inputs_check_) checkInputs();
 
@@ -55,9 +59,15 @@ void NLPQPInternal::evaluate(int nfdir, int nadir) {
 
  // Pass inputs of QP to NLP form
 
-  std::copy(input(QP_SOLVER_H).data().begin(),input(QP_SOLVER_H).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_H).size();
-  std::copy(input(QP_SOLVER_G).data().begin(),input(QP_SOLVER_G).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_G).size();
-  std::copy(input(QP_SOLVER_A).data().begin(),input(QP_SOLVER_A).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k);
+  std::copy(input(QP_SOLVER_H).data().begin(),
+            input(QP_SOLVER_H).data().end(),
+            nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_H).size();
+  std::copy(input(QP_SOLVER_G).data().begin(),
+            input(QP_SOLVER_G).data().end(),
+            nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_G).size();
+  std::copy(input(QP_SOLVER_A).data().begin(),
+            input(QP_SOLVER_A).data().end(),
+            nlpsolver_.input(NLP_SOLVER_P).data().begin()+k);
 
 
   nlpsolver_.input(NLP_SOLVER_LBX).set(input(QP_SOLVER_LBX));
@@ -115,4 +125,3 @@ void NLPQPInternal::init(){
 }
 
 } // namespace casadi
-

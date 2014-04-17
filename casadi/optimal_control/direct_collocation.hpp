@@ -43,7 +43,8 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocation : public OCPSolver{
     DirectCollocation();
 
     /// Constructor
-    explicit DirectCollocation(const Function& ffcn, const Function& mfcn, const Function& cfcn=Function(), const Function& rfcn=Function());
+    explicit DirectCollocation(const Function& ffcn, const Function& mfcn,
+                               const Function& cfcn=Function(), const Function& rfcn=Function());
 
     /// Access functions of the node
     DirectCollocationInternal* operator->();
@@ -70,7 +71,8 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocation : public OCPSolver{
     void reportConstraints(std::ostream &stream=std::cout);
 
     /// Return the report as a string
-    std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
+    std::string getReportConstraints()
+    { std::stringstream s; reportConstraints(s); return s.str(); }
 };
 
 } // namespace casadi

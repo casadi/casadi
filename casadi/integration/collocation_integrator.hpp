@@ -68,7 +68,8 @@ namespace casadi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static Integrator creator(const Function& f, const Function& g){ return CollocationIntegrator(f,g);}
+    static Integrator creator(const Function& f, const Function& g)
+    { return CollocationIntegrator(f,g);}
 #ifdef SWIG
     %nocallback;
 #endif

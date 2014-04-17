@@ -73,7 +73,8 @@ namespace casadi{
   * Elements larger than or equal to stop are chopped off.
   *
   */
-  CASADI_SYMBOLIC_EXPORT std::vector<int> range(int start, int stop, int step=1, int len=std::numeric_limits<int>::max());
+  CASADI_SYMBOLIC_EXPORT std::vector<int> range(int start, int stop, int step=1,
+                                                int len=std::numeric_limits<int>::max());
 
   /** Range function
   * \param stop
@@ -222,14 +223,15 @@ namespace casadi{
   * \param[in] invert_indices Output indices such that 'sorted_values[indices=values'
   **/
   template<typename T>
-  void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices,bool invert_indices =false);
+  void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices,
+            bool invert_indices =false);
   #endif //SWIG
 
   /** \brief Make a vector of a certain length with its entries specified
-  *  Usage C++:
-  *     makeVector<ClassName>(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2, ...)
-  *  Usage Python:
-  *     makeVector(ClassName,(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...)
+  * Usage C++:
+  *   makeVector<ClassName>(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2, ...)
+  * Usage Python:
+  *   makeVector(ClassName,(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...)
   */
   #ifndef SWIG
   template<typename T>
@@ -258,7 +260,8 @@ namespace casadi{
   #ifdef SWIGPYTHON
 %pythoncode %{
    def makeVector(T,size,*elems):
-      assert len(elems) % 2 == 0, "The number of provided indices does not the number of provided values"
+      assert len(elems) % 2 == 0, \
+        "The number of provided indices does not the number of provided values"
       num_elem = len(elems)/2
       ret = [T()]*size
       for i in range(num_elem):
@@ -528,7 +531,8 @@ namespace casadi{
 
   template<typename T, typename F, typename L>
   void linspace(std::vector<T> &v, const F& first, const L& last){
-    if(v.size()<2) throw CasadiException("std::linspace: vector must contain at least two elements");
+    if(v.size()<2)
+        throw CasadiException("std::linspace: vector must contain at least two elements");
 
     // Increment
     T increment = (last-first)/T(v.size()-1);
@@ -556,7 +560,8 @@ namespace casadi{
   }
 
   template<typename T>
-  void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,  bool invert_indices) {
+  void sort(const std::vector<T> &values, std::vector<T> &sorted_values,
+            std::vector<int> &indices, bool invert_indices) {
 
     // Create a list of (value,index) pairs
     std::vector< std::pair<T,int> > pvalues(values.size());
@@ -615,8 +620,10 @@ namespace casadi{
     const int max_size = 20;
 
     // Collect all arguments
-    int ind[max_size] = {ind0,ind1,ind2,ind3,ind4,ind5,ind6,ind7,ind8,ind9,ind10,ind11,ind12,ind13,ind14,ind15,ind16,ind17,ind18,ind19};
-    T val[max_size] = {val0,val1,val2,val3,val4,val5,val6,val7,val8,val9,val10,val11,val12,val13,val14,val15,val16,val17,val18,val19};
+    int ind[max_size] = {ind0,ind1,ind2,ind3,ind4,ind5,ind6,ind7,ind8,ind9,
+                         ind10,ind11,ind12,ind13,ind14,ind15,ind16,ind17,ind18,ind19};
+    T val[max_size] = {val0,val1,val2,val3,val4,val5,val6,val7,val8,val9,
+                       val10,val11,val12,val13,val14,val15,val16,val17,val18,val19};
 
     // Return value
     std::vector<T> ret(size);
@@ -637,7 +644,8 @@ namespace casadi{
   template<typename T>
   bool isRegular(const std::vector<T> &v) {
     for (int k=0;k<v.size();++k) {
-      if (v[k]!=v[k] || v[k]==std::numeric_limits<T>::infinity() || v[k]==-std::numeric_limits<T>::infinity() ) return false;
+      if (v[k]!=v[k] || v[k]==std::numeric_limits<T>::infinity() ||
+          v[k]==-std::numeric_limits<T>::infinity() ) return false;
     }
     return true;
   }

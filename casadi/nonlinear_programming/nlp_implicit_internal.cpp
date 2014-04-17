@@ -28,15 +28,21 @@
 using namespace std;
 namespace casadi {
 
-  NLPImplicitInternal::NLPImplicitInternal(const Function& f, const Function& jac, const LinearSolver& linsol) : ImplicitFunctionInternal(f,jac,linsol) {
-    addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "The NLPSolver used to solve the implicit system.");
-    addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
+  NLPImplicitInternal::NLPImplicitInternal(const Function& f, const Function& jac,
+                                           const LinearSolver& linsol)
+      : ImplicitFunctionInternal(f,jac,linsol) {
+    addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(),
+              "The NLPSolver used to solve the implicit system.");
+    addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
+              "Options to be passed to the NLPSolver");
   }
 
   NLPImplicitInternal::~NLPImplicitInternal(){
   }
 
-  void NLPImplicitInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void NLPImplicitInternal::deepCopyMembers(
+    std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     ImplicitFunctionInternal::deepCopyMembers(already_copied);
     nlp_solver_ = deepcopy(nlp_solver_,already_copied);
   }
@@ -128,4 +134,3 @@ namespace casadi {
   }
 
 } // namespace casadi
-

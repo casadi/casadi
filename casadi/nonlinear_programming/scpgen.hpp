@@ -32,8 +32,8 @@ namespace casadi{
   class SCPgenInternal;
 
   /**
-     \brief A structure-exploiting sequential quadratic programming (to be come sequential convex programming)
-     method for nonlinear programming.
+     \brief A structure-exploiting sequential quadratic programming
+     (to be come sequential convex programming) method for nonlinear programming.
 
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
@@ -44,7 +44,9 @@ namespace casadi{
     SCPgen();
 
     /// \brief Create an NLP solver instance
-    explicit SCPgen(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+    explicit SCPgen(const Function& nlp
+                    /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto
+                       [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                     );
 
     /// Access functions of the node

@@ -28,7 +28,8 @@
 using namespace std;
 namespace casadi{
 
-  CSparseInternal::CSparseInternal(const Sparsity& sparsity, int nrhs)  : LinearSolverInternal(sparsity,nrhs){
+  CSparseInternal::CSparseInternal(const Sparsity& sparsity, int nrhs)
+      : LinearSolverInternal(sparsity,nrhs){
     N_ = 0;
     S_ = 0;
   }
@@ -51,7 +52,8 @@ namespace casadi{
     A_.nzmax = input().size();  // maximum number of entries
     A_.m = input().size1(); // number of rows
     A_.n = input().size2(); // number of columns
-    A_.p = const_cast<int*>(&input().colind().front()); // column pointers (size n+1) or col indices (size nzmax)
+    A_.p = const_cast<int*>(&input().colind().front()); // column pointers (size n+1)
+                                                        // or col indices (size nzmax)
     A_.i = const_cast<int*>(&input().row().front()); // row indices, size nzmax
     A_.x = &input().front(); // numerical values, size nzmax
     A_.nz = -1; // of entries in triplet matrix, -1 for compressed-col
@@ -63,7 +65,8 @@ namespace casadi{
     called_once_ = false;
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog,this,"CSparse",ProfilingData_FunctionType_Other,2);
+      profileWriteName(CasadiOptions::profilingLog,this,"CSparse",
+                       ProfilingData_FunctionType_Other,2);
 
       profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"prepare",-1);
       profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"solve",-1);
@@ -126,7 +129,8 @@ namespace casadi{
         throw CasadiException(ss.str());
       } else {
         stringstream ss;
-        ss << "CSparseInternal::prepare: factorization failed, check if Jacobian is singular" << endl;
+        ss << "CSparseInternal::prepare: factorization failed, check if Jacobian is singular"
+           << endl;
         if(verbose()){
           ss << "Sparsity of the linear system: " << endl;
           input(LINSOL_A).sparsity().print(ss); // print detailed
@@ -140,7 +144,9 @@ namespace casadi{
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog,this,0,time_stop-time_start,time_stop-time_start);
+      profileWriteTime(CasadiOptions::profilingLog,this,0,
+                       time_stop-time_start,
+                       time_stop-time_start);
       profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_start);
     }
   }
@@ -176,7 +182,9 @@ namespace casadi{
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog,this,1,time_stop-time_start,time_stop-time_start);
+      profileWriteTime(CasadiOptions::profilingLog,this,1,
+                       time_stop-time_start,
+                       time_stop-time_start);
       profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_start);
     }
   }

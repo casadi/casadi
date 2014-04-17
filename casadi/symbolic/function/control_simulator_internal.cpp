@@ -36,15 +36,27 @@ using namespace std;
 namespace casadi{
 
 
-  ControlSimulatorInternal::ControlSimulatorInternal(const Function& control_dae, const Function& output_fcn, const vector<double>& gridc) : control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc){
+  ControlSimulatorInternal::ControlSimulatorInternal(
+      const Function& control_dae, const Function& output_fcn, const vector<double>& gridc) :
+      control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc)
+  {
     setOption("name","unnamed controlsimulator");
-    addOption("nf",OT_INTEGER,1,"Number of minor grained integration steps per major interval. nf>0 must hold. This option is not used when 'minor_grid' is provided.");
-    addOption("minor_grid",OT_INTEGERVECTOR,GenericType(),"The local grid used on each major interval, with time normalized to 1. By default, option 'nf' is used to construct a linearly spaced grid.");
-    addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
-    addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
-    addOption("simulator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the simulator");
+    addOption("nf",OT_INTEGER,1,"Number of minor grained integration steps per major interval. "
+              "nf>0 must hold. This option is not used when 'minor_grid' is provided.");
+    addOption("minor_grid",OT_INTEGERVECTOR,GenericType(),
+              "The local grid used on each major interval, with time "
+              "normalized to 1. By default, option 'nf' is used to "
+              "construct a linearly spaced grid.");
+    addOption("integrator",               OT_INTEGRATOR, GenericType(),
+              "An integrator creator function");
+    addOption("integrator_options",       OT_DICTIONARY, GenericType(),
+              "Options to be passed to the integrator");
+    addOption("simulator_options",       OT_DICTIONARY, GenericType(),
+              "Options to be passed to the simulator");
     addOption("control_interpolation",   OT_STRING,     "none", "none|nearest|linear");
-    addOption("control_endpoint",        OT_BOOLEAN,       false, "Include a control value at the end of the simulation domain. Used for interpolation.");
+    addOption("control_endpoint",        OT_BOOLEAN,       false,
+              "Include a control value at the end of the simulation domain. "
+              "Used for interpolation.");
 
     input_.scheme = SCHEME_ControlSimulatorInput;
   }
@@ -61,7 +73,9 @@ namespace casadi{
 
     casadi_assert_message(!gridc_.empty(),"The supplied time grid must not be empty.");
 
-    casadi_assert_message(isIncreasing(gridc_),"The supplied time grid must be strictly increasing. Notably, you cannot have a time instance repeating.");
+    casadi_assert_message(isIncreasing(gridc_),
+                          "The supplied time grid must be strictly increasing. "
+                          "Notably, you cannot have a time instance repeating.");
 
     if (control_dae_.getNumInputs()==DAE_NUM_IN) {
       vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
@@ -73,7 +87,9 @@ namespace casadi{
       control_dae_ = MXFunction(control_dae_in_,control_dae_.call(dae_in_));
       control_dae_.init();
     }
-    casadi_assert_message(control_dae_.getNumInputs()==CONTROL_DAE_NUM_IN,"ControlSimulatorInternal::init: supplied control_dae does not conform to the CONTROL_DAE or DAE input scheme.");
+    casadi_assert_message(control_dae_.getNumInputs()==CONTROL_DAE_NUM_IN,
+                          "ControlSimulatorInternal::init: supplied control_dae does not "
+                          "conform to the CONTROL_DAE or DAE input scheme.");
 
     // Cast control_dae in a form that integrator can manage
     vector<MX> dae_in_(DAE_NUM_IN);
@@ -114,16 +130,19 @@ namespace casadi{
     int iTF = 1;
     IMatrix iP  = 2+IMatrix(control_dae_.input(CONTROL_DAE_P).sparsity(),range(np_));
     IMatrix iUstart  = 2+np_ + IMatrix(u_sparsity,range(nu_));
-    IMatrix iUend    = 2+np_ + nu_ + IMatrix(control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),range(nu_end));
+    IMatrix iUend    = 2+np_ + nu_ + IMatrix(control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),
+                                             range(nu_end));
     IMatrix iYM;
     if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty()) {
-      iYM = 2+np_ + nu_ + nu_end + IMatrix(control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity(),range(ny_));
+      iYM = 2+np_ + nu_ + nu_end + IMatrix(control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity(),
+                                           range(ny_));
     }
 
     vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
 
     if (!control_dae_.input(CONTROL_DAE_T).isEmpty())
-      control_dae_in_[CONTROL_DAE_T]        = dae_in_[DAE_P](iT0) + (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
+      control_dae_in_[CONTROL_DAE_T]        = dae_in_[DAE_P](iT0) +
+          (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
     if (!control_dae_.input(CONTROL_DAE_T0).isEmpty())
       control_dae_in_[CONTROL_DAE_T0]       = dae_in_[DAE_P](iT0);
     if (!control_dae_.input(CONTROL_DAE_TF).isEmpty())
@@ -136,7 +155,8 @@ namespace casadi{
       control_dae_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
     if (!control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
       MX tau = (dae_in_[DAE_P](iTF)-dae_in_[DAE_T])/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
-      control_dae_in_[CONTROL_DAE_U_INTERP] = dae_in_[DAE_P](iUstart) * (1-tau) + tau* dae_in_[DAE_P](iUend);
+      control_dae_in_[CONTROL_DAE_U_INTERP] = dae_in_[DAE_P](iUstart) * (1-tau) +
+          tau* dae_in_[DAE_P](iUend);
     }
     if (!control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty())
       control_dae_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
@@ -144,7 +164,8 @@ namespace casadi{
     std::vector<MX> control_dae_call = control_dae_.call(control_dae_in_);
 
 
-    std::vector<MX> dae_out(daeOut("ode",(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]));
+    std::vector<MX> dae_out(
+      daeOut("ode",(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]));
 
     int i=1;
     while( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}
@@ -171,7 +192,8 @@ namespace casadi{
     if (hasSetOption("minor_grid")) {
       gridlocal_ = getOption("minor_grid");
       nf_ = gridlocal_.size()-1;
-      casadi_assert_message(gridlocal_.size()>1,"Option 'minor_grid' must have more then one element.");
+      casadi_assert_message(gridlocal_.size()>1,
+                            "Option 'minor_grid' must have more then one element.");
     } else {
       gridlocal_.resize(nf_+1);
       linspace(gridlocal_,0,1);
@@ -240,7 +262,8 @@ namespace casadi{
     // Initialize the output function
     output_fcn_.init();
 
-    casadi_assert_message(output_fcn_.getNumInputs()==CONTROL_DAE_NUM_IN,"Output function, if supplied, must adhere to ControlledDAEInput scheme.");
+    casadi_assert_message(output_fcn_.getNumInputs()==CONTROL_DAE_NUM_IN,
+                     "Output function, if supplied, must adhere to ControlledDAEInput scheme.");
 
     // Extend the output function two extra outputs at the start: DAE_X and DAE_XDOT
     vector<MX> output_fcn_in_ = output_fcn_.symbolicInput();
@@ -257,21 +280,28 @@ namespace casadi{
     // Initialize the output function again
     output_fcn_.init();
 
-    if (!output_fcn_.input(CONTROL_DAE_U).isEmpty() && control_dae_.input(CONTROL_DAE_U).isEmpty()) {
-      casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U input. The supplied DAE should have it as well.");
+    if (!output_fcn_.input(CONTROL_DAE_U).isEmpty() &&
+        control_dae_.input(CONTROL_DAE_U).isEmpty()) {
+      casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U input. "
+                   "The supplied DAE should have it as well.");
     }
-    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isEmpty() && control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
-      casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U_INTERP input. The supplied DAE should have it as well.");
+    if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isEmpty() &&
+        control_dae_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
+      casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U_INTERP input."
+                   " The supplied DAE should have it as well.");
     }
-    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isEmpty() && control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty()) {
-      casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_X_MAJOR input. The supplied DAE should have it as well.");
+    if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isEmpty() &&
+        control_dae_.input(CONTROL_DAE_X_MAJOR).isEmpty()) {
+      casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_X_MAJOR "
+                   "input. The supplied DAE should have it as well.");
     }
 
     output_fcn_in_ = vector<MX>(CONTROL_DAE_NUM_IN);
 
     dae_in_[DAE_T] = MX::sym("tau");
     if (!output_fcn_.input(CONTROL_DAE_T).isEmpty()) {
-      output_fcn_in_[CONTROL_DAE_T]        = dae_in_[DAE_P](iT0) + (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
+      output_fcn_in_[CONTROL_DAE_T]        =
+          dae_in_[DAE_P](iT0) + (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*dae_in_[DAE_T];
     }
     if (!output_fcn_.input(CONTROL_DAE_T0).isEmpty())
       output_fcn_in_[CONTROL_DAE_T0]       = dae_in_[DAE_P](iT0);
@@ -282,7 +312,8 @@ namespace casadi{
     if (!output_fcn_.input(CONTROL_DAE_U).isEmpty())
       output_fcn_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
     if (!output_fcn_.input(CONTROL_DAE_U_INTERP).isEmpty()) {
-      output_fcn_in_[CONTROL_DAE_U_INTERP] = dae_in_[DAE_P](iUstart) * (1-dae_in_[DAE_T]) + dae_in_[DAE_T]* dae_in_[DAE_P](iUend);
+      output_fcn_in_[CONTROL_DAE_U_INTERP] =
+          dae_in_[DAE_P](iUstart) * (1-dae_in_[DAE_T]) + dae_in_[DAE_T]* dae_in_[DAE_P](iUend);
     }
     if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).isEmpty())
       output_fcn_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
@@ -325,7 +356,8 @@ namespace casadi{
     all_output_in[CONTROLSIMULATOR_P] = P;
     all_output_in[CONTROLSIMULATOR_U] = U;
 
-    // Placeholder with which simulator.input(INTEGRATOR_P) will be fed [t0 tf P Ustart Uend Y_MAJOR]
+    // Placeholder with which simulator.input(INTEGRATOR_P)
+    // will be fed [t0 tf P Ustart Uend Y_MAJOR]
     vector<MX> P_eval(6);
     P_eval[2] = P; // We can already set the fixed part in advance.
 
@@ -404,7 +436,9 @@ namespace casadi{
     Matrix<double> ret = Matrix<double>::zeros(nu_,grid_.size()-1);
     for (int i=0;i<ns_-1;++i) {
       for (int k=0;k<nf_;++k) {
-        copy(input(CONTROLSIMULATOR_U).data().begin()+i*nu_,input(CONTROLSIMULATOR_U).data().begin()+(i+1)*nu_,ret.begin()+i*nu_*nf_+k*nu_);
+        copy(input(CONTROLSIMULATOR_U).data().begin()+i*nu_,
+             input(CONTROLSIMULATOR_U).data().begin()+(i+1)*nu_,
+             ret.begin()+i*nu_*nf_+k*nu_);
       }
     }
     return ret;
@@ -415,5 +449,3 @@ namespace casadi{
   }
 
 } // namespace casadi
-
-

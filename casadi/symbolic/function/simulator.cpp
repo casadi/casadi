@@ -29,13 +29,19 @@ namespace casadi{
   Simulator::Simulator(){
   }
 
-  Simulator::Simulator(const Integrator& integrator, const Function& output_fcn, const vector<double>& grid){
+  Simulator::Simulator(const Integrator& integrator, const Function& output_fcn,
+                       const vector<double>& grid){
     assignNode(new SimulatorInternal(integrator,output_fcn,grid));
   }
 
-  Simulator::Simulator(const Integrator& integrator, const Function& output_fcn, const Matrix<double>& grid){
-    casadi_assert_message(grid.isVector(),"Simulator::Simulator: grid must be a column vector, but got " << grid.dimString());
-    casadi_assert_message(grid.isDense(),"Simulator::Simulator: grid must be dense, but got " << grid.dimString());
+  Simulator::Simulator(const Integrator& integrator, const Function& output_fcn,
+                       const Matrix<double>& grid){
+    casadi_assert_message(grid.isVector(),
+                          "Simulator::Simulator: grid must be a column vector, but got "
+                          << grid.dimString());
+    casadi_assert_message(grid.isDense(),
+                          "Simulator::Simulator: grid must be dense, but got "
+                          << grid.dimString());
     assignNode(new SimulatorInternal(integrator,output_fcn,grid.data()));
   }
 
@@ -44,8 +50,12 @@ namespace casadi{
   }
 
   Simulator::Simulator(const Integrator& integrator, const Matrix<double>& grid){
-    casadi_assert_message(grid.isVector(),"Simulator::Simulator: grid must be column vector, but got " << grid.dimString());
-    casadi_assert_message(grid.isDense(),"Simulator::Simulator: grid must be dense, but got " << grid.dimString());
+    casadi_assert_message(grid.isVector(),
+                          "Simulator::Simulator: grid must be column vector, but got "
+                          << grid.dimString());
+    casadi_assert_message(grid.isDense(),
+                          "Simulator::Simulator: grid must be dense, but got "
+                          << grid.dimString());
     assignNode(new SimulatorInternal(integrator,Function(),grid.data()));
   }
 
@@ -64,4 +74,3 @@ namespace casadi{
 
 
 } // namespace casadi
-

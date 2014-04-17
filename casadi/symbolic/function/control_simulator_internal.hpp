@@ -39,13 +39,15 @@ namespace casadi{
   public:
 
     /** \brief  Constructor */
-    ControlSimulatorInternal(const Function& dae, const Function& output_fcn, const std::vector<double>& gridc);
+    ControlSimulatorInternal(const Function& dae, const Function& output_fcn,
+                             const std::vector<double>& gridc);
 
     /** \brief  Destructor */
     virtual ~ControlSimulatorInternal();
 
     /** \brief  Clone */
-    virtual ControlSimulatorInternal* clone() const{ return new ControlSimulatorInternal(deepcopy(dae_),deepcopy(output_fcn_),gridc_);}
+    virtual ControlSimulatorInternal* clone() const{
+        return new ControlSimulatorInternal(deepcopy(dae_),deepcopy(output_fcn_),gridc_);}
 
     /** \brief  initialize */
     virtual void init();

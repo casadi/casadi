@@ -33,21 +33,27 @@ using namespace std;
 CustomFunction::CustomFunction(){
 }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const vector<Sparsity> &inputscheme,const  vector<Sparsity> &outputscheme) {
+CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const vector<Sparsity> &inputscheme,
+                               const  vector<Sparsity> &outputscheme) {
   assignNode(new CustomFunctionInternal(c_fcn,inputscheme,outputscheme));
 }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const IOSchemeVector< Sparsity > &inputscheme,const  vector<Sparsity> &outputscheme) {
+CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
+                               const IOSchemeVector< Sparsity > &inputscheme,
+                               const  vector<Sparsity> &outputscheme) {
   assignNode(new CustomFunctionInternal(c_fcn,inputscheme,outputscheme));
   setInputScheme(inputscheme.scheme);
 }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const vector<Sparsity> &inputscheme,const  IOSchemeVector< Sparsity > &outputscheme) {
+CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const vector<Sparsity> &inputscheme,
+                               const  IOSchemeVector< Sparsity > &outputscheme) {
   assignNode(new CustomFunctionInternal(c_fcn,inputscheme,outputscheme));
   setOutputScheme(outputscheme.scheme);
 }
 
-CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const IOSchemeVector< Sparsity > &inputscheme,const  IOSchemeVector< Sparsity > &outputscheme) {
+CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,
+                               const IOSchemeVector< Sparsity > &inputscheme,
+                               const IOSchemeVector< Sparsity > &outputscheme) {
   assignNode(new CustomFunctionInternal(c_fcn,inputscheme,outputscheme));
   setInputScheme(inputscheme.scheme);
   setOutputScheme(outputscheme.scheme);
@@ -72,4 +78,3 @@ bool CustomFunction::checkNode() const{
 
 
 } // namespace casadi
-

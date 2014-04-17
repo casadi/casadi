@@ -173,7 +173,9 @@ namespace casadi{
   }
 
   const MX MX::sub(const Matrix<int>& j, const Matrix<int>& i) const {
-    casadi_assert_message(i.sparsity()==j.sparsity(),"sub(Imatrix i, Imatrix j): sparsities must match. Got " << i.dimString() << " and " << j.dimString() << ".");
+    casadi_assert_message(i.sparsity()==j.sparsity(),
+                          "sub(Imatrix i, Imatrix j): sparsities must match. Got "
+                          << i.dimString() << " and " << j.dimString() << ".");
 
     MX ret(i.sparsity(),MX(0));
     for (int k=0;k<i.size();++k) {
@@ -242,8 +244,12 @@ namespace casadi{
       }
     }
 
-    casadi_assert_message(rr.size()==m.size1(),"Dimension mismatch." << "lhs is " << rr.size() << " x " << cc.size() << ", while rhs is " << m.dimString());
-    casadi_assert_message(cc.size()==m.size2(),"Dimension mismatch." << "lhs is " << rr.size() << " x " << cc.size() << ", while rhs is " << m.dimString());
+    casadi_assert_message(rr.size()==m.size1(),
+                          "Dimension mismatch." << "lhs is " << rr.size() << " x " << cc.size()
+                          << ", while rhs is " << m.dimString());
+    casadi_assert_message(cc.size()==m.size2(),
+                          "Dimension mismatch." << "lhs is " << rr.size() << " x " << cc.size()
+                          << ", while rhs is " << m.dimString());
 
     if(isDense() && m.isDense()){
       // Dense mode
@@ -315,7 +321,10 @@ namespace casadi{
     }
 
     if (!inBounds(ii,size2())) {
-      casadi_error("setSub[.,ii,j] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+      casadi_error("setSub[.,ii,j] out of bounds. Your ii contains "
+                   << *std::min_element(ii.begin(),ii.end()) << " up to "
+                   << *std::max_element(ii.begin(),ii.end())
+                   << ", which is outside of the matrix shape " << dimString() << ".");
     }
 
     //Sparsity result_sparsity = repmat(j,ii.size(),1).sparsity();
@@ -404,7 +413,9 @@ namespace casadi{
 
   MX MX::getNZ(int k) const{
     if (k<0) k+=size();
-    casadi_assert_message(k<size(),"MX::getNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".");
+    casadi_assert_message(k<size(),
+                          "MX::getNZ: requested at(" <<  k << "), but that is out of bounds:  "
+                          << dimString() << ".");
     return getNZ(std::vector<int>(1,k));
   }
 
@@ -412,7 +423,8 @@ namespace casadi{
     Sparsity sp = Sparsity::dense(k.size());
 
     for (int i=0;i<k.size();i++) {
-      casadi_assert_message(k[i] < size(),"Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
+      casadi_assert_message(k[i] < size(),"Mapping::assign: index vector reaches " << k[i]
+                            << ", while dependant is only of size " << size());
     }
 
     MX ret = (*this)->getGetNonzeros(sp,k);
@@ -426,7 +438,9 @@ namespace casadi{
 
   void MX::setNZ(int k, const MX& el){
     if (k<0) k+=size();
-    casadi_assert_message(k<size(),"MX::setNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".");
+    casadi_assert_message(k<size(),
+                          "MX::setNZ: requested at(" <<  k << "), but that is out of bounds:  "
+                          << dimString() << ".");
     setNZ(std::vector<int>(1,k),el);
   }
 
@@ -445,7 +459,9 @@ namespace casadi{
 
     // Assert correctness
     for(int i=0; i<k.size(); ++i){
-      casadi_assert_message(k[i] < size(), "Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
+      casadi_assert_message(k[i] < size(),
+                            "Mapping::assign: index vector reaches " << k[i]
+                            << ", while dependant is only of size " << size());
     }
 
     // Quick return if no assignments to be made
@@ -471,7 +487,10 @@ namespace casadi{
       setNZ(kk.data(),m);
       return;
     }
-    casadi_assert_message(kk.sparsity()==m.sparsity(),"Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl << "must match sparsity of rhs " << m.dimString() << ".");
+    casadi_assert_message(kk.sparsity()==m.sparsity(),
+                          "Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString()
+                          << " " << std::endl << "must match sparsity of rhs " << m.dimString()
+                          << ".");
     setNZ(kk.data(),m);
   }
 
@@ -565,7 +584,8 @@ namespace casadi{
   }
 
   Sparsity& MX::sparsityRef(){
-    // Since we can potentially change the behavior of the MX node, we must make a deep copy if there are other references
+    // Since we can potentially change the behavior of the MX node,
+    // we must make a deep copy if there are other references
     makeUnique();
 
     // Return the reference, again, deep copy if multiple references
@@ -641,7 +661,9 @@ namespace casadi{
   }
 
   MX MX::attachAssert(const MX& y,const std::string &fail_message) const{
-    casadi_assert_message(y.isScalar(),"Error in attachAssert: assertion expression y must be scalar, but got " << y.dimString());
+    casadi_assert_message(y.isScalar(),
+                          "Error in attachAssert: assertion expression y must be scalar, "
+                          "but got " << y.dimString());
     return(*this)->getAssertion(y, fail_message);
   }
 
@@ -791,8 +813,10 @@ namespace casadi{
   }
 
   MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
-  MX MX::__mrdivide__(const MX& b) const { if (b.isScalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
-  MX MX::__mpower__(const MX& b) const   { return pow(*this,b); throw CasadiException("mpower: Not implemented");}
+  MX MX::__mrdivide__(const MX& b) const
+  { if (b.isScalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
+  MX MX::__mpower__(const MX& b) const
+  { return pow(*this,b); throw CasadiException("mpower: Not implemented");}
 
   void MX::append(const MX& y){
     *this = vertcat(*this,y);
@@ -864,14 +888,17 @@ namespace casadi{
 
   bool MX::isCommutative() const {
     if (isUnary()) return true;
-    casadi_assert_message(isBinary() || isUnary(),"MX::isCommutative: must be binary or unary operation");
+    casadi_assert_message(isBinary() || isUnary(),
+                          "MX::isCommutative: must be binary or unary operation");
     return operation_checker<CommChecker>(getOp());
   }
 
   long MX::__hash__() const {
-    // FIXME: This is bad coding, the pointer might on certain architectures be larger than the long,
-    // giving an error of type "error: cast from 'const SharedObjectInternal*' to 'int' loses precision"
-    // The solution is to convert to intptr_t, but this is not yet C++ standard
+    // TODO(Joel):
+    // This is bad coding, the pointer might on certain architectures be larger
+    // than the long, giving an error of type "error: cast from 'const SharedObjectInternal*'
+    // to 'int' loses precision". The solution is to convert to intptr_t, but this is not
+    // yet C++ standard
     return long(get());
   }
 

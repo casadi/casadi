@@ -51,8 +51,12 @@ namespace casadi{
       if (stop<0) stop+=len;
     }
 
-    casadi_assert_message(stop<=len,"Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with supplied length of " << len);
-    casadi_assert_message(start>=0, "Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with start<0.");
+    casadi_assert_message(stop<=len,
+                          "Slice (start=" << start << ", stop=" << stop << ", step=" << step_
+                          << ") out of bounds with supplied length of " << len);
+    casadi_assert_message(start>=0,
+                          "Slice (start=" << start << ", stop=" << stop << ", step=" << step_
+                          << ") out of bounds with start<0.");
     if ((stop>=start && step_<0) || (stop<=start && step_>0)) return std::vector<int>();
 
     return range(start,stop,step_,len);

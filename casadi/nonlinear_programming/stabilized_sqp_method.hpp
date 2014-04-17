@@ -43,8 +43,11 @@ namespace casadi{
     StabilizedSQPMethod();
 
     /// \brief Create an NLP solver instance
-    explicit StabilizedSQPMethod(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
-                    );
+    explicit StabilizedSQPMethod(const Function& nlp
+                                 /**< nlp function:
+                                    \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto
+                                    [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                                 );
 
     /// Access functions of the node
     StabilizedSQPInternal* operator->();

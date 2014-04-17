@@ -45,7 +45,8 @@ namespace casadi{
 
 
   template<typename DataType>
-  class CASADI_SYMBOLIC_EXPORT NonZeroIterator : public std::iterator< std::forward_iterator_tag, NonZero<DataType> > {
+  class CASADI_SYMBOLIC_EXPORT NonZeroIterator :
+        public std::iterator< std::forward_iterator_tag, NonZero<DataType> > {
   public:
     NonZeroIterator(const Matrix<DataType> & m);
 
@@ -68,7 +69,8 @@ namespace casadi{
 /// \cond CLUTTER
   //@{
   /** \brief Get typename */
-  template <typename DataType> inline std::string matrixName() { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
+  template <typename DataType> inline std::string matrixName()
+  { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
   template<> inline std::string matrixName<double>() { return "DMatrix"; }
   template<> inline std::string matrixName<int>() { return "IMatrix"; }
   //@}
@@ -76,24 +78,32 @@ namespace casadi{
 
   /** \brief Sparse matrix class. SX and DMatrix are specializations.
 
-      General sparse matrix class that is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
-      This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
+      General sparse matrix class that is designed with the idea that "everything is a matrix",
+      that is, also scalars and vectors.\n
+      This philosophy makes it easy to use and to interface in particularily
+      with Python and Matlab/Octave.\n
 
       Index starts with 0.\n
       Index vec happens as follows: (rr,cc) -> k = rr+cc*size1()\n
       Vectors are column vectors.\n
 
-      The storage format is Compressed Column Storage (CCS), similar to that used for sparse matrices in Matlab, \n
-      but unlike this format, we do allow for elements to be structurally non-zero but numerically zero.\n
+      The storage format is Compressed Column Storage (CCS), similar to that used for
+      sparse matrices in Matlab, \n
+      but unlike this format, we do allow for elements to be structurally non-zero
+      but numerically zero.\n
 
-      Matrix<DataType> is polymorphic with a std::vector<DataType> that contain all non-identical-zero elements.\n
+      Matrix<DataType> is polymorphic with a std::vector<DataType> that contain
+      all non-identical-zero elements.\n
       The sparsity can be accessed with Sparsity& sparsity()\n
 
       \author Joel Andersson
       \date 2010-2014
   */
   template<typename DataType>
-  class CASADI_SYMBOLIC_EXPORT Matrix : public GenericExpression<Matrix<DataType> >, public GenericMatrix<Matrix<DataType> >, public PrintableObject{
+  class CASADI_SYMBOLIC_EXPORT Matrix :
+        public GenericExpression<Matrix<DataType> >,
+        public GenericMatrix<Matrix<DataType> >,
+        public PrintableObject{
   public:
 
     /** \brief  constructors */
@@ -199,7 +209,8 @@ namespace casadi{
     /// \endcond
 #endif // SWIG
 
-    /** \brief  Create a matrix from a matrix with a different type of matrix entries (assuming that the scalar conversion is valid) */
+    /** \brief  Create a matrix from a matrix with a different type of matrix entries
+     * (assuming that the scalar conversion is valid) */
     template<typename A>
     Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), data_(std::vector<DataType>(x.size())){
       copy(x.begin(),x.end(),begin());
@@ -207,14 +218,18 @@ namespace casadi{
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
-    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<DataType>(x.size())){
+    Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(),1)),
+        data_(std::vector<DataType>(x.size())){
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
-    Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<DataType>(x.size())){
-      if(x.size() != nrow*ncol) throw CasadiException("Matrix::Matrix(const std::vector<DataType>& x,  int n, int m): dimension mismatch");
+    Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow,ncol)),
+        data_(std::vector<DataType>(x.size())){
+      if(x.size() != nrow*ncol)
+          throw CasadiException("Matrix::Matrix(const std::vector<DataType>& x,"
+                                " int n, int m): dimension mismatch");
       copy(x.begin(),x.end(),begin());
     }
 
@@ -274,20 +289,29 @@ namespace casadi{
     //@{
     /// Get a submatrix
     const Matrix<DataType> sub(int rr, int cc) const;
-    const Matrix<DataType> sub(const std::vector<int>& rr, int cc) const{ return sub(rr,std::vector<int>(1,cc));}
-    const Matrix<DataType> sub(int rr, const std::vector<int>& cc) const{ return sub(std::vector<int>(1,rr),cc);}
+    const Matrix<DataType> sub(const std::vector<int>& rr, int cc) const
+    { return sub(rr,std::vector<int>(1,cc));}
+    const Matrix<DataType> sub(int rr, const std::vector<int>& cc) const
+    { return sub(std::vector<int>(1,rr),cc);}
     const Matrix<DataType> sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
-    const Matrix<DataType> sub(const Slice& rr, const std::vector<int>& cc) const { return sub(rr.getAll(size1()),cc);}
-    const Matrix<DataType> sub(const std::vector<int>& rr, const Slice& cc) const { return sub(rr,cc.getAll(size2()));}
-    const Matrix<DataType> sub(const Slice& rr, const Slice& cc) const{ return sub(rr.getAll(size1()),cc.getAll(size2()));}
-    const Matrix<DataType> sub(const Slice& rr, int cc) const{ return sub(rr.getAll(size1()),std::vector<int>(1,cc));}
-    const Matrix<DataType> sub(int rr, const Slice& cc) const{ return sub(std::vector<int>(1,rr),cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Slice& rr, const std::vector<int>& cc) const
+    { return sub(rr.getAll(size1()),cc);}
+    const Matrix<DataType> sub(const std::vector<int>& rr, const Slice& cc) const
+    { return sub(rr,cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Slice& rr, const Slice& cc) const
+    { return sub(rr.getAll(size1()),cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Slice& rr, int cc) const
+    { return sub(rr.getAll(size1()),std::vector<int>(1,cc));}
+    const Matrix<DataType> sub(int rr, const Slice& cc) const
+    { return sub(std::vector<int>(1,rr),cc.getAll(size2()));}
     const Matrix<DataType> sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
     const Matrix<DataType> sub(const Matrix<int>& rr, int cc) const { return sub(rr,Slice(cc));}
     const Matrix<DataType> sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
     const Matrix<DataType> sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr),cc);}
-    const Matrix<DataType> sub(const Matrix<int>& rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
-    const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc) const {return sub(rr.getAll(size1()),cc);}
+    const Matrix<DataType> sub(const Matrix<int>& rr, const Slice& cc) const
+    {return sub(rr,cc.getAll(size2()));}
+    const Matrix<DataType> sub(const Slice& rr, const Matrix<int>& cc) const
+    {return sub(rr.getAll(size1()),cc);}
     const Matrix<DataType> sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
     const Matrix<DataType> sub(const Sparsity& sp, int dummy = 0) const;
     //@}
@@ -295,21 +319,32 @@ namespace casadi{
     //@{
     /// Set a submatrix
     void setSub(const Matrix<DataType>& m, int rr, int cc);
-    void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, int cc){ setSub(m,rr,std::vector<int>(1,cc));}
-    void setSub(const Matrix<DataType>& m, int rr, const std::vector<int>& cc){ setSub(m,std::vector<int>(1,rr),cc);}
+    void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, int cc)
+    { setSub(m,rr,std::vector<int>(1,cc));}
+    void setSub(const Matrix<DataType>& m, int rr, const std::vector<int>& cc)
+    { setSub(m,std::vector<int>(1,rr),cc);}
     void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const std::vector<int>& cc);
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const std::vector<int>& cc){ setSub(m,rr.getAll(size1()),cc);}
-    void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Slice& cc){ setSub(m,rr,cc.getAll(size2()));}
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc){ setSub(m,rr.getAll(size1()),cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const std::vector<int>& cc)
+    { setSub(m,rr.getAll(size1()),cc);}
+    void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Slice& cc)
+    { setSub(m,rr,cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Slice& cc)
+    { setSub(m,rr.getAll(size1()),cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const std::vector<int>& cc);
-    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, int cc) { setSub(m,rr,std::vector<int>(1,cc)); }
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, int cc)
+    { setSub(m,rr,std::vector<int>(1,cc)); }
     void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, int rr, const Matrix<int>& cc) { setSub(m,std::vector<int>(1,rr),cc); }
-    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc) {setSub(m,rr,cc.getAll(size2()));}
-    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc) {setSub(m,rr.getAll(size1()),cc);}
+    void setSub(const Matrix<DataType>& m, int rr, const Matrix<int>& cc)
+    { setSub(m,std::vector<int>(1,rr),cc); }
+    void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Slice& cc)
+    {setSub(m,rr,cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Slice& rr, const Matrix<int>& cc)
+    {setSub(m,rr.getAll(size1()),cc);}
     void setSub(const Matrix<DataType>& m, const Matrix<int>& rr, const Matrix<int>& cc);
-    void setSub(const Matrix<DataType>& m, const Slice& rr, int cc){setSub(m,rr.getAll(size1()),std::vector<int>(1,cc));}
-    void setSub(const Matrix<DataType>& m, const int rr, const Slice& cc){setSub(m,std::vector<int>(1,rr),cc.getAll(size2()));}
+    void setSub(const Matrix<DataType>& m, const Slice& rr, int cc)
+    {setSub(m,rr.getAll(size1()),std::vector<int>(1,cc));}
+    void setSub(const Matrix<DataType>& m, const int rr, const Slice& cc)
+    {setSub(m,std::vector<int>(1,rr),cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy);
 
     //@}
@@ -359,11 +394,16 @@ namespace casadi{
     /// get a non-zero
     const Matrix<DataType> nz_indexed_one_based(int k) const{ return this->operator[](k-1);}
     const Matrix<DataType> nz_indexed_zero_based(int k) const{ return this->operator[](k);}
-    const Matrix<DataType> nz_indexed_one_based(const Matrix<int>& k) const{ return this->operator[](k-1);}
-    const Matrix<DataType> nz_indexed_zero_based(const Matrix<int>& k) const{ return this->operator[](k);}
-    const Matrix<DataType> indexed_one_based(const Matrix<int>& k) const{ return this->operator[](k-1);}
-    const Matrix<DataType> indexed_zero_based(const Matrix<int>& k) const{ return this->operator[](k);}
-    const Matrix<DataType> nz_indexed(const Slice &k) const{ return this->operator[](k);}
+    const Matrix<DataType> nz_indexed_one_based(const Matrix<int>& k) const
+    { return this->operator[](k-1);}
+    const Matrix<DataType> nz_indexed_zero_based(const Matrix<int>& k) const
+    { return this->operator[](k);}
+    const Matrix<DataType> indexed_one_based(const Matrix<int>& k) const
+    { return this->operator[](k-1);}
+    const Matrix<DataType> indexed_zero_based(const Matrix<int>& k) const
+    { return this->operator[](k);}
+    const Matrix<DataType> nz_indexed(const Slice &k) const
+    { return this->operator[](k);}
     const Matrix<DataType> nz_indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
@@ -375,11 +415,13 @@ namespace casadi{
     const Matrix<DataType> indexed(const IndexList &rr, const IndexList &cc) const{
       return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
-    const Matrix<DataType> indexed(const Slice &rr, const Matrix<int>& cc) const{ return (*this)(rr,cc); }
+    const Matrix<DataType> indexed(const Slice &rr, const Matrix<int>& cc) const
+    { return (*this)(rr,cc); }
     const Matrix<DataType> indexed(const Matrix<int>& rr, const IndexList &cc) const{
       return (*this)(rr,cc.getAll(size2()));
     }
-    const Matrix<DataType> indexed(const Matrix<int>& rr, const Slice &cc) const{ return (*this)(rr,cc); }
+    const Matrix<DataType> indexed(const Matrix<int>& rr, const Slice &cc) const
+    { return (*this)(rr,cc); }
     const Matrix<DataType> indexed(const IndexList& rr, const Matrix<int> &cc) const{
       return (*this)(rr.getAll(size1()),cc);
     }
@@ -389,21 +431,40 @@ namespace casadi{
     const Matrix<DataType> indexed(const Sparsity &sp) const{ return (*this)(sp); }
 
     /// Get a vector element
-    const Matrix<DataType> indexed_one_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr-1);}
-    const Matrix<DataType> indexed_zero_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr);}
-    const Matrix<DataType> indexed(const Slice &rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr); }
-    const Matrix<DataType> indexed(const IndexList &rr) const{
-      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ; return (*this)(rr.getAll(size1()));
+    const Matrix<DataType> indexed_one_based(int rr) const {
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got "
+                            << dimString() << ".");
+      return (*this)(rr-1);
+    }
+    const Matrix<DataType> indexed_zero_based(int rr) const {
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      return (*this)(rr);
+    }
+    const Matrix<DataType> indexed(const Slice &rr) const {
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      return (*this)(rr);
+    }
+    const Matrix<DataType> indexed(const IndexList &rr) const {
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      return (*this)(rr.getAll(size1()));
     }
 
     /// set a non-zero
     void nz_indexed_one_based_assignment(int k, const DataType & m){ at(k-1) = m;}
     void nz_indexed_zero_based_assignment(int k, const DataType & m){ at(k) = m;}
     void nz_indexed_assignment(const Slice &k, const Matrix<DataType>& m){ (*this)[k] = m;}
-    void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k-1] = m;}
-    void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k] = m;}
-    void nz_indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k-1] = m;}
-    void nz_indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m){ (*this)[k] = m;}
+    void indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
+    { (*this)[k-1] = m;}
+    void indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
+    { (*this)[k] = m;}
+    void nz_indexed_one_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
+    { (*this)[k-1] = m;}
+    void nz_indexed_zero_based_assignment(const Matrix<int> &k, const Matrix<DataType>& m)
+    { (*this)[k] = m;}
     void nz_indexed_assignment(const IndexList &k, const Matrix<DataType>& m){
       (*this)[k.getAll(size())] = m;
     }
@@ -411,7 +472,8 @@ namespace casadi{
     /// set a matrix element
     void indexed_one_based_assignment(int rr, int cc, const DataType & m){ elem(rr-1,cc-1) = m;}
     void indexed_zero_based_assignment(int rr, int cc, const DataType & m){ elem(rr,cc) = m;}
-    void indexed_assignment(const Slice &rr, const Slice &cc, const Matrix<DataType>& m){ (*this)(rr,cc) = m; }
+    void indexed_assignment(const Slice &rr, const Slice &cc, const Matrix<DataType>& m)
+    { (*this)(rr,cc) = m; }
     void indexed_assignment(const IndexList &rr, const IndexList &cc, const Matrix<DataType>& m){
       (*this)(rr.getAll(size1()),cc.getAll(size2())) = m;
     }
@@ -427,7 +489,8 @@ namespace casadi{
     void indexed_assignment( const IndexList& rr, const Matrix<int> &cc, const Matrix<DataType>& m){
       (*this)(rr.getAll(size1()),cc) = m;
     }
-    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const Matrix<DataType>& m){
+    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc,
+                             const Matrix<DataType>& m){
       (*this)(rr,cc) = m;
     }
     void indexed_assignment(const Sparsity &sp,const Matrix<DataType>& m){
@@ -438,9 +501,21 @@ namespace casadi{
     //@}
 
     /// set a vector element
-    void indexed_one_based_assignment(int rr, const DataType & m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;elem(rr-1) = m;}
-    void indexed_zero_based_assignment(int rr, const DataType & m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;elem(rr) = m;}
-    void indexed_assignment(const Slice &rr, const Matrix<DataType>& m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr,Slice(0)) = m; }
+    void indexed_one_based_assignment(int rr, const DataType & m){
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      elem(rr-1) = m;
+    }
+    void indexed_zero_based_assignment(int rr, const DataType & m){
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      elem(rr) = m;
+    }
+    void indexed_assignment(const Slice &rr, const Matrix<DataType>& m) {
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      (*this)(rr,Slice(0)) = m;
+    }
     void indexed_assignment(const IndexList &rr, const Matrix<DataType>& m){
       (*this)(rr.getAll(size1()),0) = m;
     }
@@ -458,7 +533,8 @@ namespace casadi{
     /// Make the matrix dense
     void densify(const DataType& val = 0);
 
-    /** \brief  Make a matrix sparse by removing numerical zeros smaller in absolute value than a specified tolerance */
+    /** \brief  Make a matrix sparse by removing numerical zeros smaller
+     * in absolute value than a specified tolerance */
     void sparsify(double tol=0);
 
     Matrix<DataType> operator+() const;
@@ -469,9 +545,12 @@ namespace casadi{
     /** \brief  Create nodes by their ID */
     static Matrix<DataType> binary(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
     static Matrix<DataType> unary(int op, const Matrix<DataType> &x);
-    static Matrix<DataType> scalar_matrix(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
-    static Matrix<DataType> matrix_scalar(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
-    static Matrix<DataType> matrix_matrix(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> scalar_matrix(int op,
+                                          const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> matrix_scalar(int op,
+                                          const Matrix<DataType> &x, const Matrix<DataType> &y);
+    static Matrix<DataType> matrix_matrix(int op,
+                                          const Matrix<DataType> &x, const Matrix<DataType> &y);
     //@}
     /// \endcond
 
@@ -500,21 +579,27 @@ namespace casadi{
     Matrix<DataType> mul(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
 
     /// Matrix-matrix product, no memory allocation: z += mul(x,y)
-    static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y, Matrix<DataType>& z);
+    static void mul_no_alloc_nn(const Matrix<DataType> &x, const Matrix<DataType>& y,
+                                Matrix<DataType>& z);
 
     /// Matrix-matrix product, no memory allocation: z += mul(trans(x),y)
-    static void mul_no_alloc_tn(const Matrix<DataType> &trans_x, const Matrix<DataType> &y, Matrix<DataType>& z);
+    static void mul_no_alloc_tn(const Matrix<DataType> &trans_x, const Matrix<DataType> &y,
+                                Matrix<DataType>& z);
 
     /// Matrix-matrix product, no memory allocation: z += mul(x,trans(y))
-    static void mul_no_alloc_nt(const Matrix<DataType>& x, const Matrix<DataType> &trans_y, Matrix<DataType>& z);
+    static void mul_no_alloc_nt(const Matrix<DataType>& x, const Matrix<DataType> &trans_y,
+                                Matrix<DataType>& z);
 
     /// Matrix-vector product, no memory allocation: z += mul(trans(x),y)
-    static void mul_no_alloc_tn(const Matrix<DataType>& trans_x, const std::vector<DataType> &y, std::vector<DataType>& z);
+    static void mul_no_alloc_tn(const Matrix<DataType>& trans_x, const std::vector<DataType> &y,
+                                std::vector<DataType>& z);
 
     /// vector-matrix product, no memory allocation: z += mul(x,y)
-    static void mul_no_alloc_nn(const Matrix<DataType>& x, const std::vector<DataType> &y, std::vector<DataType>& z);
+    static void mul_no_alloc_nn(const Matrix<DataType>& x, const std::vector<DataType> &y,
+                                std::vector<DataType>& z);
 
-    /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(trans(x),y)
+    /// Propagate sparsity using 0-1 logic through a matrix product,
+    // no memory allocation: z = mul(trans(x),y)
     template<bool Fwd>
     static void mul_sparsity(Matrix<DataType> &x_trans, Matrix<DataType> &y, Matrix<DataType>& z);
 
@@ -567,10 +652,12 @@ namespace casadi{
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
     //@}
 
-    /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
+    /** \brief Set or reset the maximum number of calls to the
+     * printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
 
-    /** \brief Get the maximum number of calls to the printing function when printing an expression */
+    /** \brief Get the maximum number of calls to the printing
+     * function when printing an expression */
     static long getMaxNumCallsInPrint();
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */
@@ -611,7 +698,8 @@ namespace casadi{
     void remove(const std::vector<int>& rr, const std::vector<int>& cc);
 
     /** \brief Enlarge matrix
-        Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
+        Make the matrix larger by inserting empty rows and columns,
+        keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& rr, const std::vector<int>& cc);
 
     /// Access the non-zero elements
@@ -671,7 +759,8 @@ namespace casadi{
     void setArray(const DataType* val);
 
     /** \brief  Get the non-zero elements, strided array */
-    void getStridedArray(DataType* val, int len, int stride1, int stride2, SparsityType sp=SPARSE) const;
+    void getStridedArray(DataType* val, int len, int stride1, int stride2,
+                         SparsityType sp=SPARSE) const;
 
 #ifndef SWIG
     /** \brief  Legacy - use getArray instead */
@@ -715,9 +804,12 @@ namespace casadi{
      * Default matrix size is max(col) x max(row)
      */
     //@{
-    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<DataType>& d);
-    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<DataType>& d, int nrow, int ncol);
-    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col, const std::vector<DataType>& d, const std::pair<int,int>& rc);
+    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
+                                    const std::vector<DataType>& d);
+    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
+                                    const std::vector<DataType>& d, int nrow, int ncol);
+    static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
+                                    const std::vector<DataType>& d, const std::pair<int,int>& rc);
     //@}
 
     //@{
@@ -764,7 +856,8 @@ namespace casadi{
     /** \brief Check if the matrix is constant (note that false negative answers are possible)*/
     bool isConstant() const;
 
-    /** \brief Check if the matrix is integer-valued (note that false negative answers are possible)*/
+    /** \brief Check if the matrix is integer-valued
+     * (note that false negative answers are possible)*/
     bool isInteger() const;
 
     /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
@@ -776,7 +869,8 @@ namespace casadi{
     /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
     bool isMinusOne() const;
 
-    /** \brief  check if the matrix is an identity matrix (note that false negative answers are possible)*/
+    /** \brief  check if the matrix is an identity matrix (note that false negative answers
+     * are possible)*/
     bool isIdentity() const;
 
     /** \brief Check if two expressions are equal
@@ -838,4 +932,3 @@ namespace casadi{
 #endif
 
 #endif // MATRIX_HPP
-

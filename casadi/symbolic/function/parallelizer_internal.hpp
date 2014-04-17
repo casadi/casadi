@@ -67,7 +67,8 @@ namespace casadi{
     /// Propagate the sparsity pattern through a set of directional derivatives forward or backward
     virtual void spEvaluate(bool use_fwd);
 
-    /// Propagate the sparsity pattern through a set of directional derivatives forward or backward, one task only
+    /// Propagate the sparsity pattern through a set of directional derivatives
+    // forward or backward, one task only
     void spEvaluateTask(bool use_fwd, int task);
 
     /// Is the class able to propate seeds through the algorithm?

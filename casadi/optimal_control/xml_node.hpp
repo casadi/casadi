@@ -61,7 +61,8 @@ public:
 
     // check if the attribute exists
     if(it == attributes_.end()){
-      casadi_assert_message(!assert_existance, "Error in XMLNode::readAttribute: could not find " + attribute_name);
+      casadi_assert_message(!assert_existance,
+                            "Error in XMLNode::readAttribute: could not find " + attribute_name);
     } else {
       readString(it->second,val);
     }
@@ -119,7 +120,8 @@ public:
   /** \brief  Read node from parsed XML file */
   void addNode(TiXmlNode* node);
 
-  CASADI_OPTIMAL_CONTROL_EXPORT friend std::ostream& operator<<(std::ostream &stream, const XMLNode& node);
+  CASADI_OPTIMAL_CONTROL_EXPORT friend std::ostream& operator<<(std::ostream &stream,
+                                                                const XMLNode& node);
 
   void dump(std::ostream &stream, int indent=0) const;
 
@@ -127,7 +129,8 @@ public:
 
     std::map<std::string, std::string>  attributes_;
     std::vector<XMLNode>                children_;
-    std::map<std::string,int>           child_indices_; // the index of the children sorted by their name
+    std::map<std::string,int>           child_indices_; // the index of the children
+                                                        // sorted by their name
 
     std::string name_;
     std::string comment_;

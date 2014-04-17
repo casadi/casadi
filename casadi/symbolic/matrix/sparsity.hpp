@@ -68,27 +68,27 @@ namespace casadi{
    In this format, the structural non-zero elements are stored in column-major order, starting from
    the upper left corner of the matrix and ending in the lower right corner.
 
-   In addition to the dimension (size1(),size2()), (i.e. the number of rows and the number of columns
-   respectively), there are also two vectors of integers:
+   In addition to the dimension (size1(),size2()), (i.e. the number of rows and the number of
+   columns respectively), there are also two vectors of integers:
 
-   1. "colind" [length size2()+1], which contains the index to the first non-zero element on or after
-   the corresponding column. All the non-zero elements of a particular i are thus the elements with
-   index el that fulfils: colind[i] <= el < colind[i+1].
+   1. "colind" [length size2()+1], which contains the index to the first non-zero element on or
+   after the corresponding column. All the non-zero elements of a particular i are thus the elements
+   with index el that fulfils: colind[i] <= el < colind[i+1].
 
    2. "row" [same length as the number of non-zero elements, size()] The rows for each of the
    structural non-zeros.
 
-   Note that with this format, it is cheap to loop over all the non-zero elements of a particular column,
-   at constant time per element, but expensive to jump to access a location (i,j).
+   Note that with this format, it is cheap to loop over all the non-zero elements of a particular
+   column, at constant time per element, but expensive to jump to access a location (i,j).
 
    If the matrix is dense, i.e. length(row) == size1()*size2(), the format reduces to standard dense
    column major format, which allows access to an arbitrary element in constant time.
 
-   Since the object is reference counted (it inherits from SharedObject), several matrices are allowed
-   to share the same sparsity pattern.
+   Since the object is reference counted (it inherits from SharedObject), several matrices are
+   allowed to share the same sparsity pattern.
 
-   The implementations of some methods of this class has been taken from the CSparse package and modified
-   to use C++ standard library and CasADi data structures.
+   The implementations of some methods of this class has been taken from the CSparse package and
+   modified to use C++ standard library and CasADi data structures.
 
    * \see Matrix
    *
@@ -126,7 +126,8 @@ namespace casadi{
     static Sparsity sparse(const std::pair<int,int> &rc){ return sparse(rc.first,rc.second);}
     //@}
 
-    /** \brief Create the sparsity pattern for a unit vector of length n and a nonzero on position el **/
+    /** \brief Create the sparsity pattern for a unit vector of length n and a nonzero on
+     * position el **/
     //@{
     static Sparsity unit(int n, int el);
     //@}
@@ -160,21 +161,29 @@ namespace casadi{
     static Sparsity banded(int n, int p);
 
     /** \brief Construct a block sparsity pattern from (row,col) vectors */
-    static Sparsity rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol);
+    static Sparsity rowcol(const std::vector<int>& row,
+                           const std::vector<int>& col,
+                           int nrow, int ncol);
 
     /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form
     **/
-    static Sparsity triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col, std::vector<int>& mapping, bool invert_mapping=false);
+    static Sparsity triplet(int nrow, int ncol,
+                            const std::vector<int>& row, const std::vector<int>& col,
+                            std::vector<int>& mapping, bool invert_mapping=false);
 
-    /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form (no nonzero mapping)
-        rows_are_sorted==true means that the row entries already in increasing order for each col and without any duplicates
+    /** \brief Create a sparsity pattern given the nonzeros in sparse triplet form
+        (no nonzero mapping)
+        rows_are_sorted==true means that the row entries already in increasing order
+        for each col and without any duplicates
     **/
-    static Sparsity triplet(int nrow, int ncol, const std::vector<int>& row, const std::vector<int>& col);
+    static Sparsity triplet(int nrow, int ncol, const std::vector<int>& row,
+                            const std::vector<int>& col);
 
     /** Create from a single vector containing the pattern in compressed column storage format:
      * The format:
      * The first two entries are the number of rows (nrow) and columns (ncol)
-     * The next ncol+1 entries are the column offsets (colind). Note that the last element, colind[ncol], gives the number of nonzeros
+     * The next ncol+1 entries are the column offsets (colind).
+       Note that the last element, colind[ncol], gives the number of nonzeros
      * The last colind[ncol] entries are the row indices
      **/
     //@{
@@ -185,7 +194,8 @@ namespace casadi{
     //@}
 
     /// \cond INTERNAL
-    /** \brief Check if there is an identical copy of the sparsity pattern in the cache, and if so, make a shallow copy of that one */
+    /** \brief Check if there is an identical copy of the sparsity pattern in the cache,
+     * and if so, make a shallow copy of that one */
     void reCache();
 
     /** \brief Clear the cache */
@@ -197,8 +207,8 @@ namespace casadi{
      * throws an error as possible result
      */
     void sanityCheck(bool complete=false) const;
-
-    /** Get the diagonal of the matrix/create a diagonal matrix (mapping will contain the nonzero mapping)
+    /** Get the diagonal of the matrix/create a diagonal matrix
+        (mapping will contain the nonzero mapping)
         When the input is square, the diagonal elements are returned.
         If the input is vector-like, a diagonal matrix is constructed with it.
     */
@@ -225,7 +235,8 @@ namespace casadi{
     /// \name Check if two sparsity patterns are identical
     /// @{
     bool isEqual(const Sparsity& y) const;
-    bool isEqual(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row) const;
+    bool isEqual(int nrow, int ncol, const std::vector<int>& colind,
+                 const std::vector<int>& row) const;
     bool operator==(const Sparsity& y) const{ return isEqual(y);}
     /// @}
 
@@ -245,17 +256,20 @@ namespace casadi{
         \see size()  */
     int numel() const;
 
-    /// Check if the sparsity is empty, i.e. if one of the dimensions is zero (or optionally both dimensions)
+    /// Check if the sparsity is empty, i.e. if one of the dimensions is zero
+    // (or optionally both dimensions)
     bool isEmpty(bool both=false) const;
 
     /** \brief Get the number of (structural) non-zeros
         \see numel() */
     int size() const;
 
-    /** \brief Number of non-zeros in the upper triangular half, i.e. the number of elements (i,j) with j>=i */
+    /** \brief Number of non-zeros in the upper triangular half,
+     * i.e. the number of elements (i,j) with j>=i */
     int sizeU() const;
 
-    /** \brief Number of non-zeros in the lower triangular half, i.e. the number of elements (i,j) with j<=i */
+    /** \brief Number of non-zeros in the lower triangular half,
+     * i.e. the number of elements (i,j) with j<=i */
     int sizeL() const;
 
     /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i,j) with j==i */
@@ -267,7 +281,8 @@ namespace casadi{
 #endif
     /// @}
 
-    /** \brief Get a reference to row-vector, containing rows for all non-zero elements (see class description) */
+    /** \brief Get a reference to row-vector,
+     * containing rows for all non-zero elements (see class description) */
     const std::vector<int>& row() const;
 
     /** \brief Get the row of a non-zero element */
@@ -340,7 +355,8 @@ namespace casadi{
      * Returns the sparsity of the submatrix, with a mapping such that
      *   submatrix[k] = originalmatrix[mapping[k]]
      */
-    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii, std::vector<int>& SWIG_OUTPUT(mapping)) const;
+    Sparsity sub(const std::vector<int>& jj, const std::vector<int>& ii,
+                 std::vector<int>& SWIG_OUTPUT(mapping)) const;
 
     /// Transpose the matrix
     Sparsity transpose() const;
@@ -350,7 +366,8 @@ namespace casadi{
     Sparsity T() const{ return transpose();}
 #endif
 
-    /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
+    /// Transpose the matrix and get the reordering of the non-zero entries,
+    // i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
 
     /// Check if the sparsity is the transpose of another
@@ -361,35 +378,48 @@ namespace casadi{
 
     /// @{
     /** \brief Combine two sparsity patterns
-        Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
-        The mapping matrix contains the arguments for each nonzero, the first bit indicates if the first argument is nonzero,
-        the second bit indicates if the second argument is nonzero (note that none of, one of or both of the arguments can be nonzero) */
-    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero, std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+        Returns the new sparsity pattern as well as a mapping with the same length as
+        the number of non-zero elements
+        The mapping matrix contains the arguments for each nonzero, the first bit indicates
+        if the first argument is nonzero,
+        the second bit indicates if the second argument is nonzero (note that none of,
+        one of or both of the arguments can be nonzero) */
+    Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
+                            std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
     Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero) const;
     /// @}
 
     /// @{
     /** \brief Union of two sparsity patterns */
-    Sparsity patternUnion(const Sparsity& y, std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+    Sparsity patternUnion(const Sparsity& y,
+                          std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
     Sparsity patternUnion(const Sparsity& y) const;
     Sparsity operator+(const Sparsity& b) const;
     /// @}
 
     /// @{
     /** \brief Intersection of two sparsity patterns
-        Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
-        The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from the second and 3 (i.e. 1 | 2) if from both */
-    Sparsity patternIntersection(const Sparsity& y, std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
+        Returns the new sparsity pattern as well as a mapping with the same length as the
+        number of non-zero elements
+        The value is 1 if the non-zero comes from the first (i.e. this) object, 2 if it is from
+        the second and 3 (i.e. 1 | 2) if from both */
+    Sparsity patternIntersection(const Sparsity& y,
+                                 std::vector<unsigned char>& SWIG_OUTPUT(mapping)) const;
     Sparsity patternIntersection(const Sparsity& y) const;
     Sparsity operator*(const Sparsity& b) const;
     /// @}
 
     /// @{
     /** \brief Sparsity pattern for a matrix-matrix product
-        Returns the sparsity pattern resulting from premultiplying the pattern with the transpose of x.
-        Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
-        The mapping contains a vector of the index pairs that makes up the scalar products for each non-zero */
-    Sparsity patternProduct(const Sparsity& x_trans, std::vector< std::vector< std::pair<int,int> > >& SWIG_OUTPUT(mapping)) const;
+        Returns the sparsity pattern resulting from premultiplying the pattern with the
+        transpose of x.
+        Returns the new sparsity pattern as well as a mapping with the same length as the number
+        of non-zero elements
+        The mapping contains a vector of the index pairs that makes up the scalar products
+        for each non-zero */
+    Sparsity patternProduct(
+      const Sparsity& x_trans,
+      std::vector< std::vector< std::pair<int,int> > >& SWIG_OUTPUT(mapping)) const;
     Sparsity patternProduct(const Sparsity& x_trans) const;
 
     /// @}
@@ -465,10 +495,12 @@ namespace casadi{
     /// Get lower triangular part
     Sparsity getTril(bool includeDiagonal=true) const;
 
-    /// Do the rows appear sequentially on each column (if strictly==true, then do not allow multiple entries)
+    /// Do the rows appear sequentially on each column
+    // (if strictly==true, then do not allow multiple entries)
     bool rowsSequential(bool strictly=true) const;
 
-    /// Remove duplicate entries: The same indices will be removed from the mapping vector, which must have the same length as the number of nonzeros
+    /// Remove duplicate entries: The same indices will be removed from the mapping vector,
+    // which must have the same length as the number of nonzeros
     void removeDuplicates(std::vector<int>& mapping);
 
 /// \cond INTERNAL
@@ -493,21 +525,26 @@ namespace casadi{
     /** \brief Calculate the elimination tree
         See Direct Methods for Sparse Linear Systems by Davis (2006).
         If the parameter ata is false, the algorithm is equivalent to Matlab's etree(A), except that
-        the indices are zero-based. If ata is true, the algorithm is equivalent to Matlab's etree(A,'row').
+        the indices are zero-based. If ata is true, the algorithm is equivalent to Matlab's
+        etree(A,'row').
     */
     std::vector<int> eliminationTree(bool ata=false) const;
 
     /** \brief Depth-first search on the adjacency graph of the sparsity
         See Direct Methods for Sparse Linear Systems by Davis (2006).
     */
-    int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const;
+    int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack,
+                         const std::vector<int>& pinv, std::vector<bool>& marked) const;
 
-    /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern of a square matrix
+    /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern
+        of a square matrix
+
         See Direct Methods for Sparse Linear Systems by Davis (2006).
         Returns:
         - Number of components
         - Offset for each components (length: 1 + number of components)
-        - Indices for each components, component i has indices index[offset[i]], ..., index[offset[i+1]]
+        - Indices for each components, component i has indices
+          index[offset[i]], ..., index[offset[i+1]]
 
         In the case that the matrix is symmetric, the result has a particular interpretation:
         Given a symmetric matrix A and
@@ -517,16 +554,19 @@ namespace casadi{
         with the indices of the block boundaries to be found in r.
 
     */
-    int stronglyConnectedComponents(std::vector<int>& SWIG_OUTPUT(index), std::vector<int>& SWIG_OUTPUT(offset)) const;
+    int stronglyConnectedComponents(std::vector<int>& SWIG_OUTPUT(index),
+                                    std::vector<int>& SWIG_OUTPUT(offset)) const;
 
     /** \brief Compute the Dulmage-Mendelsohn decomposition
         See Direct Methods for Sparse Linear Systems by Davis (2006).
 
         Dulmage-Mendelsohn will try to bring your matrix into lower block-triangular (LBT) form.
         It will not care about the distance of off-diagonal elements to the diagonal:
-        there is no guarantee you will get a block-diagonal matrix if you supply a randomly permuted block-diagonal matrix.
+        there is no guarantee you will get a block-diagonal matrix if you supply a randomly
+        permuted block-diagonal matrix.
 
-        If your matrix is symmetrical, this method is of limited use; permutation can make it non-symmetric.
+        If your matrix is symmetrical, this method is of limited use; permutation can make it
+        non-symmetric.
 
         \sa stronglyConnectedComponents
 
@@ -551,17 +591,21 @@ namespace casadi{
     /// Get the location of all nonzero elements (inplace version)
     void getElements(std::vector<int>& loc, bool col_major=true) const;
 
-    /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
-    Sparsity unidirectionalColoring(const Sparsity& AT=Sparsity(), int cutoff = std::numeric_limits<int>::max()) const;
+    /** \brief Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+        (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) */
+    Sparsity unidirectionalColoring(const Sparsity& AT=Sparsity(),
+                                    int cutoff = std::numeric_limits<int>::max()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
-        A greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+        A greedy distance-2 coloring algorithm
+        (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
         Ordering options: None (0), largest first (1)
     */
     Sparsity starColoring(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
 
     /** \brief Perform a star coloring of a symmetric matrix:
-        A new greedy distance-2 coloring algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+        A new greedy distance-2 coloring algorithm
+        (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
         Ordering options: None (0), largest first (1)
     */
     Sparsity starColoring2(int ordering = 1, int cutoff = std::numeric_limits<int>::max()) const;
@@ -574,7 +618,8 @@ namespace casadi{
         P * A * trans(P), A * trans(P) or A * trans(P) with P defined by an index vector
         containing the row for each col. As an alternative, P can be transposed (inverted).
     */
-    Sparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_cols=true, bool invert_permutation=false) const;
+    Sparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_cols=true,
+                   bool invert_permutation=false) const;
 
     /// Get the dimension as a string
     std::string dimString() const;
@@ -583,7 +628,8 @@ namespace casadi{
      */
     void spy(std::ostream &stream=std::cout) const;
 
-    /** \brief Generate a script for Matlab or Octave which visualizes the sparsity using the spy command  */
+    /** \brief Generate a script for Matlab or Octave which visualizes
+     * the sparsity using the spy command  */
     void spyMatlab(const std::string& mfile) const;
 
     /** \brief Print a compact description of the sparsity pattern */
@@ -593,22 +639,26 @@ namespace casadi{
     std::size_t hash() const;
 
 #ifndef SWIG
-    /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
+    /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero
+     * entries of another sparsity pattern */
     template<typename T>
     void set(T* data, const T* val_data, const Sparsity& val_sp) const;
 
-    /** \brief Add the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
+    /** \brief Add the nonzero entries of one sparsity pattern to the nonzero entries
+     * of another sparsity pattern */
     template<typename T>
     void add(T* data, const T* val_data, const Sparsity& val_sp) const;
 
-    /** \brief Bitwise or of the nonzero entries of one sparsity pattern and the nonzero entries of another sparsity pattern */
+    /** \brief Bitwise or of the nonzero entries of one sparsity pattern and the nonzero
+     * entries of another sparsity pattern */
     template<typename T>
     void bor(T* data, const T* val_data, const Sparsity& val_sp) const;
 
 
   private:
     /// Construct a sparsity pattern from vectors, reuse cached pattern if possible
-    void assignCached(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
+    void assignCached(int nrow, int ncol, const std::vector<int>& colind,
+                      const std::vector<int>& row);
 
 #endif //SWIG
 
@@ -631,7 +681,9 @@ namespace casadi{
   }
 
   /** \brief Hash a sparsity pattern */
-  CASADI_SYMBOLIC_EXPORT std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& colind, const std::vector<int>& row);
+  CASADI_SYMBOLIC_EXPORT std::size_t hash_sparsity(int nrow, int ncol,
+                                                   const std::vector<int>& colind,
+                                                   const std::vector<int>& row);
   /// \endcond
 
   // Template instantiations
@@ -666,7 +718,9 @@ namespace casadi{
       if(nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::set<DataType>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
+                            "Sparsity::set<DataType>: shape mismatch. lhs is matrix of shape "
+                            << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
 
       // Sparsity
       const std::vector<int>& c = row();
@@ -746,7 +800,10 @@ namespace casadi{
       if(nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
+                            "Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape "
+                            << dimString() << ", while rhs is shape "
+                            << val_sp.dimString() << ".");
 
       // Sparsity
       const std::vector<int>& c = row();
@@ -824,7 +881,9 @@ namespace casadi{
       if(nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
-      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,"Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+      casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
+                            "Sparsity::add<DataType>: shape mismatch. lhs is matrix of shape "
+                            << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
 
       // Sparsity
       const std::vector<int>& c = row();

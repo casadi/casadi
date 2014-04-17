@@ -35,11 +35,13 @@ class SDPSDQPInternal;
 
   /** \brief SDP SDQP Solver for quadratic programming
    *
-   *  Note: this implementation relies on Cholesky decomposition:  Chol(H) = L ->  H = LL' with L lower triangular
+   *  Note: this implementation relies on Cholesky decomposition:
+   *        Chol(H) = L ->  H = LL' with L lower triangular
    *   This requires Pi, H to be positive definite. Positive semi-definite is not sufficient.
    *    Notably, H==0  will not work.
    *
-   *  A better implementation would rely on matrix square root, but we need singular value decomposition to implement that.
+   *  A better implementation would rely on matrix square root,
+   *  but we need singular value decomposition to implement that.
    *
    *
    @copydoc SDQPSolver_doc
@@ -84,4 +86,3 @@ public:
 } // namespace casadi
 
 #endif //SDP_SDQP_SOLVER_HPP
-

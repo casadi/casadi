@@ -34,7 +34,8 @@ namespace casadi{
 
   HomotopyNLPInternal::HomotopyNLPInternal(const Function& hnlp) : hnlp_(hnlp){
 
-    addOption("expand",             OT_BOOLEAN,  false,          "Expand the NLP function in terms of scalar operations, i.e. MX->SX");
+    addOption("expand",             OT_BOOLEAN,  false,
+              "Expand the NLP function in terms of scalar operations, i.e. MX->SX");
 
     // Enable string notation for IO
     input_.scheme = SCHEME_NLPSolverInput;
@@ -49,8 +50,10 @@ namespace casadi{
     // Initialize the Homotopy NLP
     hnlp_.init(false);
 
-    casadi_assert_message(hnlp_.getNumInputs()==HNL_NUM_IN, "The HNLP function must have exactly three input");
-    casadi_assert_message(hnlp_.getNumOutputs()==NL_NUM_OUT, "The HNLP function must have exactly two outputs");
+    casadi_assert_message(hnlp_.getNumInputs()==HNL_NUM_IN,
+                          "The HNLP function must have exactly three input");
+    casadi_assert_message(hnlp_.getNumOutputs()==NL_NUM_OUT,
+                          "The HNLP function must have exactly two outputs");
 
     // Sparsity patterns
     const Sparsity& x_sparsity = hnlp_.input(HNL_X).sparsity();

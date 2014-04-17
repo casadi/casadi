@@ -100,15 +100,17 @@ namespace casadi{
   typedef SOCPSolver (*SOCPSolverCreator)(const SOCPStructure& st);
 
   /// Function pointer to an implicit function creator
-  typedef ImplicitFunction (*implicitFunctionCreator)(const Function& f, const Function& jac, const LinearSolver& linsol);
+  typedef ImplicitFunction (*implicitFunctionCreator)(const Function& f, const Function& jac,
+                                                      const LinearSolver& linsol);
 
 
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized
   const int optimized_num_dir = 64;
 
-  // Type with a size corresponding to that of double (or smaller) that can be used to hold a set of booleans
-  // If the compiler supports C99 or has defined __SIZEOF_LONG_LONG__, we shall use the long long datatype, which is 64 bit, otherwise long
+  // Type with a size corresponding to that of double (or smaller) that can be used to hold a set
+  // of booleans. If the compiler supports C99 or has defined __SIZEOF_LONG_LONG__,
+  // we shall use the long long datatype, which is 64 bit, otherwise long
   #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L || defined(__SIZEOF_LONG_LONG__))
   typedef unsigned long long bvec_t;
   #else
@@ -116,7 +118,8 @@ namespace casadi{
   #endif
 
   // Number of directions we can deal with at a time
-  const int bvec_size = CHAR_BIT*sizeof(bvec_t); // the size of bvec_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
+  // the size of bvec_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
+  const int bvec_size = CHAR_BIT*sizeof(bvec_t);
 
   // Make sure that the integer datatype is indeed smaller or equal to the double
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange

@@ -38,10 +38,12 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShootingInternal : public OCPS
 
   public:
     // Constructor
-    DirectMultipleShootingInternal(const Function& ffcn, const Function& mfcn, const Function& cfcn, const Function& rfcn);
+    DirectMultipleShootingInternal(const Function& ffcn, const Function& mfcn,
+                                   const Function& cfcn, const Function& rfcn);
 
     // clone
-    virtual DirectMultipleShootingInternal* clone() const{ return new DirectMultipleShootingInternal(*this);}
+    virtual DirectMultipleShootingInternal* clone() const
+    { return new DirectMultipleShootingInternal(*this);}
 
     // Destructor
     virtual ~DirectMultipleShootingInternal();

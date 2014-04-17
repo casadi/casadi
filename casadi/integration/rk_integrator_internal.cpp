@@ -26,10 +26,12 @@
 using namespace std;
 namespace casadi{
 
-  RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) : FixedStepIntegratorInternal(f,g){
-  }
+  RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) :
+      FixedStepIntegratorInternal(f,g) { }
 
-  void RKIntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void RKIntegratorInternal::deepCopyMembers(
+    std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     FixedStepIntegratorInternal::deepCopyMembers(already_copied);
   }
 
@@ -41,7 +43,8 @@ namespace casadi{
     FixedStepIntegratorInternal::init();
 
     // Algebraic variables not (yet?) supported
-    casadi_assert_message(nz_==0 && nrz_==0, "Explicit Runge-Kutta integrators do not support algebraic variables");
+    casadi_assert_message(nz_==0 && nrz_==0,
+                          "Explicit Runge-Kutta integrators do not support algebraic variables");
   }
 
   void RKIntegratorInternal::setupFG(){
@@ -101,7 +104,8 @@ namespace casadi{
       MX xf = x0 + (h_/6)*(k1 + 2*k2 + 2*k3 + k4);
       MX qf = (h_/6)*(k1q + 2*k2q + 2*k3q + k4q);
 
-      // Define discrete time dynamics // TODO: Change this and make x_k1, x_k2, x_k3 and x_k4 algebraic outputs
+      // Define discrete time dynamics
+      // TODO(Joel): Change this and make x_k1, x_k2, x_k3 and x_k4 algebraic outputs
       f_arg[DAE_T] = t;
       f_arg[DAE_X] = x0;
       f_arg[DAE_P] = p;

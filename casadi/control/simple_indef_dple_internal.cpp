@@ -37,13 +37,17 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace casadi{
 
-  SimpleIndefDpleInternal::SimpleIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V) : DpleInternal(A,V) {
+  SimpleIndefDpleInternal::SimpleIndefDpleInternal(
+      const std::vector< Sparsity > & A,
+      const std::vector< Sparsity > &V) : DpleInternal(A,V) {
 
     // set default options
     setOption("name","unnamed_simple_indef_dple_solver"); // name of the function
 
-    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
+    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(),
+              "User-defined linear solver class. Needed for sensitivities.");
+    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+              "Options to be passed to the linear solver.");
 
   }
 
@@ -55,8 +59,10 @@ namespace casadi{
 
     DpleInternal::init();
 
-    casadi_assert_message(!pos_def_,"pos_def option set to True: Solver only handles the indefinite case.");
-    casadi_assert_message(const_dim_,"const_dim option set to False: Solver only handles the True case.");
+    casadi_assert_message(!pos_def_,
+      "pos_def option set to True: Solver only handles the indefinite case.");
+    casadi_assert_message(const_dim_,
+      "const_dim option set to False: Solver only handles the True case.");
 
     n_ = A_[0].size1();
 
@@ -78,7 +84,8 @@ namespace casadi{
 
     MX AA = blkdiag(AA_list);
 
-    MX A_total = DMatrix::eye(n_*n_*K_)-vertcat(AA(range(K_*n_*n_-n_*n_,K_*n_*n_),range(K_*n_*n_)),AA(range(K_*n_*n_-n_*n_),range(K_*n_*n_)));
+    MX A_total = DMatrix::eye(n_*n_*K_)-vertcat(AA(range(K_*n_*n_-n_*n_,K_*n_*n_),range(K_*n_*n_)),
+                                                AA(range(K_*n_*n_-n_*n_),range(K_*n_*n_)));
 
     std::vector<MX> Vss_shift;
     Vss_shift.push_back(Vss.back());
@@ -113,7 +120,9 @@ namespace casadi{
   }
 
 
-  void SimpleIndefDpleInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void SimpleIndefDpleInternal::deepCopyMembers(
+      std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     DpleInternal::deepCopyMembers(already_copied);
   }
 

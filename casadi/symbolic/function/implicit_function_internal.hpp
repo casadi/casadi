@@ -53,12 +53,14 @@ namespace casadi{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac, const LinearSolver& linsol) const = 0;
+    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
+                                             const LinearSolver& linsol) const = 0;
 
     /// Initialize
     virtual void init();
 
-    /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
+    /** \brief  Propagate the sparsity pattern through a set of
+     * directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
     /// Is the class able to propate seeds through the algorithm?
@@ -70,9 +72,12 @@ namespace casadi{
     /// Solve the nonlinear system of equations
     virtual void solveNonLinear() = 0;
 
-    // The following functions are called internally from EvaluateMX. For documentation, see the MXNode class
+    // The following functions are called internally from EvaluateMX.
+    // For documentation, see the MXNode class
     //@{
-    virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given);
+    virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed,
+                            MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens,
+                            bool output_given);
     //@}
 
     /// Number of equations

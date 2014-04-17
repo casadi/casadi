@@ -169,7 +169,8 @@ void SharedObject::makeUnique(bool clone_members){
   makeUnique(already_copied,clone_members);
 }
 
-void SharedObject::makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied, bool clone_members){
+void SharedObject::makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied,
+                              bool clone_members){
   if(node && node->count>1){
     // First find out if the expression has already been copied
     std::map<SharedObjectNode*,SharedObject>::iterator it = already_copied.find(node);
@@ -233,7 +234,9 @@ bool SharedObjectNode::isInit() const{
 }
 
 void SharedObjectNode::assertInit() const{
-  casadi_assert_message(isInit(),"You must first initialize a Shared Object before you can use it." << std::endl <<  "Use something like f.init()");
+  casadi_assert_message(isInit(),
+                        "You must first initialize a Shared Object before you can use it."
+                        << std::endl <<  "Use something like f.init()");
 }
 
   WeakRef* SharedObject::weak(){

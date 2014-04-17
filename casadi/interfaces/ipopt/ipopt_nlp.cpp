@@ -180,7 +180,8 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   tnlp_adapter->ResortBnds(z_L, z_L_, z_U, z_U_);
   // Copied from Ipopt source: Hopefully the following is correct to recover the bound
   // multipliers for fixed variables (sign ok?)
-  if (tnlp_adapter->fixed_variable_treatment_==TNLPAdapter::MAKE_CONSTRAINT && tnlp_adapter->n_x_fixed_>0) {
+  if (tnlp_adapter->fixed_variable_treatment_==TNLPAdapter::MAKE_CONSTRAINT &&
+      tnlp_adapter->n_x_fixed_>0) {
     const DenseVector* dy_c = static_cast<const DenseVector*>(&y_c);
     Index n_c_no_fixed = y_c.Dim() - tnlp_adapter->n_x_fixed_;
     if (!dy_c->IsHomogeneous()) {
@@ -202,7 +203,9 @@ bool IpoptUserClass::intermediate_callback(AlgorithmMode mode, Index iter, Numbe
   full_callback = true;
 #endif // WITH_IPOPT_CALLBACK
 
-  return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,inf_pr,inf_du,mu,d_norm,regularization_size,alpha_du,alpha_pr,ls_trials,full_callback);
+  return solver->intermediate_callback(x_,z_L_,z_U_,g_,lambda_,obj_value,iter,
+                                       inf_pr,inf_du,mu,d_norm,regularization_size,
+                                       alpha_du,alpha_pr,ls_trials,full_callback);
 
 
 }
@@ -217,20 +220,25 @@ bool IpoptUserClass::get_list_of_nonlinear_variables(Index num_nonlin_vars, Inde
   return solver->get_list_of_nonlinear_variables(num_nonlin_vars,pos_nonlin_vars);
 }
 
-bool IpoptUserClass::get_var_con_metadata(Index n,StringMetaDataMapType& var_string_md, IntegerMetaDataMapType& var_integer_md, NumericMetaDataMapType& var_numeric_md,
-                                          Index m,StringMetaDataMapType& con_string_md, IntegerMetaDataMapType& con_integer_md, NumericMetaDataMapType& con_numeric_md){
+bool IpoptUserClass::get_var_con_metadata(Index n,StringMetaDataMapType& var_string_md,
+                                          IntegerMetaDataMapType& var_integer_md,
+                                          NumericMetaDataMapType& var_numeric_md,
+                                          Index m,StringMetaDataMapType& con_string_md,
+                                          IntegerMetaDataMapType& con_integer_md,
+                                          NumericMetaDataMapType& con_numeric_md){
 
-  return solver->get_var_con_metadata(n, var_string_md, var_integer_md, var_numeric_md, m, con_string_md, con_integer_md, con_numeric_md);
+  return solver->get_var_con_metadata(n, var_string_md, var_integer_md, var_numeric_md, m,
+                                      con_string_md, con_integer_md, con_numeric_md);
 }
 
 void IpoptUserClass::finalize_metadata(Index n, const StringMetaDataMapType& var_string_md,
-                                       const IntegerMetaDataMapType& var_integer_md, const NumericMetaDataMapType& var_numeric_md,
+                                       const IntegerMetaDataMapType& var_integer_md,
+                                       const NumericMetaDataMapType& var_numeric_md,
                                        Index m, const StringMetaDataMapType& con_string_md,
-                                       const IntegerMetaDataMapType& con_integer_md, const NumericMetaDataMapType& con_numeric_md){
-  solver->finalize_metadata(n,var_string_md,var_integer_md,var_numeric_md,m,con_string_md,con_integer_md,con_numeric_md);
+                                       const IntegerMetaDataMapType& con_integer_md,
+                                       const NumericMetaDataMapType& con_numeric_md){
+  solver->finalize_metadata(n,var_string_md,var_integer_md,var_numeric_md,m,con_string_md,
+                            con_integer_md,con_numeric_md);
 }
-
-
-
 
 } // namespace casadi

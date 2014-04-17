@@ -73,11 +73,14 @@ namespace casadi{
     return res;
   }
 
-  vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x, const Dictionary& paropt){
+  vector<vector<MX> > Function::callParallel(const vector<vector<MX> > &x,
+                                             const Dictionary& paropt){
     assertInit();
 
     // Make sure not empty
-    casadi_assert_message(x.size()>1,"Function: callParallel(vector<vector<MX> >): argument must be of length > 1. You supplied length " << x.size() << ".");
+    casadi_assert_message(x.size()>1,"Function: callParallel(vector<vector<MX> >): "
+                          "argument must be of length > 1. You supplied length "
+                          << x.size() << ".");
 
     // Return object
     vector<vector<MX> > ret(x.size());
@@ -311,7 +314,9 @@ namespace casadi{
                           const SXVectorVector& fseed, SXVectorVector& fsens,
                           const SXVectorVector& aseed, SXVectorVector& asens,
                           bool always_inline, bool never_inline){
-    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of expected " << getNumInputs() << ".");
+    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension "
+                          "mismatch. You supplied " << arg.size()
+                          << " arguments instead of expected " << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 
@@ -319,7 +324,10 @@ namespace casadi{
                           const MXVectorVector& fseed, MXVectorVector& fsens,
                           const MXVectorVector& aseed, MXVectorVector& asens,
                           bool always_inline, bool never_inline){
-    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension mismatch. You supplied " << arg.size() << " arguments instead of expected " << getNumInputs() << ".");
+    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: "
+                          "dimension mismatch. You supplied "
+                          << arg.size() << " arguments instead of expected "
+                          << getNumInputs() << ".");
     (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
   }
 

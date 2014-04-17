@@ -47,7 +47,8 @@ public:
   NewtonImplicitSolver();
 
   /** \brief Create a solver instance */
-  explicit NewtonImplicitSolver(const Function& f, const Function& jac=Function(), const LinearSolver& linsol=LinearSolver());
+  explicit NewtonImplicitSolver(const Function& f, const Function& jac=Function(),
+                                const LinearSolver& linsol=LinearSolver());
 
   /** \brief  Access functions of the node */
   NewtonImplicitInternal* operator->();
@@ -60,7 +61,10 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static ImplicitFunction creator(const Function& f, const Function& jac, const LinearSolver& linsol){ return NewtonImplicitSolver(f,jac,linsol);}
+  static ImplicitFunction creator(const Function& f,
+                                  const Function& jac,
+                                  const LinearSolver& linsol)
+  { return NewtonImplicitSolver(f,jac,linsol);}
   #ifdef SWIG
   %nocallback;
   #endif
@@ -71,4 +75,3 @@ public:
 } // namespace casadi
 
 #endif //NEWTON_IMPLICIT_SOLVER_HPP
-

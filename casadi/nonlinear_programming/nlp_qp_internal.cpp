@@ -38,8 +38,10 @@ NLPQPInternal* NLPQPInternal::clone() const{
 
 NLPQPInternal::NLPQPInternal(const std::vector<Sparsity> &st) : QPSolverInternal(st) {
 
-  addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSOlver used to solve the QPs.");
-  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSOlver");
+  addOption("nlp_solver",       OT_NLPSOLVER, GenericType(),
+            "The NLPSOlver used to solve the QPs.");
+  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
+            "Options to be passed to the NLPSOlver");
 
 }
 
@@ -53,9 +55,15 @@ void NLPQPInternal::evaluate() {
 
  // Pass inputs of QP to NLP form
 
-  std::copy(input(QP_SOLVER_H).data().begin(),input(QP_SOLVER_H).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_H).size();
-  std::copy(input(QP_SOLVER_G).data().begin(),input(QP_SOLVER_G).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_G).size();
-  std::copy(input(QP_SOLVER_A).data().begin(),input(QP_SOLVER_A).data().end(),nlpsolver_.input(NLP_SOLVER_P).data().begin()+k);
+  std::copy(input(QP_SOLVER_H).data().begin(),
+            input(QP_SOLVER_H).data().end(),
+            nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_H).size();
+  std::copy(input(QP_SOLVER_G).data().begin(),
+            input(QP_SOLVER_G).data().end(),
+            nlpsolver_.input(NLP_SOLVER_P).data().begin()+k); k+= input(QP_SOLVER_G).size();
+  std::copy(input(QP_SOLVER_A).data().begin(),
+            input(QP_SOLVER_A).data().end(),
+            nlpsolver_.input(NLP_SOLVER_P).data().begin()+k);
 
 
   nlpsolver_.input(NLP_SOLVER_LBX).set(input(QP_SOLVER_LBX));
@@ -116,4 +124,3 @@ void NLPQPInternal::init(){
 }
 
 } // namespace casadi
-

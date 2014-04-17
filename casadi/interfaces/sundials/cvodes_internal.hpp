@@ -55,7 +55,8 @@ public:
   virtual CVodesInternal* clone() const;
 
   /** \brief  Create a new integrator */
-  virtual CVodesInternal* create(const Function& f, const Function& g) const{ return new CVodesInternal(f,g);}
+  virtual CVodesInternal* create(const Function& f, const Function& g) const
+  { return new CVodesInternal(f,g);}
 
   /** \brief  Destructor */
   virtual ~CVodesInternal();
@@ -106,56 +107,102 @@ public:
   // Sundials callback functions
   void rhs(double t, const double* x, double* xdot);
   void ehfun(int error_code, const char *module, const char *function, char *msg);
-  void rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2);
-  void rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, N_Vector tmp1, N_Vector tmp2);
+  void rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF,
+            N_Vector tmp1, N_Vector tmp2);
+  void rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF,
+             N_Vector tmp1, N_Vector tmp2);
   void rhsQ(double t, const double* x, double* qdot);
-  void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2);
+  void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot,
+             N_Vector tmp1, N_Vector tmp2);
   void rhsB(double t, const double* x, const double *rx, double* rxdot);
   void rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xB, N_Vector xdotB);
   void rhsQB(double t, const double* x, const double* rx, double* rqdot);
   void jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, N_Vector tmp);
-  void jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector tmpB);
-  void djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  void djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-  void bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  void bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  void jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
+               N_Vector xdotB, N_Vector tmpB);
+  void djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
+            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB,
+             N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  void bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac,
+            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB,
+             N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   /// z = M^(-1).r
-  void psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z, double gamma, double delta, int lr, N_Vector tmp);
-  void psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, N_Vector tmpB);
+  void psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
+              double gamma, double delta, int lr, N_Vector tmp);
+  void psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB, N_Vector zvecB,
+               double gammaB, double deltaB, int lr, N_Vector tmpB);
   /// M = I-gamma*df/dx, factorize
-  void psetup(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  void psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype jokB, booleantype *jcurPtrB, double gammaB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  void psetup(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr,
+              double gamma,
+              N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+               booleantype jokB, booleantype *jcurPtrB, double gammaB,
+               N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   /// M = I-gamma*df/dx, factorize
-  void lsetup(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  void lsetupB(double t, double gamma, int convfail, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  void lsetup(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr,
+              N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  void lsetupB(double t, double gamma, int convfail, N_Vector x, N_Vector xB, N_Vector xdotB,
+               booleantype *jcurPtr,
+               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   /// b = M^(-1).b
   void lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
-  void lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x, N_Vector xB, N_Vector xdotB);
+  void lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x,
+               N_Vector xB, N_Vector xdotB);
 
   // Static wrappers to be passed to Sundials
   static int rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data);
-  static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *user_data);
-  static int rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
-  static int rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg,
+                            void *user_data);
+  static int rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF,
+                          N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS,
+                           N_Vector xF, N_Vector xdotF, void *user_data,
+                           N_Vector tmp1, N_Vector tmp2);
   static int rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data);
-  static int rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF,
+                           N_Vector qdot, N_Vector *qdotF,
+                           void *user_data, N_Vector tmp1, N_Vector tmp2);
   static int rhsB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, void *user_data);
-  static int rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xB, N_Vector xdotB, void *user_data);
+  static int rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xB, N_Vector xdotB,
+                           void *user_data);
   static int rhsQB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector qdotB, void *user_data);
-  static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, void *user_data, N_Vector tmp);
-  static int jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, void *user_data ,N_Vector tmpB);
-  static int djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-  static int bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-  static int psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp);
-  static int psolveB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, void *user_data, N_Vector tmpB);
-  static int psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype jokB, booleantype *jcurPtrB, double gammaB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-  static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
-  static int lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  static int lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
+  static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
+                            void *user_data, N_Vector tmp);
+  static int jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
+                             N_Vector xdotB, void *user_data ,N_Vector tmpB);
+  static int djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,
+                          N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+                           DlsMat JacB, void *user_data,
+                           N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  static int bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot,
+                          DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB,
+                           N_Vector xdotB, DlsMat JacB, void *user_data,
+                           N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  static int psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
+                            double gamma, double delta, int lr, void *user_data, N_Vector tmp);
+  static int psolveB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
+                             N_Vector zvecB, double gammaB, double deltaB, int lr, void *user_data,
+                             N_Vector tmpB);
+  static int psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok,
+                            booleantype *jcurPtr, double gamma, void *user_data,
+                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype jokB,
+                             booleantype *jcurPtrB, double gammaB, void *user_data,
+                             N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+                            booleantype *jcurPtr,
+                            N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x,
+                            N_Vector xdot);
+  static int lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+                             booleantype *jcurPtr,
+                             N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight,
+                             N_Vector x, N_Vector xdot);
 
   // CVodes memory block
   void* mem_;

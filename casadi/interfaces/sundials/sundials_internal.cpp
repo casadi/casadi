@@ -35,49 +35,92 @@ using namespace std;
 namespace casadi{
 
 SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
-  addOption("max_num_steps",               OT_INTEGER,          10000,          "Maximum number of integrator steps");
-  addOption("reltol",                      OT_REAL,             1e-6,           "Relative tolerence for the IVP solution");
-  addOption("abstol",                      OT_REAL,             1e-8,           "Absolute tolerence  for the IVP solution");
-  addOption("exact_jacobian",              OT_BOOLEAN,          true,           "Use exact Jacobian information for the forward integration");
-  addOption("exact_jacobianB",             OT_BOOLEAN,          GenericType(),  "Use exact Jacobian information for the backward integration [default: equal to exact_jacobian]");
-  addOption("upper_bandwidth",             OT_INTEGER,          GenericType(),  "Upper band-width of banded Jacobian (estimations)");
-  addOption("lower_bandwidth",             OT_INTEGER,          GenericType(),  "Lower band-width of banded Jacobian (estimations)");
-  addOption("linear_solver_type",          OT_STRING,           "dense",        "","user_defined|dense|banded|iterative");
-  addOption("iterative_solver",            OT_STRING,           "gmres",        "","gmres|bcgstab|tfqmr");
-  addOption("pretype",                     OT_STRING,           "none",         "","none|left|right|both");
-  addOption("max_krylov",                  OT_INTEGER,          10,             "Maximum Krylov subspace size");
-  addOption("sensitivity_method",          OT_STRING,           "simultaneous", "","simultaneous|staggered");
+  addOption("max_num_steps",               OT_INTEGER,          10000,
+            "Maximum number of integrator steps");
+  addOption("reltol",                      OT_REAL,             1e-6,
+            "Relative tolerence for the IVP solution");
+  addOption("abstol",                      OT_REAL,             1e-8,
+            "Absolute tolerence  for the IVP solution");
+  addOption("exact_jacobian",              OT_BOOLEAN,          true,
+            "Use exact Jacobian information for the forward integration");
+  addOption("exact_jacobianB",             OT_BOOLEAN,          GenericType(),
+            "Use exact Jacobian information for the backward integration "
+            "[default: equal to exact_jacobian]");
+  addOption("upper_bandwidth",             OT_INTEGER,          GenericType(),
+            "Upper band-width of banded Jacobian (estimations)");
+  addOption("lower_bandwidth",             OT_INTEGER,          GenericType(),
+            "Lower band-width of banded Jacobian (estimations)");
+  addOption("linear_solver_type",          OT_STRING,           "dense",
+            "","user_defined|dense|banded|iterative");
+  addOption("iterative_solver",            OT_STRING,           "gmres",
+            "","gmres|bcgstab|tfqmr");
+  addOption("pretype",                     OT_STRING,           "none",
+            "","none|left|right|both");
+  addOption("max_krylov",                  OT_INTEGER,          10,
+            "Maximum Krylov subspace size");
+  addOption("sensitivity_method",          OT_STRING,           "simultaneous", "",
+            "simultaneous|staggered");
   addOption("max_multistep_order",         OT_INTEGER,          5);
-  addOption("use_preconditioner",          OT_BOOLEAN,          false,          "Precondition an iterative solver");
-  addOption("use_preconditionerB",         OT_BOOLEAN,          GenericType(),  "Precondition an iterative solver for the backwards problem [default: equal to use_preconditioner]");
-  addOption("stop_at_end",                 OT_BOOLEAN,          true,          "Stop the integrator at the end of the interval");
+  addOption("use_preconditioner",          OT_BOOLEAN,          false,
+            "Precondition an iterative solver");
+  addOption("use_preconditionerB",         OT_BOOLEAN,          GenericType(),
+            "Precondition an iterative solver for the backwards problem "
+            "[default: equal to use_preconditioner]");
+  addOption("stop_at_end",                 OT_BOOLEAN,          true,
+            "Stop the integrator at the end of the interval");
 
   // Quadratures
-  addOption("quad_err_con",                OT_BOOLEAN,          false,          "Should the quadratures affect the step size control");
+  addOption("quad_err_con",                OT_BOOLEAN,          false,
+            "Should the quadratures affect the step size control");
 
   // Forward sensitivity problem
-  addOption("fsens_err_con",               OT_BOOLEAN,          true,           "include the forward sensitivities in all error controls");
-  addOption("finite_difference_fsens",     OT_BOOLEAN,          false,          "Use finite differences to approximate the forward sensitivity equations (if AD is not available)");
-  addOption("fsens_reltol",                OT_REAL,             GenericType(),  "Relative tolerence for the forward sensitivity solution [default: equal to reltol]");
-  addOption("fsens_abstol",                OT_REAL,             GenericType(),  "Absolute tolerence for the forward sensitivity solution [default: equal to abstol]");
-  addOption("fsens_scaling_factors",       OT_REALVECTOR,       GenericType(),  "Scaling factor for the components if finite differences is used");
-  addOption("fsens_sensitiviy_parameters", OT_INTEGERVECTOR,    GenericType(),  "Specifies which components will be used when estimating the sensitivity equations");
+  addOption("fsens_err_con",               OT_BOOLEAN,          true,
+            "include the forward sensitivities in all error controls");
+  addOption("finite_difference_fsens",     OT_BOOLEAN,          false,
+            "Use finite differences to approximate the forward sensitivity equations "
+            "(if AD is not available)");
+  addOption("fsens_reltol",                OT_REAL,             GenericType(),
+            "Relative tolerence for the forward sensitivity solution [default: equal to reltol]");
+  addOption("fsens_abstol",                OT_REAL,             GenericType(),
+            "Absolute tolerence for the forward sensitivity solution [default: equal to abstol]");
+  addOption("fsens_scaling_factors",       OT_REALVECTOR,       GenericType(),
+            "Scaling factor for the components if finite differences is used");
+  addOption("fsens_sensitiviy_parameters", OT_INTEGERVECTOR,    GenericType(),
+            "Specifies which components will be used when estimating the sensitivity equations");
 
   // Adjoint sensivity problem
-  addOption("steps_per_checkpoint",        OT_INTEGER,          20,             "Number of steps between two consecutive checkpoints");
-  addOption("interpolation_type",          OT_STRING,           "hermite",      "Type of interpolation for the adjoint sensitivities","hermite|polynomial");
-  addOption("upper_bandwidthB",            OT_INTEGER,          GenericType(),  "Upper band-width of banded jacobians for backward integration [default: equal to upper_bandwidth]");
-  addOption("lower_bandwidthB",            OT_INTEGER,          GenericType(),  "lower band-width of banded jacobians for backward integration [default: equal to lower_bandwidth]");
-  addOption("linear_solver_typeB",         OT_STRING,           GenericType(),  "","user_defined|dense|banded|iterative");
-  addOption("iterative_solverB",           OT_STRING,           GenericType(),  "","gmres|bcgstab|tfqmr");
-  addOption("pretypeB",                    OT_STRING,           GenericType(),  "","none|left|right|both");
-  addOption("max_krylovB",                 OT_INTEGER,          GenericType(),  "Maximum krylov subspace size");
-  addOption("reltolB",                     OT_REAL,             GenericType(),  "Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]");
-  addOption("abstolB",                     OT_REAL,             GenericType(),  "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]");
-  addOption("linear_solver",               OT_LINEARSOLVER,     GenericType(),  "A custom linear solver creator function");
-  addOption("linear_solver_options",       OT_DICTIONARY,       GenericType(),  "Options to be passed to the linear solver");
-  addOption("linear_solverB",              OT_LINEARSOLVER,     GenericType(),  "A custom linear solver creator function for backwards integration [default: equal to linear_solver]");
-  addOption("linear_solver_optionsB",      OT_DICTIONARY,       GenericType(),  "Options to be passed to the linear solver for backwards integration [default: equal to linear_solver_options]");
+  addOption("steps_per_checkpoint",        OT_INTEGER,          20,
+            "Number of steps between two consecutive checkpoints");
+  addOption("interpolation_type",          OT_STRING,           "hermite",
+            "Type of interpolation for the adjoint sensitivities","hermite|polynomial");
+  addOption("upper_bandwidthB",            OT_INTEGER,          GenericType(),
+            "Upper band-width of banded jacobians for backward integration "
+            "[default: equal to upper_bandwidth]");
+  addOption("lower_bandwidthB",            OT_INTEGER,          GenericType(),
+            "lower band-width of banded jacobians for backward integration "
+            "[default: equal to lower_bandwidth]");
+  addOption("linear_solver_typeB",         OT_STRING,           GenericType(),
+            "","user_defined|dense|banded|iterative");
+  addOption("iterative_solverB",           OT_STRING,           GenericType(),
+            "","gmres|bcgstab|tfqmr");
+  addOption("pretypeB",                    OT_STRING,           GenericType(),
+            "","none|left|right|both");
+  addOption("max_krylovB",                 OT_INTEGER,          GenericType(),
+            "Maximum krylov subspace size");
+  addOption("reltolB",                     OT_REAL,             GenericType(),
+            "Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]");
+  addOption("abstolB",                     OT_REAL,             GenericType(),
+            "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]");
+  addOption("linear_solver",               OT_LINEARSOLVER,     GenericType(),
+            "A custom linear solver creator function");
+  addOption("linear_solver_options",       OT_DICTIONARY,       GenericType(),
+            "Options to be passed to the linear solver");
+  addOption("linear_solverB",              OT_LINEARSOLVER,     GenericType(),
+            "A custom linear solver creator function for backwards integration "
+            "[default: equal to linear_solver]");
+  addOption("linear_solver_optionsB",      OT_DICTIONARY,       GenericType(),
+            "Options to be passed to the linear solver for backwards integration "
+            "[default: equal to linear_solver_options]");
 }
 
 SundialsInternal::~SundialsInternal(){
@@ -94,18 +137,23 @@ void SundialsInternal::init(){
   abstol_ = getOption("abstol");
   reltol_ = getOption("reltol");
   exact_jacobian_ = getOption("exact_jacobian");
-  exact_jacobianB_ = hasSetOption("exact_jacobianB") ? getOption("exact_jacobianB") && !g_.isNull() : exact_jacobian_;
+  exact_jacobianB_ = hasSetOption("exact_jacobianB") ?
+      getOption("exact_jacobianB") && !g_.isNull() : exact_jacobian_;
   max_num_steps_ = getOption("max_num_steps");
   finite_difference_fsens_ = getOption("finite_difference_fsens");
-  fsens_abstol_ = hasSetOption("fsens_abstol") ? static_cast<double>(getOption("fsens_abstol")) : abstol_;
-  fsens_reltol_ = hasSetOption("fsens_reltol") ? static_cast<double>(getOption("fsens_reltol")) : reltol_;
+  fsens_abstol_ =
+      hasSetOption("fsens_abstol") ? static_cast<double>(getOption("fsens_abstol")) : abstol_;
+  fsens_reltol_ =
+      hasSetOption("fsens_reltol") ? static_cast<double>(getOption("fsens_reltol")) : reltol_;
   abstolB_ = hasSetOption("abstolB") ? static_cast<double>(getOption("abstolB")) : abstol_;
   reltolB_ = hasSetOption("reltolB") ? static_cast<double>(getOption("reltolB")) : reltol_;
   stop_at_end_ = getOption("stop_at_end");
   use_preconditioner_ = getOption("use_preconditioner");
-  use_preconditionerB_ =  hasSetOption("use_preconditionerB") ? static_cast<bool>(getOption("use_preconditionerB")): use_preconditioner_;
+  use_preconditionerB_ =  hasSetOption("use_preconditionerB") ?
+      static_cast<bool>(getOption("use_preconditionerB")): use_preconditioner_;
   max_krylov_ = getOption("max_krylov");
-  max_krylovB_ =  hasSetOption("max_krylovB") ? static_cast<int>(getOption("max_krylovB")): max_krylov_;
+  max_krylovB_ =
+      hasSetOption("max_krylovB") ? static_cast<int>(getOption("max_krylovB")): max_krylov_;
 
   // Linear solver for forward integration
   if(getOption("linear_solver_type")=="dense"){
@@ -131,7 +179,7 @@ void SundialsInternal::init(){
     else if(getOption("pretype")=="left")          pretype_f_ = PREC_LEFT;
     else if(getOption("pretype")=="right")         pretype_f_ = PREC_RIGHT;
     else if(getOption("pretype")=="both")          pretype_f_ = PREC_BOTH;
-    else                                           throw CasadiException("Unknown preconditioning type for forward integration");
+    else throw CasadiException("Unknown preconditioning type for forward integration");
   } else if(getOption("linear_solver_type")=="user_defined") {
     linsol_f_ = SD_USER_DEFINED;
   } else {
@@ -139,8 +187,10 @@ void SundialsInternal::init(){
   }
 
 
-  std::string linear_solver_typeB = hasSetOption("linear_solver_typeB") ? getOption("linear_solver_typeB") : getOption("linear_solver_type");
-  std::string iterative_solverB = hasSetOption("iterative_solverB") ? getOption("iterative_solverB") : getOption("iterative_solver");
+  std::string linear_solver_typeB = hasSetOption("linear_solver_typeB") ?
+      getOption("linear_solver_typeB") : getOption("linear_solver_type");
+  std::string iterative_solverB = hasSetOption("iterative_solverB") ?
+      getOption("iterative_solverB") : getOption("iterative_solver");
   std::string pretypeB = hasSetOption("pretypeB") ? getOption("pretypeB"): getOption("pretype");
 
   // Linear solver for backward integration
@@ -167,7 +217,7 @@ void SundialsInternal::init(){
     else if(pretypeB=="left")          pretype_g_ = PREC_LEFT;
     else if(pretypeB=="right")         pretype_g_ = PREC_RIGHT;
     else if(pretypeB=="both")          pretype_g_ = PREC_BOTH;
-    else                                           throw CasadiException("Unknown preconditioning type for backward integration");
+    else throw CasadiException("Unknown preconditioning type for backward integration");
   } else if(linear_solver_typeB=="user_defined") {
     linsol_g_ = SD_USER_DEFINED;
   } else {
@@ -225,7 +275,8 @@ void SundialsInternal::init(){
 
   if((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()){
     // Create a linear solver
-    linearSolverCreator creator = hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
+    linearSolverCreator creator =
+        hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
     linsolB_ = creator(jacB_.output().sparsity(),1);
     // Pass options
     if(hasSetOption("linear_solver_optionsB")){

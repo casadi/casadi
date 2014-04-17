@@ -38,7 +38,8 @@ namespace casadi{
 /** \brief Provides options setting/getting functionality
 
   Gives a derived class the ability to set and retrieve options in a convenient way.
-  It also contains error checking, making sure that the option exists and that the value type is correct.
+  It also contains error checking, making sure that the option exists
+  and that the value type is correct.
 
   A derived class should add option names, types and default values to the corresponding vectors.
 
@@ -237,11 +238,14 @@ virtual ~OptionsFunctionalityNode();
   *
   * \return Some metric for confidence about the best match
   */
-  static double getBestMatches(const std::string & word, const std::vector<std::string> &dictionary, std::vector<std::string> &suggestions, int amount = 5);
+  static double getBestMatches(const std::string & word,
+                               const std::vector<std::string> &dictionary,
+                               std::vector<std::string> &suggestions, int amount = 5);
 
   /** \brief Get th ebest suggestions of option names
   */
-  double getBestMatches(const std::string & name, std::vector<std::string> &suggestions, int amount = 5) const;
+  double getBestMatches(const std::string & name, std::vector<std::string> &suggestions,
+                        int amount = 5) const;
 
 
   /** \brief A distance metric between two words */
@@ -260,11 +264,13 @@ protected:
   *
   *  allowed_vals can taken multiple forms:
   *    "foo|bar"   ->   specifies that the values "foo" and "bar" are allowed
-  *    "foo:5|bar:6" -> specifies that the values "foo" and "bar" are allowed and map to 5 and 6 respectively
+  *    "foo:5|bar:6" -> specifies that the values "foo" and "bar" are allowed and map
+  *                     to 5 and 6 respectively
   *    "foo:5:description_foo|bar:6:description_bar|" -> same as above, but specifies documentation
   *
   **/
-  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val, const std::string& desc, const std::string &allowed_vals, bool inherit = false);
+  void addOption(const std::string &str, const opt_type& type, const GenericType &def_val,
+                 const std::string& desc, const std::string &allowed_vals, bool inherit = false);
 
 void assert_exists(const std::string &str) const;
 

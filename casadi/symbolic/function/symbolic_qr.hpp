@@ -30,7 +30,8 @@ namespace casadi{
   // Forward declaration of internal class
   class SymbolicQRInternal;
 
-  /** \brief  LinearSolver based on QR factorization with sparsity pattern based reordering  _without_ partial pivoting
+  /** \brief  LinearSolver based on QR factorization with sparsity pattern based reordering
+             _without_ partial pivoting
       @copydoc LinearSolver_doc
       \author Joel Andersson
       \date 2013
@@ -67,4 +68,3 @@ namespace casadi{
 } // namespace casadi
 
 #endif //SYMBOLIC_QR_HPP
-

@@ -37,7 +37,8 @@ using namespace std;
 
 namespace casadi{
 
-  MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std::vector<MX>& outputv) :
+  MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv,
+                                         const std::vector<MX>& outputv) :
     XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>(inputv,outputv) {
 
     setOption("name", "unnamed_mx_function");
@@ -217,19 +218,23 @@ namespace casadi{
     // Find a place in the work vector for the operation
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
 
-      // There are two tasks, allocate memory of the result and free the memory off the arguments, order depends on whether inplace is possible
+      // There are two tasks, allocate memory of the result and free the
+      // memory off the arguments, order depends on whether inplace is possible
       int first_to_free = 0;
       int last_to_free = it->op==OP_OUTPUT ? 1 : it->data->numInplace();
       for(int task=0; task<2; ++task){
 
         // Dereference or free the memory of the arguments
-        for(int c=last_to_free-1; c>=first_to_free; --c){ // reverse order so that the first argument will end up at the top of the stack
+        for(int c=last_to_free-1; c>=first_to_free; --c){ // reverse order so that the
+                                                          // first argument will end up
+                                                          // at the top of the stack
 
           // Index of the argument
           int& ch_ind = it->arg[c];
           if(ch_ind>=0){
 
-            // Decrease reference count and add to the stack of unused variables if the count hits zero
+            // Decrease reference count and add to the stack of
+            // unused variables if the count hits zero
             int remaining = --refcount[ch_ind];
 
             // Free variable for reuse
@@ -283,7 +288,9 @@ namespace casadi{
 
     if(verbose()){
       if(live_variables){
-        cout << "Using live variables: work array is " <<  worksize << " instead of " << nodes.size() << endl;
+        cout << "Using live variables: work array is "
+             <<  worksize << " instead of "
+             << nodes.size() << endl;
       } else {
         cout << "Live variables disabled." << endl;
       }
@@ -352,12 +359,14 @@ namespace casadi{
     }
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog,this,getOption("name"),ProfilingData_FunctionType_MXFunction,algorithm_.size());
+      profileWriteName(CasadiOptions::profilingLog,this,getOption("name"),
+                       ProfilingData_FunctionType_MXFunction,algorithm_.size());
       int alg_counter = 0;
       for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter){
         std::stringstream ss;
         print(ss,*it);
-        profileWriteSourceLine(CasadiOptions::profilingLog,this,alg_counter,ss.str(),it->op,(it->op == OP_CALL)? it->data->getFunction().operator->() : 0);
+        profileWriteSourceLine(CasadiOptions::profilingLog, this, alg_counter,ss.str(), it->op,
+                               (it->op == OP_CALL)? it->data->getFunction().operator->() : 0);
       }
     }
 
@@ -409,10 +418,12 @@ namespace casadi{
     if (!free_vars_.empty()) {
       std::stringstream ss;
       repr(ss);
-      casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
+      casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables "
+                   << free_vars_ << " are free.");
     }
 
-    // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
+    // Evaluate all of the nodes of the algorithm:
+    // should only evaluate nodes that have not yet been calculated!
     int alg_counter = 0;
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter){
       if(CasadiOptions::profiling) {
@@ -440,9 +451,13 @@ namespace casadi{
         time_stop = getRealTime(); // Stop timer
 
         if (CasadiOptions::profilingBinary) {
-          profileWriteTime(CasadiOptions::profilingLog,this,alg_counter,time_stop-time_start,time_stop-time_zero);
+          profileWriteTime(CasadiOptions::profilingLog,this,alg_counter,
+                           time_stop-time_start,time_stop-time_zero);
         } else {
-          CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | " << (time_stop-time_zero)*1e3 << " ms | " << this << ":" <<getOption("name") << ":" << alg_counter <<"|";
+          CasadiOptions::profilingLog  << (time_stop-time_start)*1e6 << " ns | "
+                                       << (time_stop-time_zero)*1e3 << " ms | "
+                                       << this << ":" <<getOption("name") << ":"
+                                       << alg_counter <<"|";
           if (it->op == OP_CALL) {
             Function f = it->data->getFunction();
             CasadiOptions::profilingLog << f.get() << ":" << f.getOption("name");
@@ -459,7 +474,9 @@ namespace casadi{
       if (CasadiOptions::profilingBinary) {
         profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_zero);
       } else {
-        CasadiOptions::profilingLog  << "stop " << this << ":" <<getOption("name") << (time_stop-time_zero)*1e3 << " ms" << std::endl;
+        CasadiOptions::profilingLog  << "stop " << this << ":"
+                                     <<getOption("name") << (time_stop-time_zero)*1e3
+                                     << " ms" << std::endl;
       }
     }
 
@@ -519,7 +536,9 @@ namespace casadi{
     return new MXFunctionInternal(*this);
   }
 
-  void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void MXFunctionInternal::deepCopyMembers(
+      std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::deepCopyMembers(already_copied);
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
@@ -633,8 +652,10 @@ namespace casadi{
   }
 
   void MXFunctionInternal::evalMX(const std::vector<MX>& arg1, std::vector<MX>& res1,
-                                  const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens,
-                                  const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens){
+                                  const std::vector<std::vector<MX> >& fseed,
+                                  std::vector<std::vector<MX> >& fsens,
+                                  const std::vector<std::vector<MX> >& aseed,
+                                  std::vector<std::vector<MX> >& asens) {
     log("MXFunctionInternal::evalMX begin");
     assertInit();
     casadi_assert_message(arg1.size()==getNumInputs(),"Wrong number of input arguments");
@@ -642,7 +663,8 @@ namespace casadi{
     // Resize the number of outputs
     res1.resize(outputv_.size());
 
-    // Check if arguments matches the input expressions, in which case the output is known to be the output expressions
+    // Check if arguments matches the input expressions, in which case
+    // the output is known to be the output expressions
     const int checking_depth = 2;
     bool output_given = true;
     for(int i=0; i<arg1.size() && output_given; ++i){
@@ -656,7 +678,8 @@ namespace casadi{
       copy(outputv_.begin(),outputv_.end(),res1.begin());
     }
 
-    // Use the function arguments if possible to avoid problems involving equivalent but different expressions
+    // Use the function arguments if possible to avoid problems involving
+    // equivalent but different expressions
     const vector<MX>& arg = output_given ? inputv_ : arg1;
     vector<MX>& res = output_given ? outputv_ : res1;
 
@@ -842,14 +865,17 @@ namespace casadi{
         if(!output_given || nfdir>0){
           if (it->data->getOp()==OP_CALL) {
             // Purge the directions that have all-zero seeds #905
-            // We do this only for OP_CALL since some operations might have a substancial effect on the sensitivities even though all seeds are zero: the sparsity might be changed e.g. in OP_SETSPARSE
+            // We do this only for OP_CALL since some operations might have
+            // a substancial effect on the sensitivities even though all seeds are zero:
+            // the sparsity might be changed e.g. in OP_SETSPARSE
             purgeSeeds(fseed_p,fsens_p,fseed_purged,fsens_purged, true);
             if (fsens_purged.size()==0 && fsens_purged.size()==0) {
               it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,output_given);
             } else {
               if (CasadiOptions::purgeSeeds) {
                 // Call the evaluation function
-                it->data->evaluateMX(input_p,output_p,fseed_purged,fsens_purged,dummy_p,dummy_p,output_given);
+                it->data->evaluateMX(input_p,output_p,fseed_purged,fsens_purged,
+                                     dummy_p,dummy_p,output_given);
               } else {
                 // Do nothing special
                 it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
@@ -861,7 +887,8 @@ namespace casadi{
           }
         }
 
-        // Save results of the operation to work vector, if known (not earlier to allow inplace operations)
+        // Save results of the operation to work vector,
+        // if known (not earlier to allow inplace operations)
         if(output_given){
           for(int i=0; i<it->res.size(); ++i){
             int el = it->res[i]; // index of the output
@@ -879,8 +906,11 @@ namespace casadi{
 
       int alg_counter = algorithm_.size()-1;
       tt--;
-      for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it, --alg_counter){
-        // Mark spilled work vector elements to be recovered to allow the operator input to be updated but not the operator output
+      for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin();
+          it!=algorithm_.rend();
+          ++it, --alg_counter) {
+        // Mark spilled work vector elements to be recovered to allow the
+        // operator input to be updated but not the operator output
         // (important for inplace operations)
         if(it->op!=OP_OUTPUT){
           for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
@@ -903,7 +933,8 @@ namespace casadi{
         } else if(it->op==OP_OUTPUT){
           // Pass the adjoint seeds
           for(int d=0; d<nadir; ++d){
-            dwork[it->arg.front()][d].addToSum(aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(),true));
+            dwork[it->arg.front()][d].addToSum(
+              aseed[d][it->res.front()].setSparse(output(it->res.front()).sparsity(),true));
           }
         } else if(it->op==OP_PARAMETER){
           // Clear adjoint seeds
@@ -918,7 +949,8 @@ namespace casadi{
             if(el<0){
               input_p[i] = 0;
             } else {
-              int tmp = work_[el].second; // Positive if the data should be retrieved from the tape instead of the work vector
+              int tmp = work_[el].second; // Positive if the data should be retrieved from the
+                                          // tape instead of the work vector
               input_p[i] = tmp==0 ? &swork[el] : &tape[tmp-1].second;
             }
           }
@@ -958,7 +990,9 @@ namespace casadi{
 
           if (it->data->getOp()==OP_CALL) {
             // Purge the directions that have all-zero seeds #905
-            // We do this only for OP_CALL since some operations might have a substancial effect on the sensitivities even though all seeds are zero: the sparisty might be changed e.g. in OP_SETSPARSE
+            // We do this only for OP_CALL since some operations might have a substancial effect
+            // on the sensitivities even though all seeds are zero: the sparisty might be
+            // changed e.g. in OP_SETSPARSE
             purgeSeeds(aseed_p,asens_p,aseed_purged,asens_purged, false);
             if (aseed_purged.size()==0 && asens_purged.size()==0) {
               // Call the evaluation function
@@ -966,7 +1000,8 @@ namespace casadi{
             } else {
               if (CasadiOptions::purgeSeeds) {
                 // Call the evaluation function
-                it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_purged,asens_purged,true);
+                it->data->evaluateMX(input_p,output_p,dummy_p,
+                                     dummy_p,aseed_purged,asens_purged,true);
               } else {
                 // Do nothing special
                 it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
@@ -978,7 +1013,8 @@ namespace casadi{
           }
         }
 
-        // Recover the spilled elements to the work vector for later access (delayed for inplace operations)
+        // Recover the spilled elements to the work vector for later access
+        // (delayed for inplace operations)
         if(it->op!=OP_OUTPUT){
           for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
             if(*c >=0 && work_[*c].second > 0){
@@ -993,8 +1029,10 @@ namespace casadi{
   }
 
   void MXFunctionInternal::evalSXsparse(const std::vector<SX>& input_s, std::vector<SX>& output_s,
-                                  const std::vector<std::vector<SX> >& fwdSeed, std::vector<std::vector<SX> >& fwdSens,
-                                  const std::vector<std::vector<SX> >& adjSeed, std::vector<std::vector<SX> >& adjSens){
+                                        const std::vector<std::vector<SX> >& fwdSeed,
+                                        std::vector<std::vector<SX> >& fwdSens,
+                                        const std::vector<std::vector<SX> >& adjSeed,
+                                        std::vector<std::vector<SX> >& adjSens){
     casadi_assert_message(fwdSens.empty(),"Not implemented");
     casadi_assert_message(adjSeed.empty(),"Not implemented");
 
@@ -1012,7 +1050,8 @@ namespace casadi{
     // Create a temporary vector
     vector<SXElement> rtmp(rtmp_.size());
 
-    // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
+    // Evaluate all of the nodes of the algorithm:
+    // should only evaluate nodes that have not yet been calculated!
     vector<SX*> sxarg;
     vector<SX*> sxres;
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
@@ -1117,11 +1156,13 @@ namespace casadi{
     }
   }
 
-  void MXFunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
+  void MXFunctionInternal::generateDeclarations(std::ostream &stream, const std::string& type,
+                                                CodeGenerator& gen) const{
 
     // Make sure that there are no free variables
     if(!free_vars_.empty()) {
-      casadi_error("Code generation is not possible since variables " << free_vars_ << " are free.");
+      casadi_error("Code generation is not possible since variables "
+                   << free_vars_ << " are free.");
     }
 
     // Add sparsity patterns in the intermediate variables
@@ -1142,7 +1183,8 @@ namespace casadi{
     }
   }
 
-  void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type, CodeGenerator& gen) const{
+  void MXFunctionInternal::generateBody(std::ostream &stream, const std::string& type,
+                                        CodeGenerator& gen) const{
 
     // Data structure to hold intermediate variables
     stream << "  static struct wstruct{" << endl;

@@ -35,21 +35,25 @@ namespace casadi{
 
   /** \brief MX - Matrix expression
 
-      The MX class is used to build up trees made up from MXNodes. It is a more general graph representation than the scalar expression,
-      SX, and much less efficient for small objects. On the other hand, the class allows much more general operations than does SX,
+      The MX class is used to build up trees made up from MXNodes. It is a more general
+      graph representation than the scalar expression, SX, and much less efficient for small
+      objects. On the other hand, the class allows much more general operations than does SX,
       in particular matrix valued operations and calls to arbitrary differentiable functions.
 
-      The MX class is designed to have identical syntax with the Matrix<> template class, and uses Matrix<double> as its internal
-      representation of the values at a node. By keeping the syntaxes identical, it is possible to switch from one class to the other,
+      The MX class is designed to have identical syntax with the Matrix<> template class,
+      and uses Matrix<double> as its internal representation of the values at a node. By keeping
+      the syntaxes identical, it is possible to switch from one class to the other,
       as well as inlining MX functions to SXElement functions.
 
-      Note that an operation is always "lazy", making a matrix multiplication will create a matrix multiplication node, not perform
-      the actual multiplication.
+      Note that an operation is always "lazy", making a matrix multiplication will create a
+      matrix multiplication node, not perform the actual multiplication.
 
       \author Joel Andersson
       \date 2010-2011
   */
-  class CASADI_SYMBOLIC_EXPORT MX : public GenericExpression<MX>, public GenericMatrix<MX>, public SharedObject{
+  class CASADI_SYMBOLIC_EXPORT MX : public GenericExpression<MX>,
+                                    public GenericMatrix<MX>,
+                                    public SharedObject{
   public:
 
     /** \brief  Default constructor */
@@ -144,13 +148,25 @@ namespace casadi{
     }
 
     // get a vector element
-    const MX indexed_one_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr-1);}
-    const MX indexed_zero_based(int rr) const{ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr);}
+    const MX indexed_one_based(int rr) const {
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      return (*this)(rr-1);
+    }
+    const MX indexed_zero_based(int rr) const {
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      return (*this)(rr);
+    }
     const MX indexed(const IndexList &rr) const{
-      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr.getAll(size1()));
+      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got "
+                            << dimString() << ".");
+      return (*this)(rr.getAll(size1()));
     }
     const MX indexed(const Slice &rr) const{
-      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;return (*this)(rr.getAll(size1()));
+      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got "
+                            << dimString() << ".");
+      return (*this)(rr.getAll(size1()));
     }
 
     /// set a non-zero
@@ -201,10 +217,20 @@ namespace casadi{
     //@}
 
     // set a vector element
-    void indexed_one_based_assignment(int rr, const MX &m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr-1) = m;}
-    void indexed_zero_based_assignment(int rr, const MX &m){ casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr) = m;}
+    void indexed_one_based_assignment(int rr, const MX &m){
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      (*this)(rr-1) = m;
+    }
+    void indexed_zero_based_assignment(int rr, const MX &m){
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      (*this)(rr) = m;
+    }
     void indexed_assignment(const IndexList &rr, const MX &m){
-      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got " << dimString() << ".") ;(*this)(rr.getAll(size1())) = m;
+      casadi_assert_message(isDense() && isVector(),
+                            "Matrix must be a dense vector, but got " << dimString() << ".");
+      (*this)(rr.getAll(size1())) = m;
     }
 
     void indexed_assignment(const Slice &rr, const MX &m){
@@ -292,7 +318,8 @@ namespace casadi{
     /// Check if norm
     bool isNorm() const;
 
-    /** \brief  check if all nonzeros are symbolic (this function is currently identical to isSymbolic) */
+    /** \brief  check if all nonzeros are symbolic
+     * (this function is currently identical to isSymbolic) */
     bool isSymbolicSparse() const;
 
     /** \brief  check if identity */
@@ -393,9 +420,12 @@ namespace casadi{
     const MX sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
     const MX sub(int rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
     const MX sub(const Slice& rr, int cc) const {return sub(rr.getAll(size1()),cc);}
-    const MX sub(const Slice& rr, const Slice& cc) const {return sub(rr.getAll(size1()),cc.getAll(size2()));}
-    const MX sub(const Matrix<int>& rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
-    const MX sub(const Slice& rr, const Matrix<int>& cc) const {return sub(rr.getAll(size1()),cc);}
+    const MX sub(const Slice& rr, const Slice& cc) const
+    { return sub(rr.getAll(size1()),cc.getAll(size2())); }
+    const MX sub(const Matrix<int>& rr, const Slice& cc) const
+    { return sub(rr,cc.getAll(size2())); }
+    const MX sub(const Slice& rr, const Matrix<int>& cc) const
+    { return sub(rr.getAll(size1()),cc); }
     const MX sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
     const MX sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr),cc);}
 
@@ -403,7 +433,8 @@ namespace casadi{
     void setSub(const MX& m, const std::vector<int>& rr, int cc);
     void setSub(const MX& m, int rr, const std::vector<int>& cc);
     void setSub(const MX& m, const std::vector<int>& rr, const std::vector<int>& cc);
-    void setSub(const MX& m, const std::vector<int>& rr, Slice cc) { setSub(m,rr,cc.getAll(size2()));}
+    void setSub(const MX& m, const std::vector<int>& rr, Slice cc)
+    { setSub(m,rr,cc.getAll(size2()));}
     void setSub(const MX& m, const Matrix<int>& rr, const std::vector<int>& cc);
     void setSub(const MX& m, const Matrix<int>& rr, int cc) { setSub(m,rr,std::vector<int>(1,cc)); }
     void setSub(const MX& m, const std::vector<int>& rr, const Matrix<int>& cc);
@@ -514,10 +545,12 @@ namespace casadi{
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */
     Matrix<int> mapping() const;
 
-    /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
+    /** \brief Set or reset the maximum number of calls to the 
+     * printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
 
-    /** \brief Get the maximum number of calls to the printing function when printing an expression */
+    /** \brief Get the maximum number of calls to the printing
+     * function when printing an expression */
     static long getMaxNumCallsInPrint();
 
     /** \brief Set or reset the depth to which equalities are being checked for simplifications */

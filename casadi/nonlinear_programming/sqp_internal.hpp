@@ -141,7 +141,8 @@ public:
   virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J);
 
   // Evaluate the Hessian of the Lagrangian
-  virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H);
+  virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda,
+                      double sigma, Matrix<double>& H);
 
   // Calculate the regularization parameter using Gershgorin theorem
   double getRegularization(const Matrix<double>& H);
@@ -152,12 +153,16 @@ public:
   // Solve the QP subproblem
   virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
                         const std::vector<double>& lbx, const std::vector<double>& ubx,
-                        const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
-                        std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt);
+                        const Matrix<double>& A, const std::vector<double>& lbA,
+                        const std::vector<double>& ubA,
+                        std::vector<double>& x_opt, std::vector<double>& lambda_x_opt,
+                        std::vector<double>& lambda_A_opt);
 
   // Calculate the L1-norm of the primal infeasibility
-  double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
-                             const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg);
+  double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx,
+                             const std::vector<double>& ubx,
+                             const std::vector<double>& g, const std::vector<double>& lbg,
+                             const std::vector<double>& ubg);
 
   /// Calculates inner_prod(x,mul(A,x))
   static double quad_form(const std::vector<double>& x, const DMatrix& A);

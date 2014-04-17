@@ -74,7 +74,8 @@ namespace casadi{
     /** \brief  Initialize */
     virtual void init();
 
-    /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
+    /** \brief  Propagate the sparsity pattern through a set of
+     * directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
     /// Is the class able to propate seeds through the algorithm?
@@ -94,7 +95,8 @@ namespace casadi{
     /** \brief Set solver specific options to generated augmented integrators */
     virtual void setDerivativeOptions(Integrator& integrator, const AugOffset& offset);
 
-    /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
+    /// Generate a augmented DAE system with nfwd forward sensitivities
+    // and nadj adjoint sensitivities
     virtual std::pair<Function,Function> getAugmented(int nfwd, int nadj, AugOffset& offset);
 
     // Get offsets in augmented problem

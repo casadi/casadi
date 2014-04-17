@@ -39,16 +39,19 @@ namespace casadi{
   Concat::~Concat(){
   }
 
-  void Concat::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp, std::vector<double>& rtmp){
+  void Concat::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
+                         std::vector<double>& rtmp){
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
-  void Concat::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp, std::vector<SXElement>& rtmp){
+  void Concat::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
+                          std::vector<SXElement>& rtmp){
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
-  void Concat::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp){
+  void Concat::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+                           std::vector<T>& rtmp){
     typename vector<T>::iterator res_it = output[0]->data().begin();
     for(int i=0; i<input.size(); ++i){
       const vector<T>& arg_i = input[i]->data();
@@ -74,11 +77,13 @@ namespace casadi{
     }
   }
 
-  void Concat::generateOperation(std::ostream &stream, const std::vector<std::string>& arg, const std::vector<std::string>& res, CodeGenerator& gen) const{
+  void Concat::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
+                                 const std::vector<std::string>& res, CodeGenerator& gen) const{
     int nz_offset = 0;
     for(int i=0; i<arg.size(); ++i){
       int nz = dep(i).size();
-      stream << "  for(i=0; i<" << nz << "; ++i) " << res.front() << "[i+" << nz_offset << "] = " << arg.at(i) << "[i];" << endl;
+      stream << "  for(i=0; i<" << nz << "; ++i) " << res.front() << "[i+" << nz_offset
+             << "] = " << arg.at(i) << "[i];" << endl;
       nz_offset += nz;
     }
     casadi_assert(nz_offset == size());
@@ -148,7 +153,9 @@ namespace casadi{
     }
   }
 
-  void Horzcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Horzcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                           bool output_given){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
@@ -204,7 +211,9 @@ namespace casadi{
     }
   }
 
-  void Vertcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+  void Vertcat::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
+                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                           bool output_given){
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
