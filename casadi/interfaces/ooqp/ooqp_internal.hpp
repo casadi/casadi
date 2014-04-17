@@ -59,7 +59,8 @@ namespace casadi{
     static const char* errFlag(int flag);
 
     /// Print an OOQP bounds vector
-    static std::string printBounds(const std::vector<double>& b, const std::vector<char>& ib, int n, const char *sign);
+    static std::string printBounds(const std::vector<double>& b,
+                                   const std::vector<char>& ib, int n, const char *sign);
 
     /// Problem data (vectors)
     std::vector<double> c_, bA_, xlow_, xupp_, clow_, cupp_, x_, gamma_, phi_, y_, z_, lambda_, pi_;

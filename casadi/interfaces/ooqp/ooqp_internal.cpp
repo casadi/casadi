@@ -263,9 +263,10 @@ namespace casadi {
       cout << "   minimize    1/2*x'*Q*x + c'*x" << endl;
       cout << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
       cout << "with" << endl;
-      cout << "Q = " << tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(),irowQ_.begin()+nnzQ),
-                                                  vector<int>(jcolQ_.begin(),jcolQ_.begin()+nnzQ),
-                                                  vector<double>(dQ_.begin(),dQ_.begin()+nnzQ),nx,nx)) << endl;
+      cout << "Q = " <<
+          tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(),irowQ_.begin()+nnzQ),
+                                     vector<int>(jcolQ_.begin(),jcolQ_.begin()+nnzQ),
+                                     vector<double>(dQ_.begin(),dQ_.begin()+nnzQ),nx,nx)) << endl;
       cout << "c = " << vector<double>(c_.begin(),c_.begin()+nx) << endl;
       cout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),irowA_.begin()+nnzA),
                                         vector<int>(jcolA_.begin(),jcolA_.begin()+nnzA),
@@ -416,7 +417,8 @@ namespace casadi {
     }
   }
 
-  std::string OOQPInternal::printBounds(const std::vector<double>& b, const std::vector<char>& ib, int n, const char *sign){
+  std::string OOQPInternal::printBounds(const std::vector<double>& b,
+                                        const std::vector<char>& ib, int n, const char *sign){
     stringstream ss;
     ss << "[";
     for(int i=0; i<n; ++i){
