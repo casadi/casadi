@@ -35,7 +35,7 @@
 /// \cond INTERNAL
 namespace casadi{
 
-  /** \brief  Interal node class for SX
+  /** \brief  Internal node class for SX
       \author Joel Andersson
       \date 2010
   */
@@ -114,7 +114,7 @@ namespace casadi{
     static int eq_depth_;
 
     /** Temporary variables to be used in user algorithms like sorting,
-        the user is resposible of making sure that use is thread-safe
+        the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero
     */
     int temp;

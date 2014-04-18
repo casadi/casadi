@@ -64,7 +64,7 @@ namespace casadi{
     std::vector<T> vector() const { return this->data; }
 
 #ifndef SWIG
-    /// Print a destription of the object
+    /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const {
       stream << "IOSchemeVector(" ;
       for (int i=0;i<this->data.size();++i) {

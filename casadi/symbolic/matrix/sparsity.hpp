@@ -73,7 +73,7 @@ namespace casadi{
 
    1. "colind" [length size2()+1], which contains the index to the first non-zero element on or
    after the corresponding column. All the non-zero elements of a particular i are thus the elements
-   with index el that fulfils: colind[i] <= el < colind[i+1].
+   with index el that fullfills: colind[i] <= el < colind[i+1].
 
    2. "row" [same length as the number of non-zero elements, size()] The rows for each of the
    structural non-zeros.
@@ -318,14 +318,14 @@ namespace casadi{
     int getNZ(int rr, int cc);
 
     /** \brief Get the index of an existing non-zero element
-        return -1 if the element does not exists */
+        return -1 if the element does not exist */
     int getNZ(int rr, int cc) const;
 
     /// Returns true if the pattern has a non-zero at location rr,cc
     bool hasNZ(int rr, int cc) const;
 
     /** \brief Get a set of non-zero element
-        return -1 if the element does not exists */
+        return -1 if the element does not exist */
     std::vector<int> getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
     /** \brief Get the nonzero index for a set of elements
@@ -411,7 +411,7 @@ namespace casadi{
 
     /// @{
     /** \brief Sparsity pattern for a matrix-matrix product
-        Returns the sparsity pattern resulting from premultiplying the pattern with the
+        Returns the sparsity pattern resulting from pre-multiplying the pattern with the
         transpose of x.
         Returns the new sparsity pattern as well as a mapping with the same length as the number
         of non-zero elements
@@ -486,7 +486,7 @@ namespace casadi{
     /// Is lower triangular?
     bool isTril() const;
 
-    /// Check whether the sparsity-pattern inidcates structural singularity
+    /// Check whether the sparsity-pattern indicates structural singularity
     bool isSingular() const;
 
     /// Get upper triangular part

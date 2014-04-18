@@ -297,7 +297,7 @@ namespace casadi{
     /// Get a set of non-zero element - does bounds checking
     std::vector<int> getNZ(const std::vector<int>& rr, const std::vector<int>& cc) const;
 
-    /// Get the nonzero index for a set of elements (see descripion in public class)
+    /// Get the nonzero index for a set of elements (see description in public class)
     void getNZInplace(std::vector<int>& indices) const;
 
     /// Does the rows appear sequentially on each col

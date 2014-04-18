@@ -197,7 +197,7 @@ public:
                              const std::vector<double>& g,
                              const std::vector<double>& lbg, const std::vector<double>& ubg);
 
-  /// Calculates inner_prod(x,mul(A,x))
+  /// Calculates <tt>inner_prod(x,mul(A,x))</tt>
   static double quad_form(const std::vector<double>& x, const DMatrix& A);
 
   /// Calculate the merit function gradient

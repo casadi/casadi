@@ -58,7 +58,7 @@ namespace casadi {
       *  Default: true
       */
       static bool catch_errors_python;
-      /** \brief Indicates wether simplifications should be made on the fly.
+      /** \brief Indicates whether simplifications should be made on the fly.
       * e.g   cos(-x) -> cos(x)
       * Default: true
       */

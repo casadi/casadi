@@ -62,7 +62,7 @@ namespace casadi{
     addOption("inputs_check",             OT_BOOLEAN,             true,
               "Throw exceptions when the numerical values of the inputs don't make sense");
     addOption("gather_stats",             OT_BOOLEAN,             false,
-              "Flag to indicate wether statistics must be gathered");
+              "Flag to indicate whether statistics must be gathered");
     addOption("derivative_generator",     OT_DERIVATIVEGENERATOR,   GenericType(),
               "Function that returns a derivative function given a number of forward "
               "and reverse directional derivative, overrides internal routines. "
@@ -1903,7 +1903,7 @@ namespace casadi{
         << arg.size() << ") should not exceed the number of inputs of the function ("
         << getNumInputs() << ").");
 
-      // Assumes initialised
+      // Assumes initialized
       for(int i=0; i<arg.size(); ++i){
         if(arg[i].isNull() || arg[i].isEmpty() || input(i).isEmpty()) continue;
         casadi_assert_message(

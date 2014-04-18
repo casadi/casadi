@@ -346,7 +346,7 @@ namespace casadi{
     // Total number of levels
     int nlevels = 0;
 
-    // Get the earliest posible level
+    // Get the earliest possible level
     for(typename std::vector<NodeType*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
       // maximum level of any of the children
       int maxlevel = -1;
@@ -669,7 +669,7 @@ namespace casadi{
     // Additions to the jacobian matrix
     std::vector<int> adds, adds2;
 
-    // A vector used to resolve collitions between directions
+    // A vector used to resolve collisions between directions
     std::vector<int> hits;
 
     // Progress
@@ -688,7 +688,7 @@ namespace casadi{
     // Sparsity of the seeds
     vector<int> seed_col, seed_row;
 
-    // Evaluate until everything has been determinated
+    // Evaluate until everything has been determined
     for(int s=0; s<nsweep; ++s){
       // Print progress
       if(verbose()){

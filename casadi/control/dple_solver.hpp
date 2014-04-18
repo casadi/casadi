@@ -30,22 +30,25 @@
 /** \defgroup DPLE_doc Discrete periodic Lyapunov Equation solver
 
 
-    Given matrices A_k and symmetric V_k,  k = 0..K-1
+    Given matrices \f$A_k\f$ and symmetric \f$V_k,  k = 0..K-1\f$
 
+    \verbatim
     A_k in R^(n x n)
     V_k in R^n
+    \endverbatim
 
-    provides all of P_k that satisfy:
+    provides all of \f$P_k\f$ that satisfy:
 
+    \verbatim
     P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k
     P_k+1 = A_k*P_k*A_k' + V_k  for k = 1..K-1
-
+    \endverbatim
 
 
 */
 namespace casadi{
 
-  /// Input arguments of a dple solver [dpleIn]
+  /// Input arguments of a \e dple solver [dpleIn]
   enum DPLEInput{
     /// A matrices (horzcat when const_dim, blkdiag otherwise) [a]
     DPLE_A,
@@ -54,9 +57,9 @@ namespace casadi{
     DPLE_NUM_IN
   };
 
-  /// Output arguments of a dple solver [dpleOut]
+  /// Output arguments of a \e dple solver [dpleOut]
   enum DPLEOutput{
-    /// Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def) [p]
+    /// Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [p]
     DPLE_P,
     /// Number of arguments.
     DPLE_NUM_OUT
@@ -68,7 +71,7 @@ namespace casadi{
   /**  \brief Base class for Discrete Periodic Lyapunov Equation Solvers
 
      @copydoc DPLE_doc
-       \author Joris gillis
+       \author Joris Gillis
       \date 2014
 
   */

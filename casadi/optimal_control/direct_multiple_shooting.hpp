@@ -35,11 +35,11 @@ namespace casadi{
   /** \brief Direct Multiple Shooting
    *
    *   ns: Number of shooting nodes: from option number_of_grid_points\n
-   *   nx: Number of differential states: from ffcn.input(INTEGRATOR_X0).size() \n
-   *   nc: Number of constants during intergation: ffcn.input(INTEGRATOR_P).size()
+   *   nx: Number of differential states: from <tt>ffcn.input(INTEGRATOR_X0).size()</tt> \n
+   *   nc: Number of constants during integration: <tt>ffcn.input(INTEGRATOR_P).size()</tt>
    *   nu: Number of controls: from nc - np \n
    *   np: Number of parameters: from option number_of_parameters\n
-   *   nh: Number of point constraints: from cfcn.input(0).size()
+   *   nh: Number of point constraints: from <tt>cfcn.input(0).size()</tt>
    *
    *
    *   \author Joel Andersson
@@ -51,7 +51,7 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShooting : public OCPSolver{
     DirectMultipleShooting();
 
     /** \brief Create a multiple shooting OCP solver
-    * \param ffcn Continuous time dynamics, an casadi::Function with the folowing mapping:
+    * \param ffcn Continuous time dynamics, an casadi::Function with the following mapping:
     * \copydoc scheme_DAEInput
     * \copydoc scheme_DAEOutput
     * Important notes:
@@ -60,7 +60,7 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShooting : public OCPSolver{
     *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters
     *    to be optimized but constant over the whole domain.
     *    The remainder are interpreted as controls.
-    *  - BEWARE: if the right hand side of ffcn is dependent on time, the results will be incorrect.
+    *  - BEWARE: if the right hand side of \a ffcn is dependent on time, the results will be incorrect.
     *
     * \param mfcn Mayer term, casadi::Function mapping to cost (1 x 1)
     * @copydoc scheme_MayerInput

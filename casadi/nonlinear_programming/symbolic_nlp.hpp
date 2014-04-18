@@ -72,7 +72,7 @@ class CASADI_NONLINEAR_PROGRAMMING_EXPORT SymbolicNLP : public PrintableObject{
     void parseNL(const std::string& filename, const Dictionary& options = Dictionary());
 
 #ifndef SWIG
-    /// Print a destription of the object
+    /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object

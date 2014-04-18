@@ -106,14 +106,14 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
     /// Describe the index
     std::string describe(int i) const;
 
-    /// Check wether the scheme is known
+    /// Check whether the scheme is known
     bool known() const;
 
-    /// Check wether this scheme is compatible with the given size
+    /// Check whether this scheme is compatible with the given size
     int compatibleSize(int size) const;
 
     #ifndef SWIG
-    /// Print a destription of the object
+    /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object

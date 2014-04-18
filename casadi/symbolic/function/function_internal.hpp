@@ -80,7 +80,7 @@ namespace casadi{
         forward or backward, using the sparsity patterns */
     virtual void spEvaluateViaJacSparsity(bool fwd);
 
-    /** \brief  Is the class able to propate seeds through the algorithm? */
+    /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd){ return false;}
 
     /** \brief  Reset the sparsity propagation */
@@ -181,7 +181,7 @@ namespace casadi{
      */
     Function derivative(int nfwd, int nadj);
 
-    /** Set a function that calculates nfwd forward dedrivatives and nadj adjoint derivatives */
+    /** Set a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
     void setDerivative(const Function& fcn, int nfwd, int nadj);
 
     /** \brief Constructs and returns a function that calculates forward derivatives */
@@ -380,7 +380,7 @@ namespace casadi{
     /** \brief  Dictionary of statistics (resulting from evaluate) */
     Dictionary stats_;
 
-    /** \brief  Flag to indicate wether statistics must be gathered */
+    /** \brief  Flag to indicate whether statistics must be gathered */
     bool gather_stats_;
 
     /// Cache for functions to evaluate directional derivatives

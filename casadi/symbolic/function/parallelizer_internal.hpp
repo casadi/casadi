@@ -71,7 +71,7 @@ namespace casadi{
     // forward or backward, one task only
     void spEvaluateTask(bool use_fwd, int task);
 
-    /// Is the class able to propate seeds through the algorithm?
+    /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives

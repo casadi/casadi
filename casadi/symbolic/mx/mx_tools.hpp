@@ -202,7 +202,7 @@ namespace casadi{
   */
   CASADI_SYMBOLIC_EXPORT MX vec(const MX &x);
 
-  /** \brief Returns a vectorized version of the MX, prseverving only nonzeros
+  /** \brief Returns a vectorized version of the MX, preserving only nonzeros
   */
   CASADI_SYMBOLIC_EXPORT MX vecNZ(const MX &x);
 
@@ -274,7 +274,7 @@ namespace casadi{
   /// Return summation of all elements
   CASADI_SYMBOLIC_EXPORT MX sumAll(const MX &x);
 
-  /** \brief  Evaluate a polynomial with coefficeints p in x */
+  /** \brief  Evaluate a polynomial with coefficients p in x */
   CASADI_SYMBOLIC_EXPORT MX polyval(const MX& p, const MX& x);
 
   /** \brief Get a string representation for a binary MX, using custom arguments */

@@ -33,7 +33,7 @@
 
 namespace casadi{
 
-/** \brief  An elemenent of the algorithm, namely an MX node */
+/** \brief  An element of the algorithm, namely an MX node */
 struct MXAlgEl{
   /// Operator index
   int op;

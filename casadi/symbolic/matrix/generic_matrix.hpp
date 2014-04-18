@@ -42,7 +42,7 @@ namespace casadi{
 
       The class is designed with the idea that "everything is a matrix",
       that is, also scalars and vectors.\n
-      This philosophy makes it easy to use and to interface in particularily
+      This philosophy makes it easy to use and to interface in particularly
       with Python and Matlab/Octave.\n
 
       The syntax tries to stay as close as possible to the ublas syntax

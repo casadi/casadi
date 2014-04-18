@@ -382,7 +382,7 @@ namespace casadi{
     bvec_t *inputd0 = get_bvec_t(input[0]->data());
     bvec_t *inputd = get_bvec_t(input[1]->data());
 
-    // Propate sparsity
+    // Propagate sparsity
     if(fwd){
       if(outputd != inputd0){
         copy(inputd0,inputd0+input[0]->size(),outputd);
@@ -420,7 +420,7 @@ namespace casadi{
     bvec_t *inputd0 = get_bvec_t(input[0]->data());
     bvec_t *inputd = get_bvec_t(input[1]->data());
 
-    // Propate sparsity
+    // Propagate sparsity
     if(fwd){
       if(outputd != inputd0){
         copy(inputd0,inputd0+input[0]->size(),outputd);
@@ -456,7 +456,7 @@ namespace casadi{
     bvec_t *inputd0 = get_bvec_t(input[0]->data());
     bvec_t *inputd = get_bvec_t(input[1]->data());
 
-    // Propate sparsity
+    // Propagate sparsity
     if(fwd){
       if(outputd != inputd0){
         copy(inputd0,inputd0+input[0]->size(),outputd);

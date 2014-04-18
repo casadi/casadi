@@ -80,7 +80,7 @@ namespace casadi{
 
       General sparse matrix class that is designed with the idea that "everything is a matrix",
       that is, also scalars and vectors.\n
-      This philosophy makes it easy to use and to interface in particularily
+      This philosophy makes it easy to use and to interface in particularly
       with Python and Matlab/Octave.\n
 
       Index starts with 0.\n
@@ -618,7 +618,7 @@ namespace casadi{
     //@{
 
     //@{
-    /// Operations defined in the standard namespace for unambigous access and Numpy compatibility
+    /// Operations defined in the standard namespace for unambiguous access and Numpy compatibility
     Matrix<DataType> sin() const;
     Matrix<DataType> cos() const;
     Matrix<DataType> tan() const;

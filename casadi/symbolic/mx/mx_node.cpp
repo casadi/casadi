@@ -73,7 +73,7 @@ namespace casadi{
         *cc = MX();
 
       } else {
-        // Stack of experssions to be deleted
+        // Stack of expressions to be deleted
         std::stack<MX> deletion_stack;
 
         // Move the child to the deletion stack

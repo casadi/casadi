@@ -83,7 +83,7 @@ namespace casadi{
       AUX_TRANS
     };
 
-    /** \brief Add a built-in axiliary function */
+    /** \brief Add a built-in auxiliary function */
     void addAuxiliary(Auxiliary f);
 
     /// Flush generated file to a stream

@@ -123,10 +123,10 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal :
 
   /** \brief  DATA MEMBERS */
 
-  /** \brief  An elemenent of the algorithm, namely a binary operation */
+  /** \brief  An element of the algorithm, namely a binary operation */
   typedef ScalarAtomic AlgEl;
 
-  /** \brief  An elemenent of the tape */
+  /** \brief  An element of the tape */
   template<typename T>
   struct TapeEl{
     T d[2];
@@ -166,7 +166,7 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal :
   /// Propagate a sparsity pattern through the algorithm
   virtual void spEvaluate(bool fwd);
 
-  /// Is the class able to propate seeds through the algorithm?
+  /// Is the class able to propagate seeds through the algorithm?
   virtual bool spCanEvaluate(bool fwd){ return true;}
 
   /// Reset the sparsity propagation

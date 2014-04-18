@@ -32,7 +32,7 @@ namespace casadi{
   /** \brief Internal storage for DpleSolver related data
 
       @copydoc DPLE_doc
-     \author Joris gillis
+     \author Joris Gillis
       \date 2014
   */
   class CASADI_SLICOT_INTERFACE_EXPORT PsdIndefDpleInternal : public DpleInternal{

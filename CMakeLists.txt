@@ -46,6 +46,7 @@ endif()
 #end workaround
 
 include(CppLint)
+include(SpellCheck)
 include(embed_resources)
 include (GenerateExportHeader)
 

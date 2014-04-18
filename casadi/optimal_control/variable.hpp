@@ -59,7 +59,7 @@ namespace casadi{
     CAT_DEPENDENT_PARAMETER,
     /** An independent parameter "parameter Real p2=3"*/
     CAT_INDEPENDENT_PARAMETER,
-    /** An algebraic variabel or input */
+    /** An algebraic variable or input */
     CAT_ALGEBRAIC
   };
 

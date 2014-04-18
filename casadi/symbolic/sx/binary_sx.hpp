@@ -74,11 +74,11 @@ class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode{
           // Check if binary
           if(!n1->hasDep()){ // n1 is not binary
 
-            delete n1; // Delete stright away
+            delete n1; // Delete straight away
 
           } else { // n1 is binary
 
-            // Stack of experssions to be deleted
+            // Stack of expressions to be deleted
             std::stack<SXNode*> deletion_stack;
 
             // Add the node to the deletion stack
@@ -104,7 +104,7 @@ class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode{
                   // Check if binary
                   if(!n2->hasDep()){
 
-                    // Delete stright away if not binary
+                    // Delete straight away if not binary
                     delete n2;
 
                   } else {

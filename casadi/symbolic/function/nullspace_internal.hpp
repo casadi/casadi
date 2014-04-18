@@ -54,7 +54,7 @@ namespace casadi{
 
   protected:
 
-    /// Should the suspace be dense?
+    /// Should the subspace be dense?
     bool dense_;
 
     /// Storage for input structure

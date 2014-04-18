@@ -62,7 +62,7 @@ namespace casadi{
     /// Return a string with a representation (for SWIG)
     std::string getRepresentation() const;
 
-    /// Return a string with a destription (for SWIG)
+    /// Return a string with a description (for SWIG)
     std::string getDescription() const;
   };
 

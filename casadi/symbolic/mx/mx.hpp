@@ -562,7 +562,7 @@ namespace casadi{
 #ifndef SWIG
   private:
 
-    /// Create an expression from a node: extra dummy arguments to avoid ambigousity for 0/NULL
+    /// Create an expression from a node: extra dummy arguments to avoid ambiguity for 0/NULL
     MX(MXNode* node, bool dummy1, bool dummy2, bool dummy3, bool dummy4);
 
     // Maximum number of calls

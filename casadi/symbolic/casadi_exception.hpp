@@ -99,7 +99,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
 #define CASADI_ASSERT_STR1(x) #x
 #define CASADI_ASSERT_STR(x) CASADI_ASSERT_STR1(x)
 
-// String denoting where the assertation is situated
+// String denoting where the assertion is situated
 #define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) \
     " of file " CASADI_ASSERT_STR(__FILE__)
 
@@ -135,7 +135,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
  }\
 } \
 
-// This assersion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
+// This assertion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
 // but never in destructors
 #define casadi_assert(x) casadi_assert_message(x, \
     "(Hint for developers: CasadiOptions.setCatchErrorsPython(False)" \

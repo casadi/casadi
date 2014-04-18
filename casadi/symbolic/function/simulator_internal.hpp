@@ -30,7 +30,7 @@
 
 namespace casadi{
 
-  /** \brief Simulator data storage classs
+  /** \brief Simulator data storage class
       \author Joel Andersson
       \date 2010
   */

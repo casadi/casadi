@@ -42,9 +42,9 @@ namespace casadi{
       map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$,
       in which n,m,p,q can take different values for every (i,j) pair.\n
 
-      When passing input, you specify which partition i is active.
+      When passing input, you specify which partition \f$i\f$ is active.
       You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
-      When requesting output, you specify which partition j is active.
+      When requesting output, you specify which partition \f$j\f$ is active.
       You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
 
       To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
@@ -63,11 +63,11 @@ namespace casadi{
       \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
       \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
 
-      Some quantities is these formulas must be transposed: \n
+      Some quantities in these formulas must be transposed: \n
       input  col: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
       output col: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
 
-      NOTE: Function's are allowed to modify their input arguments when evaluating:
+      NOTE: Functions are allowed to modify their input arguments when evaluating:
             implicitFunction, IDAS solver
       Futher releases may disallow this.
 
@@ -344,7 +344,7 @@ namespace casadi{
      */
     Function derivative(int nfwd, int nadj);
 
-    /** Set a function that calculates nfwd forward dedrivatives and nadj adjoint derivatives
+    /** Set a function that calculates nfwd forward derivatives and nadj adjoint derivatives
      NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
     void setDerivative(const Function& fcn, int nfwd, int nadj);
 
@@ -413,7 +413,7 @@ namespace casadi{
     std::vector<SX> symbolicInputSX() const;
 
     /// \cond INTERNAL
-    /** \brief Is the class able to propate seeds through the algorithm?
+    /** \brief Is the class able to propagate seeds through the algorithm?
      * (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);
 

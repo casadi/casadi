@@ -63,7 +63,7 @@ namespace casadi{
      * directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
-    /// Is the class able to propate seeds through the algorithm?
+    /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
 
     /// Solve the system of equations and calculate derivatives

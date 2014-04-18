@@ -28,7 +28,7 @@
  *  generated files is not recommended and subject to change.
  *
  *  We show three ways of calling generated code. First from C with the signature
- *  of the generated file known, secondly from C with the signature unknwon
+ *  of the generated file known, secondly from C with the signature unknown
  *  and thirdly from C++ using the CasADi function ExternalFunction.
  *
  *  Joel Andersson, K.U. Leuven 2013
