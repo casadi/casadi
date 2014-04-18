@@ -68,7 +68,9 @@ namespace casadi{
     /** \brief  Initialize */
     virtual void init();
 
-    /// Generate a function that calculates \a nfwd forward derivatives and \a nadj adjoint derivatives
+    /** \brief Generate a function that calculates \a nfwd forward derivatives
+     and \a nadj adjoint derivatives
+     */
     virtual Function getDerivative(int nfwd, int nadj)=0;
 
     /// List of sparsities of A_i

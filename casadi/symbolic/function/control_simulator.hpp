@@ -32,7 +32,7 @@ namespace casadi{
     /// Global physical time. (1-by-1) [t]
     CONTROL_DAE_T,
     /// State vector (dimension nx-by-1).
-    /// Should have the same amount of 
+    /// Should have the same amount of
     /// non-zeros as DAEOutput:DAE_RES [x]
     CONTROL_DAE_X,
     /// Algebraic state vector (dimension np-by-1). [z]
