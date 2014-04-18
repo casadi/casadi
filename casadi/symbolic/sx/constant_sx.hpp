@@ -120,11 +120,11 @@ class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX{
       }
     }
 
-    //@{
+    ///@{
     /** \brief  Get the value */
     virtual double getValue() const{ return value;}
     virtual int getIntValue() const{ return static_cast<int>(value);}
-    //@}
+    ///@}
 
     virtual bool isAlmostZero(double tol) const{ return fabs(value)<=tol; }
 
@@ -176,11 +176,11 @@ class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX{
       }
     }
 
-    //@{
+    ///@{
     /** \brief  evaluate function */
     virtual double getValue() const{  return value; }
     virtual int getIntValue() const{  return value; }
-    //@}
+    ///@}
 
     /** \brief  Properties */
     virtual bool isInteger() const{ return true; }
@@ -205,18 +205,18 @@ public:
   virtual ~ZeroSX(){}
   explicit ZeroSX(){}
 
-  //@{
+  ///@{
   /** \brief  Get the value */
   virtual double getValue() const{ return 0;}
   virtual int getIntValue() const{ return 0;}
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /** \brief  Properties */
   virtual bool isInteger() const{ return true; }
   virtual bool isZero() const{ return true; }
   virtual bool isAlmostZero(double tol) const{ return true; }
-  //@}
+  ///@}
 };
 
 
@@ -251,17 +251,17 @@ public:
   explicit MinusOneSX(){}
   virtual ~MinusOneSX(){}
 
-  //@{
+  ///@{
   /** \brief  Get the value */
   virtual double getValue() const{ return -1;}
   virtual int getIntValue() const{ return -1;}
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /** \brief  Properties */
   virtual bool isInteger() const{ return true; }
   virtual bool isMinusOne() const{ return true; }
-  //@}
+  ///@}
 
 };
 

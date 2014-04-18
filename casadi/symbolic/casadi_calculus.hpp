@@ -156,7 +156,7 @@ namespace casadi{
 #pragma warning (disable:4800)
 #endif
 
-  //@{
+  ///@{
   /** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
   template<class T> T sqrt(const T &x){return x.sqrt();}
   using std::sqrt;
@@ -237,9 +237,9 @@ namespace casadi{
   template<class T> T atan2(double   x, const T &n){ return T(x).arctan2(n);}
   using std::atan2;
 
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /** \brief  C99 elementary functions from the math.h header */
   template<class T> T erf(const T &x){return x.erf();}
 #ifdef HAS_ERF
@@ -271,9 +271,9 @@ namespace casadi{
 
   inline int isnan(double x) throw(){ return x!=x;}
   inline int isinf(double x) throw(){ return isnan(x-x);}
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /** \brief  CasADi additions */
   template<class T> T constpow(const T &x, const T &n){ return x.constpow(n);}
   template<class T> T printme(const T &x, const T &y){ return x.printme(y);}
@@ -340,7 +340,7 @@ namespace casadi{
     }
   }
 #endif // HAS_ERFINV
-  //@}
+  ///@}
 
   template<typename T>
   T twice(const T& x){
@@ -472,7 +472,7 @@ namespace casadi{
     }
   };
 
-  //@{
+  ///@{
   /// Smoothness (by default true)
   template<int I> struct SmoothChecker{ static const bool check=true;};
   template<>      struct SmoothChecker<OP_LT>{ static const bool check=false;};
@@ -487,9 +487,9 @@ namespace casadi{
   template<>      struct SmoothChecker<OP_AND>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_OR>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_IF_ELSE_ZERO>{ static const bool check=false;};
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /// If evaluated with the first argument zero, is the result zero?
   template<int I> struct F0XChecker{ static const bool check=false;};
   template<>      struct F0XChecker<OP_ASSIGN>{ static const bool check=true;};
@@ -518,17 +518,17 @@ namespace casadi{
   template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_AND>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /// If evaluated with the second argument zero, is the result zero?
   template<int I> struct Function0Checker{ static const bool check=false;};
   template<>      struct Function0Checker<OP_MUL>{ static const bool check=true;};
   template<>      struct Function0Checker<OP_AND>{ static const bool check=true;};
   template<>      struct Function0Checker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /// If evaluated with both arguments zero, is the result zero?
   template<int I> struct F00Checker{ static const bool check=F0XChecker<I>::check;};
   template<>      struct F00Checker<OP_ADD>{ static const bool check=true;};
@@ -538,9 +538,9 @@ namespace casadi{
   template<>      struct F00Checker<OP_AND>{ static const bool check=true;};
   template<>      struct F00Checker<OP_OR>{ static const bool check=true;};
   template<>      struct F00Checker<OP_COPYSIGN>{ static const bool check=true;};
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /// Is commutative
   template<int I> struct CommChecker{ static const bool check=false;};
   template<>      struct CommChecker<OP_ADD>{ static const bool check=true;};
@@ -549,9 +549,9 @@ namespace casadi{
   template<>      struct CommChecker<OP_NE>{ static const bool check=true;};
   template<>      struct CommChecker<OP_AND>{ static const bool check=true;};
   template<>      struct CommChecker<OP_OR>{ static const bool check=true;};
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /// Always non-negative (false by default)
   template<int I> struct NonnegativeChecker{ static const bool check=false;};
   template<>      struct NonnegativeChecker<OP_SQRT>{ static const bool check=true;};
@@ -564,9 +564,9 @@ namespace casadi{
   template<>      struct NonnegativeChecker<OP_NOT>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_AND>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_OR>{ static const bool check=true;};
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /// Is the operation binary as opposed to unary
   template<int I> struct BinaryChecker{ static const bool check=false;};
   template<>      struct BinaryChecker<OP_ADD>{ static const bool check=true;};
@@ -585,7 +585,7 @@ namespace casadi{
   template<>      struct BinaryChecker<OP_ATAN2>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_COPYSIGN>{ static const bool check=true;};
-  //@}
+  ///@}
 
   /// Simple assignment
   template<>

@@ -103,11 +103,11 @@ public:
   /// stopping criterion for the stepsize
   double tol_pr_step_;
 
-  /// stopping criterion for the lagrangian gradient
+  /// stopping criterion for the Lagrangian gradient
   double tol_gl_;
 
   /// Linesearch parameters
-  //@{
+  ///@{
   double c1_;
   double beta_;
   int max_iter_ls_;
@@ -115,7 +115,7 @@ public:
   int merit_memsize_;
   double merit_start_;
   int merit_ind_;
-  //@}
+  ///@}
 
   /// Enable Code generation
   bool codegen_;

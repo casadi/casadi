@@ -63,7 +63,7 @@ namespace casadi{
      * directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
-    /// Is the class able to propate seeds through the algorithm?
+    /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
 
     /// Solve the system of equations and calculate derivatives
@@ -74,11 +74,11 @@ namespace casadi{
 
     // The following functions are called internally from EvaluateMX.
     // For documentation, see the MXNode class
-    //@{
+    ///@{
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed,
                             MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens,
                             bool output_given);
-    //@}
+    ///@}
 
     /// Number of equations
     int n_;

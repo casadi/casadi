@@ -64,7 +64,7 @@ namespace casadi{
 
     /// \cond CLUTTER
     /** \brief Default constructor (not-a-number)
-        Object is initialised as not-a-number.
+        Object is initialized as not-a-number.
     */
     SXElement();
     /// \endcond
@@ -86,7 +86,7 @@ namespace casadi{
 #ifndef SWIG
 
     /// \cond INTERNAL
-    /// Create an expression from a node: extra dummy argument to avoid ambigousity for 0/NULL
+    /// Create an expression from a node: extra dummy argument to avoid ambiguity for 0/NULL
     SXElement(SXNode* node, bool dummy);
     /// \endcond
 
@@ -149,7 +149,7 @@ namespace casadi{
     bool isInteger() const;
     bool isSymbolic() const;
     bool hasDep() const;
-    /** \brief Check wether a binary SXElement is commutative*/
+    /** \brief Check whether a binary SXElement is commutative*/
     bool isCommutative() const;
     bool isZero() const;
     bool isAlmostZero(double tol) const;
@@ -217,7 +217,7 @@ namespace casadi{
     SXElement trans() const{ return *this;}
 
     /// The following functions serves two purposes:
-    // Numpy compatibility and to allow unambigous access
+    // Numpy compatibility and to allow unambiguous access
     SXElement mul(const SXElement& y) const{ return __mul__(y);}
     SXElement exp() const;
     SXElement log() const;

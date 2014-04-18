@@ -34,7 +34,7 @@ namespace casadi{
   /**
      \brief Sequential Quadratic Programming method.
 
-     The algorithm is a classical SQP method with either exact (may be also provided) or
+     The algorithm is a classical SQP method with either exact (may also be provided) or
      damped BFGS Lagrange Hessian approximation.
      Two different line-search algorithms are available.
      First, Armijo (Wolfe) condition with backtracking (suffers from Maratos effect).

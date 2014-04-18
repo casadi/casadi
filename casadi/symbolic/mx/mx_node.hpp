@@ -33,7 +33,7 @@
 
 namespace casadi{
   /// \cond INTERNAL
-  //@{
+  ///@{
   /** \brief Convenience function, convert vectors to vectors of pointers */
   template<class T>
   std::vector<T*> ptrVec(std::vector<T>& v){
@@ -66,7 +66,7 @@ namespace casadi{
       ret[i] = ptrVec(v[i]);
     return ret;
   }
-  //@}
+  ///@}
 
 
   /** \brief Node class for MX objects
@@ -295,7 +295,7 @@ namespace casadi{
 
     /** \brief Matrix multiplication
     *
-    *  The optinal argument sp_z will be used as the sparsity pattern of the result
+    *  The optimal argument sp_z will be used as the sparsity pattern of the result
     */
     virtual MX getMultiplication(const MX& y, const Sparsity& sp_z=Sparsity()) const;
 
@@ -347,7 +347,7 @@ namespace casadi{
     /// Frobenius norm
     virtual MX getNormF() const;
 
-    /// Spectran norm
+    /// Spectral norm
     virtual MX getNorm2() const;
 
     /// Infinity norm
@@ -360,7 +360,7 @@ namespace casadi{
     MX getAssertion(const MX& y, const std::string & fail_message="") const;
 
     /** Temporary variables to be used in user algorithms like sorting,
-        the user is resposible of making sure that use is thread-safe
+        the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero
     */
     int temp;

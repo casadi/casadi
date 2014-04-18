@@ -119,7 +119,7 @@ class CASADI_SYMBOLIC_EXPORT GenericExpression{
     /** @name Operations from the left
      *  For Python
      */
-    //@{
+    ///@{
     inline ExType __radd__(const ExType& y) const
     { return y.__add__(static_cast<const ExType&>(*this));}
     inline ExType __rsub__(const ExType& y) const
@@ -142,7 +142,7 @@ class CASADI_SYMBOLIC_EXPORT GenericExpression{
     { return y.__ne__(static_cast<const ExType&>(*this));}
     inline ExType __rtruediv__(const ExType& y) const
     { return y.__truediv__(static_cast<const ExType&>(*this));}
-    //@}
+    ///@}
     /// \endcond
 
 };

@@ -262,7 +262,7 @@ protected:
     std::vector<std::string> enum_descr= std::vector<std::string>());
   /** \brief Add an option
   *
-  *  allowed_vals can taken multiple forms:
+  *  allowed_vals can take multiple forms:
   *    "foo|bar"   ->   specifies that the values "foo" and "bar" are allowed
   *    "foo:5|bar:6" -> specifies that the values "foo" and "bar" are allowed and map
   *                     to 5 and 6 respectively

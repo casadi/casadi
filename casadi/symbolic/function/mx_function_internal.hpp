@@ -83,7 +83,7 @@ namespace casadi{
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
 
-    /** \brief  An elemenent of the algorithm, namely an MX node */
+    /** \brief  An element of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
 
     /** \brief  All the runtime elements in the order of evaluation */
@@ -137,7 +137,7 @@ namespace casadi{
     /// Propagate a sparsity pattern through the algorithm
     virtual void spEvaluate(bool fwd);
 
-    /// Is the class able to propate seeds through the algorithm?
+    /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
 
     /// Reset the sparsity propagation

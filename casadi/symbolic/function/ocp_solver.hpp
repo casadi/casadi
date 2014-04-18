@@ -45,7 +45,7 @@ enum MayerInput{
 /// Input arguments of an OCP Solver \n [ocpIn]
 ///   ns: Number of shooting nodes: from option number_of_grid_points\n
 ///   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
-///   nc: Number of constants duting intergation: ffcn.input(INTEGRATOR_P).size()
+///   nc: Number of constants during integration: ffcn.input(INTEGRATOR_P).size()
 ///   nu: Number of controls: from nc - np \n
 ///   np: Number of parameters: from option number_of_parameters\n
 ///   nh: Number of point constraints: from cfcn.input(0).size()

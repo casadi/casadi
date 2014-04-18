@@ -344,7 +344,7 @@ std::string QPOasesInternal::getErrorMessage(int flag){
     case qpOASES::RET_QPOBJECT_NOT_SETUP:
         return "The QP object has not been setup correctly, use another constructor.";
     case qpOASES::RET_QP_ALREADY_INITIALISED:
-        return "QProblem has already been initialised.";
+        return "QProblem has already been initialized.";
     case qpOASES::RET_NO_INIT_WITH_STANDARD_SOLVER:
         return "Initialisation via extern QP solver is not yet implemented.";
     case qpOASES::RET_RESET_FAILED:
@@ -368,7 +368,7 @@ std::string QPOasesInternal::getErrorMessage(int flag){
     case qpOASES::RET_SETUP_WORKINGSET_FAILED:
         return "Failed to setup working set for auxiliary QP.";
     case qpOASES::RET_SETUP_AUXILIARYQP_FAILED:
-        return "Failed to setup auxiliary QP for initialised homotopy.";
+        return "Failed to setup auxiliary QP for initialized homotopy.";
     case qpOASES::RET_NO_EXTERN_SOLVER:
         return "No extern QP solver available.";
     case qpOASES::RET_QP_UNBOUNDED:
@@ -489,7 +489,7 @@ std::string QPOasesInternal::getErrorMessage(int flag){
     case qpOASES::RET_PRINT_ITERATION_FAILED:
         return "Unable to print information on current iteration.";
     case qpOASES::RET_NO_GLOBAL_MESSAGE_OUTPUTFILE:
-        return "No global message output file initialised.";
+        return "No global message output file initialized.";
     case qpOASES::RET_DISABLECONSTRAINTS_FAILED:
         return "Unable to disbable constraints.";
     case qpOASES::RET_ENABLECONSTRAINTS_FAILED:

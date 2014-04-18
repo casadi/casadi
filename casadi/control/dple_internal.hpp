@@ -34,7 +34,7 @@ namespace casadi{
   /** \brief Internal storage for DpleSolver related data
 
       @copydoc DPLE_doc
-     \author Joris gillis
+     \author Joris Gillis
       \date 2014
   */
   class CASADI_CONTROL_EXPORT DpleInternal : public FunctionInternal{
@@ -68,7 +68,9 @@ namespace casadi{
     /** \brief  Initialize */
     virtual void init();
 
-    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    /** \brief Generate a function that calculates \a nfwd forward derivatives
+     and \a nadj adjoint derivatives
+     */
     virtual Function getDerivative(int nfwd, int nadj)=0;
 
     /// List of sparsities of A_i
@@ -89,7 +91,7 @@ namespace casadi{
     /// Throw an error when system is unstable
     bool error_unstable_;
 
-    /// Margin for unstability detection
+    /// Margin for instability detection
     double eps_unstable_;
 
     /// Number of forward derivatives

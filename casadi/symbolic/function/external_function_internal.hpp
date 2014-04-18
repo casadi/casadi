@@ -59,12 +59,12 @@ class CASADI_SYMBOLIC_EXPORT ExternalFunctionInternal : public FunctionInternal{
 
   protected:
 
-//@{
+///@{
 /** \brief  Function pointer types */
   typedef int (*evaluatePtr)(const double** x, double** r);
   typedef int (*initPtr)(int *n_in_, int *n_out_);
   typedef int (*getSparsityPtr)(int n_in, int *n_row, int *n_col, int **colind, int **row);
-//@}
+///@}
 
   /** \brief  Name of binary */
   std::string bin_name_;

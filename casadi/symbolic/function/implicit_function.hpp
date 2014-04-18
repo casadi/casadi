@@ -37,7 +37,7 @@ namespace casadi{
 
       F(z, x1, x2, ..., xn) == 0
 
-      where d_F/dz is invertable, implicitly defines the equation:
+      where d_F/dz is invertible, implicitly defines the equation:
 
       z := G(x1, x2, ..., xn)
 

@@ -113,7 +113,7 @@ namespace casadi{
   *  lookupvector[i]!=-1     <=>  v contains i
   *  v[lookupvector[i]] == i <=>  v contains i
   *
-  *  Duplicates are treated by looking up last occurence
+  *  Duplicates are treated by looking up last occurrence
   */
   CASADI_SYMBOLIC_EXPORT std::vector<int> lookupvector(const std::vector<int> &v, int size);
 
@@ -729,7 +729,7 @@ namespace casadi{
 #define VTT_INST(T,function_name) \
 %template(function_name) casadi::function_name<T>;
 
-// Define template instanciations
+// Define template instantiations
 #define VECTOR_TOOLS_TEMPLATES(T) \
 VTT_INST(T,isIncreasing) \
 VTT_INST(T,isDecreasing) \

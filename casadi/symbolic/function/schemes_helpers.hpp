@@ -40,7 +40,7 @@ class CASADI_SYMBOLIC_EXPORT DPLEInputIOSchemeVector : public IOSchemeVector<M> 
       : IOSchemeVector<M>(t,SCHEME_DPLEInput){}
 };
 /// \endcond
-/// Input arguments of a dple solver
+/// Input arguments of a \e dple solver
 ///
 /// \copydoc scheme_DPLEInput
 template<class M>
@@ -84,7 +84,7 @@ class CASADI_SYMBOLIC_EXPORT DPLEOutputIOSchemeVector : public IOSchemeVector<M>
       : IOSchemeVector<M>(t,SCHEME_DPLEOutput){}
 };
 /// \endcond
-/// Output arguments of a dple solver
+/// Output arguments of a \e dple solver
 ///
 /// \copydoc scheme_DPLEOutput
 template<class M>
@@ -1417,7 +1417,7 @@ class CASADI_SYMBOLIC_EXPORT OCPInputIOSchemeVector : public IOSchemeVector<M> {
 /// Input arguments of an OCP Solver \n
 /// ns: Number of shooting nodes: from option number_of_grid_points\n
 /// nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
-/// nc: Number of constants duting intergation: ffcn.input(INTEGRATOR_P).size()
+/// nc: Number of constants during integration: ffcn.input(INTEGRATOR_P).size()
 /// nu: Number of controls: from nc - np \n
 /// np: Number of parameters: from option number_of_parameters\n
 /// nh: Number of point constraints: from cfcn.input(0).size()

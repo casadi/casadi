@@ -23,7 +23,7 @@
 #ifndef CASADI_HPP
 #define CASADI_HPP
 
-// Scalar expressions (why do i need to put it up here?)
+// Scalar expressions (why do I need to put it up here?)
 #include "sx/sx_element.hpp"
 
 // Generic tools

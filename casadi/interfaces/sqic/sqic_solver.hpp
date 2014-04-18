@@ -35,7 +35,7 @@ class SQICInternal;
   /**  \brief Interface to the SQIC solver for quadratic programming
 
      @copydoc QPSolver_doc
-       \author Joris gillis
+       \author Joris Gillis
       \date 2013
 
   */

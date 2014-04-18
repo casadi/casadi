@@ -33,7 +33,7 @@
 
 namespace casadi{
 
-/** \brief  An elemenent of the algorithm, namely an MX node */
+/** \brief  An element of the algorithm, namely an MX node */
 struct MXAlgEl{
   /// Operator index
   int op;
@@ -141,7 +141,7 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  //@{
+  ///@{
   /** \brief Jacobian via source code transformation */
   MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
   MX jac(const std::string & iname, int oind=0, bool compact=false, bool symmetric=false)
@@ -151,25 +151,25 @@ public:
   MX jac(const std::string & iname, const std::string & oname,
          bool compact=false, bool symmetric=false)
   { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /** \brief Gradient via source code transformation */
   MX grad(int iind=0, int oind=0);
   MX grad(const std::string & iname, int oind=0) { return grad(inputSchemeEntry(iname),oind); }
   MX grad(int iind, const std::string & oname) { return grad(iind,outputSchemeEntry(oname)); }
   MX grad(const std::string & iname, const std::string & oname)
   { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
-  //@}
+  ///@}
 
-  //@{
+  ///@{
   /** \brief Tangent via source code transformation */
   MX tang(int iind=0, int oind=0);
   MX tang(const std::string & iname, int oind=0) { return tang(inputSchemeEntry(iname),oind); }
   MX tang(int iind, const std::string & oname) { return tang(iind,outputSchemeEntry(oname)); }
   MX tang(const std::string & iname, const std::string & oname)
   { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
-  //@}
+  ///@}
 
   /** \brief Expand the matrix valued graph into a scalar valued graph */
   SXFunction expand(const std::vector<SX>& inputv = std::vector<SX>());

@@ -33,7 +33,7 @@
 
 namespace casadi{
 
-  //@{
+  ///@{
   /** \brief Obtain collocation points of specific order and scheme
   \param scheme  'radau' or 'legendre'
   **/
@@ -43,7 +43,7 @@ namespace casadi{
   CASADI_INTEGRATION_EXPORT
     std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
 #endif // SWIG
-  //@}
+  ///@}
 
   /** \brief Obtain collocation interpolating matrices
   \param tau_root  location of collocation points, as obtained from collocationPoints
@@ -103,7 +103,7 @@ extern const long double** collocation_points[2];
   * \copydoc scheme_DAEOutput
   * \param tf    Integration end time
   * \param order Order of integration
-  * \param ne    Number of times the RK primitive is repeated over the integration interval
+  * \param ne    Number of times the \e RK primitive is repeated over the integration interval
   */
   CASADI_INTEGRATION_EXPORT Function explicitRK(Function& f, const MX &tf=1,
                                                 int order=4, int ne = 1);
@@ -115,7 +115,7 @@ extern const long double** collocation_points[2];
   * \param tf    Integration end time
   * \param order Order of integration
   * \param scheme Collocation scheme, as excepted by collocationPoints function.
-  * \param ne    Number of times the RK primitive is repeated over the integration interval
+  * \param ne    Number of times the \e RK primitive is repeated over the integration interval
   */
   CASADI_INTEGRATION_EXPORT
     Function implicitRK(Function& f, implicitFunctionCreator impl,

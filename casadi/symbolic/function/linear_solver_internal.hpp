@@ -77,11 +77,11 @@ namespace casadi{
     void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                               std::vector<double>& rtmp, bool fwd, bool transpose);
 
-    //@{
+    ///@{
     // Propagate sparsity through a linear solve
     void spSolve(bvec_t* X, const bvec_t* B, bool transpose) const;
     void spSolve(DMatrix& X, const DMatrix& B, bool transpose) const;
-    //@}
+    ///@}
 
     // Dulmage-Mendelsohn decomposition
     std::vector<int> rowperm_, colperm_, rowblock_, colblock_;

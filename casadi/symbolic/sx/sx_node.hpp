@@ -35,7 +35,7 @@
 /// \cond INTERNAL
 namespace casadi{
 
-  /** \brief  Interal node class for SX
+  /** \brief  Internal node class for SX
       \author Joel Andersson
       \date 2010
   */
@@ -51,7 +51,7 @@ namespace casadi{
     /** \brief  destructor  */
     virtual ~SXNode();
 
-    //@{
+    ///@{
     /** \brief  check properties of a node */
     virtual bool isConstant() const; // check if constant
     virtual bool isInteger() const; // check if integer
@@ -64,13 +64,13 @@ namespace casadi{
     virtual bool isNan() const; // check if not a number
     virtual bool isInf() const; // check if infinity
     virtual bool isMinusInf() const; // check if minus infinity
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief  Get value of a constant node */
     virtual double getValue() const;  // only works for constant nodes
     virtual int getIntValue() const;  // only works for integer nodes
-    //@}
+    ///@}
 
     virtual const std::string& getName() const; // get the name
 
@@ -114,7 +114,7 @@ namespace casadi{
     static int eq_depth_;
 
     /** Temporary variables to be used in user algorithms like sorting,
-        the user is resposible of making sure that use is thread-safe
+        the user is responsible of making sure that use is thread-safe
         The variable is initialized to zero
     */
     int temp;

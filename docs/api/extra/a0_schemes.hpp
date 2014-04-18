@@ -14,9 +14,9 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::QCQPSolverInput  (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QCQP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. .</td></tr>
+<tr><td>QCQP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
 <tr><td>QCQP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
-<tr><td>QCQP_SOLVER_P</td><td>p</td><td>The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. .</td></tr>
+<tr><td>QCQP_SOLVER_P</td><td>p</td><td>The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
 <tr><td>QCQP_SOLVER_Q</td><td>q</td><td>The vertical stack of all qi: dense, (nq n x 1) .</td></tr>
 <tr><td>QCQP_SOLVER_R</td><td>r</td><td>The vertical stack of all scalars ri (nq x 1) .</td></tr>
 <tr><td>QCQP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
@@ -184,7 +184,7 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::StabilizedQPSolverInput  (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>STABILIZED_QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. .</td></tr>
+<tr><td>STABILIZED_QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
 <tr><td>STABILIZED_QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
 <tr><td>STABILIZED_QP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
 <tr><td>STABILIZED_QP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
@@ -282,7 +282,7 @@
 <caption>Input scheme: casadi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 10) [controldaeIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>CONTROL_DAE_T</td><td>t</td><td>Global physical time. (1-by-1) .</td></tr>
-<tr><td>CONTROL_DAE_X</td><td>x</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES .</td></tr>
+<tr><td>CONTROL_DAE_X</td><td>x</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES </td></tr>
 <tr><td>CONTROL_DAE_Z</td><td>z</td><td>Algebraic state vector (dimension np-by-1). .</td></tr>
 <tr><td>CONTROL_DAE_P</td><td>p</td><td>Parameter vector (dimension np-by-1). .</td></tr>
 <tr><td>CONTROL_DAE_U</td><td>u</td><td>Control vector (dimension nu-by-1). .</td></tr>
@@ -318,7 +318,7 @@
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::QPSolverInput  (QP_SOLVER_NUM_IN = 10) [qpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. .</td></tr>
+<tr><td>QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
 <tr><td>QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
 <tr><td>QP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
 <tr><td>QP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
@@ -423,7 +423,7 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>HESSLAG_X</td><td>x</td><td>Decision variable .</td></tr>
 <tr><td>HESSLAG_P</td><td>p</td><td>Fixed parameter .</td></tr>
-<tr><td>HESSLAG_LAM_F</td><td>lam_f</td><td>Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. .</td></tr>
+<tr><td>HESSLAG_LAM_F</td><td>lam_f</td><td>Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. </td></tr>
 <tr><td>HESSLAG_LAM_G</td><td>lam_g</td><td>Multiplier for g .</td></tr>
 </table>
 */

@@ -84,7 +84,7 @@ namespace casadi{
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const = 0;
 
-    /// Matrix multiplcation
+    /// Matrix multiplication
     //    virtual MX getMultiplication(const MX& y) const;
 
     /// Inner product

@@ -1,5 +1,6 @@
 
 set(LINT_TARGETS)
+set(SPELL_TARGETS)
 
 macro(casadi_library name)
   if(ENABLE_STATIC)
@@ -30,6 +31,8 @@ macro(casadi_library name)
   )
   add_style_check_target(${name} "${ARGN}")
   set(LINT_TARGETS ${LINT_TARGETS} "lint_${name}" PARENT_SCOPE)
+  add_spell_check_target(${name} "${ARGN}")
+  set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
 endmacro()
 
 add_subdirectory(symbolic)  # needed by all except external_packages
@@ -44,6 +47,10 @@ add_subdirectory(control)
 # depend on the other lint targets
 add_custom_target(lint
   DEPENDS ${LINT_TARGETS}
+  VERBATIM)
+  
+add_custom_target(spell
+  DEPENDS ${SPELL_TARGETS}
   VERBATIM)
 
 
@@ -73,7 +80,7 @@ foreach(name ${CASADI_MODULES})
   endfunction()
   
   obtain_interface_link_libraries(${name} OUTPUT)
-  
+  message("${name} : ${OUTPUT}")
   set(PC_REQUIRES)
   set(PC_LIBRARIES)
   

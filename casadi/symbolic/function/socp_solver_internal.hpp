@@ -75,7 +75,7 @@ class CASADI_SYMBOLIC_EXPORT SOCPSolverInternal : public FunctionInternal{
     /// Number of linear constraints
     int nc_;
 
-    /// Indicates wether problem is printed before solving
+    /// Indicates whether problem is printed before solving
     bool print_problem_;
 };
 

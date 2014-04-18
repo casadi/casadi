@@ -39,15 +39,15 @@ namespace casadi{
     /// Constructor
     SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i,j)), mat_(mat), i_(i), j_(j){}
 
-    //@{
-    /// Methods that modify a part of the parent obejct (A(i,j) = ?, A(i,j) += ?, etc.)
+    ///@{
+    /// Methods that modify a part of the parent object (A(i,j) = ?, A(i,j) += ?, etc.)
     const M& operator=(const SubMatrix<M,I,J> &y);
     const M& operator=(const M &y);
     M operator+=(const M &y);
     M operator-=(const M &y);
     M operator*=(const M &y);
     M operator/=(const M &y);
-    //@}
+    ///@}
 
   private:
     /// A reference to the matrix that is allowed to be modified

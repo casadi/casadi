@@ -61,7 +61,7 @@ public:
   double min_step_size_;
 
   /// Linesearch parameters
-  //@{
+  ///@{
   double sigma_;
   double c1_;
   double beta_;
@@ -70,7 +70,7 @@ public:
   double sigmaMax_;
   double dvMax_;
   double alphaMin_;
-  //@}
+  ///@}
 
   /// Hessian regularization
   double reg_;
@@ -197,7 +197,7 @@ public:
                              const std::vector<double>& g,
                              const std::vector<double>& lbg, const std::vector<double>& ubg);
 
-  /// Calculates inner_prod(x,mul(A,x))
+  /// Calculates <tt>inner_prod(x,mul(A,x))</tt>
   static double quad_form(const std::vector<double>& x, const DMatrix& A);
 
   /// Calculate the merit function gradient

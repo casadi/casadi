@@ -40,7 +40,8 @@ namespace casadi{
    *
    * With optional sp_z you can specify the sparsity of the result
    * A typical use case might be where the product is only constructed to
-   * inspect the trace of it. sp_z diagonal will be more efficient then.
+   * inspect the trace of it. sp_z diagonal will be more efficient 
+   * in that case.
    */
   template<typename DataType>
   Matrix<DataType> mul(const Matrix<DataType> &x, const Matrix<DataType> &y,
@@ -344,7 +345,7 @@ namespace casadi{
   template<typename DataType>
   Matrix<DataType> repmat(const Matrix<DataType> &A, int n, int m);
 
-  /** \brief  Evaluate a polynomial with coefficeints p in x */
+  /** \brief  Evaluate a polynomial with coefficients p in x */
   template<typename DataType>
   Matrix<DataType> polyval(const Matrix<DataType>& p, const Matrix<DataType>& x);
 
@@ -1212,7 +1213,7 @@ namespace casadi{
 #define MTT_INST(DataType,function_name)                       \
   %template(function_name) casadi::function_name <DataType >;
 
-// Define template instanciations
+// Define template instantiations
 #define MATRIX_TOOLS_TEMPLATES_COMMON(DataType)        \
   MTT_INST(DataType,transpose)                         \
   MTT_INST(DataType,mul)                               \

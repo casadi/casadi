@@ -247,7 +247,7 @@ namespace casadi{
    */
   CASADI_SYMBOLIC_EXPORT std::vector<SXElement> getSymbols(const SX& e);
 
-  //@{
+  ///@{
   /** \brief Calculate jacobian via source code transformation
 
       Uses casadi::SXFunction::jac
@@ -258,10 +258,11 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT SX hessian(const SX &ex, const SX &arg);
   // hessian and gradient:
   CASADI_SYMBOLIC_EXPORT void hessian(const SX &ex, const SX &arg, SX &H, SX &g);
-  //@}
+  ///@}
 
   /** \brief Calculate the Jacobian and multiply by a vector from the left
-      This is equivalent to mul(jacobian(ex,arg),v) or mul(jacobian(ex,arg).T,v) for
+      This is equivalent to <tt>mul(jacobian(ex,arg),v)</tt> or
+      <tt>mul(jacobian(ex,arg).T,v)</tt> for
       transpose_jacobian set to false and true respectively. If contrast to these
       expressions, it will use directional derivatives which is typically (but
       not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
@@ -270,9 +271,9 @@ namespace casadi{
                                                 bool transpose_jacobian=false);
 
   /**
-   * \brief univariate taylor series expansion
+   * \brief univariate Taylor series expansion
    *
-   * Calculate the taylor expansion of expression 'ex' up to order 'order' with
+   * Calculate the Taylor expansion of expression 'ex' up to order 'order' with
    * respect to variable 'x' around the point 'a'
    *
    * \f$(x)=f(a)+f'(a)(x-a)+f''(a)\frac{(x-a)^2}{2!}+f'''(a)\frac{(x-a)^3}{3!}+\ldots\f$
@@ -287,17 +288,17 @@ namespace casadi{
                                    const SX& a=casadi_limits<SXElement>::zero,int order=1);
 
   /**
-   * \brief multivariate taylor series expansion
+   * \brief multivariate Taylor series expansion
    *
-   * Do taylor expansions until the aggregated order of a term is equal to 'order'.
+   * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
    * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
    *
    */
   CASADI_SYMBOLIC_EXPORT SX mtaylor(const SX& ex,const SX& x, const SX& a,int order=1);
   /**
-   * \brief multivariate taylor series expansion
+   * \brief multivariate Taylor series expansion
    *
-   * Do taylor expansions until the aggregated order of a term is equal to 'order'.
+   * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
    * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
    *
    * The argument order_contributions can denote how match each variable contributes
@@ -345,7 +346,7 @@ namespace casadi{
   /** \brief extracts polynomial coefficients from an expression
    *
    * \parameter ex Scalar expression that represents a polynomial
-   * \paramater x  Scalar symbol that th epolynomial is build up with
+   * \paramater x  Scalar symbol that the polynomial is build up with
    */
   CASADI_SYMBOLIC_EXPORT SX poly_coeff(const SX& ex, const SX&x);
 

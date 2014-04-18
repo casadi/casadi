@@ -459,7 +459,7 @@ namespace casadi{
     // Resize data and copy
     data_.resize(nrow*ncol,val);
 
-    // Loop over the colums in reverse order
+    // Loop over the columns in reverse order
     for(int cc=ncol-1; cc>=0; --cc){
       // Loop over nonzero elements of the column in reverse order
       for(int el=colind[cc+1]-1; el>=colind[cc]; --el){
@@ -1169,7 +1169,7 @@ namespace casadi{
     } else if(sp==SPARSESYM) {
       // NOTE: Has to be rewritten! sparsity().transpose(...) involves memory allocation
       // and is not threadsafe!!!
-      // This routines is supposed to be used inside threadsafe code.
+      // These routines is supposed to be used inside threadsafe code.
       std::vector<int> mapping;
       sparsity().transpose(mapping,false);
       // copy to the result vector

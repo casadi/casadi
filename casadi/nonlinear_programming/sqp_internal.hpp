@@ -61,13 +61,13 @@ public:
   double min_step_size_;
 
   /// Linesearch parameters
-  //@{
+  ///@{
   double sigma_;
   double c1_;
   double beta_;
   int max_iter_ls_;
   int merit_memsize_;
-  //@}
+  ///@}
 
   /// Hessian regularization
   double reg_;
@@ -164,10 +164,10 @@ public:
                              const std::vector<double>& g, const std::vector<double>& lbg,
                              const std::vector<double>& ubg);
 
-  /// Calculates inner_prod(x,mul(A,x))
+  /// Calculates <tt>inner_prod(x,mul(A,x))</tt>
   static double quad_form(const std::vector<double>& x, const DMatrix& A);
 
-  // Accummulated time since last reset:
+  // Accumulated time since last reset:
   double t_eval_f_; // time spent in eval_f
   double t_eval_grad_f_; // time spent in eval_grad_f
   double t_eval_g_; // time spent in eval_g
@@ -177,7 +177,7 @@ public:
   double t_callback_prepare_; // time spent in callback preparation
   double t_mainloop_; // time spent in the main loop of the solver
 
-  // Accummulated counts since last reset:
+  // Accumulated counts since last reset:
   int n_eval_f_; // number of calls to eval_f
   int n_eval_grad_f_; // number of calls to eval_grad_f
   int n_eval_g_; // number of calls to eval_g

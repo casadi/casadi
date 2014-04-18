@@ -50,7 +50,7 @@ namespace casadi{
 #define GET_INST(DataType,function_name) \
 %template(function_name) casadi::function_name< DataType >;
 
-// Define template instanciations
+// Define template instantiations
 #define GENERIC_EXPRESSION_TOOLS_TEMPLATES(DataType) \
 GET_INST(DataType,logic_and) \
 GET_INST(DataType,logic_or) \

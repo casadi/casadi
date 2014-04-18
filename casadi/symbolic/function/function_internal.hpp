@@ -80,7 +80,7 @@ namespace casadi{
         forward or backward, using the sparsity patterns */
     virtual void spEvaluateViaJacSparsity(bool fwd);
 
-    /** \brief  Is the class able to propate seeds through the algorithm? */
+    /** \brief  Is the class able to propagate seeds through the algorithm? */
     virtual bool spCanEvaluate(bool fwd){ return false;}
 
     /** \brief  Reset the sparsity propagation */
@@ -142,46 +142,46 @@ namespace casadi{
               const SXVectorVector& aseed, SXVectorVector& asens,
               bool always_inline, bool never_inline);
 
-    //@{
+    ///@{
     /** \brief Return Hessian function */
     Function hessian(int iind, int oind);
     virtual Function getHessian(int iind, int oind);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief Return gradient function */
     Function gradient(int iind, int oind);
     virtual Function getGradient(int iind, int oind);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief Return tangent function */
     Function tangent(int iind, int oind);
     virtual Function getTangent(int iind, int oind);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief Return Jacobian function */
     Function jacobian(int iind, int oind, bool compact, bool symmetric);
     void setJacobian(const Function& jac, int iind, int oind, bool compact);
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
     virtual Function getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief Return Jacobian of all input elements with respect to all output elements */
     Function fullJacobian();
     virtual Function getFullJacobian();
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief Return function that calculates forward derivatives
      *    This method returns a cached instance if available,
      *    and calls Function getDerivative(int nfwd, int nadj) if no cached version is available.
      */
     Function derivative(int nfwd, int nadj);
 
-    /** Set a function that calculates nfwd forward dedrivatives and nadj adjoint derivatives */
+    /** Set a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
     void setDerivative(const Function& fcn, int nfwd, int nadj);
 
     /** \brief Constructs and returns a function that calculates forward derivatives */
@@ -191,7 +191,7 @@ namespace casadi{
      *  by creating the Jacobian then multiplying */
     virtual Function getDerivativeViaJac(int nfwd, int nadj);
 
-    //@}
+    ///@}
 
 
     /** \brief Create a helper MXFunction with some properties copied
@@ -292,30 +292,30 @@ namespace casadi{
     static void assignIgnore(MX& y, const MX& x, const std::vector<int>& nz);
     static void assignIgnore(SX& y, const SX& x, const std::vector<int>& nz);
 
-    //@{
+    ///@{
     /** \brief Access input/output scheme */
     inline const IOScheme& inputScheme() const{ return input_.scheme;}
     inline const IOScheme& outputScheme() const{ return output_.scheme;}
     inline IOScheme& inputScheme(){ return input_.scheme;}
     inline IOScheme& outputScheme(){ return output_.scheme;}
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Input/output structures of the function */
     inline const IOSchemeVector<DMatrix>& input_struct() const{ return input_;}
     inline const IOSchemeVector<DMatrix>& output_struct() const{ return output_;}
     inline IOSchemeVector<DMatrix>& input_struct(){ return input_;}
     inline IOSchemeVector<DMatrix>& output_struct(){ return output_;}
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Input/output access without checking (faster, but unsafe)
     inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind);}
     inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind);}
 
     inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind);}
     inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind);}
-    //@}
+    ///@}
 
     /** \brief  Log the status of the solver */
     void log(const std::string& msg) const;
@@ -329,7 +329,7 @@ namespace casadi{
 
     // The following functions are called internally from EvaluateMX.
     // For documentation, see the MXNode class
-    //@{
+    ///@{
     virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res,
                            std::vector<int>& itmp, std::vector<double>& rtmp);
     virtual void evaluateSX(MXNode* node, const SXPtrV& arg, SXPtrV& res,
@@ -345,7 +345,7 @@ namespace casadi{
                                    const std::vector<std::string>& arg,
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
     virtual void printPart(const MXNode* node, std::ostream &stream, int part) const;
-    //@}
+    ///@}
 
     /** \brief Prints out a human readable report about possible constraint violations
     *          - specific constraints
@@ -380,7 +380,7 @@ namespace casadi{
     /** \brief  Dictionary of statistics (resulting from evaluate) */
     Dictionary stats_;
 
-    /** \brief  Flag to indicate wether statistics must be gathered */
+    /** \brief  Flag to indicate whether statistics must be gathered */
     bool gather_stats_;
 
     /// Cache for functions to evaluate directional derivatives

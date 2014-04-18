@@ -67,7 +67,7 @@ namespace casadi{
   template<typename MatType>
   MatType tril(const GenericMatrix<MatType> &a);
 
-  /** \brief Check if two expressions are equal, assuming that they are comparible */
+  /** \brief Check if two expressions are equal, assuming that they are comparable */
   template<typename MatType>
   bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y){
     return static_cast<const MatType&>(x).isEqual(static_cast<const MatType&>(y));
@@ -177,7 +177,7 @@ namespace casadi{
 #define GMTT_INST(MatType,function_name) \
 %template(function_name) casadi::function_name< MatType >;
 
-// Define template instanciations
+// Define template instantiations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType) \
 GMTT_INST(MatType,cross) \
 GMTT_INST(MatType,tril2symm) \
@@ -186,7 +186,7 @@ GMTT_INST(MatType,triu) \
 GMTT_INST(MatType,tril) \
 GMTT_INST(MatType,isEqual)
 
-// Define template instanciations
+// Define template instantiations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(MatType) \
 GMTT_INST(MatType,linspace)
 

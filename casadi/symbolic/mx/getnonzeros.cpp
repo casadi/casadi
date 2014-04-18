@@ -112,7 +112,7 @@ namespace casadi{
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
 
-    // Propate sparsity
+    // Propagate sparsity
     if(fwd){
       for(vector<int>::const_iterator k=nz_.begin(); k!=nz_.end(); ++k){
         *outputd++ = *k>=0 ? inputd[*k] : 0;
@@ -130,7 +130,7 @@ namespace casadi{
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
 
-    // Propate sparsity
+    // Propagate sparsity
     if(fwd){
       for(int k=s_.start_; k!=s_.stop_; k+=s_.step_){
         *outputd++ = inputd[k];
@@ -148,7 +148,7 @@ namespace casadi{
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd = get_bvec_t(input[0]->data());
 
-    // Propate sparsity
+    // Propagate sparsity
     if(fwd){
       for(int k1=outer_.start_; k1!=outer_.stop_; k1+=outer_.step_){
         for(int k2=k1+inner_.start_; k2!=k1+inner_.stop_; k2+=inner_.step_){

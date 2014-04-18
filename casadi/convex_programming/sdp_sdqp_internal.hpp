@@ -61,7 +61,7 @@ namespace casadi{
     /// Underlying SDP solver
     SDPSolver sdpsolver_;
 
-    /// Cholseky Decomposition
+    /// Cholesky Decomposition
     CSparseCholesky cholesky_;
 
     /// Mapping

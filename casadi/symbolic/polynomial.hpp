@@ -80,7 +80,7 @@ namespace casadi{
     void trim();
 
 #ifndef SWIG
-    /// Print a destription of the object
+    /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
     /// Print a representation of the object

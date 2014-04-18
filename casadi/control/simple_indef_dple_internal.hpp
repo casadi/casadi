@@ -32,7 +32,7 @@ namespace casadi{
   /** \brief Internal storage for DpleSolver related data
 
       @copydoc DPLE_doc
-     \author Joris gillis
+     \author Joris Gillis
       \date 2014
   */
   class CASADI_CONTROL_EXPORT SimpleIndefDpleInternal : public DpleInternal{
@@ -66,7 +66,9 @@ namespace casadi{
     /** \brief  Initialize */
     virtual void init();
 
-    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    /** \brief Generate a function that calculates \a nfwd forward derivatives
+     and \a nadj adjoint derivatives
+    */
     virtual Function getDerivative(int nfwd, int nadj);
 
   private:

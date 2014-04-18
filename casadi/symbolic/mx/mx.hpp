@@ -59,12 +59,12 @@ namespace casadi{
     /** \brief  Default constructor */
     MX();
 
-    //@{
+    ///@{
     /** \brief Construct constant matrix with a given sparsity */
     MX(const Sparsity& sp, int val=0);
     MX(const Sparsity& sp, double val);
     MX(const Sparsity& sp, const MX& val);
-    //@}
+    ///@}
 
     /** \brief  Create scalar constant (also implicit type conversion) */
     MX(double x);
@@ -104,7 +104,7 @@ namespace casadi{
     bool __nonzero__() const;
 
     /// \cond CLUTTER
-    //@{
+    ///@{
     /// Indexing for interfaced languages
 
     /// get a non-zero
@@ -214,7 +214,7 @@ namespace casadi{
     void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const MX& m){
       (*this)(rr,cc) = m;
     }
-    //@}
+    ///@}
 
     // set a vector element
     void indexed_one_based_assignment(int rr, const MX &m){
@@ -261,13 +261,13 @@ namespace casadi{
     MX operator-() const;
 
     /// \cond INTERNAL
-    //@{
+    ///@{
     /** \brief  Access a member of the node */
     MXNode* operator->();
 
     /** \brief  Const access a member of the node */
     const MXNode* operator->() const;
-    //@}
+    ///@}
     /// \endcond
 
     /** \brief Get the nth dependency as MX */
@@ -378,32 +378,32 @@ namespace casadi{
     void setTemp(int t);
     /// \endcond
 
-    //@{
+    ///@{
     /** \brief  Create nodes by their ID */
     static MX binary(int op, const MX &x, const MX &y);
     static MX unary(int op, const MX &x);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief  create a matrix with all inf */
     static MX inf(const Sparsity& sp);
     static MX inf(int nrow=1, int ncol=1);
     static MX inf(const std::pair<int,int>& rc);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief  create a matrix with all nan */
     static MX nan(const Sparsity& sp);
     static MX nan(int nrow=1, int ncol=1);
     static MX nan(const std::pair<int,int>& rc);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief  create a matrix by repeating an existing matrix */
     static MX repmat(const MX& x, const Sparsity& sp);
     static MX repmat(const MX& x, int nrow, int ncol=1);
     static MX repmat(const MX& x, const std::pair<int, int> &rc);
-    //@}
+    ///@}
 
     /** \brief  Identity matrix */
     static MX eye(int ncol);
@@ -562,7 +562,7 @@ namespace casadi{
 #ifndef SWIG
   private:
 
-    /// Create an expression from a node: extra dummy arguments to avoid ambigousity for 0/NULL
+    /// Create an expression from a node: extra dummy arguments to avoid ambiguity for 0/NULL
     MX(MXNode* node, bool dummy1, bool dummy2, bool dummy3, bool dummy4);
 
     // Maximum number of calls
@@ -578,7 +578,7 @@ namespace casadi{
   template<>
   MX GenericMatrix<MX>::sym(const std::string& name, const Sparsity& sp);
 
-  //@{
+  ///@{
   /// Some typedefs
   typedef std::vector<MX> MXVector;
   typedef std::vector< std::vector<MX> > MXVectorVector;
@@ -587,7 +587,7 @@ namespace casadi{
   typedef std::vector<MXPtr> MXPtrV;
   typedef std::vector<MXPtrV> MXPtrVV;
   /// \endcond
-  //@}
+  ///@}
 
 } // namespace casadi
 

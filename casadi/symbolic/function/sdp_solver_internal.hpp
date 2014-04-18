@@ -102,7 +102,7 @@ class CASADI_SYMBOLIC_EXPORT SDPSolverInternal : public FunctionInternal{
     */
     bool calc_p_;
 
-    /// Indicates wether problem is printed before solving
+    /// Indicates whether problem is printed before solving
     bool print_problem_;
 };
 

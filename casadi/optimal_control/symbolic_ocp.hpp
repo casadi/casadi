@@ -91,37 +91,39 @@ namespace casadi{
     /** @name Variables and equations
      *  Public data members
      */
-    //@{
+    ///@{
     /** \brief Independent variable (usually time) */
     SX t;
 
     /** \brief Differential-algebraic equation (DAE) with corresponding state vector and initial
      * conditions
      * DAE in fully-implicit form and corresponding states and algebraic variables.
-     * dae and s have matching dimensions and 0 == dae(der(s),s,...) implicitly defines der(s).
-     * At t==0, 0 == initial(der(s),s,...) holds in addition to the dae.
+     * dae and s have matching dimensions and <tt>0 == dae(der(s),s,...)</tt>
+     * implicitly defines <tt>der(s)</tt>.
+     * At <tt>t==0</tt>, <tt>0 == initial(der(s),s,...)</tt> holds in addition to the dae.
      */
     SX s, dae, initial;
 
     /** \brief Differential states defined by ordinary differential equations (ODE)
-     * The ODE can be retrieved by calling the method "ode" with x as argument.
+     * The ODE can be retrieved by calling the method #ode with x as argument.
      */
     SX x;
 
     /** \brief Algebraic equations and corresponding algebraic variables
-     * alg and z have matching dimensions and 0 == alg(z,...) implicitly defines z.
+     * \a alg and \a z have matching dimensions and 
+     * <tt>0 == alg(z,...)</tt> implicitly defines \a z.
      */
     SX z, alg;
 
     /** \brief Quadrature states
      * Quadrature states are defined by ODEs whose state does not enter in the right-hand-side.
-     * The ODE can be retrieved by calling the method "ode" with q as argument.
+     * The ODE can be retrieved by calling the method #ode with q as argument.
      */
     SX q;
 
     /** \brief Output variables
      * Interdependencies are allowed but must be non-cyclic.
-     * The definitions can be retrieved by calling the method "beq" with y as argument.
+     * The definitions can be retrieved by calling the method #beq with y as argument.
      */
     SX y;
 
@@ -141,7 +143,7 @@ namespace casadi{
      * An independent parameter is a parameter whose value is determined by an expression that
      * contains only literals.
      * An independent parameter is fixed after the DAE has been initialized.
-     * The definitions can be retrieved by calling the method "beq" with pi as argument.
+     * The definitions can be retrieved by calling the method #beq with pi as argument.
      */
     SX pi;
 
@@ -150,25 +152,25 @@ namespace casadi{
      * contains references to other parameters.
      * A dependent parameter is fixed after the DAE has been initialized.
      * Interdependencies are allowed but must be non-cyclic.
-     * The definitions can be retrieved by calling the method "beq" with pd as argument.
+     * The definitions can be retrieved by calling the method #beq with pd as argument.
     */
     SX pd;
 
     /** \brief Independent constant
      * An independent constant is a constant whose value is determined by an expression that
      * contains only literals.
-     * The definitions can be retrieved by calling the method "beq" with ci as argument.
+     * The definitions can be retrieved by calling the method #beq with ci as argument.
      */
     SX ci;
 
-    /** \brief Dependent constants and correspinding definitions
+    /** \brief Dependent constants and corresponding definitions
      * A dependent constant is a constant whose value is determined by an expression which
      * contains references to other constants.
      * Interdependencies are allowed but must be non-cyclic.
-     * The definitions can be retrieved by calling the method "beq" with cd as argument.
+     * The definitions can be retrieved by calling the method #beq with cd as argument.
     */
     SX cd;
-    //@}
+    ///@}
 
     /// Interval start time
     double t0;
@@ -191,19 +193,19 @@ namespace casadi{
     /// Time points
     std::vector<double> tp;
 
-    //@}
+    ///@}
 
     /** @name Objective function terms
      *  Terms in the objective function.
      */
-    //@{
+    ///@{
 
     /// Mayer terms in the objective (point terms)
     SX mterm;
 
     /// Lagrange terms in the objective (integral terms)
     SX lterm;
-    //@}
+    ///@}
 
     /** \brief Path constraints of the optimal control problem
      */
@@ -219,16 +221,16 @@ namespace casadi{
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
 
-    //@{
+    ///@{
     /// Access a variable by name
     Variable& variable(const std::string& name);
     const Variable& variable(const std::string& name) const;
-    //@}
+    ///@}
 
     /** @name Manipulation
      *  Reformulate the dynamic optimization problem.
      */
-    //@{
+    ///@{
 
     /// Identify and separate the algebraic variables and equations in the DAE
     void separateAlgebraic();
@@ -269,17 +271,17 @@ namespace casadi{
     /// Eliminate quadrature states and turn them into ODE states
     void eliminateQuadratureStates();
 
-    /// Sort the DAE and implictly defined states
+    /// Sort the DAE and implicitly defined states
     void sortDAE();
 
     /// Sort the algebraic equations and algebraic states
     void sortALG();
 
-    /// Generate a MUSCOD-II compatible DAT file
+    /// Generate a <tt>MUSCOD-II</tt> compatible DAT file
     void generateMuscodDatFile(const std::string& filename,
                                const Dictionary& mc2_ops=Dictionary()) const;
 
-    //@}
+    ///@}
 
     /// Scale the variables
     void scaleVariables();
@@ -309,7 +311,7 @@ namespace casadi{
     void setBeq(const SX& var, const SX& val);
 
     /// Get a derivative binding equation (i.e. ordinary differential equation, ODE) by name.
-    // Returns variable expression if unknwon.
+    // Returns variable expression if unknown.
     SX ode(const std::string& name) const;
 
     /// Get a derivative binding expression (i.e. ordinary differential equation, ODE)

@@ -38,12 +38,12 @@ namespace casadi{
   class SharedObjectNode;
   /// \endcond
 
-  /** \brief SharedObject implements a reference counting framework simular for effient and
+  /** \brief SharedObject implements a reference counting framework similar for efficient and
       easily-maintained memory management.
 
       To use the class, both the SharedObject class (the public class), and the SharedObjectNode
       class (the internal class) must be inherited from. It can be done in two different files
-      and together with memory management, this approach provides a clear destinction of which
+      and together with memory management, this approach provides a clear distinction of which
       methods of the class are to be considered "public", i.e. methods for public use that can
       be considered to remain over time with small changes, and the internal memory.
 
@@ -56,7 +56,7 @@ namespace casadi{
       use the constructor with arguments.
 
       The copy constructor and the assignment operator perform shallow copies only,
-      to make a deep copy you must use the clone method explictly.
+      to make a deep copy you must use the clone method explicitly.
       This will give a shared pointer instance.
 
       In an inheritance hierarchy, you can cast down automatically,
@@ -102,7 +102,7 @@ namespace casadi{
     /// Assign the node to a node class pointer (or null)
     void assignNode(SharedObjectNode* node);
 
-    /// Assign the node to a node class pointer without reference counting: inproper
+    /// Assign the node to a node class pointer without reference counting: improper
     // use will cause memory leaks!
     void assignNodeNoCount(SharedObjectNode* node);
 
@@ -128,7 +128,7 @@ namespace casadi{
     /// Print a representation of the object
     virtual void repr(std::ostream &stream) const;
 
-    /// Print a destription of the object
+    /// Print a description of the object
     virtual void print(std::ostream &stream=std::cout) const;
 
 #endif // SWIG
@@ -161,7 +161,7 @@ namespace casadi{
     /// \endcond
 
 
-    //@{
+    ///@{
     /// \cond SWIGINTERNAL
     /// If there are other references to the object, then make a deep copy of it
     // and point to this new object
@@ -173,7 +173,7 @@ namespace casadi{
                     bool clone_members=true);
 #endif
     /// \endcond
-    //@}
+    ///@}
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -229,7 +229,7 @@ namespace casadi{
     /// Print a representation of the object
     virtual void repr(std::ostream &stream) const;
 
-    /// Print a destription of the object
+    /// Print a description of the object
     virtual void print(std::ostream &stream) const;
 
     /** \brief Get a weak reference to the object */
@@ -305,7 +305,7 @@ namespace casadi{
     return !shared_cast<B>(A).isNull();
   }
 
-  //@{
+  ///@{
   /// Make a deep copy of an object (Note: default is a shallow copy!)
   template<class A>
   A deepcopy(const A& a){
@@ -345,7 +345,7 @@ namespace casadi{
     return ret;
   }
   /// \endcond
-  //@}
+  ///@}
 
   /// \cond INTERNAL
   // Template function implementations

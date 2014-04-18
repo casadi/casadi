@@ -67,20 +67,20 @@ namespace casadi{
 /// \endcond
 
 /// \cond CLUTTER
-  //@{
+  ///@{
   /** \brief Get typename */
   template <typename DataType> inline std::string matrixName()
   { return std::string("Matrix<") + typeid(DataType).name() + std::string(">");}
   template<> inline std::string matrixName<double>() { return "DMatrix"; }
   template<> inline std::string matrixName<int>() { return "IMatrix"; }
-  //@}
+  ///@}
 /// \endcond
 
   /** \brief Sparse matrix class. SX and DMatrix are specializations.
 
       General sparse matrix class that is designed with the idea that "everything is a matrix",
       that is, also scalars and vectors.\n
-      This philosophy makes it easy to use and to interface in particularily
+      This philosophy makes it easy to use and to interface in particularly
       with Python and Matlab/Octave.\n
 
       Index starts with 0.\n
@@ -121,10 +121,10 @@ namespace casadi{
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<DataType> >& m);
 
-    //@{
+    ///@{
     /// Sparse matrix with a given sparsity
     explicit Matrix(const Sparsity& sparsity, const DataType& val=DataType(0));
-    //@}
+    ///@}
 
     /// Sparse matrix with a given sparsity and non-zero elements.
     Matrix(const Sparsity& sparsity, const std::vector<DataType>& d);
@@ -286,7 +286,7 @@ namespace casadi{
     bool __nonzero__() const;
 
     /// \cond INTERNAL
-    //@{
+    ///@{
     /// Get a submatrix
     const Matrix<DataType> sub(int rr, int cc) const;
     const Matrix<DataType> sub(const std::vector<int>& rr, int cc) const
@@ -314,9 +314,9 @@ namespace casadi{
     {return sub(rr.getAll(size1()),cc);}
     const Matrix<DataType> sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
     const Matrix<DataType> sub(const Sparsity& sp, int dummy = 0) const;
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Set a submatrix
     void setSub(const Matrix<DataType>& m, int rr, int cc);
     void setSub(const Matrix<DataType>& m, const std::vector<int>& rr, int cc)
@@ -347,38 +347,38 @@ namespace casadi{
     {setSub(m,std::vector<int>(1,rr),cc.getAll(size2()));}
     void setSub(const Matrix<DataType>& m, const Sparsity& sp, int dummy);
 
-    //@}
+    ///@}
 
 
 
-    //@{
+    ///@{
     /// Add a submatrix to an existing matrix (TODO: remove memory allocation)
     template<typename RR, typename CC>
     void addSub(const Matrix<DataType>& m, RR rr, CC cc){ setSub(m+sub(rr,cc),rr,cc);}
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Retrieve a submatrix (TODO: remove memory allocation)
     template<typename RR, typename CC>
     void getSub(Matrix<DataType>& m, RR rr, CC cc){ m = sub(rr,cc);}
-    //@}
+    ///@}
     /// \endcond
 
-    //@{
+    ///@{
     /// Get a set of nonzeros
     const Matrix<DataType> getNZ(int k) const{ return at(k);}
     const Matrix<DataType> getNZ(const std::vector<int>& k) const;
     const Matrix<DataType> getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
     const Matrix<DataType> getNZ(const Matrix<int>& k) const;
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Set a set of nonzeros
     void setNZ(int k, const Matrix<DataType>& m);
     void setNZ(const std::vector<int>& k, const Matrix<DataType>& m);
     void setNZ(const Slice& k, const Matrix<DataType>& m){ setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const Matrix<DataType>& m);
-    //@}
+    ///@}
 
     /// \cond INTERNAL
     /// Append a matrix vertically (NOTE: only efficient if vector)
@@ -389,7 +389,7 @@ namespace casadi{
     /// \endcond
 
     /// \cond INTERNAL
-    //@{
+    ///@{
     /// Indexing for interfaced languages
     /// get a non-zero
     const Matrix<DataType> nz_indexed_one_based(int k) const{ return this->operator[](k-1);}
@@ -498,7 +498,7 @@ namespace casadi{
           SubMatrix<Matrix<DataType>,Sparsity,int> temp(*this,sp,0);
           temp = m;
     }
-    //@}
+    ///@}
 
     /// set a vector element
     void indexed_one_based_assignment(int rr, const DataType & m){
@@ -541,7 +541,7 @@ namespace casadi{
     Matrix<DataType> operator-() const;
 
     /// \cond INTERNAL
-    //@{
+    ///@{
     /** \brief  Create nodes by their ID */
     static Matrix<DataType> binary(int op, const Matrix<DataType> &x, const Matrix<DataType> &y);
     static Matrix<DataType> unary(int op, const Matrix<DataType> &x);
@@ -551,11 +551,11 @@ namespace casadi{
                                           const Matrix<DataType> &x, const Matrix<DataType> &y);
     static Matrix<DataType> matrix_matrix(int op,
                                           const Matrix<DataType> &x, const Matrix<DataType> &y);
-    //@}
+    ///@}
     /// \endcond
 
     /// \cond INTERNAL
-    //@{
+    ///@{
     /// Elementwise operations -- Octave/Python naming
     Matrix<DataType> __add__(const Matrix<DataType> &y) const;
     Matrix<DataType> __sub__(const Matrix<DataType> &y) const;
@@ -570,7 +570,7 @@ namespace casadi{
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
     Matrix<DataType> __mpower__(const Matrix<DataType> &y) const;
     Matrix<DataType> __mrdivide__  (const Matrix<DataType> &y) const;
-    //@}
+    ///@}
 
     /// Matrix-matrix product
     Matrix<DataType> mul_full(const Matrix<DataType> &y, const Sparsity & sp_z=Sparsity()) const;
@@ -615,10 +615,10 @@ namespace casadi{
     Matrix<DataType> T() const{ return trans();}
 #endif
 
-    //@{
+    ///@{
 
-    //@{
-    /// Operations defined in the standard namespace for unambigous access and Numpy compatibility
+    ///@{
+    /// Operations defined in the standard namespace for unambiguous access and Numpy compatibility
     Matrix<DataType> sin() const;
     Matrix<DataType> cos() const;
     Matrix<DataType> tan() const;
@@ -650,7 +650,7 @@ namespace casadi{
     Matrix<DataType> logic_and(const Matrix<DataType>& y) const;
     Matrix<DataType> logic_or(const Matrix<DataType>& y) const;
     Matrix<DataType> if_else_zero(const Matrix<DataType>& y) const;
-    //@}
+    ///@}
 
     /** \brief Set or reset the maximum number of calls to the
      * printing function when printing an expression */
@@ -666,7 +666,7 @@ namespace casadi{
     /** \brief Get the depth to which equalities are being checked for simplifications */
     static int getEqualityCheckingDepth();
 
-    //@{
+    ///@{
     /// Printing
 #ifndef SWIG
     virtual void print(std::ostream &stream=std::cout) const; // print print description
@@ -677,7 +677,7 @@ namespace casadi{
     void printVector(std::ostream &stream=std::cout) const; // print vector-style
     void printDense(std::ostream &stream=std::cout) const; // Print dense matrix-stype
     void printSparse(std::ostream &stream=std::cout) const; // print sparse matrix style
-    //@}
+    ///@}
 
     // Get the sparsity pattern
     const std::vector<int>& row() const;
@@ -803,36 +803,36 @@ namespace casadi{
     /* \brief Construct a sparse matrix from triplet form
      * Default matrix size is max(col) x max(row)
      */
-    //@{
+    ///@{
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
                                     const std::vector<DataType>& d);
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
                                     const std::vector<DataType>& d, int nrow, int ncol);
     static Matrix<DataType> triplet(const std::vector<int>& row, const std::vector<int>& col,
                                     const std::vector<DataType>& d, const std::pair<int,int>& rc);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief  create a matrix with all inf */
     static Matrix<DataType> inf(const Sparsity& sp);
     static Matrix<DataType> inf(int nrow=1, int ncol=1);
     static Matrix<DataType> inf(const std::pair<int,int>& rc);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief  create a matrix with all nan */
     static Matrix<DataType> nan(const Sparsity& sp);
     static Matrix<DataType> nan(int nrow=1, int ncol=1);
     static Matrix<DataType> nan(const std::pair<int,int>& rc);
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief  create a matrix by repeating an existing matrix */
     static Matrix<DataType> repmat(const DataType& x, const Sparsity& sp);
     static Matrix<DataType> repmat(const Matrix<DataType>& x, const Sparsity& sp);
     static Matrix<DataType> repmat(const Matrix<DataType>& x, int nrow, int ncol=1);
     static Matrix<DataType> repmat(const Matrix<DataType>& x, const std::pair<int,int>& rc);
-    //@}
+    ///@}
 
     /** \brief  create an n-by-n identity matrix */
     static Matrix<DataType> eye(int ncol);

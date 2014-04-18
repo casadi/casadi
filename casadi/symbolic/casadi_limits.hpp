@@ -33,7 +33,7 @@ namespace casadi{
 /** \brief casadi_limits class
 
 The following class, which acts as a complements to the standard numeric_limits class, allows
-to specify certain properties of scalar objects. The template can be specialized for
+specifying certain properties of scalar objects. The template can be specialized for
 e.g. symbolic scalars
 \author Joel Andersson
 \date 2011

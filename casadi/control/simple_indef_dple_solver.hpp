@@ -40,7 +40,7 @@ namespace casadi{
        Based on Periodic Lyapunov equations: some applications and new algorithms.
        Int. J. Control, vol. 67, pp. 69-87, 1997.
 
-       \author Joris gillis
+       \author Joris Gillis
       \date 2014
 
   */

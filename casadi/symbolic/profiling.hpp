@@ -153,8 +153,6 @@ void profileWriteName(std::ofstream &f,T *a,const std::string &name,
   s.length=name.size();
   s.type = type;
   s.algorithm_size = algorithm_size;
-  //std::cout << name << s.thisp << ":" << s.length << ":" << s.type << ":"
-  //  << s.algorithm_size << "|" << a->getNumInputs() << "," << a->getNumOutputs() << std::endl;
   s.numin = a->getNumInputs();
   s.numout = a->getNumOutputs();
   profileWrite(f,s);
@@ -211,8 +209,6 @@ void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::str
   s.opcode = opcode;
   s.dependency = ptrToLong(dependency);
   profileWrite(f,s);
-  //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode
-  // << ":" << s.dependency << std::endl;
   f << sourceline;
 }
 
@@ -225,8 +221,6 @@ void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,
   s.length = sourceline.size();
   s.opcode = opcode;
   s.dependency = 0;
-  //std::cout << s.thisp << ":" << s.line_number<< ":" << s.length << ":" << s.opcode
-  // << ":" << s.dependency << std::endl;
   profileWrite(f,s);
   f << sourceline;
 }

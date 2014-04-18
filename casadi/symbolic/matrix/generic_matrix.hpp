@@ -42,7 +42,7 @@ namespace casadi{
 
       The class is designed with the idea that "everything is a matrix",
       that is, also scalars and vectors.\n
-      This philosophy makes it easy to use and to interface in particularily
+      This philosophy makes it easy to use and to interface in particularly
       with Python and Matlab/Octave.\n
 
       The syntax tries to stay as close as possible to the ublas syntax
@@ -207,25 +207,25 @@ namespace casadi{
     { return sym(name,Sparsity::dense(nrow,ncol),p,r);}
     ///@}
 
-    //@{
+    ///@{
     /** \brief  create a sparse matrix with all zeros */
     static MatType sparse(int nrow=1, int ncol=1){ return MatType(Sparsity::sparse(nrow,ncol));}
     static MatType sparse(const std::pair<int,int>& rc){ return sparse(rc.first,rc.second);}
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */
     static MatType zeros(int nrow=1, int ncol=1){ return zeros(Sparsity::dense(nrow,ncol)); }
     static MatType zeros(const Sparsity& sp){ return MatType(sp,0);}
     static MatType zeros(const std::pair<int,int>& rc){ return zeros(rc.first,rc.second);}
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries one */
     static MatType ones(int nrow=1, int ncol=1){ return ones(Sparsity::dense(nrow,ncol)); }
     static MatType ones(const Sparsity& sp){ return MatType(sp,1);}
     static MatType ones(const std::pair<int,int>& rc){ return ones(rc.first,rc.second);}
-    //@}
+    ///@}
 
     /** \brief Matrix-matrix multiplication.
      * Attempts to identify quick returns on matrix-level and

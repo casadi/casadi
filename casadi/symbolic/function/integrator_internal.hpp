@@ -78,7 +78,7 @@ namespace casadi{
      * directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
-    /// Is the class able to propate seeds through the algorithm?
+    /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
@@ -108,7 +108,7 @@ namespace casadi{
     // Create sparsity pattern of the extended Jacobian (backward problem)
     Sparsity spJacG();
 
-    //@{
+    ///@{
     // Shorthands
     DMatrix&  x0(){ return input(INTEGRATOR_X0 );}
     DMatrix&   p(){ return input(INTEGRATOR_P  );}
@@ -122,7 +122,7 @@ namespace casadi{
     DMatrix& rxf(){ return output(INTEGRATOR_RXF);}
     DMatrix& rqf(){ return output(INTEGRATOR_RQF);}
     DMatrix& rzf(){ return output(INTEGRATOR_RZF);}
-    //@}
+    ///@}
 
     /// Number of states for the forward integration
     int nx_, nz_, nq_;

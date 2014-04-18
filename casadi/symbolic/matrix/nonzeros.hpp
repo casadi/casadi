@@ -39,7 +39,7 @@ class CASADI_SYMBOLIC_EXPORT NonZeros : public M{
     /// Constructor
     NonZeros(M& mat, const K& k) : M(mat.getNZ(k)), mat_(mat), k_(k){}
 
-    //@{
+    ///@{
     /// Methods that modify a part of the parent object (A[k] = ?, A[k] += ?, etc.)
     const M& operator=(const NonZeros<M,K> &y);
     const M& operator=(const M &y);
@@ -47,7 +47,7 @@ class CASADI_SYMBOLIC_EXPORT NonZeros : public M{
     M operator-=(const M &y);
     M operator*=(const M &y);
     M operator/=(const M &y);
-    //@}
+    ///@}
 
   private:
     /// A reference to the matrix that is allowed to be modified

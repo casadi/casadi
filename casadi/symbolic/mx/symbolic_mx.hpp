@@ -75,7 +75,7 @@ namespace casadi{
     virtual int getOp() const{ return OP_PARAMETER;}
 
   protected:
-    // Name of the varible
+    // Name of the variable
     std::string name_;
   };
 

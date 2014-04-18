@@ -1409,8 +1409,8 @@ Construct from C pointer.
 ";
 
 %feature("docstring") casadi::Callback::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -1462,8 +1462,7 @@ Return a string with a destription (for SWIG)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -2176,8 +2175,7 @@ returned.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -2834,7 +2832,7 @@ Check if the node is pointing to the right type of object.
 ";
 
 %feature("docstring") casadi::CollocationIntegrator::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -5541,7 +5539,7 @@ the example propagating_sparsity.cpp)
 ";
 
 %feature("docstring") casadi::ControlSimulator::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -6430,8 +6428,7 @@ returned.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -6963,8 +6960,7 @@ the same as evaluate()
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -7274,8 +7270,8 @@ Set a certain option by giving an enum value.
 ";
 
 %feature("docstring") casadi::CplexSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -8147,8 +8143,8 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 ";
 
 %feature("docstring") casadi::CSparse::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -8342,8 +8338,7 @@ Get, if necessary generate, the sparsity of a Jacobian block.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -8554,7 +8549,7 @@ Input/output structures of the function */.
 ";
 
 %feature("docstring") casadi::CSparseCholesky::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -8749,8 +8744,7 @@ get function name with all non alphanumeric characters converted to '_'
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -9541,8 +9535,8 @@ reference count.
 ";
 
 %feature("docstring") casadi::CustomEvaluate::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -9586,8 +9580,7 @@ Is initialized?
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -9876,8 +9869,7 @@ Set the number of function outputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -10373,8 +10365,8 @@ Set the number of function inputs.
 ";
 
 %feature("docstring") casadi::CustomFunction::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -11171,7 +11163,7 @@ Input/output structures of the function */.
 ";
 
 %feature("docstring") casadi::CVodesIntegrator::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -11763,8 +11755,7 @@ Check if the numerical values of the supplied bounds make sense.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -13170,8 +13161,7 @@ Return a string with a destription (for SWIG)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -13181,7 +13171,7 @@ SWIGINTERNAL
 ";
 
 %feature("docstring") casadi::DerivativeGenerator::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -14377,7 +14367,7 @@ Evaluate the function symbolically or numerically.
 ";
 
 %feature("docstring") casadi::DirectCollocation::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -14527,8 +14517,7 @@ iname:  input name. Only allowed when an input scheme is set.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -15081,8 +15070,7 @@ Get the number of function outputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -15436,7 +15424,7 @@ returned.
 ";
 
 %feature("docstring") casadi::DirectMultipleShooting::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -16482,8 +16470,7 @@ C++ includes: direct_single_shooting.hpp ";
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -16824,7 +16811,7 @@ Check if the numerical values of the supplied bounds make sense.
 ";
 
 %feature("docstring") casadi::DirectSingleShooting::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -17238,8 +17225,7 @@ Get, if necessary generate, the sparsity of a Jacobian block.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -17545,8 +17531,8 @@ Const access an output.
 ";
 
 %feature("docstring") casadi::DpleSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -18296,8 +18282,8 @@ values.
 ";
 
 %feature("docstring") casadi::DSDPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -19072,8 +19058,7 @@ adheres to SCHEME_NLPINput
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -19224,7 +19209,7 @@ Get the row of a non-zero element.
 ------------------------------------------------------------------------
 [INTERNAL] 
 If there are other references to the object, then make a deep copy of
-it and point to this new object
+it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -19284,8 +19269,7 @@ entries of another sparsity pattern.
 ";
 
 %feature("docstring") casadi::EmptySparsity::isEmpty "[INTERNAL]  Check if
-the sparsity is empty, i.e. if one of the dimensions is zero (or optionally
-both dimensions)
+the sparsity is empty, i.e. if one of the dimensions is zero.
 
 ";
 
@@ -19296,7 +19280,7 @@ Take the inverse of a sparsity pattern; flip zeros and non-zeros.
 
 %feature("docstring") casadi::EmptySparsity::removeDuplicates "[INTERNAL]
 Remove duplicate entries: The same indices will be removed from the mapping
-vector, which must have the same length as the number of nonzeros.
+vector,.
 
 ";
 
@@ -19323,8 +19307,7 @@ Returns the sparsity of the submatrix, with a mapping such that submatrix[k]
 ";
 
 %feature("docstring") casadi::EmptySparsity::rowsSequential "[INTERNAL]  Do
-the rows appear sequentially on each column (if strictly==true, then do not
-allow multiple entries)
+the rows appear sequentially on each column.
 
 ";
 
@@ -19437,8 +19420,7 @@ if the node is pointing to the right type of object.
 >  Sparsity casadi::Sparsity::transpose(std::vector< int > &mapping, bool invert_mapping=false) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
- Transpose the matrix and get the reordering of the non-zero entries, i.e. the
-non-zeros of the original matrix for each non-zero of the new matrix.
+ Transpose the matrix and get the reordering of the non-zero entries,.
 
 ";
 
@@ -19604,8 +19586,8 @@ with j>=i.
 ";
 
 %feature("docstring") casadi::EmptySparsity::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -19731,9 +19713,9 @@ a sparsity, order of nonzeros remains the same.
 ";
 
 %feature("docstring") casadi::EmptySparsity::stronglyConnectedComponents "[INTERNAL]  Find the strongly connected components of the bigraph defined by
-the sparsity pattern of a square matrix See Direct Methods for Sparse Linear
-Systems by Davis (2006). Returns:
+the sparsity pattern of a square matrix.
 
+See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
 Number of components
 
 Offset for each components (length: 1 + number of components)
@@ -19930,8 +19912,7 @@ Generate C code for the function.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -20408,7 +20389,7 @@ Get output scheme.
 ";
 
 %feature("docstring") casadi::ExternalFunction::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -21367,7 +21348,7 @@ Integrate forward until a specified time point.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -21674,8 +21655,7 @@ C++ includes: fixed_step_integrator.hpp ";
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -22279,8 +22259,8 @@ Get input scheme.
 ";
 
 %feature("docstring") casadi::Function::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -22496,8 +22476,7 @@ Is a null pointer?
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -23070,8 +23049,7 @@ C++ includes: functor.hpp ";
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -23081,8 +23059,8 @@ SWIGINTERNAL
 ";
 
 %feature("docstring") casadi::Functor::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -23550,8 +23528,7 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -23567,8 +23544,8 @@ Is an integer?
 ";
 
 %feature("docstring") casadi::GenericType::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -26125,7 +26102,7 @@ adjoint directions.
 ";
 
 %feature("docstring") casadi::HomotopyNLPSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -26248,8 +26225,7 @@ Assign the node to a node class pointer (or null)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -28809,8 +28785,7 @@ adjoint directions.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -28835,8 +28810,7 @@ Default constructor.
 >  casadi::IdasIntegrator::IdasIntegrator(const Function &f, const Function &g=Function())
 ------------------------------------------------------------------------
 
-Create an integrator for a fully implicit DAE with quadrature states (nz is
-the number of states not to be included in the state vector)
+Create an integrator for a fully implicit DAE with quadrature states.
 
 Create an integrator for a fully implicit DAE with quadrature states (nz is
 the number of states not to be included in the state vector)
@@ -29117,8 +29091,8 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 ";
 
 %feature("docstring") casadi::IdasIntegrator::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -30104,7 +30078,7 @@ Is initialized?
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::assignNodeNoCount
 "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -30181,8 +30155,7 @@ input(INTEGRATOR_RX0)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -30297,7 +30270,7 @@ iname:  input name. Only allowed when an input scheme is set.
 ";
 
 %feature("docstring") casadi::ImplicitFunction::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -30887,8 +30860,7 @@ oname:  output name. Only allowed when an output scheme is set.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -32143,8 +32115,8 @@ pointer to the internal class
 ";
 
 %feature("docstring") casadi::Integrator::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -32886,8 +32858,7 @@ Get the number of function inputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -33862,8 +33833,7 @@ Describe the index.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -34019,8 +33989,8 @@ List available entries.
 ";
 
 %feature("docstring") casadi::IOScheme::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -37447,8 +37417,8 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::IpoptSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -37842,8 +37812,7 @@ Copy all options from another object.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -38758,8 +38727,7 @@ internally
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -39317,8 +39285,8 @@ destription of the object.
 ";
 
 %feature("docstring") casadi::KinsolSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -39509,8 +39477,7 @@ Access the Jacobian of the constraint function.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -40588,8 +40555,8 @@ Get output scheme.
 ";
 
 %feature("docstring") casadi::KnitroSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -41181,8 +41148,8 @@ adjoint directions.
 ";
 
 %feature("docstring") casadi::LapackLUDense::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -41254,8 +41221,7 @@ Get the dictionary.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -42192,8 +42158,8 @@ with another instance.
 ";
 
 %feature("docstring") casadi::LapackQRDense::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -42439,8 +42405,7 @@ Copy all options from another object.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -43572,8 +43537,8 @@ Generate the sparsity of a Jacobian block.
 ";
 
 %feature("docstring") casadi::LinearSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -43660,8 +43625,7 @@ oname:  output name. Only allowed when an output scheme is set.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -44278,8 +44242,7 @@ Get, if necessary generate, the sparsity of a Jacobian block.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -44482,8 +44445,8 @@ it is initialized
 ";
 
 %feature("docstring") casadi::LPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -47440,8 +47403,7 @@ Get string representation of dimensions. The representation is (nrow x ncol
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -47953,8 +47915,7 @@ Is the expression a transpose?
 %feature("docstring") casadi::MX::__rtruediv__ "";
 
 %feature("docstring") casadi::MX::assignNodeNoCount "[INTERNAL]  Assign the
-node to a node class pointer without reference counting: inproper use will
-cause memory leaks!
+node to a node class pointer without reference counting: inproper.
 
 ";
 
@@ -49040,8 +49001,8 @@ There is no guarantee that consecutive calls return identical objects
 ";
 
 %feature("docstring") casadi::MXFunction::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -49364,8 +49325,7 @@ oname:  output name. Only allowed when an output scheme is set.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -50694,8 +50654,7 @@ Get total number of elements in all of the matrix-valued inputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -50967,7 +50926,7 @@ Access linear solver.
 ";
 
 %feature("docstring") casadi::NewtonImplicitSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -51504,8 +51463,7 @@ Get output scheme.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -51914,7 +51872,7 @@ Get the number of function outputs.
 ";
 
 %feature("docstring") casadi::NLPImplicitSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -52435,8 +52393,7 @@ Get the default of a certain option
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -52469,8 +52426,8 @@ st:  Problem structure
 ";
 
 %feature("docstring") casadi::NLPQPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -54315,8 +54272,7 @@ Set input scheme.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -54360,8 +54316,8 @@ get function name with all non alphanumeric characters converted to '_'
 ";
 
 %feature("docstring") casadi::NLPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -57192,8 +57148,8 @@ Is initialized?
 ";
 
 %feature("docstring") casadi::Nullspace::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -57249,8 +57205,7 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -58406,8 +58361,7 @@ Input/output structures of the function */.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -58739,8 +58693,8 @@ representation of the object.
 ";
 
 %feature("docstring") casadi::OCPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -59374,7 +59328,7 @@ Diagrams
 C++ includes: old_collocation_integrator.hpp ";
 
 %feature("docstring") casadi::OldCollocationIntegrator::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -59457,8 +59411,7 @@ Return a string with a destription (for SWIG)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -60648,8 +60601,7 @@ Get output scheme.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -60659,8 +60611,8 @@ SWIGINTERNAL
 ";
 
 %feature("docstring") casadi::OOQPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -61287,8 +61239,7 @@ Is a null pointer?
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -61389,7 +61340,7 @@ Get the reference count.
 ";
 
 %feature("docstring") casadi::OptionsFunctionality::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -62311,8 +62262,7 @@ Set the number of function inputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -62844,8 +62794,8 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 ";
 
 %feature("docstring") casadi::Parallelizer::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -63208,8 +63158,7 @@ oname:  output name. Only allowed when an output scheme is set.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -63518,7 +63467,7 @@ Const access an input.
 ";
 
 %feature("docstring") casadi::PsdIndefDpleSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -64245,8 +64194,7 @@ forward or backward (for usage, see the example propagating_sparsity.cpp)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -64472,8 +64420,8 @@ get an option value
 ";
 
 %feature("docstring") casadi::QCQPQPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -66142,8 +66090,7 @@ Get the enum value corresponding to th certain option.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -66172,8 +66119,8 @@ input/output scheme.
 ";
 
 %feature("docstring") casadi::QCQPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -66841,8 +66788,8 @@ adjoint directions.
 ";
 
 %feature("docstring") casadi::QPLPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -66876,8 +66823,7 @@ sparsity propagation (for usage, see the example propagating_sparsity.cpp)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -67833,8 +67779,7 @@ check if there is an option str
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -68252,8 +68197,8 @@ if the numerical values of the supplied bounds make sense.
 ";
 
 %feature("docstring") casadi::QPOasesSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -68510,8 +68455,7 @@ iname:  input name. Only allowed when an input scheme is set.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -68821,8 +68765,8 @@ Get the default of a certain option
 ";
 
 %feature("docstring") casadi::QPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -70000,8 +69944,8 @@ Get the enum value corresponding to th certain option.
 ";
 
 %feature("docstring") casadi::QPStabilizer::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -70144,8 +70088,7 @@ that it is initialized
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -71630,8 +71573,8 @@ adjoint directions.
 ";
 
 %feature("docstring") casadi::RKIntegrator::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -71677,8 +71620,7 @@ adjoint sensitivities.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -72293,8 +72235,7 @@ algorithm (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
 >  Sparsity casadi::Sparsity::transpose(std::vector< int > &mapping, bool invert_mapping=false) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
- Transpose the matrix and get the reordering of the non-zero entries, i.e. the
-non-zeros of the original matrix for each non-zero of the new matrix.
+ Transpose the matrix and get the reordering of the non-zero entries,.
 
 ";
 
@@ -72376,8 +72317,7 @@ Assign the node to a node class pointer (or null)
 ";
 
 %feature("docstring") casadi::ScalarSparseSparsity::removeDuplicates "[INTERNAL]  Remove duplicate entries: The same indices will be removed from
-the mapping vector, which must have the same length as the number of
-nonzeros.
+the mapping vector,.
 
 ";
 
@@ -72512,8 +72452,7 @@ object, 2 if it is from the second and 3 (i.e. 1 | 2) if from both.
 ";
 
 %feature("docstring") casadi::ScalarSparseSparsity::isEmpty "[INTERNAL]
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
+Check if the sparsity is empty, i.e. if one of the dimensions is zero.
 
 ";
 
@@ -72538,7 +72477,7 @@ Erase rows and/or columns of a matrix.
 ------------------------------------------------------------------------
 [INTERNAL] 
 If there are other references to the object, then make a deep copy of
-it and point to this new object
+it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -72725,8 +72664,7 @@ of another sparsity pattern.
 [INTERNAL] 
 ";
 
-%feature("docstring") casadi::ScalarSparseSparsity::rowsSequential "[INTERNAL]  Do the rows appear sequentially on each column (if
-strictly==true, then do not allow multiple entries)
+%feature("docstring") casadi::ScalarSparseSparsity::rowsSequential "[INTERNAL]  Do the rows appear sequentially on each column.
 
 ";
 
@@ -72763,7 +72701,7 @@ a reference to the rows of all non-zero element (copy if not unique!)
 ";
 
 %feature("docstring") casadi::ScalarSparseSparsity::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -72809,9 +72747,9 @@ result
 %feature("docstring")
 casadi::ScalarSparseSparsity::stronglyConnectedComponents "[INTERNAL]  Find
 the strongly connected components of the bigraph defined by the sparsity
-pattern of a square matrix See Direct Methods for Sparse Linear Systems by
-Davis (2006). Returns:
+pattern of a square matrix.
 
+See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
 Number of components
 
 Offset for each components (length: 1 + number of components)
@@ -72980,8 +72918,7 @@ casadi::ScalarSparsity::transpose "
 >  Sparsity casadi::Sparsity::transpose(std::vector< int > &mapping, bool invert_mapping=false) const 
 ------------------------------------------------------------------------
 [INTERNAL] 
- Transpose the matrix and get the reordering of the non-zero entries, i.e. the
-non-zeros of the original matrix for each non-zero of the new matrix.
+ Transpose the matrix and get the reordering of the non-zero entries,.
 
 ";
 
@@ -73027,8 +72964,8 @@ symmetric?
 ";
 
 %feature("docstring") casadi::ScalarSparsity::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -73243,7 +73180,7 @@ Return a string with a destription (for SWIG)
 ------------------------------------------------------------------------
 [INTERNAL] 
 If there are other references to the object, then make a deep copy of
-it and point to this new object
+it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -73447,8 +73384,7 @@ shape.
 ";
 
 %feature("docstring") casadi::ScalarSparsity::rowsSequential "[INTERNAL]
-Do the rows appear sequentially on each column (if strictly==true, then do
-not allow multiple entries)
+Do the rows appear sequentially on each column.
 
 ";
 
@@ -73482,9 +73418,9 @@ lower triangular part.
 ";
 
 %feature("docstring") casadi::ScalarSparsity::stronglyConnectedComponents "[INTERNAL]  Find the strongly connected components of the bigraph defined by
-the sparsity pattern of a square matrix See Direct Methods for Sparse Linear
-Systems by Davis (2006). Returns:
+the sparsity pattern of a square matrix.
 
+See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
 Number of components
 
 Offset for each components (length: 1 + number of components)
@@ -73507,8 +73443,7 @@ Enlarge the matrix along the first dimension (i.e. insert rows)
 ";
 
 %feature("docstring") casadi::ScalarSparsity::isEmpty "[INTERNAL]  Check if
-the sparsity is empty, i.e. if one of the dimensions is zero (or optionally
-both dimensions)
+the sparsity is empty, i.e. if one of the dimensions is zero.
 
 ";
 
@@ -73619,7 +73554,7 @@ See:   numel()
 
 %feature("docstring") casadi::ScalarSparsity::removeDuplicates "[INTERNAL]
 Remove duplicate entries: The same indices will be removed from the mapping
-vector, which must have the same length as the number of nonzeros.
+vector,.
 
 ";
 
@@ -74680,8 +74615,7 @@ Input/output structures of the function */.
 ";
 
 %feature("docstring") casadi::SCPgen::assignNodeNoCount "[INTERNAL]  Assign
-the node to a node class pointer without reference counting: inproper use
-will cause memory leaks!
+the node to a node class pointer without reference counting: inproper.
 
 ";
 
@@ -74997,8 +74931,7 @@ Set the number of function outputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -75436,8 +75369,8 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::SDPSDQPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -76026,8 +75959,7 @@ Get total number of elements in all of the matrix-valued outputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -76272,8 +76204,8 @@ Get the allowed values of a certain option.
 ";
 
 %feature("docstring") casadi::SDPSOCPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -76308,8 +76240,7 @@ Get output scheme.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -77541,8 +77472,7 @@ adjoint directions.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -77755,8 +77685,8 @@ Get the description of a certain option.
 ";
 
 %feature("docstring") casadi::SDPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -78767,8 +78697,8 @@ adjoint directions.
 ";
 
 %feature("docstring") casadi::SDQPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -78882,8 +78812,7 @@ iname:  input name. Only allowed when an input scheme is set.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -81779,8 +81708,7 @@ destription of the object.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -81819,8 +81747,8 @@ pointer to the internal class
 ";
 
 %feature("docstring") casadi::SharedObject::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -82305,8 +82233,7 @@ the same as evaluate()
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -82594,7 +82521,7 @@ returned.
 ";
 
 %feature("docstring") casadi::SimpleHomotopyNLPSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -83234,7 +83161,7 @@ Print the pointer to the internal class
 ";
 
 %feature("docstring") casadi::SimpleIndefDpleSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -83438,8 +83365,7 @@ C++ includes: simple_indef_dple_solver.hpp ";
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -84038,8 +83964,7 @@ There is no guarantee that consecutive calls return identical objects
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -84820,8 +84745,8 @@ Output function equal to the state.
 ";
 
 %feature("docstring") casadi::Simulator::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -85473,8 +85398,7 @@ that it is initialized
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -85598,8 +85522,8 @@ values.
 ";
 
 %feature("docstring") casadi::SnoptSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -86591,7 +86515,7 @@ This implementation makes use of the following identity:
 
 x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0
 
-where we put e = [0 0 ... 1] for the qadratic constraint arising from the
+where we put e = [0 0 ... 1] for the quadratic constraint arising from the
 epigraph reformulation and e==0 for all other qc.
 
 Solves the following strictly convex problem:
@@ -87039,8 +86963,8 @@ Get output scheme.
 ";
 
 %feature("docstring") casadi::SOCPQCQPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -87461,8 +87385,7 @@ Generate C code for the function.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -87636,8 +87559,7 @@ sparsity propagation (for usage, see the example propagating_sparsity.cpp)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -88593,8 +88515,8 @@ adjoint directions.
 ";
 
 %feature("docstring") casadi::SOCPSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -89402,8 +89324,7 @@ Is square?
 
 %feature("docstring") casadi::Sparsity::rowsSequential "
 
-Do the rows appear sequentially on each column (if strictly==true, then do
-not allow multiple entries)
+Do the rows appear sequentially on each column.
 
 ";
 
@@ -89581,9 +89502,9 @@ Get a reference to the colindex of col i (see class description)
 %feature("docstring") casadi::Sparsity::stronglyConnectedComponents "
 
 Find the strongly connected components of the bigraph defined by the
-sparsity pattern of a square matrix See Direct Methods for Sparse Linear
-Systems by Davis (2006). Returns:
+sparsity pattern of a square matrix.
 
+See Direct Methods for Sparse Linear Systems by Davis (2006). Returns:
 Number of components
 
 Offset for each components (length: 1 + number of components)
@@ -89698,7 +89619,7 @@ Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
 %feature("docstring") casadi::Sparsity::removeDuplicates "
 
 Remove duplicate entries: The same indices will be removed from the mapping
-vector, which must have the same length as the number of nonzeros.
+vector,.
 
 ";
 
@@ -89845,8 +89766,7 @@ options: None (0), largest first (1)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -89879,8 +89799,7 @@ Transpose the matrix.
 >  Sparsity casadi::Sparsity::transpose(std::vector< int > &mapping, bool invert_mapping=false) const 
 ------------------------------------------------------------------------
 
-Transpose the matrix and get the reordering of the non-zero entries, i.e.
-the non-zeros of the original matrix for each non-zero of the new matrix.
+Transpose the matrix and get the reordering of the non-zero entries,.
 
 ";
 
@@ -90074,8 +89993,8 @@ j==i.
 ";
 
 %feature("docstring") casadi::Sparsity::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -90086,8 +90005,7 @@ node to a node class pointer (or null)
 
 %feature("docstring") casadi::Sparsity::isEmpty "
 
-Check if the sparsity is empty, i.e. if one of the dimensions is zero (or
-optionally both dimensions)
+Check if the sparsity is empty, i.e. if one of the dimensions is zero.
 
 ";
 
@@ -91071,8 +90989,7 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -91501,8 +91418,8 @@ Get output scheme.
 ";
 
 %feature("docstring") casadi::SQICSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -91882,8 +91799,7 @@ Set input scheme.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -92875,8 +92791,8 @@ the same as evaluate()
 ";
 
 %feature("docstring") casadi::SQPMethod::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -93879,8 +93795,7 @@ copy.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -93915,7 +93830,7 @@ weak reference to the object.
 ";
 
 %feature("docstring") casadi::StabilizedQPSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -94238,7 +94153,7 @@ Return a string with a destription (for SWIG)
 ";
 
 %feature("docstring") casadi::StabilizedSQICSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -94747,8 +94662,7 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -95353,8 +95267,7 @@ Get the dictionary.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -96393,7 +96306,7 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::StabilizedSQPMethod::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -98475,7 +98388,7 @@ Get output scheme.
 ";
 
 %feature("docstring") casadi::SundialsIntegrator::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
-counting: inproper use will cause memory leaks!
+counting: inproper.
 
 ";
 
@@ -98753,8 +98666,7 @@ Get the default of a certain option
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -98861,8 +98773,7 @@ An SXElement qualifies as leaf when it has no dependencies.
 
 %feature("docstring") casadi::SXElement::mul "
 
-The following functions serves two purposes: Numpy compatibility and to
-allow unambigous access.
+The following functions serves two purposes:
 
 ";
 
@@ -99568,8 +99479,7 @@ Get the allowed values of a certain option.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -100179,8 +100089,8 @@ the numerical values of the supplied bounds make sense.
 ";
 
 %feature("docstring") casadi::SXFunction::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -100925,14 +100835,13 @@ Generate a MUSCOD-II compatible DAT file.
 ------------------------------------------------------------------------
 
 Get a derivative binding equation (i.e. ordinary differential equation, ODE)
-by name. Returns variable expression if unknwon.
+by name.
 
 >  SX casadi::SymbolicOCP::ode(const SX &var) const 
 ------------------------------------------------------------------------
 
 Get a derivative binding expression (i.e. ordinary differential equation,
-ODE) by non-differentiated expression. Returns derivative expression if
-unknown.
+ODE)
 
 ";
 
@@ -101836,8 +101745,8 @@ Set a certain option by giving an enum value.
 ";
 
 %feature("docstring") casadi::SymbolicQR::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -101871,8 +101780,7 @@ Get total number of elements in all of the matrix-valued outputs.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -104727,7 +104635,7 @@ node to a node class pointer (or null)
 ------------------------------------------------------------------------
 [INTERNAL] 
 If there are other references to the object, then make a deep copy of
-it and point to this new object
+it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -104811,8 +104719,8 @@ Construct from a shared object (also implicit type conversion)
 ";
 
 %feature("docstring") casadi::WeakRef::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -106337,8 +106245,7 @@ Access the Jacobian of the constraint function.
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
 
-If there are other references to the object, then make a deep copy of it and
-point to this new object
+If there are other references to the object, then make a deep copy of it
 
 >  void casadi::SharedObject::makeUnique(std::map< SharedObjectNode *, SharedObject > &already_copied, bool clone_members=true)
 ------------------------------------------------------------------------
@@ -107110,8 +107017,8 @@ iname:  input name. Only allowed when an input scheme is set.
 ";
 
 %feature("docstring") casadi::WorhpSolver::assignNodeNoCount "[INTERNAL]
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks!
+Assign the node to a node class pointer without reference counting:
+inproper.
 
 ";
 
@@ -109232,7 +109139,7 @@ object (Note: default is a shallow copy!)
 ------------------------------------------------------------------------
 [INTERNAL] 
 Typecast a shared object to a base class to a shared object to a
-derived class, cf. dynamic_cast
+derived class,
 
 Get a pointer to the node
 
@@ -109246,7 +109153,7 @@ Null pointer if not pointing towards the right type of object
 ------------------------------------------------------------------------
 [INTERNAL] 
 Typecast a shared object to a base class to a shared object to a
-derived class, cf. dynamic_cast (const)
+derived class,.
 
 ";
 
@@ -109766,7 +109673,7 @@ functions from the math.h (cmath) header.
 
 %feature("docstring") casadi::getOperatorRepresentation "
 
->  CASADI_SYMBOLIC_EXPORT std::string casadi::getOperatorRepresentation(const MX &x, const std::vector< std::string > &args)
+>  CASADI_SYMBOLIC_EXPORT std::string casadi::getOperatorRepresentation(const MX &xb, const std::vector< std::string > &args)
 ------------------------------------------------------------------------
 
 Get a string representation for a binary MX, using custom arguments.
@@ -110300,7 +110207,7 @@ concatenate vertically while vectorizing all arguments with vec
 univariate taylor series expansion
 
 Calculate the taylor expansion of expression 'ex' up to order 'order' with
-repsect to variable 'x' around the point 'a'
+respect to variable 'x' around the point 'a'
 
 $(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
 

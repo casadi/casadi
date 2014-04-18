@@ -36,7 +36,7 @@ class SDPSDQPInternal;
   /** \brief SDP SDQP Solver for quadratic programming
    *
    *  Note: this implementation relies on Cholesky decomposition:
-   *        Chol(H) = L ->  H = LL' with L lower triangular
+   *        <tt>Chol(H) = L ->  H = LL'</tt> with L lower triangular
    *   This requires Pi, H to be positive definite. Positive semi-definite is not sufficient.
    *    Notably, H==0  will not work.
    *
