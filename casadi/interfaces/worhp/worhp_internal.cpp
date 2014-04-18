@@ -143,10 +143,10 @@ namespace casadi{
     addOption("qp_scaleIntern",OT_BOOLEAN,worhp_p_.qp.scaleIntern,"Enable scaling on QP level.");
     addOption("qp_strict",OT_BOOLEAN,worhp_p_.qp.strict,"Use strict termination criteria in IP method.");
 
-    worhp_o_.initialized = false;
-    worhp_w_.initialized = false;
-    worhp_p_.initialized = false;
-    worhp_c_.initialized = false;
+    worhp_o_.initialised = false;
+    worhp_w_.initialised = false;
+    worhp_p_.initialised = false;
+    worhp_c_.initialised = false;
 
     // WORKAROUND: Bug in scaling, set to false by default // FIXME
     setOption("ScaledObj",false);
@@ -156,7 +156,7 @@ namespace casadi{
   }
 
   WorhpInternal::~WorhpInternal(){
-    if (worhp_p_.initialized || worhp_o_.initialized || worhp_w_.initialized || worhp_c_.initialised)
+    if (worhp_p_.initialised || worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised)
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
   }
 
@@ -165,10 +165,10 @@ namespace casadi{
     WorhpInternal* node = new WorhpInternal(*this);
 
     // Mark Worhp datastructures not initialized to avoid double freeing
-    node->worhp_o_.initialized = false;
-    node->worhp_w_.initialized = false;
-    node->worhp_p_.initialized = false;
-    node->worhp_c_.initialized = false;
+    node->worhp_o_.initialised = false;
+    node->worhp_w_.initialised = false;
+    node->worhp_p_.initialised = false;
+    node->worhp_c_.initialised = false;
 
     return node;
   }
@@ -241,17 +241,17 @@ namespace casadi{
     worhp_o_.m = ng_;
 
     // Free existing Worhp memory (except parameters)
-    bool p_init_backup = worhp_p_.initialized;
-    worhp_p_.initialized = false; // Avoid freeing the memory for parameters
-    if (worhp_o_.initialized || worhp_w_.initialized || worhp_c_.initialized){
+    bool p_init_backup = worhp_p_.initialised;
+    worhp_p_.initialised = false; // Avoid freeing the memory for parameters
+    if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised){
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
     }
-    worhp_p_.initialized = p_init_backup;
+    worhp_p_.initialised = p_init_backup;
 
     /// Control data structure needs to be reset every time
-    worhp_c_.initialized = false;
-    worhp_w_.initialized = false;
-    worhp_o_.initialized = false;
+    worhp_c_.initialised = false;
+    worhp_w_.initialised = false;
+    worhp_o_.initialised = false;
 
     // Worhp uses the CS format internally, hence it is the preferred sparse matrix format.
     worhp_w_.DF.nnz = nx_;
@@ -393,7 +393,7 @@ namespace casadi{
     if (hasSetOption("qp_strict")) worhp_p_.qp.strict = getOption("qp_strict");
 
     // Mark the parameters as set
-    worhp_p_.initialized = true;
+    worhp_p_.initialised = true;
   }
 
   std::string WorhpInternal::formatStatus(int status) const {
@@ -864,7 +864,7 @@ namespace casadi{
     int status;
     char *cpy = new char[file.size()+1] ;
     strcpy(cpy, file.c_str());
-    worhp_p_.initialized = true;
+    worhp_p_.initialised = true;
     ReadParamsNoInit(&status, cpy, &worhp_p_);
     delete cpy;
 
