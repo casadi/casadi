@@ -490,11 +490,11 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DPLEOutput:
-      if(i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
+      if(i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_ControlledDAEInput:
       if(i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Should have same amount of non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
+      if(i==1) return "non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
       if(i==2) return "Algebraic state vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
       if(i==3) return "Parameter vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
       if(i==4) return "Control vector (dimension nu-by-1).";  // NOLINT(whitespace/line_length)

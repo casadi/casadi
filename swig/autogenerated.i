@@ -56,7 +56,7 @@ def dpleIn(*dummy,**kwargs):
           all arguments optional
      b) a, v = dpleIn(arg,"a", "v")
           all arguments after the first optional
-  Input arguments of a dple solver
+  Input arguments of a \e dple solver
   
   Keyword arguments:
     a -- A matrices (horzcat when const_dim, blkdiag otherwise) [DPLE_A]
@@ -102,10 +102,10 @@ def dpleOut(*dummy,**kwargs):
           all arguments optional
      b) p = dpleOut(arg,"p")
           all arguments after the first optional
-  Output arguments of a dple solver
+  Output arguments of a \e dple solver
   
   Keyword arguments:
-    p -- Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def) [DPLE_P]
+    p -- Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [DPLE_P]
   """
   if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEOutput,n)] for n in dummy[1:]]
@@ -148,7 +148,7 @@ def controldaeIn(*dummy,**kwargs):
   
   Keyword arguments:
     t        -- Global physical time. (1-by-1) [CONTROL_DAE_T]
-    x        -- Should have same amount of non-zeros as DAEOutput:DAE_RES [CONTROL_DAE_X]
+    x        -- non-zeros as DAEOutput:DAE_RES [CONTROL_DAE_X]
     z        -- Algebraic state vector (dimension np-by-1). [CONTROL_DAE_Z]
     p        -- Parameter vector (dimension np-by-1). [CONTROL_DAE_P]
     u        -- Control vector (dimension nu-by-1). [CONTROL_DAE_U]
@@ -1480,7 +1480,7 @@ def ocpIn(*dummy,**kwargs):
   Input arguments of an OCP Solver
   ns: Number of shooting nodes: from option number_of_grid_points
   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size()
-  nc: Number of constants duting intergation: ffcn.input(INTEGRATOR_P).size()
+  nc: Number of constants during integration: ffcn.input(INTEGRATOR_P).size()
   nu: Number of controls: from nc - np
   np: Number of parameters: from option number_of_parameters
   nh: Number of point constraints: from cfcn.input(0).size()

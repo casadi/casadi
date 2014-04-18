@@ -40,7 +40,7 @@ class CASADI_SYMBOLIC_EXPORT DPLEInputIOSchemeVector : public IOSchemeVector<M> 
       : IOSchemeVector<M>(t,SCHEME_DPLEInput){}
 };
 /// \endcond
-/// Input arguments of a dple solver
+/// Input arguments of a \e dple solver
 ///
 /// \copydoc scheme_DPLEInput
 template<class M>
@@ -84,7 +84,7 @@ class CASADI_SYMBOLIC_EXPORT DPLEOutputIOSchemeVector : public IOSchemeVector<M>
       : IOSchemeVector<M>(t,SCHEME_DPLEOutput){}
 };
 /// \endcond
-/// Output arguments of a dple solver
+/// Output arguments of a \e dple solver
 ///
 /// \copydoc scheme_DPLEOutput
 template<class M>
