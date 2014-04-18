@@ -21,11 +21,22 @@ def getAttribute(e,name,default=""):
   return d.attrib["value"]
 
 def getDocstring(e):
-  #return ""
   return getAttribute(e,"feature_docstring")
 
 def getModule(x):
   return x.xpath('ancestor-or-self::*/module/attributelist/attribute[@name="name"]')[-1].attrib['value']
+
+def isInternal(d,msg=None):
+  fd = d.find('attributelist/attribute[@name="feature_docstring"]')
+  fn = d.find('attributelist/attribute[@name="name"]')
+  name = [fn if fn is None else fn.attrib['value']]
+  if fd is None:
+    return False
+    #raise Exception("isInternal find fail",d.tag,name,msg)
+  v = fd.attrib['value']
+  return v.strip().startswith("[INTERNAL]")
+#  return "[INTERNAL]" in v
+#  return not (("_EXPORT" in v) and ("CASADI_" in v))
 
 # get all the enums
 enums = {}
@@ -33,6 +44,9 @@ for d in r.findall('*//enum'):
   if getModule(d) != my_module: continue
   sym_name = getAttribute(d,"sym_name")
   docs = getDocstring(d)
+  #if isInternal(d):
+  #  continue
+
   assert sym_name not in enums, "overwriting an enum"
   dt = enums[sym_name] = {"sym_name": sym_name, "docs": docs,"entries":{}}
   for e in d.findall('enumitem'):
@@ -46,10 +60,20 @@ for d in r.findall('*//enum'):
 
 
 # get all the classes
-classes = {}
+internalClasses = []
+classes0 = {}
+symnameToName = {}
 for c in r.findall('*//class'):
   name = c.find('attributelist/attribute[@name="name"]').attrib["value"]
-  docs = getDocstring(c)
+  symname = c.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
+
+  if name == "casadi::"+symname:
+    pass
+  else:
+    assert symname not in symnameToName, "overwriting a class symname"
+    symnameToName[symname] = name
+    assert "casadi::"+symname not in symnameToName, "overwriting a class symname"
+    symnameToName["casadi::"+symname] = name
 
   classModule = c.find('attributelist/attribute[@name="module"]').attrib["value"]
   if name.startswith("std::vector<"): continue
@@ -57,9 +81,58 @@ for c in r.findall('*//class'):
   if classModule is None: raise ValueError("class module information missing")
   if classModule != getModule(c): raise ValueError("class module information different than getModule()")
   if classModule != my_module: continue
+  if isInternal(c,msg="class"):
+    internalClasses.append(name)
+    continue
 
-  assert name not in classes, "overwriting a class"
-  data = classes[name] = {'methods': [],"constructors":[],"docs": docs}
+  assert name not in classes0, "overwriting a class"
+  classes0[name] = c
+
+internalClasses.extend(["casadi::SXNode",
+                        "casadi::CallbackCPtr",
+                        "casadi::DerivativeGeneratorCPtr",
+                        "casadi::CustomEvaluateCPtr"])
+
+def splitQualifiers(x):
+  for q0 in ['r.','p.','q(const).']:
+    if x.startswith(q0):
+      (q1,ret) = splitQualifiers( x[len(q0):] )
+      return ([q0]+q1, ret)
+  return ([],x)
+
+def stripQualifiers(x):
+  return splitQualifiers(x)[1]
+
+def internalClass(p):
+  return stripQualifiers(p) in internalClasses
+
+classes = {}
+numInternalMethods = 0
+numExposedMethods = 0
+numExposedConstructors = 0
+numInternalConstructors = 0
+
+def getCanonicalType(x):
+  (q,v) = splitQualifiers( x )
+  if v in symnameToName:
+    return ''.join(q)+symnameToName[v]
+  else:
+    return x
+
+def getCanonicalParams(d,debug=""):
+  params = []
+  if d.find('attributelist/parmlist') is not None:
+    for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]'):
+      params.append( getCanonicalType(x.attrib['value']) )
+
+  return params
+
+for name,c in classes0.items():
+  docs = getDocstring(c)
+  if name in classes:
+    data = classes[name]
+  else:
+    data = classes[name] = {'methods': [],"constructors":[],"docs": docs,"bases":[]}
 
   for d in c.findall('cdecl'):
     dname = d.find('attributelist/attribute[@name="name"]').attrib["value"]
@@ -73,52 +146,75 @@ for c in r.findall('*//class'):
     if featureIgnore is not None and featureIgnore.attrib['value'] == '1':
       continue
 
-    if d.find('attributelist/parmlist') is None:
-      params = []
-    else:
-      params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
+    params = getCanonicalParams(d,debug="method")
 
-    rettype = d.find('attributelist/attribute[@name="type"]').attrib["value"]
+    if any([p.endswith("Creator") for p in params]): continue
+    if any([internalClass(p) for p in params]):
+      numInternalMethods += 1
+      continue
+
+    rettype = getCanonicalType( d.find('attributelist/attribute[@name="type"]').attrib["value"] )
+
+    if internalClass(rettype):
+      numInternalMethods += 1
+      continue
     storage = getAttribute(d,"storage")
 
     access = getAttribute(d,"access")
     if access=="private": continue
+
+    if dname == "ptr": continue # WORKAROUND FOR POTENTIAL SWIG BUG
+
+    #if isInternal(d,msg="methods"):
+    #  numInternalMethods += 1
+    #  continue
+    numExposedMethods += 1
 
     docs = getDocstring(d)
 
     data["methods"].append((dname,params,rettype,"Static" if storage=="static" else "Normal",docs))
 
   for d in itertools.chain(c.findall('constructor'),c.findall('extend/constructor')):
-    if d.find('attributelist/parmlist') is None:
-      params = []
-    else:
-      params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
+    params = getCanonicalParams(d,debug="constructor")
+    if any([p.endswith("Creator") for p in params]): continue
+    if any([internalClass(p) for p in params]):
+      numInternalConstructors += 1
+      continue
 
     rettype = name
     access = getAttribute(d,"access")
     if access=="private": continue
 
+    if isInternal(d,msg="constructors"):
+      numInternalConstructors += 1
+      continue
+    if internalClass(rettype):
+      numInternalConstructors += 1
+      continue
+    numExposedConstructors += 1
     docs = getDocstring(d)
-    data["methods"].append((dname,params,rettype,"Constructor",docs))
+    data["methods"].append(("CONSTRUCTOR",params,rettype,"Constructor",docs))
 
-  data["bases"] = []
   for d in c.findall('attributelist/baselist/base'):
     base = d.attrib["name"]
-    data["bases"].append(base)
+    #if isInternal(d,msg="bases"): continue
+    data["bases"].append( getCanonicalType( base ) )
 
 for n,c in classes.items():
   new_bases = []
   for base in c['bases']:
     assert not base.startswith('std::'), "baseclass rename fail"
     if base.startswith('casadi::'):
-      new_bases.append(base)
+      new_bases.append( getCanonicalType( base ) )
     else:
-      new_bases.append('casadi::'+base)
+      new_bases.append( getCanonicalType( 'casadi::'+base ) )
+
   classes[n]['bases'] = new_bases
 
 
 # get all the functions
 functions = []
+numInternalFunctions = 0
 for d in r.findall('*//namespace/cdecl'):
   if d.find('attributelist/attribute[@name="sym_name"]') is None: continue
   if d.find('attributelist/attribute[@name="kind"]').attrib["value"]!="function": continue
@@ -126,13 +222,20 @@ for d in r.findall('*//namespace/cdecl'):
   dname = d.find('attributelist/attribute[@name="sym_name"]').attrib["value"]
   if dname == "dummy": continue
   if my_module != getModule(d): continue
+  if isInternal(d,msg="functions"):
+    numInternalFunctions += 1
+    continue
 
-  if d.find('attributelist/parmlist') is None:
-    params = []
-  else:
-    params = [ x.attrib["value"] for x in d.findall('attributelist/parmlist/parm/attributelist/attribute[@name="type"]') ]
+  params = getCanonicalParams(d,debug="function")
+  if any([p.endswith("Creator") for p in params]): continue
+  if any([internalClass(p) for p in params]):
+    numInternalFunctions += 1
+    continue
 
-  rettype = getAttribute(d,"type")
+  rettype = getCanonicalType( getAttribute(d,"type") )
+  if internalClass(rettype):
+    numInternalFunctions += 1
+    continue
   docs = getDocstring(d)
 
   functions.append((dname,params,rettype,docs))
@@ -167,12 +270,12 @@ for k,v in classes.items():
   methods = []
   if "methods" in v:
     for (name,pars,rettype,mkind,docs) in getAllMethods(k): # v["methods"]:
-      methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":docs,"methodDocslink":""})
+      methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":"","methodDocslink":""})
 
-  treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": v["docs"],"classDocslink":""})
+  treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": "","classDocslink":""})
 
 for (name,pars,rettype,docs) in functions:
-  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":""})
+  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":"","funDocslink":""})
 
 for k,v in enums.items():
   treedata["treeEnums"][k] = {
@@ -186,6 +289,10 @@ print "%5d classes %5d functions %5d enums" % (len(treedata['treeClasses']),
                                                len(treedata['treeFunctions']),
                                                len(treedata['treeEnums']))
 
+#print "classes:      %5d exposed %5d internal" % (len(classes),           len(internalClasses))
+#print "methods:      %5d exposed %5d internal" % (numExposedMethods,      numInternalMethods)
+#print "constructors: %5d exposed %5d internal" % (numExposedConstructors, numInternalConstructors)
+#print "functions:    %5d exposed %5d internal" % (len(functions),         numInternalFunctions)
 
 treedata["treeInheritance"] = dict((k, [i for i in v["bases"]]) for k,v in classes.items())
 
