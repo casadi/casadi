@@ -47,11 +47,11 @@ namespace casadi{
     IOSchemeVector(const std::vector<T>& d = std::vector<T>(), const IOScheme& s = IOScheme()) : data(d), scheme(s){}
 
 #ifndef SWIG
-    //@{
+    ///@{
     // Automatic type conversion
     operator std::vector<T>&(){ return this->data;}
     operator const std::vector<T>&() const{ return this->data;}
-    //@}
+    ///@}
     T operator[](int i) const {
       casadi_assert_message(i>=0 && i<this->data.size(),"Index error for " << this->scheme.name() << ": supplied integer must be >=0 and <= " << this->data.size() << " but got " << i << ".");
       return this->data.at(i);

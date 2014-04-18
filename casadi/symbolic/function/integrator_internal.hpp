@@ -108,7 +108,7 @@ namespace casadi{
     // Create sparsity pattern of the extended Jacobian (backward problem)
     Sparsity spJacG();
 
-    //@{
+    ///@{
     // Shorthands
     DMatrix&  x0(){ return input(INTEGRATOR_X0 );}
     DMatrix&   p(){ return input(INTEGRATOR_P  );}
@@ -122,7 +122,7 @@ namespace casadi{
     DMatrix& rxf(){ return output(INTEGRATOR_RXF);}
     DMatrix& rqf(){ return output(INTEGRATOR_RQF);}
     DMatrix& rzf(){ return output(INTEGRATOR_RZF);}
-    //@}
+    ///@}
 
     /// Number of states for the forward integration
     int nx_, nz_, nq_;

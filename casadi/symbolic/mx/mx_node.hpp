@@ -33,7 +33,7 @@
 
 namespace casadi{
   /// \cond INTERNAL
-  //@{
+  ///@{
   /** \brief Convenience function, convert vectors to vectors of pointers */
   template<class T>
   std::vector<T*> ptrVec(std::vector<T>& v){
@@ -66,7 +66,7 @@ namespace casadi{
       ret[i] = ptrVec(v[i]);
     return ret;
   }
-  //@}
+  ///@}
 
 
   /** \brief Node class for MX objects

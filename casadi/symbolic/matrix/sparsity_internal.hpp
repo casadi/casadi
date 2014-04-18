@@ -232,14 +232,14 @@ namespace casadi{
     /// Get the dimension as a string
     std::string dimString() const;
 
-    //@{
+    ///@{
     /// Sparsity pattern for a matrix-matrix product (details in public class)
     Sparsity patternProduct(const Sparsity& x_trans,
                             std::vector< std::vector< std::pair<int,int> > >& mapping) const;
     Sparsity patternProduct(const Sparsity& x_trans) const;
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Union of two sparsity patterns
     Sparsity patternCombine(const Sparsity& y, bool f0x_is_zero, bool function0_is_zero,
                             std::vector<unsigned char>& mapping) const;
@@ -251,7 +251,7 @@ namespace casadi{
 
     template<bool with_mapping, bool f0x_is_zero, bool function0_is_zero>
     Sparsity patternCombineGen(const Sparsity& y, std::vector<unsigned char>& mapping) const;
-    //@}
+    ///@}
 
     /// Take the inverse of a sparsity pattern; flip zeros and non-zeros
     Sparsity patternInverse() const;

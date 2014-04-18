@@ -110,27 +110,27 @@ namespace casadi{
 #endif
 
     /** \brief Create a scalar sparsity pattern **/
-    //@{
+    ///@{
     static Sparsity scalar(bool dense_scalar=true){ return dense_scalar ? dense(1,1) : sparse(1,1);}
-    //@}
+    ///@}
 
     /** \brief Create a dense rectangular sparsity pattern **/
-    //@{
+    ///@{
     static Sparsity dense(int nrow, int ncol=1);
     static Sparsity dense(const std::pair<int,int> &rc){ return dense(rc.first,rc.second);}
-    //@}
+    ///@}
 
     /** \brief Create a sparse (empty) rectangular sparsity pattern **/
-    //@{
+    ///@{
     static Sparsity sparse(int nrow, int ncol=1);
     static Sparsity sparse(const std::pair<int,int> &rc){ return sparse(rc.first,rc.second);}
-    //@}
+    ///@}
 
     /** \brief Create the sparsity pattern for a unit vector of length n and a nonzero on
      * position el **/
-    //@{
+    ///@{
     static Sparsity unit(int n, int el);
-    //@}
+    ///@}
 
     /** \brief Create a upper triangular square sparsity pattern **/
     static Sparsity triu(int n);
@@ -139,11 +139,11 @@ namespace casadi{
     static Sparsity tril(int n);
 
     /** \brief Create diagonal sparsity pattern **/
-    //@{
+    ///@{
     static Sparsity diag(int nrow){ return diag(nrow,nrow);}
     static Sparsity diag(int nrow, int ncol);
     static Sparsity diag(const std::pair<int,int> &rc){ return diag(rc.first,rc.second);}
-    //@}
+    ///@}
 
     /** \brief Create a single band in a square sparsity pattern
      *
@@ -186,12 +186,12 @@ namespace casadi{
        Note that the last element, colind[ncol], gives the number of nonzeros
      * The last colind[ncol] entries are the row indices
      **/
-    //@{
+    ///@{
     static Sparsity compressed(const std::vector<int>& v);
 #ifndef SWIG
     static Sparsity compressed(const int* v);
 #endif // SWIG
-    //@}
+    ///@}
 
     /// \cond INTERNAL
     /** \brief Check if there is an identical copy of the sparsity pattern in the cache,

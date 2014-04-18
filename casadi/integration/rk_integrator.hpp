@@ -52,11 +52,11 @@ namespace casadi{
      */
     explicit RKIntegrator(const Function& f, const Function& g=Function());
 
-    //@{
+    ///@{
     /// Access functions of the node
     RKIntegratorInternal* operator->();
     const RKIntegratorInternal* operator->() const;
-    //@}
+    ///@}
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

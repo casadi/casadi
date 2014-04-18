@@ -43,7 +43,7 @@ class CASADI_NONLINEAR_PROGRAMMING_EXPORT SymbolicNLP : public PrintableObject{
     /** @name Symbolic representation of the NLP
     *  Data members
     */
-    //@{
+    ///@{
 
       /// Variables
       SX x;
@@ -66,7 +66,7 @@ class CASADI_NONLINEAR_PROGRAMMING_EXPORT SymbolicNLP : public PrintableObject{
       /// Dual initial guess
       DMatrix lambda_init;
 
-    //@}
+    ///@}
 
     /// Parse an AMPL och PyOmo NL-file
     void parseNL(const std::string& filename, const Dictionary& options = Dictionary());

@@ -109,7 +109,7 @@ namespace casadi{
     const SXFunctionInternal* operator->() const;
 /// \endcond
 
-    //@{
+    ///@{
     /** \brief Jacobian via source code transformation
      *
      * \see casadi::Jacobian for an AD approach
@@ -122,34 +122,34 @@ namespace casadi{
     SX jac(const std::string& iname, const std::string& oname,
            bool compact=false, bool symmetric=false)
     { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Gradient via source code transformation
     SX grad(int iind=0, int oind=0);
     SX grad(const std::string& iname, int oind=0) { return grad(inputSchemeEntry(iname),oind); }
     SX grad(int iind, const std::string& oname) { return grad(iind,outputSchemeEntry(oname)); }
     SX grad(const std::string& iname, const std::string& oname)
     { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Tangent via source code transformation
     SX tang(int iind=0, int oind=0);
     SX tang(const std::string& iname, int oind=0) { return tang(inputSchemeEntry(iname),oind); }
     SX tang(int iind, const std::string& oname) { return tang(iind,outputSchemeEntry(oname)); }
     SX tang(const std::string& iname, const std::string& oname)
     { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /// Hessian (forward over adjoint) via source code transformation
     SX hess(int iind=0, int oind=0);
     SX hess(const std::string& iname, int oind=0) { return hess(inputSchemeEntry(iname),oind); }
     SX hess(int iind, const std::string& oname) { return hess(iind,outputSchemeEntry(oname)); }
     SX hess(const std::string& iname, const std::string& oname)
     { return hess(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
-    //@}
+    ///@}
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

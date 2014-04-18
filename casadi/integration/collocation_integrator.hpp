@@ -55,11 +55,11 @@ namespace casadi{
      */
     explicit CollocationIntegrator(const Function& f, const Function& g=Function());
 
-    //@{
+    ///@{
     /// Access functions of the node
     CollocationIntegratorInternal* operator->();
     const CollocationIntegratorInternal* operator->() const;
-    //@}
+    ///@}
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

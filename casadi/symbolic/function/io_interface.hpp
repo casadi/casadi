@@ -42,7 +42,7 @@ namespace casadi{
     /// \cond UNSAFE
     /// \brief [UNSAFE] Obtain reference to inputs
     // \seealso getInput, setInput
-    //@{
+    ///@{
     /// Access input argument
     inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind);}
     inline const Matrix<double>& input(const std::string &iname) const
@@ -52,11 +52,11 @@ namespace casadi{
 #endif
     inline Matrix<double>& input(int iind=0){ return inputS<true>(iind);}
     inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
-    //@}
+    ///@}
 
     /// \brief [UNSAFE] Obtain reference to outputs
     // \seealso getOutput, getOutput
-    //@{
+    ///@{
     /// Access output argument
     inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind);}
     inline const Matrix<double>& output(const std::string &oname) const
@@ -67,7 +67,7 @@ namespace casadi{
     inline Matrix<double>& output(int oind=0){ return outputS<true>(oind);}
     inline Matrix<double>& output(const std::string &oname)
     { return output(outputSchemeEntry(oname));}
-    //@}
+    ///@}
     /// \endcond
 
     /// Get the number of function inputs

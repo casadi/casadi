@@ -91,7 +91,7 @@ namespace casadi{
     /** @name Variables and equations
      *  Public data members
      */
-    //@{
+    ///@{
     /** \brief Independent variable (usually time) */
     SX t;
 
@@ -170,7 +170,7 @@ namespace casadi{
      * The definitions can be retrieved by calling the method #beq with cd as argument.
     */
     SX cd;
-    //@}
+    ///@}
 
     /// Interval start time
     double t0;
@@ -193,19 +193,19 @@ namespace casadi{
     /// Time points
     std::vector<double> tp;
 
-    //@}
+    ///@}
 
     /** @name Objective function terms
      *  Terms in the objective function.
      */
-    //@{
+    ///@{
 
     /// Mayer terms in the objective (point terms)
     SX mterm;
 
     /// Lagrange terms in the objective (integral terms)
     SX lterm;
-    //@}
+    ///@}
 
     /** \brief Path constraints of the optimal control problem
      */
@@ -221,16 +221,16 @@ namespace casadi{
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
 
-    //@{
+    ///@{
     /// Access a variable by name
     Variable& variable(const std::string& name);
     const Variable& variable(const std::string& name) const;
-    //@}
+    ///@}
 
     /** @name Manipulation
      *  Reformulate the dynamic optimization problem.
      */
-    //@{
+    ///@{
 
     /// Identify and separate the algebraic variables and equations in the DAE
     void separateAlgebraic();
@@ -281,7 +281,7 @@ namespace casadi{
     void generateMuscodDatFile(const std::string& filename,
                                const Dictionary& mc2_ops=Dictionary()) const;
 
-    //@}
+    ///@}
 
     /// Scale the variables
     void scaleVariables();

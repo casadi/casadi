@@ -330,7 +330,7 @@ namespace casadi{
   /** \brief Print compact, introducing new variables for shared subexpressions */
   CASADI_SYMBOLIC_EXPORT void printCompact(const MX& ex, std::ostream &stream=std::cout);
 
-  //@{
+  ///@{
   /** \brief Calculate jacobian via source code transformation
 
       Uses casadi::MXFunction::jac
@@ -338,7 +338,7 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT MX jacobian(const MX &ex, const MX &arg);
   CASADI_SYMBOLIC_EXPORT MX gradient(const MX &ex, const MX &arg);
   CASADI_SYMBOLIC_EXPORT MX tangent(const MX &ex, const MX &arg);
-  //@}
+  ///@}
 
   /** \brief Computes the nullspace of a matrix A
   *

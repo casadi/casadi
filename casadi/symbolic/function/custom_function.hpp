@@ -46,7 +46,7 @@ public:
 /** \brief  default constructor */
   CustomFunction();
 
-  //@{
+  ///@{
   /** \brief  Create a function with input/output schemes given */
   explicit CustomFunction(const CustomEvaluate &c_fcn,
                           const std::vector<Sparsity> &inputscheme,
@@ -63,7 +63,7 @@ public:
   explicit CustomFunction(const CustomEvaluate &c_fcn,
                           const IOSchemeVector< Sparsity > &inputscheme,
                           const IOSchemeVector< Sparsity > &outputscheme);
-  //@}
+  ///@}
 
   /** \brief  Create a function, user sets inputs outputs manually */
   explicit CustomFunction(const CustomEvaluate &c_fcn);

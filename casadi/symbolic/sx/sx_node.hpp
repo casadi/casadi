@@ -51,7 +51,7 @@ namespace casadi{
     /** \brief  destructor  */
     virtual ~SXNode();
 
-    //@{
+    ///@{
     /** \brief  check properties of a node */
     virtual bool isConstant() const; // check if constant
     virtual bool isInteger() const; // check if integer
@@ -64,13 +64,13 @@ namespace casadi{
     virtual bool isNan() const; // check if not a number
     virtual bool isInf() const; // check if infinity
     virtual bool isMinusInf() const; // check if minus infinity
-    //@}
+    ///@}
 
-    //@{
+    ///@{
     /** \brief  Get value of a constant node */
     virtual double getValue() const;  // only works for constant nodes
     virtual int getIntValue() const;  // only works for integer nodes
-    //@}
+    ///@}
 
     virtual const std::string& getName() const; // get the name
 

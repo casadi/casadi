@@ -161,7 +161,7 @@ namespace casadi{
     /// \endcond
 
 
-    //@{
+    ///@{
     /// \cond SWIGINTERNAL
     /// If there are other references to the object, then make a deep copy of it
     // and point to this new object
@@ -173,7 +173,7 @@ namespace casadi{
                     bool clone_members=true);
 #endif
     /// \endcond
-    //@}
+    ///@}
 
 /// \cond INTERNAL
 #ifndef SWIG
@@ -305,7 +305,7 @@ namespace casadi{
     return !shared_cast<B>(A).isNull();
   }
 
-  //@{
+  ///@{
   /// Make a deep copy of an object (Note: default is a shallow copy!)
   template<class A>
   A deepcopy(const A& a){
@@ -345,7 +345,7 @@ namespace casadi{
     return ret;
   }
   /// \endcond
-  //@}
+  ///@}
 
   /// \cond INTERNAL
   // Template function implementations

@@ -74,11 +74,11 @@ namespace casadi{
 
     // The following functions are called internally from EvaluateMX.
     // For documentation, see the MXNode class
-    //@{
+    ///@{
     virtual void evaluateMX(MXNode* node, const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed,
                             MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens,
                             bool output_given);
-    //@}
+    ///@}
 
     /// Number of equations
     int n_;

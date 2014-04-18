@@ -57,7 +57,7 @@ public:
   /// Linear solver forward, backward
   LinearSolver linsol_, linsolB_;
 
-  //@{
+  ///@{
   /// options
   bool exact_jacobian_, exact_jacobianB_;
   double abstol_, reltol_;
@@ -66,7 +66,7 @@ public:
   int max_num_steps_;
   bool finite_difference_fsens_;
   bool stop_at_end_;
-  //@}
+  ///@}
 
   /// number of checkpoints stored so far
   int ncheck_;

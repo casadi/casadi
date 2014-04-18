@@ -33,7 +33,7 @@
 
 namespace casadi{
 
-  //@{
+  ///@{
   /** \brief Obtain collocation points of specific order and scheme
   \param scheme  'radau' or 'legendre'
   **/
@@ -43,7 +43,7 @@ namespace casadi{
   CASADI_INTEGRATION_EXPORT
     std::vector<long double> collocationPointsL(int order, const std::string& scheme="radau");
 #endif // SWIG
-  //@}
+  ///@}
 
   /** \brief Obtain collocation interpolating matrices
   \param tau_root  location of collocation points, as obtained from collocationPoints

@@ -48,10 +48,10 @@ namespace casadi{
     /// Dense matrix constructor with data given as vector of vectors
     explicit SparseStorage(const std::vector< std::vector<DataType> >& m);
 
-    //@{
+    ///@{
     /// Sparse matrix with a given sparsity
     explicit SparseStorage(const Sparsity& sparsity, const DataType& val=DataType(0));
-    //@}
+    ///@}
 
     /// Sparse matrix with a given sparsity and non-zero elements.
     SparseStorage(const Sparsity& sparsity, const std::vector<DataType>& d);

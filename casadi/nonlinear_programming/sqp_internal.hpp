@@ -61,13 +61,13 @@ public:
   double min_step_size_;
 
   /// Linesearch parameters
-  //@{
+  ///@{
   double sigma_;
   double c1_;
   double beta_;
   int max_iter_ls_;
   int merit_memsize_;
-  //@}
+  ///@}
 
   /// Hessian regularization
   double reg_;

@@ -247,7 +247,7 @@ namespace casadi{
    */
   CASADI_SYMBOLIC_EXPORT std::vector<SXElement> getSymbols(const SX& e);
 
-  //@{
+  ///@{
   /** \brief Calculate jacobian via source code transformation
 
       Uses casadi::SXFunction::jac
@@ -258,7 +258,7 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT SX hessian(const SX &ex, const SX &arg);
   // hessian and gradient:
   CASADI_SYMBOLIC_EXPORT void hessian(const SX &ex, const SX &arg, SX &H, SX &g);
-  //@}
+  ///@}
 
   /** \brief Calculate the Jacobian and multiply by a vector from the left
       This is equivalent to <tt>mul(jacobian(ex,arg),v)</tt> or

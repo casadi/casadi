@@ -61,7 +61,7 @@ public:
   double min_step_size_;
 
   /// Linesearch parameters
-  //@{
+  ///@{
   double sigma_;
   double c1_;
   double beta_;
@@ -70,7 +70,7 @@ public:
   double sigmaMax_;
   double dvMax_;
   double alphaMin_;
-  //@}
+  ///@}
 
   /// Hessian regularization
   double reg_;
