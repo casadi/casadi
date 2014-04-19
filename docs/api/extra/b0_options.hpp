@@ -1615,7 +1615,7 @@
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>False</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate wether statistics must be gathered</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>None</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>None</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::WorhpInternal</td></tr>
@@ -1813,7 +1813,7 @@
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>False</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate wether statistics must be gathered</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>None</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>None</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::WorhpInternal</td></tr>
@@ -2187,7 +2187,7 @@
 <tr><td>gamma_phi</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the filter margin for the barrier function. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gamma_theta</td><td>OT_REAL</td><td>1e-05</td><td>Relaxation factor in the filter margin for the constraint violation. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate wether statistics must be gathered</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>None</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>None</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::IpoptInternal</td></tr>
@@ -2506,7 +2506,7 @@
 <tr><td>gamma_phi</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the filter margin for the barrier function. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gamma_theta</td><td>OT_REAL</td><td>1e-05</td><td>Relaxation factor in the filter margin for the constraint violation. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate wether statistics must be gathered</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>False</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>None</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>None</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::IpoptInternal</td></tr>

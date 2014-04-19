@@ -282,7 +282,7 @@
 <caption>Input scheme: casadi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 10) [controldaeIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>CONTROL_DAE_T</td><td>t</td><td>Global physical time. (1-by-1) .</td></tr>
-<tr><td>CONTROL_DAE_X</td><td>x</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES </td></tr>
+<tr><td>CONTROL_DAE_X</td><td>x</td><td>State vector (dimension nx-by-1). Should have the same amount of non-zeros as DAEOutput:DAE_RES </td></tr>
 <tr><td>CONTROL_DAE_Z</td><td>z</td><td>Algebraic state vector (dimension np-by-1). .</td></tr>
 <tr><td>CONTROL_DAE_P</td><td>p</td><td>Parameter vector (dimension np-by-1). .</td></tr>
 <tr><td>CONTROL_DAE_U</td><td>u</td><td>Control vector (dimension nu-by-1). .</td></tr>
@@ -414,7 +414,7 @@
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::DPLEOutput  (DPLE_NUM_OUT = 2) [dpleOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (cholesky of P if pos_def) .</td></tr>
+<tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) .</td></tr>
 </table>
 */
 /** \defgroup scheme_HessLagInput
