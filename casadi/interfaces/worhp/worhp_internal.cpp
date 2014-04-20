@@ -35,8 +35,10 @@ namespace casadi{
   WorhpInternal::WorhpInternal(const Function& nlp) : NLPSolverInternal(nlp){
 
     // Monitors
-    addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
-    addOption("print_time",         OT_BOOLEAN,       true,           "Print information about execution time");
+    addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions",
+              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
+    addOption("print_time",         OT_BOOLEAN,       true,
+              "Print information about execution time");
 
     int status;
     InitParams(&status, &worhp_p_);
@@ -75,7 +77,8 @@ namespace casadi{
 
     addOption("qp_ipBarrier",OT_REAL,worhp_p_.qp.ipBarrier,"IP barrier parameter.");
     addOption("qp_ipComTol",OT_REAL,worhp_p_.qp.ipComTol,"IP complementarity tolerance.");
-    addOption("qp_ipFracBound",OT_REAL,worhp_p_.qp.ipFracBound,"IP fraction-to-the-boundary parameter.");
+    addOption("qp_ipFracBound",OT_REAL,worhp_p_.qp.ipFracBound,
+              "IP fraction-to-the-boundary parameter.");
     addOption("qp_ipLsMethod",OT_STRING,GenericType(),
       "Select the direct linear solver used by the IP method.",
       "LAPACK::0|MA57: only available if provided by the user:1|"
@@ -110,7 +113,8 @@ namespace casadi{
     setOptionByEnumValue("qp_lsItPrecondMethod",worhp_p_.qp.lsItPrecondMethod);
     addOption("qp_lsRefineMaxIter",OT_INTEGER,worhp_p_.qp.lsRefineMaxIter,
       "Maximum number of iterative refinement steps of the direct linear solvers.");
-    addOption("qp_lsScale",OT_BOOLEAN,worhp_p_.qp.lsScale,"Enables scaling on linear solver level.");
+    addOption("qp_lsScale",OT_BOOLEAN,worhp_p_.qp.lsScale,
+              "Enables scaling on linear solver level.");
     addOption("qp_lsTrySimple",OT_BOOLEAN,worhp_p_.qp.lsTrySimple,
       "Some matrices can be solved without calling a linear equation solver."
       "Currently only diagonal matrices are supported."
@@ -134,14 +138,16 @@ namespace casadi{
       "Select the direct linear solver used by the NSN method.",
       "SuperLU::2|MA48: only available if provided by the user:4");
     setOptionByEnumValue("qp_nsnLsMethod",worhp_p_.qp.nsnLsMethod);
-    addOption("qp_nsnMinAlpha",OT_REAL,worhp_p_.qp.nsnMinAlpha,"NSN line search minimum step size.");
+    addOption("qp_nsnMinAlpha",OT_REAL,worhp_p_.qp.nsnMinAlpha,
+              "NSN line search minimum step size.");
     addOption("qp_nsnSigma",OT_REAL,worhp_p_.qp.nsnSigma,"NSN line search slope parameter.");
     addOption("qp_printLevel",OT_STRING,GenericType(),
       "Controls the amount of QP solver output.",
       "none:No output.:0|warn:Print warnings and errors.:1|iterations:Print iterations.:2");
     setOptionByEnumValue("qp_printLevel",worhp_p_.qp.printLevel);
     addOption("qp_scaleIntern",OT_BOOLEAN,worhp_p_.qp.scaleIntern,"Enable scaling on QP level.");
-    addOption("qp_strict",OT_BOOLEAN,worhp_p_.qp.strict,"Use strict termination criteria in IP method.");
+    addOption("qp_strict",OT_BOOLEAN,worhp_p_.qp.strict,
+              "Use strict termination criteria in IP method.");
 
     worhp_o_.initialised = false;
     worhp_w_.initialised = false;
@@ -156,7 +162,8 @@ namespace casadi{
   }
 
   WorhpInternal::~WorhpInternal(){
-    if (worhp_p_.initialised || worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised)
+    if (worhp_p_.initialised || worhp_o_.initialised ||
+        worhp_w_.initialised || worhp_c_.initialised)
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
   }
 
@@ -223,7 +230,8 @@ namespace casadi{
     status_[Timeout]="Timeout";
     status_[FDError]="FDError";
     status_[LocalInfeas]="LocalInfeas";
-    status_[LicenseError]="LicenseError. Please set the WORHP_LICENSE_FILE environmental variable with the full path to the license file";
+    status_[LicenseError]="LicenseError. Please set the WORHP_LICENSE_FILE environmental "
+        "variable with the full path to the license file";
     status_[TerminatedByUser]="TerminatedByUser";
     status_[FunctionErrorF]="FunctionErrorF";
     status_[FunctionErrorG]="FunctionErrorG";
@@ -375,8 +383,10 @@ namespace casadi{
     if (hasSetOption("qp_ipResTol")) worhp_p_.qp.ipResTol = getOption("qp_ipResTol");
     if (hasSetOption("qp_lsItMaxIter")) worhp_p_.qp.lsItMaxIter = getOption("qp_lsItMaxIter");
     if (hasSetOption("qp_lsItMethod")) worhp_p_.qp.lsItMethod = getOptionEnumValue("qp_lsItMethod");
-    if (hasSetOption("qp_lsItPrecondMethod")) worhp_p_.qp.lsItPrecondMethod = getOptionEnumValue("qp_lsItPrecondMethod");
-    if (hasSetOption("qp_lsRefineMaxIter")) worhp_p_.qp.lsRefineMaxIter = getOption("qp_lsRefineMaxIter");
+    if (hasSetOption("qp_lsItPrecondMethod"))
+        worhp_p_.qp.lsItPrecondMethod = getOptionEnumValue("qp_lsItPrecondMethod");
+    if (hasSetOption("qp_lsRefineMaxIter"))
+        worhp_p_.qp.lsRefineMaxIter = getOption("qp_lsRefineMaxIter");
     if (hasSetOption("qp_lsScale")) worhp_p_.qp.lsScale = getOption("qp_lsScale");
     if (hasSetOption("qp_lsTrySimple")) worhp_p_.qp.lsTrySimple = getOption("qp_lsTrySimple");
     if (hasSetOption("qp_lsTol")) worhp_p_.qp.lsTol = getOption("qp_lsTol");
@@ -385,7 +395,8 @@ namespace casadi{
     if (hasSetOption("qp_nsnBeta")) worhp_p_.qp.nsnBeta = getOption("qp_nsnBeta");
     if (hasSetOption("qp_nsnGradStep")) worhp_p_.qp.nsnGradStep = getOption("qp_nsnGradStep");
     if (hasSetOption("qp_nsnKKT")) worhp_p_.qp.nsnKKT = getOption("qp_nsnKKT");
-    if (hasSetOption("qp_nsnLsMethod")) worhp_p_.qp.nsnLsMethod = getOptionEnumValue("qp_nsnLsMethod");
+    if (hasSetOption("qp_nsnLsMethod"))
+        worhp_p_.qp.nsnLsMethod = getOptionEnumValue("qp_nsnLsMethod");
     if (hasSetOption("qp_nsnMinAlpha")) worhp_p_.qp.nsnMinAlpha = getOption("qp_nsnMinAlpha");
     if (hasSetOption("qp_nsnSigma")) worhp_p_.qp.nsnSigma = getOption("qp_nsnSigma");
     if (hasSetOption("qp_printLevel")) worhp_p_.qp.printLevel = getOptionEnumValue("qp_printLevel");
@@ -426,7 +437,8 @@ namespace casadi{
     checkInitialBounds();
 
     // Reset the counters
-    t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+    t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ =
+      t_callback_prepare_ = t_mainloop_ = 0;
 
     n_eval_f_ = n_eval_grad_f_ = n_eval_g_ = n_eval_jac_g_ = n_eval_h_ = 0;
 
@@ -493,7 +505,8 @@ namespace casadi{
             static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(worhp_w_.NormMax_CV);
             static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(worhp_w_.ScaledKKT);
             static_cast<std::vector<double> &>(iterations["obj"]).push_back(worhp_o_.F);
-            static_cast<std::vector<double> &>(iterations["alpha_pr"]).push_back(worhp_w_.ArmijoAlpha);
+            static_cast<std::vector<double> &>(
+              iterations["alpha_pr"]).push_back(worhp_w_.ArmijoAlpha);
           }
 
           if (!callback_.isNull()) {
@@ -586,7 +599,8 @@ namespace casadi{
       cout << endl;
       cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s.";
       if (n_eval_grad_f_>0)
-        cout << " (" << n_eval_grad_f_ << " calls, " << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
+        cout << " (" << n_eval_grad_f_ << " calls, "
+             << (t_eval_grad_f_/n_eval_grad_f_)*1000 << " ms. average)";
       cout << endl;
       cout << "time spent in eval_g: " << t_eval_g_ << " s.";
       if (n_eval_g_>0)
@@ -594,7 +608,8 @@ namespace casadi{
       cout << endl;
       cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s.";
       if (n_eval_jac_g_>0)
-        cout << " (" << n_eval_jac_g_ << " calls, " << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
+        cout << " (" << n_eval_jac_g_ << " calls, "
+             << (t_eval_jac_g_/n_eval_jac_g_)*1000 << " ms. average)";
       cout << endl;
       cout << "time spent in eval_h: " << t_eval_h_ << " s.";
       if (n_eval_h_>1)
@@ -625,7 +640,8 @@ namespace casadi{
 
   }
 
-  bool WorhpInternal::eval_h(const double* x, double obj_factor, const double* lambda, double* values){
+  bool WorhpInternal::eval_h(const double* x, double obj_factor,
+                             const double* lambda, double* values){
     try{
       log("eval_h started");
       double time1 = clock();
@@ -680,7 +696,8 @@ namespace casadi{
         std::cout << "H = " << hessLag.output(HESSLAG_HESS) << std::endl;
       }
 
-      if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(hessLag.output(HESSLAG_HESS).data()))
+          casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_h_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -763,7 +780,8 @@ namespace casadi{
       }
       obj_value *= scale;
 
-      if (regularity_check_ && !isRegular(nlp_.output().data())) casadi_error("WorhpInternal::eval_f: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output().data()))
+          casadi_error("WorhpInternal::eval_f: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -800,7 +818,8 @@ namespace casadi{
         }
       }
 
-      if (regularity_check_ && !isRegular(nlp_.output(NL_G).data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(nlp_.output(NL_G).data()))
+          casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -839,7 +858,8 @@ namespace casadi{
         cout << "grad_f = " << gradF_.output() << endl;
       }
 
-      if (regularity_check_ && !isRegular(gradF_.output().data())) casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
+      if (regularity_check_ && !isRegular(gradF_.output().data()))
+          casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
 
       double time2 = clock();
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
@@ -863,7 +883,7 @@ namespace casadi{
   void WorhpInternal::setOptionsFromFile(const std::string & file) {
     int status;
     char *cpy = new char[file.size()+1] ;
-    strcpy(cpy, file.c_str());
+    strcpy(cpy, file.c_str());  // NOLINT(runtime/printf)
     worhp_p_.initialised = true;
     ReadParamsNoInit(&status, cpy, &worhp_p_);
     delete cpy;
@@ -968,7 +988,4 @@ namespace casadi{
 
 map<int,string> WorhpInternal::flagmap = WorhpInternal::calc_flagmap();
 
-
-
 } // namespace casadi
-
