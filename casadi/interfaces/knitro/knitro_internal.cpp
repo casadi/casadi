@@ -31,21 +31,36 @@ using namespace std;
 namespace casadi{
 
   KnitroInternal::KnitroInternal(const Function& nlp) : NLPSolverInternal(nlp){
-    casadi_warning("KnitroInternal: the KNITRO interface is still experimental, more tests are needed");
+    casadi_warning("KnitroInternal: the KNITRO interface is still experimental, "
+                   "more tests are needed");
 
     // Monitors
-    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
+    addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
+              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
 
     // Not yet ready
-    //addOption("algorithm",                OT_STRING, GenericType(), "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
-    //addOption("bar_directinterval",       OT_INTEGER, GenericType(), "When using the Interior/Direct algorithm, this parameter controls the
-    // maximum number of consecutive CG steps before trying to force the algorithm to take a direct step again. See KNITRO documentation.");
-    //addOption("bar_feasible",             OT_STRING, GenericType(), "Whether feasibility is given special emphasis. See KNITRO documentation.", "no|stay|get|get_stay");
-    //addOption("bar_feasmodetol",          OT_REAL, GenericType(), "Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.");
-    //addOption("bar_initmu",               OT_INTEGER, GenericType(), "Initial value for the barrier parameter. See KNITRO documentation.");
-    //addOption("bar_initpt",               OT_STRING, GenericType(), "Whether to use the initial point strategy with barrier algorithms.  See KNITRO documentation.", "auto|yes|no");
-    //addOption("bar_maxbacktrack",         OT_INTEGER, GenericType(), "Maximum allowable number of backtracks during the linesearch of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.");
-    //addOption("bar_maxrefactor",          OT_INTEGER, GenericType(), "Maximum number of refactorizations of the KKT system per iteration of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.");
+    //addOption("algorithm",                OT_STRING, GenericType(),
+    // "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
+    //addOption("bar_directinterval",       OT_INTEGER, GenericType(),
+    //  "When using the Interior/Direct algorithm, this parameter controls the maximum number of "
+    //  "consecutive CG steps before trying to force the algorithm to take a direct step again. "
+    //  "See KNITRO documentation.");
+    //addOption("bar_feasible",             OT_STRING, GenericType(),
+    //  "Whether feasibility is given special emphasis. See KNITRO documentation.",
+    //  "no|stay|get|get_stay");
+    //addOption("bar_feasmodetol",          OT_REAL, GenericType(),
+    //  "Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.");
+    //addOption("bar_initmu",               OT_INTEGER, GenericType(),
+    //  "Initial value for the barrier parameter. See KNITRO documentation.");
+    //addOption("bar_initpt",               OT_STRING, GenericType(),
+    //  "Whether to use the initial point strategy with barrier algorithms. "
+    //  "See KNITRO documentation.", "auto|yes|no");
+    //addOption("bar_maxbacktrack",         OT_INTEGER, GenericType(),
+    //  "Maximum allowable number of backtracks during the linesearch of the Interior Direct "
+    //  "algorithm before reverting to a CG step. See KNITRO documentation.");
+    //addOption("bar_maxrefactor",          OT_INTEGER, GenericType(),
+    //  "Maximum number of refactorizations of the KKT system per iteration of the Interior "
+    //  "Direct algorithm before reverting to a CG step. See KNITRO documentation.");
 
     //addOption("Alg",OT_INTEGER,0,"Algorithm");
     addOption("BarRule",OT_INTEGER,0,"Barrier Rule");
@@ -182,7 +197,8 @@ namespace casadi{
     }
 
     // Set user set options
-    for(std::map<std::string, double>::iterator it=double_param_.begin(); it!=double_param_.end(); ++it){
+    for(std::map<std::string, double>::iterator it=double_param_.begin();
+        it!=double_param_.end(); ++it){
       status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
       if(status!=0){
         throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
@@ -196,7 +212,8 @@ namespace casadi{
       }
     }
 
-    for(std::map<std::string, std::string>::iterator it=string_param_.begin(); it!=string_param_.end(); ++it){
+    for(std::map<std::string, std::string>::iterator it=string_param_.begin();
+        it!=string_param_.end(); ++it){
       status = KTR_set_char_param_by_name(kc_handle_, it->first.c_str(), it->second.c_str());
       if(status!=0){
         throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
@@ -212,19 +229,24 @@ namespace casadi{
     }
 
     // "Correct" upper and lower bounds
-    for(vector<double>::iterator it=input(NLP_SOLVER_LBX).begin(); it!=input(NLP_SOLVER_LBX).end(); ++it)
+    for(vector<double>::iterator it=input(NLP_SOLVER_LBX).begin();
+        it!=input(NLP_SOLVER_LBX).end(); ++it)
       if(isinf(*it)) *it = -KTR_INFBOUND;
-    for(vector<double>::iterator it=input(NLP_SOLVER_UBX).begin(); it!=input(NLP_SOLVER_UBX).end(); ++it)
+    for(vector<double>::iterator it=input(NLP_SOLVER_UBX).begin();
+        it!=input(NLP_SOLVER_UBX).end(); ++it)
       if(isinf(*it)) *it =  KTR_INFBOUND;
-    for(vector<double>::iterator it=input(NLP_SOLVER_LBG).begin(); it!=input(NLP_SOLVER_LBG).end(); ++it)
+    for(vector<double>::iterator it=input(NLP_SOLVER_LBG).begin();
+        it!=input(NLP_SOLVER_LBG).end(); ++it)
       if(isinf(*it)) *it = -KTR_INFBOUND;
-    for(vector<double>::iterator it=input(NLP_SOLVER_UBG).begin(); it!=input(NLP_SOLVER_UBG).end(); ++it)
+    for(vector<double>::iterator it=input(NLP_SOLVER_UBG).begin();
+        it!=input(NLP_SOLVER_UBG).end(); ++it)
       if(isinf(*it)) *it =  KTR_INFBOUND;
 
     // Initialize KNITRO
     status = KTR_init_problem(kc_handle_, nx_, KTR_OBJGOAL_MINIMIZE, KTR_OBJTYPE_GENERAL,
                               &input(NLP_SOLVER_LBX).front(), &input(NLP_SOLVER_UBX).front(),
-                              ng_, &cType.front(), &input(NLP_SOLVER_LBG).front(), &input(NLP_SOLVER_UBG).front(),
+                              ng_, &cType.front(), &input(NLP_SOLVER_LBG).front(),
+                              &input(NLP_SOLVER_UBG).front(),
                               Jcol.size(), &Jcol.front(), &Jrow.front(),
                               nnzH,
                               getPtr(Hrow),
@@ -273,9 +295,11 @@ namespace casadi{
   }
 
 
-  int KnitroInternal::callback(const int evalRequestCode, const int n, const int m, const int nnzJ, const int nnzH, const double* const x,
-                               const double* const lambda, double* const obj, double* const c, double* const objGrad,
-                               double* const jac, double* const hessian, double* const hessVector, void *userParams){
+  int KnitroInternal::callback(const int evalRequestCode, const int n, const int m, const int nnzJ,
+                               const int nnzH, const double* const x, const double* const lambda,
+                               double* const obj, double* const c, double* const objGrad,
+                               double* const jac, double* const hessian, double* const hessVector,
+                               void *userParams){
     try{
       // Get a pointer to the calling object
       KnitroInternal* this_ = static_cast<KnitroInternal*>(userParams);
@@ -374,7 +398,5 @@ namespace casadi{
       cout << "H = " << hessLag_ << endl;
     }
   }
-
-
 
 } // namespace casadi

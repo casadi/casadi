@@ -40,7 +40,9 @@ class CASADI_KNITRO_INTERFACE_EXPORT KnitroSolver : public NLPSolver {
     KnitroSolver();
 
     /// \brief Create an NLP solver instance
-    explicit KnitroSolver(const Function& nlp /**< nlp function: \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+    explicit KnitroSolver(const Function& nlp
+                          /**< nlp function: \f$ [\mathbb{R}^{n_x} \times
+                           * \mathbb{R}^{n_p}] \mapsto [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
                          );
 
     /// Access functions of the node
