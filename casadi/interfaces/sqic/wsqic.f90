@@ -8,7 +8,8 @@ module SQICModule
 
 end module
 
-subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, nnzH, indH, locH, valH) bind ( C, name="sqic" )
+subroutine wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, &
+                  nnzH, indH, locH, valH) bind ( C, name="sqic" )
 
   use SQICModule
 
