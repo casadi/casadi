@@ -36,15 +36,19 @@ namespace casadi{
 
   CplexInternal::CplexInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
     // Options available
-    addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.","automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
+    addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
+              "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
     addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format.");
     addOption("dump_filename",   OT_STRING,     "qp.dat", "The filename to dump to.");
     addOption("tol",               OT_REAL,         1E-6, "Tolerance of solver");
-    addOption("dep_check",      OT_STRING,         "off", "Detect redundant constraints.","automatic:-1|off:0|begin:1|end:2|both:3");
-    addOption("simplex_maxiter", OT_INTEGER,       2100000000, "Maximum number of simplex iterations.");
-    addOption("barrier_maxiter", OT_INTEGER,       2100000000, "Maximum number of barrier iterations.");
-    addOption("warm_start",      OT_BOOLEAN,            false, "Use warm start with simplex methods (affects only the simplex methods).");
-    addOption("convex",          OT_BOOLEAN,             true, "Indicates if the QP is convex or not (affects only the barrier method).");
+    addOption("dep_check",      OT_STRING,         "off", "Detect redundant constraints.",
+              "automatic:-1|off:0|begin:1|end:2|both:3");
+    addOption("simplex_maxiter", OT_INTEGER,   2100000000, "Maximum number of simplex iterations.");
+    addOption("barrier_maxiter", OT_INTEGER,   2100000000, "Maximum number of barrier iterations.");
+    addOption("warm_start",      OT_BOOLEAN,        false,
+              "Use warm start with simplex methods (affects only the simplex methods).");
+    addOption("convex",          OT_BOOLEAN,         true,
+              "Indicates if the QP is convex or not (affects only the barrier method).");
 
     // Setting warm-start flag
     is_warm_ = false;
@@ -68,7 +72,8 @@ namespace casadi{
     int status;
     casadi_assert(env_==0);
     env_ = CPXopenCPLEX (&status);
-    casadi_assert_message(env_!=0, "CPLEX: Cannot initialize CPLEX environment. STATUS: " << status);
+    casadi_assert_message(env_!=0, "CPLEX: Cannot initialize CPLEX environment. STATUS: "
+                          << status);
 
     // Turn on some debug messages if requested
     if (verbose()){
@@ -135,12 +140,14 @@ namespace casadi{
     // Matrix A, count the number of elements per column
     const Sparsity& A_sp = input(QP_SOLVER_A).sparsity();
     matcnt_.resize(A_sp.size2());
-    transform(A_sp.colind().begin()+1,A_sp.colind().end(),A_sp.colind().begin(),matcnt_.begin(),minus<int>());
+    transform(A_sp.colind().begin()+1,A_sp.colind().end(),A_sp.colind().begin(),matcnt_.begin(),
+              minus<int>());
 
     // Matrix H, count the number of elements per column
     const Sparsity& H_sp = input(QP_SOLVER_H).sparsity();
     qmatcnt_.resize(H_sp.size2());
-    transform(H_sp.colind().begin()+1,H_sp.colind().end(),H_sp.colind().begin(),qmatcnt_.begin(),minus<int>());
+    transform(H_sp.colind().begin()+1,H_sp.colind().end(),H_sp.colind().begin(),qmatcnt_.begin(),
+              minus<int>());
 
     casadi_assert(lp_==0);
     lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
@@ -213,7 +220,7 @@ namespace casadi{
     const double* x0 = input(QP_SOLVER_X0).ptr();
     const double* lam_x0 = input(QP_SOLVER_LAM_X0).ptr();
     if (qp_method_ != 0 && qp_method_ != 4 && is_warm_){
-      // TODO: Initialize slacks and dual variables of bound constraints
+      // TODO(Joel): Initialize slacks and dual variables of bound constraints
       CPXcopystart(env_, lp_, getPtr(cstat_), getPtr(rstat_), x0, NULL, NULL, lam_x0);
     } else {
       status = CPXcopystart(env_, lp_, NULL, NULL, x0, NULL, NULL, lam_x0);
@@ -247,8 +254,10 @@ namespace casadi{
     }
 
     // Flip the sign of the multipliers
-    for(vector<double>::iterator it=output(QP_SOLVER_LAM_A).begin(); it!=output(QP_SOLVER_LAM_A).end(); ++it) *it = -*it;
-    for(vector<double>::iterator it=output(QP_SOLVER_LAM_X).begin(); it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
+    for(vector<double>::iterator it=output(QP_SOLVER_LAM_A).begin();
+        it!=output(QP_SOLVER_LAM_A).end(); ++it) *it = -*it;
+    for(vector<double>::iterator it=output(QP_SOLVER_LAM_X).begin();
+        it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
 
     int solnstat = CPXgetstat (env_, lp_);
     stringstream errormsg; // NOTE: Why not print directly to cout and cerr?
@@ -262,11 +271,14 @@ namespace casadi{
       } else if (solnstat == CPX_STAT_INForUNBD) {
         errormsg << "CPLEX: solution status: Model is infeasible or unbounded\n";
       } else if (solnstat == CPX_STAT_OPTIMAL_INFEAS){
-        errormsg << "CPLEX: solution status: Optimal solution is available but with infeasibilities\n";
+        errormsg << "CPLEX: solution status: Optimal solution "
+            "is available but with infeasibilities\n";
       } else if (solnstat == CPX_STAT_NUM_BEST){
-        errormsg << "CPLEX: solution status: Solution available, but not proved optimal due to numeric difficulties.\n";
+        errormsg << "CPLEX: solution status: Solution available, but not "
+            "proved optimal due to numeric difficulties.\n";
       } else if (solnstat == CPX_STAT_FIRSTORDER){
-        errormsg << "CPLEX: solution status: Solution satisfies first-order optimality conditions, but is not necessarily globally optimal.\n";
+        errormsg << "CPLEX: solution status: Solution satisfies first-order optimality "
+            "conditions, but is not necessarily globally optimal.\n";
       } else {
         errormsg << "CPLEX: solution status: " <<  solnstat << "\n";
       }
@@ -324,4 +336,3 @@ namespace casadi{
   }
 
 } // end namespace casadi
-
