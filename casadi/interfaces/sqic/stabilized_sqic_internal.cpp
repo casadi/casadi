@@ -44,7 +44,8 @@ StabilizedSQICInternal* StabilizedSQICInternal::clone() const{
   return node;
 }
 
-StabilizedSQICInternal::StabilizedSQICInternal(const std::vector<Sparsity>& st) : StabilizedQPSolverInternal(st){
+StabilizedSQICInternal::StabilizedSQICInternal(const std::vector<Sparsity>& st)
+    : StabilizedQPSolverInternal(st){
   is_init_ = false;
 }
 
@@ -58,16 +59,22 @@ void StabilizedSQICInternal::evaluate() {
   std::copy(input(STABILIZED_QP_SOLVER_X0).begin(),input(STABILIZED_QP_SOLVER_X0).end(),x_.begin());
   std::fill(x_.begin()+n_,x_.end(),0);
 
-  std::transform(input(STABILIZED_QP_SOLVER_LAM_X0).begin(),input(STABILIZED_QP_SOLVER_LAM_X0).end(),rc_.begin(),negate<double>());
+  std::transform(input(STABILIZED_QP_SOLVER_LAM_X0).begin(),
+                 input(STABILIZED_QP_SOLVER_LAM_X0).end(),rc_.begin(),negate<double>());
   std::fill(rc_.begin()+n_,rc_.end(),0);
 
-  std::copy(input(STABILIZED_QP_SOLVER_LBX).begin(),input(STABILIZED_QP_SOLVER_LBX).end(),bl_.begin());
-  std::copy(input(STABILIZED_QP_SOLVER_UBX).begin(),input(STABILIZED_QP_SOLVER_UBX).end(),bu_.begin());
+  std::copy(input(STABILIZED_QP_SOLVER_LBX).begin(),input(STABILIZED_QP_SOLVER_LBX).end(),
+            bl_.begin());
+  std::copy(input(STABILIZED_QP_SOLVER_UBX).begin(),input(STABILIZED_QP_SOLVER_UBX).end(),
+            bu_.begin());
 
-  std::copy(input(STABILIZED_QP_SOLVER_LBA).begin(),input(STABILIZED_QP_SOLVER_LBA).end(),bl_.begin()+n_);
-  std::copy(input(STABILIZED_QP_SOLVER_UBA).begin(),input(STABILIZED_QP_SOLVER_UBA).end(),bu_.begin()+n_);
+  std::copy(input(STABILIZED_QP_SOLVER_LBA).begin(),input(STABILIZED_QP_SOLVER_LBA).end(),
+            bl_.begin()+n_);
+  std::copy(input(STABILIZED_QP_SOLVER_UBA).begin(),input(STABILIZED_QP_SOLVER_UBA).end(),
+            bu_.begin()+n_);
 
-  std::copy(input(STABILIZED_QP_SOLVER_MUE).begin(),input(STABILIZED_QP_SOLVER_MUE).end(),piE_.begin());
+  std::copy(input(STABILIZED_QP_SOLVER_MUE).begin(),input(STABILIZED_QP_SOLVER_MUE).end(),
+            piE_.begin());
 
 
   for (int i=0;i<n_+nc_+1;++i) {
@@ -81,11 +88,14 @@ void StabilizedSQICInternal::evaluate() {
 
   int m = nc_+1;
 
-  sqicSolveStabilized(&output(QP_SOLVER_COST).data()[0],&input(STABILIZED_QP_SOLVER_MU).data()[0],&m,&piE_[0]);
+  sqicSolveStabilized(&output(QP_SOLVER_COST).data()[0],&input(STABILIZED_QP_SOLVER_MU).data()[0],
+                      &m,&piE_[0]);
 
   std::copy(x_.begin(),x_.begin()+n_,output(QP_SOLVER_X).begin());
-  std::transform(rc_.begin(),rc_.begin()+n_,output(QP_SOLVER_LAM_X).begin(),negate<double>());
-  std::transform(rc_.begin()+n_,rc_.begin()+n_+nc_,output(QP_SOLVER_LAM_A).begin(),negate<double>());
+  std::transform(rc_.begin(),rc_.begin()+n_,output(QP_SOLVER_LAM_X).begin(),
+                 negate<double>());
+  std::transform(rc_.begin()+n_,rc_.begin()+n_+nc_,output(QP_SOLVER_LAM_A).begin(),
+                 negate<double>());
 
   output(QP_SOLVER_COST)[0]+= x_[n_+nc_];
 }
@@ -147,8 +157,9 @@ void StabilizedSQICInternal::init(){
 
   std::fill(hEtype_.begin()+n_,hEtype_.end(),3);
 
-  sqic(&m , &n, &nnzA, &indA_[0], &locA_[0], &formatA_.output().data()[0], &bl_[0], &bu_[0], &hEtype_[0], &hs_[0], &x_[0], &pi_[0], &rc_[0], &nnzH, &indH_[0], &locH_[0], &input(STABILIZED_QP_SOLVER_H).data()[0]);
-
+  sqic(&m , &n, &nnzA, &indA_[0], &locA_[0], &formatA_.output().data()[0], &bl_[0], &bu_[0],
+       &hEtype_[0], &hs_[0], &x_[0], &pi_[0], &rc_[0], &nnzH, &indH_[0], &locH_[0],
+       &input(STABILIZED_QP_SOLVER_H).data()[0]);
 }
 
 map<int,string> StabilizedSQICInternal::calc_flagmap(){
@@ -189,7 +200,8 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
   }
 
   file.precision(std::numeric_limits<double>::digits10+2);
-  file << std::scientific; // This is really only to force a decimal dot, would be better if it can be avoided
+  file << std::scientific; // This is really only to force a decimal dot,
+                           // would be better if it can be avoided
 
   file << "program exported" << std::endl;
   file << "  use SQICModule" << std::endl;
@@ -199,8 +211,10 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
 
   file << "  real(rp)                  :: Obj, mu" << std::endl;
 
-  file << "  real(rp), allocatable:: bl(:), bu(:), x(:), valA(:), valH(:) ,pi(:), piE(:), rc(:)" << std::endl;
-  file << "  integer(ip), allocatable:: indA(:), locA(:), indH(:), locH(:), hEtype(:), hs(:)" << std::endl;
+  file << "  real(rp), allocatable:: bl(:), bu(:), x(:), valA(:), valH(:) ,pi(:), piE(:), rc(:)"
+       << std::endl;
+  file << "  integer(ip), allocatable:: indA(:), locA(:), indH(:), locH(:), hEtype(:), hs(:)"
+       << std::endl;
 
   int n = n_;
   int m = nc_+1;
@@ -254,7 +268,9 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
     file << "  pi(" << i +1 << ") = " <<  0 << std::endl; //pi_[i] << std::endl;
   }
   for (int i=0;i<rc_.size();++i) {
-    file << "  rc(" << i +1 << ") = " << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0) << std::endl;
+    file << "  rc(" << i +1 << ") = "
+         << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
+         << std::endl;
   }
   file << "  lenpi = " << m << std::endl;
   file << "  mu = " << input(STABILIZED_QP_SOLVER_MUR).at(0) << std::endl;
@@ -262,7 +278,8 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
     file << "  piE(" << i +1 << ") = " << piE_[i] << std::endl;
   }
 
-  file << "  call wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, pi, rc, nnzH, indH, locH, valH)" << std::endl;
+  file << "  call wsqic (m, n, nnzA, indA, locA, valA, bl, bu, hEtype, hs, x, "
+       << "pi, rc, nnzH, indH, locH, valH)" << std::endl;
   /**for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
     file << "  x(" << i +1 << ") = " << input(QP_SOLVER_X0).at(i) << std::endl;
   }
@@ -270,7 +287,9 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
     file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
   }
   for (int i=0;i<rc_.size();++i) {
-    file << "  rc(" << i +1 << ") = " << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0) << std::endl;
+    file << "  rc(" << i +1 << ") = "
+         << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
+         << std::endl;
   }*/
   file << "  call sqicSolveStabilized (Obj,mu,lenpi,piE)" << std::endl;
   /**for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
@@ -280,7 +299,9 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
     file << "  pi(" << i +1 << ") = " << pi_[i] << std::endl;
   }
   for (int i=0;i<rc_.size();++i) {
-    file << "  rc(" << i +1 << ") = " << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0) << std::endl;
+    file << "  rc(" << i +1 << ") = "
+         << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
+         << std::endl;
   }
   file << "  call sqicSolveStabilized (Obj,mu,lenpi,piE)" << std::endl;**/
   file << "  deallocate ( bl, bu )" << std::endl;
@@ -290,8 +311,6 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
   file << "  deallocate ( valH, locH, indH )" << std::endl;
   file << "  call sqicDestroy()" << std::endl;
   file << "end program exported" << std::endl;
-
-
 }
 
 } // namespace casadi
