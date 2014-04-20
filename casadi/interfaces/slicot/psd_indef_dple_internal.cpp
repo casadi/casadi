@@ -41,7 +41,9 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace casadi{
 
-  PsdIndefDpleInternal::PsdIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V, int nfwd, int nadj) : DpleInternal(A,V, nfwd, nadj) {
+  PsdIndefDpleInternal::PsdIndefDpleInternal(const std::vector< Sparsity > & A,
+                                             const std::vector< Sparsity > &V, int nfwd, int nadj)
+      : DpleInternal(A,V, nfwd, nadj) {
 
     // set default options
     setOption("name","unnamed_psd_indef_dple_solver"); // name of the function
@@ -49,9 +51,10 @@ namespace casadi{
     setOption("pos_def",false);
     setOption("const_dim",true);
 
-    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
-    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(), "Options to be passed to the linear solver.");
-
+    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(),
+              "User-defined linear solver class. Needed for sensitivities.");
+    addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
+              "Options to be passed to the linear solver.");
   }
 
   PsdIndefDpleInternal::~PsdIndefDpleInternal(){
@@ -62,8 +65,10 @@ namespace casadi{
 
     DpleInternal::init();
 
-    casadi_assert_message(!pos_def_,"pos_def option set to True: Solver only handles the indefinite case.");
-    casadi_assert_message(const_dim_,"const_dim option set to False: Solver only handles the True case.");
+    casadi_assert_message(!pos_def_,
+                          "pos_def option set to True: Solver only handles the indefinite case.");
+    casadi_assert_message(const_dim_,
+                          "const_dim option set to False: Solver only handles the True case.");
 
     n_ = A_[0].size1();
 
@@ -149,7 +154,8 @@ namespace casadi{
     }
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog,this,"PsdIndefSolver",ProfilingData_FunctionType_Other,4);
+      profileWriteName(CasadiOptions::profilingLog,this,"PsdIndefSolver",
+                       ProfilingData_FunctionType_Other,4);
 
       profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"periodic schur form",-1);
       profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"nominal",-1);
@@ -270,7 +276,8 @@ namespace casadi{
       nnKa_[k].set(0.0);
       nnKb_[k].set(0.0);
       // nnKa[k] <- V[k]*Z[k+1]
-      dense_mul_nt(n_,n_,n_,&input(DPLE_V).data()[k*n_*n_],&Z_[((k+1) % K_)*n_*n_],&nnKa_[k].data()[0]);
+      dense_mul_nt(n_,n_,n_,&input(DPLE_V).data()[k*n_*n_],&Z_[((k+1) % K_)*n_*n_],
+                   &nnKa_[k].data()[0]);
       // nnKb[k] <- Z[k+1]'*V[k]*Z[k+1]
       dense_mul_nn(n_,n_,n_,&Z_[((k+1) % K_)*n_*n_],&nnKa_[k].data()[0],&nnKb_[k].data()[0]);
     }
@@ -428,16 +435,20 @@ namespace casadi{
           for (k=0;k<K_-1;++k) {
             for (int ll=0;ll<np;++ll) {
               for (int m=0;m<np;++m) {
-                A[np*(np+1)*((k+1)%K_)+ll*(np+1)+m] = -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
-                //A[np*(np+1)*k+m*(np+1)+ll+1] = -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
+                A[np*(np+1)*((k+1)%K_)+ll*(np+1)+m] =
+                    -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
+                //A[np*(np+1)*k+m*(np+1)+ll+1] =
+                //  -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
               }
             }
           }
 
           for (int ll=0;ll<np;++ll) {
             for (int m=0;m<np;++m) {
-              A[np*(np+1)*((k+1)%K_)+ll*(np+1)+m+1] = -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
-              //A[np*(np+1)*(K_-1)+m*(np+1)+ll] = -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
+              A[np*(np+1)*((k+1)%K_)+ll*(np+1)+m+1] =
+                -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
+              //A[np*(np+1)*(K_-1)+m*(np+1)+ll] =
+              //  -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
             }
           }
         }
@@ -500,7 +511,8 @@ namespace casadi{
         std::fill(nnKa_[k].begin(),nnKa_[k].end(),0);
 
         // nnKb <- dV
-        std::copy(&input(DPLE_NUM_IN*(d+1)+DPLE_V).data()[n_*n_*k],&input(DPLE_NUM_IN*(d+1)+DPLE_V).data()[n_*n_*(k+1)], &nnKb_[k].data()[0]);
+        std::copy(&input(DPLE_NUM_IN*(d+1)+DPLE_V).data()[n_*n_*k],
+                  &input(DPLE_NUM_IN*(d+1)+DPLE_V).data()[n_*n_*(k+1)], &nnKb_[k].data()[0]);
 
         // Force seed to be symmetric
         for (int r=0;r<n_;++r) {
@@ -512,19 +524,22 @@ namespace casadi{
         }
 
         // nnKa <- x*a'
-        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],&input(DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0]);
+        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],&input(DPLE_A).data()[n_*n_*k],
+                     &nnKa_[k].data()[0]);
 
         // nnKb += da*nnKa
-        dense_mul_tn(n_,n_,n_,&input(DPLE_NUM_IN*(d+1)+DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0],&nnKb_[k].data()[0]);
+        dense_mul_tn(n_,n_,n_,&input(DPLE_NUM_IN*(d+1)+DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0],
+                     &nnKb_[k].data()[0]);
 
         std::fill(nnKa_[k].begin(),nnKa_[k].end(),0);
 
         // nnKa <- x*da'
-        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],&input(DPLE_NUM_IN*(d+1)+DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0]);
+        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],
+                     &input(DPLE_NUM_IN*(d+1)+DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0]);
 
         // nnKb += a*nnKa
-        dense_mul_tn(n_,n_,n_,&input(DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0],&nnKb_[k].data()[0]);
-
+        dense_mul_tn(n_,n_,n_,&input(DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0],
+                     &nnKb_[k].data()[0]);
       }
 
       // ********** START ***************
@@ -562,7 +577,8 @@ namespace casadi{
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    F_[k*4*n_+4*i+2*ii+jj] += dX_[partindex(i,j,k,ii,kk)]*T_[partindex(l,j,k,jj,kk)];
+                    F_[k*4*n_+4*i+2*ii+jj] +=
+                        dX_[partindex(i,j,k,ii,kk)]*T_[partindex(l,j,k,jj,kk)];
                   }
                 }
               }
@@ -589,7 +605,8 @@ namespace casadi{
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    F_[k*4*n_+4*r+2*ii+jj] += dX_[partindex(r,j,k,ii,kk)]*T_[partindex(l,j,k,jj,kk)];
+                    F_[k*4*n_+4*r+2*ii+jj] +=
+                        dX_[partindex(r,j,k,ii,kk)]*T_[partindex(l,j,k,jj,kk)];
                   }
                 }
               }
@@ -648,7 +665,8 @@ namespace casadi{
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
-                      M[np*((k+1)%K_)+ii*n2+jj] += T_[partindex(r,i,k,ii,kk)]*F_[k*4*n_+4*i+2*kk+jj];
+                      M[np*((k+1)%K_)+ii*n2+jj] +=
+                          T_[partindex(r,i,k,ii,kk)]*F_[k*4*n_+4*i+2*kk+jj];
                     }
                   }
                 }
@@ -709,13 +727,15 @@ namespace casadi{
           // nnKa[k] <- V[k]*Z[k]'
           dense_mul_nn(n_,n_,n_,&dX_[k*n_*n_],&Z_[k*n_*n_],&nnKa_[k].data()[0]);
           // output <- Z[k]*V[k]*Z[k]'
-          dense_mul_tn(n_,n_,n_,&Z_[k*n_*n_],&nnKa_[k].data()[0],&output(DPLE_NUM_OUT*(d+1)+DPLE_P).data()[k*n_*n_]);
+          dense_mul_tn(n_,n_,n_,&Z_[k*n_*n_],&nnKa_[k].data()[0],
+                       &output(DPLE_NUM_OUT*(d+1)+DPLE_P).data()[k*n_*n_]);
         }
       }
 
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        profileWriteTime(CasadiOptions::profilingLog,this,2,time_stop-time_start,time_stop-time_zero);
+        profileWriteTime(CasadiOptions::profilingLog,this,2,time_stop-time_start,
+                         time_stop-time_zero);
       }
 
     }
@@ -864,7 +884,8 @@ namespace casadi{
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
-                      F_[k*4*n_+4*i+2*kk+jj] += T_[partindex(r,i,k,ii,kk)]*Mbar[np*((k+1)%K_)+ii*n2+jj];
+                      F_[k*4*n_+4*i+2*kk+jj] +=
+                          T_[partindex(r,i,k,ii,kk)]*Mbar[np*((k+1)%K_)+ii*n2+jj];
                     }
                   }
                 }
@@ -888,7 +909,8 @@ namespace casadi{
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
-                      Xbar_[partindex(r,j,k,ii,kk)] += F_[k*4*n_+4*r+2*ii+jj]*T_[partindex(l,j,k,jj,kk)];
+                      Xbar_[partindex(r,j,k,ii,kk)] +=
+                          F_[k*4*n_+4*r+2*ii+jj]*T_[partindex(l,j,k,jj,kk)];
                     }
                   }
                 }
@@ -916,7 +938,8 @@ namespace casadi{
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    Xbar_[partindex(i,j,k,ii,kk)] += F_[k*4*n_+4*i+2*ii+jj]*T_[partindex(l,j,k,jj,kk)];
+                    Xbar_[partindex(i,j,k,ii,kk)] +=
+                        F_[k*4*n_+4*i+2*ii+jj]*T_[partindex(l,j,k,jj,kk)];
                   }
                 }
               }
@@ -950,7 +973,8 @@ namespace casadi{
       // A_bar = [mul([vb+vb.T,a,x]) for vb,x,a in zip(V_bar,X,As)]
       for(int k=0;k<K_;++k) {
         std::fill(nnKa_[k].begin(),nnKa_[k].end(),0);
-        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],&input(DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0]);
+        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],&input(DPLE_A).data()[n_*n_*k],
+                     &nnKa_[k].data()[0]);
 
         dense_mul_nt(n_,n_,n_,&nnKa_[k].data()[0],&Vbar[n_*n_*k],&Abar[n_*n_*k]);
         dense_mul_nn(n_,n_,n_,&nnKa_[k].data()[0],&Vbar[n_*n_*k],&Abar[n_*n_*k]);
@@ -960,7 +984,8 @@ namespace casadi{
 
      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        profileWriteTime(CasadiOptions::profilingLog,this,3,time_stop-time_start,time_stop-time_zero);
+        profileWriteTime(CasadiOptions::profilingLog,this,3,time_stop-time_start,
+                         time_stop-time_zero);
      }
 
     }
@@ -987,7 +1012,9 @@ namespace casadi{
 
   }
 
-  void PsdIndefDpleInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void PsdIndefDpleInternal::deepCopyMembers(
+      std::map<SharedObjectNode*,SharedObject>& already_copied)
+  {
     DpleInternal::deepCopyMembers(already_copied);
   }
 
@@ -998,7 +1025,4 @@ namespace casadi{
     return node;
   }
 
-
 } // namespace casadi
-
-

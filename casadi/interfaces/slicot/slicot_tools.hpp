@@ -30,16 +30,24 @@ namespace casadi{
 
 /// \cond INTERNAL
 #ifndef SWIG
-void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau, int ldtau, double * dwork=0);
+void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,
+                   int ldtau, double * dwork=0);
 
-void slicot_mb03vy(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, const double * tau, int ldtau, double * dwork=0, int ldwork=0);
+void slicot_mb03vy(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2,
+                   const double * tau, int ldtau, double * dwork=0, int ldwork=0);
 
-void slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz, double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr, double *wi, double * dwork=0, int ldwork=0);
+void slicot_mb03wd(char job, char compz, int n, int p, int ilo, int ihi, int iloz, int ihiz,
+                   double *h, int ldh1, int ldh2, double* z, int ldz1, int ldz2, double* wr,
+                   double *wi, double * dwork=0, int ldwork=0);
 
 
-void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z, std::vector<double> &eig_real, std::vector<double> &eig_imag);
+void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
+                           std::vector< double > & t, std::vector< double > & z,
+                           std::vector<double> &eig_real, std::vector<double> &eig_imag);
 
-void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t, std::vector< double > & z, std::vector<double> &dwork, std::vector<double> &eig_real, std::vector<double> &eig_imag);
+void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t,
+                           std::vector< double > & z, std::vector<double> &dwork,
+                           std::vector<double> &eig_real, std::vector<double> &eig_imag);
 #endif // SWIG
 /// \endcond
 
