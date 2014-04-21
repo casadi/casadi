@@ -5892,7 +5892,7 @@ mapping:
 +------------------------+------------------------+------------------------+
 | CONTROL_DAE_X          | x                      | State vector           |
 |                        |                        | (dimension nx-by-1).   |
-|                        |                        | Should have same       |
+|                        |                        | Should have the same   |
 |                        |                        | amount of non-zeros as |
 |                        |                        | DAEOutput:DAE_RES      |
 +------------------------+------------------------+------------------------+
@@ -5961,7 +5961,7 @@ outputs.
 +------------------------+------------------------+------------------------+
 | CONTROL_DAE_X          | x                      | State vector           |
 |                        |                        | (dimension nx-by-1).   |
-|                        |                        | Should have same       |
+|                        |                        | Should have the same   |
 |                        |                        | amount of non-zeros as |
 |                        |                        | DAEOutput:DAE_RES      |
 +------------------------+------------------------+------------------------+
@@ -16844,7 +16844,7 @@ P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 | DPLE_P                 | p                      | Lyapunov matrix        |
 |                        |                        | (horzcat when          |
 |                        |                        | const_dim, blkdiag     |
-|                        |                        | otherwise) (cholesky   |
+|                        |                        | otherwise) (Cholesky   |
 |                        |                        | of P if pos_def) .     |
 +------------------------+------------------------+------------------------+
 
@@ -33224,7 +33224,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | False        | Flag to      | casadi::Ipop |
 |              |              |              | indicate     | tInternal    |
-|              |              |              | wether       |              |
+|              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
@@ -60734,7 +60734,7 @@ Joris Gillis
 | DPLE_P                 | p                      | Lyapunov matrix        |
 |                        |                        | (horzcat when          |
 |                        |                        | const_dim, blkdiag     |
-|                        |                        | otherwise) (cholesky   |
+|                        |                        | otherwise) (Cholesky   |
 |                        |                        | of P if pos_def) .     |
 +------------------------+------------------------+------------------------+
 
@@ -78978,7 +78978,7 @@ Joris Gillis
 | DPLE_P                 | p                      | Lyapunov matrix        |
 |                        |                        | (horzcat when          |
 |                        |                        | const_dim, blkdiag     |
-|                        |                        | otherwise) (cholesky   |
+|                        |                        | otherwise) (Cholesky   |
 |                        |                        | of P if pos_def) .     |
 +------------------------+------------------------+------------------------+
 
@@ -99916,7 +99916,7 @@ np: number of parameters
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | False        | Flag to      | casadi::Worh |
 |              |              |              | indicate     | pInternal    |
-|              |              |              | wether       |              |
+|              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
@@ -103273,7 +103273,7 @@ Input arguments of an ODE/DAE function
 +------------------------+------------------------+------------------------+
 | CONTROL_DAE_X          | x                      | State vector           |
 |                        |                        | (dimension nx-by-1).   |
-|                        |                        | Should have same       |
+|                        |                        | Should have the same   |
 |                        |                        | amount of non-zeros as |
 |                        |                        | DAEOutput:DAE_RES      |
 +------------------------+------------------------+------------------------+
@@ -104322,7 +104322,7 @@ Output arguments of a dple solver
 | DPLE_P                 | p                      | Lyapunov matrix        |
 |                        |                        | (horzcat when          |
 |                        |                        | const_dim, blkdiag     |
-|                        |                        | otherwise) (cholesky   |
+|                        |                        | otherwise) (Cholesky   |
 |                        |                        | of P if pos_def) .     |
 +------------------------+------------------------+------------------------+
 

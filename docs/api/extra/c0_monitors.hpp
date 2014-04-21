@@ -43,34 +43,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::KnitroInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::KnitroInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class casadi::KnitroSolver
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::KnitroInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
 /** \class casadi::SnoptInternal
 \n
 \par
@@ -222,33 +194,5 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>eval_djac</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>eval_f</td><td>casadi::SundialsInternal</td></tr>
-</table>
-*/
-/// \cond INTERNAL
-/** \class casadi::WorhpInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::WorhpInternal</td></tr>
-</table>
-*/
-/// \endcond
-/** \class casadi::WorhpSolver
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::WorhpInternal</td></tr>
 </table>
 */

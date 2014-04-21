@@ -5,12 +5,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegratorInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -21,12 +21,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegratorInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -41,7 +41,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>casadi::LapackLUDenseInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -56,7 +56,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>casadi::LapackLUDenseInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -68,17 +68,17 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>allow_equilibration_failure</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>casadi::CVodesInternal</td></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>[default: equal to exact_jacobian]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>[default: equal to linear_solver]</td><td>casadi::SundialsInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>[default: equal to linear_solver_options]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to lower_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>casadi::SundialsInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_djac)</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to upper_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -91,17 +91,17 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>allow_equilibration_failure</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>casadi::CVodesInternal</td></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>[default: equal to exact_jacobian]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>[default: equal to linear_solver]</td><td>casadi::SundialsInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>[default: equal to linear_solver_options]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to lower_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>casadi::SundialsInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_djac)</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to upper_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -118,7 +118,7 @@
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OOQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>0</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OOQPInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -134,7 +134,7 @@
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>casadi::OOQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>0</td><td>Print level. OOQP listens to print_level 0, 10 and 100</td><td>casadi::OOQPInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -148,7 +148,7 @@
 <tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::QPLPInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -162,7 +162,7 @@
 <tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::QPLPInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -173,15 +173,14 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>const_dim</td><td>OT_BOOLEAN</td><td>true</td><td>Assume constant dimension of P</td><td>casadi::DpleInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::DpleInternal</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::PsdIndefDpleInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -192,15 +191,14 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>const_dim</td><td>OT_BOOLEAN</td><td>true</td><td>Assume constant dimension of P</td><td>casadi::DpleInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::DpleInternal</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::PsdIndefDpleInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::PsdIndefDpleInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -211,11 +209,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -226,11 +224,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -243,7 +241,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -256,7 +254,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -269,7 +267,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -282,7 +280,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -295,7 +293,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -308,7 +306,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -324,7 +322,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -340,7 +338,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::ControlSimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -354,7 +352,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>(serial|openmp|mpi)</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -368,7 +366,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>(serial|openmp|mpi)</td><td>casadi::ParallelizerInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -382,7 +380,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>(serial|openmp|mpi)</td><td>casadi::SOCPQCQPInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -396,7 +394,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>"serial"</td><td>(serial|openmp|mpi)</td><td>casadi::SOCPQCQPInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -410,7 +408,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(initial|step)</td><td>casadi::SimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -424,7 +422,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(initial|step)</td><td>casadi::SimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -439,7 +437,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(initial|step)</td><td>casadi::SOCPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SOCPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -454,7 +452,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(initial|step)</td><td>casadi::SOCPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SOCPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -487,7 +485,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -502,7 +500,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>casadi::HomotopyNLPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::SimpleHomotopyNLPInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -516,7 +514,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>casadi::HomotopyNLPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::SimpleHomotopyNLPInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -529,7 +527,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::SDQPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -542,7 +540,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::SDQPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -561,7 +559,7 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>Check documentation of Callback.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -580,7 +578,7 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>Check documentation of Callback.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -594,7 +592,7 @@
 <tr><td>codegen</td><td>OT_BOOLEAN</td><td>false</td><td>C-code generation</td><td>casadi::SymbolicQRInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -608,7 +606,7 @@
 <tr><td>codegen</td><td>OT_BOOLEAN</td><td>false</td><td>C-code generation</td><td>casadi::SymbolicQRInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -622,7 +620,7 @@
 <tr><td>codegen</td><td>OT_BOOLEAN</td><td>false</td><td>C-code generation</td><td>casadi::QPStabilizerInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -636,7 +634,7 @@
 <tr><td>codegen</td><td>OT_BOOLEAN</td><td>false</td><td>C-code generation</td><td>casadi::QPStabilizerInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -674,6 +672,7 @@
 <tr><td>ShiftInit</td><td>OT_BOOLEAN</td><td>1</td><td>Interior-point shifting initial point</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>Soc</td><td>OT_INTEGER</td><td>1</td><td>Second order correction</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>XTol</td><td>OT_REAL</td><td>1e-15</td><td>Relative solution change tolerance</td><td>casadi::KnitroInternal</td></tr>
+<tr><td>codegen</td><td>OT_BOOLEAN</td><td>false</td><td>C-code generation</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>constraints to be passed to IPOPT</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td></td><td>casadi::KnitroInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
@@ -681,10 +680,9 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>Check documentation of Callback.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -722,6 +720,7 @@
 <tr><td>ShiftInit</td><td>OT_BOOLEAN</td><td>1</td><td>Interior-point shifting initial point</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>Soc</td><td>OT_INTEGER</td><td>1</td><td>Second order correction</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>XTol</td><td>OT_REAL</td><td>1e-15</td><td>Relative solution change tolerance</td><td>casadi::KnitroInternal</td></tr>
+<tr><td>codegen</td><td>OT_BOOLEAN</td><td>false</td><td>C-code generation</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>constraints to be passed to IPOPT</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td></td><td>casadi::KnitroInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
@@ -729,10 +728,9 @@
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>Check documentation of Callback.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -757,7 +755,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>print information about execution time</td><td>casadi::SnoptInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -782,7 +780,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>print information about execution time</td><td>casadi::SnoptInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -805,7 +803,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>primalTol</td><td>OT_REAL</td><td>1e-4</td><td>(translates to dual infeasibility in dsdp terms)</td><td>casadi::DSDPInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SDPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -828,7 +826,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>primalTol</td><td>OT_REAL</td><td>1e-4</td><td>(translates to dual infeasibility in dsdp terms)</td><td>casadi::DSDPInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SDPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -845,7 +843,7 @@
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::DirectSingleShootingInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -862,7 +860,7 @@
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::DirectSingleShootingInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -879,7 +877,7 @@
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::DirectMultipleShootingInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -896,7 +894,7 @@
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::DirectMultipleShootingInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -910,7 +908,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::SDQPSolverInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::SDPSDQPInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -924,7 +922,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::SDQPSolverInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::SDPSDQPInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -939,7 +937,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -954,7 +952,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -966,6 +964,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>casadi::IdasInternal</td></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>backwards system [default: equal to calc_ic].</td><td>casadi::IdasInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::IdasInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
@@ -973,13 +972,12 @@
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>fsens_abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>casadi::IdasInternal</td></tr>
 <tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>[default: equal to linear_solver]</td><td>casadi::SundialsInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>[default: equal to linear_solver_options]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to lower_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>casadi::SundialsInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_djac)</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to upper_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -992,6 +990,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>casadi::IdasInternal</td></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>backwards system [default: equal to calc_ic].</td><td>casadi::IdasInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::IdasInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
@@ -999,13 +998,12 @@
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>fsens_abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>casadi::IdasInternal</td></tr>
 <tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>[default: equal to linear_solver]</td><td>casadi::SundialsInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>[default: equal to linear_solver_options]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to lower_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>casadi::SundialsInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_djac)</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to upper_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1017,12 +1015,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegratorInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1033,12 +1031,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegratorInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1051,7 +1049,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1064,7 +1062,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1077,7 +1075,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1090,7 +1088,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1106,7 +1104,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1122,7 +1120,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1136,7 +1134,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>casadi::HomotopyNLPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1150,7 +1148,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>casadi::HomotopyNLPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1164,7 +1162,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>just_in_time_sparsity</td><td>OT_BOOLEAN</td><td>false</td><td>compilation to a CPU or GPU using OpenCL</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1178,7 +1176,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>just_in_time_sparsity</td><td>OT_BOOLEAN</td><td>false</td><td>compilation to a CPU or GPU using OpenCL</td><td>casadi::SXFunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1195,7 +1193,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(step|stepsize|J|F|normF)</td><td>casadi::NewtonImplicitInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1212,7 +1210,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(step|stepsize|J|F|normF)</td><td>casadi::NewtonImplicitInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1225,7 +1223,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1238,7 +1236,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1256,7 +1254,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(step|stepsize|J|F|normF)</td><td>casadi::SimpleIndefDpleInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1274,7 +1272,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(step|stepsize|J|F|normF)</td><td>casadi::SimpleIndefDpleInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1298,7 +1296,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::KinsolInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>u_scale</td><td>OT_REALVECTOR</td><td></td><td></td><td>casadi::KinsolInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td></td><td>casadi::KinsolInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>casadi::KinsolInternal</td></tr>
@@ -1325,7 +1323,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::ImplicitFunctionInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>casadi::KinsolInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>u_scale</td><td>OT_REALVECTOR</td><td></td><td></td><td>casadi::KinsolInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td></td><td>casadi::KinsolInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>casadi::KinsolInternal</td></tr>
@@ -1339,14 +1337,14 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::ImplicitFixedStepIntegratorInternal</td></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::ImplicitFixedStepIntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_djac)</td><td>casadi::CollocationIntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegratorInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1357,14 +1355,14 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::ImplicitFixedStepIntegratorInternal</td></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::ImplicitFixedStepIntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_djac)</td><td>casadi::CollocationIntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegratorInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1377,7 +1375,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1390,7 +1388,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1401,17 +1399,17 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>[default: equal to exact_jacobian]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>[default: equal to linear_solver]</td><td>casadi::SundialsInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>[default: equal to linear_solver_options]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to lower_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>casadi::SundialsInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_djac)</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to upper_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1423,17 +1421,17 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>[default: equal to exact_jacobian]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>[default: equal to linear_solver]</td><td>casadi::SundialsInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>[default: equal to linear_solver_options]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to lower_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>casadi::SundialsInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(eval_f|eval_djac)</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>[default: equal to upper_bandwidth]</td><td>casadi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
@@ -1451,7 +1449,7 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1468,7 +1466,7 @@
 <tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>pos_def</td><td>OT_BOOLEAN</td><td>false</td><td>Assume P positive definite</td><td>casadi::DpleInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1612,6 +1610,7 @@
 <tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>constraints to be passed to IPOPT</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>False</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
@@ -1662,8 +1661,8 @@
 <tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>1e-11</td><td>NSN line search minimum step size.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>0.01</td><td>NSN line search slope parameter.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_printLevel</td><td>OT_STRING</td><td>None</td><td>Controls the amount of QP solver output.</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>False</td><td>Enable scaling on QP level.</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>True</td><td>Use strict termination criteria in IP method.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>True</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>Verbose evaluation -- for debugging</td><td>casadi::WorhpInternal</td></tr>
@@ -1810,6 +1809,7 @@
 <tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>constraints to be passed to IPOPT</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>False</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
@@ -1860,8 +1860,8 @@
 <tr><td>qp_nsnMinAlpha</td><td>OT_REAL</td><td>1e-11</td><td>NSN line search minimum step size.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_nsnSigma</td><td>OT_REAL</td><td>0.01</td><td>NSN line search slope parameter.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_printLevel</td><td>OT_STRING</td><td>None</td><td>Controls the amount of QP solver output.</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>False</td><td>Enable scaling on QP level.</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>True</td><td>Use strict termination criteria in IP method.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>True</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>Verbose evaluation -- for debugging</td><td>casadi::WorhpInternal</td></tr>
@@ -1877,7 +1877,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1890,7 +1890,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1903,7 +1903,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1916,7 +1916,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1927,11 +1927,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::OldCollocationIntegratorInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1942,11 +1942,11 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::OldCollocationIntegratorInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1959,7 +1959,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::NLPQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1972,7 +1972,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::NLPQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -1988,7 +1988,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SDPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2004,7 +2004,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SDPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2018,7 +2018,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::NullspaceInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2032,7 +2032,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::NullspaceInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2052,7 +2052,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2072,7 +2072,7 @@
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2085,7 +2085,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2098,7 +2098,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2345,7 +2345,7 @@
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_timing_statistics</td><td>OT_STRING</td><td>no</td><td>Switch to print timing statistics. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_user_options</td><td>OT_STRING</td><td>no</td><td>Print all options set by the user. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>quality_function_balancing_term</td><td>OT_STRING</td><td>none</td><td>The balancing term included in the quality function for centrality. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>quality_function_centrality</td><td>OT_STRING</td><td>none</td><td>The penalty term for centrality that is included in quality function. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>quality_function_max_section_steps</td><td>OT_INTEGER</td><td>8</td><td>Maximum number of search steps during direct search procedure determining the optimal centering parameter. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -2664,7 +2664,7 @@
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_timing_statistics</td><td>OT_STRING</td><td>no</td><td>Switch to print timing statistics. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_user_options</td><td>OT_STRING</td><td>no</td><td>Print all options set by the user. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>quality_function_balancing_term</td><td>OT_STRING</td><td>none</td><td>The balancing term included in the quality function for centrality. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>quality_function_centrality</td><td>OT_STRING</td><td>none</td><td>The penalty term for centrality that is included in quality function. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>quality_function_max_section_steps</td><td>OT_INTEGER</td><td>8</td><td>Maximum number of search steps during direct search procedure determining the optimal centering parameter. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -2749,7 +2749,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2762,7 +2762,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2781,7 +2781,7 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>Check documentation of Callback.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2800,7 +2800,7 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>Check documentation of Callback.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2812,18 +2812,15 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::CplexInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::CplexInternal</td></tr>
-<tr><td>dep_check</td><td>OT_STRING</td><td>"off"</td><td>Detect redundant constraints. (automatic:-1|off:0|begin:1|end:2|both:3)</td><td>casadi::CplexInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>"qp.dat"</td><td>The filename to dump to.</td><td>casadi::CplexInternal</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>false</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_method</td><td>OT_STRING</td><td>"automatic"</td><td>Determines which CPLEX algorithm to use. (automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover)</td><td>casadi::CplexInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::CplexInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simplex_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of simplex iterations.</td><td>casadi::CplexInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1E-6</td><td>Tolerance of solver</td><td>casadi::CplexInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>warm_start</td><td>OT_BOOLEAN</td><td>false</td><td>Use warm start with simplex methods (affects only the simplex methods).</td><td>casadi::CplexInternal</td></tr>
 </table>
 */
 /// \endcond
@@ -2834,18 +2831,15 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::CplexInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::CplexInternal</td></tr>
-<tr><td>dep_check</td><td>OT_STRING</td><td>"off"</td><td>Detect redundant constraints. (automatic:-1|off:0|begin:1|end:2|both:3)</td><td>casadi::CplexInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>"qp.dat"</td><td>The filename to dump to.</td><td>casadi::CplexInternal</td></tr>
 <tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>false</td><td>Dumps QP to file in CPLEX format.</td><td>casadi::CplexInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_method</td><td>OT_STRING</td><td>"automatic"</td><td>Determines which CPLEX algorithm to use. (automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover)</td><td>casadi::CplexInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::CplexInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>simplex_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of simplex iterations.</td><td>casadi::CplexInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1E-6</td><td>Tolerance of solver</td><td>casadi::CplexInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>warm_start</td><td>OT_BOOLEAN</td><td>false</td><td>Use warm start with simplex methods (affects only the simplex methods).</td><td>casadi::CplexInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -2855,13 +2849,13 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::DirectCollocationInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::DirectCollocationInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2872,13 +2866,13 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::DirectCollocationInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::DirectCollocationInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>casadi::OCPSolverInternal</td></tr>
 <tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>casadi::OCPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2889,12 +2883,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::SDPSOCPInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::SDPSOCPInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(initial|step)</td><td>casadi::SOCPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SOCPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2905,12 +2899,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::SDPSOCPInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::SDPSOCPInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>(initial|step)</td><td>casadi::SOCPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>print_problem</td><td>OT_BOOLEAN</td><td>false</td><td>Print out problem statement for debugging.</td><td>casadi::SOCPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2923,7 +2917,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2936,7 +2930,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2947,13 +2941,13 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::ImplicitFixedStepIntegratorInternal</td></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::ImplicitFixedStepIntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegratorInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2964,13 +2958,13 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::ImplicitFixedStepIntegratorInternal</td></tr>
+<tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>casadi::IntegratorInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::ImplicitFixedStepIntegratorInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_augmented</td><td>OT_BOOLEAN</td><td>true</td><td>DAE callback function also be SXFunction.</td><td>casadi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>casadi::IntegratorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INTEGER</td><td>20</td><td>Number of finite elements</td><td>casadi::FixedStepIntegratorInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2983,7 +2977,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -2996,7 +2990,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3007,8 +3001,8 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::SQPInternal</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>constraints to be passed to IPOPT</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::SQPInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
@@ -3016,7 +3010,7 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>Check documentation of Callback.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3027,8 +3021,8 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::SQPInternal</td></tr>
 <tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>constraints to be passed to IPOPT</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::SQPInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
@@ -3036,7 +3030,7 @@
 <tr><td>iteration_callback</td><td>OT_CALLBACK</td><td>GenericType()</td><td>Check documentation of Callback.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3047,12 +3041,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::NLPImplicitInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::NLPImplicitInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3063,12 +3057,12 @@
 <a name='options'></a><table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>casadi::NLPImplicitInternal</td></tr>
 <tr><td>constraints</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>1: ui &gt;= 0.0, -1: ui &lt;= 0.0, 2: ui &gt; 0.0, -2: ui &lt; 0.0.</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>true</td><td>Indicates if the QP is convex or not (affects only the barrier method).</td><td>casadi::NLPImplicitInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to casadi::Parallelizer</td><td>casadi::ImplicitFunctionInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3085,7 +3079,7 @@
 <tr><td>nWSR</td><td>OT_INTEGER</td><td>GenericType()</td><td>the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QPOasesInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>PrintLevel_to_string</td><td>see Section 5.7 (none|low|medium|high)</td><td>casadi::QPOasesInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3102,7 +3096,7 @@
 <tr><td>nWSR</td><td>OT_INTEGER</td><td>GenericType()</td><td>the initial homotopy. Default is 5(nx + nc)</td><td>casadi::QPOasesInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>printLevel</td><td>OT_STRING</td><td>PrintLevel_to_string</td><td>see Section 5.7 (none|low|medium|high)</td><td>casadi::QPOasesInternal</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3116,7 +3110,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enableEqualities</td><td>OT_BOOLEAN</td><td>BooleanType_to_bool</td><td>(True) or not (False)</td><td>casadi::QCQPQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3130,7 +3124,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enableEqualities</td><td>OT_BOOLEAN</td><td>BooleanType_to_bool</td><td>(True) or not (False)</td><td>casadi::QCQPQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3143,7 +3137,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
@@ -3156,7 +3150,7 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qp_strict</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.strict</td><td>Use strict termination criteria in IP method.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>qp_scaleIntern</td><td>OT_BOOLEAN</td><td>worhp_p_.qp.scaleIntern</td><td>Enable scaling on QP level.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
