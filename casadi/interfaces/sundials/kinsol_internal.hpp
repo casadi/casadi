@@ -107,12 +107,12 @@ namespace casadi{
     /// For timings
     clock_t time1_, time2_;
 
-    /// Accummulated time since last reset:
+    /// Accumulated time since last reset:
     double t_func_; // time spent in the residual function
-    double t_jac_; // time spent in the jacobian function
+    double t_jac_; // time spent in the Jacobian function
     double t_lsolve_; // preconditioner/linear solver solve function
-    double t_lsetup_jac_; // preconditioner/linear solver setup function, generate jacobian
-    double t_lsetup_fac_; // preconditioner setup function, factorize jacobian
+    double t_lsetup_jac_; // preconditioner/linear solver setup function, generate Jacobian
+    double t_lsetup_fac_; // preconditioner setup function, factorize Jacobian
 
     /// Globalization strategy
     int strategy_;

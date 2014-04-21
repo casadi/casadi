@@ -67,7 +67,9 @@ namespace casadi{
     /** \brief  Initialize */
     virtual void init();
 
-    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    /** \brief Generate a function that calculates \a nfwd forward derivatives
+    and \a nadj adjoint derivatives
+    */
     virtual Function getDerivative(int nfwd, int nadj);
 
   private:
@@ -92,10 +94,10 @@ namespace casadi{
     /// Transformed V data
     std::vector<double> VZ_;
 
-    /// Temp data  nxn x K
+    /// Temp data  (n x n) x K
     std::vector< Matrix<double> > nnKa_;
 
-    /// Temp data  nxn x K
+    /// Temp data  (n x n) x K
     std::vector< Matrix<double> > nnKb_;
 
     /// Real parts of eigenvalues

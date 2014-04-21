@@ -31,11 +31,11 @@ namespace casadi{
   /// Forward declaration of internal class
   class PsdIndefDpleInternal;
 
-  /** \brief An efficient solver for Discrete Periodic Lyapunov Eaauqtions using SLICOT
+  /** \brief An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
    *
    * @copydoc DPLE_doc
-
-       Uses Periodic Schur Decomposition (psd) and does not assume positive definiteness.
+   
+       Uses Periodic Schur Decomposition ('psd') and does not assume positive definiteness.
        Based on Periodic Lyapunov equations: some applications and new algorithms.
        Int. J. Control, vol. 67, pp. 69-87, 1997.
 

@@ -600,7 +600,7 @@ namespace casadi{
     // Loop over rows
     stream << "[";
     for(int rr=0; rr<size1(); ++rr){
-      // Add delimitor
+      // Add delimiter
       if(rr!=0) stream << ",";
 
       // Check if nonzero
@@ -2007,7 +2007,7 @@ namespace casadi{
     // Quick return if empty
     if(y.size2()==0 && y.size1()==0) return;
 
-    // Appending can be done efficeintly if vectors
+    // Appending can be done efficiently if vectors
     if(isVector()){
       // Append the sparsity pattern vertically
       sparsityRef().append(y.sparsity());

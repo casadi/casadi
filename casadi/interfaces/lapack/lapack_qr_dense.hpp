@@ -37,8 +37,8 @@ namespace casadi{
    *
    @copydoc LinearSolver_doc
    *
-   * This class solves the linear system A.x=b by making an QR factorization of A: \n
-   * A = Q.R, with Q orthogonal and R upper triangular
+   * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
+   * <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
    *
    * LapackQRDense is an casadi::Function mapping from 2 inputs
    * [ A (matrix),b (vector)] to one output [x (vector)].

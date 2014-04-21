@@ -55,7 +55,7 @@ public:
 
 
   /** \brief  Create an integrator for a fully implicit DAE with quadrature states
-  * (nz is the number of states not to be included in the state vector)
+  * (\a nz is the number of states not to be included in the state vector)
   *   \param f dynamical system
   * \copydoc scheme_DAEInput
   * \copydoc scheme_DAEOutput
@@ -74,7 +74,7 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /// Correct the initial value for yp and z after resetting the solver
+  /// Correct the initial value for \p yp and \p z after resetting the solver
   void correctInitialConditions();
 
   /// Static creator function

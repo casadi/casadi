@@ -103,9 +103,10 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
   /** \brief  Get the integrator Jacobian for the backward problem (generic)
   *   Structure:
   *
-  *
+  * \verbatim
   *   | diff(gx,rx) + cj*diff(gx,dot(rx))  |   diff(gx,rz) |
   *   | diff(gz,rx)                        |   diff(gz,rz) |
+  * \endverbatim
   */
   template<typename FunctionType>
   FunctionType getJacGenB();
@@ -271,13 +272,13 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
   // For timings
   clock_t time1, time2;
 
-  // Accummulated time since last reset:
+  // Accumulated time since last reset:
   double t_res; // time spent in the DAE residual
   double t_fres; // time spent in the forward sensitivity residual
-  double t_jac, t_jacB; // time spent in the jacobian, or jacobian times vector function
+  double t_jac, t_jacB; // time spent in the Jacobian, or Jacobian times vector function
   double t_lsolve; // preconditioner/linear solver solve function
-  double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
-  double t_lsetup_fac; // preconditioner setup function, factorize jacobian
+  double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
+  double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
 
   // Has the adjoint problem been initialized
   bool isInitAdj_;
@@ -291,7 +292,7 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal{
   // Disable IDAS internal warning messages
   bool disable_internal_warnings_;
 
-  //  Initial values for xdot and z
+  //  Initial values for \p xdot and \p z
   std::vector<double> init_xdot_;
 
 };

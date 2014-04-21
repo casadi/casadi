@@ -39,10 +39,12 @@ class CSparseCholeskyInternal;
 * CSparseCholesky is an casadi::Function mapping from 2 inputs
 * [ A (matrix),b (vector)] to one output [x (vector)].
 *
+* \verbatim
 *  A = LL'
 *    Ax = b
 *    LL'x = b
 *    L'x = L^-1 b
+* \endverbatim
 *
 * The usual procedure to use CSparseCholesky is: \n
 *  -# init()
@@ -74,7 +76,7 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /// Solve the system of equations Lx = b
+  /// Solve the system of equations <tt>Lx = b</tt>
   void solveL(double* x, int nrhs, bool transpose);
 
   /// Obtain a symbolic Cholesky factorization

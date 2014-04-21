@@ -79,16 +79,16 @@ public:
   virtual bool eval_g(Index n, const Number* x, bool new_x, Index m, Number* g);
 
   /** Method to return:
-   *   1) The structure of the jacobian (if "values" is NULL)
-   *   2) The values of the jacobian (if "values" is not NULL)
+   *   1) The structure of the Jacobian (if "values" is NULL)
+   *   2) The values of the Jacobian (if "values" is not NULL)
    */
   virtual bool eval_jac_g(Index n, const Number* x, bool new_x,
                           Index m, Index nele_jac, Index* iRow, Index *jCol,
                           Number* values);
 
   /** Method to return:
-   *   1) The structure of the hessian of the lagrangian (if "values" is NULL)
-   *   2) The values of the hessian of the lagrangian (if "values" is not NULL)
+   *   1) The structure of the hessian of the Lagrangian (if "values" is NULL)
+   *   2) The values of the hessian of the Lagrangian (if "values" is not NULL)
    */
   virtual bool eval_h(Index n, const Number* x, bool new_x,
                       Number obj_factor, Index m, const Number* lambda,

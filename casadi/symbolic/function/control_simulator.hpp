@@ -81,7 +81,7 @@ namespace casadi{
       * Minor time-steps. These are time steps linearly interpolated from one major time-step
         to the next. The option 'nf' regulates how many minor time-steps are taken.\n
       * Integration time-steps. Time steps that the supplied integrator might choose to
-        integrate the continous dynamics.
+        integrate the continuous dynamics.
         They are not important what ControlSimulator is concerned.\n
 
       np  Number of parameters
@@ -139,7 +139,7 @@ namespace casadi{
     Matrix<double> getMinorU() const;
 
 
-    /** \brief Get the index i such that gridminor[i] == gridmajor
+    /** \brief Get the index i such that <tt>gridminor[i] == gridmajor</tt>
      */
     std::vector< int > getMajorIndex() const;
 

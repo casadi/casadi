@@ -1,7 +1,11 @@
 CasADi
 Matlab
+Matlab's
 Python
 Numpy
+Sourceforge
+Fortran
+perl
 matlab
 Andersson
 Moritz
@@ -45,14 +49,21 @@ Hessian
 Hessians
 Frobenius
 Kahn
-
+Hessenberg
+Hessenberg-triangular
+Wachter
+Biegler
+Krylov
 indices
 
 'radau'
 'legendre'
 hotstart
+warmstart
 startup
 nonlifted
+multistep
+preconditioner
 NL
 nl
 QP
@@ -78,7 +89,7 @@ linesearch
 subproblem
 subproblems
 stepsize
-stepsiwes
+stepsizes
 gridpoint
 gridpoints
 interdependencies
@@ -113,6 +124,7 @@ inplace
 unary
 typdef
 typedefs
+sizeof
 denorm
 dll
 lossless
@@ -120,11 +132,19 @@ stacktrace
 stacktraces
 gdb
 valgrind
+stringstreams
+functor
+nondifferentiated
+.cpp
+.hpp
 
 start
 horzcat
 vertcat
+horzsplit
+vertsplit
 blkdiag
+blocksplit
 
 MX
 SX
@@ -149,6 +169,8 @@ bitwise
 submatrix
 preprocessor
 inlining
+multi-input
+multi-output
 VM
 
 NaN
@@ -163,6 +185,11 @@ columnspace
 nonsingular
 nonnegative
 nonpositive
+arcus
+ceil
+copysign
+arctan2
+codegen
 
 
 ok
@@ -174,3 +201,22 @@ str
 parallelizer
 
 syntaxes
+filename
+webpage
+repo
+pythonic
+symbolics
+inbetween
+inputscheme
+outputscheme
+
+strided
+unstrided
+tri-diagonal
+pre-
+equilibrate
+xml
+w.r.t.
+kinsol
+idas
+

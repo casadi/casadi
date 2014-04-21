@@ -57,7 +57,7 @@ namespace casadi{
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
 
-    // Solve the system of equations Lx = b
+    // Solve the system of equations <tt>Lx = b</tt>
     void solveL(double* x, int nrhs, bool transpose);
 
     /// Obtain a symbolic Cholesky factorization
@@ -69,7 +69,7 @@ namespace casadi{
     // Clone
     virtual CSparseCholeskyInternal* clone() const;
 
-    // The tranpose of linear system in form (CCS)
+    // The transpose of linear system in form (CCS)
     cs AT_;
 
     // The symbolic factorization

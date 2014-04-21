@@ -2,6 +2,7 @@ from pyparsing import *
 import hunspell
 hobj = hunspell.HunSpell('/usr/share/hunspell/en_US.dic', '/usr/share/hunspell/en_US.aff')
 import subprocess
+from multiprocessing import Process, Queue, Lock
 
 lt_exclusions = [
   'WHITESPACE_RULE',
@@ -32,22 +33,28 @@ import os
 dir = sys.argv[1]
 files = sys.argv[2:]
 
+if 'symbolic' in dir:
+  sys.exit(0)
+
 success = True
 
-for f in files:
+def checkfile(f,lock,queue):
   localsuccess = True
-  ff = os.path.join(dir,f)
-  if f.endswith("cpp"):
-    continue
   text = ""
   spells = ""
-  for (m,s,e) in cppStyleComment.scanString(file(ff,'r').read()):
+  interface = None
+  m = re.search("interfaces/(\w+)/",f)
+  if m:
+    interface = re.compile(r"\b"+m.group(1)+r"\b",re.I)
+  for (m,s,e) in cppStyleComment.scanString(file(f,'r').read()):
     t = m.asList()[0]
+    if t.startswith("/*") and not t.startswith("/**"):
+      continue
     #if "//" in t[3:-3]:
     #  continue
     t = re.sub('\[\w+\]','',t)
     t = re.sub('\(\w+\s+x\s+\w+\)','',t)
-    t = re.sub('[\\\\@](copydoc|a|e|param) \w+','',t)
+    t = re.sub('[\\\\@](copydoc|a|e|p|param|defgroup)\s+\w+','',t)
     t = re.sub(r'\b[A-Z_]{2,}\w+','',t)
     t = re.sub(r'(?<!\w)-+(?!\w)','',t)
     t = re.sub('\\\\verbatim(.*?)\\\\endverbatim','',t,flags=re.DOTALL)
@@ -58,11 +65,17 @@ for f in files:
     t = re.sub(r'\b\w+_\w+\b','',t) # camelcase
     t = re.sub('[\\\\@][\w{}]+','',t)
     t = re.sub('<tt>.*?</tt>','',t)
-    t = re.sub(r'\b[ntdpcx][a-zA-Z0-9]\b',lambda e: e.group(0) if hobj.spell(e.group()) else '',t) # should be escaped with \e
     t = re.sub('</?\w+>','',t)
     t = re.sub('#\w+','',t)
     t = re.sub('\*','',t)
-    t = re.sub('[\w\d]+-by-[\w+\d]','',t)
+    t = re.sub('\b[\w\d]+(-by-|x)[\w+\d]\b','',t)
+    t = re.sub('C\d+','',t) # Visual studio warnings
+    t = re.sub("'[^\s]*?'",'',t)
+    t = re.sub(r'\b[ntdpcx][a-zA-Z0-9]\b',lambda e: e.group(0) if hobj.spell(e.group()) else '',t) # should be escaped with \e
+    t = re.sub("-\d+",'',t)
+    t = re.sub("\b\w+\d+\b",'',t)
+    if interface is not None:
+      t = interface.sub('',t)
     text+= t+"\n"
     #for w in t.split(" "):
     #  if not hobj.spell(w):
@@ -78,10 +91,25 @@ for f in files:
   if len(outh) > 0:
     localsuccess = False
   if not localsuccess:
-    print "In file ", ff
+    lock.acquire()
+    print "In file ", f
     print "\n".join(out.split("\n")[2:-2])
     print outh
-    success = False
+    lock.release()
+    return False
+  
+
+lock = Lock()
+queue = Queue()
+for f in files:
+  localsuccess = True
+  ff = os.path.join(dir,f)
+  if f.endswith("cpp"):
+    continue
+  p = Process(target=checkfile, args=(ff,lock,queue))
+  p.start()
+  
+success = True
     
 if success:
   sys.exit(0)

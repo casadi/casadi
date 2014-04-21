@@ -157,7 +157,7 @@ namespace casadi{
 #endif
 
   ///@{
-  /** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
+  /** \brief  Pre-C99 elementary functions from the 'math.h' ('cmath') header */
   template<class T> T sqrt(const T &x){return x.sqrt();}
   using std::sqrt;
 
@@ -240,14 +240,14 @@ namespace casadi{
   ///@}
 
   ///@{
-  /** \brief  C99 elementary functions from the math.h header */
+  /** \brief  C99 elementary functions from the 'math.h' header */
   template<class T> T erf(const T &x){return x.erf();}
 #ifdef HAS_ERF
   using ::erf;
 #else // HAS ERF
   inline double erf(double x) throw(){
-    // Approximation found in sourceforge and modified,
-    // originally from numerical recepies in fortran
+    // Approximation found in Sourceforge and modified,
+    // originally from numerical recipes in Fortran
     double sx = x<0 ? -1 : x>0 ? 1 : x;
     double z = sx*x;
     double t = 1.0/(1.0+0.5*z);
@@ -310,7 +310,7 @@ namespace casadi{
   using ::erfinv;
 #else // HAS ERFINV
   inline double erfinv(double x) throw(){
-    // Approximation found in sourceforge and modified: Not very efficent
+    // Approximation found in Sourceforge and modified: Not very efficient
     if(x>=1){
       return x==1 ? std::numeric_limits<double>::infinity() :
           std::numeric_limits<double>::quiet_NaN();

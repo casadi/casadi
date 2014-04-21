@@ -37,12 +37,12 @@ namespace casadi{
 @{
 */
 
-  /** \brief Matlab's linspace command
+  /** \brief Matlab's \c linspace command
    */
   template<typename MatType>
   MatType linspace(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int nsteps);
 
-  /** \brief Matlab's cross command
+  /** \brief Matlab's \c cross command
    */
   template<typename MatType>
   MatType cross(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int dim = -1);

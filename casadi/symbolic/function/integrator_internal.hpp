@@ -81,10 +81,12 @@ namespace casadi{
     /// Is the class able to propagate seeds through the algorithm?
     virtual bool spCanEvaluate(bool fwd){ return true;}
 
-    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    /** Generate a function that calculates \a nfwd forward derivatives
+     * and \a nadj adjoint derivatives
+    */
     virtual Function getDerivative(int nfwd, int nadj);
 
-    /** \brief Calculate the jacobian of output oind with respect to input iind */
+    /** \brief Calculate the jacobian of output \a oind with respect to input \a iind */
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
 
     // Helper structure
@@ -95,8 +97,8 @@ namespace casadi{
     /** \brief Set solver specific options to generated augmented integrators */
     virtual void setDerivativeOptions(Integrator& integrator, const AugOffset& offset);
 
-    /// Generate a augmented DAE system with nfwd forward sensitivities
-    // and nadj adjoint sensitivities
+    /// Generate a augmented DAE system with \a nfwd forward sensitivities
+    // and \a nadj adjoint sensitivities
     virtual std::pair<Function,Function> getAugmented(int nfwd, int nadj, AugOffset& offset);
 
     // Get offsets in augmented problem

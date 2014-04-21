@@ -87,7 +87,7 @@ namespace casadi{
     virtual int getOp() const{ return OP_NORMF;}
   };
 
-  /** \brief Represents a 2-norm (spectran norm)
+  /** \brief Represents a 2-norm (spectral norm)
       \author Joel Andersson
       \date 2010-2013
   */

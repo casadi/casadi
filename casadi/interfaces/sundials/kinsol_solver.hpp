@@ -42,11 +42,11 @@ namespace casadi{
    *
    The constraints option expects an integer entry for each variable u:\n
 
-   0 then no constraint is imposed on ui. \n
-   1 then ui will be constrained to be ui >= 0.0. \n
-   −1 then ui will be constrained to be ui <= 0.0. \n
-   2 then ui will be constrained to be ui > 0.0. \n
-   −2 then ui will be constrained to be ui < 0.0. \n
+   0 then no constraint is imposed on \p ui. \n
+   1 then \p ui will be constrained to be \p ui >= 0.0. \n
+   −1 then \p ui will be constrained to be \p ui <= 0.0. \n
+   2 then \p ui will be constrained to be \p ui > 0.0. \n
+   −2 then \p ui will be constrained to be \p ui < 0.0. \n
 
    *
    * \see ImplicitFunction for more information

@@ -70,11 +70,11 @@ namespace casadi{
     std::vector< std::vector< std::vector<int> > > pattern_;
     std::vector< std::vector< std::vector<double> > > values_;
 
-    /// Temporary work vector of size n*(n+1)/2
+    /// Temporary work vector of size <tt>n*(n+1)/2</tt>
     std::vector< std::vector<double> > store_X_;
     std::vector< std::vector<double> > store_P_;
 
-    /// Mapping to get [A LBA]'
+    /// Mapping to get <tt>[A LBA]'</tt>
     Function mappingA_;
   };
 

@@ -72,29 +72,29 @@ public:
     /// Flag: is already initialized
     bool is_init_;
 
-    /// Storage space for sqic bl variable
+    /// Storage space for sqic \p bl variable
     std::vector<double> bl_;
-    /// Storage space for sqic bu variable
+    /// Storage space for sqic \p bu variable
     std::vector<double> bu_;
-    /// Storage space for sqic x variable
+    /// Storage space for sqic \p x variable
     std::vector<double> x_;
-    /// Storage space for sqic locA variable
+    /// Storage space for sqic \p locA variable
     std::vector<int> locA_;
-    /// Storage space for sqic indA variable
+    /// Storage space for sqic \p indA variable
     std::vector<int> indA_;
-    /// Storage space for sqic hs variable
+    /// Storage space for sqic \p hs variable
     std::vector<int> hs_;
-    /// Storage space for sqic hEtype variable
+    /// Storage space for sqic \p hEtype variable
     std::vector<int> hEtype_;
-    /// Storage space for sqic indH variable
+    /// Storage space for sqic \p indH variable
     std::vector<int> indH_;
-    /// Storage space for sqic locH variable
+    /// Storage space for sqic \p locH variable
     std::vector<int> locH_;
-    /// Storage space for sqic rc variable
+    /// Storage space for sqic \p rc variable
     std::vector<double> rc_;
-    /// Storage space for sqic pi variable
+    /// Storage space for sqic \p pi variable
     std::vector<double> pi_;
-    /// Storage space for sqic piE variable
+    /// Storage space for sqic \p piE variable
     std::vector<double> piE_;
 
     /// Helper function to bring A into correct format

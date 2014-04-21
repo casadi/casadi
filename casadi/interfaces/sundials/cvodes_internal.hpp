@@ -128,25 +128,25 @@ public:
             N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB,
              N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-  /// z = M^(-1).r
+  /// <tt>z = M^(-1).r</tt>
   void psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
               double gamma, double delta, int lr, N_Vector tmp);
   void psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB, N_Vector zvecB,
                double gammaB, double deltaB, int lr, N_Vector tmpB);
-  /// M = I-gamma*df/dx, factorize
+  /// <tt>M = I-gamma*df/dx</tt>, factorize
   void psetup(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr,
               double gamma,
               N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
                booleantype jokB, booleantype *jcurPtrB, double gammaB,
                N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-  /// M = I-gamma*df/dx, factorize
+  /// <tt>M = I-gamma*df/dx</tt>, factorize
   void lsetup(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr,
               N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   void lsetupB(double t, double gamma, int convfail, N_Vector x, N_Vector xB, N_Vector xdotB,
                booleantype *jcurPtr,
                N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  /// b = M^(-1).b
+  /// <tt>b = M^(-1).b</tt>
   void lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
   void lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x,
                N_Vector xB, N_Vector xdotB);
@@ -210,13 +210,13 @@ public:
   // For timings
   clock_t time1, time2;
 
-  // Accummulated time since last reset:
+  // Accumulated time since last reset:
   double t_res; // time spent in the DAE residual
   double t_fres; // time spent in the forward sensitivity residual
-  double t_jac; // time spent in the jacobian, or jacobian times vector function
+  double t_jac; // time spent in the Jacobian, or Jacobian times vector function
   double t_lsolve; // preconditioner/linear solver solve function
-  double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
-  double t_lsetup_fac; // preconditioner setup function, factorize jacobian
+  double t_lsetup_jac; // preconditioner/linear solver setup function, generate Jacobian
+  double t_lsetup_fac; // preconditioner setup function, factorize Jacobian
 
   // N-vectors for the forward integration
   N_Vector x0_, x_, q_;

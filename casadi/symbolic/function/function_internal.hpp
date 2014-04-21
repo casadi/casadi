@@ -52,7 +52,7 @@ namespace casadi{
     friend class Function;
 
   protected:
-    /** \brief  Default constructor (accessable from the Function class and derived classes) */
+    /** \brief  Default constructor (accessible from the Function class and derived classes) */
     FunctionInternal();
 
   public:
@@ -176,8 +176,10 @@ namespace casadi{
 
     ///@{
     /** \brief Return function that calculates forward derivatives
+     *
      *    This method returns a cached instance if available,
-     *    and calls Function getDerivative(int nfwd, int nadj) if no cached version is available.
+     *    and calls <tt>Function getDerivative(int nfwd, int nadj)</tt>
+     *    if no cached version is available.
      */
     Function derivative(int nfwd, int nadj);
 
@@ -188,6 +190,7 @@ namespace casadi{
     virtual Function getDerivative(int nfwd, int nadj);
 
     /** \brief Constructs and returns a function that calculates forward derivatives
+     *
      *  by creating the Jacobian then multiplying */
     virtual Function getDerivativeViaJac(int nfwd, int nadj);
 
@@ -211,7 +214,7 @@ namespace casadi{
     /** \brief Generate code for function inputs and outputs */
     void generateIO(CodeGenerator& gen);
 
-    /** \brief Generate code the functon */
+    /** \brief Generate code the function */
     virtual void generateFunction(std::ostream &stream, const std::string& fname,
                                   const std::string& input_type, const std::string& output_type,
                                   const std::string& type, CodeGenerator& gen) const;
@@ -263,14 +266,15 @@ namespace casadi{
     /// Generate the sparsity of a Jacobian block
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
 
-    /// A flavour of getJacSparsity without any magic
+    /// A flavor of getJacSparsity without any magic
     Sparsity getJacSparsityPlain(int iind, int oind);
 
-    /// A flavour of getJacSparsity that does hierachical block structure recognition
+    /// A flavor of getJacSparsity that does hierarchical block structure recognition
     Sparsity getJacSparsityHierarchical(int iind, int oind);
 
-    /// A flavour of getJacSparsity that does hierachical block
-    // structure recognition for symmetric jacobians
+    /** A flavor of getJacSparsity that does hierarchical block
+    * structure recognition for symmetric Jacobians
+    */
     Sparsity getJacSparsityHierarchicalSymm(int iind, int oind);
 
     /// Generate the sparsity of a Jacobian block
@@ -323,12 +327,12 @@ namespace casadi{
     /** \brief  Log the status of the solver, function given */
     void log(const std::string& fcn, const std::string& msg) const;
 
-    // Codegen function
+    /// Codegen function
     Function dynamicCompilation(Function f, std::string fname, std::string fdescr,
                                 std::string compiler);
 
-    // The following functions are called internally from EvaluateMX.
-    // For documentation, see the MXNode class
+    /// The following functions are called internally from EvaluateMX.
+    /// For documentation, see the MXNode class
     ///@{
     virtual void evaluateD(MXNode* node, const DMatrixPtrV& arg, DMatrixPtrV& res,
                            std::vector<int>& itmp, std::vector<double>& rtmp);
@@ -350,16 +354,17 @@ namespace casadi{
     /** \brief Prints out a human readable report about possible constraint violations
     *          - specific constraints
     *
-    * Constraint visualiser strip:
+    * Constraint visualizer strip:
+    * \verbatim
     *  o-------=-------o   Indicates that the value is nicely inbetween the bounds
     *  o-=-------------o   Indicates that the value is closer to the lower bound
     *  X---------------o   Indicates that the lower bound is active
-    *  8---------------o   Indicates that the lower bound is -inifinity
+    *  8---------------o   Indicates that the lower bound is -infinity
     *  o------------=--o   Indicates that the value is closer to the upper bound
     *  o---------------X   Indicates that the upper bound is active
-    *  o---------------8   Indicates that the upper bound is inifinity
+    *  o---------------8   Indicates that the upper bound is infinity
     *     VIOLATED         Indicates constraint violation
-    *
+    * \endverbatim
     */
     static void reportConstraints(std::ostream &stream, const Matrix<double> &v,
                                   const Matrix<double> &lb, const Matrix<double> &ub,

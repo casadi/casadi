@@ -56,7 +56,7 @@ namespace casadi{
 
     virtual void setQPOptions();
 
-    /// Read options from worhp parameter xml
+    /// Read options from snopt parameter xml
     void setOptionsFromFile(const std::string & file);
 
     /// Exact Hessian?
@@ -84,9 +84,9 @@ namespace casadi{
     int nnCon_;
 
     /// Classification arrays
-    /// original variable index -> category w.r.t f
+    /// original variable index -> category w.r.t. f
     std::vector<int> x_type_g_;
-    /// original variable index -> category w.r.t g
+    /// original variable index -> category w.r.t. g
     std::vector<int> x_type_f_;
     /// original constraint index -> category
     std::vector<int> g_type_;
@@ -122,7 +122,7 @@ namespace casadi{
 
     OptionsMap optionsmap_;
 
-    // Matrix A has a inear objective row
+    // Matrix A has a linear objective row
     bool jacF_row_;
     // Matrix A has a dummy row
     bool dummyrow_;
@@ -133,13 +133,13 @@ namespace casadi{
       void snSetr(const std::string &snopt_name, double value);
       void snSet(const std::string &snopt_name, const std::string &value);
 
-      // Accummulated time in last evaluate():
+      // Accumulated time in last evaluate():
       double t_eval_grad_f_; // time spent in eval_grad_f
       double t_eval_jac_g_; // time spent in eval_jac_g
       double t_callback_fun_;  // time spent in callback function
       double t_mainloop_; // time spent in the main loop of the solver
 
-      // Accummulated counts in last evaluate():
+      // Accumulated counts in last evaluate():
       int n_eval_grad_f_; // number of calls to eval_grad_f
       int n_eval_jac_g_; // number of calls to eval_jac_g
       int n_callback_fun_; // number of calls to callback function

@@ -59,7 +59,7 @@ namespace casadi {
       */
       static bool catch_errors_python;
       /** \brief Indicates whether simplifications should be made on the fly.
-      * e.g   cos(-x) -> cos(x)
+      * e.g.   cos(-x) -> cos(x)
       * Default: true
       */
       static bool simplification_on_the_fly;

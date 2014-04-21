@@ -73,7 +73,7 @@ namespace casadi{
 
    1. "colind" [length size2()+1], which contains the index to the first non-zero element on or
    after the corresponding column. All the non-zero elements of a particular i are thus the elements
-   with index el that fullfills: colind[i] <= el < colind[i+1].
+   with index el that fulfills: colind[i] <= el < colind[i+1].
 
    2. "row" [same length as the number of non-zero elements, size()] The rows for each of the
    structural non-zeros.

@@ -54,7 +54,7 @@ namespace casadi{
     /** \brief Check if the numerical values of the supplied bounds make sense */
     virtual void checkInputs() const;
 
-    /// Warns the user about inital bounds, if option 'warn_initial_bounds' is true
+    /// Warns the user about initial bounds, if option 'warn_initial_bounds' is true
     virtual void checkInitialBounds();
 
     /// Set options that make the NLP solver more suitable for solving QPs

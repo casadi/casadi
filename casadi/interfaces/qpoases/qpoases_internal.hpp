@@ -75,7 +75,7 @@ public:
     /// Number of working set recalculations
     int max_nWSR_;
 
-    /// CPUtime for initialisation
+    /// CPUtime for initialization
     double max_cputime_;
 
     /// Throw error

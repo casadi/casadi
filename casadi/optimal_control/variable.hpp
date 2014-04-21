@@ -51,13 +51,13 @@ namespace casadi{
     CAT_DERIVATIVE,
     /** A differential state, i.e. a variable that appears differentiated in the model */
     CAT_STATE,
-    /** An independent constant: "constant Real c1 = 3" */
+    /** An independent constant: <tt>constant Real c1 = 3</tt> */
     CAT_DEPENDENT_CONSTANT,
-    /** A dependent constant "constant Real c2=c1*3". */
+    /** A dependent constant <tt>constant Real c2=c1*3</tt>. */
     CAT_INDEPENDENT_CONSTANT,
-    /** A dependent parameter "parameter Real p1=p2"*/
+    /** A dependent parameter <tt>parameter Real p1=p2</tt>*/
     CAT_DEPENDENT_PARAMETER,
-    /** An independent parameter "parameter Real p2=3"*/
+    /** An independent parameter <tt>parameter Real p2=3</tt>*/
     CAT_INDEPENDENT_PARAMETER,
     /** An algebraic variable or input */
     CAT_ALGEBRAIC

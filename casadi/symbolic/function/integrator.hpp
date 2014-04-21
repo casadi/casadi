@@ -198,6 +198,7 @@ namespace casadi{
     void integrate(double t_out);
 
     /** \brief Reset the backward problem
+     *
      * Time will be set to tf and backward state to input(INTEGRATOR_RX0)
      */
     void resetB();
@@ -208,8 +209,8 @@ namespace casadi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /** \brief Generate a augmented DAE system with nfwd forward sensitivities and nadj
-     * adjoint sensitivities
+    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
+     *    and \a nadj adjoint sensitivities
      */
     std::pair<Function,Function> getAugmented(int nfwd, int nadj);
 

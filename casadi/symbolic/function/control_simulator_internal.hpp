@@ -31,7 +31,7 @@
 
 namespace casadi{
 
-  /** \brief ControlSimulator data storage classs
+  /** \brief ControlSimulator data storage class
       \author Joel Andersson
       \date 2010
   */
@@ -58,7 +58,7 @@ namespace casadi{
     /// Get the parameters that change on a coarse time scale, sampled on the fine timescale
     Matrix<double> getVFine() const;
 
-    /** \brief Get the index i such that gridfine[i] == gridcoarse
+    /** \brief Get the index i such that <tt>gridfine[i] == gridcoarse</tt>
      */
     std::vector< int > getCoarseIndex() const;
 

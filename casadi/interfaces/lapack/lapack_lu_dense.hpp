@@ -37,8 +37,8 @@ namespace casadi{
   /** \brief  LU LinearSolver with Lapack Interface
    * @copydoc LinearSolver_doc
    *
-   * This class solves the linear system A.x=b by making an LU factorization of A: \n
-   * A = L.U, with L lower and U upper triangular
+   * This class solves the linear system <tt>A.x=b</tt> by making an LU factorization of A: \n
+   * <tt>A = L.U</tt>, with L lower and U upper triangular
    *
    * LapackLUDense is an casadi::Function mapping from 2 inputs 
    * [ A (matrix),b (vector)] to one output [x (vector)].
@@ -89,11 +89,11 @@ namespace casadi{
   extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a,
                           int *lda, int *ipiv, double *b, int *ldb, int *info);
 
-  /// Calculate col and row scalings
+  /// Calculate col and row scaling
   extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
                           double *colcnd, double *rowcnd, double *amax, int *info);
 
-  /// Equilibriate the system
+  /// Equilibrate the system
   extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
                           double *colcnd, double *rowcnd, double *amax, char *equed );
 
@@ -138,7 +138,7 @@ namespace casadi{
     // Type of scaling during the last equilibration
     char equed_;
 
-    // Equilibriate?
+    // Equilibrate?
     bool equilibriate_;
 
     // Allow the equilibration to fail

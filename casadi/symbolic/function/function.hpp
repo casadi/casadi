@@ -33,10 +33,10 @@ namespace casadi{
   /** \brief General function
 
       A general function \f$f\f$ in casadi can be multi-input, multi-output.\n
-      Number of inputs:  nin    getNumInputs()\n
-      Number of outputs: nout   getNumOutputs()\n
+      Number of inputs:  \a nin    getNumInputs()\n
+      Number of outputs: \a nout   getNumOutputs()\n
 
-      We can view this function as a being composed of a (nin, nout) grid of single-input,
+      We can view this function as a being composed of a (\a nin, \a nout) grid of single-input,
       single-output primitive functions.\n
       Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can
       map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$,
@@ -47,16 +47,16 @@ namespace casadi{
       When requesting output, you specify which partition \f$j\f$ is active.
       You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
 
-      To calculate jacobians, you need to have \f$(m=1,q=1)\f$.
+      To calculate Jacobians, you need to have \f$(m=1,q=1)\f$.
 
-      Write the jacobian as \f$J_{i,j} = \nabla f_{i,j} =
+      Write the Jacobian as \f$J_{i,j} = \nabla f_{i,j} =
       \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
 
-      Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  setFwdSeed(v,i)\n
-      Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        getFwdSens(sf,j)\n
+      Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  <tt>setFwdSeed(v,i)</tt>\n
+      Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        <tt>getFwdSens(sf,j)</tt>\n
 
-      Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  setAdjSeed(w,j)\n
-      Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        getAdjSens(sa,i)\n
+      Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  <tt>setAdjSeed(w,j)</tt>\n
+      Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        <tt>getAdjSens(sa,i)</tt>\n
 
       We have the following relationships for function mapping from a row vector to a row vector:
 
@@ -69,7 +69,7 @@ namespace casadi{
 
       NOTE: Functions are allowed to modify their input arguments when evaluating:
             implicitFunction, IDAS solver
-      Futher releases may disallow this.
+      Further releases may disallow this.
 
       \internal
       \section Notes for developers
@@ -160,7 +160,7 @@ namespace casadi{
     void solve();
 
     ///@{
-    /** \brief Generate a Jacobian function of output oind with respect to input iind
+    /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
      * \param oind The index of the output
      *
@@ -189,12 +189,12 @@ namespace casadi{
     }
     ///@}
 
-    /** Set the Jacobian function of output oind with respect to input iind
+    /** Set the Jacobian function of output \a oind with respect to input \a iind
      NOTE: Does _not_ take ownership, only weak references to the Jacobians are kept internally */
     void setJacobian(const Function& jac, int iind=0, int oind=0, bool compact=false);
 
     ///@{
-    /** \brief Generate a gradient function of output oind with respect to input iind
+    /** \brief Generate a gradient function of output \a oind with respect to input \a iind
      * \param iind The index of the input
      * \param oind The index of the output
      *
@@ -215,7 +215,7 @@ namespace casadi{
     ///@}
 
     ///@{
-    /** \brief Generate a tangent function of output oind with respect to input iind
+    /** \brief Generate a tangent function of output \a oind with respect to input \a iind
      * \param iind The index of the input
      * \param oind The index of the output
      *
@@ -233,7 +233,7 @@ namespace casadi{
     ///@}
 
     ///@{
-    /** \brief Generate a Hessian function of output oind with respect to input iind
+    /** \brief Generate a Hessian function of output \a oind with respect to input \a iind
      * \param iind The index of the input
      * \param oind The index of the output
      *
@@ -320,32 +320,36 @@ namespace casadi{
     /// \endcond
 
     /** \brief  Evaluate symbolically in parallel (matrix graph)
-        paropt: Set of options to be passed to the Parallelizer
+        \param paropt Set of options to be passed to the Parallelizer
     */
     std::vector<std::vector<MX> > callParallel(const std::vector<std::vector<MX> > &arg,
                                                const Dictionary& paropt=Dictionary());
 
     /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
      *
-     *         Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
-     *         and (1+nfwd)*n_out + nadj*n_in outputs.
-     *         The first n_in inputs corresponds to nondifferentiated inputs.
-     *         The next nfwd*n_in inputs corresponds to forward seeds, one direction at a time
-     *         and the last nadj*n_out inputs corresponds to adjoint seeds, one direction at a time.
-     *         The first n_out outputs corresponds to nondifferentiated outputs.
-     *         The next nfwd*n_out outputs corresponds to forward sensitivities,
-     *         one direction at a time and the last nadj*n_in outputs corresponds to
-     *         adjoint sensitivties, one direction at a time.
+     *         Returns a function with <tt>(1+nfwd)*n_in+nadj*n_out</tt> inputs
+     *         and <tt>(1+nfwd)*n_out + nadj*n_in</tt> outputs.
+     *         The first <tt>n_in</tt> inputs correspond to nondifferentiated inputs.
+     *         The next <tt>nfwd*n_in</tt> inputs correspond to forward seeds,
+     *         one direction at a time
+     *         and the last <tt>nadj*n_out</tt> inputs correspond to adjoint seeds,
+     *         one direction at a time.
+     *         The first n_out outputs correspond to nondifferentiated outputs.
+     *         The next <tt>nfwd*n_out</tt> outputs correspond to forward sensitivities,
+     *         one direction at a time and the last <tt>nadj*n_in</tt> outputs corresponds to
+     *         adjoint sensitivities, one direction at a time.
      *
-     *         (n_in = getNumInputs(), n_out = getNumOutputs())
+     *         <tt>(n_in = getNumInputs(), n_out = getNumOutputs())</tt>
      *
      *        The functions returned are cached, meaning that if called multiple timed
      *        with the same value, then multiple references to the same function will be returned.
      */
     Function derivative(int nfwd, int nadj);
 
-    /** Set a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-     NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
+    /** \brief Set a function that calculates \a nfwd forward derivatives
+        and \a nadj adjoint derivatives
+        
+NOTE: Does _not_ take ownership, only weak references to the derivatives are kept internally */
     void setDerivative(const Function& fcn, int nfwd, int nadj);
 
     ///@{
@@ -414,14 +418,17 @@ namespace casadi{
 
     /// \cond INTERNAL
     /** \brief Is the class able to propagate seeds through the algorithm?
+     *
      * (for usage, see the example propagating_sparsity.cpp) */
     bool spCanEvaluate(bool fwd);
 
     /** \brief Reset the sparsity propagation
+     *
      * (for usage, see the example propagating_sparsity.cpp) */
     void spInit(bool fwd);
 
     /** \brief Propagate the sparsity pattern through a set of directional
+     *
      * derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
     void spEvaluate(bool fwd);
 

@@ -113,7 +113,7 @@ class CASADI_SYMBOLIC_EXPORT GenericExpression{
     inline ExType __ge__(const ExType& y) const
     { return y.__le__(static_cast<const ExType&>(*this));}
 
-    /// Division (with __future__.division in effect)
+    /// Division (with <tt>__future__.division</tt> in effect)
     inline ExType __truediv__(const ExType& y) const {return static_cast<const ExType&>(*this)/y;}
 
     /** @name Operations from the left

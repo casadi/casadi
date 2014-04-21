@@ -30,7 +30,6 @@ namespace casadi{
 
   class SnoptInternal;
 
-  // List from worhp_internal.cpp
   /**
    *
    * \brief interface to SNOPT NLP solver
@@ -52,7 +51,7 @@ namespace casadi{
     SnoptInternal* operator->();
     const SnoptInternal* operator->() const;
 
-    /// Read options from worhp parameter xml
+    /// Read options from snopt parameter xml
     void setOptionsFromFile(const std::string & file);
 
     /// Check if the node is pointing to the right type of object

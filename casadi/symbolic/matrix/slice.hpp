@@ -38,7 +38,7 @@ namespace casadi{
    */
   class CASADI_SYMBOLIC_EXPORT Slice : public PrintableObject{
   public:
-    /// Defailt constructor - all elements
+    /// Default constructor - all elements
     Slice();
 
     /// A single element
