@@ -68,7 +68,11 @@ def _swig_repr(self):
 %}
 #endif // WITH_SWIGPYTHON
 
+#ifdef SWIGPYTHON
+%include "doc_merged.i"
+#else
 %include "doc.i"
+#endif
 
 
 %feature("autodoc", "1");
