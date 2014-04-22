@@ -137,10 +137,14 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
 
 // This assertion if for errors caused by bugs in CasADi, use it instead of C:s assert(),
 // but never in destructors
+#if NDEBUG
+#define casadi_assert(x) casadi_assert_message(x, "Please notify the CasADi developers.")
+#else
 #define casadi_assert(x) casadi_assert_message(x, \
     "(Hint for developers: CasadiOptions.setCatchErrorsPython(False)" \
     " to obtain gdb stacktrace in python.)" \
     << std::endl << "Please notify the CasADi developers.")
+#endif
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
 #define casadi_assert_warning(x,msg) \
