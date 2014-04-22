@@ -2,7 +2,8 @@ from pyparsing import *
 import hunspell
 hobj = hunspell.HunSpell('/usr/share/hunspell/en_US.dic', '/usr/share/hunspell/en_US.aff')
 import subprocess
-from multiprocessing import Process, Queue, Lock
+from multiprocessing import Process, Queue, Lock, Pool, Manager
+
 
 lt_exclusions = [
   'WHITESPACE_RULE',
@@ -30,15 +31,7 @@ import sys
 import re
 import os
 
-dir = sys.argv[1]
-files = sys.argv[2:]
-
-if 'symbolic' in dir:
-  sys.exit(0)
-
-success = True
-
-def checkfile(f,lock,queue):
+def checkfile(f,lock):
   localsuccess = True
   text = ""
   spells = ""
@@ -46,8 +39,15 @@ def checkfile(f,lock,queue):
   m = re.search("interfaces/(\w+)/",f)
   if m:
     interface = re.compile(r"\b"+m.group(1)+r"\b",re.I)
-  for (m,s,e) in cppStyleComment.scanString(file(f,'r').read()):
+  prevs = ("",0,0)
+  fc = file(f,'r').read()
+  for (m,s,e) in cppStyleComment.scanString(fc):
+    lineno = len(fc[:s].split("\n"))
     t = m.asList()[0]
+    #if re.match("^\s+$",fc[prevs[2]:s]) and not t.startswith('///') and t.startswith('//') and prevs[0].startswith('///') and "@{" not in prevs[0] and "@}" not in prevs[0]:
+    #  print "%s:%d %s" % (f,lineno,m)
+    #prevs = (t,s,e)
+    
     if t.startswith("/*") and not t.startswith("/**"):
       continue
     #if "//" in t[3:-3]:
@@ -81,6 +81,8 @@ def checkfile(f,lock,queue):
     #  if not hobj.spell(w):
     #    success = False
     #    spells+="Spelling error: %s (%s)\n" % (w,str(hobj.suggest(w)))
+    prevs = (t,s,e)
+    
   p = subprocess.Popen(['java','-jar','/home/jg/programs/LanguageTool-2.5/languagetool-commandline.jar','-l','en','-d',",".join(lt_exclusions),'-'],stdin = subprocess.PIPE, stdout = subprocess.PIPE)
   out, err = p.communicate(text)
   if len(out.split("\n")[2:-2]) > 0:
@@ -92,26 +94,50 @@ def checkfile(f,lock,queue):
     localsuccess = False
   if not localsuccess:
     lock.acquire()
-    print "In file ", f
+    print "In file %s" % f
     print "\n".join(out.split("\n")[2:-2])
     print outh
     lock.release()
     return False
+  else:
+    return True
   
 
-lock = Lock()
-queue = Queue()
-for f in files:
-  localsuccess = True
-  ff = os.path.join(dir,f)
-  if f.endswith("cpp"):
-    continue
-  p = Process(target=checkfile, args=(ff,lock,queue))
-  p.start()
+if __name__ == "__main__":
+  pool = Pool(processes=16)
+
+  dir = sys.argv[1]
+  files = sys.argv[2:]
+
+  if 'symbolic' in dir:
+    sys.exit(0)
+
+  success = True
   
-success = True
+  results = []
+
+  queue = Queue()
+
+  manager = Manager()
+  lock = manager.Lock()
+
+  for f in files:
+    localsuccess = True
+    ff = os.path.join(dir,f)
+    if f.endswith("cpp"):
+      continue
+    results.append(pool.apply_async(checkfile, args=(ff,lock)))
     
-if success:
-  sys.exit(0)
-else:
-  sys.exit(1)
+  pool.close()
+  pool.join()
+  
+  success = True
+  
+  for r in results:
+    if not r.get():
+      success = False
+
+  if success:
+    sys.exit(0)
+  else:
+    sys.exit(1)
