@@ -70,16 +70,16 @@ namespace casadi {
   }
 
   Function NLPSolver::joinFG(Function F, Function G) {
-    if(G.isNull()) {
+    if (G.isNull()) {
       // unconstrained
-      if(is_a<SXFunction>(F)) {
+      if (is_a<SXFunction>(F)) {
         SXFunction F_sx = shared_cast<SXFunction>(F);
         vector<SX> nlp_in = F_sx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
         vector<SX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_F] = F_sx.outputExpr(0);
         return SXFunction(nlp_in, nlp_out);
-      } else if(is_a<MXFunction>(F)) {
+      } else if (is_a<MXFunction>(F)) {
         MXFunction F_mx = shared_cast<MXFunction>(F);
         vector<MX> nlp_in = F_mx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
@@ -90,21 +90,21 @@ namespace casadi {
         vector<MX> F_in = F.symbolicInput();
         vector<MX> nlp_in(NL_NUM_IN);
         nlp_in[NL_X] = F_in.at(0);
-        if(F_in.size()>1) nlp_in[NL_P] = F_in.at(1);
+        if (F_in.size()>1) nlp_in[NL_P] = F_in.at(1);
         vector<MX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_F] = F.call(F_in).front();
         return MXFunction(nlp_in, nlp_out);
       }
-    } else if(F.isNull()) {
+    } else if (F.isNull()) {
       // feasibility problem
-      if(is_a<SXFunction>(G)) {
+      if (is_a<SXFunction>(G)) {
         SXFunction G_sx = shared_cast<SXFunction>(G);
         vector<SX> nlp_in = G_sx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
         vector<SX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_G] = G_sx.outputExpr(0);
         return SXFunction(nlp_in, nlp_out);
-      } else if(is_a<MXFunction>(G)) {
+      } else if (is_a<MXFunction>(G)) {
         MXFunction G_mx = shared_cast<MXFunction>(F);
         vector<MX> nlp_in = G_mx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
@@ -116,7 +116,7 @@ namespace casadi {
         vector<MX> G_in = G.symbolicInput();
         vector<MX> nlp_in(NL_NUM_IN);
         nlp_in[NL_X] = G_in.at(0);
-        if(G_in.size()>1) nlp_in[NL_P] = G_in.at(1);
+        if (G_in.size()>1) nlp_in[NL_P] = G_in.at(1);
         vector<MX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_G] = G.call(G_in).at(0);
         return MXFunction(nlp_in, nlp_out);
@@ -125,12 +125,12 @@ namespace casadi {
       // Standard (constrained) NLP
 
       // SXFunction if both functions are SXFunction
-      if(is_a<SXFunction>(F) && is_a<SXFunction>(G)) {
+      if (is_a<SXFunction>(F) && is_a<SXFunction>(G)) {
         vector<SX> nlp_in(NL_NUM_IN), nlp_out(NL_NUM_OUT);
         SXFunction F_sx = shared_cast<SXFunction>(F);
         SXFunction G_sx = shared_cast<SXFunction>(G);
         nlp_in[NL_X] = G_sx.inputExpr(0);
-        if(G_sx.getNumInputs()>1) {
+        if (G_sx.getNumInputs()>1) {
           nlp_in[NL_P] = G_sx.inputExpr(1);
         } else {
           nlp_in[NL_P] = SX::sym("p", 1, 0);
@@ -150,23 +150,23 @@ namespace casadi {
 
         // Convert to MX if cast failed and make sure that they
         // use the same expressions if cast was successful
-        if(!G_mx.isNull()) {
+        if (!G_mx.isNull()) {
           nlp_in[NL_X] = G_mx.inputExpr(0);
-          if(G_mx.getNumInputs()>1) {
+          if (G_mx.getNumInputs()>1) {
             nlp_in[NL_P] = G_mx.inputExpr(1);
           } else {
             nlp_in[NL_P] = MX::sym("p", 1, 0);
           }
           nlp_out[NL_G] = G_mx.outputExpr(0);
-          if(!F_mx.isNull()) { // Both are MXFunction, make sure they use the same variables
+          if (!F_mx.isNull()) { // Both are MXFunction, make sure they use the same variables
             nlp_out[NL_F] = substitute(F_mx.outputExpr(), F_mx.inputExpr(), G_mx.inputExpr()).front();
           } else { // G_ but not F_ MXFunction
             nlp_out[NL_F] = F.call(G_mx.inputExpr()).front();
           }
         } else {
-          if(!F_mx.isNull()) { // F but not G MXFunction
+          if (!F_mx.isNull()) { // F but not G MXFunction
             nlp_in[NL_X] = F_mx.inputExpr(0);
-            if(F_mx.getNumInputs()>1) {
+            if (F_mx.getNumInputs()>1) {
               nlp_in[NL_P] = F_mx.inputExpr(1);
             } else {
               nlp_in[NL_P] = MX::sym("p", 1, 0);
@@ -176,7 +176,7 @@ namespace casadi {
           } else { // None of them MXFunction
             vector<MX> FG_in = G.symbolicInput();
             nlp_in[NL_X] = FG_in.at(0);
-            if(FG_in.size()>1) nlp_in[NL_P] = FG_in.at(1);
+            if (FG_in.size()>1) nlp_in[NL_P] = FG_in.at(1);
             nlp_out[NL_G] = G.call(FG_in).front();
             nlp_out[NL_F] = F.call(FG_in).front();
           }

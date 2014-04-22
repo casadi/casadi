@@ -31,7 +31,7 @@ namespace casadi {
   template<typename DataType>
   const DataType& SparseStorage<DataType>::elem(int rr, int cc) const {
     int ind = sparsity().getNZ(rr, cc);
-    if(ind==-1)
+    if (ind==-1)
       return casadi_limits<DataType>::zero;
     else
       return at(ind);
@@ -41,7 +41,7 @@ namespace casadi {
   DataType& SparseStorage<DataType>::elem(int rr, int cc) {
     int oldsize = sparsity().size();
     int ind = sparsityRef().getNZ(rr, cc);
-    if(oldsize != sparsity().size())
+    if (oldsize != sparsity().size())
       data().insert(begin()+ind, DataType(0));
     return at(ind);
   }
@@ -123,7 +123,7 @@ namespace casadi {
     int ncol=d.empty() ? 1 : d.front().size();
 
     // Assert consistency
-    for(int rr=0; rr<nrow; ++rr) {
+    for (int rr=0; rr<nrow; ++rr) {
       casadi_assert_message(ncol==d[rr].size(),
         "SparseStorage<DataType>::SparseStorage(const std::vector< std::vector<DataType> >& d): "
         "shape mismatch" << std::endl <<
@@ -137,8 +137,8 @@ namespace casadi {
     sparsity_ = Sparsity::dense(nrow, ncol);
     data().resize(nrow*ncol);
     typename std::vector<DataType>::iterator it=begin();
-    for(int cc=0; cc<ncol; ++cc) {
-      for(int rr=0; rr<nrow; ++rr) {
+    for (int cc=0; cc<ncol; ++cc) {
+      for (int rr=0; rr<nrow; ++rr) {
         *it++ = d[rr][cc];
       }
     }

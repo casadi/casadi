@@ -60,8 +60,8 @@ namespace casadi {
     }
 
     // Pass the inputs to J
-    for(int i=0; i<getNumInputs(); ++i) {
-      if(i!=iin_) jac_.setInput(input(i), i);
+    for (int i=0; i<getNumInputs(); ++i) {
+      if (i!=iin_) jac_.setInput(input(i), i);
     }
 
     // Aliases
@@ -74,7 +74,7 @@ namespace casadi {
 
     bool success = true;
 
-    while(true) {
+    while (true) {
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
         log("evaluate", "Max. iterations reached.");
@@ -97,8 +97,8 @@ namespace casadi {
 
       // Use u to evaluate J
       jac_.setInput(u, iin_);
-      for(int i=0; i<getNumInputs(); ++i)
-        if(i!=iin_) jac_.setInput(input(i), i);
+      for (int i=0; i<getNumInputs(); ++i)
+        if (i!=iin_) jac_.setInput(input(i), i);
 
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
@@ -187,8 +187,8 @@ namespace casadi {
       std::transform(u.begin(), u.end(), F.begin(), u.begin(), std::minus<double>());
 
       // Get auxiliary outputs
-      for(int i=0; i<getNumOutputs(); ++i) {
-        if(i!=iout_) jac_.getOutput(output(i), 1+i);
+      for (int i=0; i<getNumOutputs(); ++i) {
+        if (i!=iout_) jac_.getOutput(output(i), 1+i);
       }
     }
 

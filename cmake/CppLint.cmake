@@ -29,7 +29,6 @@ set(STYLE_FILTER)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/semicolon,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/blank_line,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/operators,)
-set(STYLE_FILTER ${STYLE_FILTER}-whitespace/parens,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/indent,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/comments,)
 

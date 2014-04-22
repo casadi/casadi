@@ -44,7 +44,7 @@ class CASADI_SYMBOLIC_EXPORT UnarySX : public SXNode {
 
     /** \brief  Create a unary expression */
     inline static SXElement create(unsigned char op, const SXElement& dep) {
-      if(dep.isConstant()) {
+      if (dep.isConstant()) {
         // Evaluate constant
         double dep_val = dep.getValue();
         double ret_val;

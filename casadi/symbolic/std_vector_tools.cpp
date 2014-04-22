@@ -31,7 +31,7 @@ namespace casadi {
     int nret = (stop-start)/step + ((stop-start)%step!=0);
     std::vector<int> ret(nret);
     int ind = start;
-    for(std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it) {
+    for (std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it) {
       *it = ind;
       ind += step;
     }
@@ -72,7 +72,7 @@ namespace casadi {
   }
 
   bvec_t* get_bvec_t(std::vector<double>& v) {
-    if(v.empty()) {
+    if (v.empty()) {
       return 0;
     } else {
       return reinterpret_cast<bvec_t*>(&v.front());
@@ -81,7 +81,7 @@ namespace casadi {
 
   /// Get an pointer of sets of booleans from a double vector
   const bvec_t* get_bvec_t(const std::vector<double>& v) {
-    if(v.empty()) {
+    if (v.empty()) {
       return 0;
     } else {
       return reinterpret_cast<const bvec_t*>(&v.front());

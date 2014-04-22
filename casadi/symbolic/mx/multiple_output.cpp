@@ -50,11 +50,11 @@ namespace casadi {
   }
 
   void OutputNode::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
-      if(ndep()>1)
+    if (part==0) {
+      if (ndep()>1)
         stream << "[";
-    } else if(part==ndep()) {
-      if(ndep()>1)
+    } else if (part==ndep()) {
+      if (ndep()>1)
         stream << "]";
       stream << "{" << oind_ << "}";
     } else {

@@ -50,7 +50,7 @@ opt_type GenericType::getType() const {
 }
 
 bool GenericType::can_cast_to(opt_type other) const {
-  switch(other) {
+  switch (other) {
       case OT_BOOLEAN:
         return isBool() || isInt() || isDouble();
       case OT_BOOLVECTOR:
@@ -65,7 +65,7 @@ bool GenericType::can_cast_to(opt_type other) const {
 }
 
 GenericType GenericType::from_type(opt_type type) {
-  switch(type) {
+  switch (type) {
       case OT_INTEGERVECTOR:
               return std::vector<int>();
       case OT_BOOLVECTOR:
@@ -80,7 +80,7 @@ GenericType GenericType::from_type(opt_type type) {
 }
 
 std::string GenericType::get_type_description(const opt_type &type) {
-  switch(type) {
+  switch (type) {
       case OT_BOOLEAN:
               return "OT_BOOLEAN";
       case OT_INTEGER:
@@ -267,7 +267,7 @@ bool GenericType::toBool() const {
 }
 
 int GenericType::toInt() const {
-  if(isDouble()) {
+  if (isDouble()) {
     double v = toDouble();
     casadi_assert_message(v == std::floor(v), "The value is not an integer");
     return static_cast<int>(v);
@@ -280,7 +280,7 @@ int GenericType::toInt() const {
 }
 
 double GenericType::toDouble() const {
-  if(isInt()) {
+  if (isInt()) {
     return static_cast<double>(toInt());
   } else {
     casadi_assert_message(isDouble(), "type mismatch");
@@ -343,33 +343,33 @@ bool GenericType::operator==(const GenericType& op2) const {
 }
 
 bool GenericType::operator!=(const GenericType& op2) const {
-  if(isString() && op2.isString()) {
+  if (isString() && op2.isString()) {
     return toString().compare(op2.toString()) != 0;
   }
 
-  if(isInt() && op2.isInt()) {
+  if (isInt() && op2.isInt()) {
     return toInt() != op2.toInt();
   }
 
-  if(isDouble() && op2.isDouble()) {
+  if (isDouble() && op2.isDouble()) {
     return toDouble() != op2.toDouble();
   }
 
-  if(isDoubleVector() && op2.isDoubleVector()) {
+  if (isDoubleVector() && op2.isDoubleVector()) {
     const vector<double> &v1 = toDoubleVector();
     const vector<double> &v2 = op2.toDoubleVector();
-    if(v1.size() != v2.size()) return true;
-    for(int i=0; i<v1.size(); ++i)
-      if(v1[i] != v2[i]) return true;
+    if (v1.size() != v2.size()) return true;
+    for (int i=0; i<v1.size(); ++i)
+      if (v1[i] != v2[i]) return true;
     return false;
   }
 
-  if(isIntVector() && op2.isIntVector()) {
+  if (isIntVector() && op2.isIntVector()) {
     const vector<int> &v1 = toIntVector();
     const vector<int> &v2 = op2.toIntVector();
-    if(v1.size() != v2.size()) return true;
-    for(int i=0; i<v1.size(); ++i)
-      if(v1[i] != v2[i]) return true;
+    if (v1.size() != v2.size()) return true;
+    for (int i=0; i<v1.size(); ++i)
+      if (v1[i] != v2[i]) return true;
     return false;
   }
 

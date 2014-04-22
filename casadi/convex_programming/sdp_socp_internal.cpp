@@ -33,7 +33,7 @@ namespace casadi {
 SDPSOCPInternal* SDPSOCPInternal::clone() const {
   // Return a deep copy
   SDPSOCPInternal* node = new SDPSOCPInternal(st_);
-  if(!node->is_init_)
+  if (!node->is_init_)
     node->init();
   return node;
 }
@@ -164,7 +164,7 @@ void SDPSOCPInternal::init() {
               "g", mapping_.output(1).sparsity()));
 
   sdpsolver_.setSOCPOptions();
-  if(hasSetOption("sdp_solver_options")) {
+  if (hasSetOption("sdp_solver_options")) {
     sdpsolver_.setOption(getOption("sdp_solver_options"));
   }
 

@@ -55,7 +55,7 @@ namespace casadi {
     // Simple constraints
     vector<double>& lbx = nlp_solver_.input(NLP_SOLVER_LBX).data();
     vector<double>& ubx = nlp_solver_.input(NLP_SOLVER_UBX).data();
-    for(int k=0; k<u_c_.size(); ++k) {
+    for (int k=0; k<u_c_.size(); ++k) {
       lbx[k] = u_c_[k] <= 0 ? -std::numeric_limits<double>::infinity() : 0;
       ubx[k] = u_c_[k] >= 0 ?  std::numeric_limits<double>::infinity() : 0;
     }
@@ -65,8 +65,8 @@ namespace casadi {
 
     // Add auxiliary inputs
     vector<double>::iterator nlp_p = nlp_solver_.input(NLP_SOLVER_P).begin();
-    for(int i=0; i<getNumInputs(); ++i) {
-      if(i!=iin_) {
+    for (int i=0; i<getNumInputs(); ++i) {
+      if (i!=iin_) {
         std::copy(input(i).begin(), input(i).end(), nlp_p);
         nlp_p += input(i).size();
       }
@@ -80,13 +80,13 @@ namespace casadi {
     output(iout_).set(nlp_solver_.output(NLP_SOLVER_X));
 
     // Evaluate auxilary outputs, if necessary
-    if(getNumOutputs()>0) {
+    if (getNumOutputs()>0) {
       f_.setInput(output(iout_), iin_);
-      for(int i=0; i<getNumInputs(); ++i)
-        if(i!=iin_) f_.setInput(input(i), i);
+      for (int i=0; i<getNumInputs(); ++i)
+        if (i!=iin_) f_.setInput(input(i), i);
       f_.evaluate();
-      for(int i=0; i<getNumOutputs(); ++i) {
-        if(i!=iout_) f_.getOutput(output(i), i);
+      for (int i=0; i<getNumOutputs(); ++i) {
+        if (i!=iout_) f_.getOutput(output(i), i);
       }
     }
   }
@@ -101,8 +101,8 @@ namespace casadi {
 
     // So that we can pass it on to createParent
     std::vector<Sparsity> sps;
-    for(int i=0; i<getNumInputs(); ++i)
-      if(i!=iin_) sps.push_back(input(i).sparsity());
+    for (int i=0; i<getNumInputs(); ++i)
+      if (i!=iin_) sps.push_back(input(i).sparsity());
 
     // u groups all parameters in an MX
     std::vector< MX > inputs;
@@ -114,8 +114,8 @@ namespace casadi {
     // NLP constraints
     std::vector< MX > args_call(getNumInputs());
     args_call[iin_] = u;
-    for(int i=0, i2=0; i<getNumInputs(); ++i)
-      if(i!=iin_) args_call[i] = inputs[i2++];
+    for (int i=0, i2=0; i<getNumInputs(); ++i)
+      if (i!=iin_) args_call[i] = inputs[i2++];
     MX nlp_g = f_.call(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
@@ -124,7 +124,7 @@ namespace casadi {
     // Create an nlpsolver instance
     NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
     nlp_solver_ = nlp_solvercreator(nlp);
-    if(hasSetOption("nlp_solver_options")) {
+    if (hasSetOption("nlp_solver_options")) {
       nlp_solver_.setOption(getOption("nlp_solver_options"));
     }
 

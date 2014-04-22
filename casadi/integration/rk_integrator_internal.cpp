@@ -117,7 +117,7 @@ namespace casadi {
     }
 
     // Backward integration
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
       // Symbolic inputs
       MX rx0 = MX::sym("x0", g_.input(RDAE_RX).sparsity());
       MX rp = MX::sym("p", g_.input(RDAE_RP).sparsity());

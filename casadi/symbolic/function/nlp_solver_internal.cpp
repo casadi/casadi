@@ -159,12 +159,12 @@ namespace casadi {
 
     // Find out if we are to expand the NLP in terms of scalar operations
     bool expand = getOption("expand");
-    if(expand) {
+    if (expand) {
       log("Expanding NLP in scalar operations");
 
       // Cast to MXFunction
       MXFunction nlp_mx = shared_cast<MXFunction>(nlp_);
-      if(nlp_mx.isNull()) {
+      if (nlp_mx.isNull()) {
         casadi_warning("Cannot expand NLP as it is not an MXFunction");
       } else {
         nlp_ = SXFunction(nlp_mx);
@@ -181,7 +181,7 @@ namespace casadi {
   }
 
   void NLPSolverInternal::checkInitialBounds() {
-    if(static_cast<bool>(getOption("warn_initial_bounds"))) {
+    if (static_cast<bool>(getOption("warn_initial_bounds"))) {
       bool violated = false;
       for (int k=0;k<input(NLP_SOLVER_X0).size();++k) {
         if (input(NLP_SOLVER_X0).at(k)>input(NLP_SOLVER_UBX).at(k)) {
@@ -209,14 +209,14 @@ namespace casadi {
   }
 
   Function& NLPSolverInternal::gradF() {
-    if(gradF_.isNull()) {
+    if (gradF_.isNull()) {
       gradF_ = getGradF();
     }
     return gradF_;
   }
 
   Function& NLPSolverInternal::jacF() {
-    if(jacF_.isNull()) {
+    if (jacF_.isNull()) {
       jacF_ = getJacF();
     }
     return jacF_;
@@ -224,7 +224,7 @@ namespace casadi {
 
   Function NLPSolverInternal::getJacF() {
     Function jacF;
-    if(hasSetOption("jac_f")) {
+    if (hasSetOption("jac_f")) {
       jacF = getOption("jac_f");
     } else {
       log("Generating objective jacobian");
@@ -247,7 +247,7 @@ namespace casadi {
 
   Function NLPSolverInternal::getGradF() {
     Function gradF;
-    if(hasSetOption("grad_f")) {
+    if (hasSetOption("grad_f")) {
       gradF = getOption("grad_f");
     } else {
       log("Generating objective gradient");
@@ -269,7 +269,7 @@ namespace casadi {
   }
 
   Function& NLPSolverInternal::jacG() {
-    if(jacG_.isNull()) {
+    if (jacG_.isNull()) {
       jacG_ = getJacG();
     }
     return jacG_;
@@ -279,9 +279,9 @@ namespace casadi {
     Function jacG;
 
     // Return null if no constraints
-    if(ng_==0) return jacG;
+    if (ng_==0) return jacG;
 
-    if(hasSetOption("jac_g")) {
+    if (hasSetOption("jac_g")) {
       jacG = getOption("jac_g");
     } else {
       log("Generating constraint Jacobian");
@@ -303,7 +303,7 @@ namespace casadi {
   }
 
   Function& NLPSolverInternal::gradLag() {
-    if(gradLag_.isNull()) {
+    if (gradLag_.isNull()) {
       gradLag_ = getGradLag();
     }
     return gradLag_;
@@ -311,7 +311,7 @@ namespace casadi {
 
   Function NLPSolverInternal::getGradLag() {
     Function gradLag;
-    if(hasSetOption("grad_lag")) {
+    if (hasSetOption("grad_lag")) {
       gradLag = getOption("grad_lag");
     } else {
       log("Generating/retrieving Lagrangian gradient function");
@@ -325,7 +325,7 @@ namespace casadi {
   }
 
   Function& NLPSolverInternal::hessLag() {
-    if(hessLag_.isNull()) {
+    if (hessLag_.isNull()) {
       hessLag_ = getHessLag();
     }
     return hessLag_;
@@ -333,7 +333,7 @@ namespace casadi {
 
   Function NLPSolverInternal::getHessLag() {
     Function hessLag;
-    if(hasSetOption("hess_lag")) {
+    if (hasSetOption("hess_lag")) {
       hessLag = getOption("hess_lag");
     } else {
       Function& gradLag = this->gradLag();
@@ -356,7 +356,7 @@ namespace casadi {
   }
 
   Sparsity& NLPSolverInternal::spHessLag() {
-    if(spHessLag_.isNull()) {
+    if (spHessLag_.isNull()) {
       spHessLag_ = getSpHessLag();
     }
     return spHessLag_;
@@ -364,7 +364,7 @@ namespace casadi {
 
   Sparsity NLPSolverInternal::getSpHessLag() {
     Sparsity spHessLag;
-    if(false /*hasSetOption("hess_lag_sparsity")*/) {
+    if (false /*hasSetOption("hess_lag_sparsity")*/) {
       // NOTE: No such option yet, need support for GenericType(Sparsity)
       //spHessLag = getOption("hess_lag_sparsity");
     } else {

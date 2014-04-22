@@ -49,11 +49,11 @@ namespace casadi {
   }
 
   Sparsity horzcat(const std::vector<Sparsity> & sp) {
-    if(sp.empty()) {
+    if (sp.empty()) {
       return Sparsity();
     } else {
       Sparsity ret = sp[0];
-      for(int i=1; i<sp.size(); ++i) {
+      for (int i=1; i<sp.size(); ++i) {
         ret.appendColumns(sp[i]);
       }
       return ret;
@@ -67,17 +67,17 @@ namespace casadi {
   }
 
   Sparsity vertcat(const std::vector<Sparsity> & sp) {
-    if(sp.empty()) {
+    if (sp.empty()) {
       return Sparsity();
-    } else if(sp[0].isVector()) {
+    } else if (sp[0].isVector()) {
       Sparsity ret = sp[0];
-      for(int i=1; i<sp.size(); ++i) {
+      for (int i=1; i<sp.size(); ++i) {
         ret.append(sp[i]);
       }
       return ret;
     } else {
       Sparsity ret = sp[0].T();
-      for(int i=1; i<sp.size(); ++i) {
+      for (int i=1; i<sp.size(); ++i) {
         ret.appendColumns(sp[i].T());
       }
       return ret.T();
@@ -85,7 +85,7 @@ namespace casadi {
   }
 
   Sparsity vertcat(const Sparsity & a, const Sparsity & b) {
-    if(a.isVector()) {
+    if (a.isVector()) {
       Sparsity ret = a;
       ret.append(b);
       return ret;
@@ -156,7 +156,7 @@ namespace casadi {
     int ncol, nrow = sp.size1();
 
     // Get the sparsity patterns of the outputs
-    for(int i=0; i<n; ++i) {
+    for (int i=0; i<n; ++i) {
       int first_col = offset[i];
       int last_col = offset[i+1];
       ncol = last_col - first_col;
@@ -164,7 +164,7 @@ namespace casadi {
       // Construct the sparsity pattern
       colind.resize(ncol+1);
       copy(colind_x.begin()+first_col, colind_x.begin()+last_col+1, colind.begin());
-      for(vector<int>::iterator it=colind.begin()+1; it!=colind.end(); ++it) *it -= colind[0];
+      for (vector<int>::iterator it=colind.begin()+1; it!=colind.end(); ++it) *it -= colind[0];
       colind[0] = 0;
       row.resize(colind.back());
       copy(row_x.begin()+colind_x[first_col], row_x.begin()+colind_x[last_col], row.begin());
@@ -179,7 +179,7 @@ namespace casadi {
 
   std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& offset) {
     std::vector<Sparsity> ret = horzsplit(sp.T(), offset);
-    for(std::vector<Sparsity>::iterator it=ret.begin(); it!=ret.end(); ++it) {
+    for (std::vector<Sparsity>::iterator it=ret.begin(); it!=ret.end(); ++it) {
       *it = it->T();
     }
     return ret;

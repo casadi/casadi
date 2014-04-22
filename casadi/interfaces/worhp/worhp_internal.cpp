@@ -54,7 +54,7 @@ namespace casadi {
       WorhpType type = WorhpGetParamType(i+1);
       const char* name = WorhpGetParamName(i+1);
       if (strcmp(name, "Ares")==0) continue;
-      switch(type) {
+      switch (type) {
         case WORHP_BOOL_T:
           bool default_bool;
           WorhpGetBoolParam(&worhp_p_, name, &default_bool);
@@ -199,7 +199,7 @@ namespace casadi {
     // Get/generate required functions
     gradF();
     jacG();
-    if(exact_hessian_) { // does not appear to work
+    if (exact_hessian_) { // does not appear to work
       hessLag();
     }
 
@@ -278,8 +278,8 @@ namespace casadi {
 
       // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
       worhp_w_.HM.nnz = nx_; // diagonal entries
-      for(int c=0; c<nx_; ++c) {
-        for(int el=colind[c]; el<colind[c+1] && row[el]<c; ++el) {
+      for (int c=0; c<nx_; ++c) {
+        for (int el=colind[c]; el<colind[c+1] && row[el]<c; ++el) {
           worhp_w_.HM.nnz++; // strictly lower triangular part
         }
       }
@@ -294,7 +294,7 @@ namespace casadi {
     }
 
     if (worhp_w_.DF.NeedStructure) {
-      for(int i=0; i<nx_; ++i) {
+      for (int i=0; i<nx_; ++i) {
         worhp_w_.DF.row[i] = i + 1; // Index-1 based
       }
     }
@@ -306,8 +306,8 @@ namespace casadi {
       int nz=0;
       const vector<int>& colind = J.colind();
       const vector<int>& row = J.row();
-      for(int c=0; c<nx_; ++c) {
-        for(int el=colind[c]; el<colind[c+1]; ++el) {
+      for (int c=0; c<nx_; ++c) {
+        for (int el=colind[c]; el<colind[c+1]; ++el) {
           int r = row[el];
           worhp_w_.DG.col[nz] = c + 1; // Index-1 based
           worhp_w_.DG.row[nz] = r + 1;
@@ -325,9 +325,9 @@ namespace casadi {
       int nz=0;
 
       // Upper triangular part of the Hessian (note CCS -> CRS format change)
-      for(int c=0; c<nx_; ++c) {
-        for(int el=colind[c]; el<colind[c+1]; ++el) {
-          if(row[el]>c) {
+      for (int c=0; c<nx_; ++c) {
+        for (int el=colind[c]; el<colind[c+1]; ++el) {
+          if (row[el]>c) {
             worhp_w_.HM.row[nz] = row[el] + 1;
             worhp_w_.HM.col[nz] = c + 1;
             nz++;
@@ -336,7 +336,7 @@ namespace casadi {
       }
 
       // Diagonal always included
-      for(int r=0; r<nx_; ++r) {
+      for (int r=0; r<nx_; ++r) {
         worhp_w_.HM.row[nz] = r + 1;
         worhp_w_.HM.col[nz] = r + 1;
         nz++;
@@ -355,7 +355,7 @@ namespace casadi {
       const char* name = WorhpGetParamName(i+1);
       if (strcmp(name, "Ares")==0) continue;
 
-      switch(type) {
+      switch (type) {
         case WORHP_BOOL_T:
           if (hasSetOption(name)) WorhpSetBoolParam(&worhp_p_, name, getOption(name));
           break;
@@ -480,17 +480,17 @@ namespace casadi {
     }
 
     // Replace infinite bounds with worhp_p_.Infty
-    for(int i=0; i<nx_; ++i) if(worhp_o_.XL[i]==-inf) worhp_o_.XL[i] = -worhp_p_.Infty;
-    for(int i=0; i<nx_; ++i) if(worhp_o_.XU[i]== inf) worhp_o_.XU[i] =  worhp_p_.Infty;
-    for(int i=0; i<ng_; ++i) if(worhp_o_.GL[i]==-inf) worhp_o_.GL[i] = -worhp_p_.Infty;
-    for(int i=0; i<ng_; ++i) if(worhp_o_.GU[i]== inf) worhp_o_.GU[i] =  worhp_p_.Infty;
+    for (int i=0; i<nx_; ++i) if (worhp_o_.XL[i]==-inf) worhp_o_.XL[i] = -worhp_p_.Infty;
+    for (int i=0; i<nx_; ++i) if (worhp_o_.XU[i]== inf) worhp_o_.XU[i] =  worhp_p_.Infty;
+    for (int i=0; i<ng_; ++i) if (worhp_o_.GL[i]==-inf) worhp_o_.GL[i] = -worhp_p_.Infty;
+    for (int i=0; i<ng_; ++i) if (worhp_o_.GU[i]== inf) worhp_o_.GU[i] =  worhp_p_.Infty;
 
     log("WorhpInternal::starting iteration");
 
     double time1 = clock();
 
     // Reverse Communication loop
-    while(worhp_c_.status < TerminateSuccess &&  worhp_c_.status > TerminateError) {
+    while (worhp_c_.status < TerminateSuccess &&  worhp_c_.status > TerminateError) {
       if (GetUserAction(&worhp_c_, callWorhp)) {
         Worhp(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
@@ -539,7 +539,7 @@ namespace casadi {
             time2 = clock();
             t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
 
-            if(ret) worhp_c_.status = TerminatedByUser;
+            if (ret) worhp_c_.status = TerminatedByUser;
 
           }
         }
@@ -575,7 +575,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, fidif)) {
-        WorhpFidif(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
+        WorhpFidif (&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
     }
 
@@ -672,24 +672,24 @@ namespace casadi {
       double* values_diagonal = values + (worhp_w_.HM.nnz-nx_);
 
       // Initialize diagonal to zero
-      for(int r=0; r<nx_; ++r) {
+      for (int r=0; r<nx_; ++r) {
         values_diagonal[r] = 0.;
       }
 
       // Upper triangular part of the Hessian (note CCS -> CRS format change)
-      for(int c=0; c<nx_; ++c) {
-        for(int el=colind[c]; el<colind[c+1]; ++el) {
-          if(row[el]>c) {
+      for (int c=0; c<nx_; ++c) {
+        for (int el=colind[c]; el<colind[c+1]; ++el) {
+          if (row[el]>c) {
             // Strictly upper triangular
             *values_upper++ = data[el];
-          } else if(row[el]==c) {
+          } else if (row[el]==c) {
             // Diagonal separately
             values_diagonal[c] = data[el];
           }
         }
       }
 
-      if(monitored("eval_h")) {
+      if (monitored("eval_h")) {
         std::cout << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
         std::cout << "obj_factor= " << obj_factor << std::endl;
         std::cout << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
@@ -715,7 +715,7 @@ namespace casadi {
       log("eval_jac_g started");
 
       // Quich finish if no constraints
-      if(worhp_o_.m==0) {
+      if (worhp_o_.m==0) {
         log("eval_jac_g quick return (m==0)");
         return true;
       }
@@ -739,7 +739,7 @@ namespace casadi {
 
       std::copy(J.data().begin(), J.data().end(), values);
 
-      if(monitored("eval_jac_g")) {
+      if (monitored("eval_jac_g")) {
         cout << "x = " << jacG_.input().data() << endl;
         cout << "J = " << endl;
         jacG_.output().printSparse();
@@ -774,7 +774,7 @@ namespace casadi {
       nlp_.getOutput(obj_value, NL_F);
 
       // Printing
-      if(monitored("eval_f")) {
+      if (monitored("eval_f")) {
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "obj_value = " << obj_value << endl;
       }
@@ -800,7 +800,7 @@ namespace casadi {
       log("eval_g started");
       double time1 = clock();
 
-      if(worhp_o_.m>0) {
+      if (worhp_o_.m>0) {
         // Pass the argument to the function
         nlp_.setInput(x, NL_X);
         nlp_.setInput(input(NLP_SOLVER_P), NL_P);
@@ -812,7 +812,7 @@ namespace casadi {
         nlp_.getOutput(g, NL_G);
 
         // Printing
-        if(monitored("eval_g")) {
+        if (monitored("eval_g")) {
           cout << "x = " << nlp_.input(NL_X) << endl;
           cout << "g = " << nlp_.output(NL_G) << endl;
         }
@@ -849,12 +849,12 @@ namespace casadi {
       gradF_.output().get(grad_f, DENSE);
 
       // Scale
-      for(int i=0; i<nx_; ++i) {
+      for (int i=0; i<nx_; ++i) {
         grad_f[i] *= scale;
       }
 
       // Printing
-      if(monitored("eval_grad_f")) {
+      if (monitored("eval_grad_f")) {
         cout << "grad_f = " << gradF_.output() << endl;
       }
 
@@ -865,8 +865,8 @@ namespace casadi {
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
       // Check the result for regularity
-      for(int i=0; i<nx_; ++i) {
-        if(isnan(grad_f[i]) || isinf(grad_f[i])) {
+      for (int i=0; i<nx_; ++i) {
+        if (isnan(grad_f[i]) || isinf(grad_f[i])) {
           log("eval_grad_f: result not regular");
           return false;
         }
@@ -892,7 +892,7 @@ namespace casadi {
       WorhpType type = WorhpGetParamType(i+1);
       const char* name = WorhpGetParamName(i+1);
       if (strcmp(name, "Ares")==0) continue;
-      switch(type) {
+      switch (type) {
         case WORHP_BOOL_T:
           bool default_bool;
           WorhpGetBoolParam(&worhp_p_, name, &default_bool);

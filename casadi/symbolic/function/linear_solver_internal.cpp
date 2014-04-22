@@ -75,12 +75,12 @@ namespace casadi {
 
   void LinearSolverInternal::evaluate() {
     /*  Factorization fact;
-        if(called_once) {
+        if (called_once) {
         // Check if any element has changed
         bool any_change = false;
         const vector<double>& val = input(0).data();
-        for(int i=0; i<val.size(); ++i) {
-        if(val[i] != a[i]) {
+        for (int i=0; i<val.size(); ++i) {
+        if (val[i] != a[i]) {
         any_change = true;
         break;
         }
@@ -97,7 +97,7 @@ namespace casadi {
     prepare();
 
     // Make sure preparation successful
-    if(!prepared_)
+    if (!prepared_)
       throw CasadiException("LinearSolverInternal::evaluate: Preparation failed");
 
     // Solve the factorized system
@@ -128,8 +128,8 @@ namespace casadi {
     MX& X = *output[0];
 
     // Nondifferentiated output
-    if(!output_given) {
-      if(B.isZero()) {
+    if (!output_given) {
+      if (B.isZero()) {
         X = MX::sparse(B.shape());
       } else {
         X = solve(A, B, tr);
@@ -140,20 +140,20 @@ namespace casadi {
     std::vector<int> rhs_ind;
     std::vector<MX> rhs;
     std::vector<int> col_offset(1, 0);
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       const MX& B_hat = *fwdSeed[d][0];
       const MX& A_hat = *fwdSeed[d][1];
 
       // Get right hand side
       MX rhs_d;
-      if(tr) {
+      if (tr) {
         rhs_d = B_hat - mul(A_hat.T(), X);
       } else {
         rhs_d = B_hat - mul(A_hat, X);
       }
 
       // Simplifiy if zero
-      if(rhs_d.isZero()) {
+      if (rhs_d.isZero()) {
         *fwdSens[d][0] = MX::sparse(rhs_d.shape());
       } else {
         rhs.push_back(rhs_d);
@@ -162,12 +162,12 @@ namespace casadi {
       }
     }
 
-    if(!rhs.empty()) {
+    if (!rhs.empty()) {
       // Solve for all directions at once
       rhs = horzsplit(solve(A, horzcat(rhs), tr), col_offset);
 
       // Save result
-      for(int i=0; i<rhs.size(); ++i) {
+      for (int i=0; i<rhs.size(); ++i) {
         *fwdSens[rhs_ind[i]][0] = rhs[i];
       }
     }
@@ -176,12 +176,12 @@ namespace casadi {
     rhs.resize(0);
     rhs_ind.resize(0);
     col_offset.resize(1);
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       MX& X_bar = *adjSeed[d][0];
 
       // Simplifiy if zero
-      if(X_bar.isZero()) {
-        if(adjSeed[d][0]!=adjSens[d][0]) {
+      if (X_bar.isZero()) {
+        if (adjSeed[d][0]!=adjSens[d][0]) {
           *adjSens[d][0] = X_bar;
           X_bar = MX();
         }
@@ -195,22 +195,22 @@ namespace casadi {
       }
     }
 
-    if(!rhs.empty()) {
+    if (!rhs.empty()) {
       // Solve for all directions at once
       rhs = horzsplit(solve(A, horzcat(rhs), !tr), col_offset);
 
-      for(int i=0; i<rhs.size(); ++i) {
+      for (int i=0; i<rhs.size(); ++i) {
         int d = rhs_ind[i];
 
         // Propagate to A
-        if(!tr) {
+        if (!tr) {
           adjSens[d][1]->addToSum(-mul(rhs[i], X.T(), A.sparsity()));
         } else {
           adjSens[d][1]->addToSum(-mul(X, rhs[i].T(), A.sparsity()));
         }
 
         // Propagate to B
-        if(adjSeed[d][0]==adjSens[d][0]) {
+        if (adjSeed[d][0]==adjSens[d][0]) {
           *adjSens[d][0] = rhs[i];
         } else {
           adjSens[d][0]->addToSum(rhs[i]);
@@ -239,16 +239,16 @@ namespace casadi {
     bvec_t* tmp_ptr = reinterpret_cast<bvec_t*>(getPtr(rtmp));
 
     // For all right-hand-sides
-    for(int r=0; r<nrhs; ++r) {
+    for (int r=0; r<nrhs; ++r) {
 
-      if(fwd) {
+      if (fwd) {
 
         // Copy B_ptr to a temporary vector
         copy(B_ptr, B_ptr+n, tmp_ptr);
 
         // Add A_hat contribution to tmp
-        for(int cc=0; cc<n; ++cc) {
-          for(int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
+        for (int cc=0; cc<n; ++cc) {
+          for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
             int rr = A_row[k];
             tmp_ptr[transpose ? cc : rr] |= A_ptr[k];
           }
@@ -268,13 +268,13 @@ namespace casadi {
         std::fill(B_ptr, B_ptr+n, 0);
 
         // Propagate to X_ptr
-        for(int i=0; i<n; ++i) {
+        for (int i=0; i<n; ++i) {
           X_ptr[i] |= tmp_ptr[i];
         }
 
         // Propagate to A_ptr
-        for(int cc=0; cc<n; ++cc) {
-          for(int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
+        for (int cc=0; cc<n; ++cc) {
+          for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
             int rr = A_row[k];
             A_ptr[k] |= tmp_ptr[transpose ? cc : rr];
           }
@@ -300,31 +300,31 @@ namespace casadi {
     const std::vector<int>& A_row = A_sp.row();
     int nb = rowblock_.size()-1; // number of blocks
 
-    if(!transpose) {
-      for(int b=0; b<nb; ++b) { // loop over the blocks forward
+    if (!transpose) {
+      for (int b=0; b<nb; ++b) { // loop over the blocks forward
 
         // Get dependencies from all right-hand-sides in the block ...
         bvec_t block_dep = 0;
-        for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el) {
+        for (int el=rowblock_[b]; el<rowblock_[b+1]; ++el) {
           int rr = rowperm_[el];
           block_dep |= B[rr];
         }
 
         // ... as well as all other variables in the block
-        for(int el=colblock_[b]; el<colblock_[b+1]; ++el) {
+        for (int el=colblock_[b]; el<colblock_[b+1]; ++el) {
           int cc = colperm_[el];
           block_dep |= X[cc];
         }
 
         // Propagate ...
-        for(int el=colblock_[b]; el<colblock_[b+1]; ++el) {
+        for (int el=colblock_[b]; el<colblock_[b+1]; ++el) {
           int cc = colperm_[el];
 
           // ... to all variables in the block ...
           X[cc] |= block_dep;
 
           // ... as well as to other variables which depends on variables in the block
-          for(int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
+          for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
             int rr=A_row[k];
             X[rr] |= block_dep;
           }
@@ -332,25 +332,25 @@ namespace casadi {
       }
 
     } else { // transpose
-      for(int b=nb-1; b>=0; --b) { // loop over the blocks backward
+      for (int b=nb-1; b>=0; --b) { // loop over the blocks backward
 
         // Get dependencies ...
         bvec_t block_dep = 0;
-        for(int el=colblock_[b]; el<colblock_[b+1]; ++el) {
+        for (int el=colblock_[b]; el<colblock_[b+1]; ++el) {
           int cc = colperm_[el];
 
           // .. from all right-hand-sides in the block ...
           block_dep |= B[cc];
 
           // ... as well as from all depending variables ...
-          for(int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
+          for (int k=A_colind[cc]; k<A_colind[cc+1]; ++k) {
             int rr=A_row[k];
             block_dep |= X[rr];
           }
         }
 
         // Propagate to all variables in the block
-        for(int el=rowblock_[b]; el<rowblock_[b+1]; ++el) {
+        for (int el=rowblock_[b]; el<rowblock_[b+1]; ++el) {
           int rr = rowperm_[el];
           X[rr] |= block_dep;
         }
@@ -365,7 +365,7 @@ namespace casadi {
     prepare();
 
     // Solve for nondifferentiated output
-    if(input[0]!=output[0]) {
+    if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
     solve(getPtr(output[0]->data()), output[0]->size2(), tr);

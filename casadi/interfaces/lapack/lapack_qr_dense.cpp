@@ -57,7 +57,7 @@ namespace casadi {
     nrow_ = nrow();
 
     // Currently only square matrices tested
-    if(ncol_!=nrow_) throw CasadiException("LapackQRDenseInternal::init: currently only "
+    if (ncol_!=nrow_) throw CasadiException("LapackQRDenseInternal::init: currently only "
                                            "square matrices implemented.");
 
     // Allocate matrix
@@ -76,7 +76,7 @@ namespace casadi {
     int info = -100;
     int lwork = work_.size();
     dgeqrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(tau_), getPtr(work_), &lwork, &info);
-    if(info != 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeqrf_ "
+    if (info != 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeqrf_ "
                                         "failed to factorize the jacobian");
 
     // Success if reached this point
@@ -97,7 +97,7 @@ namespace casadi {
     int k = tau_.size(); // minimum of ncol_ and nrow_
     int lwork = work_.size();
 
-    if(transpose) {
+    if (transpose) {
 
       // Solve for transpose(R)
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,
@@ -107,7 +107,7 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
               &ncol_, getPtr(work_), &lwork, &info);
-      if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed "
+      if (info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed "
                                           "to solve the linear system");
 
     } else {
@@ -116,7 +116,7 @@ namespace casadi {
       int info = 100;
       dormqr_(&sideQ, &transQ, &ncol_, &nrhs, &k, getPtr(mat_), &ncol_, getPtr(tau_), x,
               &ncol_, getPtr(work_), &lwork, &info);
-      if(info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to "
+      if (info != 0) throw CasadiException("LapackQRDenseInternal::solve: dormqr_ failed to "
                                           "solve the linear system");
 
       // Solve for R

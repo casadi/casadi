@@ -32,7 +32,7 @@ namespace casadi {
 
   Integrator  Integrator::clone() const {
     Integrator ret;
-    if(!isNull()) ret.assignNode((*this)->clone());
+    if (!isNull()) ret.assignNode((*this)->clone());
     return ret;
   }
 

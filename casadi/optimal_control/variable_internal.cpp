@@ -51,8 +51,8 @@ namespace casadi {
     map<double, SX>::const_iterator it = timed_sx_.find(t);
 
     // If not found
-    if(it==timed_sx_.end()) {
-      if(allocate) {
+    if (it==timed_sx_.end()) {
+      if (allocate) {
         // Create a timed variable
         stringstream ss;
         ss << var_.getName() << ".atTime(" << t << ")";

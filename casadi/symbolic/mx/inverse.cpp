@@ -37,7 +37,7 @@ namespace casadi {
   }
 
   void Inverse::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "inv(";
     } else {
       stream << ")";
@@ -49,21 +49,21 @@ namespace casadi {
                            bool output_given) {
     const MX& X = *input[0];
     MX& inv_X = *output[0];
-    if(!output_given) {
+    if (!output_given) {
       inv_X = inv(X);
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = -mul(inv_X, mul(*fwdSeed[d][0], inv_X));
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
-    if(nadj>0) {
+    if (nadj>0) {
       MX trans_inv_X = inv_X.T();
-      for(int d=0; d<nadj; ++d) {
+      for (int d=0; d<nadj; ++d) {
         adjSens[d][0]->addToSum(-mul(trans_inv_X, mul(*adjSeed[d][0], trans_inv_X)));
         *adjSeed[d][0] = MX();
       }

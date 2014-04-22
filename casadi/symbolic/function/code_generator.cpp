@@ -41,14 +41,14 @@ namespace casadi {
 
     // Print integer constants
     stringstream name;
-    for(int i=0; i<integer_constants_.size(); ++i) {
+    for (int i=0; i<integer_constants_.size(); ++i) {
       name.str(string());
       name << "s" << i;
       printVector(s, name.str(), integer_constants_[i]);
     }
 
     // Print double constants
-    for(int i=0; i<double_constants_.size(); ++i) {
+    for (int i=0; i<double_constants_.size(); ++i) {
       name.str(string());
       name << "c" << i;
       printVector(s, name.str(), double_constants_[i]);
@@ -74,7 +74,7 @@ namespace casadi {
     int& ind = added_dependencies_[h];
 
     // Generate it if it does not exist
-    if(added_dependencies_.size() > num_f_before) {
+    if (added_dependencies_.size() > num_f_before) {
       // Add at the end
       ind = num_f_before;
 
@@ -91,8 +91,8 @@ namespace casadi {
 
   void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<int>& v) {
     s << "int " << name << "[] = {";
-    for(int i=0; i<v.size(); ++i) {
-      if(i!=0) s << ", ";
+    for (int i=0; i<v.size(); ++i) {
+      if (i!=0) s << ", ";
       s << v[i];
     }
     s << "};" << endl;
@@ -101,8 +101,8 @@ namespace casadi {
   void CodeGenerator::printVector(std::ostream &s, const std::string& name,
                                   const vector<double>& v) {
     s << "d " << name << "[] = {";
-    for(int i=0; i<v.size(); ++i) {
-      if(i!=0) s << ", ";
+    for (int i=0; i<v.size(); ++i) {
+      if (i!=0) s << ", ";
       printConstant(s, v[i]);
     }
     s << "};" << endl;
@@ -113,10 +113,10 @@ namespace casadi {
     bool added = added_includes_.insert(new_include).second;
 
     // Quick return if it already exists
-    if(!added) return;
+    if (!added) return;
 
     // Print to the header section
-    if(relative_path) {
+    if (relative_path) {
       includes_ << "#include \"" << new_include << "\"" << endl;
     } else {
       includes_ << "#include <" << new_include << ">" << endl;
@@ -132,7 +132,7 @@ namespace casadi {
     int& ind = added_sparsities_[h];
 
     // Generate it if it does not exist
-    if(added_sparsities_.size() > num_patterns_before) {
+    if (added_sparsities_.size() > num_patterns_before) {
 
       // Compact version of the sparsity pattern
       std::vector<int> sp_compact = sp.compress();
@@ -154,11 +154,11 @@ namespace casadi {
   size_t CodeGenerator::hash(const std::vector<double>& v) {
     // Calculate a hash value for the vector
     std::size_t seed=0;
-    if(!v.empty()) {
+    if (!v.empty()) {
       casadi_assert(sizeof(double) % sizeof(size_t)==0);
       const int int_len = v.size()*(sizeof(double)/sizeof(size_t));
       const size_t* int_v = reinterpret_cast<const size_t*>(&v.front());
-      for(size_t i=0; i<int_len; ++i) {
+      for (size_t i=0; i<int_len; ++i) {
         hash_combine(seed, int_v[i]);
       }
     }
@@ -178,11 +178,11 @@ namespace casadi {
     // Try to locate it in already added constants
     pair<multimap<size_t, size_t>::iterator, multimap<size_t, size_t>::iterator> eq =
       added_double_constants_.equal_range(h);
-    for(multimap<size_t, size_t>::iterator i=eq.first; i!=eq.second; ++i) {
-      if(equal(v, double_constants_[i->second])) return i->second;
+    for (multimap<size_t, size_t>::iterator i=eq.first; i!=eq.second; ++i) {
+      if (equal(v, double_constants_[i->second])) return i->second;
     }
 
-    if(allow_adding) {
+    if (allow_adding) {
       // Add to constants
       int ind = double_constants_.size();
       double_constants_.push_back(v);
@@ -201,11 +201,11 @@ namespace casadi {
     // Try to locate it in already added constants
     pair<multimap<size_t, size_t>::iterator, multimap<size_t, size_t>::iterator> eq =
       added_integer_constants_.equal_range(h);
-    for(multimap<size_t, size_t>::iterator i=eq.first; i!=eq.second; ++i) {
-      if(equal(v, integer_constants_[i->second])) return i->second;
+    for (multimap<size_t, size_t>::iterator i=eq.first; i!=eq.second; ++i) {
+      if (equal(v, integer_constants_[i->second])) return i->second;
     }
 
-    if(allow_adding) {
+    if (allow_adding) {
       // Add to constants
       int ind = integer_constants_.size();
       integer_constants_.push_back(v);
@@ -229,10 +229,10 @@ namespace casadi {
     bool added = added_auxiliaries_.insert(f).second;
 
     // Quick return if it already exists
-    if(!added) return;
+    if (!added) return;
 
     // Add the appropriate function
-    switch(f) {
+    switch (f) {
     case AUX_COPY:
       auxiliaries_ << codegen_str_copy << endl;
       break;
@@ -289,7 +289,7 @@ namespace casadi {
 
   void CodeGenerator::printConstant(std::ostream& s, double v) {
     int v_int(v);
-    if(v_int==v) {
+    if (v_int==v) {
       // Print integer
       s << v_int << ".0";
     } else {
@@ -302,22 +302,22 @@ namespace casadi {
                                  const std::string& res, const std::string& it,
                                  bool only_if_exists) const {
     // Quick return if nothing to do
-    if(n==0) return;
+    if (n==0) return;
 
     // Indent
     s << "  ";
 
     // Print condition
-    if(only_if_exists) {
-      s << "if(" << res << "!=0) ";
+    if (only_if_exists) {
+      s << "if (" << res << "!=0) ";
     }
 
-    if(n==1) {
+    if (n==1) {
       // Simplify if scalar assignment
       s << "*" << res << "=*" << arg << ";" << endl;
     } else {
       // For loop
-      s << "for(" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res
+      s << "for (" << it << "=0; " << it << "<" << n << "; ++" << it << ") " << res
         << "[" << it << "]=" << arg << "[" << it << "];" << endl;
     }
   }

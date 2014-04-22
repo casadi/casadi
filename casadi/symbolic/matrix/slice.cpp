@@ -83,22 +83,22 @@ namespace casadi {
     bool from_beginning = start_ == 0;
     bool till_end = stop_ == std::numeric_limits<int>::max();
     bool skip_none = step_==1;
-    if(stop_==start_+1) {
+    if (stop_==start_+1) {
       stream << start_;
     } else {
-      if(!from_beginning) stream << start_;
+      if (!from_beginning) stream << start_;
       stream << ":";
-      if(!till_end) stream << stop_;
-      if(!skip_none) stream << ":" << step_;
+      if (!till_end) stream << stop_;
+      if (!skip_none) stream << ":" << step_;
     }
   }
 
   Slice::Slice(const std::vector<int>& v) {
     casadi_assert_message(isSlice(v), "Cannot be represented as a Slice");
-    if(v.size()==0) {
+    if (v.size()==0) {
       start_=stop_=0;
       step_ = 1;
-    } else if(v.size()==1) {
+    } else if (v.size()==1) {
       start_ = v.front();
       stop_ = start_ + 1;
       step_ = 1;
@@ -112,16 +112,16 @@ namespace casadi {
   bool Slice::isSlice(const std::vector<int>& v) {
     // Always false if negative numbers or non-increasing
     int last_v = -1;
-    for(int i=0; i<v.size(); ++i) {
-      if(v[i]<=last_v) return false;
+    for (int i=0; i<v.size(); ++i) {
+      if (v[i]<=last_v) return false;
       last_v = v[i];
     }
 
     // Always true if less than 2 elements
-    if(v.size()<2) return true;
+    if (v.size()<2) return true;
 
     // If two elements, true if they are different
-    if(v.size()==2) return v[0]!=v[1];
+    if (v.size()==2) return v[0]!=v[1];
 
     // We can now get the beginning, end and step
     int start = v[0];
@@ -129,8 +129,8 @@ namespace casadi {
     //int stop = start + step*v.size();
 
     // Consistency check
-    for(int i=2; i<v.size(); ++i) {
-      if(v[i]!=start+i*step) return false;
+    for (int i=2; i<v.size(); ++i) {
+      if (v[i]!=start+i*step) return false;
     }
 
     // True if reached this point
@@ -139,12 +139,12 @@ namespace casadi {
 
   bool Slice::isSlice2(const std::vector<int>& v) {
     // Always true if 1D slice
-    if(isSlice(v)) return true;
+    if (isSlice(v)) return true;
 
     // Always false if negative numbers or non-increasing
     int last_v = -1;
-    for(int i=0; i<v.size(); ++i) {
-      if(v[i]<=last_v) return false;
+    for (int i=0; i<v.size(); ++i) {
+      if (v[i]<=last_v) return false;
       last_v = v[i];
     }
 
@@ -154,9 +154,9 @@ namespace casadi {
     int start_inner = v.front();
     int step_inner = v[1]-v[0];
     int stop_inner = -1;
-    for(int i=2; i<v.size(); ++i) {
+    for (int i=2; i<v.size(); ++i) {
       int predicted_v = start_inner+i*step_inner;
-      if(v[i]!=predicted_v) {
+      if (v[i]!=predicted_v) {
         stop_inner = predicted_v;
         step_outer = v[i] - start_inner;
         break;
@@ -167,19 +167,19 @@ namespace casadi {
     // Get the end of the outer slice
     int stop_outer = v.back();
     do {
-      if(step_outer>0) stop_outer++;
+      if (step_outer>0) stop_outer++;
       else             stop_outer--;
-    } while(stop_outer % step_outer!=0);
+    } while (stop_outer % step_outer!=0);
 
     // Check consistency
     std::vector<int>::const_iterator it=v.begin();
-    for(int i=start_outer; i!=stop_outer; i+=step_outer) {
-      for(int j=i+start_inner; j!=i+stop_inner; j+=step_inner) {
+    for (int i=start_outer; i!=stop_outer; i+=step_outer) {
+      for (int j=i+start_inner; j!=i+stop_inner; j+=step_inner) {
         // False if we've reached the end
-        if(it==v.end()) return false;
+        if (it==v.end()) return false;
 
         // Check if value matches
-        if(*it++ != j) return false;
+        if (*it++ != j) return false;
       }
     }
 
@@ -191,7 +191,7 @@ namespace casadi {
     casadi_assert_message(isSlice2(v), "Cannot be represented as a nested Slice");
 
     // If simple slice
-    if(isSlice(v)) {
+    if (isSlice(v)) {
       *this = Slice(v);
       outer.start_ = 0;
       outer.step_ = outer.stop_ = stop_;
@@ -204,9 +204,9 @@ namespace casadi {
     start_ = v.front();
     step_ = v[1]-v[0];
     stop_ = -1;
-    for(int i=2; i<v.size(); ++i) {
+    for (int i=2; i<v.size(); ++i) {
       int predicted_v = start_+i*step_;
-      if(v[i]!=predicted_v) {
+      if (v[i]!=predicted_v) {
         stop_ = predicted_v;
         outer.step_ = v[i] - start_;
         break;
@@ -216,15 +216,15 @@ namespace casadi {
     // Get the end of the outer slice
     outer.stop_ = v.back();
     do {
-      if(outer.step_>0) outer.stop_++;
+      if (outer.step_>0) outer.stop_++;
       else              outer.stop_--;
-    } while(outer.stop_ % outer.step_!=0);
+    } while (outer.stop_ % outer.step_!=0);
   }
 
   std::vector<int> Slice::getAll(const Slice& outer, int len) const {
     std::vector<int> ret;
-    for(int i=outer.start_; i!=outer.stop_; i+=outer.step_) {
-      for(int j=i+start_; j!=i+stop_; j+=step_) {
+    for (int i=outer.start_; i!=outer.stop_; i+=outer.step_) {
+      for (int j=i+start_; j!=i+stop_; j+=step_) {
         ret.push_back(j);
       }
     }

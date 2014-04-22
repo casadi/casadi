@@ -91,7 +91,7 @@ namespace casadi {
     // Get all options available in (s)IPOPT
     map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> > regops =
         temp_app.RegOptions()->RegisteredOptionsList();
-    for(map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> >::const_iterator it=regops.begin();
+    for (map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> >::const_iterator it=regops.begin();
         it!=regops.end();
         ++it) {
       // Option identifier
@@ -105,7 +105,7 @@ namespace casadi {
       opt_type casadi_type;
 
       // Map Ipopt option category to a CasADi options type
-      switch(ipopt_type) {
+      switch (ipopt_type) {
       case Ipopt::OT_Number:    casadi_type = OT_REAL;          break;
       case Ipopt::OT_Integer:   casadi_type = OT_INTEGER;       break;
       case Ipopt::OT_String:    casadi_type = OT_STRING;        break;
@@ -132,20 +132,20 @@ namespace casadi {
   void IpoptInternal::freeIpopt() {
     // Free sensitivity application (or rather, the smart pointer holding it)
 #ifdef WITH_SIPOPT
-    if(app_sens_ != 0) {
+    if (app_sens_ != 0) {
       delete static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
       app_sens_ = 0;
     }
 #endif // WITH_SIPOPT
 
     // Free Ipopt application instance (or rather, the smart pointer holding it)
-    if(app_ != 0) {
+    if (app_ != 0) {
       delete static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
       app_ = 0;
     }
 
     // Free Ipopt user class (or rather, the smart pointer holding it)
-    if(userclass_ != 0) {
+    if (userclass_ != 0) {
       delete static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(userclass_);
       userclass_ = 0;
     }
@@ -166,12 +166,12 @@ namespace casadi {
     exact_hessian_ = !hasSetOption("hessian_approximation") ||
         getOption("hessian_approximation")=="exact";
 #ifdef WITH_SIPOPT
-    if(hasSetOption("run_sens")) {
+    if (hasSetOption("run_sens")) {
       run_sens_ = getOption("run_sens")=="yes";
     } else {
       run_sens_  = false;
     }
-    if(hasSetOption("compute_red_hessian")) {
+    if (hasSetOption("compute_red_hessian")) {
       compute_red_hessian_ = getOption("compute_red_hessian")=="yes";
     } else {
       compute_red_hessian_ = false;
@@ -181,7 +181,7 @@ namespace casadi {
     // Get/generate required functions
     gradF();
     jacG();
-    if(exact_hessian_) {
+    if (exact_hessian_) {
       hessLag();
     }
 
@@ -191,7 +191,7 @@ namespace casadi {
     *app = new Ipopt::IpoptApplication();
 
 #ifdef WITH_SIPOPT
-    if(run_sens_ || compute_red_hessian_) {
+    if (run_sens_ || compute_red_hessian_) {
       // Start an sIPOPT application
       Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
           new Ipopt::SmartPtr<Ipopt::SensApplication>();
@@ -210,19 +210,19 @@ namespace casadi {
     userclass_ = static_cast<void*>(userclass);
     *userclass = new IpoptUserClass(this);
 
-    if(verbose_) {
+    if (verbose_) {
       cout << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
-      if(exact_hessian_) cout << "Using exact Hessian" << endl;
+      if (exact_hessian_) cout << "Using exact Hessian" << endl;
       else             cout << "Using limited memory Hessian approximation" << endl;
     }
 
     bool ret = true;
 
     // Pass all the options to ipopt
-    for(map<string, opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
-      if(hasSetOption(it->first)) {
+    for (map<string, opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
+      if (hasSetOption(it->first)) {
         GenericType op = getOption(it->first);
-        switch(it->second) {
+        switch (it->second) {
         case OT_REAL:
           ret &= (*app)->Options()->SetNumericValue(it->first, op.toDouble(), false);
           break;
@@ -241,7 +241,7 @@ namespace casadi {
 
     // Extra initialization required by sIPOPT
     //   #ifdef WITH_SIPOPT
-    //   if(run_sens_ || compute_red_hessian_) {
+    //   if (run_sens_ || compute_red_hessian_) {
     //     Ipopt::ApplicationReturnStatus status = (*app)->Initialize("");
     //     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
     //   }
@@ -252,7 +252,7 @@ namespace casadi {
     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
 
 #ifdef WITH_SIPOPT
-    if(run_sens_ || compute_red_hessian_) {
+    if (run_sens_ || compute_red_hessian_) {
       Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
           static_cast<Ipopt::SmartPtr<Ipopt::SensApplication> *>(app_sens_);
       (*app_sens)->Initialize();
@@ -301,7 +301,7 @@ namespace casadi {
     t_mainloop_ = (time2-time1)/CLOCKS_PER_SEC;
 
 #ifdef WITH_SIPOPT
-    if(run_sens_ || compute_red_hessian_) {
+    if (run_sens_ || compute_red_hessian_) {
       // Calculate parametric sensitivities
       Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens =
           static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
@@ -310,13 +310,13 @@ namespace casadi {
 
       // Access the reduced Hessian calculator
 #ifdef WITH_CASADI_PATCH
-      if(compute_red_hessian_) {
+      if (compute_red_hessian_) {
         // Get the reduced Hessian
         std::vector<double> red_hess = (*app_sens)->ReducedHessian();
 
         // Get the dimensions
         int N;
-        for(N=0; N*N<red_hess.size(); ++N) {}
+        for (N=0; N*N<red_hess.size(); ++N) {}
         casadi_assert(N*N==red_hess.size());
 
         // Store to statistics
@@ -430,11 +430,11 @@ namespace casadi {
       }
       double time1 = clock();
       if (!callback_.isNull()) {
-        if(full_callback) {
+        if (full_callback) {
           if (!output(NLP_SOLVER_X).isEmpty()) copy(x, x+nx_, output(NLP_SOLVER_X).begin());
 
           vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
-          for(int i=0; i<lambda_x.size(); ++i) {
+          for (int i=0; i<lambda_x.size(); ++i) {
             lambda_x[i] = z_U[i]-z_L[i];
           }
           if (!output(NLP_SOLVER_LAM_G).isEmpty())
@@ -494,7 +494,7 @@ namespace casadi {
 
       // Get dual solution (simple bounds)
       vector<double>& lambda_x = output(NLP_SOLVER_LAM_X).data();
-      for(int i=0; i<lambda_x.size(); ++i) {
+      for (int i=0; i<lambda_x.size(); ++i) {
         lambda_x[i] = z_U[i]-z_L[i];
       }
 
@@ -522,8 +522,8 @@ namespace casadi {
         int nz=0;
         const vector<int>& colind = hessLag_.output().colind();
         const vector<int>& row = hessLag_.output().row();
-        for(int cc=0; cc<colind.size()-1; ++cc)
-          for(int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
+        for (int cc=0; cc<colind.size()-1; ++cc)
+          for (int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
             iRow[nz] = row[el];
             jCol[nz] = cc;
             nz++;
@@ -541,7 +541,7 @@ namespace casadi {
         // Get results
         hessLag_.output().get(values, SPARSESYM);
 
-        if(monitored("eval_h")) {
+        if (monitored("eval_h")) {
           cout << "x = " << hessLag_.input(NL_X).data() << endl;
           cout << "H = " << endl;
           hessLag_.output().printSparse();
@@ -568,7 +568,7 @@ namespace casadi {
       log("eval_jac_g started");
 
       // Quich finish if no constraints
-      if(m==0) {
+      if (m==0) {
         log("eval_jac_g quick return (m==0)");
         return true;
       }
@@ -581,8 +581,8 @@ namespace casadi {
         int nz=0;
         const vector<int>& colind = jacG.output().colind();
         const vector<int>& row = jacG.output().row();
-        for(int cc=0; cc<colind.size()-1; ++cc)
-          for(int el=colind[cc]; el<colind[cc+1]; ++el) {
+        for (int cc=0; cc<colind.size()-1; ++cc)
+          for (int el=colind[cc]; el<colind[cc+1]; ++el) {
             int rr = row[el];
             iRow[nz] = rr;
             jCol[nz] = cc;
@@ -599,7 +599,7 @@ namespace casadi {
         // Get the output
         jacG.getOutput(values);
 
-        if(monitored("eval_jac_g")) {
+        if (monitored("eval_jac_g")) {
           cout << "x = " << jacG.input(NL_X).data() << endl;
           cout << "J = " << endl;
           jacG.output().printSparse();
@@ -638,7 +638,7 @@ namespace casadi {
       nlp_.getOutput(obj_value, NL_F);
 
       // Printing
-      if(monitored("eval_f")) {
+      if (monitored("eval_f")) {
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "obj_value = " << obj_value << endl;
       }
@@ -663,7 +663,7 @@ namespace casadi {
       log("eval_g started");
       double time1 = clock();
 
-      if(m>0) {
+      if (m>0) {
         // Pass the argument to the function
         nlp_.setInput(x, NL_X);
         nlp_.setInput(input(NLP_SOLVER_P), NL_P);
@@ -675,7 +675,7 @@ namespace casadi {
         nlp_.getOutput(g, NL_G);
 
         // Printing
-        if(monitored("eval_g")) {
+        if (monitored("eval_g")) {
           cout << "x = " << nlp_.input(NL_X) << endl;
           cout << "g = " << nlp_.output(NL_G) << endl;
         }
@@ -712,7 +712,7 @@ namespace casadi {
       gradF_.output().getArray(grad_f, n, DENSE);
 
       // Printing
-      if(monitored("eval_grad_f")) {
+      if (monitored("eval_grad_f")) {
         cout << "x = " << gradF_.input(NL_X) << endl;
         cout << "grad_f = " << gradF_.output() << endl;
       }
@@ -760,14 +760,14 @@ namespace casadi {
         //casadi_assert_warning(init_z, "Not initializing z");
       }
 
-      if(init_x) {
+      if (init_x) {
         input(NLP_SOLVER_X0).getArray(x, n);
       }
 
       if (init_z) {
         // Get dual solution (simple bounds)
         vector<double>& lambda_x = input(NLP_SOLVER_LAM_X0).data();
-        for(int i=0; i<lambda_x.size(); ++i) {
+        for (int i=0; i<lambda_x.size(); ++i) {
           z_L[i] = max(0., -lambda_x[i]);
           z_U[i] = max(0., lambda_x[i]);
         }
@@ -790,13 +790,13 @@ namespace casadi {
       m = ng_;               // number of constraints
 
       // Get Jacobian sparsity pattern
-      if(nlp_.output(NL_G).size()==0)
+      if (nlp_.output(NL_G).size()==0)
         nnz_jac_g = 0;
       else
         nnz_jac_g = jacG().output().size();
 
       // Get Hessian sparsity pattern
-      if(exact_hessian_)
+      if (exact_hessian_)
         nnz_h_lag = hessLag().output().sparsity().sizeU();
       else
         nnz_h_lag = 0;
@@ -807,7 +807,7 @@ namespace casadi {
 
   int IpoptInternal::get_number_of_nonlinear_variables() {
     try {
-      if(!static_cast<bool>(getOption("pass_nonlinear_variables"))) {
+      if (!static_cast<bool>(getOption("pass_nonlinear_variables"))) {
         // No Hessian has been interfaced
         return -1;
       } else {
@@ -817,9 +817,9 @@ namespace casadi {
         // Loop over the cols
         const Sparsity& spHessLag = this->spHessLag();
         const vector<int>& colind = spHessLag.colind();
-        for(int i=0; i<colind.size()-1; ++i) {
+        for (int i=0; i<colind.size()-1; ++i) {
           // If the col contains any non-zeros, the corresponding variable appears nonlinearily
-          if(colind[i]!=colind[i+1])
+          if (colind[i]!=colind[i+1])
             nv++;
         }
 
@@ -840,9 +840,9 @@ namespace casadi {
       // Loop over the cols
       const Sparsity& spHessLag = this->spHessLag();
       const vector<int>& colind = spHessLag.colind();
-      for(int i=0; i<colind.size()-1; ++i) {
+      for (int i=0; i<colind.size()-1; ++i) {
         // If the col contains any non-zeros, the corresponding variable appears nonlinearily
-        if(colind[i]!=colind[i+1]) {
+        if (colind[i]!=colind[i+1]) {
           pos_nonlin_vars[el++] = i;
         }
       }
@@ -864,9 +864,9 @@ namespace casadi {
                                            map<string, vector<string> >& con_string_md,
                                            map<string, vector<int> >& con_integer_md,
                                            map<string, vector<double> >& con_numeric_md) {
-    if(hasSetOption("var_string_md")) {
+    if (hasSetOption("var_string_md")) {
       Dictionary dict = getOption("var_string_md");
-      for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<string> entry = it->second; // Get the entry
         // Check length for consistency
@@ -875,9 +875,9 @@ namespace casadi {
       }
     }
 
-    if(hasSetOption("var_integer_md")) {
+    if (hasSetOption("var_integer_md")) {
       Dictionary dict = getOption("var_integer_md");
-      for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<int> entry = it->second; // Get the entry
         // Check length for consistency
@@ -886,9 +886,9 @@ namespace casadi {
       }
     }
 
-    if(hasSetOption("var_numeric_md")) {
+    if (hasSetOption("var_numeric_md")) {
       Dictionary dict = getOption("var_numeric_md");
-      for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<double> entry = it->second; // Get the entry
         // Check length for consistency
@@ -897,9 +897,9 @@ namespace casadi {
       }
     }
 
-    if(hasSetOption("con_string_md")) {
+    if (hasSetOption("con_string_md")) {
       Dictionary dict = getOption("con_string_md");
-      for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<string> entry = it->second; // Get the entry
         // Check length for consistency
@@ -908,9 +908,9 @@ namespace casadi {
       }
     }
 
-    if(hasSetOption("con_integer_md")) {
+    if (hasSetOption("con_integer_md")) {
       Dictionary dict = getOption("con_integer_md");
-      for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<int> entry = it->second; // Get the entry
         // Check length for consistency
@@ -919,9 +919,9 @@ namespace casadi {
       }
     }
 
-    if(hasSetOption("con_numeric_md")) {
+    if (hasSetOption("con_numeric_md")) {
       Dictionary dict = getOption("con_numeric_md");
-      for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+      for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
         string key = it->first; // Get the key
         vector<double> entry = it->second; // Get the entry
         // Check length for consistency
@@ -942,54 +942,54 @@ namespace casadi {
                                         const map<string, vector<int> >& con_integer_md,
                                         const map<string, vector<double> >& con_numeric_md) {
 
-    if(!var_string_md.empty()) {
+    if (!var_string_md.empty()) {
       Dictionary dict;
-      for(map<string, vector<string> >::const_iterator it=var_string_md.begin();
+      for (map<string, vector<string> >::const_iterator it=var_string_md.begin();
           it!=var_string_md.end(); ++it) {
         dict[it->first] = it->second;
       }
       stats_["var_string_md"] = dict;
     }
 
-    if(!var_integer_md.empty()) {
+    if (!var_integer_md.empty()) {
       Dictionary dict;
-      for(map<string, vector<int> >::const_iterator it=var_integer_md.begin();
+      for (map<string, vector<int> >::const_iterator it=var_integer_md.begin();
           it!=var_integer_md.end(); ++it) {
         dict[it->first] = it->second;
       }
       stats_["var_integer_md"] = dict;
     }
 
-    if(!var_numeric_md.empty()) {
+    if (!var_numeric_md.empty()) {
       Dictionary dict;
-      for(map<string, vector<double> >::const_iterator it=var_numeric_md.begin();
+      for (map<string, vector<double> >::const_iterator it=var_numeric_md.begin();
           it!=var_numeric_md.end(); ++it) {
         dict[it->first] = it->second;
       }
       stats_["var_numeric_md"] = dict;
     }
 
-    if(!con_string_md.empty()) {
+    if (!con_string_md.empty()) {
       Dictionary dict;
-      for(map<string, vector<string> >::const_iterator it=con_string_md.begin();
+      for (map<string, vector<string> >::const_iterator it=con_string_md.begin();
           it!=con_string_md.end(); ++it) {
         dict[it->first] = it->second;
       }
       stats_["con_string_md"] = dict;
     }
 
-    if(!con_integer_md.empty()) {
+    if (!con_integer_md.empty()) {
       Dictionary dict;
-      for(map<string, vector<int> >::const_iterator it=con_integer_md.begin();
+      for (map<string, vector<int> >::const_iterator it=con_integer_md.begin();
           it!=con_integer_md.end(); ++it) {
         dict[it->first] = it->second;
       }
       stats_["con_integer_md"] = dict;
     }
 
-    if(!con_numeric_md.empty()) {
+    if (!con_numeric_md.empty()) {
       Dictionary dict;
-      for(map<string, vector<double> >::const_iterator it=con_numeric_md.begin();
+      for (map<string, vector<double> >::const_iterator it=con_numeric_md.begin();
           it!=con_numeric_md.end(); ++it) {
         dict[it->first] = it->second;
       }

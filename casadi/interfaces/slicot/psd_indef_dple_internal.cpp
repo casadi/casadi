@@ -97,7 +97,7 @@ namespace casadi {
     // There can be at most n partitions
     partition_.reserve(n_);
 
-    if(hasSetOption("linear_solver")) {
+    if (hasSetOption("linear_solver")) {
       linearSolverCreator linear_solver_creator = getOption("linear_solver");
 
       // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
@@ -221,7 +221,7 @@ namespace casadi {
       profileWriteEntry(CasadiOptions::profilingLog, this);
     }
 
-    if(CasadiOptions::profiling) {
+    if (CasadiOptions::profiling) {
       time_start = getRealTime(); // Start timer
     }
 
@@ -240,7 +240,7 @@ namespace casadi {
       profileWriteTime(CasadiOptions::profilingLog, this, 0, time_stop-time_start, time_stop-time_zero);
     }
 
-    if(CasadiOptions::profiling) {
+    if (CasadiOptions::profiling) {
       time_start = getRealTime(); // Start timer
     }
 
@@ -261,8 +261,8 @@ namespace casadi {
     partition_.resize(1, 0);
     int i = 0;
     int j = 0;
-    while(j<n_) {
-      while(i<n_ && T_[i+n_*j]!=0) {
+    while (j<n_) {
+      while (i<n_ && T_[i+n_*j]!=0) {
         i+=1;
       }
       j = i;
@@ -272,7 +272,7 @@ namespace casadi {
     // ********** START ***************
     // V = blocks([mul([sZ[k].T, Vs[k], sZ[k]]) for k in range(p)])
 
-    for(int k=0;k<K_;++k) {
+    for (int k=0;k<K_;++k) {
       nnKa_[k].set(0.0);
       nnKb_[k].set(0.0);
       // nnKa[k] <- V[k]*Z[k+1]
@@ -485,7 +485,7 @@ namespace casadi {
 
     output(DPLE_P).set(0.0);
 
-    for(int k=0;k<K_;++k) {
+    for (int k=0;k<K_;++k) {
       nnKa_[k].set(0.0);
 
       // nnKa[k] <- V[k]*Z[k]'
@@ -501,12 +501,12 @@ namespace casadi {
 
     for (int d=0;d<nfwd_;++d) {
 
-      if(CasadiOptions::profiling) {
+      if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
       }
 
       // dV2 = [dV+mul([a_dot, x, a.T])+mul([a, x, a_dot.T]) for vp, a, a_dot, x in zip(Vp, As, Ap, X) ]
-      for(int k=0;k<K_;++k) {
+      for (int k=0;k<K_;++k) {
         std::fill(nnKb_[k].begin(), nnKb_[k].end(), 0);
         std::fill(nnKa_[k].begin(), nnKa_[k].end(), 0);
 
@@ -545,7 +545,7 @@ namespace casadi {
       // ********** START ***************
       // V = blocks([mul([sZ[k].T, dV2[k], sZ[k]]) for k in range(p)])
 
-      for(int k=0;k<K_;++k) {
+      for (int k=0;k<K_;++k) {
         nnKa_[k].set(0.0);
         // nnKa[k] <- dV2[k]*Z[k+1]
         dense_mul_nt(n_, n_, n_,&nnKb_[k].data()[0],&Z_[((k+1) % K_)*n_*n_], &nnKa_[k].data()[0]);
@@ -721,7 +721,7 @@ namespace casadi {
 
         output(DPLE_NUM_OUT*(d+1)+DPLE_P).set(0.0);
 
-        for(int k=0;k<K_;++k) {
+        for (int k=0;k<K_;++k) {
           nnKa_[k].set(0.0);
 
           // nnKa[k] <- V[k]*Z[k]'
@@ -746,7 +746,7 @@ namespace casadi {
 
     for (int d=0;d<nadj_;++d) {
 
-      if(CasadiOptions::profiling) {
+      if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
       }
 
@@ -761,7 +761,7 @@ namespace casadi {
 
 
       // X_bar = [mul([Z[k].T, X_bar[k] , Z[k]]) for k in range(p)]
-      for(int k=0;k<K_;++k) {
+      for (int k=0;k<K_;++k) {
         nnKa_[k].set(0.0);
 
         // nnKa[k] <- nnKb*Z[k]
@@ -952,7 +952,7 @@ namespace casadi {
 
 
       // V_bar = [mul([sZ[k], V_bar[k] , sZ[k].T]) for k in range(p)]
-      for(int k=0;k<K_;++k) {
+      for (int k=0;k<K_;++k) {
         nnKa_[k].set(0.0);
         dense_mul_nn(n_, n_, n_,&Vbar[n_*n_*k],&Z_[((k+1)%K_)*n_*n_], &nnKa_[k].data()[0]);
         std::fill(&Vbar[n_*n_*k],&Vbar[n_*n_*(k+1)], 0);
@@ -960,7 +960,7 @@ namespace casadi {
       }
 
       // Force symmetry
-      for(int k=0;k<K_;++k) {
+      for (int k=0;k<K_;++k) {
         for (int r=0;r<n_;++r) {
           for (int l=0;l<r;++l) {
             double s = (Vbar[n_*n_*k+r+l*n_]+Vbar[n_*n_*k+r*n_+l])/2;
@@ -971,7 +971,7 @@ namespace casadi {
       }
 
       // A_bar = [mul([vb+vb.T, a, x]) for vb, x, a in zip(V_bar, X, As)]
-      for(int k=0;k<K_;++k) {
+      for (int k=0;k<K_;++k) {
         std::fill(nnKa_[k].begin(), nnKa_[k].end(), 0);
         dense_mul_nn(n_, n_, n_,&output(DPLE_P).data()[n_*n_*k], &input(DPLE_A).data()[n_*n_*k],
                      &nnKa_[k].data()[0]);

@@ -63,7 +63,7 @@ namespace casadi {
     integrator_.init();
 
     // Generate an output function if there is none (returns the whole state)
-    if(output_fcn_.isNull()) {
+    if (output_fcn_.isNull()) {
       SX t = SX::sym("t");
       SX x = SX::sym("x", integrator_.input(INTEGRATOR_X0).sparsity());
       SX z = SX::sym("z", integrator_.input(INTEGRATOR_Z0).sparsity());
@@ -89,13 +89,13 @@ namespace casadi {
 
     // Allocate inputs
     setNumInputs(INTEGRATOR_NUM_IN);
-    for(int i=0; i<INTEGRATOR_NUM_IN; ++i) {
+    for (int i=0; i<INTEGRATOR_NUM_IN; ++i) {
       input(i) = integrator_.input(i);
     }
 
     // Allocate outputs
     setNumOutputs(output_fcn_->getNumOutputs());
-    for(int i=0; i<getNumOutputs(); ++i) {
+    for (int i=0; i<getNumOutputs(); ++i) {
       output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(), grid_.size());
       if (!output_fcn_.output(i).isEmpty()) {
         casadi_assert_message(output_fcn_.output(i).isVector(),
@@ -148,10 +148,10 @@ namespace casadi {
     integrator_.reset();
 
     // Iterators to output data structures
-    for(int i=0; i<output_its_.size(); ++i) output_its_[i] = output(i).begin();
+    for (int i=0; i<output_its_.size(); ++i) output_its_[i] = output(i).begin();
 
     // Advance solution in time
-    for(int k=0; k<grid_.size(); ++k) {
+    for (int k=0; k<grid_.size(); ++k) {
 
       if (monitored("step")) {
         std::cout << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
@@ -169,20 +169,20 @@ namespace casadi {
       }
 
       // Pass integrator output to the output function
-      if(output_fcn_.input(DAE_T).size()!=0)
+      if (output_fcn_.input(DAE_T).size()!=0)
         output_fcn_.setInput(grid_[k], DAE_T);
-      if(output_fcn_.input(DAE_X).size()!=0)
+      if (output_fcn_.input(DAE_X).size()!=0)
         output_fcn_.setInput(integrator_.output(INTEGRATOR_XF), DAE_X);
-      if(output_fcn_.input(DAE_Z).size()!=0)
+      if (output_fcn_.input(DAE_Z).size()!=0)
         output_fcn_.setInput(integrator_.output(INTEGRATOR_ZF), DAE_Z);
-      if(output_fcn_.input(DAE_P).size()!=0)
+      if (output_fcn_.input(DAE_P).size()!=0)
         output_fcn_.setInput(input(INTEGRATOR_P), DAE_P);
 
       // Evaluate output function
       output_fcn_.evaluate();
 
       // Save the outputs of the function
-      for(int i=0; i<getNumOutputs(); ++i) {
+      for (int i=0; i<getNumOutputs(); ++i) {
         const Matrix<double> &res = output_fcn_.output(i);
         copy(res.begin(), res.end(), output_its_.at(i));
         output_its_.at(i) += res.size();
@@ -190,7 +190,7 @@ namespace casadi {
     }
 
     // Consistency check
-    for(int i=0; i<output_its_.size(); ++i) {
+    for (int i=0; i<output_its_.size(); ++i) {
       casadi_assert(output_its_[i] == output(i).end());
     }
   }

@@ -310,15 +310,15 @@ namespace casadi {
     }
 
     // Check if we can simplify the product
-    if(x.isIdentity()) {
+    if (x.isIdentity()) {
       return y;
-    } else if(y.isIdentity()) {
+    } else if (y.isIdentity()) {
       return x;
-    } else if(x.isZero() || y.isZero()) {
+    } else if (x.isZero() || y.isZero()) {
       // See if one of the arguments can be used as result
-      if(y.size()==0 && x.size2()==x.size1()) {
+      if (y.size()==0 && x.size2()==x.size1()) {
         return y;
-      } else if(x.size()==0 && y.size2()==y.size1()) {
+      } else if (x.size()==0 && y.size2()==y.size1()) {
         return x;
       } else {
         if (y.size()==0 || x.size()==0 || x.isEmpty() || y.isEmpty()) {
@@ -327,7 +327,7 @@ namespace casadi {
           return MatType::zeros(x.size1(), y.size2());
         }
       }
-    } else if(x.isScalar() || y.isScalar()) {
+    } else if (x.isScalar() || y.isScalar()) {
       return x*y;
     } else {
       return x.mul_full(y, sp_z);
@@ -336,13 +336,13 @@ namespace casadi {
 
   template<typename MatType>
   int GenericMatrix<MatType>::size(SparsityType sp) const {
-    if(sp==SPARSE) {
+    if (sp==SPARSE) {
       return size();
-    } else if(sp==SPARSESYM) {
+    } else if (sp==SPARSESYM) {
       return sizeU();
-    } else if(sp==DENSE) {
+    } else if (sp==DENSE) {
       return numel();
-    } else if(sp==DENSESYM) {
+    } else if (sp==DENSESYM) {
       return (numel()+size2())/2;
     } else {
       throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");
@@ -358,7 +358,7 @@ namespace casadi {
                                                    const Sparsity& sp, int p) {
     std::vector<MatType> ret(p);
     std::stringstream ss;
-    for(int k=0; k<p; ++k) {
+    for (int k=0; k<p; ++k) {
       ss.str("");
       ss << name << k;
       ret[k] = sym(ss.str(), sp);
@@ -370,7 +370,7 @@ namespace casadi {
   std::vector<std::vector<MatType> > GenericMatrix<MatType>::sym(const std::string& name,
                                                                  const Sparsity& sp, int p, int r) {
     std::vector<std::vector<MatType> > ret(r);
-    for(int k=0; k<r; ++k) {
+    for (int k=0; k<r; ++k) {
       std::stringstream ss;
       ss << name << "_" << k;
       ret[k] = sym(ss.str(), sp, p);

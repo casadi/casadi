@@ -31,7 +31,7 @@ namespace casadi {
 NLPQPInternal* NLPQPInternal::clone() const {
   // Return a deep copy
   NLPQPInternal* node = new NLPQPInternal(st_);
-  if(!node->is_init_)
+  if (!node->is_init_)
     node->init();
   return node;
 }
@@ -114,7 +114,7 @@ void NLPQPInternal::init() {
   nlpsolver_ = nlpsolver_creator(QP_SOLVER_nlp);
 
   nlpsolver_.setQPOptions();
-  if(hasSetOption("nlp_solver_options")) {
+  if (hasSetOption("nlp_solver_options")) {
     nlpsolver_.setOption(getOption("nlp_solver_options"));
   }
 

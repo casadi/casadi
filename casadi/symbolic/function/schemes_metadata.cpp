@@ -172,311 +172,311 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
 std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
   switch (scheme) {
     case SCHEME_DPLEInput:
-      if(i==0) return "a";
-      if(i==1) return "v";
+      if (i==0) return "a";
+      if (i==1) return "v";
       break;
     case SCHEME_DPLEOutput:
-      if(i==0) return "p";
+      if (i==0) return "p";
       break;
     case SCHEME_ControlledDAEInput:
-      if(i==0) return "t";
-      if(i==1) return "x";
-      if(i==2) return "z";
-      if(i==3) return "p";
-      if(i==4) return "u";
-      if(i==5) return "u_interp";
-      if(i==6) return "x_major";
-      if(i==7) return "t0";
-      if(i==8) return "tf";
+      if (i==0) return "t";
+      if (i==1) return "x";
+      if (i==2) return "z";
+      if (i==3) return "p";
+      if (i==4) return "u";
+      if (i==5) return "u_interp";
+      if (i==6) return "x_major";
+      if (i==7) return "t0";
+      if (i==8) return "tf";
       break;
     case SCHEME_ControlSimulatorInput:
-      if(i==0) return "x0";
-      if(i==1) return "p";
-      if(i==2) return "u";
+      if (i==0) return "x0";
+      if (i==1) return "p";
+      if (i==2) return "u";
       break;
     case SCHEME_HNLPInput:
-      if(i==0) return "x";
-      if(i==1) return "p";
-      if(i==2) return "tau";
+      if (i==0) return "x";
+      if (i==1) return "p";
+      if (i==2) return "tau";
       break;
     case SCHEME_DAEInput:
-      if(i==0) return "x";
-      if(i==1) return "z";
-      if(i==2) return "p";
-      if(i==3) return "t";
+      if (i==0) return "x";
+      if (i==1) return "z";
+      if (i==2) return "p";
+      if (i==3) return "t";
       break;
     case SCHEME_DAEOutput:
-      if(i==0) return "ode";
-      if(i==1) return "alg";
-      if(i==2) return "quad";
+      if (i==0) return "ode";
+      if (i==1) return "alg";
+      if (i==2) return "quad";
       break;
     case SCHEME_RDAEInput:
-      if(i==0) return "rx";
-      if(i==1) return "rz";
-      if(i==2) return "rp";
-      if(i==3) return "x";
-      if(i==4) return "z";
-      if(i==5) return "p";
-      if(i==6) return "t";
+      if (i==0) return "rx";
+      if (i==1) return "rz";
+      if (i==2) return "rp";
+      if (i==3) return "x";
+      if (i==4) return "z";
+      if (i==5) return "p";
+      if (i==6) return "t";
       break;
     case SCHEME_RDAEOutput:
-      if(i==0) return "ode";
-      if(i==1) return "alg";
-      if(i==2) return "quad";
+      if (i==0) return "ode";
+      if (i==1) return "alg";
+      if (i==2) return "quad";
       break;
     case SCHEME_IntegratorInput:
-      if(i==0) return "x0";
-      if(i==1) return "p";
-      if(i==2) return "z0";
-      if(i==3) return "rx0";
-      if(i==4) return "rp";
-      if(i==5) return "rz0";
+      if (i==0) return "x0";
+      if (i==1) return "p";
+      if (i==2) return "z0";
+      if (i==3) return "rx0";
+      if (i==4) return "rp";
+      if (i==5) return "rz0";
       break;
     case SCHEME_IntegratorOutput:
-      if(i==0) return "xf";
-      if(i==1) return "qf";
-      if(i==2) return "zf";
-      if(i==3) return "rxf";
-      if(i==4) return "rqf";
-      if(i==5) return "rzf";
+      if (i==0) return "xf";
+      if (i==1) return "qf";
+      if (i==2) return "zf";
+      if (i==3) return "rxf";
+      if (i==4) return "rqf";
+      if (i==5) return "rzf";
       break;
     case SCHEME_LinsolInput:
-      if(i==0) return "A";
-      if(i==1) return "B";
+      if (i==0) return "A";
+      if (i==1) return "B";
       break;
     case SCHEME_LinsolOutput:
-      if(i==0) return "X";
+      if (i==0) return "X";
       break;
     case SCHEME_LPSolverInput:
-      if(i==0) return "c";
-      if(i==1) return "a";
-      if(i==2) return "lba";
-      if(i==3) return "uba";
-      if(i==4) return "lbx";
-      if(i==5) return "ubx";
+      if (i==0) return "c";
+      if (i==1) return "a";
+      if (i==2) return "lba";
+      if (i==3) return "uba";
+      if (i==4) return "lbx";
+      if (i==5) return "ubx";
       break;
     case SCHEME_LPSolverOutput:
-      if(i==0) return "x";
-      if(i==1) return "cost";
-      if(i==2) return "lam_a";
-      if(i==3) return "lam_x";
+      if (i==0) return "x";
+      if (i==1) return "cost";
+      if (i==2) return "lam_a";
+      if (i==3) return "lam_x";
       break;
     case SCHEME_LPStruct:
-      if(i==0) return "a";
+      if (i==0) return "a";
       break;
     case SCHEME_NLPInput:
-      if(i==0) return "x";
-      if(i==1) return "p";
+      if (i==0) return "x";
+      if (i==1) return "p";
       break;
     case SCHEME_NLPOutput:
-      if(i==0) return "f";
-      if(i==1) return "g";
+      if (i==0) return "f";
+      if (i==1) return "g";
       break;
     case SCHEME_GradFInput:
-      if(i==0) return "x";
-      if(i==1) return "p";
+      if (i==0) return "x";
+      if (i==1) return "p";
       break;
     case SCHEME_GradFOutput:
-      if(i==0) return "grad";
-      if(i==1) return "f";
-      if(i==2) return "g";
+      if (i==0) return "grad";
+      if (i==1) return "f";
+      if (i==2) return "g";
       break;
     case SCHEME_JacGInput:
-      if(i==0) return "x";
-      if(i==1) return "p";
+      if (i==0) return "x";
+      if (i==1) return "p";
       break;
     case SCHEME_JacGOutput:
-      if(i==0) return "jac";
-      if(i==1) return "f";
-      if(i==2) return "g";
+      if (i==0) return "jac";
+      if (i==1) return "f";
+      if (i==2) return "g";
       break;
     case SCHEME_HessLagInput:
-      if(i==0) return "x";
-      if(i==1) return "p";
-      if(i==2) return "lam_f";
-      if(i==3) return "lam_g";
+      if (i==0) return "x";
+      if (i==1) return "p";
+      if (i==2) return "lam_f";
+      if (i==3) return "lam_g";
       break;
     case SCHEME_HessLagOutput:
-      if(i==0) return "hess";
-      if(i==1) return "f";
-      if(i==2) return "g";
-      if(i==3) return "grad_x";
-      if(i==4) return "grad_p";
+      if (i==0) return "hess";
+      if (i==1) return "f";
+      if (i==2) return "g";
+      if (i==3) return "grad_x";
+      if (i==4) return "grad_p";
       break;
     case SCHEME_NLPSolverInput:
-      if(i==0) return "x0";
-      if(i==1) return "p";
-      if(i==2) return "lbx";
-      if(i==3) return "ubx";
-      if(i==4) return "lbg";
-      if(i==5) return "ubg";
-      if(i==6) return "lam_x0";
-      if(i==7) return "lam_g0";
+      if (i==0) return "x0";
+      if (i==1) return "p";
+      if (i==2) return "lbx";
+      if (i==3) return "ubx";
+      if (i==4) return "lbg";
+      if (i==5) return "ubg";
+      if (i==6) return "lam_x0";
+      if (i==7) return "lam_g0";
       break;
     case SCHEME_NLPSolverOutput:
-      if(i==0) return "x";
-      if(i==1) return "f";
-      if(i==2) return "g";
-      if(i==3) return "lam_x";
-      if(i==4) return "lam_g";
-      if(i==5) return "lam_p";
+      if (i==0) return "x";
+      if (i==1) return "f";
+      if (i==2) return "g";
+      if (i==3) return "lam_x";
+      if (i==4) return "lam_g";
+      if (i==5) return "lam_p";
       break;
     case SCHEME_MayerInput:
-      if(i==0) return "x";
-      if(i==1) return "p";
+      if (i==0) return "x";
+      if (i==1) return "p";
       break;
     case SCHEME_OCPInput:
-      if(i==0) return "lbx";
-      if(i==1) return "ubx";
-      if(i==2) return "x_init";
-      if(i==3) return "lbu";
-      if(i==4) return "ubu";
-      if(i==5) return "u_init";
-      if(i==6) return "lbp";
-      if(i==7) return "ubp";
-      if(i==8) return "p_init";
-      if(i==9) return "lbh";
-      if(i==10) return "ubh";
-      if(i==11) return "lbg";
-      if(i==12) return "ubg";
+      if (i==0) return "lbx";
+      if (i==1) return "ubx";
+      if (i==2) return "x_init";
+      if (i==3) return "lbu";
+      if (i==4) return "ubu";
+      if (i==5) return "u_init";
+      if (i==6) return "lbp";
+      if (i==7) return "ubp";
+      if (i==8) return "p_init";
+      if (i==9) return "lbh";
+      if (i==10) return "ubh";
+      if (i==11) return "lbg";
+      if (i==12) return "ubg";
       break;
     case SCHEME_OCPOutput:
-      if(i==0) return "x_opt";
-      if(i==1) return "u_opt";
-      if(i==2) return "p_opt";
-      if(i==3) return "cost";
+      if (i==0) return "x_opt";
+      if (i==1) return "u_opt";
+      if (i==2) return "p_opt";
+      if (i==3) return "cost";
       break;
     case SCHEME_QCQPSolverInput:
-      if(i==0) return "h";
-      if(i==1) return "g";
-      if(i==2) return "p";
-      if(i==3) return "q";
-      if(i==4) return "r";
-      if(i==5) return "a";
-      if(i==6) return "lba";
-      if(i==7) return "uba";
-      if(i==8) return "lbx";
-      if(i==9) return "ubx";
-      if(i==10) return "x0";
-      if(i==11) return "lam_x0";
+      if (i==0) return "h";
+      if (i==1) return "g";
+      if (i==2) return "p";
+      if (i==3) return "q";
+      if (i==4) return "r";
+      if (i==5) return "a";
+      if (i==6) return "lba";
+      if (i==7) return "uba";
+      if (i==8) return "lbx";
+      if (i==9) return "ubx";
+      if (i==10) return "x0";
+      if (i==11) return "lam_x0";
       break;
     case SCHEME_QCQPSolverOutput:
-      if(i==0) return "x";
-      if(i==1) return "cost";
-      if(i==2) return "lam_a";
-      if(i==3) return "lam_x";
+      if (i==0) return "x";
+      if (i==1) return "cost";
+      if (i==2) return "lam_a";
+      if (i==3) return "lam_x";
       break;
     case SCHEME_QCQPStruct:
-      if(i==0) return "h";
-      if(i==1) return "p";
-      if(i==2) return "a";
+      if (i==0) return "h";
+      if (i==1) return "p";
+      if (i==2) return "a";
       break;
     case SCHEME_QPSolverInput:
-      if(i==0) return "h";
-      if(i==1) return "g";
-      if(i==2) return "a";
-      if(i==3) return "lba";
-      if(i==4) return "uba";
-      if(i==5) return "lbx";
-      if(i==6) return "ubx";
-      if(i==7) return "x0";
-      if(i==8) return "lam_x0";
+      if (i==0) return "h";
+      if (i==1) return "g";
+      if (i==2) return "a";
+      if (i==3) return "lba";
+      if (i==4) return "uba";
+      if (i==5) return "lbx";
+      if (i==6) return "ubx";
+      if (i==7) return "x0";
+      if (i==8) return "lam_x0";
       break;
     case SCHEME_QPSolverOutput:
-      if(i==0) return "x";
-      if(i==1) return "cost";
-      if(i==2) return "lam_a";
-      if(i==3) return "lam_x";
+      if (i==0) return "x";
+      if (i==1) return "cost";
+      if (i==2) return "lam_a";
+      if (i==3) return "lam_x";
       break;
     case SCHEME_QPStruct:
-      if(i==0) return "h";
-      if(i==1) return "a";
+      if (i==0) return "h";
+      if (i==1) return "a";
       break;
     case SCHEME_SDPInput:
-      if(i==0) return "f";
-      if(i==1) return "c";
-      if(i==2) return "g";
-      if(i==3) return "a";
-      if(i==4) return "lba";
-      if(i==5) return "uba";
-      if(i==6) return "lbx";
-      if(i==7) return "ubx";
+      if (i==0) return "f";
+      if (i==1) return "c";
+      if (i==2) return "g";
+      if (i==3) return "a";
+      if (i==4) return "lba";
+      if (i==5) return "uba";
+      if (i==6) return "lbx";
+      if (i==7) return "ubx";
       break;
     case SCHEME_SDPOutput:
-      if(i==0) return "x";
-      if(i==1) return "p";
-      if(i==2) return "dual";
-      if(i==3) return "cost";
-      if(i==4) return "dual_cost";
-      if(i==5) return "lam_a";
-      if(i==6) return "lam_x";
+      if (i==0) return "x";
+      if (i==1) return "p";
+      if (i==2) return "dual";
+      if (i==3) return "cost";
+      if (i==4) return "dual_cost";
+      if (i==5) return "lam_a";
+      if (i==6) return "lam_x";
       break;
     case SCHEME_SDPStruct:
-      if(i==0) return "f";
-      if(i==1) return "g";
-      if(i==2) return "a";
+      if (i==0) return "f";
+      if (i==1) return "g";
+      if (i==2) return "a";
       break;
     case SCHEME_SDQPInput:
-      if(i==0) return "h";
-      if(i==1) return "c";
-      if(i==2) return "f";
-      if(i==3) return "g";
-      if(i==4) return "a";
-      if(i==5) return "lba";
-      if(i==6) return "uba";
-      if(i==7) return "lbx";
-      if(i==8) return "ubx";
+      if (i==0) return "h";
+      if (i==1) return "c";
+      if (i==2) return "f";
+      if (i==3) return "g";
+      if (i==4) return "a";
+      if (i==5) return "lba";
+      if (i==6) return "uba";
+      if (i==7) return "lbx";
+      if (i==8) return "ubx";
       break;
     case SCHEME_SDQPOutput:
-      if(i==0) return "x";
-      if(i==1) return "p";
-      if(i==2) return "dual";
-      if(i==3) return "cost";
-      if(i==4) return "dual_cost";
-      if(i==5) return "lam_a";
-      if(i==6) return "lam_x";
+      if (i==0) return "x";
+      if (i==1) return "p";
+      if (i==2) return "dual";
+      if (i==3) return "cost";
+      if (i==4) return "dual_cost";
+      if (i==5) return "lam_a";
+      if (i==6) return "lam_x";
       break;
     case SCHEME_SDQPStruct:
-      if(i==0) return "h";
-      if(i==1) return "f";
-      if(i==2) return "g";
-      if(i==3) return "a";
+      if (i==0) return "h";
+      if (i==1) return "f";
+      if (i==2) return "g";
+      if (i==3) return "a";
       break;
     case SCHEME_SOCPInput:
-      if(i==0) return "g";
-      if(i==1) return "h";
-      if(i==2) return "e";
-      if(i==3) return "f";
-      if(i==4) return "c";
-      if(i==5) return "a";
-      if(i==6) return "lba";
-      if(i==7) return "uba";
-      if(i==8) return "lbx";
-      if(i==9) return "ubx";
+      if (i==0) return "g";
+      if (i==1) return "h";
+      if (i==2) return "e";
+      if (i==3) return "f";
+      if (i==4) return "c";
+      if (i==5) return "a";
+      if (i==6) return "lba";
+      if (i==7) return "uba";
+      if (i==8) return "lbx";
+      if (i==9) return "ubx";
       break;
     case SCHEME_SOCPOutput:
-      if(i==0) return "x";
-      if(i==1) return "cost";
-      if(i==2) return "lam_a";
-      if(i==3) return "lam_x";
+      if (i==0) return "x";
+      if (i==1) return "cost";
+      if (i==2) return "lam_a";
+      if (i==3) return "lam_x";
       break;
     case SCHEME_SOCPStruct:
-      if(i==0) return "g";
-      if(i==1) return "a";
+      if (i==0) return "g";
+      if (i==1) return "a";
       break;
     case SCHEME_StabilizedQPSolverInput:
-      if(i==0) return "h";
-      if(i==1) return "g";
-      if(i==2) return "a";
-      if(i==3) return "lba";
-      if(i==4) return "uba";
-      if(i==5) return "lbx";
-      if(i==6) return "ubx";
-      if(i==7) return "x0";
-      if(i==8) return "lam_x0";
-      if(i==9) return "muR";
-      if(i==10) return "muE";
-      if(i==11) return "mu";
+      if (i==0) return "h";
+      if (i==1) return "g";
+      if (i==2) return "a";
+      if (i==3) return "lba";
+      if (i==4) return "uba";
+      if (i==5) return "lbx";
+      if (i==6) return "ubx";
+      if (i==7) return "x0";
+      if (i==8) return "lam_x0";
+      if (i==9) return "muR";
+      if (i==10) return "muE";
+      if (i==11) return "mu";
       break;
   }
   casadi_error( "getSchemeEntryName: supplied number is out of range. Scheme '"
@@ -486,311 +486,311 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
     case SCHEME_DPLEInput:
-      if(i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "A matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "V matrices (horzcat when const_dim, blkdiag otherwise)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DPLEOutput:
-      if(i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_ControlledDAEInput:
-      if(i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Algebraic state vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Parameter vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Control vector (dimension nu-by-1).";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Control vector, linearly interpolated (dimension nu-by-1).";  // NOLINT(whitespace/line_length)
-      if(i==6) return "State vector (dimension nx-by-1) at the last major time-step";  // NOLINT(whitespace/line_length)
-      if(i==7) return "Time at start of control interval (1-by-1)";  // NOLINT(whitespace/line_length)
-      if(i==8) return "Time at end of control interval (1-by-1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Global physical time. (1-by-1)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "non-zeros as DAEOutput:DAE_RES";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Algebraic state vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Parameter vector (dimension np-by-1).";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Control vector (dimension nu-by-1).";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Control vector, linearly interpolated (dimension nu-by-1).";  // NOLINT(whitespace/line_length)
+      if (i==6) return "State vector (dimension nx-by-1) at the last major time-step";  // NOLINT(whitespace/line_length)
+      if (i==7) return "Time at start of control interval (1-by-1)";  // NOLINT(whitespace/line_length)
+      if (i==8) return "Time at end of control interval (1-by-1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_ControlSimulatorInput:
-      if(i==0) return "Differential or algebraic state at t0  (dimension nx-by-1)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Differential or algebraic state at t0  (dimension nx-by-1)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Parameters that are fixed over the entire horizon  (dimension np-by-1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Parameters that change over the integration intervals (dimension nu-by-(ns-1))";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_HNLPInput:
-      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Homotopy parameter";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Homotopy parameter";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DAEInput:
-      if(i==0) return "Differential state";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Algebraic state";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Parameter";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Explicit time dependence";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Differential state";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Algebraic state";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Parameter";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Explicit time dependence";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_DAEOutput:
-      if(i==0) return "Right hand side of the implicit ODE";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Right hand side of algebraic equations";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Right hand side of quadratures equations";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Right hand side of the implicit ODE";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Right hand side of algebraic equations";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Right hand side of quadratures equations";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_RDAEInput:
-      if(i==0) return "Backward differential state";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Backward algebraic state";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Backward  parameter vector";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Forward differential state";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Forward algebraic state";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Parameter vector";  // NOLINT(whitespace/line_length)
-      if(i==6) return "Explicit time dependence";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Backward differential state";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Backward algebraic state";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Backward  parameter vector";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Forward differential state";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Forward algebraic state";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Parameter vector";  // NOLINT(whitespace/line_length)
+      if (i==6) return "Explicit time dependence";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_RDAEOutput:
-      if(i==0) return "Right hand side of ODE.";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Right hand side of algebraic equations.";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Right hand side of quadratures.";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Right hand side of ODE.";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Right hand side of algebraic equations.";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Right hand side of quadratures.";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_IntegratorInput:
-      if(i==0) return "Differential state at the initial time";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Parameters";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Initial guess for the algebraic variable";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Backward differential state at the final time";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Backward parameter vector";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Initial guess for the backwards algebraic variable";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Differential state at the initial time";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Parameters";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Initial guess for the algebraic variable";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Backward differential state at the final time";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Backward parameter vector";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Initial guess for the backwards algebraic variable";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_IntegratorOutput:
-      if(i==0) return "Differential state at the final time";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Quadrature state at the final time";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Algebraic variable at the final time";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Backward differential state at the initial time";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Backward quadrature state at the initial time";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Backward algebraic variable at the initial time";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Differential state at the final time";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Quadrature state at the final time";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Algebraic variable at the final time";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Backward differential state at the initial time";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Backward quadrature state at the initial time";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Backward algebraic variable at the initial time";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LinsolInput:
-      if(i==0) return "The square matrix A: sparse, (n x n).";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The right-hand-side matrix b: dense,  (n x m)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The square matrix A: sparse, (n x n).";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The right-hand-side matrix b: dense,  (n x m)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LinsolOutput:
-      if(i==0) return "Solution to the linear system of equations";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Solution to the linear system of equations";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LPSolverInput:
-      if(i==0) return "The vector c: dense (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
-      if(i==2) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The vector c: dense (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if (i==2) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LPSolverOutput:
-      if(i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_LPStruct:
-      if(i==0) return "The matrix A: sparse";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The matrix A: sparse";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPInput:
-      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPOutput:
-      if(i==0) return "Objective function";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Constraint function";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Objective function";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Constraint function";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_GradFInput:
-      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_GradFOutput:
-      if(i==0) return "Jacobian of the constraints";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Objective function";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Jacobian of the constraints";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Objective function";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_JacGInput:
-      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_JacGOutput:
-      if(i==0) return "Jacobian of the constraints";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Objective function";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Jacobian of the constraints";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Objective function";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_HessLagInput:
-      if(i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
-      if(i==2) return "NLP solver might use to scale the objective.";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Multiplier for g";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Decision variable";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Fixed parameter";  // NOLINT(whitespace/line_length)
+      if (i==2) return "NLP solver might use to scale the objective.";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Multiplier for g";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_HessLagOutput:
-      if(i==0) return "Hessian of the Lagrangian";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Objective function";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Gradient of the Lagrangian with respect to x";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Gradient of the Lagrangian with respect to p";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Hessian of the Lagrangian";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Objective function";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Constraint function";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Gradient of the Lagrangian with respect to x";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Gradient of the Lagrangian with respect to p";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPSolverInput:
-      if(i==0) return "Decision variables, initial guess (nx x 1) ";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Value of fixed parameters (np x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Decision variables lower bound (nx x 1), default -inf";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Decision variables upper bound (nx x 1), default +inf";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Constraints lower bound (ng x 1), default -inf";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Constraints upper bound (ng x 1), default +inf";  // NOLINT(whitespace/line_length)
-      if(i==6) return "Lagrange multipliers for bounds on X, initial guess (nx x 1)";  // NOLINT(whitespace/line_length)
-      if(i==7) return "Lagrange multipliers for bounds on G, initial guess (ng x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Decision variables, initial guess (nx x 1) ";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Value of fixed parameters (np x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Decision variables lower bound (nx x 1), default -inf";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Decision variables upper bound (nx x 1), default +inf";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Constraints lower bound (ng x 1), default -inf";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Constraints upper bound (ng x 1), default +inf";  // NOLINT(whitespace/line_length)
+      if (i==6) return "Lagrange multipliers for bounds on X, initial guess (nx x 1)";  // NOLINT(whitespace/line_length)
+      if (i==7) return "Lagrange multipliers for bounds on G, initial guess (ng x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_NLPSolverOutput:
-      if(i==0) return "Decision variables at the optimal solution (nx x 1)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Cost function value at the optimal solution (1 x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Constraints function at the optimal solution (ng x 1)";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Lagrange multipliers for bounds on X at the solution (nx x 1)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Lagrange multipliers for bounds on G at the solution (ng x 1)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Lagrange multipliers for bounds on P at the solution (np x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Decision variables at the optimal solution (nx x 1)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Cost function value at the optimal solution (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Constraints function at the optimal solution (ng x 1)";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Lagrange multipliers for bounds on X at the solution (nx x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Lagrange multipliers for bounds on G at the solution (ng x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Lagrange multipliers for bounds on P at the solution (np x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_MayerInput:
-      if(i==0) return "States at the end of integration (nx x 1)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Problem parameters (np x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "States at the end of integration (nx x 1)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Problem parameters (np x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_OCPInput:
-      if(i==0) return "States lower bounds (nx x (ns+1))";  // NOLINT(whitespace/line_length)
-      if(i==1) return "States upper bounds (nx x (ns+1))";  // NOLINT(whitespace/line_length)
-      if(i==2) return "States initial guess (nx x (ns+1))";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Controls lower bounds (nu x ns)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Controls upper bounds (nu x ns)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Controls initial guess (nu x ns)";  // NOLINT(whitespace/line_length)
-      if(i==6) return "Parameters lower bounds (np x 1)";  // NOLINT(whitespace/line_length)
-      if(i==7) return "Parameters upper bounds (np x 1)";  // NOLINT(whitespace/line_length)
-      if(i==8) return "Parameters initial guess (np x 1)";  // NOLINT(whitespace/line_length)
-      if(i==9) return "Point constraint lower bound (nh x (ns+1))";  // NOLINT(whitespace/line_length)
-      if(i==10) return "Point constraint upper bound (nh x (ns+1))";  // NOLINT(whitespace/line_length)
-      if(i==11) return "Lower bound for the coupling constraints";  // NOLINT(whitespace/line_length)
-      if(i==12) return "Upper bound for the coupling constraints";  // NOLINT(whitespace/line_length)
+      if (i==0) return "States lower bounds (nx x (ns+1))";  // NOLINT(whitespace/line_length)
+      if (i==1) return "States upper bounds (nx x (ns+1))";  // NOLINT(whitespace/line_length)
+      if (i==2) return "States initial guess (nx x (ns+1))";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Controls lower bounds (nu x ns)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Controls upper bounds (nu x ns)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Controls initial guess (nu x ns)";  // NOLINT(whitespace/line_length)
+      if (i==6) return "Parameters lower bounds (np x 1)";  // NOLINT(whitespace/line_length)
+      if (i==7) return "Parameters upper bounds (np x 1)";  // NOLINT(whitespace/line_length)
+      if (i==8) return "Parameters initial guess (np x 1)";  // NOLINT(whitespace/line_length)
+      if (i==9) return "Point constraint lower bound (nh x (ns+1))";  // NOLINT(whitespace/line_length)
+      if (i==10) return "Point constraint upper bound (nh x (ns+1))";  // NOLINT(whitespace/line_length)
+      if (i==11) return "Lower bound for the coupling constraints";  // NOLINT(whitespace/line_length)
+      if (i==12) return "Upper bound for the coupling constraints";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_OCPOutput:
-      if(i==0) return "Optimal state trajectory";  // NOLINT(whitespace/line_length)
-      if(i==1) return "Optimal control trajectory";  // NOLINT(whitespace/line_length)
-      if(i==2) return "Optimal parameters";  // NOLINT(whitespace/line_length)
-      if(i==3) return "Objective/cost function for optimal solution (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "Optimal state trajectory";  // NOLINT(whitespace/line_length)
+      if (i==1) return "Optimal control trajectory";  // NOLINT(whitespace/line_length)
+      if (i==2) return "Optimal parameters";  // NOLINT(whitespace/line_length)
+      if (i==3) return "Objective/cost function for optimal solution (1 x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QCQPSolverInput:
-      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "triangular part is actually used. The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The vertical stack of all qi: dense,  (nq n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "The vertical stack of all scalars ri (nq x 1) ";  // NOLINT(whitespace/line_length)
-      if(i==5) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
-      if(i==6) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==7) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==8) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==9) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==10) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==11) return "dense";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "triangular part is actually used. The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The vertical stack of all qi: dense,  (nq n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "The vertical stack of all scalars ri (nq x 1) ";  // NOLINT(whitespace/line_length)
+      if (i==5) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if (i==6) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==7) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==8) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==9) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==10) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==11) return "dense";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QCQPSolverOutput:
-      if(i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QCQPStruct:
-      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if(i==1) return "triangular part is actually used. The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if (i==1) return "triangular part is actually used. The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QPSolverInput:
-      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
-      if(i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==6) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==7) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==8) return "dense";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if (i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==6) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==7) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==8) return "dense";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QPSolverOutput:
-      if(i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The dual solution corresponding to simple bounds";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_QPStruct:
-      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDPInput:
-      if(i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==6) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
-      if(i==7) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==6) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if (i==7) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDPOutput:
-      if(i==0) return "The primal solution (n x 1) - may be used as initial guess";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The solution P (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The dual solution (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "The dual optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The primal solution (n x 1) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The solution P (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The dual solution (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "The dual optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDPStruct:
-      if(i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDQPInput:
-      if(i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==6) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==7) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
-      if(i==8) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==6) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==7) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if (i==8) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDQPOutput:
-      if(i==0) return "The primal solution (n x 1) - may be used as initial guess";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The solution P (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The dual solution (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "The dual optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The primal solution (n x 1) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The solution P (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The dual solution (m x m) - may be used as initial guess";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "The dual optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==6) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SDQPStruct:
-      if(i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The matrix H: sparse ( n x n)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The horizontal stack of all matrices F_i: ( m x nm)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The matrix G: ( m x m)";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SOCPInput:
-      if(i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The vertical stack of all vectors hi: ( N x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The vertical stack of all vectors ei: ( nm x 1)";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The vertical stack of all scalars fi: ( m x 1)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
-      if(i==6) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==7) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==8) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
-      if(i==9) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The vertical stack of all vectors hi: ( N x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The vertical stack of all vectors ei: ( nm x 1)";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The vertical stack of all scalars fi: ( m x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "The vector c: ( n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if (i==6) return "Lower bounds on Ax ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==7) return "Upper bounds on Ax  ( nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==8) return "Lower bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
+      if (i==9) return "Upper bounds on x ( n x 1 )";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SOCPOutput:
-      if(i==0) return "The primal solution (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==3) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The primal solution (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The primal optimal cost (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The dual solution corresponding to the linear constraints  (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==3) return "The dual solution corresponding to simple bounds  (n x 1)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_SOCPStruct:
-      if(i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The horizontal stack of all matrices Gi: ( n x N)";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The matrix A: ( nc x n)";  // NOLINT(whitespace/line_length)
       break;
     case SCHEME_StabilizedQPSolverInput:
-      if(i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
-      if(i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
-      if(i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==4) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==6) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==7) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
-      if(i==8) return "dense";  // NOLINT(whitespace/line_length)
-      if(i==9) return "dense (1 x 1)";  // NOLINT(whitespace/line_length)
-      if(i==10) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
-      if(i==11) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==0) return "The matrix is assumed to be symmetrical.";  // NOLINT(whitespace/line_length)
+      if (i==1) return "The vector g: dense,  (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==2) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
+      if (i==3) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==4) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==6) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==7) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
+      if (i==8) return "dense";  // NOLINT(whitespace/line_length)
+      if (i==9) return "dense (1 x 1)";  // NOLINT(whitespace/line_length)
+      if (i==10) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
+      if (i==11) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
       break;
   }
   casadi_error( "getSchemeEntryDoc: supplied number is out of range. Scheme '"
@@ -800,311 +800,311 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
     case SCHEME_DPLEInput:
-      if(i==0) return "DPLE_A";
-      if(i==1) return "DPLE_V";
+      if (i==0) return "DPLE_A";
+      if (i==1) return "DPLE_V";
       break;
     case SCHEME_DPLEOutput:
-      if(i==0) return "DPLE_P";
+      if (i==0) return "DPLE_P";
       break;
     case SCHEME_ControlledDAEInput:
-      if(i==0) return "CONTROL_DAE_T";
-      if(i==1) return "CONTROL_DAE_X";
-      if(i==2) return "CONTROL_DAE_Z";
-      if(i==3) return "CONTROL_DAE_P";
-      if(i==4) return "CONTROL_DAE_U";
-      if(i==5) return "CONTROL_DAE_U_INTERP";
-      if(i==6) return "CONTROL_DAE_X_MAJOR";
-      if(i==7) return "CONTROL_DAE_T0";
-      if(i==8) return "CONTROL_DAE_TF";
+      if (i==0) return "CONTROL_DAE_T";
+      if (i==1) return "CONTROL_DAE_X";
+      if (i==2) return "CONTROL_DAE_Z";
+      if (i==3) return "CONTROL_DAE_P";
+      if (i==4) return "CONTROL_DAE_U";
+      if (i==5) return "CONTROL_DAE_U_INTERP";
+      if (i==6) return "CONTROL_DAE_X_MAJOR";
+      if (i==7) return "CONTROL_DAE_T0";
+      if (i==8) return "CONTROL_DAE_TF";
       break;
     case SCHEME_ControlSimulatorInput:
-      if(i==0) return "CONTROLSIMULATOR_X0";
-      if(i==1) return "CONTROLSIMULATOR_P";
-      if(i==2) return "CONTROLSIMULATOR_U";
+      if (i==0) return "CONTROLSIMULATOR_X0";
+      if (i==1) return "CONTROLSIMULATOR_P";
+      if (i==2) return "CONTROLSIMULATOR_U";
       break;
     case SCHEME_HNLPInput:
-      if(i==0) return "HNL_X";
-      if(i==1) return "HNL_P";
-      if(i==2) return "HNL_TAU";
+      if (i==0) return "HNL_X";
+      if (i==1) return "HNL_P";
+      if (i==2) return "HNL_TAU";
       break;
     case SCHEME_DAEInput:
-      if(i==0) return "DAE_X";
-      if(i==1) return "DAE_Z";
-      if(i==2) return "DAE_P";
-      if(i==3) return "DAE_T";
+      if (i==0) return "DAE_X";
+      if (i==1) return "DAE_Z";
+      if (i==2) return "DAE_P";
+      if (i==3) return "DAE_T";
       break;
     case SCHEME_DAEOutput:
-      if(i==0) return "DAE_ODE";
-      if(i==1) return "DAE_ALG";
-      if(i==2) return "DAE_QUAD";
+      if (i==0) return "DAE_ODE";
+      if (i==1) return "DAE_ALG";
+      if (i==2) return "DAE_QUAD";
       break;
     case SCHEME_RDAEInput:
-      if(i==0) return "RDAE_RX";
-      if(i==1) return "RDAE_RZ";
-      if(i==2) return "RDAE_RP";
-      if(i==3) return "RDAE_X";
-      if(i==4) return "RDAE_Z";
-      if(i==5) return "RDAE_P";
-      if(i==6) return "RDAE_T";
+      if (i==0) return "RDAE_RX";
+      if (i==1) return "RDAE_RZ";
+      if (i==2) return "RDAE_RP";
+      if (i==3) return "RDAE_X";
+      if (i==4) return "RDAE_Z";
+      if (i==5) return "RDAE_P";
+      if (i==6) return "RDAE_T";
       break;
     case SCHEME_RDAEOutput:
-      if(i==0) return "RDAE_ODE";
-      if(i==1) return "RDAE_ALG";
-      if(i==2) return "RDAE_QUAD";
+      if (i==0) return "RDAE_ODE";
+      if (i==1) return "RDAE_ALG";
+      if (i==2) return "RDAE_QUAD";
       break;
     case SCHEME_IntegratorInput:
-      if(i==0) return "INTEGRATOR_X0";
-      if(i==1) return "INTEGRATOR_P";
-      if(i==2) return "INTEGRATOR_Z0";
-      if(i==3) return "INTEGRATOR_RX0";
-      if(i==4) return "INTEGRATOR_RP";
-      if(i==5) return "INTEGRATOR_RZ0";
+      if (i==0) return "INTEGRATOR_X0";
+      if (i==1) return "INTEGRATOR_P";
+      if (i==2) return "INTEGRATOR_Z0";
+      if (i==3) return "INTEGRATOR_RX0";
+      if (i==4) return "INTEGRATOR_RP";
+      if (i==5) return "INTEGRATOR_RZ0";
       break;
     case SCHEME_IntegratorOutput:
-      if(i==0) return "INTEGRATOR_XF";
-      if(i==1) return "INTEGRATOR_QF";
-      if(i==2) return "INTEGRATOR_ZF";
-      if(i==3) return "INTEGRATOR_RXF";
-      if(i==4) return "INTEGRATOR_RQF";
-      if(i==5) return "INTEGRATOR_RZF";
+      if (i==0) return "INTEGRATOR_XF";
+      if (i==1) return "INTEGRATOR_QF";
+      if (i==2) return "INTEGRATOR_ZF";
+      if (i==3) return "INTEGRATOR_RXF";
+      if (i==4) return "INTEGRATOR_RQF";
+      if (i==5) return "INTEGRATOR_RZF";
       break;
     case SCHEME_LinsolInput:
-      if(i==0) return "LINSOL_A";
-      if(i==1) return "LINSOL_B";
+      if (i==0) return "LINSOL_A";
+      if (i==1) return "LINSOL_B";
       break;
     case SCHEME_LinsolOutput:
-      if(i==0) return "LINSOL_X";
+      if (i==0) return "LINSOL_X";
       break;
     case SCHEME_LPSolverInput:
-      if(i==0) return "LP_SOLVER_C";
-      if(i==1) return "LP_SOLVER_A";
-      if(i==2) return "LP_SOLVER_LBA";
-      if(i==3) return "LP_SOLVER_UBA";
-      if(i==4) return "LP_SOLVER_LBX";
-      if(i==5) return "LP_SOLVER_UBX";
+      if (i==0) return "LP_SOLVER_C";
+      if (i==1) return "LP_SOLVER_A";
+      if (i==2) return "LP_SOLVER_LBA";
+      if (i==3) return "LP_SOLVER_UBA";
+      if (i==4) return "LP_SOLVER_LBX";
+      if (i==5) return "LP_SOLVER_UBX";
       break;
     case SCHEME_LPSolverOutput:
-      if(i==0) return "LP_SOLVER_X";
-      if(i==1) return "LP_SOLVER_COST";
-      if(i==2) return "LP_SOLVER_LAM_A";
-      if(i==3) return "LP_SOLVER_LAM_X";
+      if (i==0) return "LP_SOLVER_X";
+      if (i==1) return "LP_SOLVER_COST";
+      if (i==2) return "LP_SOLVER_LAM_A";
+      if (i==3) return "LP_SOLVER_LAM_X";
       break;
     case SCHEME_LPStruct:
-      if(i==0) return "LP_STRUCT_A";
+      if (i==0) return "LP_STRUCT_A";
       break;
     case SCHEME_NLPInput:
-      if(i==0) return "NL_X";
-      if(i==1) return "NL_P";
+      if (i==0) return "NL_X";
+      if (i==1) return "NL_P";
       break;
     case SCHEME_NLPOutput:
-      if(i==0) return "NL_F";
-      if(i==1) return "NL_G";
+      if (i==0) return "NL_F";
+      if (i==1) return "NL_G";
       break;
     case SCHEME_GradFInput:
-      if(i==0) return "GRADF_X";
-      if(i==1) return "GRADF_P";
+      if (i==0) return "GRADF_X";
+      if (i==1) return "GRADF_P";
       break;
     case SCHEME_GradFOutput:
-      if(i==0) return "GRADF_GRAD";
-      if(i==1) return "GRADF_F";
-      if(i==2) return "GRADF_G";
+      if (i==0) return "GRADF_GRAD";
+      if (i==1) return "GRADF_F";
+      if (i==2) return "GRADF_G";
       break;
     case SCHEME_JacGInput:
-      if(i==0) return "JACG_X";
-      if(i==1) return "JACG_P";
+      if (i==0) return "JACG_X";
+      if (i==1) return "JACG_P";
       break;
     case SCHEME_JacGOutput:
-      if(i==0) return "JACG_JAC";
-      if(i==1) return "JACG_F";
-      if(i==2) return "JACG_G";
+      if (i==0) return "JACG_JAC";
+      if (i==1) return "JACG_F";
+      if (i==2) return "JACG_G";
       break;
     case SCHEME_HessLagInput:
-      if(i==0) return "HESSLAG_X";
-      if(i==1) return "HESSLAG_P";
-      if(i==2) return "HESSLAG_LAM_F";
-      if(i==3) return "HESSLAG_LAM_G";
+      if (i==0) return "HESSLAG_X";
+      if (i==1) return "HESSLAG_P";
+      if (i==2) return "HESSLAG_LAM_F";
+      if (i==3) return "HESSLAG_LAM_G";
       break;
     case SCHEME_HessLagOutput:
-      if(i==0) return "HESSLAG_HESS";
-      if(i==1) return "HESSLAG_F";
-      if(i==2) return "HESSLAG_G";
-      if(i==3) return "HESSLAG_GRAD_X";
-      if(i==4) return "HESSLAG_GRAD_P";
+      if (i==0) return "HESSLAG_HESS";
+      if (i==1) return "HESSLAG_F";
+      if (i==2) return "HESSLAG_G";
+      if (i==3) return "HESSLAG_GRAD_X";
+      if (i==4) return "HESSLAG_GRAD_P";
       break;
     case SCHEME_NLPSolverInput:
-      if(i==0) return "NLP_SOLVER_X0";
-      if(i==1) return "NLP_SOLVER_P";
-      if(i==2) return "NLP_SOLVER_LBX";
-      if(i==3) return "NLP_SOLVER_UBX";
-      if(i==4) return "NLP_SOLVER_LBG";
-      if(i==5) return "NLP_SOLVER_UBG";
-      if(i==6) return "NLP_SOLVER_LAM_X0";
-      if(i==7) return "NLP_SOLVER_LAM_G0";
+      if (i==0) return "NLP_SOLVER_X0";
+      if (i==1) return "NLP_SOLVER_P";
+      if (i==2) return "NLP_SOLVER_LBX";
+      if (i==3) return "NLP_SOLVER_UBX";
+      if (i==4) return "NLP_SOLVER_LBG";
+      if (i==5) return "NLP_SOLVER_UBG";
+      if (i==6) return "NLP_SOLVER_LAM_X0";
+      if (i==7) return "NLP_SOLVER_LAM_G0";
       break;
     case SCHEME_NLPSolverOutput:
-      if(i==0) return "NLP_SOLVER_X";
-      if(i==1) return "NLP_SOLVER_F";
-      if(i==2) return "NLP_SOLVER_G";
-      if(i==3) return "NLP_SOLVER_LAM_X";
-      if(i==4) return "NLP_SOLVER_LAM_G";
-      if(i==5) return "NLP_SOLVER_LAM_P";
+      if (i==0) return "NLP_SOLVER_X";
+      if (i==1) return "NLP_SOLVER_F";
+      if (i==2) return "NLP_SOLVER_G";
+      if (i==3) return "NLP_SOLVER_LAM_X";
+      if (i==4) return "NLP_SOLVER_LAM_G";
+      if (i==5) return "NLP_SOLVER_LAM_P";
       break;
     case SCHEME_MayerInput:
-      if(i==0) return "MAYER_X";
-      if(i==1) return "MAYER_P";
+      if (i==0) return "MAYER_X";
+      if (i==1) return "MAYER_P";
       break;
     case SCHEME_OCPInput:
-      if(i==0) return "OCP_LBX";
-      if(i==1) return "OCP_UBX";
-      if(i==2) return "OCP_X_INIT";
-      if(i==3) return "OCP_LBU";
-      if(i==4) return "OCP_UBU";
-      if(i==5) return "OCP_U_INIT";
-      if(i==6) return "OCP_LBP";
-      if(i==7) return "OCP_UBP";
-      if(i==8) return "OCP_P_INIT";
-      if(i==9) return "OCP_LBH";
-      if(i==10) return "OCP_UBH";
-      if(i==11) return "OCP_LBG";
-      if(i==12) return "OCP_UBG";
+      if (i==0) return "OCP_LBX";
+      if (i==1) return "OCP_UBX";
+      if (i==2) return "OCP_X_INIT";
+      if (i==3) return "OCP_LBU";
+      if (i==4) return "OCP_UBU";
+      if (i==5) return "OCP_U_INIT";
+      if (i==6) return "OCP_LBP";
+      if (i==7) return "OCP_UBP";
+      if (i==8) return "OCP_P_INIT";
+      if (i==9) return "OCP_LBH";
+      if (i==10) return "OCP_UBH";
+      if (i==11) return "OCP_LBG";
+      if (i==12) return "OCP_UBG";
       break;
     case SCHEME_OCPOutput:
-      if(i==0) return "OCP_X_OPT";
-      if(i==1) return "OCP_U_OPT";
-      if(i==2) return "OCP_P_OPT";
-      if(i==3) return "OCP_COST";
+      if (i==0) return "OCP_X_OPT";
+      if (i==1) return "OCP_U_OPT";
+      if (i==2) return "OCP_P_OPT";
+      if (i==3) return "OCP_COST";
       break;
     case SCHEME_QCQPSolverInput:
-      if(i==0) return "QCQP_SOLVER_H";
-      if(i==1) return "QCQP_SOLVER_G";
-      if(i==2) return "QCQP_SOLVER_P";
-      if(i==3) return "QCQP_SOLVER_Q";
-      if(i==4) return "QCQP_SOLVER_R";
-      if(i==5) return "QCQP_SOLVER_A";
-      if(i==6) return "QCQP_SOLVER_LBA";
-      if(i==7) return "QCQP_SOLVER_UBA";
-      if(i==8) return "QCQP_SOLVER_LBX";
-      if(i==9) return "QCQP_SOLVER_UBX";
-      if(i==10) return "QCQP_SOLVER_X0";
-      if(i==11) return "QCQP_SOLVER_LAM_X0";
+      if (i==0) return "QCQP_SOLVER_H";
+      if (i==1) return "QCQP_SOLVER_G";
+      if (i==2) return "QCQP_SOLVER_P";
+      if (i==3) return "QCQP_SOLVER_Q";
+      if (i==4) return "QCQP_SOLVER_R";
+      if (i==5) return "QCQP_SOLVER_A";
+      if (i==6) return "QCQP_SOLVER_LBA";
+      if (i==7) return "QCQP_SOLVER_UBA";
+      if (i==8) return "QCQP_SOLVER_LBX";
+      if (i==9) return "QCQP_SOLVER_UBX";
+      if (i==10) return "QCQP_SOLVER_X0";
+      if (i==11) return "QCQP_SOLVER_LAM_X0";
       break;
     case SCHEME_QCQPSolverOutput:
-      if(i==0) return "QCQP_SOLVER_X";
-      if(i==1) return "QCQP_SOLVER_COST";
-      if(i==2) return "QCQP_SOLVER_LAM_A";
-      if(i==3) return "QCQP_SOLVER_LAM_X";
+      if (i==0) return "QCQP_SOLVER_X";
+      if (i==1) return "QCQP_SOLVER_COST";
+      if (i==2) return "QCQP_SOLVER_LAM_A";
+      if (i==3) return "QCQP_SOLVER_LAM_X";
       break;
     case SCHEME_QCQPStruct:
-      if(i==0) return "QCQP_STRUCT_H";
-      if(i==1) return "QCQP_STRUCT_P";
-      if(i==2) return "QCQP_STRUCT_A";
+      if (i==0) return "QCQP_STRUCT_H";
+      if (i==1) return "QCQP_STRUCT_P";
+      if (i==2) return "QCQP_STRUCT_A";
       break;
     case SCHEME_QPSolverInput:
-      if(i==0) return "QP_SOLVER_H";
-      if(i==1) return "QP_SOLVER_G";
-      if(i==2) return "QP_SOLVER_A";
-      if(i==3) return "QP_SOLVER_LBA";
-      if(i==4) return "QP_SOLVER_UBA";
-      if(i==5) return "QP_SOLVER_LBX";
-      if(i==6) return "QP_SOLVER_UBX";
-      if(i==7) return "QP_SOLVER_X0";
-      if(i==8) return "QP_SOLVER_LAM_X0";
+      if (i==0) return "QP_SOLVER_H";
+      if (i==1) return "QP_SOLVER_G";
+      if (i==2) return "QP_SOLVER_A";
+      if (i==3) return "QP_SOLVER_LBA";
+      if (i==4) return "QP_SOLVER_UBA";
+      if (i==5) return "QP_SOLVER_LBX";
+      if (i==6) return "QP_SOLVER_UBX";
+      if (i==7) return "QP_SOLVER_X0";
+      if (i==8) return "QP_SOLVER_LAM_X0";
       break;
     case SCHEME_QPSolverOutput:
-      if(i==0) return "QP_SOLVER_X";
-      if(i==1) return "QP_SOLVER_COST";
-      if(i==2) return "QP_SOLVER_LAM_A";
-      if(i==3) return "QP_SOLVER_LAM_X";
+      if (i==0) return "QP_SOLVER_X";
+      if (i==1) return "QP_SOLVER_COST";
+      if (i==2) return "QP_SOLVER_LAM_A";
+      if (i==3) return "QP_SOLVER_LAM_X";
       break;
     case SCHEME_QPStruct:
-      if(i==0) return "QP_STRUCT_H";
-      if(i==1) return "QP_STRUCT_A";
+      if (i==0) return "QP_STRUCT_H";
+      if (i==1) return "QP_STRUCT_A";
       break;
     case SCHEME_SDPInput:
-      if(i==0) return "SDP_SOLVER_F";
-      if(i==1) return "SDP_SOLVER_C";
-      if(i==2) return "SDP_SOLVER_G";
-      if(i==3) return "SDP_SOLVER_A";
-      if(i==4) return "SDP_SOLVER_LBA";
-      if(i==5) return "SDP_SOLVER_UBA";
-      if(i==6) return "SDP_SOLVER_LBX";
-      if(i==7) return "SDP_SOLVER_UBX";
+      if (i==0) return "SDP_SOLVER_F";
+      if (i==1) return "SDP_SOLVER_C";
+      if (i==2) return "SDP_SOLVER_G";
+      if (i==3) return "SDP_SOLVER_A";
+      if (i==4) return "SDP_SOLVER_LBA";
+      if (i==5) return "SDP_SOLVER_UBA";
+      if (i==6) return "SDP_SOLVER_LBX";
+      if (i==7) return "SDP_SOLVER_UBX";
       break;
     case SCHEME_SDPOutput:
-      if(i==0) return "SDP_SOLVER_X";
-      if(i==1) return "SDP_SOLVER_P";
-      if(i==2) return "SDP_SOLVER_DUAL";
-      if(i==3) return "SDP_SOLVER_COST";
-      if(i==4) return "SDP_SOLVER_DUAL_COST";
-      if(i==5) return "SDP_SOLVER_LAM_A";
-      if(i==6) return "SDP_SOLVER_LAM_X";
+      if (i==0) return "SDP_SOLVER_X";
+      if (i==1) return "SDP_SOLVER_P";
+      if (i==2) return "SDP_SOLVER_DUAL";
+      if (i==3) return "SDP_SOLVER_COST";
+      if (i==4) return "SDP_SOLVER_DUAL_COST";
+      if (i==5) return "SDP_SOLVER_LAM_A";
+      if (i==6) return "SDP_SOLVER_LAM_X";
       break;
     case SCHEME_SDPStruct:
-      if(i==0) return "SDP_STRUCT_F";
-      if(i==1) return "SDP_STRUCT_G";
-      if(i==2) return "SDP_STRUCT_A";
+      if (i==0) return "SDP_STRUCT_F";
+      if (i==1) return "SDP_STRUCT_G";
+      if (i==2) return "SDP_STRUCT_A";
       break;
     case SCHEME_SDQPInput:
-      if(i==0) return "SDQP_SOLVER_H";
-      if(i==1) return "SDQP_SOLVER_C";
-      if(i==2) return "SDQP_SOLVER_F";
-      if(i==3) return "SDQP_SOLVER_G";
-      if(i==4) return "SDQP_SOLVER_A";
-      if(i==5) return "SDQP_SOLVER_LBA";
-      if(i==6) return "SDQP_SOLVER_UBA";
-      if(i==7) return "SDQP_SOLVER_LBX";
-      if(i==8) return "SDQP_SOLVER_UBX";
+      if (i==0) return "SDQP_SOLVER_H";
+      if (i==1) return "SDQP_SOLVER_C";
+      if (i==2) return "SDQP_SOLVER_F";
+      if (i==3) return "SDQP_SOLVER_G";
+      if (i==4) return "SDQP_SOLVER_A";
+      if (i==5) return "SDQP_SOLVER_LBA";
+      if (i==6) return "SDQP_SOLVER_UBA";
+      if (i==7) return "SDQP_SOLVER_LBX";
+      if (i==8) return "SDQP_SOLVER_UBX";
       break;
     case SCHEME_SDQPOutput:
-      if(i==0) return "SDQP_SOLVER_X";
-      if(i==1) return "SDQP_SOLVER_P";
-      if(i==2) return "SDQP_SOLVER_DUAL";
-      if(i==3) return "SDQP_SOLVER_COST";
-      if(i==4) return "SDQP_SOLVER_DUAL_COST";
-      if(i==5) return "SDQP_SOLVER_LAM_A";
-      if(i==6) return "SDQP_SOLVER_LAM_X";
+      if (i==0) return "SDQP_SOLVER_X";
+      if (i==1) return "SDQP_SOLVER_P";
+      if (i==2) return "SDQP_SOLVER_DUAL";
+      if (i==3) return "SDQP_SOLVER_COST";
+      if (i==4) return "SDQP_SOLVER_DUAL_COST";
+      if (i==5) return "SDQP_SOLVER_LAM_A";
+      if (i==6) return "SDQP_SOLVER_LAM_X";
       break;
     case SCHEME_SDQPStruct:
-      if(i==0) return "SDQP_STRUCT_H";
-      if(i==1) return "SDQP_STRUCT_F";
-      if(i==2) return "SDQP_STRUCT_G";
-      if(i==3) return "SDQP_STRUCT_A";
+      if (i==0) return "SDQP_STRUCT_H";
+      if (i==1) return "SDQP_STRUCT_F";
+      if (i==2) return "SDQP_STRUCT_G";
+      if (i==3) return "SDQP_STRUCT_A";
       break;
     case SCHEME_SOCPInput:
-      if(i==0) return "SOCP_SOLVER_G";
-      if(i==1) return "SOCP_SOLVER_H";
-      if(i==2) return "SOCP_SOLVER_E";
-      if(i==3) return "SOCP_SOLVER_F";
-      if(i==4) return "SOCP_SOLVER_C";
-      if(i==5) return "SOCP_SOLVER_A";
-      if(i==6) return "SOCP_SOLVER_LBA";
-      if(i==7) return "SOCP_SOLVER_UBA";
-      if(i==8) return "SOCP_SOLVER_LBX";
-      if(i==9) return "SOCP_SOLVER_UBX";
+      if (i==0) return "SOCP_SOLVER_G";
+      if (i==1) return "SOCP_SOLVER_H";
+      if (i==2) return "SOCP_SOLVER_E";
+      if (i==3) return "SOCP_SOLVER_F";
+      if (i==4) return "SOCP_SOLVER_C";
+      if (i==5) return "SOCP_SOLVER_A";
+      if (i==6) return "SOCP_SOLVER_LBA";
+      if (i==7) return "SOCP_SOLVER_UBA";
+      if (i==8) return "SOCP_SOLVER_LBX";
+      if (i==9) return "SOCP_SOLVER_UBX";
       break;
     case SCHEME_SOCPOutput:
-      if(i==0) return "SOCP_SOLVER_X";
-      if(i==1) return "SOCP_SOLVER_COST";
-      if(i==2) return "SOCP_SOLVER_LAM_A";
-      if(i==3) return "SOCP_SOLVER_LAM_X";
+      if (i==0) return "SOCP_SOLVER_X";
+      if (i==1) return "SOCP_SOLVER_COST";
+      if (i==2) return "SOCP_SOLVER_LAM_A";
+      if (i==3) return "SOCP_SOLVER_LAM_X";
       break;
     case SCHEME_SOCPStruct:
-      if(i==0) return "SOCP_STRUCT_G";
-      if(i==1) return "SOCP_STRUCT_A";
+      if (i==0) return "SOCP_STRUCT_G";
+      if (i==1) return "SOCP_STRUCT_A";
       break;
     case SCHEME_StabilizedQPSolverInput:
-      if(i==0) return "STABILIZED_QP_SOLVER_H";
-      if(i==1) return "STABILIZED_QP_SOLVER_G";
-      if(i==2) return "STABILIZED_QP_SOLVER_A";
-      if(i==3) return "STABILIZED_QP_SOLVER_LBA";
-      if(i==4) return "STABILIZED_QP_SOLVER_UBA";
-      if(i==5) return "STABILIZED_QP_SOLVER_LBX";
-      if(i==6) return "STABILIZED_QP_SOLVER_UBX";
-      if(i==7) return "STABILIZED_QP_SOLVER_X0";
-      if(i==8) return "STABILIZED_QP_SOLVER_LAM_X0";
-      if(i==9) return "STABILIZED_QP_SOLVER_MUR";
-      if(i==10) return "STABILIZED_QP_SOLVER_MUE";
-      if(i==11) return "STABILIZED_QP_SOLVER_MU";
+      if (i==0) return "STABILIZED_QP_SOLVER_H";
+      if (i==1) return "STABILIZED_QP_SOLVER_G";
+      if (i==2) return "STABILIZED_QP_SOLVER_A";
+      if (i==3) return "STABILIZED_QP_SOLVER_LBA";
+      if (i==4) return "STABILIZED_QP_SOLVER_UBA";
+      if (i==5) return "STABILIZED_QP_SOLVER_LBX";
+      if (i==6) return "STABILIZED_QP_SOLVER_UBX";
+      if (i==7) return "STABILIZED_QP_SOLVER_X0";
+      if (i==8) return "STABILIZED_QP_SOLVER_LAM_X0";
+      if (i==9) return "STABILIZED_QP_SOLVER_MUR";
+      if (i==10) return "STABILIZED_QP_SOLVER_MUE";
+      if (i==11) return "STABILIZED_QP_SOLVER_MU";
       break;
   }
   casadi_error( "getSchemeEntryEnumName: supplied number is out of range. Scheme '"
@@ -1255,311 +1255,311 @@ int getSchemeSize(InputOutputScheme scheme) {
 int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
   switch (scheme) {
     case SCHEME_DPLEInput:
-      if(name=="a") return 0;
-      if(name=="v") return 1;
+      if (name=="a") return 0;
+      if (name=="v") return 1;
       break;
     case SCHEME_DPLEOutput:
-      if(name=="p") return 0;
+      if (name=="p") return 0;
       break;
     case SCHEME_ControlledDAEInput:
-      if(name=="t") return 0;
-      if(name=="x") return 1;
-      if(name=="z") return 2;
-      if(name=="p") return 3;
-      if(name=="u") return 4;
-      if(name=="u_interp") return 5;
-      if(name=="x_major") return 6;
-      if(name=="t0") return 7;
-      if(name=="tf") return 8;
+      if (name=="t") return 0;
+      if (name=="x") return 1;
+      if (name=="z") return 2;
+      if (name=="p") return 3;
+      if (name=="u") return 4;
+      if (name=="u_interp") return 5;
+      if (name=="x_major") return 6;
+      if (name=="t0") return 7;
+      if (name=="tf") return 8;
       break;
     case SCHEME_ControlSimulatorInput:
-      if(name=="x0") return 0;
-      if(name=="p") return 1;
-      if(name=="u") return 2;
+      if (name=="x0") return 0;
+      if (name=="p") return 1;
+      if (name=="u") return 2;
       break;
     case SCHEME_HNLPInput:
-      if(name=="x") return 0;
-      if(name=="p") return 1;
-      if(name=="tau") return 2;
+      if (name=="x") return 0;
+      if (name=="p") return 1;
+      if (name=="tau") return 2;
       break;
     case SCHEME_DAEInput:
-      if(name=="x") return 0;
-      if(name=="z") return 1;
-      if(name=="p") return 2;
-      if(name=="t") return 3;
+      if (name=="x") return 0;
+      if (name=="z") return 1;
+      if (name=="p") return 2;
+      if (name=="t") return 3;
       break;
     case SCHEME_DAEOutput:
-      if(name=="ode") return 0;
-      if(name=="alg") return 1;
-      if(name=="quad") return 2;
+      if (name=="ode") return 0;
+      if (name=="alg") return 1;
+      if (name=="quad") return 2;
       break;
     case SCHEME_RDAEInput:
-      if(name=="rx") return 0;
-      if(name=="rz") return 1;
-      if(name=="rp") return 2;
-      if(name=="x") return 3;
-      if(name=="z") return 4;
-      if(name=="p") return 5;
-      if(name=="t") return 6;
+      if (name=="rx") return 0;
+      if (name=="rz") return 1;
+      if (name=="rp") return 2;
+      if (name=="x") return 3;
+      if (name=="z") return 4;
+      if (name=="p") return 5;
+      if (name=="t") return 6;
       break;
     case SCHEME_RDAEOutput:
-      if(name=="ode") return 0;
-      if(name=="alg") return 1;
-      if(name=="quad") return 2;
+      if (name=="ode") return 0;
+      if (name=="alg") return 1;
+      if (name=="quad") return 2;
       break;
     case SCHEME_IntegratorInput:
-      if(name=="x0") return 0;
-      if(name=="p") return 1;
-      if(name=="z0") return 2;
-      if(name=="rx0") return 3;
-      if(name=="rp") return 4;
-      if(name=="rz0") return 5;
+      if (name=="x0") return 0;
+      if (name=="p") return 1;
+      if (name=="z0") return 2;
+      if (name=="rx0") return 3;
+      if (name=="rp") return 4;
+      if (name=="rz0") return 5;
       break;
     case SCHEME_IntegratorOutput:
-      if(name=="xf") return 0;
-      if(name=="qf") return 1;
-      if(name=="zf") return 2;
-      if(name=="rxf") return 3;
-      if(name=="rqf") return 4;
-      if(name=="rzf") return 5;
+      if (name=="xf") return 0;
+      if (name=="qf") return 1;
+      if (name=="zf") return 2;
+      if (name=="rxf") return 3;
+      if (name=="rqf") return 4;
+      if (name=="rzf") return 5;
       break;
     case SCHEME_LinsolInput:
-      if(name=="A") return 0;
-      if(name=="B") return 1;
+      if (name=="A") return 0;
+      if (name=="B") return 1;
       break;
     case SCHEME_LinsolOutput:
-      if(name=="X") return 0;
+      if (name=="X") return 0;
       break;
     case SCHEME_LPSolverInput:
-      if(name=="c") return 0;
-      if(name=="a") return 1;
-      if(name=="lba") return 2;
-      if(name=="uba") return 3;
-      if(name=="lbx") return 4;
-      if(name=="ubx") return 5;
+      if (name=="c") return 0;
+      if (name=="a") return 1;
+      if (name=="lba") return 2;
+      if (name=="uba") return 3;
+      if (name=="lbx") return 4;
+      if (name=="ubx") return 5;
       break;
     case SCHEME_LPSolverOutput:
-      if(name=="x") return 0;
-      if(name=="cost") return 1;
-      if(name=="lam_a") return 2;
-      if(name=="lam_x") return 3;
+      if (name=="x") return 0;
+      if (name=="cost") return 1;
+      if (name=="lam_a") return 2;
+      if (name=="lam_x") return 3;
       break;
     case SCHEME_LPStruct:
-      if(name=="a") return 0;
+      if (name=="a") return 0;
       break;
     case SCHEME_NLPInput:
-      if(name=="x") return 0;
-      if(name=="p") return 1;
+      if (name=="x") return 0;
+      if (name=="p") return 1;
       break;
     case SCHEME_NLPOutput:
-      if(name=="f") return 0;
-      if(name=="g") return 1;
+      if (name=="f") return 0;
+      if (name=="g") return 1;
       break;
     case SCHEME_GradFInput:
-      if(name=="x") return 0;
-      if(name=="p") return 1;
+      if (name=="x") return 0;
+      if (name=="p") return 1;
       break;
     case SCHEME_GradFOutput:
-      if(name=="grad") return 0;
-      if(name=="f") return 1;
-      if(name=="g") return 2;
+      if (name=="grad") return 0;
+      if (name=="f") return 1;
+      if (name=="g") return 2;
       break;
     case SCHEME_JacGInput:
-      if(name=="x") return 0;
-      if(name=="p") return 1;
+      if (name=="x") return 0;
+      if (name=="p") return 1;
       break;
     case SCHEME_JacGOutput:
-      if(name=="jac") return 0;
-      if(name=="f") return 1;
-      if(name=="g") return 2;
+      if (name=="jac") return 0;
+      if (name=="f") return 1;
+      if (name=="g") return 2;
       break;
     case SCHEME_HessLagInput:
-      if(name=="x") return 0;
-      if(name=="p") return 1;
-      if(name=="lam_f") return 2;
-      if(name=="lam_g") return 3;
+      if (name=="x") return 0;
+      if (name=="p") return 1;
+      if (name=="lam_f") return 2;
+      if (name=="lam_g") return 3;
       break;
     case SCHEME_HessLagOutput:
-      if(name=="hess") return 0;
-      if(name=="f") return 1;
-      if(name=="g") return 2;
-      if(name=="grad_x") return 3;
-      if(name=="grad_p") return 4;
+      if (name=="hess") return 0;
+      if (name=="f") return 1;
+      if (name=="g") return 2;
+      if (name=="grad_x") return 3;
+      if (name=="grad_p") return 4;
       break;
     case SCHEME_NLPSolverInput:
-      if(name=="x0") return 0;
-      if(name=="p") return 1;
-      if(name=="lbx") return 2;
-      if(name=="ubx") return 3;
-      if(name=="lbg") return 4;
-      if(name=="ubg") return 5;
-      if(name=="lam_x0") return 6;
-      if(name=="lam_g0") return 7;
+      if (name=="x0") return 0;
+      if (name=="p") return 1;
+      if (name=="lbx") return 2;
+      if (name=="ubx") return 3;
+      if (name=="lbg") return 4;
+      if (name=="ubg") return 5;
+      if (name=="lam_x0") return 6;
+      if (name=="lam_g0") return 7;
       break;
     case SCHEME_NLPSolverOutput:
-      if(name=="x") return 0;
-      if(name=="f") return 1;
-      if(name=="g") return 2;
-      if(name=="lam_x") return 3;
-      if(name=="lam_g") return 4;
-      if(name=="lam_p") return 5;
+      if (name=="x") return 0;
+      if (name=="f") return 1;
+      if (name=="g") return 2;
+      if (name=="lam_x") return 3;
+      if (name=="lam_g") return 4;
+      if (name=="lam_p") return 5;
       break;
     case SCHEME_MayerInput:
-      if(name=="x") return 0;
-      if(name=="p") return 1;
+      if (name=="x") return 0;
+      if (name=="p") return 1;
       break;
     case SCHEME_OCPInput:
-      if(name=="lbx") return 0;
-      if(name=="ubx") return 1;
-      if(name=="x_init") return 2;
-      if(name=="lbu") return 3;
-      if(name=="ubu") return 4;
-      if(name=="u_init") return 5;
-      if(name=="lbp") return 6;
-      if(name=="ubp") return 7;
-      if(name=="p_init") return 8;
-      if(name=="lbh") return 9;
-      if(name=="ubh") return 10;
-      if(name=="lbg") return 11;
-      if(name=="ubg") return 12;
+      if (name=="lbx") return 0;
+      if (name=="ubx") return 1;
+      if (name=="x_init") return 2;
+      if (name=="lbu") return 3;
+      if (name=="ubu") return 4;
+      if (name=="u_init") return 5;
+      if (name=="lbp") return 6;
+      if (name=="ubp") return 7;
+      if (name=="p_init") return 8;
+      if (name=="lbh") return 9;
+      if (name=="ubh") return 10;
+      if (name=="lbg") return 11;
+      if (name=="ubg") return 12;
       break;
     case SCHEME_OCPOutput:
-      if(name=="x_opt") return 0;
-      if(name=="u_opt") return 1;
-      if(name=="p_opt") return 2;
-      if(name=="cost") return 3;
+      if (name=="x_opt") return 0;
+      if (name=="u_opt") return 1;
+      if (name=="p_opt") return 2;
+      if (name=="cost") return 3;
       break;
     case SCHEME_QCQPSolverInput:
-      if(name=="h") return 0;
-      if(name=="g") return 1;
-      if(name=="p") return 2;
-      if(name=="q") return 3;
-      if(name=="r") return 4;
-      if(name=="a") return 5;
-      if(name=="lba") return 6;
-      if(name=="uba") return 7;
-      if(name=="lbx") return 8;
-      if(name=="ubx") return 9;
-      if(name=="x0") return 10;
-      if(name=="lam_x0") return 11;
+      if (name=="h") return 0;
+      if (name=="g") return 1;
+      if (name=="p") return 2;
+      if (name=="q") return 3;
+      if (name=="r") return 4;
+      if (name=="a") return 5;
+      if (name=="lba") return 6;
+      if (name=="uba") return 7;
+      if (name=="lbx") return 8;
+      if (name=="ubx") return 9;
+      if (name=="x0") return 10;
+      if (name=="lam_x0") return 11;
       break;
     case SCHEME_QCQPSolverOutput:
-      if(name=="x") return 0;
-      if(name=="cost") return 1;
-      if(name=="lam_a") return 2;
-      if(name=="lam_x") return 3;
+      if (name=="x") return 0;
+      if (name=="cost") return 1;
+      if (name=="lam_a") return 2;
+      if (name=="lam_x") return 3;
       break;
     case SCHEME_QCQPStruct:
-      if(name=="h") return 0;
-      if(name=="p") return 1;
-      if(name=="a") return 2;
+      if (name=="h") return 0;
+      if (name=="p") return 1;
+      if (name=="a") return 2;
       break;
     case SCHEME_QPSolverInput:
-      if(name=="h") return 0;
-      if(name=="g") return 1;
-      if(name=="a") return 2;
-      if(name=="lba") return 3;
-      if(name=="uba") return 4;
-      if(name=="lbx") return 5;
-      if(name=="ubx") return 6;
-      if(name=="x0") return 7;
-      if(name=="lam_x0") return 8;
+      if (name=="h") return 0;
+      if (name=="g") return 1;
+      if (name=="a") return 2;
+      if (name=="lba") return 3;
+      if (name=="uba") return 4;
+      if (name=="lbx") return 5;
+      if (name=="ubx") return 6;
+      if (name=="x0") return 7;
+      if (name=="lam_x0") return 8;
       break;
     case SCHEME_QPSolverOutput:
-      if(name=="x") return 0;
-      if(name=="cost") return 1;
-      if(name=="lam_a") return 2;
-      if(name=="lam_x") return 3;
+      if (name=="x") return 0;
+      if (name=="cost") return 1;
+      if (name=="lam_a") return 2;
+      if (name=="lam_x") return 3;
       break;
     case SCHEME_QPStruct:
-      if(name=="h") return 0;
-      if(name=="a") return 1;
+      if (name=="h") return 0;
+      if (name=="a") return 1;
       break;
     case SCHEME_SDPInput:
-      if(name=="f") return 0;
-      if(name=="c") return 1;
-      if(name=="g") return 2;
-      if(name=="a") return 3;
-      if(name=="lba") return 4;
-      if(name=="uba") return 5;
-      if(name=="lbx") return 6;
-      if(name=="ubx") return 7;
+      if (name=="f") return 0;
+      if (name=="c") return 1;
+      if (name=="g") return 2;
+      if (name=="a") return 3;
+      if (name=="lba") return 4;
+      if (name=="uba") return 5;
+      if (name=="lbx") return 6;
+      if (name=="ubx") return 7;
       break;
     case SCHEME_SDPOutput:
-      if(name=="x") return 0;
-      if(name=="p") return 1;
-      if(name=="dual") return 2;
-      if(name=="cost") return 3;
-      if(name=="dual_cost") return 4;
-      if(name=="lam_a") return 5;
-      if(name=="lam_x") return 6;
+      if (name=="x") return 0;
+      if (name=="p") return 1;
+      if (name=="dual") return 2;
+      if (name=="cost") return 3;
+      if (name=="dual_cost") return 4;
+      if (name=="lam_a") return 5;
+      if (name=="lam_x") return 6;
       break;
     case SCHEME_SDPStruct:
-      if(name=="f") return 0;
-      if(name=="g") return 1;
-      if(name=="a") return 2;
+      if (name=="f") return 0;
+      if (name=="g") return 1;
+      if (name=="a") return 2;
       break;
     case SCHEME_SDQPInput:
-      if(name=="h") return 0;
-      if(name=="c") return 1;
-      if(name=="f") return 2;
-      if(name=="g") return 3;
-      if(name=="a") return 4;
-      if(name=="lba") return 5;
-      if(name=="uba") return 6;
-      if(name=="lbx") return 7;
-      if(name=="ubx") return 8;
+      if (name=="h") return 0;
+      if (name=="c") return 1;
+      if (name=="f") return 2;
+      if (name=="g") return 3;
+      if (name=="a") return 4;
+      if (name=="lba") return 5;
+      if (name=="uba") return 6;
+      if (name=="lbx") return 7;
+      if (name=="ubx") return 8;
       break;
     case SCHEME_SDQPOutput:
-      if(name=="x") return 0;
-      if(name=="p") return 1;
-      if(name=="dual") return 2;
-      if(name=="cost") return 3;
-      if(name=="dual_cost") return 4;
-      if(name=="lam_a") return 5;
-      if(name=="lam_x") return 6;
+      if (name=="x") return 0;
+      if (name=="p") return 1;
+      if (name=="dual") return 2;
+      if (name=="cost") return 3;
+      if (name=="dual_cost") return 4;
+      if (name=="lam_a") return 5;
+      if (name=="lam_x") return 6;
       break;
     case SCHEME_SDQPStruct:
-      if(name=="h") return 0;
-      if(name=="f") return 1;
-      if(name=="g") return 2;
-      if(name=="a") return 3;
+      if (name=="h") return 0;
+      if (name=="f") return 1;
+      if (name=="g") return 2;
+      if (name=="a") return 3;
       break;
     case SCHEME_SOCPInput:
-      if(name=="g") return 0;
-      if(name=="h") return 1;
-      if(name=="e") return 2;
-      if(name=="f") return 3;
-      if(name=="c") return 4;
-      if(name=="a") return 5;
-      if(name=="lba") return 6;
-      if(name=="uba") return 7;
-      if(name=="lbx") return 8;
-      if(name=="ubx") return 9;
+      if (name=="g") return 0;
+      if (name=="h") return 1;
+      if (name=="e") return 2;
+      if (name=="f") return 3;
+      if (name=="c") return 4;
+      if (name=="a") return 5;
+      if (name=="lba") return 6;
+      if (name=="uba") return 7;
+      if (name=="lbx") return 8;
+      if (name=="ubx") return 9;
       break;
     case SCHEME_SOCPOutput:
-      if(name=="x") return 0;
-      if(name=="cost") return 1;
-      if(name=="lam_a") return 2;
-      if(name=="lam_x") return 3;
+      if (name=="x") return 0;
+      if (name=="cost") return 1;
+      if (name=="lam_a") return 2;
+      if (name=="lam_x") return 3;
       break;
     case SCHEME_SOCPStruct:
-      if(name=="g") return 0;
-      if(name=="a") return 1;
+      if (name=="g") return 0;
+      if (name=="a") return 1;
       break;
     case SCHEME_StabilizedQPSolverInput:
-      if(name=="h") return 0;
-      if(name=="g") return 1;
-      if(name=="a") return 2;
-      if(name=="lba") return 3;
-      if(name=="uba") return 4;
-      if(name=="lbx") return 5;
-      if(name=="ubx") return 6;
-      if(name=="x0") return 7;
-      if(name=="lam_x0") return 8;
-      if(name=="muR") return 9;
-      if(name=="muE") return 10;
-      if(name=="mu") return 11;
+      if (name=="h") return 0;
+      if (name=="g") return 1;
+      if (name=="a") return 2;
+      if (name=="lba") return 3;
+      if (name=="uba") return 4;
+      if (name=="lbx") return 5;
+      if (name=="ubx") return 6;
+      if (name=="x0") return 7;
+      if (name=="lam_x0") return 8;
+      if (name=="muR") return 9;
+      if (name=="muE") return 10;
+      if (name=="mu") return 11;
       break;
   }
   casadi_error( "getSchemeEntryEnum: Scheme '" << getSchemeName(scheme)

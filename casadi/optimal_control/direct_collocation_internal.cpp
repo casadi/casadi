@@ -79,11 +79,11 @@ void DirectCollocationInternal::init() {
   SX tau = SX::sym("tau");
 
   // For all collocation points
-  for(int j=0; j<deg_+1; ++j) {
+  for (int j=0; j<deg_+1; ++j) {
     // Construct Lagrange polynomials to get the polynomial basis at the collocation point
     SX L = 1;
-    for(int j2=0; j2<deg_+1; ++j2) {
-      if(j2 != j) {
+    for (int j2=0; j2<deg_+1; ++j2) {
+      if (j2 != j) {
         L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
       }
     }
@@ -101,7 +101,7 @@ void DirectCollocationInternal::init() {
     // to get the coefficients of the continuity equation
     Function tfcn = lfcn.tangent();
     tfcn.init();
-    for(int j2=0; j2<deg_+1; ++j2) {
+    for (int j2=0; j2<deg_+1; ++j2) {
       tfcn.setInput(tau_root[j2]);
       tfcn.evaluate();
       C[j][j2] = tfcn.output();
@@ -114,9 +114,9 @@ void DirectCollocationInternal::init() {
 
   // All collocation time points
   vector<vector<double> > T(nk_);
-  for(int k=0; k<nk_; ++k) {
+  for (int k=0; k<nk_; ++k) {
           T[k].resize(deg_+1);
-          for(int j=0; j<=deg_; ++j) {
+          for (int j=0; j<=deg_; ++j) {
                   T[k][j] = h*(k + tau_root[j]);
           }
   }
@@ -134,10 +134,10 @@ void DirectCollocationInternal::init() {
   // Get collocated states and parametrized control
   vector<vector<MX> > X(nk_+1);
   vector<MX> U(nk_);
-  for(int k=0; k<nk_; ++k) {
+  for (int k=0; k<nk_; ++k) {
     // Collocated states
         X[k].resize(deg_+1);
-    for(int j=0; j<=deg_; ++j) {
+    for (int j=0; j<=deg_; ++j) {
         // Get the expression for the state vector
         X[k][j] = nlp_x[Slice(offset, offset+nx_)];
         offset += nx_;
@@ -161,14 +161,14 @@ void DirectCollocationInternal::init() {
   MX nlp_j = 0;
 
   // For all finite elements
-  for(int k=0; k<nk_; ++k) {
+  for (int k=0; k<nk_; ++k) {
 
     // For all collocation points
-    for(int j=1; j<=deg_; ++j) {
+    for (int j=1; j<=deg_; ++j) {
 
         // Get an expression for the state derivative at the collocation point
         MX xp_jk = 0;
-        for(int r=0; r<=deg_; ++r) {
+        for (int r=0; r<=deg_; ++r) {
             xp_jk += C[r][j]*X[k][r];
         }
 
@@ -179,7 +179,7 @@ void DirectCollocationInternal::init() {
 
     // Get an expression for the state at the end of the finite element
     MX xf_k = 0;
-    for(int r=0; r<=deg_; ++r) {
+    for (int r=0; r<=deg_; ++r) {
         xf_k += D[r]*X[k][r];
     }
 
@@ -187,7 +187,7 @@ void DirectCollocationInternal::init() {
     nlp_g.push_back(X[k+1][0] - xf_k);
 
     // Add path constraints
-    if(nh_>0) {
+    if (nh_>0) {
       MX pk = cfcn_.call(daeIn("x", X[k+1][0], "p", U[k])).at(0);
       nlp_g.push_back(pk);
     }
@@ -211,7 +211,7 @@ void DirectCollocationInternal::init() {
   nlp_solver_ = nlp_solver_creator(nlp_);
 
   // Pass options
-  if(hasSetOption("nlp_solver_options")) {
+  if (hasSetOption("nlp_solver_options")) {
     const Dictionary& nlp_solver_options = getOption("nlp_solver_options");
     nlp_solver_.setOption(nlp_solver_options);
   }
@@ -230,26 +230,26 @@ void DirectCollocationInternal::getGuess(vector<double>& V_init) const {
   int el=0;
 
   // Pass guess for parameters
-  for(int i=0; i<np_; ++i) {
+  for (int i=0; i<np_; ++i) {
     V_init[el++] = p_init.elem(i);
   }
 
-  for(int k=0; k<nk_; ++k) {
+  for (int k=0; k<nk_; ++k) {
     // Pass guess for state
-    for(int j=0; j<=deg_; ++j) {
-      for(int i=0; i<nx_; ++i) {
+    for (int j=0; j<=deg_; ++j) {
+      for (int i=0; i<nx_; ++i) {
          V_init[el++] = x_init.elem(i, k);
       }
     }
 
     // Pass guess for control
-    for(int i=0; i<nu_; ++i) {
+    for (int i=0; i<nu_; ++i) {
       V_init[el++] = u_init.elem(i, k);
     }
   }
 
   // Pass guess for final state
-  for(int i=0; i<nx_; ++i) {
+  for (int i=0; i<nx_; ++i) {
     V_init[el++] = x_init.elem(i, nk_);
   }
 
@@ -270,36 +270,36 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min,
   int min_el=0, max_el=0;
 
   // Pass bounds on parameters
-  for(int i=0; i<np_; ++i) {
+  for (int i=0; i<np_; ++i) {
     V_min[min_el++] = p_min.elem(i);
     V_max[max_el++] = p_max.elem(i);
   }
 
-  for(int k=0; k<nk_; ++k) {
+  for (int k=0; k<nk_; ++k) {
 
     // Pass bounds on state
-    for(int i=0; i<nx_; ++i) {
+    for (int i=0; i<nx_; ++i) {
       V_min[min_el++] = x_min.elem(i, k);
       V_max[max_el++] = x_max.elem(i, k);
     }
 
     // Pass bounds on collocation points
-    for(int j=0; j<deg_; ++j) {
-      for(int i=0; i<nx_; ++i) {
+    for (int j=0; j<deg_; ++j) {
+      for (int i=0; i<nx_; ++i) {
         V_min[min_el++] = std::min(x_min.elem(i, k), x_min.elem(i, k+1));
         V_max[max_el++] = std::max(x_max.elem(i, k), x_max.elem(i, k+1));
       }
     }
 
     // Pass bounds on control
-    for(int i=0; i<nu_; ++i) {
+    for (int i=0; i<nu_; ++i) {
       V_min[min_el++] = u_min.elem(i, k);
       V_max[max_el++] = u_max.elem(i, k);
     }
   }
 
   // Pass bounds on final state
-  for(int i=0; i<nx_; ++i) {
+  for (int i=0; i<nx_; ++i) {
     V_min[min_el++] = x_min.elem(i, nk_);
     V_max[max_el++] = x_max.elem(i, nk_);
   }
@@ -316,15 +316,15 @@ void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min,
   // Running index
   int min_el=0, max_el=0;
 
-  for(int k=0; k<nk_; ++k) {
-        for(int j=0; j<=deg_; ++j) {
-      for(int i=0; i<nx_; ++i) {
+  for (int k=0; k<nk_; ++k) {
+        for (int j=0; j<=deg_; ++j) {
+      for (int i=0; i<nx_; ++i) {
         G_min[min_el++] = 0.;
         G_max[max_el++] = 0.;
       }
     }
 
-    for(int i=0; i<nh_; ++i) {
+    for (int i=0; i<nh_; ++i) {
       G_min[min_el++] = h_min.elem(i, k);
       G_max[max_el++] = h_max.elem(i, k);
     }
@@ -342,14 +342,14 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
   int el=0;
 
   // Pass optimized state
-  for(int i=0; i<np_; ++i) {
+  for (int i=0; i<np_; ++i) {
     p_opt(i) = V_opt[el++];
   }
 
-  for(int k=0; k<nk_; ++k) {
+  for (int k=0; k<nk_; ++k) {
 
     // Pass optimized state
-    for(int i=0; i<nx_; ++i) {
+    for (int i=0; i<nx_; ++i) {
       x_opt(i, k) = V_opt[el++];
     }
 
@@ -357,13 +357,13 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
     el += deg_*nx_;
 
     // Pass optimized control
-    for(int i=0; i<nu_; ++i) {
+    for (int i=0; i<nu_; ++i) {
       u_opt(i, k) = V_opt[el++];
     }
   }
 
   // Pass optimized terminal state
-  for(int i=0; i<nx_; ++i) {
+  for (int i=0; i<nx_; ++i) {
     x_opt(i, nk_) = V_opt[el++];
   }
   casadi_assert(el==V_opt.size());

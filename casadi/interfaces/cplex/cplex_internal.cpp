@@ -108,7 +108,7 @@ namespace casadi {
       // Setting crossover algorithm
       status = CPXsetintparam(env_, CPX_PARAM_BARCROSSALG, 1);
     }
-    if(!static_cast<bool>(getOption("convex"))) {
+    if (!static_cast<bool>(getOption("convex"))) {
       // Enabling non-convex QPs
       status = CPXsetintparam(env_, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
     }
@@ -168,11 +168,11 @@ namespace casadi {
     const vector<double>& lba = input(QP_SOLVER_LBA).data();
     const vector<double>& uba = input(QP_SOLVER_UBA).data();
 
-    for(int i = 0; i < nc_; ++i) {
+    for (int i = 0; i < nc_; ++i) {
       // CPX_INFBOUND
 
       // Equality
-      if(uba[i] - lba[i] < 1e-20) {
+      if (uba[i] - lba[i] < 1e-20) {
         sense_[i] = 'E';
         rhs_[i] = lba[i];
         rngval_[i] = 0.;
@@ -245,7 +245,7 @@ namespace casadi {
                           output(QP_SOLVER_LAM_X).ptr()
                           );
 
-    if(status) {
+    if (status) {
       cout << "CPLEX: Failed to get solution.\n";
     }
     // Retrieving the basis
@@ -254,14 +254,14 @@ namespace casadi {
     }
 
     // Flip the sign of the multipliers
-    for(vector<double>::iterator it=output(QP_SOLVER_LAM_A).begin();
+    for (vector<double>::iterator it=output(QP_SOLVER_LAM_A).begin();
         it!=output(QP_SOLVER_LAM_A).end(); ++it) *it = -*it;
-    for(vector<double>::iterator it=output(QP_SOLVER_LAM_X).begin();
+    for (vector<double>::iterator it=output(QP_SOLVER_LAM_X).begin();
         it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
 
     int solnstat = CPXgetstat (env_, lp_);
     stringstream errormsg; // NOTE: Why not print directly to cout and cerr?
-    if(verbose()) {
+    if (verbose()) {
       if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
       } else if (solnstat == CPX_STAT_UNBOUNDED) {
@@ -303,7 +303,7 @@ namespace casadi {
   CplexInternal* CplexInternal::clone() const {
     // Return a deepcopy
     CplexInternal* node = new CplexInternal(st_);
-    if(!node->is_init_)
+    if (!node->is_init_)
       node->init();
     return node;
   }
@@ -317,18 +317,18 @@ namespace casadi {
     int status;
 
     // Only free if Cplex problem if it has been allocated
-    if(lp_!=0) {
+    if (lp_!=0) {
       status = CPXfreeprob (env_, &lp_);
-      if(status!=0) {
+      if (status!=0) {
         std::cerr << "CPXfreeprob failed, error code " << status << ".\n";
       }
       lp_ = 0;
     }
 
     // Closing down license
-    if(env_!=0) {
+    if (env_!=0) {
       status = CPXcloseCPLEX(&env_);
-      if(status!=0) {
+      if (status!=0) {
         std::cerr << "CPXcloseCPLEX failed, error code " << status << ".\n";
       }
       env_ = 0;

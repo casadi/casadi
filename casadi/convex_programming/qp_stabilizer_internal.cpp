@@ -56,7 +56,7 @@ namespace casadi {
     qp_solver_ = qp_solver_creator(qpStruct("h", H_sparsity_qp, "a", A_sparsity_qp));
 
     // Pass options if provided
-    if(hasSetOption("qp_solver_options")) {
+    if (hasSetOption("qp_solver_options")) {
       Dictionary qp_solver_options = getOption("qp_solver_options");
       qp_solver_.setOption(qp_solver_options);
     }
@@ -90,7 +90,7 @@ namespace casadi {
       std::fill(A_qp.begin()+A.size(), A_qp.end(), -muR);
 
       // Add constant to linear inequality
-      for(int i=0; i<mu.size(); ++i) {
+      for (int i=0; i<mu.size(); ++i) {
         double extra = muR*(mu[i]-muE[i]);
         qp_solver_.input(QP_SOLVER_LBA).at(i) += extra;
         qp_solver_.input(QP_SOLVER_UBA).at(i) += extra;

@@ -31,7 +31,7 @@ namespace casadi {
 QPLPInternal* QPLPInternal::clone() const {
   // Return a deep copy
   QPLPInternal* node = new QPLPInternal(st_);
-  if(!node->is_init_)
+  if (!node->is_init_)
     node->init();
   return node;
 }
@@ -82,7 +82,7 @@ void QPLPInternal::init() {
                                         "a", input(LP_SOLVER_A).sparsity()));
 
   qpsolver_.setLPOptions();
-  if(hasSetOption("qp_solver_options")) {
+  if (hasSetOption("qp_solver_options")) {
     qpsolver_.setOption(getOption("qp_solver_options"));
   }
 

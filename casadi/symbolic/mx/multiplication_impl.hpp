@@ -49,15 +49,15 @@ namespace casadi {
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX, TrY>::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "(";
-    } else if(part==1) {
+    } else if (part==1) {
       stream << "+mul(";
-    } else if(part==2) {
-      if(TrX) stream << "'";
+    } else if (part==2) {
+      if (TrX) stream << "'";
       stream << ", ";
     } else {
-      if(TrY) stream << "'";
+      if (TrY) stream << "'";
       stream << "))";
     }
   }
@@ -78,7 +78,7 @@ namespace casadi {
   template<typename T, typename MatV, typename MatVV>
   void Multiplication<TrX, TrY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
                                             std::vector<T>& rtmp) {
-    if(input[0]!=output[0]) {
+    if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
     Matrix<T>::mul_no_alloc_tn(*input[1], *input[2], *output[0]);
@@ -89,12 +89,12 @@ namespace casadi {
                                            const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
                                            const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                                            bool output_given) {
-    if(!output_given)
+    if (!output_given)
       *output[0] = *input[0] + mul(tr<TrX>(*input[1]), tr<TrY>(*input[2]), (*input[0]).sparsity());
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = *fwdSeed[d][0] + mul(tr<TrX>(*input[1]),
                                             tr<TrY>(*fwdSeed[d][2]),
                                             (*input[0]).sparsity()) + mul(tr<TrX>(*fwdSeed[d][1]),
@@ -104,14 +104,14 @@ namespace casadi {
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       adjSens[d][1]->addToSum(tr<TrX>(mul(*adjSeed[d][0],
                                           tr<!TrY>(*input[2]),
                                           tr<TrX>(*input[1]).sparsity())));
       adjSens[d][2]->addToSum(tr<TrY>(mul(tr<!TrX>(*input[1]),
                                           *adjSeed[d][0],
                                           tr<TrY>(*input[2]).sparsity())));
-      if(adjSeed[d][0]!=adjSens[d][0]) {
+      if (adjSeed[d][0]!=adjSens[d][0]) {
         adjSens[d][0]->addToSum(*adjSeed[d][0]);
         *adjSeed[d][0] = MX();
       }
@@ -124,13 +124,13 @@ namespace casadi {
     bvec_t *zd = get_bvec_t(input[0]->data());
     bvec_t *rd = get_bvec_t(output[0]->data());
     const size_t n = this->size();
-    if(fwd) {
-      if(zd!=rd) copy(zd, zd+n, rd);
+    if (fwd) {
+      if (zd!=rd) copy(zd, zd+n, rd);
       DMatrix::mul_sparsity<true>(*input[1], *input[2], *input[0]);
     } else {
       DMatrix::mul_sparsity<false>(*input[1], *input[2], *output[0]);
-      if(zd!=rd) {
-        for(int i=0; i<n; ++i) {
+      if (zd!=rd) {
+        for (int i=0; i<n; ++i) {
           zd[i] |= rd[i];
           rd[i] = bvec_t(0);
         }
@@ -147,8 +147,8 @@ namespace casadi {
     bool inplace = arg.at(0).compare(res.front())==0;
 
     // Copy first argument if not inplace
-    if(!inplace) {
-      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front()
+    if (!inplace) {
+      stream << "  for (i=0; i<" << this->size() << "; ++i) " << res.front()
              << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
@@ -169,17 +169,17 @@ namespace casadi {
     bool inplace = arg.at(0).compare(res.front())==0;
 
     // Copy first argument if not inplace
-    if(!inplace) {
-      stream << "  for(i=0; i<" << this->size() << "; ++i) " << res.front()
+    if (!inplace) {
+      stream << "  for (i=0; i<" << this->size() << "; ++i) " << res.front()
              << "[i]=" << arg.at(0) << "[i];" << endl;
     }
 
     int ncol_y = this->dep(2).size2();
     int nrow_y = this->dep(2).size1();
     int ncol_x = this->dep(1).size2();
-    stream << "  for(i=0, rr=" << res.front() <<"; i<" << ncol_y << "; ++i)";
-    stream << " for(j=0; j<" << ncol_x << "; ++j, ++rr)";
-    stream << " for(k=0, ss=" << arg.at(2) << "+i*" << nrow_y << ", tt="
+    stream << "  for (i=0, rr=" << res.front() <<"; i<" << ncol_y << "; ++i)";
+    stream << " for (j=0; j<" << ncol_x << "; ++j, ++rr)";
+    stream << " for (k=0, ss=" << arg.at(2) << "+i*" << nrow_y << ", tt="
            << arg.at(1) << "+j*" << nrow_y << "; k<" << nrow_y << "; ++k)";
     stream << " *rr += *ss++**tt++;" << endl;
   }

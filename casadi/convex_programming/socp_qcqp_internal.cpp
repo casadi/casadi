@@ -31,7 +31,7 @@ namespace casadi {
 SOCPQCQPInternal* SOCPQCQPInternal::clone() const {
   // Return a deep copy
   SOCPQCQPInternal* node = new SOCPQCQPInternal(st_);
-  if(!node->is_init_)
+  if (!node->is_init_)
     node->init();
   return node;
 }
@@ -182,7 +182,7 @@ void SOCPQCQPInternal::init() {
                "a", horzcat(input(QCQP_SOLVER_A).sparsity(), Sparsity::sparse(nc_, 1))));
 
   //socpsolver_.setQCQPOptions();
-  if(hasSetOption("socp_solver_options")) {
+  if (hasSetOption("socp_solver_options")) {
     socpsolver_.setOption(getOption("socp_solver_options"));
   }
   std::vector<int> ni(nq_+1);

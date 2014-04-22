@@ -41,23 +41,23 @@ namespace casadi {
 
   template<bool Tr>
   void Solve<Tr>::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "(";
-    } else if(part==1) {
+    } else if (part==1) {
       stream << "'/";
     } else {
-      if(!Tr) stream << "'";
+      if (!Tr) stream << "'";
       stream << ")'";
     }
   }
 
   template<bool Tr>
   void Solve<Tr>::print(std::ostream &stream, long& remaining_calls) const {
-    if(remaining_calls>0) {
+    if (remaining_calls>0) {
       remaining_calls--;
       stream << "(";
       dep(1)->print(stream, remaining_calls);
-      if(Tr) stream << "'";
+      if (Tr) stream << "'";
       stream << "\\";
       dep(0)->print(stream, remaining_calls);
       stream << ")";

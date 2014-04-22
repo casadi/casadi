@@ -39,9 +39,9 @@ namespace casadi {
   }
 
   void Assertion::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "assertion(";
-    } else if(part==1) {
+    } else if (part==1) {
        stream << ", ";
     } else {
       stream << ")";
@@ -55,17 +55,17 @@ namespace casadi {
     int nadj = adjSeed.size();
 
     // Non-differentiated output
-    if(!output_given) {
+    if (!output_given) {
       *output[0] = (*input[0]).attachAssert(*input[1], fail_message_);
     }
 
     // Forward sensitivities
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = *fwdSeed[d][0];
     }
 
     // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum(*adjSeed[d][0]);
       *adjSeed[d][0] = MX();
     }
@@ -89,8 +89,8 @@ namespace casadi {
     bvec_t *input0 = get_bvec_t(input[0]->data());
     //    bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    for(int el=0; el<output[0]->size(); ++el) {
-      if(fwd) {
+    for (int el=0; el<output[0]->size(); ++el) {
+      if (fwd) {
         outputd[el] = input0[el];
       } else {
         bvec_t s = outputd[el];

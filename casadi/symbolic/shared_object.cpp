@@ -67,7 +67,7 @@ void SharedObject::assignNodeNoCount(SharedObjectNode* node_) {
 
 SharedObject& SharedObject::operator=(const SharedObject& ref) {
   // quick return if the old and new pointers point to the same object
-  if(node == ref.node) return *this;
+  if (node == ref.node) return *this;
 
   // decrease the counter and delete if this was the last pointer
   count_down();
@@ -91,11 +91,11 @@ bool SharedObject::isNull() const {
 }
 
 void SharedObject::count_up() {
-  if(node) node->count++;
+  if (node) node->count++;
 }
 
 void SharedObject::count_down() {
-  if(node && --node->count == 0) {
+  if (node && --node->count == 0) {
     delete node;
     node = 0;
   }
@@ -119,14 +119,14 @@ SharedObjectNode::SharedObjectNode() {
 
 SharedObjectNode::~SharedObjectNode() {
    assert(count==0);
-   if(weak_ref_!=0) {
+   if (weak_ref_!=0) {
      weak_ref_->kill();
      delete weak_ref_;
    }
 }
 
 void SharedObject::init(bool allow_reinit) {
-  if(allow_reinit || !isInit()) {
+  if (allow_reinit || !isInit()) {
     (*this)->init();
   }
 }
@@ -139,7 +139,7 @@ bool SharedObject::checkNode() const {
 }
 
 void SharedObject::repr(std::ostream &stream) const {
-  if(isNull())
+  if (isNull())
     stream << 0;
   else
     (*this)->repr(stream);
@@ -151,7 +151,7 @@ void SharedObjectNode::repr(std::ostream &stream) const {
 }
 
 void SharedObject::print(std::ostream &stream) const {
-  if(isNull())    stream << "Null pointer of class \"" << typeid(this).name() << "\"";
+  if (isNull())    stream << "Null pointer of class \"" << typeid(this).name() << "\"";
   else           (*this)->print(stream);
 }
 
@@ -171,19 +171,19 @@ void SharedObject::makeUnique(bool clone_members) {
 
 void SharedObject::makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
                               bool clone_members) {
-  if(node && node->count>1) {
+  if (node && node->count>1) {
     // First find out if the expression has already been copied
     std::map<SharedObjectNode*, SharedObject>::iterator it = already_copied.find(node);
 
-    if(it==already_copied.end()) {
+    if (it==already_copied.end()) {
       // If the expression has not yet been copied
       SharedObjectNode *newnode = node->clone();
 
       // Copy the data members
-      if(clone_members) newnode->deepCopyMembers(already_copied);
+      if (clone_members) newnode->deepCopyMembers(already_copied);
 
       // Initialize object if parent was initialized
-      if(isInit() && !newnode->is_init_) {
+      if (isInit() && !newnode->is_init_) {
         newnode->init();
       }
 
@@ -198,7 +198,7 @@ void SharedObject::makeUnique(std::map<SharedObjectNode*, SharedObject>& already
 
 SharedObject SharedObject::clone() const {
   SharedObject ret;
-  if(!isNull()) {
+  if (!isNull()) {
     ret.assignNode((*this)->clone());
   }
   return ret;
@@ -244,7 +244,7 @@ void SharedObjectNode::assertInit() const {
   }
 
   WeakRef* SharedObjectNode::weak() {
-    if(weak_ref_==0) {
+    if (weak_ref_==0) {
       weak_ref_ = new WeakRef(this);
     }
     return weak_ref_;

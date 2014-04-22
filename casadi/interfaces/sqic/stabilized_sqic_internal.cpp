@@ -39,7 +39,7 @@ namespace casadi {
 StabilizedSQICInternal* StabilizedSQICInternal::clone() const {
   // Return a deep copy
   StabilizedSQICInternal* node = new StabilizedSQICInternal(st_);
-  if(!node->is_init_)
+  if (!node->is_init_)
     node->init();
   return node;
 }
@@ -175,7 +175,7 @@ void StabilizedSQICInternal::sqic_error(const string& module, int flag) {
   map<int, string>::const_iterator it = flagmap.find(flag);
 
   stringstream ss;
-  if(it == flagmap.end()) {
+  if (it == flagmap.end()) {
     ss << "Unknown error (" << flag << ") from module \"" << module << "\".";
   } else {
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";

@@ -345,13 +345,13 @@ namespace casadi {
 
   template<typename T>
   void repr(const std::vector<T> &v, std::ostream &stream) {
-    if(v.empty()) {
+    if (v.empty()) {
       stream << "[]";
     } else {
       // Print elements, python style
       stream << "[";
       stream << v.front();
-      for(unsigned int i=1; i<v.size(); ++i)
+      for (unsigned int i=1; i<v.size(); ++i)
         stream << ", " << v[i];
       stream << "]";
     }
@@ -362,14 +362,14 @@ namespace casadi {
     // print vector style
     stream << "[" << v.size() << "]"; // Print dimension
 
-    if(v.empty()) {
+    if (v.empty()) {
       stream << "()";
     } else {
       // Print elements, ublas stype
       stream << "(";
-      for(unsigned int i=0; i<v.size()-1; ++i)
+      for (unsigned int i=0; i<v.size()-1; ++i)
         stream << v[i] << ", ";
-      if(!v.empty()) stream << v.back();
+      if (!v.empty()) stream << v.back();
       stream << ")";
     }
   }
@@ -477,7 +477,7 @@ namespace casadi {
 
   template<typename T>
   void write_matlab(std::ostream &stream, const std::vector<std::vector<T> > &v) {
-    for(unsigned int i=0; i<v.size(); ++i) {
+    for (unsigned int i=0; i<v.size(); ++i) {
       std::copy(v[i].begin(), v[i].end(), std::ostream_iterator<T>(stream, " "));
       stream << std::endl;
     }
@@ -487,14 +487,14 @@ namespace casadi {
   void read_matlab(std::istream &stream, std::vector<T> &v) {
     v.clear();
 
-    while(!stream.eof()) {
+    while (!stream.eof()) {
       T val;
       stream >> val;
-      if(stream.fail()) {
+      if (stream.fail()) {
         stream.clear();
         std::string s;
         stream >> s;
-        if(s.compare("inf") == 0)
+        if (s.compare("inf") == 0)
           val = std::numeric_limits<T>::infinity();
         else
           break;
@@ -507,18 +507,18 @@ namespace casadi {
   void read_matlab(std::ifstream &file, std::vector<std::vector<T> > &v) {
     v.clear();
     std::string line;
-    while(!getline(file, line, '\n').eof()) {
+    while (!getline(file, line, '\n').eof()) {
       std::istringstream reader(line);
       std::vector<T> lineData;
 
-      while(!reader.eof()) {
+      while (!reader.eof()) {
         T val;
         reader >> val;
-        if(reader.fail()) {
+        if (reader.fail()) {
           reader.clear();
           std::string s;
           reader >> s;
-          if(s.compare("inf") == 0)
+          if (s.compare("inf") == 0)
             val = std::numeric_limits<T>::infinity();
           else
             break;
@@ -531,21 +531,21 @@ namespace casadi {
 
   template<typename T, typename F, typename L>
   void linspace(std::vector<T> &v, const F& first, const L& last) {
-    if(v.size()<2)
+    if (v.size()<2)
         throw CasadiException("std::linspace: vector must contain at least two elements");
 
     // Increment
     T increment = (last-first)/T(v.size()-1);
 
     v[0] = first;
-    for(unsigned i=1; i<v.size()-1; ++i)
+    for (unsigned i=1; i<v.size()-1; ++i)
       v[i] = v[i-1] + increment;
     v[v.size()-1] = last;
   }
 
   template<typename T>
   T* getPtr(std::vector<T> &v) {
-    if(v.empty())
+    if (v.empty())
       return 0;
     else
       return &v.front();
@@ -553,7 +553,7 @@ namespace casadi {
 
   template<typename T>
   const T* getPtr(const std::vector<T> &v) {
-    if(v.empty())
+    if (v.empty())
       return 0;
     else
       return &v.front();
@@ -629,9 +629,9 @@ namespace casadi {
     std::vector<T> ret(size);
 
     // Assign all values
-    for(int i=0; i<max_size; ++i) {
+    for (int i=0; i<max_size; ++i) {
       // Break if not assigned
-      if(ind[i]<0) break;
+      if (ind[i]<0) break;
 
       // Assign value
       ret.at(ind[i]) = val[i];
@@ -653,7 +653,7 @@ namespace casadi {
   template<typename T>
   T inner_prod(const std::vector<T>& a, const std::vector<T>& b) {
     T ret = 0;
-    for(int k=0; k<a.size(); ++k) {
+    for (int k=0; k<a.size(); ++k) {
       ret += a[k]*b[k];
     }
     return ret;
@@ -662,7 +662,7 @@ namespace casadi {
   template<typename T>
   T norm_inf(const std::vector<T>& x) {
     T ret = 0;
-    for(int k=0; k<x.size(); ++k) {
+    for (int k=0; k<x.size(); ++k) {
       ret = fmax(ret, fabs(x[k]));
     }
     return ret;
@@ -671,7 +671,7 @@ namespace casadi {
   template<typename T>
   T norm_1(const std::vector<T>& x) {
     T ret = 0;
-    for(int k=0; k<x.size(); ++k) {
+    for (int k=0; k<x.size(); ++k) {
       ret += fabs(x[k]);
     }
     return ret;
@@ -680,7 +680,7 @@ namespace casadi {
   template<typename T>
   T norm_2(const std::vector<T>& x) {
     T ret = 0;
-    for(int k=0; k<x.size(); ++k) {
+    for (int k=0; k<x.size(); ++k) {
       ret += x[k]*x[k];
     }
     return sqrt(ret);

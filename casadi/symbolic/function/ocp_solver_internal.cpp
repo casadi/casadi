@@ -50,8 +50,8 @@ void OCPSolverInternal::init() {
   // Initialize the functions
   ffcn_.init();
   mfcn_.init();
-  if(!cfcn_.isNull()) cfcn_.init();
-  if(!mfcn_.isNull()) mfcn_.init();
+  if (!cfcn_.isNull()) cfcn_.init();
+  if (!mfcn_.isNull()) mfcn_.init();
 
   // Get the number of grid points
   nk_ = getOption("number_of_grid_points");

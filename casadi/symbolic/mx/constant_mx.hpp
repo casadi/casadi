@@ -308,8 +308,8 @@ namespace casadi {
   template<typename Value>
   MX Constant<Value>::getHorzcat(const std::vector<MX>& x) const {
     // Check if all arguments have the same constant value
-    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
-      if(!(*i)->isValue(v_.value)) {
+    for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
+      if (!(*i)->isValue(v_.value)) {
         // Not all the same value, fall back to base class
         return ConstantMX::getHorzcat(x);
       }
@@ -317,7 +317,7 @@ namespace casadi {
 
     // Assemble the sparsity pattern
     Sparsity sp = sparsity();
-    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
+    for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
       sp.appendColumns(i->sparsity());
     }
     return MX(sp, v_.value);
@@ -326,8 +326,8 @@ namespace casadi {
   template<typename Value>
   MX Constant<Value>::getVertcat(const std::vector<MX>& x) const {
     // Check if all arguments have the same constant value
-    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
-      if(!(*i)->isValue(v_.value)) {
+    for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
+      if (!(*i)->isValue(v_.value)) {
         // Not all the same value, fall back to base class
         return ConstantMX::getVertcat(x);
       }
@@ -335,7 +335,7 @@ namespace casadi {
 
     // Assemble the sparsity pattern
     Sparsity sp = sparsity();
-    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
+    for (std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
       sp.append(i->sparsity());
     }
     return MX(sp, v_.value);
@@ -399,33 +399,33 @@ namespace casadi {
       }
     }
 
-    switch(op) {
+    switch (op) {
     case OP_ADD:
-      if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(y, size1(), size2()) : y;
+      if (v_.value==0) return ScY && !y->isZero() ? MX::repmat(y, size1(), size2()) : y;
       break;
     case OP_SUB:
-      if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(-y, size1(), size2()) : -y;
+      if (v_.value==0) return ScY && !y->isZero() ? MX::repmat(-y, size1(), size2()) : -y;
       break;
     case OP_MUL:
-      if(v_.value==1) return y;
-      if(v_.value==-1) return -y;
-      if(v_.value==2) return y->getUnary(OP_TWICE);
+      if (v_.value==1) return y;
+      if (v_.value==-1) return -y;
+      if (v_.value==2) return y->getUnary(OP_TWICE);
       break;
     case OP_DIV:
-      if(v_.value==1) return y->getUnary(OP_INV);
-      if(v_.value==-1) return -y->getUnary(OP_INV);
+      if (v_.value==1) return y->getUnary(OP_INV);
+      if (v_.value==-1) return -y->getUnary(OP_INV);
       break;
     case OP_POW:
-      if(v_.value==0) return MX::zeros(y.sparsity());
-      if(v_.value==1) return MX::ones(y.sparsity());
-      if(v_.value==std::exp(1.0)) return y->getUnary(OP_EXP);
+      if (v_.value==0) return MX::zeros(y.sparsity());
+      if (v_.value==1) return MX::ones(y.sparsity());
+      if (v_.value==std::exp(1.0)) return y->getUnary(OP_EXP);
       break;
     default: break; //no rule
     }
 
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
-    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
+    if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
       double y_value = y.size()>0 ? y->getValue() : 0;
       double ret;
       casadi_math<double>::fun(op, size()> 0 ? v_.value: 0, y_value, ret);
@@ -456,7 +456,7 @@ namespace casadi {
                                           const std::vector<std::string>& res,
                                           CodeGenerator& gen) const {
     // Copy the constant to the work vector
-    stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << "  for (i=0; i<" << sparsity().size() << "; ++i) ";
     stream << res.at(0) << "[i]=";
     std::ios_base::fmtflags fmtfl = stream.flags(); // get current format flags
     // full precision NOTE: hex better?
@@ -467,10 +467,10 @@ namespace casadi {
 
   template<typename Value>
   MX Constant<Value>::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
-    if(v_.value!=0) {
+    if (v_.value!=0) {
       // Check if any "holes"
-      for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k) {
-        if(*k<0) {
+      for (std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k) {
+        if (*k<0) {
           // Do not simplify
           return MXNode::getGetNonzeros(sp, nz);
         }
@@ -491,7 +491,7 @@ namespace casadi {
 
   template<typename Value>
   MX Constant<Value>::getSetSparse(const Sparsity& sp) const {
-    if(isZero()) {
+    if (isZero()) {
       return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.isDense()) {
       DMatrix v = getMatrixValue();
@@ -504,27 +504,27 @@ namespace casadi {
 
   template<typename Value>
   void Constant<Value>::printPart(std::ostream &stream, int part) const {
-    if(sparsity().isScalar()) {
+    if (sparsity().isScalar()) {
       // Print scalar
-      if(sparsity().size()==0) {
+      if (sparsity().size()==0) {
         stream << "00";
       } else {
         stream << v_.value;
       }
-    } else if(sparsity().isEmpty()) {
+    } else if (sparsity().isEmpty()) {
       // Print empty
       sparsity().printCompact(stream);
     } else {
       // Print value
-      if(v_.value==0) {
+      if (v_.value==0) {
         stream << "zeros(";
-      } else if(v_.value==1) {
+      } else if (v_.value==1) {
         stream << "ones(";
-      } else if(v_.value!=v_.value) {
+      } else if (v_.value!=v_.value) {
         stream << "nan(";
-      } else if(v_.value==std::numeric_limits<double>::infinity()) {
+      } else if (v_.value==std::numeric_limits<double>::infinity()) {
         stream << "inf(";
-      } else if(v_.value==-std::numeric_limits<double>::infinity()) {
+      } else if (v_.value==-std::numeric_limits<double>::infinity()) {
         stream << "-inf(";
       } else {
         stream << "all_" << v_.value << "(";

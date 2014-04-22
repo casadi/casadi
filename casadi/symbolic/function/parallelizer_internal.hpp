@@ -46,7 +46,7 @@ namespace casadi {
     /// clone
     virtual ParallelizerInternal* clone() const {
       ParallelizerInternal* ret = new ParallelizerInternal(*this);
-      for(std::vector<Function>::iterator it=ret->funcs_.begin(); it!=ret->funcs_.end(); ++it) {
+      for (std::vector<Function>::iterator it=ret->funcs_.begin(); it!=ret->funcs_.end(); ++it) {
         it->makeUnique();
       }
       return ret;

@@ -75,12 +75,12 @@ namespace casadi {
     vector<double> B(deg_+1, 0);
 
     // For all collocation points
-    for(int j=0; j<deg_+1; ++j) {
+    for (int j=0; j<deg_+1; ++j) {
 
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
       Polynomial p = 1;
-      for(int r=0; r<deg_+1; ++r) {
-        if(r!=j) {
+      for (int r=0; r<deg_+1; ++r) {
+        if (r!=j) {
           p *= Polynomial(-tau_root[r], 1)/(tau_root[j]-tau_root[r]);
         }
       }
@@ -92,7 +92,7 @@ namespace casadi {
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Polynomial dp = p.derivative();
-      for(int r=0; r<deg_+1; ++r) {
+      for (int r=0; r<deg_+1; ++r) {
         C[j][r] = zeroIfSmall(dp(tau_root[r]));
       }
 
@@ -109,7 +109,7 @@ namespace casadi {
     // Implicitly defined variables (z and x)
     MX v = MX::sym("v", deg_*(nx_+nz_));
     vector<int> v_offset(1, 0);
-    for(int d=0; d<deg_; ++d) {
+    for (int d=0; d<deg_; ++d) {
       v_offset.push_back(v_offset.back()+nx_);
       v_offset.push_back(v_offset.back()+nz_);
     }
@@ -118,7 +118,7 @@ namespace casadi {
 
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
-    for(int d=1; d<=deg_; ++d) {
+    for (int d=1; d<=deg_; ++d) {
       x[d] = reshape(*vv_it++, this->x0().shape());
       z[d] = reshape(*vv_it++, this->z0().shape());
     }
@@ -126,7 +126,7 @@ namespace casadi {
 
     // Collocation time points
     vector<MX> tt(deg_+1);
-    for(int d=0; d<=deg_; ++d) {
+    for (int d=0; d<=deg_; ++d) {
       tt[d] = t + h_*tau_root[d];
     }
 
@@ -140,8 +140,8 @@ namespace casadi {
     MX xf = D[0]*x0;
 
     // For all collocation points
-    for(int j=1; j<deg_+1; ++j) {
-      //for(int j=deg_; j>=1; --j) {
+    for (int j=1; j<deg_+1; ++j) {
+      //for (int j=deg_; j>=1; --j) {
 
       // Evaluate the DAE
       vector<MX> f_arg(DAE_NUM_IN);
@@ -153,7 +153,7 @@ namespace casadi {
 
       // Get an expression for the state derivative at the collocation point
       MX xp_j = C[0][j] * x0;
-      for(int r=1; r<deg_+1; ++r) {
+      for (int r=1; r<deg_+1; ++r) {
         xp_j += C[r][j] * x[r];
       }
 
@@ -186,7 +186,7 @@ namespace casadi {
     // Backwards dynamics
     // NOTE: The following is derived so that it will give the exact adjoint
     // sensitivities whenever g is the reverse mode derivative of f.
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
 
       // Symbolic inputs
       MX rx0 = MX::sym("x0", g_.input(RDAE_RX).sparsity());
@@ -195,7 +195,7 @@ namespace casadi {
       // Implicitly defined variables (rz and rx)
       MX rv = MX::sym("v", deg_*(nrx_+nrz_));
       vector<int> rv_offset(1, 0);
-      for(int d=0; d<deg_; ++d) {
+      for (int d=0; d<deg_; ++d) {
         rv_offset.push_back(rv_offset.back()+nrx_);
         rv_offset.push_back(rv_offset.back()+nrz_);
       }
@@ -204,7 +204,7 @@ namespace casadi {
 
       // Collocated states
       vector<MX> rx(deg_+1), rz(deg_+1);
-      for(int d=1; d<=deg_; ++d) {
+      for (int d=1; d<=deg_; ++d) {
         rx[d] = reshape(*rvv_it++, this->rx0().shape());
         rz[d] = reshape(*rvv_it++, this->rz0().shape());
       }
@@ -220,7 +220,7 @@ namespace casadi {
       MX rxf = D[0]*rx0;
 
       // For all collocation points
-      for(int j=1; j<deg_+1; ++j) {
+      for (int j=1; j<deg_+1; ++j) {
 
         // Evaluate the backward DAE
         vector<MX> g_arg(RDAE_NUM_IN);
@@ -235,7 +235,7 @@ namespace casadi {
 
         // Get an expression for the state derivative at the collocation point
         MX rxp_j = -D[j]*rx0;
-        for(int r=1; r<deg_+1; ++r) {
+        for (int r=1; r<deg_+1; ++r) {
           rxp_j += (B[r]*C[j][r]) * rx[r];
         }
 
@@ -279,7 +279,7 @@ namespace casadi {
     vector<double>::const_iterator x0_it = input(INTEGRATOR_X0).begin();
     vector<double>::const_iterator z_it = input(INTEGRATOR_Z0).begin();
     vector<double>::iterator Z_it = Z_.begin();
-    for(int d=0; d<deg_; ++d) {
+    for (int d=0; d<deg_; ++d) {
       copy(x0_it, x0_it+nx_, Z_it);
       Z_it += nx_;
       copy(z_it, z_it+nz_, Z_it);
@@ -292,7 +292,7 @@ namespace casadi {
     vector<double>::const_iterator rx0_it = input(INTEGRATOR_RX0).begin();
     vector<double>::const_iterator rz_it = input(INTEGRATOR_RZ0).begin();
     vector<double>::iterator RZ_it = RZ_.begin();
-    for(int d=0; d<deg_; ++d) {
+    for (int d=0; d<deg_; ++d) {
       copy(rx0_it, rx0_it+nrx_, RZ_it);
       RZ_it += nrx_;
       copy(rz_it, rz_it+nrz_, RZ_it);

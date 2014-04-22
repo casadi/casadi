@@ -50,25 +50,25 @@ namespace casadi {
                               MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                               bool output_given) {
     // Evaluate nondifferentiated
-    if(!output_given) {
-      if(output[0]) {
+    if (!output_given) {
+      if (output[0]) {
         *output[0] = shared_from_this<MX>();
       }
     }
 
     // Forward sensitivities
-    if(!fwdSens.empty()) {
+    if (!fwdSens.empty()) {
       MX zero_sens = MX::sparse(size1(), size2());
-      for(int d=0; d<fwdSens.size(); ++d) {
-        if(fwdSens[d][0]!=0) {
+      for (int d=0; d<fwdSens.size(); ++d) {
+        if (fwdSens[d][0]!=0) {
           *fwdSens[d][0] = zero_sens;
         }
       }
     }
 
     // Clear adjoint seeds
-    for(int d=0; d<adjSeed.size(); ++d) {
-      if(adjSeed[d][0]!=0) {
+    for (int d=0; d<adjSeed.size(); ++d) {
+      if (adjSeed[d][0]!=0) {
         *adjSeed[d][0] = MX();
       }
     }
@@ -86,7 +86,7 @@ namespace casadi {
     int ind = gen.getConstant(x_.data(), true);
 
     // Copy the constant to the work vector
-    stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << "  for (i=0; i<" << sparsity().size() << "; ++i) ";
     stream << res.at(0) << "[i]=";
     stream << "c" << ind << "[i];" << endl;
   }
@@ -98,10 +98,10 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, int val) {
-    if(sp.isEmpty(true)) {
+    if (sp.isEmpty(true)) {
       return ZeroByZero::getInstance();
     } else {
-      switch(val) {
+      switch (val) {
       case 0: return new Constant<CompiletimeConst<0> >(sp);
       case 1: return new Constant<CompiletimeConst<1> >(sp);
       case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
@@ -111,11 +111,11 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Sparsity& sp, double val) {
-    if(sp.isEmpty(true)) {
+    if (sp.isEmpty(true)) {
       return ZeroByZero::getInstance();
     } else {
       int intval(val);
-      if(intval-val==0) {
+      if (intval-val==0) {
         return create(sp, intval);
       } else {
         return new Constant<RuntimeConst<double> >(sp, val);
@@ -124,16 +124,16 @@ namespace casadi {
   }
 
   ConstantMX* ConstantMX::create(const Matrix<double>& val) {
-    if(val.size()==0) {
+    if (val.size()==0) {
       return create(val.sparsity(), 0);
-    } else if(val.isScalar()) {
+    } else if (val.isScalar()) {
       return create(val.sparsity(), val.toScalar());
     } else {
       // Check if all values are the same
       const vector<double> vdata = val.data();
       double v = vdata[0];
-      for(vector<double>::const_iterator i=vdata.begin(); i!=vdata.end(); ++i) {
-        if(*i!=v) {
+      for (vector<double>::const_iterator i=vdata.begin(); i!=vdata.end(); ++i) {
+        if (*i!=v) {
           // Values not all the same
           return new ConstantDMatrix(val);
         }
@@ -161,7 +161,7 @@ namespace casadi {
   }
 
   // MX ConstantMX::getMultiplication(const MX& y) const {
-  //   if(y.isConstant()) {
+  //   if (y.isConstant()) {
   //     // Constant folding
   //     DMatrix xv = getMatrixValue();
   //     DMatrix yv = y->getMatrixValue();
@@ -172,7 +172,7 @@ namespace casadi {
   // }
 
   MX ConstantMX::getInnerProd(const MX& y) const {
-    if(y.isConstant()) {
+    if (y.isConstant()) {
       // Constant folding
       DMatrix xv = getMatrixValue();
       DMatrix yv = y->getMatrixValue();
@@ -185,13 +185,13 @@ namespace casadi {
   bool ConstantDMatrix::isEqual(const MXNode* node, int depth) const {
     // Check if same node
     const ConstantDMatrix* n = dynamic_cast<const ConstantDMatrix*>(node);
-    if(n==0) return false;
+    if (n==0) return false;
 
     // Check sparsity
-    if(this->sparsity()!=node->sparsity()) return false;
+    if (this->sparsity()!=node->sparsity()) return false;
 
     // Check indices
-    if(!std::equal(x_.begin(), x_.end(), n->x_.begin())) return false;
+    if (!std::equal(x_.begin(), x_.end(), n->x_.begin())) return false;
 
     return true;
   }

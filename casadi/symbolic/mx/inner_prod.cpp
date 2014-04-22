@@ -37,9 +37,9 @@ namespace casadi {
   }
 
   void InnerProd::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "inner_prod(";
-    } else if(part==1) {
+    } else if (part==1) {
       stream << ", ";
     } else {
       stream << ")";
@@ -49,20 +49,20 @@ namespace casadi {
   void InnerProd::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                              MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                              bool output_given) {
-    if(!output_given) {
+    if (!output_given) {
       *output[0] = (*input[0])->getInnerProd(*input[1]);
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = (*input[0])->getInnerProd(*fwdSeed[d][1])
           + (*fwdSeed[d][0])->getInnerProd(*input[1]);
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum(*adjSeed[d][0] * *input[1]);
       adjSens[d][1]->addToSum(*adjSeed[d][0] * *input[0]);
       *adjSeed[d][0] = MX();
@@ -97,13 +97,13 @@ namespace casadi {
     bvec_t* arg0 = get_bvec_t(input[0]->data());
     bvec_t* arg1 = get_bvec_t(input[1]->data());
     const int n = input[0]->size();
-    if(fwd) {
+    if (fwd) {
       res = 0;
-      for(int i=0; i<n; ++i) {
+      for (int i=0; i<n; ++i) {
         res |= *arg0++ | *arg1++;
       }
     } else {
-      for(int i=0; i<n; ++i) {
+      for (int i=0; i<n; ++i) {
         *arg0++ |= res;
         *arg1++ |= res;
       }

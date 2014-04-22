@@ -106,7 +106,7 @@ class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX {
       CACHING_MAP<double, RealtypeSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
-      if(it==cached_constants_.end()) {
+      if (it==cached_constants_.end()) {
         // Allocate a new object
         RealtypeSX* n = new RealtypeSX(value);
 
@@ -162,7 +162,7 @@ class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX {
       CACHING_MAP<int, IntegerSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
-      if(it==cached_constants_.end()) {
+      if (it==cached_constants_.end()) {
         // Allocate a new object
         IntegerSX* n = new IntegerSX(value);
 

@@ -104,7 +104,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception {
     " of file " CASADI_ASSERT_STR(__FILE__)
 
 #define casadi_log(msg) \
-  if(verbose()) { \
+  if (verbose()) { \
     std::stringstream ss_internal_; \
     ss_internal_ << msg; \
     std::cout << "CasADi log message: " << ss_internal_.str() << std::endl; \
@@ -127,7 +127,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception {
       throw casadi::CasadiException(std::string("When trying to check the assertion \"" \
         CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what()); \
   } \
- if(!is_ok) { \
+ if (!is_ok) { \
   std::stringstream ss_internal_; \
   ss_internal_ << "The assertion \"" CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE \
       " failed. " << std::endl << msg  <<  std::endl;   \
@@ -144,7 +144,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception {
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
 #define casadi_assert_warning(x, msg) \
-if((x)==false) { \
+if ((x)==false) { \
   std::cerr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) \
     "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;  \
 }

@@ -60,7 +60,7 @@ XMLNode& XMLNode::operator[](const string& childname) {
   map<string, int>::const_iterator it = child_indices_.find(childname);
 
   // check that the child was indeed found
-  if(it == child_indices_.end()) {
+  if (it == child_indices_.end()) {
     throw CasadiException("Error in XMLNode::operator[]: could not find " + childname);
   }
 
@@ -84,15 +84,15 @@ void XMLNode::addNode(TiXmlNode* n) {
 
   // Save attributes
   int type = n->Type();
-  if(type == TiXmlNode::ELEMENT) {
-    if(n->ToElement()!=0) {
-      for(TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
+  if (type == TiXmlNode::ELEMENT) {
+    if (n->ToElement()!=0) {
+      for (TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
           pAttrib;
           pAttrib=pAttrib->Next()) {
           setAttribute(pAttrib->Name(), pAttrib->Value());
       }
     }
-  } else if(type == TiXmlNode::DOCUMENT) {
+  } else if (type == TiXmlNode::DOCUMENT) {
     // do nothing
   } else {
     throw CasadiException("XMLNode::addNode");
@@ -100,7 +100,7 @@ void XMLNode::addNode(TiXmlNode* n) {
 
   // Count the number of children
   int num_children = 0;
-  for( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling()) {
+  for ( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling()) {
     num_children++;
   }
   children_.reserve(num_children);
@@ -110,14 +110,14 @@ void XMLNode::addNode(TiXmlNode* n) {
   for ( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch) {
       int childtype = child->Type();
 
-      if(childtype == TiXmlNode::ELEMENT) {
+      if (childtype == TiXmlNode::ELEMENT) {
         XMLNode newnode;
         newnode.addNode(child);
         children_.push_back(newnode);
         child_indices_[newnode.getName()] = ch;
-      } else if(childtype == TiXmlNode::COMMENT) {
+      } else if (childtype == TiXmlNode::COMMENT) {
         comment_ = child->Value();
-      } else if(childtype == TiXmlNode::TEXT) {
+      } else if (childtype == TiXmlNode::TEXT) {
         text_ = child->ToText()->Value();
       } else if (childtype == TiXmlNode::DECLARATION) {
         cout << "Warning: Skipped TiXmlNode::DECLARATION" << endl;
@@ -149,22 +149,22 @@ void XMLNode::dump(ostream &stream, int indent) const {
   stream << string( indent, ' ') << "Node: " << name_ << endl;
 
   // Print comment
-  if(!comment_.empty()) {
+  if (!comment_.empty()) {
     stream << string( indent, ' ') << "----- comment starts ----- "  << endl;
     stream << comment_ << endl;
     stream << string( indent, ' ') << "----- comment ends ----- "  << endl;
   }
 
   // Print text
-  if(!text_.empty())
+  if (!text_.empty())
     stream << string( indent+2, ' ') << "Text: " << text_ << endl;
 
   // Print attributes
-  for(map<string, string>::const_iterator it=attributes_.begin(); it != attributes_.end(); ++it)
+  for (map<string, string>::const_iterator it=attributes_.begin(); it != attributes_.end(); ++it)
     stream << string( indent+2, ' ') << "attribute " << it->first << " = " << it->second << endl;
 
   // Print Children
-  for(int i=0; i<size(); ++i) {
+  for (int i=0; i<size(); ++i) {
     stream << string( indent, ' ') << "Child " << i << ":" << endl;
     (*this)[i].dump(stream, indent+2);
   }
@@ -179,9 +179,9 @@ void XMLNode::readString(const std::string& str, std::string& val) {
 }
 
 void XMLNode::readString(const std::string& str, bool& val) {
-  if(str.compare("true")==0)
+  if (str.compare("true")==0)
     val = true;
-  else if(str.compare("false")==0)
+  else if (str.compare("false")==0)
     val = false;
   else
     throw CasadiException("XML argument not true or false");

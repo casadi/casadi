@@ -117,12 +117,12 @@ namespace casadi {
     DMatrix Q = DMatrix::zeros(deg+1);
 
     // For all collocation points
-    for(int j=0; j<deg+1; ++j) {
+    for (int j=0; j<deg+1; ++j) {
 
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
       Polynomial p = 1;
-      for(int r=0; r<deg+1; ++r) {
-        if(r!=j) {
+      for (int r=0; r<deg+1; ++r) {
+        if (r!=j) {
           p *= Polynomial(-tau_root[r], 1)/(tau_root[j]-tau_root[r]);
         }
       }
@@ -135,7 +135,7 @@ namespace casadi {
       // Evaluate the time derivative of the polynomial at all collocation points to get
       // the coefficients of the continuity equation
       Polynomial dp = p.derivative();
-      for(int r=0; r<deg+1; ++r) {
+      for (int r=0; r<deg+1; ++r) {
         C_num(j, r) = dp(tau_root[r]);
         C[j][r] = C_num(j, r);
       }
@@ -177,7 +177,7 @@ namespace casadi {
     vector<vector<MX> > Z(nk);
     vector<vector<MX> > RZ(nk);
     coll_time_.resize(nk+1);
-    for(int k=0; k<nk+1; ++k) {
+    for (int k=0; k<nk+1; ++k) {
       // Number of time points
       int nj = k==nk ? 1 : deg+1;
 
@@ -187,13 +187,13 @@ namespace casadi {
       coll_time_[k].resize(nj);
 
       // Allocate algebraic variable expressions at the collocation points
-      if(k!=nk) {
+      if (k!=nk) {
         Z[k].resize(nj-1);
         RZ[k].resize(nj-1);
       }
 
       // For all time points
-      for(int j=0; j<nj; ++j) {
+      for (int j=0; j<nj; ++j) {
         // Get expressions for the differential state
         X[k][j] = reshape(V(range(offset, offset+nx_)), x0().shape());
         offset += nx_;
@@ -204,7 +204,7 @@ namespace casadi {
         coll_time_[k][j] = t0_ + h*(k + tau_root[j]);
 
         // Get expressions for the algebraic variables
-        if(j>0) {
+        if (j>0) {
           Z[k][j-1] = reshape(V(range(offset, offset+nz_)), z0().shape());
           offset += nz_;
           RZ[k][j-1] = reshape(V(range(offset, offset+nrz_)), rz0().shape());
@@ -231,16 +231,16 @@ namespace casadi {
     g.push_back(vec(X[0][0]-X0));
 
     // For all finite elements
-    for(int k=0; k<nk; ++k, ++jk) {
+    for (int k=0; k<nk; ++k, ++jk) {
 
       // For all collocation points
-      for(int j=1; j<deg+1; ++j, ++jk) {
+      for (int j=1; j<deg+1; ++j, ++jk) {
         // Get the time
         MX tkj = coll_time_[k][j];
 
         // Get an expression for the state derivative at the collocation point
         MX xp_jk = 0;
-        for(int j2=0; j2<deg+1; ++j2) {
+        for (int j2=0; j2<deg+1; ++j2) {
           xp_jk += C[j2][j]*X[k][j2];
         }
 
@@ -256,21 +256,21 @@ namespace casadi {
         g.push_back(vec(h_mx*f_out[DAE_ODE] - xp_jk));
 
         // Add the algebraic conditions
-        if(nz_>0) {
+        if (nz_>0) {
           g.push_back(vec(f_out[DAE_ALG]));
         }
 
         // Add the quadrature
-        if(nq_>0) {
+        if (nq_>0) {
           QF += Q(j)*h_mx*f_out[DAE_QUAD];
         }
 
         // Now for the backward problem
-        if(nrx_>0) {
+        if (nrx_>0) {
 
           // Get an expression for the state derivative at the collocation point
           MX rxp_jk = 0;
-          for(int j2=0; j2<deg+1; ++j2) {
+          for (int j2=0; j2<deg+1; ++j2) {
             rxp_jk += C[j2][j]*RX[k][j2];
           }
 
@@ -289,12 +289,12 @@ namespace casadi {
           g.push_back(vec(h_mx*g_out[RDAE_ODE] + rxp_jk));
 
           // Add the algebraic conditions
-          if(nrz_>0) {
+          if (nrz_>0) {
             g.push_back(vec(g_out[RDAE_ALG]));
           }
 
           // Add the backward quadrature
-          if(nrq_>0) {
+          if (nrq_>0) {
             RQF += Q(j)*h_mx*g_out[RDAE_QUAD];
           }
         }
@@ -302,17 +302,17 @@ namespace casadi {
 
       // Get an expression for the state at the end of the finite element
       MX xf_k = 0;
-      for(int j=0; j<deg+1; ++j) {
+      for (int j=0; j<deg+1; ++j) {
         xf_k += D[j]*X[k][j];
       }
 
       // Add continuity equation to the list of equations
       g.push_back(vec(X[k+1][0] - xf_k));
 
-      if(nrx_>0) {
+      if (nrx_>0) {
         // Get an expression for the state at the end of the finite element
         MX rxf_k = 0;
-        for(int j=0; j<deg+1; ++j) {
+        for (int j=0; j<deg+1; ++j) {
           rxf_k += D[j]*RX[k][j];
         }
 
@@ -322,7 +322,7 @@ namespace casadi {
     }
 
     // Add initial condition for the backward integration
-    if(nrx_>0) {
+    if (nrx_>0) {
       g.push_back(vec(RX[nk][0]-RX0));
     }
 
@@ -354,7 +354,7 @@ namespace casadi {
     ss_ifcn << "collocation_implicit_residual_" << getOption("name");
     ifcn.setOption("name", ss_ifcn.str());
     ifcn.init();
-    if(expand_f) {
+    if (expand_f) {
       ifcn = SXFunction(shared_cast<MXFunction>(ifcn));
       ifcn.setOption("name", ss_ifcn.str());
       ifcn.init();
@@ -370,7 +370,7 @@ namespace casadi {
     implicit_solver_.setOption("name", ss_implicit_solver.str());
 
     // Pass options
-    if(hasSetOption("implicit_solver_options")) {
+    if (hasSetOption("implicit_solver_options")) {
       const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
       implicit_solver_.setOption(implicit_solver_options);
     }
@@ -378,7 +378,7 @@ namespace casadi {
     // Initialize the solver
     implicit_solver_.init();
 
-    if(hasSetOption("startup_integrator")) {
+    if (hasSetOption("startup_integrator")) {
 
       // Create the linear solver
       integratorCreator startup_integrator_creator = getOption("startup_integrator");
@@ -394,7 +394,7 @@ namespace casadi {
       ss_startup_integrator << "collocation_startup_" << getOption("name");
       startup_integrator_.setOption("name", ss_startup_integrator.str());
 
-      if(hasSetOption("startup_integrator_options")) {
+      if (hasSetOption("startup_integrator_options")) {
         const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
         startup_integrator_.setOption(startup_integrator_options);
       }
@@ -421,20 +421,20 @@ namespace casadi {
     IntegratorInternal::reset();
 
     // Pass the inputs
-    for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
+    for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
       implicit_solver_.input(1+iind).set(input(iind));
     }
 
     // Pass solution guess (if this is the first integration or if hotstart is disabled)
-    if(hotstart_==false || integrated_once_==false) {
+    if (hotstart_==false || integrated_once_==false) {
       vector<double>& v = implicit_solver_.input().data();
 
       // Check if an integrator for the startup trajectory has been supplied
       bool has_startup_integrator = !startup_integrator_.isNull();
 
       // Use supplied integrator, if any
-      if(has_startup_integrator) {
-        for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
+      if (has_startup_integrator) {
+        for (int iind=0; iind<INTEGRATOR_NUM_IN; ++iind) {
           startup_integrator_.input(iind).set(input(iind));
         }
 
@@ -444,10 +444,10 @@ namespace casadi {
 
       // Integrate, stopping at all time points
       int offs=0;
-      for(int k=0; k<coll_time_.size(); ++k) {
-        for(int j=0; j<coll_time_[k].size(); ++j) {
+      for (int k=0; k<coll_time_.size(); ++k) {
+        for (int j=0; j<coll_time_[k].size(); ++j) {
 
-          if(has_startup_integrator) {
+          if (has_startup_integrator) {
             // Integrate to the time point
             startup_integrator_.integrate(coll_time_[k][j]);
           }
@@ -455,15 +455,15 @@ namespace casadi {
           // Save the differential states
           const DMatrix& x = has_startup_integrator ? startup_integrator_.output(INTEGRATOR_XF) :
               input(INTEGRATOR_X0);
-          for(int i=0; i<nx_; ++i) {
+          for (int i=0; i<nx_; ++i) {
             v.at(offs++) = x.at(i);
           }
 
           // Skip algebraic variables (for now) // FIXME
-          if(j>0) {
+          if (j>0) {
             if (has_startup_integrator && startup_integrator_.hasOption("init_z")) {
               std::vector<double> init_z = startup_integrator_.getOption("init_z");
-              for(int i=0; i<nz_; ++i) {
+              for (int i=0; i<nz_; ++i) {
                 v.at(offs++) = init_z.at(i);
               }
             } else {
@@ -473,19 +473,19 @@ namespace casadi {
 
           // Skip backward states // FIXME
           const DMatrix& rx = input(INTEGRATOR_RX0);
-          for(int i=0; i<nrx_; ++i) {
+          for (int i=0; i<nrx_; ++i) {
             v.at(offs++) = rx.at(i);
           }
 
           // Skip backward algebraic variables // FIXME
-          if(j>0) {
+          if (j>0) {
             offs += nrz_;
           }
         }
       }
 
       // Print
-      if(has_startup_integrator && verbose()) {
+      if (has_startup_integrator && verbose()) {
         cout << "startup trajectory generated, statistics:" << endl;
         startup_integrator_.printStats();
       }
@@ -519,7 +519,7 @@ namespace casadi {
   }
 
   void OldCollocationIntegratorInternal::integrate(double t_out) {
-    for(int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind) {
+    for (int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind) {
       output(oind).set(implicit_solver_.output(1+oind));
     }
   }

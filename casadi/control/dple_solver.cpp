@@ -33,7 +33,7 @@ namespace casadi {
 
   DpleSolver  DpleSolver::clone() const {
     DpleSolver ret;
-    if(!isNull()) ret.assignNode((*this)->clone());
+    if (!isNull()) ret.assignNode((*this)->clone());
     return ret;
   }
 

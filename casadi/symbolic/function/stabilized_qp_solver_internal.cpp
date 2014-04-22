@@ -104,7 +104,7 @@ namespace casadi {
     // Check box constraints
     const vector<double>& lbx = input(STABILIZED_QP_SOLVER_LBX).data();
     const vector<double>& ubx = input(STABILIZED_QP_SOLVER_UBX).data();
-    for(int i=0; i<lbx.size(); ++i) {
+    for (int i=0; i<lbx.size(); ++i) {
       casadi_assert_message(lbx.at(i)<=ubx.at(i),
                             "LBX[" << i << "]== <= UBX[" << i << "] was violated. "
                             "Got LBX["<<i<<"]=" << lbx.at(i)
@@ -114,7 +114,7 @@ namespace casadi {
     // Check linear constraint bounds
     const vector<double>& lba = input(STABILIZED_QP_SOLVER_LBA).data();
     const vector<double>& uba = input(STABILIZED_QP_SOLVER_UBA).data();
-    for(int i=0; i<lba.size(); ++i) {
+    for (int i=0; i<lba.size(); ++i) {
       casadi_assert_message(lba.at(i)<=uba.at(i),
                             "LBA[" << i << "]== <= UBA[" << i << "] was violated. "
                             "Got LBA["<<i<<"]=" << lba.at(i)

@@ -167,7 +167,7 @@ namespace casadi {
       daeOut("ode", (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]));
 
     int i=1;
-    while( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}
+    while ( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}
 
     dae_ = MXFunction(dae_in_, dae_out);
 
@@ -176,7 +176,7 @@ namespace casadi {
     // Create an integrator instance
     integratorCreator integrator_creator = getOption("integrator");
     integrator_ = integrator_creator(dae_, Function());
-    if(hasSetOption("integrator_options")) {
+    if (hasSetOption("integrator_options")) {
       integrator_.setOption(getOption("integrator_options"));
     }
 
@@ -222,7 +222,7 @@ namespace casadi {
     integrator_.init();
 
     // Generate an output function if there is none (returns the whole state)
-    if(orig_output_fcn_.isNull()) {
+    if (orig_output_fcn_.isNull()) {
 
       SX t        = SX::sym("t", control_dae_.input(CONTROL_DAE_T).sparsity());
       SX t0       = SX::sym("t0", control_dae_.input(CONTROL_DAE_T0).sparsity());
@@ -325,7 +325,7 @@ namespace casadi {
 
     // Create the simulator
     simulator_ = Simulator(integrator_, output_fcn_, gridlocal_);
-    if(hasSetOption("simulator_options")) {
+    if (hasSetOption("simulator_options")) {
       simulator_.setOption(getOption("simulator_options"));
     }
     simulator_.init();
@@ -338,7 +338,7 @@ namespace casadi {
 
     // Allocate outputs
     setNumOutputs(output_fcn_.getNumOutputs()-2);
-    for(int i=0; i<getNumOutputs(); ++i)
+    for (int i=0; i<getNumOutputs(); ++i)
       output(i) = Matrix<double>::zeros(output_fcn_.output(i+2).numel(), (ns_-1)*nf_+1);
 
     // Call base class method
@@ -368,7 +368,7 @@ namespace casadi {
     // Output of simulator.call
     vector<MX> simulator_out;
 
-    for(int k=0; k<ns_-1; ++k) {
+    for (int k=0; k<ns_-1; ++k) {
       // Set the appropriate inputs for the k'th simulator call
       simulator_in[INTEGRATOR_X0] = Xk;
       P_eval[0] = MX(gridc_[k]);

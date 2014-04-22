@@ -82,7 +82,7 @@ namespace casadi {
     ret[0] = a;
     MatType step = (b-a)/(nsteps-1);
 
-    for(int i=1; i<nsteps-1; ++i)
+    for (int i=1; i<nsteps-1; ++i)
       ret[i] = ret[i-1] + step;
 
     ret[nsteps-1] = b;

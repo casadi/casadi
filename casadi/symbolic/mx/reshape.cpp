@@ -56,7 +56,7 @@ namespace casadi {
   void Reshape::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
                             std::vector<T>& rtmp) {
     // Quick return if inplace
-    if(input[0]==output[0]) return;
+    if (input[0]==output[0]) return;
 
     vector<T>& res = output[0]->data();
     const vector<T>& arg = input[0]->data();
@@ -65,15 +65,15 @@ namespace casadi {
 
   void Reshape::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     // Quick return if inplace
-    if(input[0]==output[0]) return;
+    if (input[0]==output[0]) return;
 
     bvec_t *res_ptr = get_bvec_t(output[0]->data());
     vector<double>& arg = input[0]->data();
     bvec_t *arg_ptr = get_bvec_t(arg);
-    if(fwd) {
+    if (fwd) {
       copy(arg_ptr, arg_ptr+arg.size(), res_ptr);
     } else {
-      for(int k=0; k<arg.size(); ++k) {
+      for (int k=0; k<arg.size(); ++k) {
         *arg_ptr++ |= *res_ptr;
         *res_ptr++ = 0;
       }
@@ -81,7 +81,7 @@ namespace casadi {
   }
 
   void Reshape::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "reshape(";
     } else {
       stream << ")";
@@ -92,21 +92,21 @@ namespace casadi {
                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                            bool output_given) {
     // Quick return if inplace
-    if(input[0]==output[0]) return;
+    if (input[0]==output[0]) return;
 
-    if(!output_given) {
+    if (!output_given) {
       *output[0] = reshape(*input[0], shape());
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d = 0; d<nfwd; ++d) {
+    for (int d = 0; d<nfwd; ++d) {
       *fwdSens[d][0] = reshape(*fwdSeed[d][0], shape());
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       MX& aseed = *adjSeed[d][0];
       MX& asens = *adjSens[d][0];
       asens.addToSum(reshape(aseed, dep().shape()));
@@ -117,9 +117,9 @@ namespace casadi {
   void Reshape::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                   const std::vector<std::string>& res, CodeGenerator& gen) const {
     // Quick return if inplace
-    if(arg[0].compare(res[0])==0) return;
+    if (arg[0].compare(res[0])==0) return;
 
-    stream << "  for(i=0; i<" << size() << "; ++i) " << res.front()
+    stream << "  for (i=0; i<" << size() << "; ++i) " << res.front()
            << "[i] = " << arg.front() << "[i];" << endl;
   }
 

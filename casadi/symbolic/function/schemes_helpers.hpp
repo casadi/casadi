@@ -52,7 +52,7 @@ DPLEInputIOSchemeVector<M> dpleIn(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DPLEInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in DPLEInput: '" << it->first
@@ -92,7 +92,7 @@ DPLEOutputIOSchemeVector<M> dpleOut(
   std::map<std::string, M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DPLEOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in DPLEOutput: '" << it->first
@@ -146,7 +146,7 @@ ControlledDAEInputIOSchemeVector<M> controldaeIn(
   if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
   if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_ControlledDAEInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in ControlledDAEInput: '" << it->first
@@ -204,7 +204,7 @@ ControlSimulatorInputIOSchemeVector<M> controlsimulatorIn(
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_ControlSimulatorInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in ControlSimulatorInput: '" << it->first
@@ -250,7 +250,7 @@ HNLPInputIOSchemeVector<M> hnlpIn(
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_HNLPInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in HNLPInput: '" << it->first
@@ -298,7 +298,7 @@ DAEInputIOSchemeVector<M> daeIn(
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DAEInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in DAEInput: '" << it->first
@@ -346,7 +346,7 @@ DAEOutputIOSchemeVector<M> daeOut(
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DAEOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in DAEOutput: '" << it->first
@@ -400,7 +400,7 @@ RDAEInputIOSchemeVector<M> rdaeIn(
   if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
   if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_RDAEInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in RDAEInput: '" << it->first
@@ -454,7 +454,7 @@ RDAEOutputIOSchemeVector<M> rdaeOut(
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_RDAEOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in RDAEOutput: '" << it->first
@@ -506,7 +506,7 @@ IntegratorInputIOSchemeVector<M> integratorIn(
   if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
   if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_IntegratorInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in IntegratorInput: '" << it->first
@@ -564,7 +564,7 @@ IntegratorOutputIOSchemeVector<M> integratorOut(
   if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
   if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_IntegratorOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in IntegratorOutput: '" << it->first
@@ -614,7 +614,7 @@ LinsolInputIOSchemeVector<M> linsolIn(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LinsolInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in LinsolInput: '" << it->first
@@ -654,7 +654,7 @@ LinsolOutputIOSchemeVector<M> linsolOut(
   std::map<std::string, M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LinsolOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in LinsolOutput: '" << it->first
@@ -702,7 +702,7 @@ LPSolverInputIOSchemeVector<M> lpIn(
   if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
   if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LPSolverInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in LPSolverInput: '" << it->first
@@ -756,7 +756,7 @@ LPSolverOutputIOSchemeVector<M> lpOut(
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LPSolverOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in LPSolverOutput: '" << it->first
@@ -800,7 +800,7 @@ LPStructIOSchemeVector<M> lpStruct(
   std::map<std::string, M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LPStruct, it->first);
     if (n==-1)
       casadi_error("Keyword error in LPStruct: '" << it->first
@@ -840,7 +840,7 @@ NLPInputIOSchemeVector<M> nlpIn(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in NLPInput: '" << it->first
@@ -882,7 +882,7 @@ NLPOutputIOSchemeVector<M> nlpOut(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in NLPOutput: '" << it->first
@@ -924,7 +924,7 @@ GradFInputIOSchemeVector<M> gradFIn(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_GradFInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in GradFInput: '" << it->first
@@ -968,7 +968,7 @@ GradFOutputIOSchemeVector<M> gradFOut(
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_GradFOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in GradFOutput: '" << it->first
@@ -1012,7 +1012,7 @@ JacGInputIOSchemeVector<M> jacGIn(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_JacGInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in JacGInput: '" << it->first
@@ -1056,7 +1056,7 @@ JacGOutputIOSchemeVector<M> jacGOut(
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_JacGOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in JacGOutput: '" << it->first
@@ -1104,7 +1104,7 @@ HessLagInputIOSchemeVector<M> hessLagIn(
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_HessLagInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in HessLagInput: '" << it->first
@@ -1156,7 +1156,7 @@ HessLagOutputIOSchemeVector<M> hessLagOut(
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_HessLagOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in HessLagOutput: '" << it->first
@@ -1216,7 +1216,7 @@ NLPSolverInputIOSchemeVector<M> nlpSolverIn(
   if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
   if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPSolverInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in NLPSolverInput: '" << it->first
@@ -1278,7 +1278,7 @@ NLPSolverOutputIOSchemeVector<M> nlpSolverOut(
   if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
   if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPSolverOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in NLPSolverOutput: '" << it->first
@@ -1330,7 +1330,7 @@ MayerInputIOSchemeVector<M> mayerIn(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_MayerInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in MayerInput: '" << it->first
@@ -1400,7 +1400,7 @@ OCPInputIOSchemeVector<M> ocpIn(
   if (arg_s11!="") arg.insert(make_pair(arg_s11, arg_m11));
   if (arg_s12!="") arg.insert(make_pair(arg_s12, arg_m12));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_OCPInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in OCPInput: '" << it->first
@@ -1468,7 +1468,7 @@ OCPOutputIOSchemeVector<M> ocpOut(
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_OCPOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in OCPOutput: '" << it->first
@@ -1534,7 +1534,7 @@ QCQPSolverInputIOSchemeVector<M> qcqpIn(
   if (arg_s10!="") arg.insert(make_pair(arg_s10, arg_m10));
   if (arg_s11!="") arg.insert(make_pair(arg_s11, arg_m11));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QCQPSolverInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in QCQPSolverInput: '" << it->first
@@ -1600,7 +1600,7 @@ QCQPSolverOutputIOSchemeVector<M> qcqpOut(
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QCQPSolverOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in QCQPSolverOutput: '" << it->first
@@ -1648,7 +1648,7 @@ QCQPStructIOSchemeVector<M> qcqpStruct(
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QCQPStruct, it->first);
     if (n==-1)
       casadi_error("Keyword error in QCQPStruct: '" << it->first
@@ -1706,7 +1706,7 @@ QPSolverInputIOSchemeVector<M> qpIn(
   if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
   if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QPSolverInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in QPSolverInput: '" << it->first
@@ -1766,7 +1766,7 @@ QPSolverOutputIOSchemeVector<M> qpOut(
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QPSolverOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in QPSolverOutput: '" << it->first
@@ -1812,7 +1812,7 @@ QPStructIOSchemeVector<M> qpStruct(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QPStruct, it->first);
     if (n==-1)
       casadi_error("Keyword error in QPStruct: '" << it->first
@@ -1866,7 +1866,7 @@ SDPInputIOSchemeVector<M> sdpIn(
   if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
   if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDPInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in SDPInput: '" << it->first
@@ -1930,7 +1930,7 @@ SDPOutputIOSchemeVector<M> sdpOut(
   if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
   if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDPOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in SDPOutput: '" << it->first
@@ -1984,7 +1984,7 @@ SDPStructIOSchemeVector<M> sdpStruct(
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDPStruct, it->first);
     if (n==-1)
       casadi_error("Keyword error in SDPStruct: '" << it->first
@@ -2042,7 +2042,7 @@ SDQPInputIOSchemeVector<M> sdqpIn(
   if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
   if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDQPInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in SDQPInput: '" << it->first
@@ -2108,7 +2108,7 @@ SDQPOutputIOSchemeVector<M> sdqpOut(
   if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
   if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDQPOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in SDQPOutput: '" << it->first
@@ -2164,7 +2164,7 @@ SDQPStructIOSchemeVector<M> sdqpStruct(
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDQPStruct, it->first);
     if (n==-1)
       casadi_error("Keyword error in SDQPStruct: '" << it->first
@@ -2226,7 +2226,7 @@ SOCPInputIOSchemeVector<M> socpIn(
   if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
   if (arg_s9!="") arg.insert(make_pair(arg_s9, arg_m9));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SOCPInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in SOCPInput: '" << it->first
@@ -2288,7 +2288,7 @@ SOCPOutputIOSchemeVector<M> socpOut(
   if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SOCPOutput, it->first);
     if (n==-1)
       casadi_error("Keyword error in SOCPOutput: '" << it->first
@@ -2334,7 +2334,7 @@ SOCPStructIOSchemeVector<M> socpStruct(
   if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SOCPStruct, it->first);
     if (n==-1)
       casadi_error("Keyword error in SOCPStruct: '" << it->first
@@ -2396,7 +2396,7 @@ StabilizedQPSolverInputIOSchemeVector<M> stabilizedQpIn(
   if (arg_s10!="") arg.insert(make_pair(arg_s10, arg_m10));
   if (arg_s11!="") arg.insert(make_pair(arg_s11, arg_m11));
   typedef typename std::map<std::string, M>::const_iterator it_type;
-  for(it_type it = arg.begin(); it != arg.end(); it++) {
+  for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, it->first);
     if (n==-1)
       casadi_error("Keyword error in StabilizedQPSolverInput: '" << it->first

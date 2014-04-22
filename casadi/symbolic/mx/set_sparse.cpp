@@ -40,8 +40,8 @@ namespace casadi {
   }
 
   void SetSparse::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
-      if(sparsity().isDense()) {
+    if (part==0) {
+      if (sparsity().isDense()) {
         stream << "dense(";
       } else {
         stream << "set_sparse(";
@@ -71,19 +71,19 @@ namespace casadi {
                              MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                              bool output_given) {
     // Evaluate function
-    if(!output_given) {
+    if (!output_given) {
       *output[0] = input[0]->setSparse(sparsity());
     }
 
     // Propagate forward seeds
     int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = fwdSeed[d][0]->setSparse(sparsity(), true);
     }
 
     // Propagate adjoint seeds
     int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum(adjSeed[d][0]->setSparse(dep().sparsity(), true));
       *adjSeed[d][0] = MX();
     }
@@ -92,7 +92,7 @@ namespace casadi {
   void SetSparse::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     bvec_t *inputd = get_bvec_t(input[0]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    if(fwd) {
+    if (fwd) {
       output[0]->sparsity().set(outputd, inputd, input[0]->sparsity());
     } else {
       input[0]->sparsity().bor(inputd, outputd, output[0]->sparsity());

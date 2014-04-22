@@ -68,7 +68,7 @@ namespace casadi {
 
     // Transpose
     copy(xT_colind.begin(), xT_colind.end(), itmp.begin());
-    for(int el=0; el<x_row.size(); ++el) {
+    for (int el=0; el<x_row.size(); ++el) {
       xT[itmp[x_row[el]]++] = x[el];
     }
   }
@@ -83,8 +83,8 @@ namespace casadi {
 
     const vector<T>& x = input[0]->data();
     vector<T>& xT = output[0]->data();
-    for(int i=0; i<x_ncol; ++i) {
-      for(int j=0; j<x_nrow; ++j) {
+    for (int i=0; i<x_ncol; ++i) {
+      for (int j=0; j<x_nrow; ++j) {
         xT[i+j*x_ncol] = x[j+i*x_nrow];
       }
     }
@@ -105,13 +105,13 @@ namespace casadi {
     copy(xT_colind.begin(), xT_colind.end(), itmp.begin());
 
     // Loop over the nonzeros of the argument
-    for(int el=0; el<x_row.size(); ++el) {
+    for (int el=0; el<x_row.size(); ++el) {
 
       // Get the row
       int j = x_row[el];
 
       // Copy nonzero
-      if(fwd) {
+      if (fwd) {
         xT[itmp[j]++] = x[el];
       } else {
         int elT = itmp[j]++;
@@ -133,11 +133,11 @@ namespace casadi {
     bvec_t *xT = get_bvec_t(output[0]->data());
 
     // Loop over the elements
-    for(int i=0; i<x_ncol; ++i) {
-      for(int j=0; j<x_nrow; ++j) {
+    for (int i=0; i<x_ncol; ++i) {
+      for (int j=0; j<x_nrow; ++j) {
         int el = j+i*x_nrow;
         int elT = i+j*x_ncol;
-        if(fwd) {
+        if (fwd) {
           xT[elT] = x[el];
         } else {
           x[el] |= xT[elT];
@@ -148,7 +148,7 @@ namespace casadi {
   }
 
   void Transpose::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
     } else {
       stream << "'";
     }
@@ -157,18 +157,18 @@ namespace casadi {
   void Transpose::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                              MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                              bool output_given) {
-    if(!output_given)
+    if (!output_given)
       *output[0] = input[0]->T();
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = fwdSeed[d][0]->T();
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum(adjSeed[d][0]->T());
       *adjSeed[d][0] = MX();
     }
@@ -188,8 +188,8 @@ namespace casadi {
   void DenseTranspose::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                          const std::vector<std::string>& res,
                                          CodeGenerator& gen) const {
-    stream << "  for(i=0; i<" << dep().size2() << "; ++i) ";
-    stream << "for(j=0; j<" << dep().size1() << "; ++j) ";
+    stream << "  for (i=0; i<" << dep().size2() << "; ++i) ";
+    stream << "for (j=0; j<" << dep().size1() << "; ++j) ";
     stream << res.front() << "[i+j*" << dep().size2() << "] = " << arg.front()
            << "[j+i*" << dep().size1() << "];" << endl;
   }

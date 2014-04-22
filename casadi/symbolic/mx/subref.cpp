@@ -55,7 +55,7 @@ namespace casadi {
   }
 
   void SubRef::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "(";
     } else {
       stream << "[" << i_ << ", " << j_ << "])";

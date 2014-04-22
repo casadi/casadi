@@ -93,7 +93,7 @@ namespace casadi {
     /** \brief  Access an input */
     template<bool check>
     DMatrix& inputS(int i) {
-      if(check) {
+      if (check) {
         try {
           return static_cast<Derived*>(this)->input_struct().data.at(i);
         } catch(std::out_of_range&) {
@@ -118,7 +118,7 @@ namespace casadi {
     /** \brief  Access an output*/
     template<bool check>
     DMatrix& outputS(int i) {
-      if(check) {
+      if (check) {
         try {
           return static_cast<Derived*>(this)->output_struct().data.at(i);
         } catch(std::out_of_range&) {

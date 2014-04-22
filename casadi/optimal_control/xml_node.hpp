@@ -60,7 +60,7 @@ public:
     std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
 
     // check if the attribute exists
-    if(it == attributes_.end()) {
+    if (it == attributes_.end()) {
       casadi_assert_message(!assert_existance,
                             "Error in XMLNode::readAttribute: could not find " + attribute_name);
     } else {

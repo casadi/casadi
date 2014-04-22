@@ -40,11 +40,11 @@ namespace casadi {
 
   void ParallelizerInternal::init() {
     // Get mode
-    if(getOption("parallelization")=="serial") {
+    if (getOption("parallelization")=="serial") {
       mode_ = SERIAL;
-    } else if(getOption("parallelization")=="openmp") {
+    } else if (getOption("parallelization")=="openmp") {
       mode_ = OPENMP;
-    } else if(getOption("parallelization")=="mpi") {
+    } else if (getOption("parallelization")=="mpi") {
       mode_ = MPI;
     } else {
       casadi_error("Parallelization mode " << getOption("parallelization") << " unknown.");
@@ -52,7 +52,7 @@ namespace casadi {
 
     // Switch to serial mode if OPENMP is not supported
 #ifndef WITH_OPENMP
-    if(mode_ == OPENMP) {
+    if (mode_ == OPENMP) {
       casadi_warning("OpenMP parallelization is not available, switching to serial mode. "
                      "Recompile CasADi setting the option WITH_OPENMP to ON.");
       mode_ = SERIAL;
@@ -62,10 +62,10 @@ namespace casadi {
     // Check if a node is a copy of another
     copy_of_.resize(funcs_.size(), -1);
     map<void*, int> is_copy_of;
-    for(int i=0; i<funcs_.size(); ++i) {
+    for (int i=0; i<funcs_.size(); ++i) {
       // Check if the function has already been assigned an index
       map<void*, int>::const_iterator it=is_copy_of.find(funcs_[i].get());
-      if(it!=is_copy_of.end()) {
+      if (it!=is_copy_of.end()) {
         copy_of_[i] = it->second;
       } else {
         is_copy_of[funcs_[i].get()] = i;
@@ -73,12 +73,12 @@ namespace casadi {
     }
 
     // Initialize the dependend functions
-    for(vector<Function>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it) {
+    for (vector<Function>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it) {
       // Initialize
       it->init(false);
 
       // Make sure that the functions are unique if we are using OpenMP
-      if(mode_==OPENMP && it!=funcs_.begin())
+      if (mode_==OPENMP && it!=funcs_.begin())
         it->makeUnique();
 
     }
@@ -88,7 +88,7 @@ namespace casadi {
     outind_.clear();  outind_.push_back(0);
 
     // Add the inputs and outputs
-    for(vector<Function>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it) {
+    for (vector<Function>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it) {
       inind_.push_back(inind_.back()+it->getNumInputs());
       outind_.push_back(outind_.back()+it->getNumOutputs());
     }
@@ -96,10 +96,10 @@ namespace casadi {
     setNumOutputs(outind_.back());
 
     // Copy inputs and output dimensions and structure
-    for(int i=0; i<funcs_.size(); ++i) {
-      for(int j=inind_[i]; j<inind_[i+1]; ++j)
+    for (int i=0; i<funcs_.size(); ++i) {
+      for (int j=inind_[i]; j<inind_[i+1]; ++j)
         input(j) = funcs_[i].input(j-inind_[i]);
-      for(int j=outind_[i]; j<outind_[i+1]; ++j)
+      for (int j=outind_[i]; j<outind_[i+1]; ++j)
         output(j) = funcs_[i].output(j-outind_[i]);
     }
 
@@ -110,11 +110,11 @@ namespace casadi {
   void ParallelizerInternal::evaluate() {
 
     // Let the first call (which may contain memory allocations) be serial when using OpenMP
-    if(mode_== SERIAL) {
-      for(int task=0; task<funcs_.size(); ++task) {
+    if (mode_== SERIAL) {
+      for (int task=0; task<funcs_.size(); ++task) {
         evaluateTask(task);
       }
-    } else if(mode_== OPENMP) {
+    } else if (mode_== OPENMP) {
 #ifdef WITH_OPENMP
       // Allocate some lists to collect statistics
       std::vector<int> task_allocation(funcs_.size());
@@ -125,7 +125,7 @@ namespace casadi {
       // A private counter
       int cnt=0;
 #pragma omp parallel for firstprivate(cnt)
-      for(int task=0; task<funcs_.size(); ++task) {
+      for (int task=0; task<funcs_.size(); ++task) {
         if (gather_stats_ && task==0) {
           stats_["max_threads"] = omp_get_max_threads();
           stats_["num_threads"] = omp_get_num_threads();
@@ -161,7 +161,7 @@ namespace casadi {
       casadi_error("ParallelizerInternal::evaluate: OPENMP support was not available "
                    "during CasADi compilation");
 #endif //WITH_OPENMP
-    } else if(mode_ == MPI) {
+    } else if (mode_ == MPI) {
       casadi_error("ParallelizerInternal::evaluate: MPI not implemented");
     }
   }
@@ -172,7 +172,7 @@ namespace casadi {
     Function& fcn = funcs_[task];
 
     // Copy inputs to functions
-    for(int j=inind_[task]; j<inind_[task+1]; ++j) {
+    for (int j=inind_[task]; j<inind_[task+1]; ++j) {
       fcn.input(j-inind_[task]).set(input(j));
     }
 
@@ -180,7 +180,7 @@ namespace casadi {
     fcn.evaluate();
 
     // Get the results
-    for(int j=outind_[task]; j<outind_[task+1]; ++j) {
+    for (int j=outind_[task]; j<outind_[task+1]; ++j) {
       fcn.output(j-outind_[task]).get(output(j));
     }
   }
@@ -191,10 +191,10 @@ namespace casadi {
 
     // Find out which task corresponds to the iind
     int task;
-    for(task=0; task<ntask && iind>=inind_[task+1]; ++task) {}
+    for (task=0; task<ntask && iind>=inind_[task+1]; ++task) {}
 
     // Check if the output index is also in this task
-    if(oind>=outind_[task] && oind<outind_[task+1]) {
+    if (oind>=outind_[task] && oind<outind_[task+1]) {
 
       // Get the Jacobian index
       int iind_f = iind-inind_[task];
@@ -215,10 +215,10 @@ namespace casadi {
 
     // Find out which task corresponds to the iind
     int task;
-    for(task=0; task<ntask && iind>=inind_[task+1]; ++task) {}
+    for (task=0; task<ntask && iind>=inind_[task+1]; ++task) {}
 
     // Check if the output index is also in this task
-    if(oind>=outind_[task] && oind<outind_[task+1]) {
+    if (oind>=outind_[task] && oind<outind_[task+1]) {
 
       // Get the Jacobian index
       int iind_f = iind-inind_[task];
@@ -239,14 +239,14 @@ namespace casadi {
   }
 
   void ParallelizerInternal::spInit(bool use_fwd) {
-    for(vector<Function>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it) {
+    for (vector<Function>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it) {
       it->spInit(use_fwd);
     }
   }
 
   void ParallelizerInternal::spEvaluate(bool use_fwd) {
     // This function can be parallelized. Move logic in "evaluate" to a template function.
-    for(int task=0; task<funcs_.size(); ++task) {
+    for (int task=0; task<funcs_.size(); ++task) {
       spEvaluateTask(use_fwd, task);
     }
   }
@@ -255,9 +255,9 @@ namespace casadi {
     // Get a reference to the function
     Function& fcn = funcs_[task];
 
-    if(use_fwd) {
+    if (use_fwd) {
       // Set input influence
-      for(int j=inind_[task]; j<inind_[task+1]; ++j) {
+      for (int j=inind_[task]; j<inind_[task+1]; ++j) {
         int nv = input(j).size();
         const bvec_t* p_v = get_bvec_t(input(j).data());
         bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
@@ -268,7 +268,7 @@ namespace casadi {
       fcn.spEvaluate(use_fwd);
 
       // Get output dependence
-      for(int j=outind_[task]; j<outind_[task+1]; ++j) {
+      for (int j=outind_[task]; j<outind_[task+1]; ++j) {
         int nv = output(j).size();
         bvec_t* p_v = get_bvec_t(output(j).data());
         const bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
@@ -278,7 +278,7 @@ namespace casadi {
     } else {
 
       // Set output influence
-      for(int j=outind_[task]; j<outind_[task+1]; ++j) {
+      for (int j=outind_[task]; j<outind_[task+1]; ++j) {
         int nv = output(j).size();
         const bvec_t* p_v = get_bvec_t(output(j).data());
         bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
@@ -289,7 +289,7 @@ namespace casadi {
       fcn.spEvaluate(use_fwd);
 
       // Get input dependence
-      for(int j=inind_[task]; j<inind_[task+1]; ++j) {
+      for (int j=inind_[task]; j<inind_[task+1]; ++j) {
         int nv = input(j).size();
         bvec_t* p_v = get_bvec_t(input(j).data());
         const bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
@@ -301,8 +301,8 @@ namespace casadi {
   Function ParallelizerInternal::getDerivative(int nfwd, int nadj) {
     // Generate derivative expressions
     vector<Function> der_funcs(funcs_.size());
-    for(int i=0; i<funcs_.size(); ++i) {
-      if(copy_of_[i]>=0) {
+    for (int i=0; i<funcs_.size(); ++i) {
+      if (copy_of_[i]>=0) {
         der_funcs[i] = der_funcs[copy_of_[i]];
       } else {
         der_funcs[i] = funcs_[i].derivative(nfwd, nadj);
@@ -330,18 +330,18 @@ namespace casadi {
     ret_res.reserve(par_res.size());
 
     // Loop over all nondifferentiated inputs/outputs and forward seeds/sensitivities
-    for(int dir=-1; dir<nfwd; ++dir) {
-      for(int i=0; i<funcs_.size(); ++i) {
-        for(int j=inind_[i]; j<inind_[i+1]; ++j) ret_arg.push_back(par_arg[par_inind[i]++]);
-        for(int j=outind_[i]; j<outind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
+    for (int dir=-1; dir<nfwd; ++dir) {
+      for (int i=0; i<funcs_.size(); ++i) {
+        for (int j=inind_[i]; j<inind_[i+1]; ++j) ret_arg.push_back(par_arg[par_inind[i]++]);
+        for (int j=outind_[i]; j<outind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
       }
     }
 
     // Loop over adjoint seeds/sensitivities
-    for(int dir=0; dir<nadj; ++dir) {
-      for(int i=0; i<funcs_.size(); ++i) {
-        for(int j=outind_[i]; j<outind_[i+1]; ++j) ret_arg.push_back(par_arg[par_inind[i]++]);
-        for(int j=inind_[i]; j<inind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
+    for (int dir=0; dir<nadj; ++dir) {
+      for (int i=0; i<funcs_.size(); ++i) {
+        for (int j=outind_[i]; j<outind_[i+1]; ++j) ret_arg.push_back(par_arg[par_inind[i]++]);
+        for (int j=inind_[i]; j<inind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
       }
     }
 

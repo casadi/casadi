@@ -41,7 +41,7 @@ namespace casadi {
   template<bool ScX, bool ScY>
   BinaryMX<ScX, ScY>::BinaryMX(Operation op, const MX& x, const MX& y) : op_(op) {
     setDependencies(x, y);
-    if(ScX) {
+    if (ScX) {
       setSparsity(y.sparsity());
     } else {
       setSparsity(x.sparsity());
@@ -54,9 +54,9 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       casadi_math<double>::printPre(op_, stream);
-    } else if(part==1) {
+    } else if (part==1) {
       casadi_math<double>::printSep(op_, stream);
     } else {
       casadi_math<double>::printPost(op_, stream);
@@ -69,7 +69,7 @@ namespace casadi {
                                      bool output_given) {
     // Evaluate function
     MX f; // Function value
-    if(output_given) {
+    if (output_given) {
       f = *output[0];
     } else {
       casadi_math<MX>::fun(op_, *input[0], *input[1], f);
@@ -78,27 +78,27 @@ namespace casadi {
     // Number of forward directions
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
-    if(nfwd>0 || nadj>0) {
+    if (nfwd>0 || nadj>0) {
       // Get partial derivatives
       MX pd[2];
       casadi_math<MX>::der(op_, *input[0], *input[1], f, pd);
 
       // Propagate forward seeds
-      for(int d=0; d<nfwd; ++d) {
+      for (int d=0; d<nfwd; ++d) {
         *fwdSens[d][0] = pd[0]*(*fwdSeed[d][0]) + pd[1]*(*fwdSeed[d][1]);
       }
 
       // Propagate adjoint seeds
-      for(int d=0; d<nadj; ++d) {
+      for (int d=0; d<nadj; ++d) {
         MX s = *adjSeed[d][0];
         *adjSeed[d][0] = MX();
-        for(int c=0; c<2; ++c) {
+        for (int c=0; c<2; ++c) {
           // Get increment of sensitivity c
           MX t = pd[c]*s;
 
           // If dimension mismatch (i.e. one argument is scalar), then sum all the entries
-          if(!t.isScalar() && t.shape() != dep(c).shape()) {
-            if(pd[c].shape()!=s.shape()) pd[c] = MX(s.sparsity(), pd[c]);
+          if (!t.isScalar() && t.shape() != dep(c).shape()) {
+            if (pd[c].shape()!=s.shape()) pd[c] = MX(s.sparsity(), pd[c]);
             t = inner_prod(pd[c], s);
           }
 
@@ -108,7 +108,7 @@ namespace casadi {
       }
     }
 
-    if(!output_given) {
+    if (!output_given) {
       *output[0] = f;
     }
   }
@@ -120,12 +120,12 @@ namespace casadi {
                                             CodeGenerator& gen) const {
 
     // Print loop and right hand side
-    stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
+    stream << "  for (i=0; i<" << sparsity().size() << "; ++i) ";
     stream << res.at(0) << "[i]";
 
     // Check if inplace
     bool inplace;
-    switch(op_) {
+    switch (op_) {
     case OP_ADD:
     case OP_SUB:
     case OP_MUL:
@@ -135,7 +135,7 @@ namespace casadi {
       inplace = false;
     }
 
-    if(inplace) {
+    if (inplace) {
       casadi_math<double>::printSep(op_, stream);
       stream << "=";
       stream << arg.at(1) << (ScY ? "[0]" : "[i]");
@@ -172,9 +172,9 @@ namespace casadi {
     const vector<T> &input0 = input[0]->data();
     const vector<T> &input1 = input[1]->data();
 
-    if(!ScX && !ScY) {
+    if (!ScX && !ScY) {
       casadi_math<T>::fun(op_, getPtr(input0), getPtr(input1), getPtr(output0), output0.size());
-    } else if(ScX) {
+    } else if (ScX) {
       casadi_math<T>::fun(op_, input0[0],      getPtr(input1), getPtr(output0), output0.size());
     } else {
       casadi_math<T>::fun(op_, getPtr(input0), input1[0],      getPtr(output0), output0.size());
@@ -186,8 +186,8 @@ namespace casadi {
     bvec_t *input0 = get_bvec_t(input[0]->data());
     bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    for(int el=0; el<output[0]->size(); ++el) {
-      if(fwd) {
+    for (int el=0; el<output[0]->size(); ++el) {
+      if (fwd) {
         outputd[el] = input0[ScX ? 0 : el] | input1[ScY ? 0 : el];
       } else {
         bvec_t s = outputd[el];
@@ -200,7 +200,7 @@ namespace casadi {
 
   template<bool ScX, bool ScY>
   MX BinaryMX<ScX, ScY>::getUnary(int op) const {
-    switch(op_) {
+    switch (op_) {
     default: break; // no rule
     }
 
@@ -212,14 +212,14 @@ namespace casadi {
   MX BinaryMX<ScX, ScY>::getBinary(int op, const MX& y, bool scX, bool scY) const {
     if (!CasadiOptions::simplification_on_the_fly) return MXNode::getBinary(op, y, scX, scY);
 
-    switch(op_) {
+    switch (op_) {
     case OP_ADD:
-      if(op==OP_SUB && y.isEqual(dep(0), maxDepth())) return dep(1);
-      if(op==OP_SUB && y.isEqual(dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && y.isEqual(dep(0), maxDepth())) return dep(1);
+      if (op==OP_SUB && y.isEqual(dep(1), maxDepth())) return dep(0);
       break;
     case OP_SUB:
-      if(op==OP_SUB && y.isEqual(dep(0), maxDepth())) return -dep(1);
-      if(op==OP_ADD && y.isEqual(dep(1), maxDepth())) return dep(0);
+      if (op==OP_SUB && y.isEqual(dep(0), maxDepth())) return -dep(1);
+      if (op==OP_ADD && y.isEqual(dep(1), maxDepth())) return dep(0);
       break;
     default: break; // no rule
     }

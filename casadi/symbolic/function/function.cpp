@@ -87,8 +87,8 @@ namespace casadi {
 
     // Check if we are bypassing the parallelizer
     Dictionary::const_iterator ii=paropt.find("parallelization");
-    if(ii!=paropt.end() && ii->second=="expand") {
-      for(int i=0; i<x.size(); ++i) {
+    if (ii!=paropt.end() && ii->second=="expand") {
+      for (int i=0; i<x.size(); ++i) {
         ret[i] = call(x[i]);
       }
       return ret;
@@ -102,7 +102,7 @@ namespace casadi {
     // Concatenate the arguments
     vector<MX> p_in;
     p_in.reserve(x.size() * getNumInputs());
-    for(int i=0; i<x.size(); ++i) {
+    for (int i=0; i<x.size(); ++i) {
       p_in.insert(p_in.end(), x[i].begin(), x[i].end());
       p_in.resize(p_in.size()+getNumInputs()-x[i].size());
     }
@@ -113,7 +113,7 @@ namespace casadi {
 
     // Collect the outputs
     vector<MX>::const_iterator it=p_out.begin();
-    for(int i=0; i<x.size(); ++i) {
+    for (int i=0; i<x.size(); ++i) {
       ret[i].insert(ret[i].end(), it, it+getNumOutputs());
       it += getNumOutputs();
     }

@@ -58,7 +58,7 @@ namespace casadi {
     string compiler = getOption("compiler");
 
     // Make sure that command processor is available
-    if(codegen) {
+    if (codegen) {
 #ifdef WITH_DL
       int flag = system(static_cast<const char*>(0));
       casadi_assert_message(flag!=0, "No command procesor available");
@@ -72,12 +72,12 @@ namespace casadi {
 
     // Get the inverted column permutation
     std::vector<int> inv_colperm(colperm_.size());
-    for(int k=0; k<colperm_.size(); ++k)
+    for (int k=0; k<colperm_.size(); ++k)
       inv_colperm[colperm_[k]] = k;
 
     // Get the inverted row permutation
     std::vector<int> inv_rowperm(rowperm_.size());
-    for(int k=0; k<rowperm_.size(); ++k)
+    for (int k=0; k<rowperm_.size(); ++k)
       inv_rowperm[rowperm_[k]] = k;
 
     // Permute the linear system
@@ -89,7 +89,7 @@ namespace casadi {
     SXFunction fact_fcn(A, QR);
 
     // Optionally generate c code and load as DLL
-    if(codegen) {
+    if (codegen) {
       stringstream ss;
       ss << "symbolic_qr_fact_fcn_" << this;
       fact_fcn_ = dynamicCompilation(fact_fcn, ss.str(),
@@ -127,7 +127,7 @@ namespace casadi {
     SXFunction solv_fcn(solv_in, x);
 
     // Optionally generate c code and load as DLL
-    if(codegen) {
+    if (codegen) {
       stringstream ss;
       ss << "symbolic_qr_solv_fcn_N_" << this;
       solv_fcn_N_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_N", compiler);
@@ -157,7 +157,7 @@ namespace casadi {
     solv_fcn = SXFunction(solv_in, x);
 
     // Optionally generate c code and load as DLL
-    if(codegen) {
+    if (codegen) {
       stringstream ss;
       ss << "symbolic_qr_solv_fcn_T_" << this;
       solv_fcn_T_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_T", compiler);
@@ -192,7 +192,7 @@ namespace casadi {
     solv.setInput(R_, 1);
 
     // Solve for all right hand sides
-    for(int i=0; i<nrhs; ++i) {
+    for (int i=0; i<nrhs; ++i) {
       solv.setInput(x, 2);
       solv.evaluate();
       solv.getOutput(x);
@@ -219,7 +219,7 @@ namespace casadi {
     // Solve for every right hand side
     vector<SX> resv;
     v.resize(3);
-    for(int i=0; i<nrhs; ++i) {
+    for (int i=0; i<nrhs; ++i) {
       v[2] = r(Slice(), i);
       resv.push_back(solv(v).at(0));
     }
@@ -250,13 +250,13 @@ namespace casadi {
 
     // Check if the factorization is up-to-date
     stream << "  int i;" << endl;
-    stream << "  for(i=0; prepared && i<" << input(LINSOL_A).size()
+    stream << "  for (i=0; prepared && i<" << input(LINSOL_A).size()
            << "; ++i) prepared=A[i]!=x0[i];" << endl;
 
     // Factorize if needed
     int fact_ind = gen.getDependency(fact_fcn_);
-    stream << "  if(!prepared) {" << endl;
-    stream << "    for(i=0; i<" << input(LINSOL_A).size() << "; ++i) A[i]=x0[i];" << endl;
+    stream << "  if (!prepared) {" << endl;
+    stream << "    for (i=0; i<" << input(LINSOL_A).size() << "; ++i) A[i]=x0[i];" << endl;
     stream << "    f" << fact_ind << "(A, Q, R);" << endl;
     stream << "    prepared = 1;" << endl;
     stream << "  }" << endl;
@@ -265,7 +265,7 @@ namespace casadi {
     int solv_ind_N = gen.getDependency(solv_fcn_N_);
     int neq = input(LINSOL_B).size1();
     int nrhs = input(LINSOL_B).size2();
-    stream << "  for(i=0; i<" << nrhs << "; ++i) {" << endl;
+    stream << "  for (i=0; i<" << nrhs << "; ++i) {" << endl;
     stream << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl;
     stream << "    x1+=" << neq << "; r0+=" << neq << ";" << endl;
     stream << "  }" << endl;

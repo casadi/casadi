@@ -35,7 +35,7 @@ namespace casadi {
   }
 
   void Determinant::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "det(";
     } else {
       stream << ")";
@@ -51,23 +51,23 @@ namespace casadi {
     // Non-differentiated output
     const MX& X = *input[0];
     MX& det_X = *output[0];
-    if(!output_given) {
+    if (!output_given) {
       det_X = det(X);
     }
 
     // Quick return
-    if(nfwd==0 && nadj==0) return;
+    if (nfwd==0 && nadj==0) return;
 
     // Create only once
     MX trans_inv_X = inv(X).T();
 
     // Forward sensitivities
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = det_X * inner_prod(trans_inv_X, *fwdSeed[d][0]);
     }
 
     // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum((*adjSeed[d][0]*det_X) * trans_inv_X);
       *adjSeed[d][0] = MX();
     }

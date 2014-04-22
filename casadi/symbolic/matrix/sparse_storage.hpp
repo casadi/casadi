@@ -125,7 +125,7 @@ namespace casadi {
     template<typename A>
     SparseStorage(const std::vector<A>& x,  int nrow, int ncol) :
       sparsity_(Sparsity::dense(nrow, ncol)), data_(std::vector<DataType>(x.size())) {
-      if(x.size() != nrow*ncol)
+      if (x.size() != nrow*ncol)
         throw CasadiException("SparseStorage::SparseStorage(const std::vector<DataType>& x, "
                               "int n, int m): dimension mismatch");
       copy(x.begin(), x.end(), begin());

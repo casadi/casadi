@@ -202,12 +202,12 @@ namespace casadi {
     SX ret;
 
     /** \brief  loop over cols */
-    for(int i=0; i<n; ++i) {
+    for (int i=0; i<n; ++i) {
       /** \brief  Create a col */
       SX col;
 
       /** \brief  append components to the col */
-      for(int j=0; j<m; ++j) {
+      for (int j=0; j<m; ++j) {
         col.appendColumns(array[i][j]);
       }
 
@@ -225,7 +225,7 @@ namespace casadi {
     SX ret;
 
     /** \brief  loop over cols */
-    for(int i=0; i<n; ++i) {
+    for (int i=0; i<n; ++i) {
       /** \brief  append components */
       ret.appendColumns(array[i]);
     }

@@ -688,7 +688,7 @@ namespace casadi {
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
   inline void hash_combine(std::size_t& seed, const std::vector<int>& v) {
-    for(std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed, *i);
+    for (std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed, *i);
   }
 
   /** \brief Hash a sparsity pattern */
@@ -714,7 +714,7 @@ namespace casadi {
     const int val_nel = val_sz1*val_sz2;
 
     // Check if sparsity matches
-    if(val_sp==*this) {
+    if (val_sp==*this) {
       std::copy(val_data, val_data+sz, data);
     } else if (this->isEmpty()) {
       // Quick return
@@ -722,11 +722,11 @@ namespace casadi {
     } else if (val_sp.isEmpty()) {
       // Quick return
       return;
-    } else if(val_nel==1) { // if scalar
+    } else if (val_nel==1) { // if scalar
       std::fill(data, data+sz, val_sz==0 ? DataType(0) : val_data[0]);
     } else {
       // Quick return if empty
-      if(nel==0 && val_nel==0) return;
+      if (nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
@@ -740,7 +740,7 @@ namespace casadi {
       const std::vector<int>& v_rind = val_sp.colind();
 
       // For all cols
-      for(int i=0; i<sz2; ++i) {
+      for (int i=0; i<sz2; ++i) {
 
         // Nonzero of the assigning matrix
         int v_el = v_rind[i];
@@ -752,19 +752,19 @@ namespace casadi {
         int v_j = v_el<v_el_end ? v_c[v_el] : sz1;
 
         // Assign all nonzeros
-        for(int el=rind[i]; el!=rind[i+1]; ++el) {
+        for (int el=rind[i]; el!=rind[i+1]; ++el) {
 
           //  Get row
           int j=c[el];
 
           // Forward the assigning nonzero
-          while(v_j<j) {
+          while (v_j<j) {
             v_el++;
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }
 
           // Assign nonzero
-          if(v_j==j) {
+          if (v_j==j) {
             data[el] = val_data[v_el++];
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           } else {
@@ -790,8 +790,8 @@ namespace casadi {
     const int val_nel = val_sz1*val_sz2;
 
     // Check if sparsity matches
-    if(val_sp==*this) {
-      for(int k=0; k<sz; ++k) {
+    if (val_sp==*this) {
+      for (int k=0; k<sz; ++k) {
         data[k] += val_data[k];
       }
     } else if (this->isEmpty()) {
@@ -800,15 +800,15 @@ namespace casadi {
     } else if (val_sp.isEmpty()) {
       // Quick return
       return;
-    }  else if(val_nel==1) { // if scalar
-      if(val_sz!=0) {
-        for(int k=0; k<sz; ++k) {
+    }  else if (val_nel==1) { // if scalar
+      if (val_sz!=0) {
+        for (int k=0; k<sz; ++k) {
           data[k] += val_data[0];
         }
       }
     } else {
       // Quick return if empty
-      if(nel==0 && val_nel==0) return;
+      if (nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
@@ -823,7 +823,7 @@ namespace casadi {
       const std::vector<int>& v_rind = val_sp.colind();
 
       // For all cols
-      for(int i=0; i<sz2; ++i) {
+      for (int i=0; i<sz2; ++i) {
 
         // Nonzero of the assigning matrix
         int v_el = v_rind[i];
@@ -835,19 +835,19 @@ namespace casadi {
         int v_j = v_el<v_el_end ? v_c[v_el] : sz1;
 
         // Assign all nonzeros
-        for(int el=rind[i]; el!=rind[i+1]; ++el) {
+        for (int el=rind[i]; el!=rind[i+1]; ++el) {
 
           //  Get row
           int j=c[el];
 
           // Forward the assigning nonzero
-          while(v_j<j) {
+          while (v_j<j) {
             v_el++;
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }
 
           // Assign nonzero
-          if(v_j==j) {
+          if (v_j==j) {
             data[el] += val_data[v_el++];
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }
@@ -871,8 +871,8 @@ namespace casadi {
     const int val_nel = val_sz1*val_sz2;
 
     // Check if sparsity matches
-    if(val_sp==*this) {
-      for(int k=0; k<sz; ++k) {
+    if (val_sp==*this) {
+      for (int k=0; k<sz; ++k) {
         data[k] |= val_data[k];
       }
     } else if (this->isEmpty()) {
@@ -881,15 +881,15 @@ namespace casadi {
     } else if (val_sp.isEmpty()) {
       // Quick return
       return;
-    }  else if(val_nel==1) { // if scalar
-      if(val_sz!=0) {
-        for(int k=0; k<sz; ++k) {
+    }  else if (val_nel==1) { // if scalar
+      if (val_sz!=0) {
+        for (int k=0; k<sz; ++k) {
           data[k] |= val_data[0];
         }
       }
     } else {
       // Quick return if empty
-      if(nel==0 && val_nel==0) return;
+      if (nel==0 && val_nel==0) return;
 
       // Make sure that dimension matches
       casadi_assert_message(sz2==val_sz2 && sz1==val_sz1,
@@ -903,7 +903,7 @@ namespace casadi {
       const std::vector<int>& v_rind = val_sp.colind();
 
       // For all columns
-      for(int i=0; i<sz2; ++i) {
+      for (int i=0; i<sz2; ++i) {
 
         // Nonzero of the assigning matrix
         int v_el = v_rind[i];
@@ -915,19 +915,19 @@ namespace casadi {
         int v_j = v_el<v_el_end ? v_c[v_el] : sz1;
 
         // Assign all nonzeros
-        for(int el=rind[i]; el!=rind[i+1]; ++el) {
+        for (int el=rind[i]; el!=rind[i+1]; ++el) {
 
           //  Get row
           int j=c[el];
 
           // Forward the assigning nonzero
-          while(v_j<j) {
+          while (v_j<j) {
             v_el++;
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }
 
           // Assign nonzero
-          if(v_j==j) {
+          if (v_j==j) {
             data[el] |= val_data[v_el++];
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }

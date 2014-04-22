@@ -64,7 +64,7 @@ namespace casadi {
     implicit_solver_.setOption("implicit_output", DAE_ALG);
 
     // Pass options
-    if(hasSetOption("implicit_solver_options")) {
+    if (hasSetOption("implicit_solver_options")) {
       const Dictionary& implicit_solver_options = getOption("implicit_solver_options");
       implicit_solver_.setOption(implicit_solver_options);
     }
@@ -73,7 +73,7 @@ namespace casadi {
     implicit_solver_.init();
 
     // Allocate a root-finding solver for the backward problem
-    if(nRZ_>0) {
+    if (nRZ_>0) {
 
       // Get the NLP creator function
       implicitFunctionCreator backward_implicit_function_creator = getOption("implicit_solver");
@@ -86,7 +86,7 @@ namespace casadi {
       backward_implicit_solver_.setOption("implicit_output", RDAE_ALG);
 
       // Pass options
-      if(hasSetOption("implicit_solver_options")) {
+      if (hasSetOption("implicit_solver_options")) {
         const Dictionary& backward_implicit_solver_options = getOption("implicit_solver_options");
         backward_implicit_solver_.setOption(backward_implicit_solver_options);
       }

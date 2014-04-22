@@ -56,9 +56,9 @@ namespace casadi {
   }
 
   void SubAssign::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "(";
-    } else if(part==1) {
+    } else if (part==1) {
       stream << "[" << i_ << ", " << j_ << "]=";
     } else {
       stream << ")";

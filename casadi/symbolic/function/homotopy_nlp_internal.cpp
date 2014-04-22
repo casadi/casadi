@@ -90,12 +90,12 @@ namespace casadi {
 
     // Find out if we are to expand the NLP in terms of scalar operations
     bool expand = getOption("expand");
-    if(expand) {
+    if (expand) {
       log("Expanding NLP in scalar operations");
 
       // Cast to MXFunction
       MXFunction hnlp_mx = shared_cast<MXFunction>(hnlp_);
-      if(hnlp_mx.isNull()) {
+      if (hnlp_mx.isNull()) {
         casadi_warning("Cannot expand NLP as it is not an MXFunction");
       } else {
         hnlp_ = SXFunction(hnlp_mx);

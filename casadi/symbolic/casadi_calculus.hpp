@@ -311,19 +311,19 @@ namespace casadi {
 #else // HAS ERFINV
   inline double erfinv(double x) throw() {
     // Approximation found in Sourceforge and modified: Not very efficient
-    if(x>=1) {
+    if (x>=1) {
       return x==1 ? std::numeric_limits<double>::infinity() :
           std::numeric_limits<double>::quiet_NaN();
-    } else if(x<=-1) {
+    } else if (x<=-1) {
       return x==-1 ? -std::numeric_limits<double>::infinity() :
           std::numeric_limits<double>::quiet_NaN();
-    } else if(x<-0.7) {
+    } else if (x<-0.7) {
       double z = sqrt(-log((1.0+x)/2.0));
       return -(((1.641345311*z+3.429567803)*z-1.624906493)*z-1.970840454)/
           ((1.637067800*z+3.543889200)*z+1.0);
     } else {
       double y;
-      if(x<0.7) {
+      if (x<0.7) {
         double z = x*x;
         y = x*(((-0.140543331*z+0.914624893)*z-1.645349621)*z+0.886226899)/
             ((((-0.329097515*z+0.012229801)*z+1.442710462)*z-2.118377725)*z+1.0);
@@ -424,14 +424,14 @@ namespace casadi {
   struct BinaryOperationVV {
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T* y, T* f, int n) {
-      for(int i=0; i<n; ++i) {
+      for (int i=0; i<n; ++i) {
         BinaryOperation<I>::fcn(*x++, *y++, *f++);
       }
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T* x, const T* y, const T* f, T* d, int n) {
-      for(int i=0; i<n; ++i, d+=2) {
+      for (int i=0; i<n; ++i, d+=2) {
         BinaryOperation<I>::der(*x++, *y++, *f++, d);
       }
     }
@@ -442,14 +442,14 @@ namespace casadi {
   struct BinaryOperationVS {
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T& y, T* f, int n) {
-      for(int i=0; i<n; ++i) {
+      for (int i=0; i<n; ++i) {
         BinaryOperation<I>::fcn(*x++, y, *f++);
       }
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T* x, const T& y, const T* f, T* d, int n) {
-      for(int i=0; i<n; ++i, d+=2) {
+      for (int i=0; i<n; ++i, d+=2) {
         BinaryOperation<I>::der(*x++, y, *f++, d);
       }
     }
@@ -460,14 +460,14 @@ namespace casadi {
   struct BinaryOperationSV {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T* y, T* f, int n) {
-      for(int i=0; i<n; ++i) {
+      for (int i=0; i<n; ++i) {
         BinaryOperation<I>::fcn(x, *y++, *f++);
       }
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T& x, const T* y, const T* f, T* d, int n) {
-      for(int i=0; i<n; ++i, d+=2) {
+      for (int i=0; i<n; ++i, d+=2) {
         BinaryOperation<I>::der(x, *y++, *f++, d);
       }
     }

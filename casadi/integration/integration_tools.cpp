@@ -199,11 +199,11 @@ namespace casadi {
     SX tau = SX::sym("tau");
 
     // For all collocation points
-    for(int j=0; j<deg+1; ++j) {
+    for (int j=0; j<deg+1; ++j) {
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
       SX L = 1;
-      for(int j2=0; j2<deg+1; ++j2) {
-        if(j2 != j) {
+      for (int j2=0; j2<deg+1; ++j2) {
+        if (j2 != j) {
           L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
         }
       }
@@ -221,7 +221,7 @@ namespace casadi {
       // get the coefficients of the continuity equation
       Function tfcn = lfcn.tangent();
       tfcn.init();
-      for(int j2=0; j2<deg+1; ++j2) {
+      for (int j2=0; j2<deg+1; ++j2) {
         tfcn.setInput(tau_root[j2]);
         tfcn.evaluate();
         C[j2][j] = tfcn.output().at(0);

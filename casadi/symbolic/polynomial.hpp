@@ -57,7 +57,7 @@ namespace casadi {
     T operator()(const T& x) const {
       std::vector<real_t>::const_reverse_iterator it = p_.rbegin();
       T ret = *it++;
-      while(it!=p_.rend()) {
+      while (it!=p_.rend()) {
         ret *= x;
         ret += *it++;
       }

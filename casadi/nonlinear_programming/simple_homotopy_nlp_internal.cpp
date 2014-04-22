@@ -79,7 +79,7 @@ namespace casadi {
     NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");
     nlpsolver_ = nlpsolver_creator(nlp);
 
-    if(hasSetOption("nlp_solver_options")) {
+    if (hasSetOption("nlp_solver_options")) {
       nlpsolver_.setOption(getOption("nlp_solver_options"));
     }
 

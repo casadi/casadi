@@ -202,7 +202,7 @@ GenericType OptionsFunctionality::getOption(const string &name) const {
 void OptionsFunctionalityNode::assert_exists(const std::string &name) const {
   // First check if the option exists
   map<string, opt_type>::const_iterator it = allowed_options.find(name);
-  if(it == allowed_options.end()) {
+  if (it == allowed_options.end()) {
     stringstream ss;
     ss << "Unknown option: " << name << endl;
     std::vector<std::string> suggestions;
@@ -222,7 +222,7 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const {
   Dictionary::const_iterator it = dictionary_.find(name);
 
   // Check if found
-  if(it == dictionary_.end()) {
+  if (it == dictionary_.end()) {
     stringstream ss;
     if (allowed_options.find(name)!=allowed_options.end()) {
       ss << "Option: '" << name << "' has not been set." << endl;
@@ -257,7 +257,7 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
   if (allowed_vals=="") allowed_vals_vec.push_back("");
 
   int val = -1;
-  while(std::getline(ss, item, '|')) {
+  while (std::getline(ss, item, '|')) {
     std::stringstream sss(item);
     std::string name;
     std::getline(sss, name, ':');
@@ -320,7 +320,7 @@ void OptionsFunctionalityNode::addOption(
   enum_descr_vec.insert( enum_descr_vec.end(), enum_descr.begin(), enum_descr.end() );
   enum_values_vec.insert( enum_values_vec.end(), enum_values.begin(), enum_values.end() );
 
-  if(!def_val.isNull())
+  if (!def_val.isNull())
     dictionary_[name] = def_val;
 
   // Inherit description
@@ -356,7 +356,7 @@ void OptionsFunctionalityNode::printOption(const std::string &name, ostream &str
 
       // Check if the option has been set, and print it's value if it is.
       Dictionary::const_iterator dictionary_it=dictionary_.find(name);
-      if(dictionary_it==dictionary_.end())
+      if (dictionary_it==dictionary_.end())
         stream << "(not set)";
       else
         stream << "= " << dictionary_it->second;
@@ -389,7 +389,7 @@ void OptionsFunctionalityNode::printOption(const std::string &name, ostream &str
 
 void OptionsFunctionalityNode::printOptions(ostream &stream) const {
   stream << "\"Option name\" [type] = value" << endl;
-  for(map<string, opt_type>::const_iterator it=allowed_options.begin();
+  for (map<string, opt_type>::const_iterator it=allowed_options.begin();
       it!=allowed_options.end(); ++it) {
     printOption(it->first, stream);
   }
@@ -401,7 +401,7 @@ bool OptionsFunctionalityNode::hasOption(const string &str) const {
 }
 
 bool OptionsFunctionalityNode::hasSetOption(const string &str) const {
-  if(!hasOption(str)) casadi_error("OptionsFunctionalityNode::hasSetOption: no such option '"
+  if (!hasOption(str)) casadi_error("OptionsFunctionalityNode::hasSetOption: no such option '"
                                    << str << "'");
   Dictionary::const_iterator it = dictionary_.find(str);
   return it != dictionary_.end();
@@ -509,7 +509,7 @@ const Dictionary& OptionsFunctionalityNode::dictionary() const {
 }
 
 void OptionsFunctionalityNode::setOption(const Dictionary& dict, bool skipUnknown) {
-  for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
+  for (Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
     if (!skipUnknown || hasOption(it->first)) {
       setOption(it->first, it->second);
     }
@@ -526,7 +526,7 @@ void OptionsFunctionalityNode::repr(ostream &stream) const {
 
 std::vector<std::string> OptionsFunctionalityNode::getOptionNames() const {
   std::vector<std::string> names;
-  for(map<string, opt_type>::const_iterator it=allowed_options.begin();
+  for (map<string, opt_type>::const_iterator it=allowed_options.begin();
       it!=allowed_options.end(); ++it) {
     names.push_back(it->first);
   }

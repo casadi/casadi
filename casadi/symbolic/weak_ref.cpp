@@ -36,7 +36,7 @@ namespace casadi {
 
   SharedObject WeakRef::shared() {
     SharedObject ret;
-    if(alive()) {
+    if (alive()) {
       ret.assignNode((*this)->raw_);
     }
     return ret;

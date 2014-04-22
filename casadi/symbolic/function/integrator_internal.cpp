@@ -70,7 +70,7 @@ namespace casadi {
     integrate(tf_);
 
     // If backwards integration is needed
-    if(nrx_>0) {
+    if (nrx_>0) {
 
       // Re-initialize backward problem
       resetB();
@@ -80,7 +80,7 @@ namespace casadi {
     }
 
     // Print statistics
-    if(print_stats_) printStats(std::cout);
+    if (print_stats_) printStats(std::cout);
   }
 
   void IntegratorInternal::init() {
@@ -89,7 +89,7 @@ namespace casadi {
     casadi_assert(!f_.isNull());
 
     // Initialize and get dimensions for the forward integration
-    if(!f_.isInit()) f_.init();
+    if (!f_.isInit()) f_.init();
     casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,
                           "Wrong number of inputs for the DAE callback function");
     casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,
@@ -100,11 +100,11 @@ namespace casadi {
     np_  = f_.input(DAE_P).size();
 
     // Initialize and get dimensions for the backward integration
-    if(g_.isNull()) {
+    if (g_.isNull()) {
       // No backwards integration
       nrx_ = nrz_ = nrq_ = nrp_ = 0;
     } else {
-      if(!g_.isInit()) g_.init();
+      if (!g_.isInit()) g_.init();
       casadi_assert_message(g_.getNumInputs()==RDAE_NUM_IN,
                             "Wrong number of inputs for the backwards DAE callback function");
       casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,
@@ -120,7 +120,7 @@ namespace casadi {
     x0()  = DMatrix::zeros(f_.input(DAE_X).sparsity());
     p()   = DMatrix::zeros(f_.input(DAE_P).sparsity());
     z0()   = DMatrix::zeros(f_.input(DAE_Z).sparsity());
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
       rx0()  = DMatrix::zeros(g_.input(RDAE_RX).sparsity());
       rp()  = DMatrix::zeros(g_.input(RDAE_RP).sparsity());
       rz0()  = DMatrix::zeros(g_.input(RDAE_RZ).sparsity());
@@ -131,7 +131,7 @@ namespace casadi {
     xf() = x0();
     qf() = DMatrix::zeros(f_.output(DAE_QUAD).sparsity());
     zf() = z0();
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
       rxf()  = rx0();
       rqf()  = DMatrix::zeros(g_.output(RDAE_QUAD).sparsity());
       rzf()  = rz0();
@@ -152,7 +152,7 @@ namespace casadi {
                           << z0().shape() << ", but got "
                           << f_.output(DAE_ALG).shape() << " instead.");
     casadi_assert(f_.output(DAE_ALG).sparsity()==z0().sparsity());
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
       casadi_assert(g_.input(RDAE_P).sparsity()==p().sparsity());
       casadi_assert(g_.input(RDAE_X).sparsity()==x0().sparsity());
       casadi_assert(g_.input(RDAE_Z).sparsity()==z0().sparsity());
@@ -178,7 +178,7 @@ namespace casadi {
     // Form a linear solver for the sparsity propagation
     linsol_f_ = LinearSolver(spJacF());
     linsol_f_.init();
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
       linsol_g_ = LinearSolver(spJacG());
       linsol_g_.init();
     }
@@ -245,11 +245,11 @@ namespace casadi {
     fill(tmp.begin(), tmp.end(), MX());
 
     // Collect arguments for calling d
-    for(int dir=-1; dir<nfwd; ++dir) {
+    for (int dir=-1; dir<nfwd; ++dir) {
       tmp[DAE_T] = dir<0 ? aug_t : zero_t;
-      if( nx_>0) tmp[DAE_X] = *aug_x_split_it++;
-      if( nz_>0) tmp[DAE_Z] = *aug_z_split_it++;
-      if( np_>0) tmp[DAE_P] = *aug_p_split_it++;
+      if ( nx_>0) tmp[DAE_X] = *aug_x_split_it++;
+      if ( nz_>0) tmp[DAE_Z] = *aug_z_split_it++;
+      if ( np_>0) tmp[DAE_P] = *aug_p_split_it++;
       f_arg.insert(f_arg.end(), tmp.begin(), tmp.end());
     }
 
@@ -260,19 +260,19 @@ namespace casadi {
     // Collect right-hand-sides
     tmp.resize(DAE_NUM_OUT);
     fill(tmp.begin(), tmp.end(), MX());
-    for(int dir=-1; dir<nfwd; ++dir) {
+    for (int dir=-1; dir<nfwd; ++dir) {
       copy(res_it, res_it+tmp.size(), tmp.begin());
       res_it += tmp.size();
-      if( nx_>0) f_ode.push_back(tmp[DAE_ODE]);
-      if( nz_>0) f_alg.push_back(tmp[DAE_ALG]);
-      if( nq_>0) f_quad.push_back(tmp[DAE_QUAD]);
+      if ( nx_>0) f_ode.push_back(tmp[DAE_ODE]);
+      if ( nz_>0) f_alg.push_back(tmp[DAE_ALG]);
+      if ( nq_>0) f_quad.push_back(tmp[DAE_QUAD]);
     }
 
     // Consistency check
     casadi_assert(res_it==res.end());
 
     vector<MX> g_arg;
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
 
       // Forward derivatives of g
       d = g_.derivative(nfwd, 0);
@@ -286,14 +286,14 @@ namespace casadi {
       aug_p_split_it = aug_p_split.begin();
 
       // Collect arguments for calling d
-      for(int dir=-1; dir<nfwd; ++dir) {
+      for (int dir=-1; dir<nfwd; ++dir) {
         tmp[RDAE_T] = dir<0 ? aug_t : zero_t;
-        if( nx_>0) tmp[RDAE_X] = *aug_x_split_it++;
-        if( nz_>0) tmp[RDAE_Z] = *aug_z_split_it++;
-        if( np_>0) tmp[RDAE_P] = *aug_p_split_it++;
-        if(nrx_>0) tmp[RDAE_RX] = *aug_rx_split_it++;
-        if(nrz_>0) tmp[RDAE_RZ] = *aug_rz_split_it++;
-        if(nrp_>0) tmp[RDAE_RP] = *aug_rp_split_it++;
+        if ( nx_>0) tmp[RDAE_X] = *aug_x_split_it++;
+        if ( nz_>0) tmp[RDAE_Z] = *aug_z_split_it++;
+        if ( np_>0) tmp[RDAE_P] = *aug_p_split_it++;
+        if (nrx_>0) tmp[RDAE_RX] = *aug_rx_split_it++;
+        if (nrz_>0) tmp[RDAE_RZ] = *aug_rz_split_it++;
+        if (nrp_>0) tmp[RDAE_RP] = *aug_rp_split_it++;
         g_arg.insert(g_arg.end(), tmp.begin(), tmp.end());
       }
 
@@ -304,19 +304,19 @@ namespace casadi {
       // Collect right-hand-sides
       tmp.resize(RDAE_NUM_OUT);
       fill(tmp.begin(), tmp.end(), MX());
-      for(int dir=-1; dir<nfwd; ++dir) {
+      for (int dir=-1; dir<nfwd; ++dir) {
         copy(res_it, res_it+tmp.size(), tmp.begin());
         res_it += tmp.size();
-        if(nrx_>0) g_ode.push_back(tmp[RDAE_ODE]);
-        if(nrz_>0) g_alg.push_back(tmp[RDAE_ALG]);
-        if(nrq_>0) g_quad.push_back(tmp[RDAE_QUAD]);
+        if (nrx_>0) g_ode.push_back(tmp[RDAE_ODE]);
+        if (nrz_>0) g_alg.push_back(tmp[RDAE_ALG]);
+        if (nrq_>0) g_quad.push_back(tmp[RDAE_QUAD]);
       }
 
       // Consistency check
       casadi_assert(res_it==res.end());
     }
 
-    if(nadj>0) {
+    if (nadj>0) {
 
       // Adjoint derivatives of f
       d = f_.derivative(0, nadj);
@@ -326,10 +326,10 @@ namespace casadi {
       // Collect arguments for calling d
       tmp.resize(DAE_NUM_OUT);
       fill(tmp.begin(), tmp.end(), MX());
-      for(int dir=0; dir<nadj; ++dir) {
-        if( nx_>0) tmp[DAE_ODE] = *aug_rx_split_it++;
-        if( nz_>0) tmp[DAE_ALG] = *aug_rz_split_it++;
-        if( nq_>0) tmp[DAE_QUAD] = *aug_rp_split_it++;
+      for (int dir=0; dir<nadj; ++dir) {
+        if ( nx_>0) tmp[DAE_ODE] = *aug_rx_split_it++;
+        if ( nz_>0) tmp[DAE_ALG] = *aug_rz_split_it++;
+        if ( nq_>0) tmp[DAE_QUAD] = *aug_rp_split_it++;
         f_arg.insert(f_arg.end(), tmp.begin(), tmp.end());
       }
 
@@ -344,18 +344,18 @@ namespace casadi {
 
       // Collect right-hand-sides
       tmp.resize(DAE_NUM_IN);
-      for(int dir=0; dir<nadj; ++dir) {
+      for (int dir=0; dir<nadj; ++dir) {
         copy(res_it, res_it+tmp.size(), tmp.begin());
         res_it += tmp.size();
-        if( nx_>0) g_ode.push_back(tmp[DAE_X]);
-        if( nz_>0) g_alg.push_back(tmp[DAE_Z]);
-        if( np_>0) g_quad.push_back(tmp[DAE_P]);
+        if ( nx_>0) g_ode.push_back(tmp[DAE_X]);
+        if ( nz_>0) g_alg.push_back(tmp[DAE_Z]);
+        if ( np_>0) g_quad.push_back(tmp[DAE_P]);
       }
 
       // Consistency check
       casadi_assert(res_it==res.end());
 
-      if(!g_.isNull()) {
+      if (!g_.isNull()) {
 
         // Adjoint derivatives of g
         d = g_.derivative(0, nadj);
@@ -365,10 +365,10 @@ namespace casadi {
         // Collect arguments for calling der
         tmp.resize(RDAE_NUM_OUT);
         fill(tmp.begin(), tmp.end(), MX());
-        for(int dir=0; dir<nadj; ++dir) {
-          if(nrx_>0) tmp[RDAE_ODE] = *aug_x_split_it++;
-          if(nrz_>0) tmp[RDAE_ALG] = *aug_z_split_it++;
-          if(nrq_>0) tmp[RDAE_QUAD] = *aug_p_split_it++;
+        for (int dir=0; dir<nadj; ++dir) {
+          if (nrx_>0) tmp[RDAE_ODE] = *aug_x_split_it++;
+          if (nrz_>0) tmp[RDAE_ALG] = *aug_z_split_it++;
+          if (nrq_>0) tmp[RDAE_QUAD] = *aug_p_split_it++;
           g_arg.insert(g_arg.end(), tmp.begin(), tmp.end());
         }
 
@@ -378,12 +378,12 @@ namespace casadi {
 
         // Collect right-hand-sides
         tmp.resize(RDAE_NUM_IN);
-        for(int dir=0; dir<nadj; ++dir) {
+        for (int dir=0; dir<nadj; ++dir) {
           copy(res_it, res_it+tmp.size(), tmp.begin());
           res_it += tmp.size();
-          if( nx_>0) g_ode[g_ode_ind++] += tmp[RDAE_X];
-          if( nz_>0) g_alg[g_alg_ind++] += tmp[RDAE_Z];
-          if( np_>0) g_quad[g_quad_ind++] += tmp[RDAE_P];
+          if ( nx_>0) g_ode[g_ode_ind++] += tmp[RDAE_X];
+          if ( nz_>0) g_alg[g_alg_ind++] += tmp[RDAE_Z];
+          if ( np_>0) g_quad[g_quad_ind++] += tmp[RDAE_P];
         }
 
         // Consistency check
@@ -392,9 +392,9 @@ namespace casadi {
         casadi_assert(g_quad_ind == g_quad.size());
 
         // Remove the dependency of rx, rz, rp in the forward integration (see Joel's thesis)
-        if(nrx_>0) g_arg[RDAE_RX] = MX::zeros(g_arg[RDAE_RX].sparsity());
-        if(nrz_>0) g_arg[RDAE_RZ] = MX::zeros(g_arg[RDAE_RZ].sparsity());
-        if(nrp_>0) g_arg[RDAE_RP] = MX::zeros(g_arg[RDAE_RP].sparsity());
+        if (nrx_>0) g_arg[RDAE_RX] = MX::zeros(g_arg[RDAE_RX].sparsity());
+        if (nrz_>0) g_arg[RDAE_RZ] = MX::zeros(g_arg[RDAE_RZ].sparsity());
+        if (nrp_>0) g_arg[RDAE_RP] = MX::zeros(g_arg[RDAE_RP].sparsity());
 
         // Call der again
         res = d.call(g_arg);
@@ -402,12 +402,12 @@ namespace casadi {
 
         // Collect right-hand-sides and add contribution to the forward integration
         tmp.resize(RDAE_NUM_IN);
-        for(int dir=0; dir<nadj; ++dir) {
+        for (int dir=0; dir<nadj; ++dir) {
           copy(res_it, res_it+tmp.size(), tmp.begin());
           res_it += tmp.size();
-          if(nrx_>0) f_ode.push_back(tmp[RDAE_RX]);
-          if(nrz_>0) f_alg.push_back(tmp[RDAE_RZ]);
-          if(nrp_>0) f_quad.push_back(tmp[RDAE_RP]);
+          if (nrx_>0) f_ode.push_back(tmp[RDAE_RX]);
+          if (nrz_>0) f_alg.push_back(tmp[RDAE_RZ]);
+          if (nrp_>0) f_quad.push_back(tmp[RDAE_RP]);
         }
 
         // Consistency check
@@ -422,7 +422,7 @@ namespace casadi {
     expand = expand && is_a<SXFunction>(f_) && (g_.isNull() || is_a<SXFunction>(g_));
 
     // Form the augmented forward integration function
-    if(g_.isNull() && nfwd==0) {
+    if (g_.isNull() && nfwd==0) {
       ret.first = f_; // reuse the existing one
     } else {
       vector<MX> f_in(DAE_NUM_IN), f_out(DAE_NUM_OUT);
@@ -430,13 +430,13 @@ namespace casadi {
       f_in[DAE_X] = aug_x;
       f_in[DAE_Z] = aug_z;
       f_in[DAE_P] = aug_p;
-      if(!f_ode.empty()) f_out[DAE_ODE] = dense(horzcat(f_ode));
-      if(!f_alg.empty()) f_out[DAE_ALG] = dense(horzcat(f_alg));
-      if(!f_quad.empty()) f_out[DAE_QUAD] = dense(horzcat(f_quad));
+      if (!f_ode.empty()) f_out[DAE_ODE] = dense(horzcat(f_ode));
+      if (!f_alg.empty()) f_out[DAE_ALG] = dense(horzcat(f_alg));
+      if (!f_quad.empty()) f_out[DAE_QUAD] = dense(horzcat(f_quad));
       MXFunction f_mx(f_in, f_out);
 
       // Expand to SXFuncion?
-      if(expand) {
+      if (expand) {
         f_mx.init();
         ret.first = SXFunction(f_mx);
       } else {
@@ -445,7 +445,7 @@ namespace casadi {
     }
 
     // Form the augmented backward integration function
-    if(!g_ode.empty()) {
+    if (!g_ode.empty()) {
       vector<MX> g_in(RDAE_NUM_IN), g_out(RDAE_NUM_OUT);
       g_in[RDAE_T] = aug_t;
       g_in[RDAE_X] = aug_x;
@@ -454,13 +454,13 @@ namespace casadi {
       g_in[RDAE_RX] = aug_rx;
       g_in[RDAE_RZ] = aug_rz;
       g_in[RDAE_RP] = aug_rp;
-      if(!g_ode.empty()) g_out[RDAE_ODE] = dense(horzcat(g_ode));
-      if(!g_alg.empty()) g_out[RDAE_ALG] = dense(horzcat(g_alg));
-      if(!g_quad.empty()) g_out[RDAE_QUAD] = dense(horzcat(g_quad));
+      if (!g_ode.empty()) g_out[RDAE_ODE] = dense(horzcat(g_ode));
+      if (!g_alg.empty()) g_out[RDAE_ALG] = dense(horzcat(g_alg));
+      if (!g_quad.empty()) g_out[RDAE_QUAD] = dense(horzcat(g_quad));
       MXFunction g_mx(g_in, g_out);
 
       // Expand to SXFuncion?
-      if(expand) {
+      if (expand) {
         g_mx.init();
         ret.second = SXFunction(g_mx);
       } else {
@@ -488,7 +488,7 @@ namespace casadi {
     casadi_assert(!linsol_f_.isNull());
     tmp_f1 = reinterpret_cast<bvec_t*>(linsol_f_.input(LINSOL_B).ptr());
     tmp_f2 = reinterpret_cast<bvec_t*>(linsol_f_.output(LINSOL_X).ptr());
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
       casadi_assert(!linsol_g_.isNull());
       tmp_g1 = reinterpret_cast<bvec_t*>(linsol_g_.input(LINSOL_B).ptr());
       tmp_g2 = reinterpret_cast<bvec_t*>(linsol_g_.output(LINSOL_X).ptr());
@@ -496,11 +496,11 @@ namespace casadi {
 
     // Initialize the callback functions for sparsity propagation
     f_.spInit(fwd);
-    if(!g_.isNull()) {
+    if (!g_.isNull()) {
       g_.spInit(fwd);
     }
 
-    if(fwd) {
+    if (fwd) {
 
       // Propagate through the DAE
       f_.input(DAE_T).setZeroBV();
@@ -519,7 +519,7 @@ namespace casadi {
       zf().setArrayBV(tmp_f2+nx_, nz_);
 
       // Get influence on the quadratures
-      if(nq_>0) {
+      if (nq_>0) {
         f_.input(DAE_X).setArrayBV(tmp_f2, nx_);
         f_.input(DAE_Z).setBV(zf());
         f_.spEvaluate(true);
@@ -527,7 +527,7 @@ namespace casadi {
       }
 
       // Propagate through g
-      if(!g_.isNull()) {
+      if (!g_.isNull()) {
 
         // Propagate through the backward DAE
         g_.input(RDAE_T).setZeroBV();
@@ -549,7 +549,7 @@ namespace casadi {
         rzf().setArrayBV(tmp_g2+nrx_, nrz_);
 
         // Get influence on the backward quadratures
-        if(nrq_>0) {
+        if (nrq_>0) {
           g_.input(RDAE_RX).setBV(rxf());
           g_.input(RDAE_RZ).setBV(rzf());
           g_.spEvaluate(true);
@@ -567,10 +567,10 @@ namespace casadi {
       rz0().setBV(rzf());
 
       // Propagate through g
-      if(!g_.isNull()) {
+      if (!g_.isNull()) {
 
         // Propagate influence from the backward quadratures
-        if(nrq_>0) {
+        if (nrq_>0) {
           g_.output(RDAE_ODE).setZeroBV();
           g_.output(RDAE_ALG).setZeroBV();
           g_.output(RDAE_QUAD).setBV(rqf());
@@ -602,7 +602,7 @@ namespace casadi {
       }
 
       // Propagate influence from the quadratures
-      if(nq_>0) {
+      if (nq_>0) {
         f_.output(DAE_ODE).setZeroBV();
         f_.output(DAE_ALG).setZeroBV();
         f_.output(DAE_QUAD).setBV(qf());
@@ -646,38 +646,38 @@ namespace casadi {
     ret.rp.resize(1, 0);
 
     // Count nondifferentiated and forward sensitivities
-    for(int dir=-1; dir<nfwd; ++dir) {
-      if( nx_>0) ret.x.push_back(x0().size2());
-      if( nz_>0) ret.z.push_back(z0().size2());
-      if( nq_>0) ret.q.push_back(qf().size2());
-      if( np_>0) ret.p.push_back(p().size2());
-      if(nrx_>0) ret.rx.push_back(rx0().size2());
-      if(nrz_>0) ret.rz.push_back(rz0().size2());
-      if(nrq_>0) ret.rq.push_back(rqf().size2());
-      if(nrp_>0) ret.rp.push_back(rp().size2());
+    for (int dir=-1; dir<nfwd; ++dir) {
+      if ( nx_>0) ret.x.push_back(x0().size2());
+      if ( nz_>0) ret.z.push_back(z0().size2());
+      if ( nq_>0) ret.q.push_back(qf().size2());
+      if ( np_>0) ret.p.push_back(p().size2());
+      if (nrx_>0) ret.rx.push_back(rx0().size2());
+      if (nrz_>0) ret.rz.push_back(rz0().size2());
+      if (nrq_>0) ret.rq.push_back(rqf().size2());
+      if (nrp_>0) ret.rp.push_back(rp().size2());
     }
 
     // Count adjoint sensitivities
-    for(int dir=0; dir<nadj; ++dir) {
-      if( nx_>0) ret.rx.push_back(x0().size2());
-      if( nz_>0) ret.rz.push_back(z0().size2());
-      if( np_>0) ret.rq.push_back(p().size2());
-      if( nq_>0) ret.rp.push_back(qf().size2());
-      if(nrx_>0) ret.x.push_back(rx0().size2());
-      if(nrz_>0) ret.z.push_back(rz0().size2());
-      if(nrp_>0) ret.q.push_back(rp().size2());
-      if(nrq_>0) ret.p.push_back(rqf().size2());
+    for (int dir=0; dir<nadj; ++dir) {
+      if ( nx_>0) ret.rx.push_back(x0().size2());
+      if ( nz_>0) ret.rz.push_back(z0().size2());
+      if ( np_>0) ret.rq.push_back(p().size2());
+      if ( nq_>0) ret.rp.push_back(qf().size2());
+      if (nrx_>0) ret.x.push_back(rx0().size2());
+      if (nrz_>0) ret.z.push_back(rz0().size2());
+      if (nrp_>0) ret.q.push_back(rp().size2());
+      if (nrq_>0) ret.p.push_back(rqf().size2());
     }
 
     // Get cummulative offsets
-    for(int i=1; i<ret.x.size(); ++i) ret.x[i] += ret.x[i-1];
-    for(int i=1; i<ret.z.size(); ++i) ret.z[i] += ret.z[i-1];
-    for(int i=1; i<ret.q.size(); ++i) ret.q[i] += ret.q[i-1];
-    for(int i=1; i<ret.p.size(); ++i) ret.p[i] += ret.p[i-1];
-    for(int i=1; i<ret.rx.size(); ++i) ret.rx[i] += ret.rx[i-1];
-    for(int i=1; i<ret.rz.size(); ++i) ret.rz[i] += ret.rz[i-1];
-    for(int i=1; i<ret.rq.size(); ++i) ret.rq[i] += ret.rq[i-1];
-    for(int i=1; i<ret.rp.size(); ++i) ret.rp[i] += ret.rp[i-1];
+    for (int i=1; i<ret.x.size(); ++i) ret.x[i] += ret.x[i-1];
+    for (int i=1; i<ret.z.size(); ++i) ret.z[i] += ret.z[i-1];
+    for (int i=1; i<ret.q.size(); ++i) ret.q[i] += ret.q[i-1];
+    for (int i=1; i<ret.p.size(); ++i) ret.p[i] += ret.p[i-1];
+    for (int i=1; i<ret.rx.size(); ++i) ret.rx[i] += ret.rx[i-1];
+    for (int i=1; i<ret.rz.size(); ++i) ret.rz[i] += ret.rz[i-1];
+    for (int i=1; i<ret.rq.size(); ++i) ret.rq[i] += ret.rq[i-1];
+    for (int i=1; i<ret.rp.size(); ++i) ret.rp[i] += ret.rp[i-1];
 
     // Return the offsets
     return ret;
@@ -719,47 +719,47 @@ namespace casadi {
 
     // Add nondifferentiated inputs and forward seeds
     dd.resize(INTEGRATOR_NUM_IN);
-    for(int dir=-1; dir<nfwd; ++dir) {
+    for (int dir=-1; dir<nfwd; ++dir) {
 
       // Differential state
       ss.clear();
       ss << "x0";
-      if(dir>=0) ss << "_" << dir;
+      if (dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_X0] = MX::sym(ss.str(), x0().sparsity());
       x0_aug.appendColumns(dd[INTEGRATOR_X0]);
 
       // Parameter
       ss.clear();
       ss << "p";
-      if(dir>=0) ss << "_" << dir;
+      if (dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_P] = MX::sym(ss.str(), p().sparsity());
       p_aug.appendColumns(dd[INTEGRATOR_P]);
 
       // Initial guess for algebraic variable
       ss.clear();
       ss << "r0";
-      if(dir>=0) ss << "_" << dir;
+      if (dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_Z0] = MX::sym(ss.str(), z0().sparsity());
       z0_aug.appendColumns(dd[INTEGRATOR_Z0]);
 
       // Backward state
       ss.clear();
       ss << "rx0";
-      if(dir>=0) ss << "_" << dir;
+      if (dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_RX0] = MX::sym(ss.str(), rx0().sparsity());
       rx0_aug.appendColumns(dd[INTEGRATOR_RX0]);
 
       // Backward parameter
       ss.clear();
       ss << "rp";
-      if(dir>=0) ss << "_" << dir;
+      if (dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_RP] = MX::sym(ss.str(), rp().sparsity());
       rp_aug.appendColumns(dd[INTEGRATOR_RP]);
 
       // Initial guess for backward algebraic variable
       ss.clear();
       ss << "rz0";
-      if(dir>=0) ss << "_" << dir;
+      if (dir>=0) ss << "_" << dir;
       dd[INTEGRATOR_RZ0] = MX::sym(ss.str(), rz0().sparsity());
       rz0_aug.appendColumns(dd[INTEGRATOR_RZ0]);
 
@@ -769,7 +769,7 @@ namespace casadi {
 
     // Add adjoint seeds
     dd.resize(INTEGRATOR_NUM_OUT);
-    for(int dir=0; dir<nadj; ++dir) {
+    for (int dir=0; dir<nadj; ++dir) {
 
       // Differential states become backward differential state
       ss.clear();
@@ -842,26 +842,26 @@ namespace casadi {
     // Collect the nondifferentiated results and forward sensitivities
     dd.resize(INTEGRATOR_NUM_OUT);
     fill(dd.begin(), dd.end(), MX());
-    for(int dir=-1; dir<nfwd; ++dir) {
-      if( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
-      if( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
-      if( nz_>0) dd[INTEGRATOR_ZF]  = *zf_aug_it++;
-      if(nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
-      if(nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
-      if(nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
+    for (int dir=-1; dir<nfwd; ++dir) {
+      if ( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
+      if ( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
+      if ( nz_>0) dd[INTEGRATOR_ZF]  = *zf_aug_it++;
+      if (nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
+      if (nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
+      if (nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
 
     // Collect the adjoint sensitivities
     dd.resize(INTEGRATOR_NUM_IN);
     fill(dd.begin(), dd.end(), MX());
-    for(int dir=0; dir<nadj; ++dir) {
-      if( nx_>0) dd[INTEGRATOR_X0]  = *rxf_aug_it++;
-      if( np_>0) dd[INTEGRATOR_P]   = *rqf_aug_it++;
-      if( nz_>0) dd[INTEGRATOR_Z0]  = *rzf_aug_it++;
-      if(nrx_>0) dd[INTEGRATOR_RX0] = *xf_aug_it++;
-      if(nrp_>0) dd[INTEGRATOR_RP]  = *qf_aug_it++;
-      if(nrz_>0) dd[INTEGRATOR_RZ0] = *zf_aug_it++;
+    for (int dir=0; dir<nadj; ++dir) {
+      if ( nx_>0) dd[INTEGRATOR_X0]  = *rxf_aug_it++;
+      if ( np_>0) dd[INTEGRATOR_P]   = *rqf_aug_it++;
+      if ( nz_>0) dd[INTEGRATOR_Z0]  = *rzf_aug_it++;
+      if (nrx_>0) dd[INTEGRATOR_RX0] = *xf_aug_it++;
+      if (nrp_>0) dd[INTEGRATOR_RP]  = *qf_aug_it++;
+      if (nrz_>0) dd[INTEGRATOR_RZ0] = *zf_aug_it++;
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
     log("IntegratorInternal::getDerivative", "end");
@@ -924,7 +924,7 @@ namespace casadi {
     ret = ret.patternUnion(Sparsity::diag(nx_));
 
     // Quick return if no algebraic variables
-    if(nz_==0) return ret;
+    if (nz_==0) return ret;
 
     // Add contribution from algebraic variables and equations
     Sparsity jac_ode_z = f_.jacSparsity(DAE_Z, DAE_ODE).T();
@@ -943,7 +943,7 @@ namespace casadi {
     ret = ret.patternUnion(Sparsity::diag(nrx_));
 
     // Quick return if no algebraic variables
-    if(nrz_==0) return ret;
+    if (nrz_==0) return ret;
 
     // Add contribution from algebraic variables and equations
     Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ, RDAE_ODE).T();

@@ -66,7 +66,7 @@ namespace casadi {
     nRZ_ =  RZ_.size();
 
     // Allocate tape if backward states are present
-    if(nrx_>0) {
+    if (nrx_>0) {
       x_tape_.resize(nk_+1, vector<double>(nx_));
       Z_tape_.resize(nk_, vector<double>(nZ_));
     }
@@ -82,7 +82,7 @@ namespace casadi {
     Function& F = getExplicit();
 
     // Take time steps until end time has been reached
-    while(k_<k_out) {
+    while (k_<k_out) {
       // Take step
       F.input(DAE_T).set(t_);
       F.input(DAE_X).set(output(INTEGRATOR_XF));
@@ -98,7 +98,7 @@ namespace casadi {
                 std::plus<double>());
 
       // Tape
-      if(nrx_>0) {
+      if (nrx_>0) {
         output(INTEGRATOR_XF).get(x_tape_.at(k_+1));
         Z_.get(Z_tape_.at(k_));
       }
@@ -119,7 +119,7 @@ namespace casadi {
     Function& G = getExplicitB();
 
     // Take time steps until end time has been reached
-    while(k_>k_out) {
+    while (k_>k_out) {
       // Advance time
       k_--;
       t_ = t0_ + k_*h_;
@@ -154,7 +154,7 @@ namespace casadi {
     calculateInitialConditions();
 
     // Add the first element in the tape
-    if(nrx_>0) {
+    if (nrx_>0) {
       output(INTEGRATOR_XF).get(x_tape_.at(0));
     }
   }

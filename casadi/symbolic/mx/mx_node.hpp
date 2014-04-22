@@ -38,7 +38,7 @@ namespace casadi {
   template<class T>
   std::vector<T*> ptrVec(std::vector<T>& v) {
     std::vector<T*> ret(v.size());
-    for(int i=0; i<v.size(); ++i)
+    for (int i=0; i<v.size(); ++i)
       ret[i] = &v[i];
     return ret;
   }
@@ -46,7 +46,7 @@ namespace casadi {
   template<class T>
   const std::vector<T*> ptrVec(const std::vector<T>& v) {
     std::vector<T*> ret(v.size());
-    for(int i=0; i<v.size(); ++i)
+    for (int i=0; i<v.size(); ++i)
       ret[i] = const_cast<T*>(&v[i]);
     return ret;
   }
@@ -54,7 +54,7 @@ namespace casadi {
   template<class T>
   std::vector<std::vector<T*> > ptrVec(std::vector<std::vector<T> >& v) {
     std::vector<std::vector<T*> > ret(v.size());
-    for(int i=0; i<v.size(); ++i)
+    for (int i=0; i<v.size(); ++i)
       ret[i] = ptrVec(v[i]);
     return ret;
   }
@@ -62,7 +62,7 @@ namespace casadi {
   template<class T>
   const std::vector<std::vector<T*> > ptrVec(const std::vector<std::vector<T> >& v) {
     std::vector<std::vector<T*> > ret(v.size());
-    for(int i=0; i<v.size(); ++i)
+    for (int i=0; i<v.size(); ++i)
       ret[i] = ptrVec(v[i]);
     return ret;
   }
@@ -245,7 +245,7 @@ namespace casadi {
 
     /// Convert scalar to matrix
     inline static MX toMatrix(const MX& x, const Sparsity& sp) {
-      if(x.shape()==sp.shape()) {
+      if (x.shape()==sp.shape()) {
         return x;
       } else {
         return MX(sp, x);
@@ -384,8 +384,8 @@ namespace casadi {
   template<typename T>
   std::vector<T> MXNode::getVector(const std::vector<T*> v) {
     std::vector<T> ret(v.size());
-    for(int i=0; i<v.size(); i++) {
-      if(v[i]!=0) {
+    for (int i=0; i<v.size(); i++) {
+      if (v[i]!=0) {
         ret[i] = *v[i];
       }
     }
@@ -395,7 +395,7 @@ namespace casadi {
   template<typename T>
   std::vector<std::vector<T> > MXNode::getVector(const std::vector<std::vector<T*> > v) {
     std::vector<std::vector<T> > ret(v.size());
-    for(int i=0; i<v.size(); i++) {
+    for (int i=0; i<v.size(); i++) {
       ret[i] = getVector(v[i]);
     }
     return ret;

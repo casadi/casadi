@@ -33,7 +33,7 @@ namespace casadi {
   }
 
   void NormF::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "||";
     } else {
       stream << "||_F";
@@ -65,19 +65,19 @@ namespace casadi {
   void NormF::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                          MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                          bool output_given) {
-    if(!output_given) {
+    if (!output_given) {
       *output[0] = (*input[0])->getNormF();
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d) {
+    for (int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = (*input[0])->getInnerProd(*fwdSeed[d][0]) / (*output[0]);
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d) {
+    for (int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum(((*adjSeed[d][0])/(*output[0])) * *input[0]);
       *adjSeed[d][0] = MX();
     }
@@ -91,7 +91,7 @@ namespace casadi {
   }
 
   void Norm2::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "||";
     } else {
       stream << "||_2";
@@ -99,7 +99,7 @@ namespace casadi {
   }
 
   void Norm1::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "||";
     } else {
       stream << "||_1";
@@ -107,7 +107,7 @@ namespace casadi {
   }
 
   void NormInf::printPart(std::ostream &stream, int part) const {
-    if(part==0) {
+    if (part==0) {
       stream << "||";
     } else {
       stream << "||_inf";
