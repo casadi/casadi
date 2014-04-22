@@ -160,7 +160,7 @@ namespace casadi {
     int status;
 
     // We change method in crossover
-    if ( is_warm_ && qp_method_ == 7) {
+    if (is_warm_ && qp_method_ == 7) {
       status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 1);
     }
 
@@ -242,8 +242,7 @@ namespace casadi {
                           output(QP_SOLVER_X).ptr(),
                           output(QP_SOLVER_LAM_A).ptr(),
                           getPtr(slack),
-                          output(QP_SOLVER_LAM_X).ptr()
-                          );
+                          output(QP_SOLVER_LAM_X).ptr());
 
     if (status) {
       cout << "CPLEX: Failed to get solution.\n";
