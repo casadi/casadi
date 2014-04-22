@@ -5,6 +5,7 @@ set(PACKAGE_VERSION "1.9.0+")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson")
 set(PACKAGE_MAINTAINER "Joris Gillis")
+set(PACKAGE_URL "http://casadi.org")
 
 # For systems with git installed, find out revsion and description.
 execute_process(COMMAND git rev-parse HEAD
