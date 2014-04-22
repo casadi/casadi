@@ -137,10 +137,14 @@ class Doxy2SWIG_X(Doxy2SWIG):
         o = my_open_write(fname)
         if self.multi:
             for p in self.pieces:
-              o.write(p.encode("ascii","ignore"))
+              pp = p.encode("ascii","ignore")
+              pp = re.sub("[A-Z_]*_EXPORT ","",pp)
+              o.write(pp)
         else:
             for p in self.clean_pieces(self.pieces):
-              o.write(p.encode("ascii","ignore"))
+              pp = p.encode("ascii","ignore")
+              pp = re.sub("[A-Z_]*_EXPORT ","",pp)
+              o.write(pp)
         o.close()
         
   def do_doxygenindex(self, node):
