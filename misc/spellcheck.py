@@ -49,7 +49,7 @@ def checkfile(f,lock):
     #if re.match("^\s+$",fc[prevs[2]:s]) and not t.startswith('///') and t.startswith('//') and prevs[0].startswith('///') and "@{" not in prevs[0] and "@}" not in prevs[0]:
     #  print "%s:%d %s" % (f,lineno,m)
     #prevs = (t,s,e)
-    if t[1:-1].endswith(".hpp"):
+    if t[1:-1].endswith(".hpp") or t[1:-1].endswith(".h"):
       continue
       
     
