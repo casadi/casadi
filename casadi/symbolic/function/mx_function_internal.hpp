@@ -119,7 +119,7 @@ namespace casadi {
                         std::vector<std::vector<MX> >& adjSens);
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
-    SXFunction expand(const std::vector<SX>& inputv );
+    SXFunction expand(const std::vector<SX>& inputv);
 
     // Update pointers to a particular element
     void updatePointers(const AlgEl& el);

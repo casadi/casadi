@@ -313,7 +313,7 @@ namespace casadi {
       }
 
       return 0;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "KnitroInternal::callback caugth exception: " << ex.what() << endl;
       return -1;
     }

@@ -95,7 +95,7 @@ namespace casadi {
 
   /// Equilibrate the system
   extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
-                          double *colcnd, double *rowcnd, double *amax, char *equed );
+                          double *colcnd, double *rowcnd, double *amax, char *equed);
 
   /// Internal class
   class CASADI_LAPACK_INTERFACE_EXPORT LapackLUDenseInternal : public LinearSolverInternal {

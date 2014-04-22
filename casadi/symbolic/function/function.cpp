@@ -252,7 +252,7 @@ namespace casadi {
 
   void Function::generateCode(const string& filename) {
     std::ofstream cfile;
-    cfile.open (filename.c_str());
+    cfile.open(filename.c_str());
     generateCode(cfile);
     cfile.close();
   }

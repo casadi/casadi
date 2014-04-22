@@ -472,7 +472,7 @@ namespace casadi {
       } else {
         return 1;
       }
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       if (getOption("iteration_callback_ignore_errors")) {
         cerr << "intermediate_callback: " << ex.what() << endl;
       } else {
@@ -507,7 +507,7 @@ namespace casadi {
       // Get statistics
       stats_["iter_count"] = iter_count;
 
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "finalize_solution failed: " << ex.what() << endl;
     }
   }
@@ -556,7 +556,7 @@ namespace casadi {
       n_eval_h_ += 1;
       log("eval_h ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_h failed: " << ex.what() << endl;
       return false;
     }
@@ -613,7 +613,7 @@ namespace casadi {
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_jac_g failed: " << ex.what() << endl;
       return false;
     }
@@ -651,7 +651,7 @@ namespace casadi {
       n_eval_f_ += 1;
       log("eval_f ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_f failed: " << ex.what() << endl;
       return false;
     }
@@ -689,7 +689,7 @@ namespace casadi {
       n_eval_g_ += 1;
       log("eval_g ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_g failed: " << ex.what() << endl;
       return false;
     }
@@ -725,7 +725,7 @@ namespace casadi {
       n_eval_grad_f_ += 1;
       log("eval_grad_f ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_grad_f failed: " << ex.what() << endl;
       return false;
     }
@@ -741,7 +741,7 @@ namespace casadi {
       input(NLP_SOLVER_LBG).getArray(g_l, m);
       input(NLP_SOLVER_UBG).getArray(g_u, m);
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "get_bounds_info failed: " << ex.what() << endl;
       return false;
     }
@@ -778,7 +778,7 @@ namespace casadi {
       }
 
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "get_starting_point failed: " << ex.what() << endl;
       return false;
     }
@@ -800,7 +800,7 @@ namespace casadi {
         nnz_h_lag = hessLag().output().sparsity().sizeU();
       else
         nnz_h_lag = 0;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "get_nlp_info failed: " << ex.what() << endl;
     }
   }
@@ -826,7 +826,7 @@ namespace casadi {
         // Return the number
         return nv;
       }
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
       return -1;
     }
@@ -850,7 +850,7 @@ namespace casadi {
       // Assert number and return
       casadi_assert(el==num_nonlin_vars);
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
       return false;
     }

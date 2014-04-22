@@ -160,7 +160,7 @@ namespace casadi {
       "sub(Sparsity sp): shape mismatch. This matrix has shape "
       << size1() << " x " << size2()
       << ", but supplied sparsity index has shape "
-      << sp.size1() << " x " << sp.size2() << "." );
+      << sp.size1() << " x " << sp.size2() << ".");
     Matrix<DataType> ret(sp);
 
     std::vector<unsigned char> mapping; // Mapping that will be filled by patternunion
@@ -344,7 +344,7 @@ namespace casadi {
       "sub(Sparsity sp): shape mismatch. This matrix has shape "
       << size2() << " x " << size1()
       << ", but supplied sparsity index has shape "
-      << sp.size2() << " x " << sp.size1() << "." );
+      << sp.size2() << " x " << sp.size1() << ".");
     // TODO(Joel): optimize this for speed
     Matrix<DataType> elm;
     if (m.isScalar()) {
@@ -1843,8 +1843,7 @@ namespace casadi {
       casadi_math<DataType>::print(op, ss, "lhs", "rhs");
       casadi_error("matrix_matrix: dimension mismatch in element-wise matrix operation "
                    << ss.str() <<"." << std::endl << "Left argument has shape " << x.dimString()
-                   << ", right has shape " << y.dimString() << ". They should be equal."
-                   );
+                   << ", right has shape " << y.dimString() << ". They should be equal.");
     }
 
     // Get the sparsity pattern of the result

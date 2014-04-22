@@ -49,8 +49,8 @@ DPLEInputIOSchemeVector<M> dpleIn(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DPLEInput, it->first);
@@ -67,8 +67,8 @@ std::vector<M> dpleIn(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEInput, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -90,7 +90,7 @@ DPLEOutputIOSchemeVector<M> dpleOut(
     const std::string &arg_s0 ="", const M &arg_m0 =M()) {
   std::vector<M> ret(1);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DPLEOutput, it->first);
@@ -106,7 +106,7 @@ template<class M>
 std::vector<M> dpleOut(const std::vector<M>& args,
     const std::string &arg_s0="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DPLEOutput, arg_s0))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -136,15 +136,15 @@ ControlledDAEInputIOSchemeVector<M> controldaeIn(
     const std::string &arg_s8 ="", const M &arg_m8 =M()) {
   std::vector<M> ret(9);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_ControlledDAEInput, it->first);
@@ -168,15 +168,15 @@ std::vector<M> controldaeIn(const std::vector<M>& args,
     const std::string &arg_s7="",
     const std::string &arg_s8="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlledDAEInput, arg_s8))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -200,9 +200,9 @@ ControlSimulatorInputIOSchemeVector<M> controlsimulatorIn(
     const std::string &arg_s2 ="", const M &arg_m2 =M()) {
   std::vector<M> ret(3);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_ControlSimulatorInput, it->first);
@@ -220,9 +220,9 @@ std::vector<M> controlsimulatorIn(const std::vector<M>& args,
     const std::string &arg_s1="",
     const std::string &arg_s2="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_ControlSimulatorInput, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -246,9 +246,9 @@ HNLPInputIOSchemeVector<M> hnlpIn(
     const std::string &arg_s2 ="", const M &arg_m2 =M()) {
   std::vector<M> ret(3);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_HNLPInput, it->first);
@@ -266,9 +266,9 @@ std::vector<M> hnlpIn(const std::vector<M>& args,
     const std::string &arg_s1="",
     const std::string &arg_s2="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HNLPInput, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -293,10 +293,10 @@ DAEInputIOSchemeVector<M> daeIn(
     const std::string &arg_s3 ="", const M &arg_m3 =M()) {
   std::vector<M> ret(4);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DAEInput, it->first);
@@ -315,10 +315,10 @@ std::vector<M> daeIn(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEInput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -342,9 +342,9 @@ DAEOutputIOSchemeVector<M> daeOut(
     const std::string &arg_s2 ="", const M &arg_m2 =M()) {
   std::vector<M> ret(3);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DAEOutput, it->first);
@@ -362,9 +362,9 @@ std::vector<M> daeOut(const std::vector<M>& args,
     const std::string &arg_s1="",
     const std::string &arg_s2="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_DAEOutput, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -392,13 +392,13 @@ RDAEInputIOSchemeVector<M> rdaeIn(
     const std::string &arg_s6 ="", const M &arg_m6 =M()) {
   std::vector<M> ret(7);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_RDAEInput, it->first);
@@ -420,13 +420,13 @@ std::vector<M> rdaeIn(const std::vector<M>& args,
     const std::string &arg_s5="",
     const std::string &arg_s6="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEInput, arg_s6))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -450,9 +450,9 @@ RDAEOutputIOSchemeVector<M> rdaeOut(
     const std::string &arg_s2 ="", const M &arg_m2 =M()) {
   std::vector<M> ret(3);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_RDAEOutput, it->first);
@@ -470,9 +470,9 @@ std::vector<M> rdaeOut(const std::vector<M>& args,
     const std::string &arg_s1="",
     const std::string &arg_s2="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_RDAEOutput, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -499,12 +499,12 @@ IntegratorInputIOSchemeVector<M> integratorIn(
     const std::string &arg_s5 ="", const M &arg_m5 =M()) {
   std::vector<M> ret(6);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_IntegratorInput, it->first);
@@ -525,12 +525,12 @@ std::vector<M> integratorIn(const std::vector<M>& args,
     const std::string &arg_s4="",
     const std::string &arg_s5="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorInput, arg_s5))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -557,12 +557,12 @@ IntegratorOutputIOSchemeVector<M> integratorOut(
     const std::string &arg_s5 ="", const M &arg_m5 =M()) {
   std::vector<M> ret(6);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_IntegratorOutput, it->first);
@@ -583,12 +583,12 @@ std::vector<M> integratorOut(const std::vector<M>& args,
     const std::string &arg_s4="",
     const std::string &arg_s5="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_IntegratorOutput, arg_s5))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -611,8 +611,8 @@ LinsolInputIOSchemeVector<M> linsolIn(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LinsolInput, it->first);
@@ -629,8 +629,8 @@ std::vector<M> linsolIn(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolInput, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -652,7 +652,7 @@ LinsolOutputIOSchemeVector<M> linsolOut(
     const std::string &arg_s0 ="", const M &arg_m0 =M()) {
   std::vector<M> ret(1);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LinsolOutput, it->first);
@@ -668,7 +668,7 @@ template<class M>
 std::vector<M> linsolOut(const std::vector<M>& args,
     const std::string &arg_s0="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LinsolOutput, arg_s0))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -695,12 +695,12 @@ LPSolverInputIOSchemeVector<M> lpIn(
     const std::string &arg_s5 ="", const M &arg_m5 =M()) {
   std::vector<M> ret(6);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LPSolverInput, it->first);
@@ -721,12 +721,12 @@ std::vector<M> lpIn(const std::vector<M>& args,
     const std::string &arg_s4="",
     const std::string &arg_s5="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -751,10 +751,10 @@ LPSolverOutputIOSchemeVector<M> lpOut(
     const std::string &arg_s3 ="", const M &arg_m3 =M()) {
   std::vector<M> ret(4);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LPSolverOutput, it->first);
@@ -773,10 +773,10 @@ std::vector<M> lpOut(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -798,7 +798,7 @@ LPStructIOSchemeVector<M> lpStruct(
     const std::string &arg_s0 ="", const M &arg_m0 =M()) {
   std::vector<M> ret(1);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_LPStruct, it->first);
@@ -814,7 +814,7 @@ template<class M>
 std::vector<M> lpStruct(const std::vector<M>& args,
     const std::string &arg_s0="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPStruct, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_LPStruct, arg_s0))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -837,8 +837,8 @@ NLPInputIOSchemeVector<M> nlpIn(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPInput, it->first);
@@ -855,8 +855,8 @@ std::vector<M> nlpIn(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPInput, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -879,8 +879,8 @@ NLPOutputIOSchemeVector<M> nlpOut(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPOutput, it->first);
@@ -897,8 +897,8 @@ std::vector<M> nlpOut(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPOutput, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -921,8 +921,8 @@ GradFInputIOSchemeVector<M> gradFIn(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_GradFInput, it->first);
@@ -939,8 +939,8 @@ std::vector<M> gradFIn(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFInput, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -964,9 +964,9 @@ GradFOutputIOSchemeVector<M> gradFOut(
     const std::string &arg_s2 ="", const M &arg_m2 =M()) {
   std::vector<M> ret(3);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_GradFOutput, it->first);
@@ -984,9 +984,9 @@ std::vector<M> gradFOut(const std::vector<M>& args,
     const std::string &arg_s1="",
     const std::string &arg_s2="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_GradFOutput, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1009,8 +1009,8 @@ JacGInputIOSchemeVector<M> jacGIn(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_JacGInput, it->first);
@@ -1027,8 +1027,8 @@ std::vector<M> jacGIn(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGInput, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1052,9 +1052,9 @@ JacGOutputIOSchemeVector<M> jacGOut(
     const std::string &arg_s2 ="", const M &arg_m2 =M()) {
   std::vector<M> ret(3);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_JacGOutput, it->first);
@@ -1072,9 +1072,9 @@ std::vector<M> jacGOut(const std::vector<M>& args,
     const std::string &arg_s1="",
     const std::string &arg_s2="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_JacGOutput, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1099,10 +1099,10 @@ HessLagInputIOSchemeVector<M> hessLagIn(
     const std::string &arg_s3 ="", const M &arg_m3 =M()) {
   std::vector<M> ret(4);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_HessLagInput, it->first);
@@ -1121,10 +1121,10 @@ std::vector<M> hessLagIn(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagInput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1150,11 +1150,11 @@ HessLagOutputIOSchemeVector<M> hessLagOut(
     const std::string &arg_s4 ="", const M &arg_m4 =M()) {
   std::vector<M> ret(5);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_HessLagOutput, it->first);
@@ -1174,11 +1174,11 @@ std::vector<M> hessLagOut(const std::vector<M>& args,
     const std::string &arg_s3="",
     const std::string &arg_s4="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_HessLagOutput, arg_s4))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1207,14 +1207,14 @@ NLPSolverInputIOSchemeVector<M> nlpSolverIn(
     const std::string &arg_s7 ="", const M &arg_m7 =M()) {
   std::vector<M> ret(8);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPSolverInput, it->first);
@@ -1237,14 +1237,14 @@ std::vector<M> nlpSolverIn(const std::vector<M>& args,
     const std::string &arg_s6="",
     const std::string &arg_s7="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1271,12 +1271,12 @@ NLPSolverOutputIOSchemeVector<M> nlpSolverOut(
     const std::string &arg_s5 ="", const M &arg_m5 =M()) {
   std::vector<M> ret(6);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_NLPSolverOutput, it->first);
@@ -1297,12 +1297,12 @@ std::vector<M> nlpSolverOut(const std::vector<M>& args,
     const std::string &arg_s4="",
     const std::string &arg_s5="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s5))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1327,8 +1327,8 @@ MayerInputIOSchemeVector<M> mayerIn(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_MayerInput, it->first);
@@ -1345,8 +1345,8 @@ std::vector<M> mayerIn(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_MayerInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_MayerInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_MayerInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_MayerInput, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1386,19 +1386,19 @@ OCPInputIOSchemeVector<M> ocpIn(
     const std::string &arg_s12 ="", const M &arg_m12 =M()) {
   std::vector<M> ret(13);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
-  if (arg_s9!="") arg.insert(make_pair(arg_s9, arg_m9));
-  if (arg_s10!="") arg.insert(make_pair(arg_s10, arg_m10));
-  if (arg_s11!="") arg.insert(make_pair(arg_s11, arg_m11));
-  if (arg_s12!="") arg.insert(make_pair(arg_s12, arg_m12));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
+  if (arg_s9 != "") arg.insert(make_pair(arg_s9, arg_m9));
+  if (arg_s10 != "") arg.insert(make_pair(arg_s10, arg_m10));
+  if (arg_s11 != "") arg.insert(make_pair(arg_s11, arg_m11));
+  if (arg_s12 != "") arg.insert(make_pair(arg_s12, arg_m12));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_OCPInput, it->first);
@@ -1426,19 +1426,19 @@ std::vector<M> ocpIn(const std::vector<M>& args,
     const std::string &arg_s11="",
     const std::string &arg_s12="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s11))); // NOLINT(whitespace/line_length)
-  if (arg_s12!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s12))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s9))); // NOLINT(whitespace/line_length)
+  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s10))); // NOLINT(whitespace/line_length)
+  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s11))); // NOLINT(whitespace/line_length)
+  if (arg_s12 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPInput, arg_s12))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1463,10 +1463,10 @@ OCPOutputIOSchemeVector<M> ocpOut(
     const std::string &arg_s3 ="", const M &arg_m3 =M()) {
   std::vector<M> ret(4);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_OCPOutput, it->first);
@@ -1485,10 +1485,10 @@ std::vector<M> ocpOut(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_OCPOutput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1521,18 +1521,18 @@ QCQPSolverInputIOSchemeVector<M> qcqpIn(
     const std::string &arg_s11 ="", const M &arg_m11 =M()) {
   std::vector<M> ret(12);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
-  if (arg_s9!="") arg.insert(make_pair(arg_s9, arg_m9));
-  if (arg_s10!="") arg.insert(make_pair(arg_s10, arg_m10));
-  if (arg_s11!="") arg.insert(make_pair(arg_s11, arg_m11));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
+  if (arg_s9 != "") arg.insert(make_pair(arg_s9, arg_m9));
+  if (arg_s10 != "") arg.insert(make_pair(arg_s10, arg_m10));
+  if (arg_s11 != "") arg.insert(make_pair(arg_s11, arg_m11));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QCQPSolverInput, it->first);
@@ -1559,18 +1559,18 @@ std::vector<M> qcqpIn(const std::vector<M>& args,
     const std::string &arg_s10="",
     const std::string &arg_s11="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
+  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
+  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1595,10 +1595,10 @@ QCQPSolverOutputIOSchemeVector<M> qcqpOut(
     const std::string &arg_s3 ="", const M &arg_m3 =M()) {
   std::vector<M> ret(4);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QCQPSolverOutput, it->first);
@@ -1617,10 +1617,10 @@ std::vector<M> qcqpOut(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1644,9 +1644,9 @@ QCQPStructIOSchemeVector<M> qcqpStruct(
     const std::string &arg_s2 ="", const M &arg_m2 =M()) {
   std::vector<M> ret(3);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QCQPStruct, it->first);
@@ -1664,9 +1664,9 @@ std::vector<M> qcqpStruct(const std::vector<M>& args,
     const std::string &arg_s1="",
     const std::string &arg_s2="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QCQPStruct, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1696,15 +1696,15 @@ QPSolverInputIOSchemeVector<M> qpIn(
     const std::string &arg_s8 ="", const M &arg_m8 =M()) {
   std::vector<M> ret(9);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QPSolverInput, it->first);
@@ -1728,15 +1728,15 @@ std::vector<M> qpIn(const std::vector<M>& args,
     const std::string &arg_s7="",
     const std::string &arg_s8="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1761,10 +1761,10 @@ QPSolverOutputIOSchemeVector<M> qpOut(
     const std::string &arg_s3 ="", const M &arg_m3 =M()) {
   std::vector<M> ret(4);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QPSolverOutput, it->first);
@@ -1783,10 +1783,10 @@ std::vector<M> qpOut(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1809,8 +1809,8 @@ QPStructIOSchemeVector<M> qpStruct(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_QPStruct, it->first);
@@ -1827,8 +1827,8 @@ std::vector<M> qpStruct(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_QPStruct, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1857,14 +1857,14 @@ SDPInputIOSchemeVector<M> sdpIn(
     const std::string &arg_s7 ="", const M &arg_m7 =M()) {
   std::vector<M> ret(8);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDPInput, it->first);
@@ -1887,14 +1887,14 @@ std::vector<M> sdpIn(const std::vector<M>& args,
     const std::string &arg_s6="",
     const std::string &arg_s7="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPInput, arg_s7))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1922,13 +1922,13 @@ SDPOutputIOSchemeVector<M> sdpOut(
     const std::string &arg_s6 ="", const M &arg_m6 =M()) {
   std::vector<M> ret(7);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDPOutput, it->first);
@@ -1950,13 +1950,13 @@ std::vector<M> sdpOut(const std::vector<M>& args,
     const std::string &arg_s5="",
     const std::string &arg_s6="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPOutput, arg_s6))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -1980,9 +1980,9 @@ SDPStructIOSchemeVector<M> sdpStruct(
     const std::string &arg_s2 ="", const M &arg_m2 =M()) {
   std::vector<M> ret(3);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDPStruct, it->first);
@@ -2000,9 +2000,9 @@ std::vector<M> sdpStruct(const std::vector<M>& args,
     const std::string &arg_s1="",
     const std::string &arg_s2="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDPStruct, arg_s2))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2032,15 +2032,15 @@ SDQPInputIOSchemeVector<M> sdqpIn(
     const std::string &arg_s8 ="", const M &arg_m8 =M()) {
   std::vector<M> ret(9);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDQPInput, it->first);
@@ -2064,15 +2064,15 @@ std::vector<M> sdqpIn(const std::vector<M>& args,
     const std::string &arg_s7="",
     const std::string &arg_s8="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPInput, arg_s8))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2100,13 +2100,13 @@ SDQPOutputIOSchemeVector<M> sdqpOut(
     const std::string &arg_s6 ="", const M &arg_m6 =M()) {
   std::vector<M> ret(7);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDQPOutput, it->first);
@@ -2128,13 +2128,13 @@ std::vector<M> sdqpOut(const std::vector<M>& args,
     const std::string &arg_s5="",
     const std::string &arg_s6="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPOutput, arg_s6))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2159,10 +2159,10 @@ SDQPStructIOSchemeVector<M> sdqpStruct(
     const std::string &arg_s3 ="", const M &arg_m3 =M()) {
   std::vector<M> ret(4);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SDQPStruct, it->first);
@@ -2181,10 +2181,10 @@ std::vector<M> sdqpStruct(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SDQPStruct, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2215,16 +2215,16 @@ SOCPInputIOSchemeVector<M> socpIn(
     const std::string &arg_s9 ="", const M &arg_m9 =M()) {
   std::vector<M> ret(10);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
-  if (arg_s9!="") arg.insert(make_pair(arg_s9, arg_m9));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
+  if (arg_s9 != "") arg.insert(make_pair(arg_s9, arg_m9));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SOCPInput, it->first);
@@ -2249,16 +2249,16 @@ std::vector<M> socpIn(const std::vector<M>& args,
     const std::string &arg_s8="",
     const std::string &arg_s9="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s9))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPInput, arg_s9))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2283,10 +2283,10 @@ SOCPOutputIOSchemeVector<M> socpOut(
     const std::string &arg_s3 ="", const M &arg_m3 =M()) {
   std::vector<M> ret(4);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SOCPOutput, it->first);
@@ -2305,10 +2305,10 @@ std::vector<M> socpOut(const std::vector<M>& args,
     const std::string &arg_s2="",
     const std::string &arg_s3="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPOutput, arg_s3))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2331,8 +2331,8 @@ SOCPStructIOSchemeVector<M> socpStruct(
     const std::string &arg_s1 ="", const M &arg_m1 =M()) {
   std::vector<M> ret(2);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_SOCPStruct, it->first);
@@ -2349,8 +2349,8 @@ std::vector<M> socpStruct(const std::vector<M>& args,
     const std::string &arg_s0="",
     const std::string &arg_s1="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_SOCPStruct, arg_s1))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2383,18 +2383,18 @@ StabilizedQPSolverInputIOSchemeVector<M> stabilizedQpIn(
     const std::string &arg_s11 ="", const M &arg_m11 =M()) {
   std::vector<M> ret(12);
   std::map<std::string, M> arg;
-  if (arg_s0!="") arg.insert(make_pair(arg_s0, arg_m0));
-  if (arg_s1!="") arg.insert(make_pair(arg_s1, arg_m1));
-  if (arg_s2!="") arg.insert(make_pair(arg_s2, arg_m2));
-  if (arg_s3!="") arg.insert(make_pair(arg_s3, arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4, arg_m4));
-  if (arg_s5!="") arg.insert(make_pair(arg_s5, arg_m5));
-  if (arg_s6!="") arg.insert(make_pair(arg_s6, arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7, arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8, arg_m8));
-  if (arg_s9!="") arg.insert(make_pair(arg_s9, arg_m9));
-  if (arg_s10!="") arg.insert(make_pair(arg_s10, arg_m10));
-  if (arg_s11!="") arg.insert(make_pair(arg_s11, arg_m11));
+  if (arg_s0 != "") arg.insert(make_pair(arg_s0, arg_m0));
+  if (arg_s1 != "") arg.insert(make_pair(arg_s1, arg_m1));
+  if (arg_s2 != "") arg.insert(make_pair(arg_s2, arg_m2));
+  if (arg_s3 != "") arg.insert(make_pair(arg_s3, arg_m3));
+  if (arg_s4 != "") arg.insert(make_pair(arg_s4, arg_m4));
+  if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
+  if (arg_s6 != "") arg.insert(make_pair(arg_s6, arg_m6));
+  if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
+  if (arg_s8 != "") arg.insert(make_pair(arg_s8, arg_m8));
+  if (arg_s9 != "") arg.insert(make_pair(arg_s9, arg_m9));
+  if (arg_s10 != "") arg.insert(make_pair(arg_s10, arg_m10));
+  if (arg_s11 != "") arg.insert(make_pair(arg_s11, arg_m11));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, it->first);
@@ -2421,18 +2421,18 @@ std::vector<M> stabilizedQpIn(const std::vector<M>& args,
     const std::string &arg_s10="",
     const std::string &arg_s11="") {
   std::vector<M> ret;
-  if (arg_s0!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
-  if (arg_s8!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
-  if (arg_s9!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
-  if (arg_s10!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
-  if (arg_s11!="") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s8 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s8))); // NOLINT(whitespace/line_length)
+  if (arg_s9 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s9))); // NOLINT(whitespace/line_length)
+  if (arg_s10 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s10))); // NOLINT(whitespace/line_length)
+  if (arg_s11 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput, arg_s11))); // NOLINT(whitespace/line_length)
   return ret;
 
 }

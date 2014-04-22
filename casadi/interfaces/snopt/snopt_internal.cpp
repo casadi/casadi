@@ -807,7 +807,7 @@ namespace casadi {
         t_callback_fun_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
         n_callback_fun_ += 1;
       }
-    } catch (std::exception& ex) {
+    } catch(std::exception& ex) {
       std::cerr << "eval_nlp failed: " << ex.what() << std::endl;
       *mode = -1;  // Reduce step size - we've got problems
       return;

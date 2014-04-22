@@ -1122,8 +1122,8 @@ namespace casadi {
     // Heuristics
     if (
         (module=="IDACalcIC" && (flag==IDA_CONV_FAIL || flag==IDA_NO_RECOVERY ||
-                                 flag==IDA_LINESEARCH_FAIL )) ||
-        (module=="IDASolve" && flag ==IDA_ERR_FAIL )
+                                 flag==IDA_LINESEARCH_FAIL)) ||
+        (module=="IDASolve" && flag ==IDA_ERR_FAIL)
         ) {
       ss << "Some common causes for this error: " << std::endl;
       ss << "  - providing an initial guess for which 0=g(y, z, t) is not invertible wrt y. "

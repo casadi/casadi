@@ -72,7 +72,7 @@ namespace casadi {
     // ordering and symbolic analysis
     int order = 0; // ordering?
     if (S_) cs_sfree(S_);
-    S_ = cs_schol (order, &AT_) ;
+    S_ = cs_schol(order, &AT_) ;
   }
 
 
@@ -86,13 +86,13 @@ namespace casadi {
     int *Li = &colind.front();
     int *Lp = &row.front();
     const cs* C;
-    C = S_->pinv ? cs_symperm (&AT_, S_->pinv, 1) : &AT_;
+    C = S_->pinv ? cs_symperm(&AT_, S_->pinv, 1) : &AT_;
     std::vector< int > temp(2*n);
     int *c = & temp.front();
     int *s = c+n;
     for (int k = 0 ; k < n ; k++) c[k] = S_->cp[k] ;
     for (int k = 0 ; k < n ; k++) {       /* compute L(k, :) for L*L' = C */
-      int top = cs_ereach (C, k, S_->parent, s, c) ;
+      int top = cs_ereach(C, k, S_->parent, s, c) ;
       for ( ; top < n ; top++) {  /* solve L(0:k-1, 0:k-1) * x = C(:, k) */
           int i = s[top] ;               /* s[top..n-1] is pattern of L(k, :) */
           int p = c[i]++ ;
@@ -184,15 +184,15 @@ namespace casadi {
     double *t = &temp_.front();
     for (int k=0; k<nrhs; ++k) {
       if (transpose) {
-        cs_pvec (S_->q, x, t, AT_.n) ;   // t = P1\b
-        cs_ltsolve (L_->L, t) ;               // t = L\t
-        cs_lsolve (L_->L, t) ;              // t = U\t
-        cs_pvec (L_->pinv, t, x, AT_.n) ;      // x = P2\t
+        cs_pvec(S_->q, x, t, AT_.n) ;   // t = P1\b
+        cs_ltsolve(L_->L, t) ;               // t = L\t
+        cs_lsolve(L_->L, t) ;              // t = U\t
+        cs_pvec(L_->pinv, t, x, AT_.n) ;      // x = P2\t
       } else {
-        cs_ipvec (L_->pinv, x, t, AT_.n) ;   // t = P1\b
-        cs_lsolve (L_->L, t) ;               // t = L\t
-        cs_ltsolve (L_->L, t) ;              // t = U\t
-        cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t
+        cs_ipvec(L_->pinv, x, t, AT_.n) ;   // t = P1\b
+        cs_lsolve(L_->L, t) ;               // t = L\t
+        cs_ltsolve(L_->L, t) ;              // t = U\t
+        cs_ipvec(S_->q, t, x, AT_.n) ;      // x = P2\t
       }
       x += ncol();
     }
@@ -205,10 +205,10 @@ namespace casadi {
     double *t = getPtr(temp_);
 
     for (int k=0; k<nrhs; ++k) {
-      cs_ipvec (L_->pinv, x, t, AT_.n) ;   // t = P1\b
-      if (transpose) cs_lsolve (L_->L, t) ; // t = L\t
-      if (!transpose) cs_ltsolve (L_->L, t) ; // t = U\t
-      cs_ipvec (S_->q, t, x, AT_.n) ;      // x = P2\t
+      cs_ipvec(L_->pinv, x, t, AT_.n) ;   // t = P1\b
+      if (transpose) cs_lsolve(L_->L, t) ; // t = L\t
+      if (!transpose) cs_ltsolve(L_->L, t) ; // t = U\t
+      cs_ipvec(S_->q, t, x, AT_.n) ;      // x = P2\t
       x += ncol();
     }
   }

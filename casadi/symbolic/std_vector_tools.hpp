@@ -124,7 +124,7 @@ namespace casadi {
   Apply a function f to each element in a vector
   */
   template<class T>
-  std::vector<T> applymap(T (*f)(const T& ), const std::vector<T>&);
+  std::vector<T> applymap(T (*f)(const T&), const std::vector<T>&);
 
   /**
   Apply a function f to each element in a vector
@@ -645,7 +645,7 @@ namespace casadi {
   bool isRegular(const std::vector<T> &v) {
     for (int k=0;k<v.size();++k) {
       if (v[k]!=v[k] || v[k]==std::numeric_limits<T>::infinity() ||
-          v[k]==-std::numeric_limits<T>::infinity() ) return false;
+          v[k]==-std::numeric_limits<T>::infinity()) return false;
     }
     return true;
   }

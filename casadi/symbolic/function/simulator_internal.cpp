@@ -105,9 +105,9 @@ namespace casadi {
       }
     }
 
-    casadi_assert_message( output_fcn_.input(DAE_T).numel() <=1,
-                           "SimulatorInternal::init: output_fcn DAE_T argument must be "
-                           "scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
+    casadi_assert_message(output_fcn_.input(DAE_T).numel() <=1,
+                          "SimulatorInternal::init: output_fcn DAE_T argument must be "
+                          "scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
 
     casadi_assert_message(
         output_fcn_.input(DAE_P).isEmpty() ||

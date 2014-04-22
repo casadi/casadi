@@ -124,7 +124,7 @@ namespace casadi {
                   << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
       if (monitored("J")) std::cout << "  J = " << J << std::endl;
 
-      if ( numeric_limits<double>::infinity() != abstol_ ) {
+      if (numeric_limits<double>::infinity() != abstol_) {
         double maxF = std::max((*std::max_element(F.data().begin(),
                                                   F.data().end())),
                                -(*std::min_element(F.data().begin(),
@@ -169,7 +169,7 @@ namespace casadi {
         std::cout << "  step = " << F << std::endl;
       }
 
-      if ( numeric_limits<double>::infinity() != abstolStep_ ) {
+      if (numeric_limits<double>::infinity() != abstolStep_) {
         double maxF = std::max((*std::max_element(F.data().begin(),
                                                   F.data().end())),
                                -(*std::min_element(F.data().begin(),

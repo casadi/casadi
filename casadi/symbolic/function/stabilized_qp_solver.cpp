@@ -47,7 +47,7 @@ void StabilizedQPSolver::setLPOptions() {
 
 void StabilizedQPSolver::generateNativeCode(const std::string &filename) const {
   std::ofstream file;
-  file.open (filename.c_str());
+  file.open(filename.c_str());
   (*this)->generateNativeCode(file);
 }
 

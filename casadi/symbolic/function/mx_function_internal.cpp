@@ -1078,7 +1078,7 @@ namespace casadi {
     }
   }
 
-  SXFunction MXFunctionInternal::expand(const std::vector<SX>& inputvsx ) {
+  SXFunction MXFunctionInternal::expand(const std::vector<SX>& inputvsx) {
     assertInit();
 
     // Create inputs with the same name and sparsity as the matrix valued symbolic inputs

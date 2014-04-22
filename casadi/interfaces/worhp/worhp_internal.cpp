@@ -575,7 +575,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, fidif)) {
-        WorhpFidif (&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
+        WorhpFidif(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
       }
     }
 
@@ -704,7 +704,7 @@ namespace casadi {
       n_eval_h_ += 1;
       log("eval_h ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_h failed: " << ex.what() << endl;
       return false;
     }
@@ -750,7 +750,7 @@ namespace casadi {
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_jac_g failed: " << ex.what() << endl;
       return false;
     }
@@ -788,7 +788,7 @@ namespace casadi {
       n_eval_f_ += 1;
       log("eval_f ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_f failed: " << ex.what() << endl;
       return false;
     }
@@ -826,13 +826,13 @@ namespace casadi {
       n_eval_g_ += 1;
       log("eval_g ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_g failed: " << ex.what() << endl;
       return false;
     }
   }
 
-  bool WorhpInternal::eval_grad_f(const double* x, double scale , double* grad_f )
+  bool WorhpInternal::eval_grad_f(const double* x, double scale , double* grad_f)
   {
     try {
       log("eval_grad_f started");
@@ -874,7 +874,7 @@ namespace casadi {
 
       log("eval_grad_f ok");
       return true;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_jac_f failed: " << ex.what() << endl;
       return false;
     }
@@ -917,7 +917,7 @@ namespace casadi {
     setOption("qp_ipBarrier", worhp_p_.qp.ipBarrier);
     setOption("qp_ipComTol", worhp_p_.qp.ipComTol);
     setOption("qp_ipFracBound", worhp_p_.qp.ipFracBound);
-    setOptionByEnumValue("qp_ipLsMethod", worhp_p_.qp.ipLsMethod );
+    setOptionByEnumValue("qp_ipLsMethod", worhp_p_.qp.ipLsMethod);
     setOption("qp_ipMinAlpha", worhp_p_.qp.ipMinAlpha);
     setOption("qp_ipTryRelax", worhp_p_.qp.ipTryRelax);
     setOption("qp_ipRelaxDiv", worhp_p_.qp.ipRelaxDiv);
@@ -926,21 +926,21 @@ namespace casadi {
     setOption("qp_ipRelaxMin", worhp_p_.qp.ipRelaxMin);
     setOption("qp_ipResTol", worhp_p_.qp.ipResTol);
     setOption("qp_lsItMaxIter", worhp_p_.qp.lsItMaxIter);
-    setOptionByEnumValue("qp_lsItMethod", worhp_p_.qp.lsItMethod );
-    setOptionByEnumValue("qp_lsItPrecondMethod", worhp_p_.qp.lsItPrecondMethod );
+    setOptionByEnumValue("qp_lsItMethod", worhp_p_.qp.lsItMethod);
+    setOptionByEnumValue("qp_lsItPrecondMethod", worhp_p_.qp.lsItPrecondMethod);
     setOption("qp_lsRefineMaxIter", worhp_p_.qp.lsRefineMaxIter);
     setOption("qp_lsScale", worhp_p_.qp.lsScale);
     setOption("qp_lsTrySimple", worhp_p_.qp.lsTrySimple);
     setOption("qp_lsTol", worhp_p_.qp.lsTol);
     setOption("qp_maxIter", worhp_p_.qp.maxIter);
-    setOptionByEnumValue("qp_method", worhp_p_.qp.method );
+    setOptionByEnumValue("qp_method", worhp_p_.qp.method);
     setOption("qp_nsnBeta", worhp_p_.qp.nsnBeta);
     setOption("qp_nsnGradStep", worhp_p_.qp.nsnGradStep);
     setOption("qp_nsnKKT", worhp_p_.qp.nsnKKT);
-    setOptionByEnumValue("qp_nsnLsMethod", worhp_p_.qp.nsnLsMethod );
+    setOptionByEnumValue("qp_nsnLsMethod", worhp_p_.qp.nsnLsMethod);
     setOption("qp_nsnMinAlpha", worhp_p_.qp.nsnMinAlpha);
     setOption("qp_nsnSigma", worhp_p_.qp.nsnSigma);
-    setOptionByEnumValue("qp_printLevel", worhp_p_.qp.printLevel );
+    setOptionByEnumValue("qp_printLevel", worhp_p_.qp.printLevel);
     setOption("qp_scaleIntern", worhp_p_.qp.scaleIntern);
     setOption("qp_strict", worhp_p_.qp.strict);
 

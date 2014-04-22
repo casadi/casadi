@@ -100,14 +100,14 @@ void XMLNode::addNode(TiXmlNode* n) {
 
   // Count the number of children
   int num_children = 0;
-  for ( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling()) {
+  for (TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling()) {
     num_children++;
   }
   children_.reserve(num_children);
 
   // add children
   int ch = 0;
-  for ( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch) {
+  for (TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch) {
       int childtype = child->Type();
 
       if (childtype == TiXmlNode::ELEMENT) {
@@ -146,26 +146,26 @@ void XMLNode::setName(const string& name) {
 
 void XMLNode::dump(ostream &stream, int indent) const {
   // Print name
-  stream << string( indent, ' ') << "Node: " << name_ << endl;
+  stream << string(indent, ' ') << "Node: " << name_ << endl;
 
   // Print comment
   if (!comment_.empty()) {
-    stream << string( indent, ' ') << "----- comment starts ----- "  << endl;
+    stream << string(indent, ' ') << "----- comment starts ----- "  << endl;
     stream << comment_ << endl;
-    stream << string( indent, ' ') << "----- comment ends ----- "  << endl;
+    stream << string(indent, ' ') << "----- comment ends ----- "  << endl;
   }
 
   // Print text
   if (!text_.empty())
-    stream << string( indent+2, ' ') << "Text: " << text_ << endl;
+    stream << string(indent+2, ' ') << "Text: " << text_ << endl;
 
   // Print attributes
   for (map<string, string>::const_iterator it=attributes_.begin(); it != attributes_.end(); ++it)
-    stream << string( indent+2, ' ') << "attribute " << it->first << " = " << it->second << endl;
+    stream << string(indent+2, ' ') << "attribute " << it->first << " = " << it->second << endl;
 
   // Print Children
   for (int i=0; i<size(); ++i) {
-    stream << string( indent, ' ') << "Child " << i << ":" << endl;
+    stream << string(indent, ' ') << "Child " << i << ":" << endl;
     (*this)[i].dump(stream, indent+2);
   }
 }

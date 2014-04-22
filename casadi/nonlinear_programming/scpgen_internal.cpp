@@ -849,7 +849,7 @@ namespace casadi {
     }
 
     stream << endl;
-    stream.unsetf( std::ios::floatfield);
+    stream.unsetf(std::ios::floatfield);
   }
 
   void SCPgenInternal::printIteration(std::ostream &stream, int iter, double obj,
@@ -884,7 +884,7 @@ namespace casadi {
       iteration_note_ = string();
     }
 
-    stream.unsetf( std::ios::floatfield);
+    stream.unsetf(std::ios::floatfield);
     stream << endl;
   }
 

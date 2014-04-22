@@ -44,7 +44,7 @@ namespace casadi {
         \code
                 try {
                         throw CasadiException("This is a nasty error");
-                catch (CasadiException &e) {
+                catch(CasadiException &e) {
                         throw CasadiException("Serious error.") << e;
                 }
         \endcode
@@ -154,10 +154,8 @@ if ((x)==false) { \
 std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". " << std::endl;
 
 // http://stackoverflow.com/questions/303562/c-format-macro-inline-ostringstream
-#define STRING(ITEMS)                                             \
-  ( ( dynamic_cast<ostringstream &> (                             \
-         ostringstream() . seekp( 0, ios_base::cur ) << ITEMS )   \
-    ) . str() )
+#define STRING(ITEMS) \
+  ((dynamic_cast<ostringstream &>(ostringstream() . seekp(0, ios_base::cur) << ITEMS)) . str())
 
 #endif // CASADI_NDEBUG
 

@@ -61,11 +61,11 @@ namespace casadi {
     */
     static std::string getVersion() { return version; }
     /** \brief Obtain the git hash of this build
-    *      (only available if built from a git repo )
+    *      (only available if built from a git repo)
     */
     static std::string getGitRevision() { return git_revision; }
     /** \brief Obtain the git description of this build
-    *      (only available if built from a git repo )
+    *      (only available if built from a git repo)
     */
     static std::string getGitDescribe() { return git_describe; }
     /** \brief Obtain list of features that were compiled into this build

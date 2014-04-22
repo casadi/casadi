@@ -112,15 +112,15 @@ namespace casadi {
 
     ///@{
     // Shorthands
-    DMatrix&  x0() { return input(INTEGRATOR_X0 );}
-    DMatrix&   p() { return input(INTEGRATOR_P  );}
-    DMatrix&  z0() { return input(INTEGRATOR_Z0 );}
+    DMatrix&  x0() { return input(INTEGRATOR_X0);}
+    DMatrix&   p() { return input(INTEGRATOR_P );}
+    DMatrix&  z0() { return input(INTEGRATOR_Z0);}
     DMatrix& rx0() { return input(INTEGRATOR_RX0);}
-    DMatrix&  rp() { return input(INTEGRATOR_RP );}
+    DMatrix&  rp() { return input(INTEGRATOR_RP);}
     DMatrix& rz0() { return input(INTEGRATOR_RZ0);}
-    DMatrix&  xf() { return output(INTEGRATOR_XF );}
-    DMatrix&  qf() { return output(INTEGRATOR_QF );}
-    DMatrix&  zf() { return output(INTEGRATOR_ZF );}
+    DMatrix&  xf() { return output(INTEGRATOR_XF);}
+    DMatrix&  qf() { return output(INTEGRATOR_QF);}
+    DMatrix&  zf() { return output(INTEGRATOR_ZF);}
     DMatrix& rxf() { return output(INTEGRATOR_RXF);}
     DMatrix& rqf() { return output(INTEGRATOR_RQF);}
     DMatrix& rzf() { return output(INTEGRATOR_RZF);}

@@ -46,15 +46,13 @@ namespace casadi {
         "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
         << std::endl <<
         "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
-        "We need: H.size2()==A.size2()" << std::endl
-        );
+        "We need: H.size2()==A.size2()" << std::endl);
     }
 
     casadi_assert_message(H.isSymmetric(),
       "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
       "H: " << H.dimString() <<
-      "We need H square & symmetric" << std::endl
-      );
+      "We need H square & symmetric" << std::endl);
 
     // Sparsity
     Sparsity x_sparsity = Sparsity::dense(n_, 1);

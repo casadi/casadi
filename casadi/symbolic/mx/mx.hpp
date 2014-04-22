@@ -202,7 +202,7 @@ namespace casadi {
     void indexed_assignment(const Matrix<int> &rr, const Slice& cc, const MX& m) {
       (*this)(rr, cc.getAll(size2())) = m;
     }
-    void indexed_assignment( const Slice& rr, const Matrix<int>& cc, const MX& m) {
+    void indexed_assignment(const Slice& rr, const Matrix<int>& cc, const MX& m) {
       (*this)(rr.getAll(size1()), cc) = m;
     }
     void indexed_assignment(const Matrix<int>& rr, const IndexList& cc, const MX& m) {
@@ -211,7 +211,7 @@ namespace casadi {
     void indexed_assignment(const IndexList& rr, const Matrix<int>& cc, const MX& m) {
       (*this)(rr.getAll(size1()), cc) = m;
     }
-    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const MX& m) {
+    void indexed_assignment(const Matrix<int>& rr, const Matrix<int>& cc, const MX& m) {
       (*this)(rr, cc) = m;
     }
     ///@}
@@ -234,8 +234,7 @@ namespace casadi {
     }
 
     void indexed_assignment(const Slice &rr, const MX &m) {
-      (*this
-      )(rr.getAll(size1())) = m;
+      (*this)(rr.getAll(size1())) = m;
     }
 
     /// \endcond
@@ -307,7 +306,7 @@ namespace casadi {
     int getEvaluationOutput() const;
 
     /// Is it a certain operation
-    bool isOperation (int op) const;
+    bool isOperation(int op) const;
 
     /// Check if multiplication
     bool isMultiplication() const;
@@ -473,7 +472,7 @@ namespace casadi {
     MX __truediv__(const MX& y) const { return __div__(y);}
     MX __pow__(const MX& b) const;
     MX __constpow__(const MX& b) const;
-    MX __mrdivide__  (const MX& b) const;
+    MX __mrdivide__(const MX& b) const;
     MX __mpower__(const MX& b) const;
     /// \endcond
 

@@ -191,7 +191,7 @@ namespace casadi {
       "sub(Sparsity sp): shape mismatch. This matrix has shape "
       << size2() << " x " << size1()
       << ", but supplied sparsity index has shape "
-      << sp.size2() << " x " << sp.size1() << "." );
+      << sp.size2() << " x " << sp.size1() << ".");
     std::vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
 
     // Quick return if sparsity matches MX's sparsity
@@ -377,7 +377,7 @@ namespace casadi {
       "setSub(., Sparsity sp): shape mismatch. This matrix has shape "
       << size2() << " x " << size1()
       << ", but supplied sparsity index has shape "
-      << sp.size2() << " x " << sp.size1() << "." );
+      << sp.size2() << " x " << sp.size1() << ".");
 
     // If m is scalar
     if (m.isScalar()) {
@@ -447,8 +447,7 @@ namespace casadi {
   void MX::setNZ(const std::vector<int>& k, const MX& el) {
     casadi_assert_message(k.size()==el.size() || el.size()==1,
                           "MX::setNZ: length of non-zero indices (" << k.size() << ") " <<
-                          "must match size of rhs (" << el.size() << ")."
-                          );
+                          "must match size of rhs (" << el.size() << ").");
 
     // Call recursively if points both objects point to the same node
     if (this==&el) {

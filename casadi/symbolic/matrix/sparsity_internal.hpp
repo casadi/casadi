@@ -84,12 +84,12 @@ namespace casadi {
                           std::vector<int>& rr, int set);
 
     /// return 1 if col i is in R2 : see cs_rprune in CSparse
-    static int rprune (int i, int j, double aij, void *other);
+    static int rprune(int i, int j, double aij, void *other);
 
     /** \brief drop entries for which fkeep(A(i, j)) is false; return nz if OK, else -1: :
      * see cs_fkeep in CSparse
      */
-    int drop(int (*fkeep) (int, int, double, void *), void *other);
+    int drop(int (*fkeep)(int, int, double, void *), void *other);
 
     /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
     int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm,
@@ -131,7 +131,7 @@ namespace casadi {
     Sparsity permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const;
 
     /// consider A(i, j), node j in ith col subtree and return lca(jprev, j): See cs_leaf in CSparse
-    static int leaf (int i, int j, const int *first, int *maxfirst,
+    static int leaf(int i, int j, const int *first, int *maxfirst,
                      int *prevleaf, int *ancestor, int *jleaf);
 
     /** compute nnz(V) = S->lnz, S->pinv, S->leftmost, S->m2 from A and S->parent:

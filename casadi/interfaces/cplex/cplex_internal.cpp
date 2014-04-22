@@ -71,15 +71,15 @@ namespace casadi {
 
     int status;
     casadi_assert(env_==0);
-    env_ = CPXopenCPLEX (&status);
+    env_ = CPXopenCPLEX(&status);
     casadi_assert_message(env_!=0, "CPLEX: Cannot initialize CPLEX environment. STATUS: "
                           << status);
 
     // Turn on some debug messages if requested
     if (verbose()) {
-      CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_ON);
+      CPXsetintparam(env_, CPX_PARAM_SCRIND, CPX_ON);
     } else {
-      CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_OFF);
+      CPXsetintparam(env_, CPX_PARAM_SCRIND, CPX_OFF);
     }
     if (status) {
       std::cout << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
@@ -201,7 +201,7 @@ namespace casadi {
     const double* obj = input(QP_SOLVER_G).ptr();
     const double* lb = input(QP_SOLVER_LBX).ptr();
     const double* ub = input(QP_SOLVER_UBX).ptr();
-    status = CPXcopylp (env_, lp_, n_, nc_, objsen_, obj, rhs_.data(), sense_.data(),
+    status = CPXcopylp(env_, lp_, n_, nc_, objsen_, obj, rhs_.data(), sense_.data(),
                         matbeg, getPtr(matcnt_), matind, matval, lb, ub, rngval_.data());
 
     // Preparing coefficient matrix Q
@@ -237,7 +237,7 @@ namespace casadi {
 
     std::vector<double> slack;
     slack.resize(nc_);
-    status = CPXsolution (env_, lp_, &solstat,
+    status = CPXsolution(env_, lp_, &solstat,
                           output(QP_SOLVER_COST).ptr(),
                           output(QP_SOLVER_X).ptr(),
                           output(QP_SOLVER_LAM_A).ptr(),
@@ -259,7 +259,7 @@ namespace casadi {
     for (vector<double>::iterator it=output(QP_SOLVER_LAM_X).begin();
         it!=output(QP_SOLVER_LAM_X).end(); ++it) *it = -*it;
 
-    int solnstat = CPXgetstat (env_, lp_);
+    int solnstat = CPXgetstat(env_, lp_);
     stringstream errormsg; // NOTE: Why not print directly to cout and cerr?
     if (verbose()) {
       if (solnstat == CPX_STAT_OPTIMAL) {
@@ -318,7 +318,7 @@ namespace casadi {
 
     // Only free if Cplex problem if it has been allocated
     if (lp_!=0) {
-      status = CPXfreeprob (env_, &lp_);
+      status = CPXfreeprob(env_, &lp_);
       if (status!=0) {
         std::cerr << "CPXfreeprob failed, error code " << status << ".\n";
       }

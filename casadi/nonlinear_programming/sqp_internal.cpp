@@ -423,7 +423,7 @@ namespace casadi {
             // Evaluating objective and constraints
             eval_f(x_cand_, fk_cand);
             eval_g(x_cand_, gk_cand_);
-          } catch (const CasadiException& ex) {
+          } catch(const CasadiException& ex) {
             // Silent ignore; line-search failed
             ls_iter++;
             // Backtracking
@@ -497,7 +497,7 @@ namespace casadi {
       transform(gLag_.begin(), gLag_.end(), mu_x_.begin(), gLag_.begin(), plus<double>());
 
       // Updating Lagrange Hessian
-      if ( !exact_hessian_) {
+      if (!exact_hessian_) {
         log("Updating Hessian (BFGS)");
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0) {
@@ -650,7 +650,7 @@ namespace casadi {
 
   void SQPInternal::reset_h() {
     // Initial Hessian approximation of BFGS
-    if ( !exact_hessian_) {
+    if (!exact_hessian_) {
       Bk_.set(B_init_);
     }
 
@@ -729,7 +729,7 @@ namespace casadi {
         }
       }
 
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_h failed: " << ex.what() << endl;
       throw;
     }
@@ -761,7 +761,7 @@ namespace casadi {
       double time2 = clock();
       t_eval_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_g_ += 1;
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_g failed: " << ex.what() << endl;
       throw;
     }
@@ -800,7 +800,7 @@ namespace casadi {
       t_eval_jac_g_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_jac_g_ += 1;
 
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_jac_g failed: " << ex.what() << endl;
       throw;
     }
@@ -839,7 +839,7 @@ namespace casadi {
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
 
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_grad_f failed: " << ex.what() << endl;
       throw;
     }
@@ -869,7 +869,7 @@ namespace casadi {
       t_eval_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_f_ += 1;
 
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_f failed: " << ex.what() << endl;
       throw;
     }

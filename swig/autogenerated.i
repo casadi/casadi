@@ -62,7 +62,7 @@ def dpleIn(*dummy,**kwargs):
     a -- A matrices (horzcat when const_dim, blkdiag otherwise) [DPLE_A]
     v -- V matrices (horzcat when const_dim, blkdiag otherwise) [DPLE_V]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEInput,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
@@ -107,7 +107,7 @@ def dpleOut(*dummy,**kwargs):
   Keyword arguments:
     p -- Lyapunov matrix (horzcat when const_dim, blkdiag otherwise) (Cholesky of P if pos_def) [DPLE_P]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of dpleOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DPLEOutput,n)] for n in dummy[1:]]
   p = []
   if 'p' in kwargs:
@@ -157,7 +157,7 @@ def controldaeIn(*dummy,**kwargs):
     t0       -- Time at start of control interval (1-by-1) [CONTROL_DAE_T0]
     tf       -- Time at end of control interval (1-by-1) [CONTROL_DAE_TF]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controldaeIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controldaeIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlledDAEInput,n)] for n in dummy[1:]]
   t = []
   if 't' in kwargs:
@@ -225,7 +225,7 @@ def controlsimulatorIn(*dummy,**kwargs):
     p  -- Parameters that are fixed over the entire horizon  (dimension np-by-1) [CONTROLSIMULATOR_P]
     u  -- Parameters that change over the integration intervals (dimension nu-by-(ns-1)) [CONTROLSIMULATOR_U]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controlsimulatorIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of controlsimulatorIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_ControlSimulatorInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
@@ -275,7 +275,7 @@ def hnlpIn(*dummy,**kwargs):
     p   -- Fixed parameter [HNL_P]
     tau -- Homotopy parameter [HNL_TAU]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hnlpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hnlpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HNLPInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -326,7 +326,7 @@ def daeIn(*dummy,**kwargs):
     p -- Parameter [DAE_P]
     t -- Explicit time dependence [DAE_T]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DAEInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -379,7 +379,7 @@ def daeOut(*dummy,**kwargs):
     alg  -- Right hand side of algebraic equations [DAE_ALG]
     quad -- Right hand side of quadratures equations [DAE_QUAD]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of daeOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_DAEOutput,n)] for n in dummy[1:]]
   ode = []
   if 'ode' in kwargs:
@@ -433,7 +433,7 @@ def rdaeIn(*dummy,**kwargs):
     p  -- Parameter vector [RDAE_P]
     t  -- Explicit time dependence [RDAE_T]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_RDAEInput,n)] for n in dummy[1:]]
   rx = []
   if 'rx' in kwargs:
@@ -495,7 +495,7 @@ def rdaeOut(*dummy,**kwargs):
     alg  -- Right hand side of algebraic equations. [RDAE_ALG]
     quad -- Right hand side of quadratures. [RDAE_QUAD]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of rdaeOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_RDAEOutput,n)] for n in dummy[1:]]
   ode = []
   if 'ode' in kwargs:
@@ -548,7 +548,7 @@ def integratorIn(*dummy,**kwargs):
     rp  -- Backward parameter vector [INTEGRATOR_RP]
     rz0 -- Initial guess for the backwards algebraic variable [INTEGRATOR_RZ0]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
@@ -610,7 +610,7 @@ def integratorOut(*dummy,**kwargs):
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
     rzf -- Backward algebraic variable at the initial time [INTEGRATOR_RZF]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of integratorOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_IntegratorOutput,n)] for n in dummy[1:]]
   xf = []
   if 'xf' in kwargs:
@@ -668,7 +668,7 @@ def linsolIn(*dummy,**kwargs):
     A -- The square matrix A: sparse, (n x n). [LINSOL_A]
     B -- The right-hand-side matrix b: dense,  (n x m) [LINSOL_B]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolInput,n)] for n in dummy[1:]]
   A = []
   if 'A' in kwargs:
@@ -713,7 +713,7 @@ def linsolOut(*dummy,**kwargs):
   Keyword arguments:
     X -- Solution to the linear system of equations [LINSOL_X]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of linsolOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LinsolOutput,n)] for n in dummy[1:]]
   X = []
   if 'X' in kwargs:
@@ -760,7 +760,7 @@ def lpIn(*dummy,**kwargs):
     lbx -- dense, (n x 1) [LP_SOLVER_LBX]
     ubx -- dense, (n x 1) [LP_SOLVER_UBX]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPSolverInput,n)] for n in dummy[1:]]
   c = []
   if 'c' in kwargs:
@@ -820,7 +820,7 @@ def lpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [LP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [LP_SOLVER_LAM_X]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -871,7 +871,7 @@ def lpStruct(*dummy,**kwargs):
   Keyword arguments:
     a -- The matrix A: sparse [LP_STRUCT_A]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpStruct. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of lpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_LPStruct,n)] for n in dummy[1:]]
   a = []
   if 'a' in kwargs:
@@ -907,7 +907,7 @@ def nlpIn(*dummy,**kwargs):
     x -- Decision variable [NL_X]
     p -- Fixed parameter [NL_P]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -953,7 +953,7 @@ def nlpOut(*dummy,**kwargs):
     f -- Objective function [NL_F]
     g -- Constraint function [NL_G]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPOutput,n)] for n in dummy[1:]]
   f = []
   if 'f' in kwargs:
@@ -999,7 +999,7 @@ def gradFIn(*dummy,**kwargs):
     x -- Decision variable [GRADF_X]
     p -- Fixed parameter [GRADF_P]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of gradFIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of gradFIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_GradFInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -1046,7 +1046,7 @@ def gradFOut(*dummy,**kwargs):
     f    -- Objective function [GRADF_F]
     g    -- Constraint function [GRADF_G]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of gradFOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of gradFOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_GradFOutput,n)] for n in dummy[1:]]
   grad = []
   if 'grad' in kwargs:
@@ -1095,7 +1095,7 @@ def jacGIn(*dummy,**kwargs):
     x -- Decision variable [JACG_X]
     p -- Fixed parameter [JACG_P]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of jacGIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of jacGIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_JacGInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -1142,7 +1142,7 @@ def jacGOut(*dummy,**kwargs):
     f   -- Objective function [JACG_F]
     g   -- Constraint function [JACG_G]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of jacGOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of jacGOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_JacGOutput,n)] for n in dummy[1:]]
   jac = []
   if 'jac' in kwargs:
@@ -1193,7 +1193,7 @@ def hessLagIn(*dummy,**kwargs):
     lam_f -- NLP solver might use to scale the objective. [HESSLAG_LAM_F]
     lam_g -- Multiplier for g [HESSLAG_LAM_G]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HessLagInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -1248,7 +1248,7 @@ def hessLagOut(*dummy,**kwargs):
     grad_x -- Gradient of the Lagrangian with respect to x [HESSLAG_GRAD_X]
     grad_p -- Gradient of the Lagrangian with respect to p [HESSLAG_GRAD_P]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of hessLagOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_HessLagOutput,n)] for n in dummy[1:]]
   hess = []
   if 'hess' in kwargs:
@@ -1309,7 +1309,7 @@ def nlpSolverIn(*dummy,**kwargs):
     lam_x0 -- Lagrange multipliers for bounds on X, initial guess (nx x 1) [NLP_SOLVER_LAM_X0]
     lam_g0 -- Lagrange multipliers for bounds on G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPSolverInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
@@ -1377,7 +1377,7 @@ def nlpSolverOut(*dummy,**kwargs):
     lam_g -- Lagrange multipliers for bounds on G at the solution (ng x 1) [NLP_SOLVER_LAM_G]
     lam_p -- Lagrange multipliers for bounds on P at the solution (np x 1) [NLP_SOLVER_LAM_P]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -1437,7 +1437,7 @@ def mayerIn(*dummy,**kwargs):
     x -- States at the end of integration (nx x 1) [MAYER_X]
     p -- Problem parameters (np x 1) [MAYER_P]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of mayerIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of mayerIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_MayerInput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -1500,7 +1500,7 @@ def ocpIn(*dummy,**kwargs):
     lbg    -- Lower bound for the coupling constraints [OCP_LBG]
     ubg    -- Upper bound for the coupling constraints [OCP_UBG]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of ocpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of ocpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_OCPInput,n)] for n in dummy[1:]]
   lbx = []
   if 'lbx' in kwargs:
@@ -1581,7 +1581,7 @@ def ocpOut(*dummy,**kwargs):
     p_opt -- Optimal parameters [OCP_P_OPT]
     cost  -- Objective/cost function for optimal solution (1 x 1) [OCP_COST]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of ocpOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of ocpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_OCPOutput,n)] for n in dummy[1:]]
   x_opt = []
   if 'x_opt' in kwargs:
@@ -1643,7 +1643,7 @@ def qcqpIn(*dummy,**kwargs):
     x0     -- dense, (n x 1) [QCQP_SOLVER_X0]
     lam_x0 -- dense [QCQP_SOLVER_LAM_X0]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
@@ -1721,7 +1721,7 @@ def qcqpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QCQP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QCQP_SOLVER_LAM_X]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -1774,7 +1774,7 @@ def qcqpStruct(*dummy,**kwargs):
     p -- triangular part is actually used. The matrix is assumed to be symmetrical. [QCQP_STRUCT_P]
     a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QCQP_STRUCT_A]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpStruct. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qcqpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QCQPStruct,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
@@ -1823,7 +1823,7 @@ def qpIn(*dummy,**kwargs):
     x0     -- dense, (n x 1) [QP_SOLVER_X0]
     lam_x0 -- dense [QP_SOLVER_LAM_X0]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
@@ -1892,7 +1892,7 @@ def qpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to linear bounds [QP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds [QP_SOLVER_LAM_X]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -1944,7 +1944,7 @@ def qpStruct(*dummy,**kwargs):
     h -- The matrix is assumed to be symmetrical. [QP_STRUCT_H]
     a -- The matrix A: sparse, (nc x n) - product with x must be dense. [QP_STRUCT_A]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpStruct. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPStruct,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
@@ -1989,7 +1989,7 @@ def sdpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDP_SOLVER_UBX]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPInput,n)] for n in dummy[1:]]
   f = []
   if 'f' in kwargs:
@@ -2058,7 +2058,7 @@ def sdpOut(*dummy,**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDP_SOLVER_LAM_X]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -2120,7 +2120,7 @@ def sdpStruct(*dummy,**kwargs):
     g -- The matrix G: ( m x m) [SDP_STRUCT_G]
     a -- The matrix A: ( nc x n) [SDP_STRUCT_A]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpStruct. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDPStruct,n)] for n in dummy[1:]]
   f = []
   if 'f' in kwargs:
@@ -2169,7 +2169,7 @@ def sdqpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SDQP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SDQP_SOLVER_UBX]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
@@ -2241,7 +2241,7 @@ def sdqpOut(*dummy,**kwargs):
     lam_a     -- The dual solution corresponding to the linear constraints  (nc x 1) [SDQP_SOLVER_LAM_A]
     lam_x     -- The dual solution corresponding to simple bounds  (n x 1) [SDQP_SOLVER_LAM_X]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -2304,7 +2304,7 @@ def sdqpStruct(*dummy,**kwargs):
     g -- The matrix G: ( m x m) [SDQP_STRUCT_G]
     a -- The matrix A: ( nc x n) [SDQP_STRUCT_A]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpStruct. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of sdqpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SDQPStruct,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
@@ -2357,7 +2357,7 @@ def socpIn(*dummy,**kwargs):
     lbx -- Lower bounds on x ( n x 1 ) [SOCP_SOLVER_LBX]
     ubx -- Upper bounds on x ( n x 1 ) [SOCP_SOLVER_UBX]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPInput,n)] for n in dummy[1:]]
   g = []
   if 'g' in kwargs:
@@ -2429,7 +2429,7 @@ def socpOut(*dummy,**kwargs):
     lam_a -- The dual solution corresponding to the linear constraints  (nc x 1) [SOCP_SOLVER_LAM_A]
     lam_x -- The dual solution corresponding to simple bounds  (n x 1) [SOCP_SOLVER_LAM_X]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpOut. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpOut. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
@@ -2481,7 +2481,7 @@ def socpStruct(*dummy,**kwargs):
     g -- The horizontal stack of all matrices Gi: ( n x N) [SOCP_STRUCT_G]
     a -- The matrix A: ( nc x n) [SOCP_STRUCT_A]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpStruct. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of socpStruct. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_SOCPStruct,n)] for n in dummy[1:]]
   g = []
   if 'g' in kwargs:
@@ -2530,7 +2530,7 @@ def stabilizedQpIn(*dummy,**kwargs):
     muE    -- dense (nc x 1) [STABILIZED_QP_SOLVER_MUE]
     mu     -- dense (nc x 1) [STABILIZED_QP_SOLVER_MU]
   """
-  if(len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of stabilizedQpIn. Either use keywords or non-keywords ")
+  if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of stabilizedQpIn. Either use keywords or non-keywords ")
   if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:

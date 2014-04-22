@@ -558,7 +558,7 @@ namespace casadi {
     std::vector<int>& Cimatch = m2 < n2 ? jmatch : imatch;
 
     // get workspace
-    w.resize( 5 * C->ncol_);
+    w.resize(5 * C->ncol_);
 
     int *cheap = &w.front() + C->ncol_;
     int *js = &w.front() + 2*C->ncol_;
@@ -774,7 +774,7 @@ namespace casadi {
 
     for (int k=0; k<n; ++k) {
       // j = rand int in range k to n-1
-      int j = k + (rand ( ) % (n-k));
+      int j = k + (rand() % (n-k));
 
       // swap p[k] and p[j]
       int t = p[j];
@@ -828,7 +828,7 @@ namespace casadi {
     return C;
   }
 
-  int SparsityInternal::drop(int (*fkeep) (int, int, double, void *), void *other) {
+  int SparsityInternal::drop(int (*fkeep)(int, int, double, void *), void *other) {
     int nz = 0;
 
     for (int j = 0; j<ncol_; ++j) {
@@ -850,8 +850,8 @@ namespace casadi {
     return nz ;
   }
 
-  int SparsityInternal::leaf (int i, int j, const int *first, int *maxfirst, int *prevleaf,
-                              int *ancestor, int *jleaf) {
+  int SparsityInternal::leaf(int i, int j, const int *first, int *maxfirst, int *prevleaf,
+                             int *ancestor, int *jleaf) {
     int q, s, sparent, jprev ;
     if (!first || !maxfirst || !prevleaf || !ancestor || !jleaf) return (-1) ;
     *jleaf = 0 ;
@@ -1149,7 +1149,7 @@ namespace casadi {
 #undef HEAD
 #undef NEXT
 
-  int SparsityInternal::wclear (int mark, int lemax, int *w, int n) {
+  int SparsityInternal::wclear(int mark, int lemax, int *w, int n) {
     int k ;
     if (mark < 2 || (mark + lemax < 0)) {
         for (k = 0 ; k < n ; k++) if (w[k] != 0) w[k] = 1 ;
@@ -1158,7 +1158,7 @@ namespace casadi {
     return (mark) ;     /* at this point, w[0..n-1] < mark holds */
   }
 
-  int SparsityInternal::diag (int i, int j, double aij, void *other) {
+  int SparsityInternal::diag(int i, int j, double aij, void *other) {
     return (i != j) ;
   }
 
@@ -1278,7 +1278,7 @@ namespace casadi {
     }
 
     // clear w
-    mark = wclear (0, 0, w, n);
+    mark = wclear(0, 0, w, n);
 
     // n is a dead element
     elen[n] = -2;
@@ -1309,7 +1309,7 @@ namespace casadi {
         // node i is dead
         elen[i] = -1;
         nel++;
-        Cp[i] = CS_FLIP (n) ;
+        Cp[i] = CS_FLIP(n) ;
         nv[n]++ ;
       } else {
         if (head[d] != -1)
@@ -1354,9 +1354,9 @@ namespace casadi {
         }
 
         // scan all of memory
-        for (q = 0, p = 0 ; p < cnz ; ) {
+        for (q = 0, p = 0 ; p < cnz ;) {
           // found object j
-          if ((j = CS_FLIP (Ci[p++])) >= 0) {
+          if ((j = CS_FLIP(Ci[p++])) >= 0) {
             // restore first entry of object
             Ci[q] = Cp[j];
 
@@ -1428,7 +1428,7 @@ namespace casadi {
 
         if (e != k) {
           // absorb e into k
-          Cp[e] = CS_FLIP (k);
+          Cp[e] = CS_FLIP(k);
 
           // e is now a dead element
           w[e] = 0;
@@ -1508,7 +1508,7 @@ namespace casadi {
 
             } else {
               // aggressive absorb. e->k
-              Cp[e] = CS_FLIP (k);
+              Cp[e] = CS_FLIP(k);
 
               // e is a dead element
               w[e] = 0;
@@ -1613,7 +1613,7 @@ namespace casadi {
           jlast = i;
 
           // compare i with all j
-          for (j = next[i] ; j != -1 ; ) {
+          for (j = next[i] ; j != -1 ;) {
             ok = (len[j] == ln) && (elen[j] == eln) ;
             for (p = Cp[j] + 1 ; ok && p <= Cp[j] + ln - 1 ; p++) {
               if (w[Ci[p]] != mark) ok = 0 ;    /* compare i and j*/
@@ -1622,7 +1622,7 @@ namespace casadi {
             // i and j are identical
             if (ok) {
               // absorb j into i
-              Cp[j] = CS_FLIP (i);
+              Cp[j] = CS_FLIP(i);
               nv[i] += nv[j] ;
               nv[j] = 0;
 
@@ -3320,7 +3320,7 @@ namespace casadi {
     // 4: for i <- 1 to |V | do
     for (int i=0; i<ncol_; ++i) {
 
-      // 5: for each w \in N1 (vi ) do
+      // 5: for each w \in N1 (vi) do
       for (int w_el=colind_[i]; w_el<colind_[i+1]; ++w_el) {
         int w = row_[w_el];
 

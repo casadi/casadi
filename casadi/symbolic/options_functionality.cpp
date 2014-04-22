@@ -61,7 +61,7 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a, const std::s
       if (s != t)
         cost = 1;
 
-      v1[j+1] = min(min( v1[j] + 1, v0[j+1] + 1), v0[j] + cost);
+      v1[j+1] = min(min(v1[j] + 1, v0[j+1] + 1), v0[j] + cost);
     }
 
     for (int j=0; j<nb+1; j++)
@@ -74,7 +74,7 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a, const std::s
 /// \cond INTERNAL
 /// A helper class to use stl::sort in OptionsFunctionalityNode::getBestMatches
 struct mysortclass {
-  bool operator () (std::pair<std::string, double> a, std::pair<std::string, double> b) {
+  bool operator()(std::pair<std::string, double> a, std::pair<std::string, double> b) {
       return (a.second<b.second);}
 } mysorter;
 /// \endcond
@@ -92,7 +92,7 @@ double OptionsFunctionalityNode::getBestMatches(const std::string & word,
   }
 
   // Sort it
-  sort (candidates.begin(), candidates.end(), mysorter);
+  sort(candidates.begin(), candidates.end(), mysorter);
 
   // Put the first 'amount' of them in suggestions
   suggestions.clear();
@@ -267,7 +267,7 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
     enum_descr.push_back(descr);
     std::string value;
     if (std::getline(sss, value, ':')) {
-      std::istringstream ( value ) >> val;
+      std::istringstream(value) >> val;
     } else {
       val++;
     }
@@ -291,8 +291,7 @@ void OptionsFunctionalityNode::addOption(
          << "' was indicated to inherit, but the type definition of the ancestor '"
          << GenericType::get_type_description(allowed_options[name])
          << "' conflicts with the type definition here '"
-         << GenericType::get_type_description(type) << "'."
-     );
+         << GenericType::get_type_description(type) << "'.");
   }
 
   defaults_[name] = def_val;
@@ -304,21 +303,21 @@ void OptionsFunctionalityNode::addOption(
 
   // Inherit
   if (inherit && allowed_vals_.find(name)!=allowed_vals_.end()) {
-    allowed_vals_vec.insert( allowed_vals_vec.end(), allowed_vals_[name].begin(),
-                             allowed_vals_[name].end() );
+    allowed_vals_vec.insert(allowed_vals_vec.end(), allowed_vals_[name].begin(),
+                            allowed_vals_[name].end());
   }
   if (inherit && enum_descr_.find(name)!=enum_descr_.end()) {
-    enum_descr_vec.insert( enum_descr_vec.end(), enum_descr_[name].begin(),
-                           enum_descr_[name].end() );
+    enum_descr_vec.insert(enum_descr_vec.end(), enum_descr_[name].begin(),
+                          enum_descr_[name].end());
   }
   if (inherit && enum_values_.find(name)!=enum_values_.end()) {
-    enum_values_vec.insert( enum_values_vec.end(), enum_values_[name].begin(),
-                            enum_values_[name].end() );
+    enum_values_vec.insert(enum_values_vec.end(), enum_values_[name].begin(),
+                           enum_values_[name].end());
   }
   // Insert current allowed_vals
-  allowed_vals_vec.insert( allowed_vals_vec.end(), allowed_vals.begin(), allowed_vals.end() );
-  enum_descr_vec.insert( enum_descr_vec.end(), enum_descr.begin(), enum_descr.end() );
-  enum_values_vec.insert( enum_values_vec.end(), enum_values.begin(), enum_values.end() );
+  allowed_vals_vec.insert(allowed_vals_vec.end(), allowed_vals.begin(), allowed_vals.end());
+  enum_descr_vec.insert(enum_descr_vec.end(), enum_descr.begin(), enum_descr.end());
+  enum_values_vec.insert(enum_values_vec.end(), enum_values.begin(), enum_values.end());
 
   if (!def_val.isNull())
     dictionary_[name] = def_val;

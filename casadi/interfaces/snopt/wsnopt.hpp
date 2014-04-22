@@ -25,20 +25,20 @@ extern "C" {
     char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
   // cvalue is always length 8
-  extern void snopt_getc (const char *buffer, const int* lenbuffer, char *cvalue, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
-  extern void snopt_geti (const char *buffer, const int* lenbuffer, int *ivalue, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
+  extern void snopt_getc(const char *buffer, const int* lenbuffer, char *cvalue, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
+  extern void snopt_geti(const char *buffer, const int* lenbuffer, int *ivalue, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
-  extern void snopt_getr (const char *buffer, const int* lenbuffer, double *rvalue, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
+  extern void snopt_getr(const char *buffer, const int* lenbuffer, double *rvalue, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
-  extern void snopt_set (const char *buffer, const int* lenbuffer, int * iPrint, int * iSumm, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
-  extern void snopt_seti (const char *buffer, const int* lenbuffer, const int *ivalue, int * iPrint, int * iSumm, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
+  extern void snopt_set(const char *buffer, const int* lenbuffer, int * iPrint, int * iSumm, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
+  extern void snopt_seti(const char *buffer, const int* lenbuffer, const int *ivalue, int * iPrint, int * iSumm, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
-  extern void snopt_setr (const char *buffer, const int* lenbuffer, const double *rvalue, int * iPrint, int * iSumm, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
+  extern void snopt_setr(const char *buffer, const int* lenbuffer, const double *rvalue, int * iPrint, int * iSumm, int* Errors, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
 
-  extern void snopt_spec (const int *iSpecs, int* INFO, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
+  extern void snopt_spec(const int *iSpecs, int* INFO, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
-  extern void snopt_memb (int *INFO, const int* m, const int* n, const int* neA, const int*  negCon, const int* nnCon, const int* nnJac, const int*  nnObj, int* mincw, int* miniw, int* minrw, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
+  extern void snopt_memb(int *INFO, const int* m, const int* n, const int* neA, const int*  negCon, const int* nnCon, const int* nnJac, const int*  nnObj, int* mincw, int* miniw, int* minrw, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
     // direct calls to the fortran library
   extern void sninit_(const int * iPrint, const int * iSumm,

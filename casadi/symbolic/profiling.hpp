@@ -46,7 +46,7 @@ namespace casadi {
  * The returned real time is only useful for computing an elapsed time
  * between two calls to this function.
  */
-CASADI_SYMBOLIC_EXPORT double getRealTime( );
+CASADI_SYMBOLIC_EXPORT double getRealTime();
 
 enum ProfilingData_Type { ProfilingData_Type_TIMELINE,
                           ProfilingData_Type_SOURCE,

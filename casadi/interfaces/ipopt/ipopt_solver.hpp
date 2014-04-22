@@ -66,7 +66,7 @@ namespace casadi {
     explicit IpoptSolver(const Function& nlp
                          /**< nlp function: \f$ [\mathbb {R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto
                           * [\mathbb {R} \times \mathbb{R}^{n_g}]\f$*/
-                         );
+                         );  // NOLINT(whitespace/parens)
 
     /** \brief Get the reduced Hessian.
      * Requires a patched sIPOPT installation, see CasADi documentation. */

@@ -332,7 +332,7 @@ void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min,
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
 }
 
-void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt ) {
+void DirectCollocationInternal::setOptimalSolution(const vector<double> &V_opt) {
   // OCP solution
   Matrix<double> &p_opt = output(OCP_P_OPT);
   Matrix<double> &x_opt = output(OCP_X_OPT);

@@ -479,9 +479,9 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==11) return "mu";
       break;
   }
-  casadi_error( "getSchemeEntryName: supplied number is out of range. Scheme '"
-                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
-                << " entries: " << getSchemeEntryNames(scheme) << ".");
+  casadi_error("getSchemeEntryName: supplied number is out of range. Scheme '"
+               << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
+               << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
   switch (scheme) {
@@ -793,9 +793,9 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==11) return "dense (nc x 1)";  // NOLINT(whitespace/line_length)
       break;
   }
-  casadi_error( "getSchemeEntryDoc: supplied number is out of range. Scheme '"
-                << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
-                << " entries: " << getSchemeEntryNames(scheme) << ".");
+  casadi_error("getSchemeEntryDoc: supplied number is out of range. Scheme '"
+               << getSchemeName(scheme) << "' has only " << getSchemeSize(scheme)
+               << " entries: " << getSchemeEntryNames(scheme) << ".");
 }
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
   switch (scheme) {
@@ -1107,9 +1107,9 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==11) return "STABILIZED_QP_SOLVER_MU";
       break;
   }
-  casadi_error( "getSchemeEntryEnumName: supplied number is out of range. Scheme '"
-                << getSchemeName(scheme) << "' has only "
-                << getSchemeSize(scheme) << " entries: "
+  casadi_error("getSchemeEntryEnumName: supplied number is out of range. Scheme '"
+               << getSchemeName(scheme) << "' has only "
+               << getSchemeSize(scheme) << " entries: "
                 << getSchemeEntryNames(scheme) << ".");
 }
 int getSchemeSize(InputOutputScheme scheme) {
@@ -1562,9 +1562,9 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="mu") return 11;
       break;
   }
-  casadi_error( "getSchemeEntryEnum: Scheme '" << getSchemeName(scheme)
-                <<  "' has no entry named '" << name
-                <<  "'. Available entries are: "
+  casadi_error("getSchemeEntryEnum: Scheme '" << getSchemeName(scheme)
+               <<  "' has no entry named '" << name
+               <<  "'. Available entries are: "
                 << getSchemeEntryNames(scheme) << ".");
 }
 } // namespace casadi

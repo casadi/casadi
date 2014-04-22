@@ -87,7 +87,7 @@ namespace casadi {
       // ordering and symbolic analysis
       int order = 0; // ordering?
       if (S_) cs_sfree(S_);
-      S_ = cs_sqr (order, &A_, 0) ;
+      S_ = cs_sqr(order, &A_, 0) ;
     }
 
     prepared_ = false;
@@ -166,16 +166,16 @@ namespace casadi {
 
     for (int k=0; k<nrhs; ++k) {
       if (transpose) {
-        cs_pvec (S_->q, x, t, A_.n) ;       // t = P2*b
+        cs_pvec(S_->q, x, t, A_.n) ;       // t = P2*b
         casadi_assert(N_->U!=0);
-        cs_utsolve (N_->U, t) ;              // t = U'\t
-        cs_ltsolve (N_->L, t) ;              // t = L'\t
-        cs_pvec (N_->pinv, t, x, A_.n) ;    // x = P1*t
+        cs_utsolve(N_->U, t) ;              // t = U'\t
+        cs_ltsolve(N_->L, t) ;              // t = L'\t
+        cs_pvec(N_->pinv, t, x, A_.n) ;    // x = P1*t
       } else {
-        cs_ipvec (N_->pinv, x, t, A_.n) ;   // t = P1\b
-        cs_lsolve (N_->L, t) ;               // t = L\t
-        cs_usolve (N_->U, t) ;               // t = U\t
-        cs_ipvec (S_->q, t, x, A_.n) ;      // x = P2\t
+        cs_ipvec(N_->pinv, x, t, A_.n) ;   // t = P1\b
+        cs_lsolve(N_->L, t) ;               // t = L\t
+        cs_usolve(N_->U, t) ;               // t = U\t
+        cs_ipvec(S_->q, t, x, A_.n) ;      // x = P2\t
       }
       x += ncol();
     }

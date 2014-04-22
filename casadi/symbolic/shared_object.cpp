@@ -151,8 +151,10 @@ void SharedObjectNode::repr(std::ostream &stream) const {
 }
 
 void SharedObject::print(std::ostream &stream) const {
-  if (isNull())    stream << "Null pointer of class \"" << typeid(this).name() << "\"";
-  else           (*this)->print(stream);
+  if (isNull())
+    stream << "Null pointer of class \"" << typeid(this).name() << "\"";
+  else
+    (*this)->print(stream);
 }
 
 void SharedObject::printPtr(std::ostream &stream) const {

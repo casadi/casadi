@@ -319,11 +319,11 @@ namespace casadi {
       std::vector<int> krowC(nC+1);
 
       //int status_code = 0;
-      makehb( getPtr(irowQ_), nnzQ, getPtr(krowQ), nx, &ierr );
-      if ( ierr == 0 ) makehb( getPtr(irowA_), nnzA, getPtr(krowA), nA, &ierr );
-      if ( ierr == 0 ) makehb( getPtr(irowC_), nnzC, getPtr(krowC), nC, &ierr );
+      makehb(getPtr(irowQ_), nnzQ, getPtr(krowQ), nx, &ierr);
+      if (ierr == 0) makehb(getPtr(irowA_), nnzA, getPtr(krowA), nA, &ierr);
+      if (ierr == 0) makehb(getPtr(irowC_), nnzC, getPtr(krowC), nC, &ierr);
 
-      if ( ierr == 0 ) {
+      if (ierr == 0) {
         QpGenContext ctx;
 
         QpGenHbGondzioSetup( getPtr(c_), nx, getPtr(krowQ), getPtr(jcolQ_), getPtr(dQ_),
@@ -346,7 +346,7 @@ namespace casadi {
                        &ierr );
         }
 
-        QpGenCleanup( &ctx );
+        QpGenCleanup(&ctx);
       }
     }
 

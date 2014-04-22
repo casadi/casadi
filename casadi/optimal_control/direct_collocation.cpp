@@ -54,7 +54,7 @@ void DirectCollocation::getConstraintBounds(std::vector<double>& G_min,
   (*this)->getConstraintBounds(G_min, G_max);
 }
 
-void DirectCollocation::setOptimalSolution( const std::vector<double> &V_opt ) {
+void DirectCollocation::setOptimalSolution(const std::vector<double> &V_opt) {
   (*this)->setOptimalSolution(V_opt);
 }
 

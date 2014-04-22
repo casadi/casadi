@@ -54,7 +54,7 @@ void DirectMultipleShooting::getConstraintBounds(std::vector<double>& G_min,
   (*this)->getConstraintBounds(G_min, G_max);
 }
 
-void DirectMultipleShooting::setOptimalSolution( const std::vector<double> &V_opt ) {
+void DirectMultipleShooting::setOptimalSolution(const std::vector<double> &V_opt) {
   (*this)->setOptimalSolution(V_opt);
 }
 

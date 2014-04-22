@@ -480,17 +480,17 @@ namespace casadi {
     void indexed_assignment(const Slice &rr, const Matrix<int>& cc, const Matrix<DataType>& m) {
       (*this)(rr, cc) = m;
     }
-    void indexed_assignment( const Matrix<int>& rr, const Slice &cc, const Matrix<DataType>& m) {
+    void indexed_assignment(const Matrix<int>& rr, const Slice &cc, const Matrix<DataType>& m) {
       (*this)(rr, cc) = m;
     }
     void indexed_assignment(const Matrix<int> &rr, const IndexList& cc, const Matrix<DataType>& m) {
       (*this)(rr, cc.getAll(size2())) = m;
     }
-    void indexed_assignment( const IndexList& rr, const Matrix<int> &cc, const Matrix<DataType>& m) {
+    void indexed_assignment(const IndexList& rr, const Matrix<int> &cc, const Matrix<DataType>& m) {
       (*this)(rr.getAll(size1()), cc) = m;
     }
-    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc,
-                             const Matrix<DataType>& m) {
+    void indexed_assignment(const Matrix<int>& rr, const Matrix<int>& cc,
+                            const Matrix<DataType>& m) {
       (*this)(rr, cc) = m;
     }
     void indexed_assignment(const Sparsity &sp, const Matrix<DataType>& m) {
@@ -569,7 +569,7 @@ namespace casadi {
     Matrix<DataType> __pow__(const Matrix<DataType> &y) const;
     Matrix<DataType> __constpow__(const Matrix<DataType> &y) const;
     Matrix<DataType> __mpower__(const Matrix<DataType> &y) const;
-    Matrix<DataType> __mrdivide__  (const Matrix<DataType> &y) const;
+    Matrix<DataType> __mrdivide__(const Matrix<DataType> &y) const;
     ///@}
 
     /// Matrix-matrix product

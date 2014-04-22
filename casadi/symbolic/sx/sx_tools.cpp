@@ -1104,7 +1104,7 @@ namespace casadi {
 
     if (!success) casadi_error("poly: suplied expression does not appear to be polynomial.");
 
-    std::reverse( ret.data().begin(), ret.data().end() );
+    std::reverse(ret.data().begin(), ret.data().end());
 
     return ret;
 
@@ -1166,7 +1166,7 @@ namespace casadi {
       SX bb= b*b;
       SX f = c - (3*bb/8);
       SX g = d + (bb*b / 8) - b*c/2;
-      SX h = e - (3*bb*bb/256) + (bb * c/16) - ( b*d/4);
+      SX h = e - (3*bb*bb/256) + (bb * c/16) - (b*d/4);
       SX poly;
       poly.append(1);
       poly.append(f/2);
@@ -1187,7 +1187,7 @@ namespace casadi {
       SX ret;
       ret.append(p + q + r -s);
       ret.append(p - q - r -s);
-      ret.append(-p + q - r -s );
+      ret.append(-p + q - r -s);
       ret.append(-p - q + r -s);
 
       return ret;

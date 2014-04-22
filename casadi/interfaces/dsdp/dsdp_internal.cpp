@@ -210,16 +210,16 @@ namespace casadi {
       SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
     }
     if (nc_>0) {
-      DSDPCreateLPCone( dsdp_, &lpcone_);
+      DSDPCreateLPCone(dsdp_, &lpcone_);
       LPConeSetData(lpcone_, nc_*2, getPtr(mappingA_.output().colind()),
                     getPtr(mappingA_.output().row()), mappingA_.output().ptr());
     }
 
-    DSDPCreateBCone( dsdp_, &bcone_);
-    BConeAllocateBounds( bcone_, n_);
+    DSDPCreateBCone(dsdp_, &bcone_);
+    BConeAllocateBounds(bcone_, n_);
 
     DSDPUsePenalty(dsdp_, getOption("_use_penalty") ? 1: 0);
-    DSDPSetPenaltyParameter(dsdp_, getOption("_penalty") );
+    DSDPSetPenaltyParameter(dsdp_, getOption("_penalty"));
     DSDPSetPotentialParameter(dsdp_, getOption("_rho"));
     DSDPSetZBar(dsdp_, getOption("_zbar"));
     DSDPReuseMatrix(dsdp_, getOption("_reuse") ? 1: 0);
@@ -261,7 +261,7 @@ namespace casadi {
       for (int i=0;i<n_+1;++i) {
         for (int j=0;j<nb_;++j) {
           SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, getPtr(pattern_[i][j]),
-                                  getPtr(values_[i][j]), pattern_[i][j].size() );
+                                  getPtr(values_[i][j]), pattern_[i][j].size());
         }
       }
     }
@@ -331,14 +331,14 @@ namespace casadi {
 
     DSDPComputeX(dsdp_);
 
-    info = BConeCopyXSingle( bcone_, output(SDP_SOLVER_LAM_X).ptr(), n_);
+    info = BConeCopyXSingle(bcone_, output(SDP_SOLVER_LAM_X).ptr(), n_);
 
     if (nc_>0) {
       int dummy;
       double *lam;
 
       info = LPConeGetXArray(lpcone_, &lam, &dummy);
-      std::transform (lam + nc_, lam + 2*nc_, lam,
+      std::transform(lam + nc_, lam + 2*nc_, lam,
                       output(SDP_SOLVER_LAM_A).ptr(), std::minus<double>());
     }
 

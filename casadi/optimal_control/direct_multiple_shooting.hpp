@@ -88,7 +88,7 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShooting : public OCPSolver {
     void getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const;
 
     /// Set the optimal solution
-    void setOptimalSolution( const std::vector<double> &V_opt );
+    void setOptimalSolution(const std::vector<double> &V_opt);
 
     // Access the underlying NLPSolver object
     NLPSolver getNLPSolver() const;

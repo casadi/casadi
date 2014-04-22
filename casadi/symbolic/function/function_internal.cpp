@@ -751,7 +751,7 @@ namespace casadi {
       hasrun = true;
     }
 
-    casadi_log("Number of sweeps: " << nsweeps );
+    casadi_log("Number of sweeps: " << nsweeps);
     casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
                ", " << r.size() << " nonzeros, " << (100.0*r.size())/r.numel() << " % nonzeros).");
 
@@ -1056,7 +1056,7 @@ namespace casadi {
       }
       hasrun = true;
     }
-    casadi_log("Number of sweeps: " << nsweeps );
+    casadi_log("Number of sweeps: " << nsweeps);
     casadi_log("Formed Jacobian sparsity pattern (dimension " << r.shape() <<
                ", " << r.size() << " nonzeros, " << (100.0*r.size())/r.numel() << " % nonzeros).");
 
@@ -2759,7 +2759,7 @@ namespace casadi {
     //stream.precision(8);
 
     // Check if any constraint is violated
-    if ( all(v <= ub + tol) && all(v >= lb - tol) ) {
+    if (all(v <= ub + tol) && all(v >= lb - tol)) {
       stream << "All " << v.size() << " constraints on " << name << " are met: " << endl;
     } else {
       stream << "Problem with constraints on " << name << ": " << endl;
@@ -2843,7 +2843,7 @@ namespace casadi {
   std::string FunctionInternal::getSanitizedName() const {
       casadi_assert(hasSetOption("name"));
       string name = getOption("name");
-      std::replace_if (name.begin(), name.end(), isBadChar, '_');
+      std::replace_if(name.begin(), name.end(), isBadChar, '_');
       return name;
   }
 

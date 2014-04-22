@@ -147,13 +147,13 @@ namespace casadi {
   // Disable some Visual studio warnings
 #ifdef _MSC_VER
 
-#pragma warning (disable:4996)
+#pragma warning(disable:4996)
 
   // warning C4018: '<' : signed/unsigned mismatch
-#pragma warning (disable:4018)
+#pragma warning(disable:4018)
 
   // warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
-#pragma warning (disable:4800)
+#pragma warning(disable:4800)
 #endif
 
   ///@{

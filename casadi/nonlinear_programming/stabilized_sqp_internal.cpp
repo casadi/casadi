@@ -636,7 +636,7 @@ namespace casadi {
         // Line-search
         log("Starting line-search");
 
-        casadi_assert_message( max_iter_ls_ > 0, "max line search iterations should be > 0");
+        casadi_assert_message(max_iter_ls_ > 0, "max line search iterations should be > 0");
 
         // Line-search loop
         while (true) {
@@ -741,7 +741,7 @@ namespace casadi {
       transform(gLag_.begin(), gLag_.end(), mu_x_.begin(), gLag_.begin(), plus<double>());
 
       // Updating Lagrange Hessian
-      if ( !exact_hessian_) {
+      if (!exact_hessian_) {
         log("Updating Hessian (BFGS)");
         // BFGS with careful updates and restarts
         if (iter % lbfgs_memory_ == 0) {
@@ -859,7 +859,7 @@ namespace casadi {
 
   void StabilizedSQPInternal::reset_h() {
     // Initial Hessian approximation of BFGS
-    if ( !exact_hessian_) {
+    if (!exact_hessian_) {
       Bk_.set(B_init_);
     }
 
@@ -939,7 +939,7 @@ namespace casadi {
         }
       }
 
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_h failed: " << ex.what() << endl;
       throw;
     }
@@ -966,7 +966,7 @@ namespace casadi {
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "g = " << nlp_.output(NL_G) << endl;
       }
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_g failed: " << ex.what() << endl;
       throw;
     }
@@ -998,7 +998,7 @@ namespace casadi {
         cout << "J = " << endl;
         J.printSparse();
       }
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_jac_g failed: " << ex.what() << endl;
       throw;
     }
@@ -1031,7 +1031,7 @@ namespace casadi {
         cout << "x      = " << x << endl;
         cout << "grad_f = " << grad_f << endl;
       }
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_grad_f failed: " << ex.what() << endl;
       throw;
     }
@@ -1054,7 +1054,7 @@ namespace casadi {
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "f = " << f << endl;
       }
-    } catch (exception& ex) {
+    } catch(exception& ex) {
       cerr << "eval_f failed: " << ex.what() << endl;
       throw;
     }

@@ -50,21 +50,21 @@ namespace casadi {
 #error "Unable to define getRealTime( ) for an unknown OS."
 #endif
 
-double getRealTime( ) {
+double getRealTime() {
 #if defined(_WIN32)
     FILETIME tm;
     ULONGLONG t;
 #if defined(NTDDI_WIN8) && NTDDI_VERSION >= NTDDI_WIN8
     /* Windows 8, Windows Server 2012 and later. ---------------- */
-    GetSystemTimePreciseAsFileTime( &tm );
+    GetSystemTimePreciseAsFileTime(&tm);
 #else
     /* Windows 2000 and later. ---------------------------------- */
-    GetSystemTimeAsFileTime( &tm );
+    GetSystemTimeAsFileTime(&tm);
 #endif
     t = (static_cast<ULONGLONG>(tm.dwHighDateTime) << 32) | (ULONGLONG)tm.dwLowDateTime;
     return static_cast<double>(t) / 10000000.0;
 
-#elif (defined(__hpux) || defined(hpux)) || \
+#elif (defined(__hpux) || defined(hpux)) || \  //NOLINT(whitespace/parens)
     ((defined(__sun__) || defined(__sun) || defined(sun)) && \
      (defined(__SVR4) || defined(__svr4__)))
     /* HP-UX, Solaris. ------------------------------------------ */
@@ -73,9 +73,9 @@ double getRealTime( ) {
 #elif defined(__MACH__) && defined(__APPLE__)
     /* OSX. ----------------------------------------------------- */
     static double timeConvert = 0.0;
-    if ( timeConvert == 0.0 ) {
+    if (timeConvert == 0.0) {
         mach_timebase_info_data_t timeBase;
-        (void)mach_timebase_info( &timeBase );
+        (void)mach_timebase_info(&timeBase);
         timeConvert = static_cast<double>(timeBase.numer)/
             static_cast<double>(timeBase.denom) / 1000000000.0;
     }
@@ -104,7 +104,7 @@ double getRealTime( ) {
 #else
         const clockid_t id = (clockid_t)-1; /* Unknown. */
 #endif /* CLOCK_* */
-        if ( id != (clockid_t)-1 && clock_gettime( id, &ts ) != -1 )
+        if ( id != (clockid_t)-1 && clock_gettime(id, &ts) != -1)
           return ts.tv_sec + ts.tv_nsec/1000000000.0;
         /* Fall thru. */
     }
@@ -112,7 +112,7 @@ double getRealTime( ) {
 
     /* AIX, BSD, Cygwin, HP-UX, Linux, OSX, POSIX, Solaris. ----- */
     struct timeval tm;
-    gettimeofday( &tm, NULL );
+    gettimeofday(&tm, NULL);
     return tm.tv_sec + tm.tv_usec/1000000.0;
 #else
     return -1.0;        /* Failed. */
@@ -120,7 +120,7 @@ double getRealTime( ) {
 }
 
 #else //WITH_PROFILING
- double getRealTime( ) { return 0; }
+ double getRealTime() { return 0; }
 #endif
 
 } // namespace casadi

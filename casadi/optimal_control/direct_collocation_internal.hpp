@@ -63,7 +63,7 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolver
     void getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const;
 
     // Set the optimal solution
-    void setOptimalSolution( const std::vector<double> &V_opt );
+    void setOptimalSolution(const std::vector<double> &V_opt);
 
     // Prints out a human readable report about possible constraint violations - all constraints
     void reportConstraints(std::ostream &stream=std::cout);

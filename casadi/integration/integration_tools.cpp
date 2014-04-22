@@ -271,7 +271,7 @@ namespace casadi {
     std::vector<int> splitPositions = range(0, order*nx, nx);
     if (nz>0) {
       std::vector<int> Zc_pos = range(order*nx, order*nx+(order+1)*nz, nz);
-      splitPositions.insert( splitPositions.end(), Zc_pos.begin(), Zc_pos.end() );
+      splitPositions.insert(splitPositions.end(), Zc_pos.begin(), Zc_pos.end());
     } else {
       splitPositions.push_back(order*nx);
     }
@@ -328,7 +328,7 @@ namespace casadi {
       // Attempt to convert to SXFunction to decrease overhead
       vfcn = SXFunction(vfcn);
       vfcn.init();
-    } catch (CasadiException & e) {
+    } catch(CasadiException & e) {
       //
     }
 
