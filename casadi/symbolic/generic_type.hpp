@@ -53,7 +53,7 @@ namespace casadi{
     OT_SDQPSOLVER,
     OT_IMPLICITFUNCTION,
     OT_DERIVATIVEGENERATOR,
-    OT_Function,
+    OT_FUNCTION,
     OT_CALLBACK,
     OT_VOIDPTR,
     OT_UNKNOWN};

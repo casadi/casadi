@@ -128,8 +128,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_IMPLICITFUNCTION";
       case OT_CALLBACK:
               return "OT_CALLBACK";
-      case OT_Function:
-              return "OT_Function";
+      case OT_FUNCTION:
+              return "OT_FUNCTION";
       case OT_VOIDPTR:
               return "OT_VOIDPTR";
       default:
@@ -246,7 +246,7 @@ GenericType::GenericType(const SharedObject& obj) : type_(OT_UNKNOWN) {
   assignNode(new SharedObjectType(obj));
 }
 
-GenericType::GenericType(const Function& f) : type_(OT_Function) {
+GenericType::GenericType(const Function& f) : type_(OT_FUNCTION) {
   assignNode(new FunctionType(f));
 }
 

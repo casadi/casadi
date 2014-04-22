@@ -203,15 +203,15 @@ for name,meta in metadata.items():
       if ('//' in l and (l.find('addOption') > l.find('//'))) or '->first' in l or '::addOption' in l or 'allowed_vals_vec' in l:
         continue
       while ";" not in l:
-        linec+=1
         l+=lines[linec]
+        linec+=1
         
       try:
         result = parse_match.parseString(l).asDict()
         for k,v in result.iteritems():
           result[k]=v.strip()
       except:
-        print "Ignoring ", l
+        print "Ignoring ", name, l
       d = meta['options'][result["name"]]={'name': result["name"],"type": result["type"],'used': name,'default':'','description':'','inherit': False}
       if 'default' in result:
         d["default"]= result["default"]
