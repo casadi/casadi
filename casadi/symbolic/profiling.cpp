@@ -64,7 +64,7 @@ double getRealTime() {
     t = (static_cast<ULONGLONG>(tm.dwHighDateTime) << 32) | (ULONGLONG)tm.dwLowDateTime;
     return static_cast<double>(t) / 10000000.0;
 
-#elif (defined(__hpux) || defined(hpux)) || \  //NOLINT(whitespace/parens)
+#elif (defined(__hpux) || defined(hpux)) ||  /* NOLINT(whitespace/parens) */  \
     ((defined(__sun__) || defined(__sun) || defined(sun)) && \
      (defined(__SVR4) || defined(__svr4__)))
     /* HP-UX, Solaris. ------------------------------------------ */
