@@ -32,6 +32,7 @@ Schur
 Cholesky
 Runge-Kutta
 Radau
+radau
 Legendre
 Maratos
 Gershgorin
@@ -197,6 +198,7 @@ signalled
 
 
 init
+initializer
 str
 parallelizer
 
@@ -219,4 +221,6 @@ xml
 w.r.t.
 kinsol
 idas
+bugfix
+recoverably
 

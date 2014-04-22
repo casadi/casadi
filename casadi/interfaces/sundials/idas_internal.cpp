@@ -2099,7 +2099,7 @@ namespace casadi{
       if(jac_.isNull())
           throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
 
-      // Make sure that a linear solver has been providided
+      // Make sure that a linear solver has been provided
       if(linsol_.isNull())
           throw CasadiException("IdasInternal::init(): "
                                 "No user defined linear solver has been provided.");
@@ -2114,7 +2114,7 @@ namespace casadi{
     // Make sure that a Jacobian has been provided
     casadi_assert(!jac_.isNull());
 
-    // Make sure that a linear solver has been providided
+    // Make sure that a linear solver has been provided
     casadi_assert(!linsol_.isNull());
 
     //  Set fields in the IDA memory
@@ -2181,7 +2181,7 @@ namespace casadi{
       if(jacB_.isNull())
           throw CasadiException("IdasInternal::init(): No backwards Jacobian has been provided.");
 
-      // Make sure that a linear solver has been providided
+      // Make sure that a linear solver has been provided
       if(linsolB_.isNull())
           throw CasadiException("IdasInternal::init(): No backwards user "
                                 "defined linear solver has been provided.");
@@ -2197,7 +2197,7 @@ namespace casadi{
     // Make sure that a Jacobian has been provided
     casadi_assert(!jacB_.isNull());
 
-    // Make sure that a linear solver has been providided
+    // Make sure that a linear solver has been provided
     casadi_assert(!linsolB_.isNull());
 
     //  Set fields in the IDA memory

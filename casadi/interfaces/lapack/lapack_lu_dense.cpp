@@ -46,7 +46,7 @@ namespace casadi{
 
   LapackLUDenseInternal::LapackLUDenseInternal(const Sparsity& sparsity, int nrhs) :
       LinearSolverInternal(sparsity,nrhs){
-    // Equilibriate the matrix
+    // Equilibrate the matrix
     addOption("equilibration",OT_BOOLEAN,true);
     addOption("allow_equilibration_failure",OT_BOOLEAN,false);
   }
@@ -70,7 +70,7 @@ namespace casadi{
     mat_.resize(ncol_*ncol_);
     ipiv_.resize(ncol_);
 
-    // Equilibriate?
+    // Equilibrate?
     equilibriate_ = getOption("equilibration").toInt();
     if(equilibriate_){
       r_.resize(ncol_);
@@ -103,7 +103,7 @@ namespace casadi{
 
     if(equilibriate_){
       // Calculate the col and row scaling factors
-      double colcnd, rowcnd; // ratio of smallest to largest col/row scaling factor
+      double colcnd, rowcnd; // ratio of the smallest to the largest col/row scaling factor
       double amax; // absolute value of the largest matrix element
       int info = -100;
       dgeequ_(&ncol_,&nrow_,getPtr(mat_),&ncol_,getPtr(r_),
@@ -125,7 +125,7 @@ namespace casadi{
         else                              casadi_error(ss.str());
       }
 
-      // Equilibriate the matrix if scaling was successful
+      // Equilibrate the matrix if scaling was successful
       if(info!=0)
         dlaqge_(&ncol_,&nrow_,getPtr(mat_),&ncol_,getPtr(r_),getPtr(c_),
                 &colcnd, &rowcnd, &amax, &equed_);
@@ -137,9 +137,9 @@ namespace casadi{
     int info = -100;
     dgetrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(ipiv_), &info);
     if(info != 0) throw CasadiException("LapackLUDenseInternal::prepare: "
-                                        "dgetrf_ failed to factorize the jacobian");
+                                        "dgetrf_ failed to factorize the Jacobian");
 
-    // Sucess if reached this point
+    // Success if reached this point
     prepared_ = true;
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {

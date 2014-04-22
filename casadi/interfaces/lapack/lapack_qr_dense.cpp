@@ -77,7 +77,7 @@ namespace casadi{
     int lwork = work_.size();
     dgeqrf_(&ncol_, &ncol_, getPtr(mat_), &ncol_, getPtr(tau_), getPtr(work_), &lwork, &info);
     if(info != 0) throw CasadiException("LapackQRDenseInternal::prepare: dgeqrf_ "
-                                        "failed to factorize the jacobian");
+                                        "failed to factorize the Jacobian");
 
     // Success if reached this point
     prepared_ = true;

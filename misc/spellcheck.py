@@ -3,7 +3,7 @@ import hunspell
 hobj = hunspell.HunSpell('/usr/share/hunspell/en_US.dic', '/usr/share/hunspell/en_US.aff')
 import subprocess
 from multiprocessing import Process, Queue, Lock, Pool, Manager
-
+from itertools import chain
 
 lt_exclusions = [
   'WHITESPACE_RULE',
@@ -41,12 +41,17 @@ def checkfile(f,lock):
     interface = re.compile(r"\b"+m.group(1)+r"\b",re.I)
   prevs = ("",0,0)
   fc = file(f,'r').read()
-  for (m,s,e) in cppStyleComment.scanString(fc):
+  for (m,s,e) in chain(cppStyleComment.scanString(fc),dblQuotedString.scanString(fc)):
+
+    
     lineno = len(fc[:s].split("\n"))
     t = m.asList()[0]
     #if re.match("^\s+$",fc[prevs[2]:s]) and not t.startswith('///') and t.startswith('//') and prevs[0].startswith('///') and "@{" not in prevs[0] and "@}" not in prevs[0]:
     #  print "%s:%d %s" % (f,lineno,m)
     #prevs = (t,s,e)
+    if t[1:-1].endswith(".hpp"):
+      continue
+      
     
     if t.startswith("/*") and not t.startswith("/**"):
       continue
@@ -55,14 +60,14 @@ def checkfile(f,lock):
     t = re.sub('\[\w+\]','',t)
     t = re.sub('\(\w+\s+x\s+\w+\)','',t)
     t = re.sub('[\\\\@](copydoc|a|e|p|param|defgroup)\s+\w+','',t)
-    t = re.sub(r'\b[A-Z_]{2,}\w+','',t)
+    t = re.sub(r'\b([A-Z]-)[A-Z_]{2,}\w+','',t)
     t = re.sub(r'(?<!\w)-+(?!\w)','',t)
     t = re.sub('\\\\verbatim(.*?)\\\\endverbatim','',t,flags=re.DOTALL)
     t = re.sub('\\\\f\$(.*?)\\\\f\$','',t,flags=re.DOTALL)
     t = re.sub('\\\\f\[(.*?)\\\\f\]\$','',t,flags=re.DOTALL)
     
     t = re.sub(r'\b\w+[A-Z]\w+\b','',t) # camelcase
-    t = re.sub(r'\b\w+_\w+\b','',t) # camelcase
+    t = re.sub(r'\b\w+_\w*\b','',t) # camelcase
     t = re.sub('[\\\\@][\w{}]+','',t)
     t = re.sub('<tt>.*?</tt>','',t)
     t = re.sub('</?\w+>','',t)
@@ -74,6 +79,7 @@ def checkfile(f,lock):
     t = re.sub(r'\b[ntdpcx][a-zA-Z0-9]\b',lambda e: e.group(0) if hobj.spell(e.group()) else '',t) # should be escaped with \e
     t = re.sub("-\d+",'',t)
     t = re.sub("\b\w+\d+\b",'',t)
+    t = re.sub("- ",'',t)
     if interface is not None:
       t = interface.sub('',t)
     text+= t+"\n"
