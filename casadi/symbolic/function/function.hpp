@@ -25,7 +25,7 @@
 
 #include "io_interface.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /** Forward declaration of internal class */
   class FunctionInternal;
@@ -38,8 +38,8 @@ namespace casadi{
 
       We can view this function as a being composed of a (\a nin, \a nout) grid of single-input,
       single-output primitive functions.\n
-      Each such primitive function \f$f_{i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can
-      map as \f$\mathbf{R}^{n,m}\to\mathbf{R}^{p,q}\f$,
+      Each such primitive function \f$f_ {i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can
+      map as \f$\mathbf {R}^{n,m}\to\mathbf{R}^{p,q}\f$,
       in which n,m,p,q can take different values for every (i,j) pair.\n
 
       When passing input, you specify which partition \f$i\f$ is active.
@@ -49,23 +49,23 @@ namespace casadi{
 
       To calculate Jacobians, you need to have \f$(m=1,q=1)\f$.
 
-      Write the Jacobian as \f$J_{i,j} = \nabla f_{i,j} =
-      \frac{\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
+      Write the Jacobian as \f$J_ {i,j} = \nabla f_{i,j} =
+      \frac {\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
 
-      Using \f$\vec{v} \in \mathbf{R}^n\f$ as a forward seed:  <tt>setFwdSeed(v,i)</tt>\n
-      Retrieving \f$\vec{s}_f \in \mathbf{R}^p\f$ from:        <tt>getFwdSens(sf,j)</tt>\n
+      Using \f$\vec {v} \in \mathbf{R}^n\f$ as a forward seed:  <tt>setFwdSeed(v,i)</tt>\n
+      Retrieving \f$\vec {s}_f \in \mathbf{R}^p\f$ from:        <tt>getFwdSens(sf,j)</tt>\n
 
-      Using \f$\vec{w} \in \mathbf{R}^p\f$ as a forward seed:  <tt>setAdjSeed(w,j)</tt>\n
-      Retrieving \f$\vec{s}_a \in \mathbf{R}^n \f$ from:        <tt>getAdjSens(sa,i)</tt>\n
+      Using \f$\vec {w} \in \mathbf{R}^p\f$ as a forward seed:  <tt>setAdjSeed(w,j)</tt>\n
+      Retrieving \f$\vec {s}_a \in \mathbf{R}^n \f$ from:        <tt>getAdjSens(sa,i)</tt>\n
 
       We have the following relationships for function mapping from a row vector to a row vector:
 
-      \f$ \vec{s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
-      \f$ \vec{s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
+      \f$ \vec {s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
+      \f$ \vec {s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
 
       Some quantities in these formulas must be transposed: \n
-      input  col: transpose \f$ \vec{v} \f$ and \f$\vec{s}_a\f$ \n
-      output col: transpose \f$ \vec{w} \f$ and \f$\vec{s}_f\f$ \n
+      input  col: transpose \f$ \vec {v} \f$ and \f$\vec{s}_a\f$ \n
+      output col: transpose \f$ \vec {w} \f$ and \f$\vec{s}_f\f$ \n
 
       NOTE: Functions are allowed to modify their input arguments when evaluating:
             implicitFunction, IDAS solver
@@ -271,25 +271,25 @@ namespace casadi{
 
     ///@{
     /// Functor shorthand for evaluation
-    std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg){ return call(arg);}
-    std::vector<SX> operator()(const std::vector<SX>& arg){ return call(arg);}
-    std::vector<MX> operator()(const std::vector<MX>& arg){ return call(arg);}
+    std::vector<DMatrix> operator()(const std::vector<DMatrix>& arg) { return call(arg);}
+    std::vector<SX> operator()(const std::vector<SX>& arg) { return call(arg);}
+    std::vector<MX> operator()(const std::vector<MX>& arg) { return call(arg);}
     ///@}
 
 #ifndef SWIG
     ///@{
     /// Functor shorthand for evaluation, single argument (only C++)
-    std::vector<DMatrix> operator()(const DMatrix& arg0){ return call(toVector(arg0));}
-    std::vector<SX> operator()(const SX& arg0){ return call(toVector(arg0));}
-    std::vector<MX> operator()(const MX& arg0){ return call(toVector(arg0));}
+    std::vector<DMatrix> operator()(const DMatrix& arg0) { return call(toVector(arg0));}
+    std::vector<SX> operator()(const SX& arg0) { return call(toVector(arg0));}
+    std::vector<MX> operator()(const MX& arg0) { return call(toVector(arg0));}
     ///@}
 
     ///@{
     /// Functor shorthand for evaluation, two arguments (only C++)
     std::vector<DMatrix> operator()(const DMatrix& arg0, const DMatrix& arg1)
     { return call(toVector(arg0,arg1));}
-    std::vector<SX> operator()(const SX& arg0, const SX& arg1){ return call(toVector(arg0,arg1));}
-    std::vector<MX> operator()(const MX& arg0, const MX& arg1){ return call(toVector(arg0,arg1));}
+    std::vector<SX> operator()(const SX& arg0, const SX& arg1) { return call(toVector(arg0,arg1));}
+    std::vector<MX> operator()(const MX& arg0, const MX& arg1) { return call(toVector(arg0,arg1));}
     ///@}
 #endif // SWIG
 

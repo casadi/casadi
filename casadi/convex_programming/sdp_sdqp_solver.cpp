@@ -24,9 +24,9 @@
 #include "sdp_sdqp_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-SDPSDQPSolver::SDPSDQPSolver(){
+SDPSDQPSolver::SDPSDQPSolver() {
 }
 
 
@@ -34,16 +34,16 @@ SDPSDQPSolver::SDPSDQPSolver(const SDQPStructure & st)  {
   assignNode(new SDPSDQPInternal(st));
 }
 
-SDPSDQPInternal* SDPSDQPSolver::operator->(){
+SDPSDQPInternal* SDPSDQPSolver::operator->() {
   return static_cast<SDPSDQPInternal*>(Function::operator->());
 }
 
-const SDPSDQPInternal* SDPSDQPSolver::operator->() const{
+const SDPSDQPInternal* SDPSDQPSolver::operator->() const {
   return static_cast<const SDPSDQPInternal*>(Function::operator->());
 
 }
 
-bool SDPSDQPSolver::checkNode() const{
+bool SDPSDQPSolver::checkNode() const {
   return dynamic_cast<const SDPSDQPInternal*>(get());
 }
 

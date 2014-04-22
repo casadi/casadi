@@ -35,14 +35,14 @@
 #endif // WITH_OPENCL
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 #ifdef WITH_OPENCL
   /** \brief Singleton for the sparsity propagation kernel
       TODO: Move to a separate file and make non sparsity pattern specific
       \author Joel Andersson
       \date 2013
   */
-  class SparsityPropagationKernel{
+  class SparsityPropagationKernel {
   public:
     // Default constructor
     SparsityPropagationKernel();
@@ -93,15 +93,15 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal :
 
   /** \brief  Helper class to be plugged into evaluateGen when working
    * with a value known only at runtime */
-  struct int_runtime{
+  struct int_runtime {
     const int value;
-    int_runtime(int v) : value(v){}
+    int_runtime(int v) : value(v) {}
   };
 
   /** \brief  Helper class to be plugged into evaluateGen when working
    * with a value known already at compiletime */
   template<int v>
-  struct int_compiletime{
+  struct int_compiletime {
     static const int value = v;
   };
 
@@ -128,7 +128,7 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal :
 
   /** \brief  An element of the tape */
   template<typename T>
-  struct TapeEl{
+  struct TapeEl {
     T d[2];
   };
 
@@ -167,7 +167,7 @@ class CASADI_SYMBOLIC_EXPORT SXFunctionInternal :
   virtual void spEvaluate(bool fwd);
 
   /// Is the class able to propagate seeds through the algorithm?
-  virtual bool spCanEvaluate(bool fwd){ return true;}
+  virtual bool spCanEvaluate(bool fwd) { return true;}
 
   /// Reset the sparsity propagation
   virtual void spInit(bool fwd);

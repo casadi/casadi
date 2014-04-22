@@ -27,7 +27,7 @@
 #include <limits>
 
 /** \brief The casadi namespace */
-namespace casadi{
+namespace casadi {
 
 
 /** \brief casadi_limits class
@@ -40,19 +40,19 @@ e.g. symbolic scalars
 */
 
 template<class T>
-class CASADI_SYMBOLIC_EXPORT casadi_limits{
+class CASADI_SYMBOLIC_EXPORT casadi_limits {
   public:
-    static bool isZero(const T& val){ return val==0; }
-    static bool isAlmostZero(const T& val, double tol){ return val<=tol && val>=-tol; }
-    static bool isOne(const T& val){ return val==1;}
-    static bool isMinusOne(const T& val){ return val==-1;}
-    static bool isConstant(const T& val){ return true;}
-    static bool isInteger(const T& val){ return val==static_cast<int>(val);}
-    static bool isInf(const T& val){ return std::numeric_limits<T>::has_infinity ?
+    static bool isZero(const T& val) { return val==0; }
+    static bool isAlmostZero(const T& val, double tol) { return val<=tol && val>=-tol; }
+    static bool isOne(const T& val) { return val==1;}
+    static bool isMinusOne(const T& val) { return val==-1;}
+    static bool isConstant(const T& val) { return true;}
+    static bool isInteger(const T& val) { return val==static_cast<int>(val);}
+    static bool isInf(const T& val) { return std::numeric_limits<T>::has_infinity ?
             val==std::numeric_limits<T>::infinity() : false;}
-    static bool isMinusInf(const T& val){ return std::numeric_limits<T>::has_infinity ?
+    static bool isMinusInf(const T& val) { return std::numeric_limits<T>::has_infinity ?
             val==-std::numeric_limits<T>::infinity() : false;}
-    static bool isNaN(const T& val){
+    static bool isNaN(const T& val) {
         return std::numeric_limits<T>::has_quiet_NaN ? val!=val : false;}
     static const T zero;
     static const T one;

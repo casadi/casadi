@@ -29,7 +29,7 @@
 #include "sdp_socp_solver.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for SDPSOCPInternal
    *

@@ -29,7 +29,7 @@
 #include "qcqp_qp_solver.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for QCQPQPInternal
    *

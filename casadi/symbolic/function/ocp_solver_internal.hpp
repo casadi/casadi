@@ -29,13 +29,13 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
 /** \brief  Internal node class for OCPSolver
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT OCPSolverInternal : public FunctionInternal{
+class CASADI_SYMBOLIC_EXPORT OCPSolverInternal : public FunctionInternal {
   friend class OCPSolver;
   public:
 

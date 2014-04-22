@@ -52,10 +52,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
 /// Input arguments of a LP problem [lpIn]
-enum LPSolverInput{
+enum LPSolverInput {
   /// The vector c: dense (n x 1) [c]
   LP_SOLVER_C,
   /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
@@ -71,7 +71,7 @@ enum LPSolverInput{
   LP_SOLVER_NUM_IN};
 
 /// Output arguments of an LP Solver [lpOut]
-enum LPSolverOutput{
+enum LPSolverOutput {
   /// The primal solution [x]
   LP_SOLVER_X,
   /// The optimal cost [cost]
@@ -83,7 +83,7 @@ enum LPSolverOutput{
   LP_SOLVER_NUM_OUT};
 
 /// Structure specification of an LP [lpStruct]
-enum LPStruct{
+enum LPStruct {
   /// The matrix A: sparse [a]
   LP_STRUCT_A,
   LP_STRUCT_NUM};
@@ -99,7 +99,7 @@ class LPSolverInternal;
   \author Joris Gillis
   \date 2013
 */
-class CASADI_SYMBOLIC_EXPORT LPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT LPSolver : public Function {
   public:
 
   /// Default constructor

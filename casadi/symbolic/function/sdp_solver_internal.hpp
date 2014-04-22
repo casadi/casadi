@@ -28,10 +28,10 @@
 
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
 /// Internal class
-class CASADI_SYMBOLIC_EXPORT SDPSolverInternal : public FunctionInternal{
+class CASADI_SYMBOLIC_EXPORT SDPSolverInternal : public FunctionInternal {
   public:
 
     // Constructor

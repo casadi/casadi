@@ -24,9 +24,9 @@
 #include "sdp_socp_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-SDPSOCPSolver::SDPSOCPSolver(){
+SDPSOCPSolver::SDPSOCPSolver() {
 }
 
 
@@ -34,16 +34,16 @@ SDPSOCPSolver::SDPSOCPSolver(const SOCPStructure & st)  {
   assignNode(new SDPSOCPInternal(st));
 }
 
-SDPSOCPInternal* SDPSOCPSolver::operator->(){
+SDPSOCPInternal* SDPSOCPSolver::operator->() {
   return static_cast<SDPSOCPInternal*>(Function::operator->());
 }
 
-const SDPSOCPInternal* SDPSOCPSolver::operator->() const{
+const SDPSOCPInternal* SDPSOCPSolver::operator->() const {
   return static_cast<const SDPSOCPInternal*>(Function::operator->());
 
 }
 
-bool SDPSOCPSolver::checkNode() const{
+bool SDPSOCPSolver::checkNode() const {
   return dynamic_cast<const SDPSOCPInternal*>(get());
 }
 

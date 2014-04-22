@@ -22,39 +22,39 @@
 
 #include "direct_collocation_internal.hpp"
 
-namespace casadi{
+namespace casadi {
 
-DirectCollocation::DirectCollocation(){
+DirectCollocation::DirectCollocation() {
 }
 
 DirectCollocation::DirectCollocation(const Function& ffcn, const Function& mfcn,
-                                     const Function& cfcn, const Function& rfcn){
+                                     const Function& cfcn, const Function& rfcn) {
   assignNode(new DirectCollocationInternal(ffcn,mfcn,cfcn,rfcn));
 }
 
-const DirectCollocationInternal* DirectCollocation::operator->() const{
+const DirectCollocationInternal* DirectCollocation::operator->() const {
   return static_cast<const DirectCollocationInternal*>(Function::operator->());
 }
 
-DirectCollocationInternal* DirectCollocation::operator->(){
+DirectCollocationInternal* DirectCollocation::operator->() {
   return static_cast<DirectCollocationInternal*>(Function::operator->());
 }
 
-void DirectCollocation::getGuess(std::vector<double>& V_init) const{
+void DirectCollocation::getGuess(std::vector<double>& V_init) const {
   (*this)->getGuess(V_init);
 }
 
 void DirectCollocation::getVariableBounds(std::vector<double>& V_min,
-                                          std::vector<double>& V_max) const{
+                                          std::vector<double>& V_max) const {
   (*this)->getVariableBounds(V_min,V_max);
 }
 
 void DirectCollocation::getConstraintBounds(std::vector<double>& G_min,
-                                            std::vector<double>& G_max) const{
+                                            std::vector<double>& G_max) const {
   (*this)->getConstraintBounds(G_min,G_max);
 }
 
-void DirectCollocation::setOptimalSolution( const std::vector<double> &V_opt ){
+void DirectCollocation::setOptimalSolution( const std::vector<double> &V_opt ) {
   (*this)->setOptimalSolution(V_opt);
 }
 

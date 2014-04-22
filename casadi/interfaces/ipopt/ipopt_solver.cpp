@@ -24,28 +24,28 @@
 #include "ipopt_nlp.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  IpoptSolver::IpoptSolver(){
+  IpoptSolver::IpoptSolver() {
   }
 
-  IpoptSolver::IpoptSolver(const Function& nlp){
+  IpoptSolver::IpoptSolver(const Function& nlp) {
     assignNode(new IpoptInternal(nlp));
   }
 
-  IpoptInternal* IpoptSolver::operator->(){
+  IpoptInternal* IpoptSolver::operator->() {
     return static_cast<IpoptInternal*>(NLPSolver::operator->());
   }
 
-  const IpoptInternal* IpoptSolver::operator->() const{
+  const IpoptInternal* IpoptSolver::operator->() const {
     return static_cast<const IpoptInternal*>(NLPSolver::operator->());
   }
 
-  bool IpoptSolver::checkNode() const{
+  bool IpoptSolver::checkNode() const {
     return dynamic_cast<const IpoptInternal*>(get());
   }
 
-  DMatrix IpoptSolver::getReducedHessian(){
+  DMatrix IpoptSolver::getReducedHessian() {
     return (*this)->getReducedHessian();
   }
 

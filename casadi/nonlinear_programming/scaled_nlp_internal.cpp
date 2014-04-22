@@ -28,7 +28,7 @@
 using namespace std;
 namespace casadi {
 
-NLPQPInternal* NLPQPInternal::clone() const{
+NLPQPInternal* NLPQPInternal::clone() const {
   // Return a deep copy
   NLPQPInternal* node = new NLPQPInternal(st_);
   if(!node->is_init_)
@@ -45,7 +45,7 @@ NLPQPInternal::NLPQPInternal(const std::vector<CRSSparsity> &st) : QPSolverInter
 
 }
 
-NLPQPInternal::~NLPQPInternal(){
+NLPQPInternal::~NLPQPInternal() {
 }
 
 void NLPQPInternal::evaluate(int nfdir, int nadir) {
@@ -86,7 +86,7 @@ void NLPQPInternal::evaluate(int nfdir, int nadir) {
   output(QP_SOLVER_LAM_X).set(nlpsolver_.output(NLP_SOLVER_LAM_X));
 }
 
-void NLPQPInternal::init(){
+void NLPQPInternal::init() {
 
 
   QPSolverInternal::init();
@@ -115,7 +115,7 @@ void NLPQPInternal::init(){
   nlpsolver_ = nlpsolver_creator(QP_SOLVER_nlp);
 
   nlpsolver_.setQPOptions();
-  if(hasSetOption("nlp_solver_options")){
+  if(hasSetOption("nlp_solver_options")) {
     nlpsolver_.setOption(getOption("nlp_solver_options"));
   }
 

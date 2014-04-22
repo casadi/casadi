@@ -29,12 +29,12 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Reshape an expression
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT Reshape : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Reshape : public MXNode {
   public:
 
     /// Constructor
@@ -44,7 +44,7 @@ namespace casadi{
     virtual Reshape* clone() const;
 
     /// Destructor
-    virtual ~Reshape(){}
+    virtual ~Reshape() {}
 
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
@@ -74,10 +74,10 @@ namespace casadi{
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_RESHAPE;}
+    virtual int getOp() const { return OP_RESHAPE;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const{ return 1;}
+    virtual int numInplace() const { return 1;}
 
     /// Reshape
     virtual MX getReshape(const Sparsity& sp) const;

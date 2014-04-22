@@ -24,20 +24,20 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(){
+  ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator() {
   }
 
-  ImplicitFixedStepIntegratorInternal* ImplicitFixedStepIntegrator::operator->(){
+  ImplicitFixedStepIntegratorInternal* ImplicitFixedStepIntegrator::operator->() {
     return static_cast<ImplicitFixedStepIntegratorInternal*>(Integrator::operator->());
   }
 
-  const ImplicitFixedStepIntegratorInternal* ImplicitFixedStepIntegrator::operator->() const{
+  const ImplicitFixedStepIntegratorInternal* ImplicitFixedStepIntegrator::operator->() const {
     return static_cast<const ImplicitFixedStepIntegratorInternal*>(Integrator::operator->());
   }
 
-  bool ImplicitFixedStepIntegrator::checkNode() const{
+  bool ImplicitFixedStepIntegrator::checkNode() const {
     return dynamic_cast<const ImplicitFixedStepIntegratorInternal*>(get())!=0;
   }
 

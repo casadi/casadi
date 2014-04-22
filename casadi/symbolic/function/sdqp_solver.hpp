@@ -32,10 +32,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
 /// Input arguments of a SDQP problem [sdqpIn]
-enum SDQPInput{
+enum SDQPInput {
   /// The matrix H: sparse ( n x n) [h]
   SDQP_SOLVER_H,
   /// The vector c: ( n x 1) [c]
@@ -57,7 +57,7 @@ enum SDQPInput{
   SDQP_SOLVER_NUM_IN};
 
 /// Output arguments of an SDQP Solver [sdqpOut]
-enum SDQPOutput{
+enum SDQPOutput {
   /// The primal solution (n x 1) - may be used as initial guess [x]
   SDQP_SOLVER_X,
   /// The solution P (m x m) - may be used as initial guess [p]
@@ -75,7 +75,7 @@ enum SDQPOutput{
   SDQP_SOLVER_NUM_OUT};
 
 /// Structure specification of an SDQP [sdqpStruct]
-enum SDQPStruct{
+enum SDQPStruct {
   /// The matrix H: sparse ( n x n) [h]
   SDQP_STRUCT_H,
   /// The horizontal stack of all matrices F_i: ( m x nm) [f]
@@ -97,7 +97,7 @@ class SDQPSolverInternal;
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT SDQPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT SDQPSolver : public Function {
   public:
 
   /// Default constructor

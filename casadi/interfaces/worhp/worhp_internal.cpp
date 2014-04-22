@@ -30,9 +30,9 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  WorhpInternal::WorhpInternal(const Function& nlp) : NLPSolverInternal(nlp){
+  WorhpInternal::WorhpInternal(const Function& nlp) : NLPSolverInternal(nlp) {
 
     // Monitors
     addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions",
@@ -161,13 +161,13 @@ namespace casadi{
     setOption("ScaleConIter",true);
   }
 
-  WorhpInternal::~WorhpInternal(){
+  WorhpInternal::~WorhpInternal() {
     if (worhp_p_.initialised || worhp_o_.initialised ||
         worhp_w_.initialised || worhp_c_.initialised)
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
   }
 
-  WorhpInternal* WorhpInternal::clone() const{
+  WorhpInternal* WorhpInternal::clone() const {
     // Use default copy routine
     WorhpInternal* node = new WorhpInternal(*this);
 
@@ -180,7 +180,7 @@ namespace casadi{
     return node;
   }
 
-  void WorhpInternal::init(){
+  void WorhpInternal::init() {
 
     // Call the init method of the base class
     NLPSolverInternal::init();
@@ -199,7 +199,7 @@ namespace casadi{
     // Get/generate required functions
     gradF();
     jacG();
-    if(exact_hessian_){ // does not appear to work
+    if(exact_hessian_) { // does not appear to work
       hessLag();
     }
 
@@ -240,7 +240,7 @@ namespace casadi{
     status_[FunctionErrorHM]="FunctionErrorHM";
   }
 
-  void WorhpInternal::reset(){
+  void WorhpInternal::reset() {
 
     // Number of (free) variables
     worhp_o_.n = nx_;
@@ -251,7 +251,7 @@ namespace casadi{
     // Free existing Worhp memory (except parameters)
     bool p_init_backup = worhp_p_.initialised;
     worhp_p_.initialised = false; // Avoid freeing the memory for parameters
-    if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised){
+    if (worhp_o_.initialised || worhp_w_.initialised || worhp_c_.initialised) {
       WorhpFree(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
     }
     worhp_p_.initialised = p_init_backup;
@@ -278,8 +278,8 @@ namespace casadi{
 
       // Get number of nonzeros in the lower triangular part of the Hessian including full diagonal
       worhp_w_.HM.nnz = nx_; // diagonal entries
-      for(int c=0; c<nx_; ++c){
-        for(int el=colind[c]; el<colind[c+1] && row[el]<c; ++el){
+      for(int c=0; c<nx_; ++c) {
+        for(int el=colind[c]; el<colind[c+1] && row[el]<c; ++el) {
           worhp_w_.HM.nnz++; // strictly lower triangular part
         }
       }
@@ -293,8 +293,8 @@ namespace casadi{
       casadi_error("Main: Initialisation failed. Status: " << formatStatus(worhp_c_.status));
     }
 
-    if (worhp_w_.DF.NeedStructure){
-      for(int i=0; i<nx_; ++i){
+    if (worhp_w_.DF.NeedStructure) {
+      for(int i=0; i<nx_; ++i) {
         worhp_w_.DF.row[i] = i + 1; // Index-1 based
       }
     }
@@ -306,8 +306,8 @@ namespace casadi{
       int nz=0;
       const vector<int>& colind = J.colind();
       const vector<int>& row = J.row();
-      for(int c=0; c<nx_; ++c){
-        for(int el=colind[c]; el<colind[c+1]; ++el){
+      for(int c=0; c<nx_; ++c) {
+        for(int el=colind[c]; el<colind[c+1]; ++el) {
           int r = row[el];
           worhp_w_.DG.col[nz] = c + 1; // Index-1 based
           worhp_w_.DG.row[nz] = r + 1;
@@ -325,9 +325,9 @@ namespace casadi{
       int nz=0;
 
       // Upper triangular part of the Hessian (note CCS -> CRS format change)
-      for(int c=0; c<nx_; ++c){
-        for(int el=colind[c]; el<colind[c+1]; ++el){
-          if(row[el]>c){
+      for(int c=0; c<nx_; ++c) {
+        for(int el=colind[c]; el<colind[c+1]; ++el) {
+          if(row[el]>c) {
             worhp_w_.HM.row[nz] = row[el] + 1;
             worhp_w_.HM.col[nz] = c + 1;
             nz++;
@@ -336,7 +336,7 @@ namespace casadi{
       }
 
       // Diagonal always included
-      for(int r=0; r<nx_; ++r){
+      for(int r=0; r<nx_; ++r) {
         worhp_w_.HM.row[nz] = r + 1;
         worhp_w_.HM.col[nz] = r + 1;
         nz++;
@@ -417,7 +417,7 @@ namespace casadi{
     }
   }
 
-  void WorhpInternal::evaluate(){
+  void WorhpInternal::evaluate() {
     log("WorhpInternal::evaluate");
 
     if (gather_stats_) {
@@ -473,7 +473,7 @@ namespace casadi{
     lbx.getArray(worhp_o_.XL,worhp_o_.n);
     ubx.getArray(worhp_o_.XU,worhp_o_.n);
     lam_x0.getArray(worhp_o_.Lambda,worhp_o_.n);
-    if (worhp_o_.m>0){
+    if (worhp_o_.m>0) {
       lam_g0.getArray(worhp_o_.Mu,worhp_o_.m);
       lbg.getArray(worhp_o_.GL,worhp_o_.m);
       ubg.getArray(worhp_o_.GU,worhp_o_.m);
@@ -641,8 +641,8 @@ namespace casadi{
   }
 
   bool WorhpInternal::eval_h(const double* x, double obj_factor,
-                             const double* lambda, double* values){
-    try{
+                             const double* lambda, double* values) {
+    try {
       log("eval_h started");
       double time1 = clock();
 
@@ -672,24 +672,24 @@ namespace casadi{
       double* values_diagonal = values + (worhp_w_.HM.nnz-nx_);
 
       // Initialize diagonal to zero
-      for(int r=0; r<nx_; ++r){
+      for(int r=0; r<nx_; ++r) {
         values_diagonal[r] = 0.;
       }
 
       // Upper triangular part of the Hessian (note CCS -> CRS format change)
-      for(int c=0; c<nx_; ++c){
-        for(int el=colind[c]; el<colind[c+1]; ++el){
-          if(row[el]>c){
+      for(int c=0; c<nx_; ++c) {
+        for(int el=colind[c]; el<colind[c+1]; ++el) {
+          if(row[el]>c) {
             // Strictly upper triangular
             *values_upper++ = data[el];
-          } else if(row[el]==c){
+          } else if(row[el]==c) {
             // Diagonal separately
             values_diagonal[c] = data[el];
           }
         }
       }
 
-      if(monitored("eval_h")){
+      if(monitored("eval_h")) {
         std::cout << "x = " <<  hessLag.input(HESSLAG_X) << std::endl;
         std::cout << "obj_factor= " << obj_factor << std::endl;
         std::cout << "lambda = " << hessLag.input(HESSLAG_LAM_G) << std::endl;
@@ -704,18 +704,18 @@ namespace casadi{
       n_eval_h_ += 1;
       log("eval_h ok");
       return true;
-    } catch (exception& ex){
+    } catch (exception& ex) {
       cerr << "eval_h failed: " << ex.what() << endl;
       return false;
     }
   }
 
-  bool WorhpInternal::eval_jac_g(const double* x,double* values){
-    try{
+  bool WorhpInternal::eval_jac_g(const double* x,double* values) {
+    try {
       log("eval_jac_g started");
 
       // Quich finish if no constraints
-      if(worhp_o_.m==0){
+      if(worhp_o_.m==0) {
         log("eval_jac_g quick return (m==0)");
         return true;
       }
@@ -739,7 +739,7 @@ namespace casadi{
 
       std::copy(J.data().begin(),J.data().end(),values);
 
-      if(monitored("eval_jac_g")){
+      if(monitored("eval_jac_g")) {
         cout << "x = " << jacG_.input().data() << endl;
         cout << "J = " << endl;
         jacG_.output().printSparse();
@@ -750,13 +750,13 @@ namespace casadi{
       n_eval_jac_g_ += 1;
       log("eval_jac_g ok");
       return true;
-    } catch (exception& ex){
+    } catch (exception& ex) {
       cerr << "eval_jac_g failed: " << ex.what() << endl;
       return false;
     }
   }
 
-  bool WorhpInternal::eval_f(const double* x, double scale, double& obj_value){
+  bool WorhpInternal::eval_f(const double* x, double scale, double& obj_value) {
     try {
       log("eval_f started");
 
@@ -774,7 +774,7 @@ namespace casadi{
       nlp_.getOutput(obj_value,NL_F);
 
       // Printing
-      if(monitored("eval_f")){
+      if(monitored("eval_f")) {
         cout << "x = " << nlp_.input(NL_X) << endl;
         cout << "obj_value = " << obj_value << endl;
       }
@@ -788,7 +788,7 @@ namespace casadi{
       n_eval_f_ += 1;
       log("eval_f ok");
       return true;
-    } catch (exception& ex){
+    } catch (exception& ex) {
       cerr << "eval_f failed: " << ex.what() << endl;
       return false;
     }
@@ -800,7 +800,7 @@ namespace casadi{
       log("eval_g started");
       double time1 = clock();
 
-      if(worhp_o_.m>0){
+      if(worhp_o_.m>0) {
         // Pass the argument to the function
         nlp_.setInput(x,NL_X);
         nlp_.setInput(input(NLP_SOLVER_P),NL_P);
@@ -812,7 +812,7 @@ namespace casadi{
         nlp_.getOutput(g,NL_G);
 
         // Printing
-        if(monitored("eval_g")){
+        if(monitored("eval_g")) {
           cout << "x = " << nlp_.input(NL_X) << endl;
           cout << "g = " << nlp_.output(NL_G) << endl;
         }
@@ -826,7 +826,7 @@ namespace casadi{
       n_eval_g_ += 1;
       log("eval_g ok");
       return true;
-    } catch (exception& ex){
+    } catch (exception& ex) {
       cerr << "eval_g failed: " << ex.what() << endl;
       return false;
     }
@@ -849,12 +849,12 @@ namespace casadi{
       gradF_.output().get(grad_f,DENSE);
 
       // Scale
-      for(int i=0; i<nx_; ++i){
+      for(int i=0; i<nx_; ++i) {
         grad_f[i] *= scale;
       }
 
       // Printing
-      if(monitored("eval_grad_f")){
+      if(monitored("eval_grad_f")) {
         cout << "grad_f = " << gradF_.output() << endl;
       }
 
@@ -865,8 +865,8 @@ namespace casadi{
       t_eval_grad_f_ += (time2-time1)/CLOCKS_PER_SEC;
       n_eval_grad_f_ += 1;
       // Check the result for regularity
-      for(int i=0; i<nx_; ++i){
-        if(isnan(grad_f[i]) || isinf(grad_f[i])){
+      for(int i=0; i<nx_; ++i) {
+        if(isnan(grad_f[i]) || isinf(grad_f[i])) {
           log("eval_grad_f: result not regular");
           return false;
         }
@@ -874,7 +874,7 @@ namespace casadi{
 
       log("eval_grad_f ok");
       return true;
-    } catch (exception& ex){
+    } catch (exception& ex) {
       cerr << "eval_jac_f failed: " << ex.what() << endl;
       return false;
     }
@@ -947,7 +947,7 @@ namespace casadi{
     std::cout << "readparams status: " << status << std::endl;
   }
 
-  map<int,string> WorhpInternal::calc_flagmap(){
+  map<int,string> WorhpInternal::calc_flagmap() {
   map<int,string> f;
   f[TerminateSuccess] = "TerminateSuccess";
   f[OptimalSolution] = "OptimalSolution";

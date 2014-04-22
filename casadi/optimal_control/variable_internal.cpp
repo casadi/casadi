@@ -24,35 +24,35 @@
 #include "casadi/symbolic/casadi_exception.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  VariableInternal::VariableInternal(const string& name){
+  VariableInternal::VariableInternal(const string& name) {
   }
 
-  VariableInternal::~VariableInternal(){
+  VariableInternal::~VariableInternal() {
   }
 
-  void VariableInternal::repr(ostream &stream) const{
+  void VariableInternal::repr(ostream &stream) const {
     var_.print(stream);
   }
 
 
-  void VariableInternal::print(ostream &stream) const{
+  void VariableInternal::print(ostream &stream) const {
     var_.print(stream);
   }
 
-  SX VariableInternal::atTime(double t, bool allocate) const{
+  SX VariableInternal::atTime(double t, bool allocate) const {
     casadi_assert(!allocate);
     return const_cast<VariableInternal*>(this)->atTime(t,false);
   }
 
-  SX VariableInternal::atTime(double t, bool allocate){
+  SX VariableInternal::atTime(double t, bool allocate) {
     // Find an existing element
     map<double,SX>::const_iterator it = timed_sx_.find(t);
 
     // If not found
-    if(it==timed_sx_.end()){
-      if(allocate){
+    if(it==timed_sx_.end()) {
+      if(allocate) {
         // Create a timed variable
         stringstream ss;
         ss << var_.getName() << ".atTime(" << t << ")";

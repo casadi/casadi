@@ -29,12 +29,12 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Concatenation: Join multiple expressions stacking the nonzeros
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_SYMBOLIC_EXPORT Concat : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Concat : public MXNode {
   public:
 
     /// Constructor
@@ -66,7 +66,7 @@ namespace casadi{
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth);}
+    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node,depth);}
   };
 
 
@@ -74,17 +74,17 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT Horzcat : public Concat{
+  class CASADI_SYMBOLIC_EXPORT Horzcat : public Concat {
   public:
 
     /// Constructor
     Horzcat(const std::vector<MX>& x);
 
     /// Clone function
-    virtual Horzcat* clone() const{ return new Horzcat(*this);}
+    virtual Horzcat* clone() const { return new Horzcat(*this);}
 
     /// Destructor
-    virtual ~Horzcat(){}
+    virtual ~Horzcat() {}
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -95,24 +95,24 @@ namespace casadi{
                             bool output_given);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_HORZCAT;}
+    virtual int getOp() const { return OP_HORZCAT;}
   };
 
   /** \brief Vertical concatenation of vectors
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_SYMBOLIC_EXPORT Vertcat : public Concat{
+  class CASADI_SYMBOLIC_EXPORT Vertcat : public Concat {
   public:
 
     /// Constructor
     Vertcat(const std::vector<MX>& x);
 
     /// Clone function
-    virtual Vertcat* clone() const{ return new Vertcat(*this);}
+    virtual Vertcat* clone() const { return new Vertcat(*this);}
 
     /// Destructor
-    virtual ~Vertcat(){}
+    virtual ~Vertcat() {}
 
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -123,7 +123,7 @@ namespace casadi{
                             bool output_given);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_VERTCAT;}
+    virtual int getOp() const { return OP_VERTCAT;}
   };
 
 } // namespace casadi

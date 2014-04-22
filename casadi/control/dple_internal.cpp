@@ -33,7 +33,7 @@ INPUTSCHEME(DPLEInput)
 OUTPUTSCHEME(DPLEOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   DpleInternal::DpleInternal(const std::vector< Sparsity > & A,
                              const std::vector< Sparsity > &V,int nfwd, int nadj) :
@@ -57,11 +57,11 @@ namespace casadi{
 
   }
 
-  DpleInternal::~DpleInternal(){
+  DpleInternal::~DpleInternal() {
 
   }
 
-  void DpleInternal::init(){
+  void DpleInternal::init() {
 
     const_dim_ = getOption("const_dim");
     pos_def_ = getOption("pos_def");
@@ -137,7 +137,7 @@ namespace casadi{
 
   }
 
-  void DpleInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void DpleInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied) {
     FunctionInternal::deepCopyMembers(already_copied);
   }
 

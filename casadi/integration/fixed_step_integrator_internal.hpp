@@ -28,9 +28,9 @@
 #include "casadi/symbolic/function/mx_function.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
-  class CASADI_INTEGRATION_EXPORT FixedStepIntegratorInternal : public IntegratorInternal{
+  class CASADI_INTEGRATION_EXPORT FixedStepIntegratorInternal : public IntegratorInternal {
   public:
 
     /// Constructor
@@ -73,10 +73,10 @@ namespace casadi{
     virtual void calculateInitialConditionsB();
 
     /// Get explicit dynamics
-    virtual Function& getExplicit(){ return F_;}
+    virtual Function& getExplicit() { return F_;}
 
     /// Get explicit dynamics (backward problem)
-    virtual Function& getExplicitB(){ return G_;}
+    virtual Function& getExplicitB() { return G_;}
 
     // Discrete time dynamics
     Function F_, G_;

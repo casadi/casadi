@@ -30,9 +30,9 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
-  class CodeGenerator{
+  class CodeGenerator {
   public:
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>
@@ -63,7 +63,7 @@ namespace casadi{
     std::string casadi_dot(int n, const std::string& x, int inc_x, const std::string& y, int inc_y);
 
     /** \brief Auxiliary functions */
-    enum Auxiliary{
+    enum Auxiliary {
       // BLAS Level 1
       AUX_COPY,
       AUX_SWAP,
@@ -139,9 +139,9 @@ namespace casadi{
 
     // Compare two vectors
     template<typename T>
-    static bool equal(const std::vector<T>& v1, const std::vector<T>& v2){
+    static bool equal(const std::vector<T>& v1, const std::vector<T>& v2) {
       if(v1.size()!=v2.size()) return false;
-      for(int j=0; j<v1.size(); ++j){
+      for(int j=0; j<v1.size(); ++j) {
         if(v1[j]!=v2[j]) return false;
       }
       return true;

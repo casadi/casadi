@@ -108,10 +108,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
 /// Input arguments of a SDP problem [sdpIn]
-enum SDPInput{
+enum SDPInput {
   /// The horizontal stack of all matrices F_i: ( m x nm) [f]
   SDP_SOLVER_F,
   /// The vector c: ( n x 1) [c]
@@ -131,7 +131,7 @@ enum SDPInput{
   SDP_SOLVER_NUM_IN};
 
 /// Output arguments of an SDP Solver [sdpOut]
-enum SDPOutput{
+enum SDPOutput {
   /// The primal solution (n x 1) - may be used as initial guess [x]
   SDP_SOLVER_X,
   /// The solution P (m x m) - may be used as initial guess [p]
@@ -149,7 +149,7 @@ enum SDPOutput{
   SDP_SOLVER_NUM_OUT};
 
 /// Structure specification of an SDP [sdpStruct]
-enum SDPStruct{
+enum SDPStruct {
   /// The horizontal stack of all matrices F_i: ( m x nm) [f]
   SDP_STRUCT_F,
   /// The matrix G: ( m x m) [g]
@@ -169,7 +169,7 @@ class SDPSolverInternal;
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT SDPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT SDPSolver : public Function {
   public:
 
   /// Default constructor

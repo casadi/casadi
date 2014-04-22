@@ -22,39 +22,39 @@
 
 #include "direct_multiple_shooting_internal.hpp"
 
-namespace casadi{
+namespace casadi {
 
-DirectMultipleShooting::DirectMultipleShooting(){
+DirectMultipleShooting::DirectMultipleShooting() {
 }
 
 DirectMultipleShooting::DirectMultipleShooting(const Function& ffcn, const Function& mfcn,
-                                               const Function& cfcn, const Function& rfcn){
+                                               const Function& cfcn, const Function& rfcn) {
   assignNode(new DirectMultipleShootingInternal(ffcn,mfcn,cfcn,rfcn));
 }
 
-const DirectMultipleShootingInternal* DirectMultipleShooting::operator->() const{
+const DirectMultipleShootingInternal* DirectMultipleShooting::operator->() const {
   return static_cast<const DirectMultipleShootingInternal*>(Function::operator->());
 }
 
-DirectMultipleShootingInternal* DirectMultipleShooting::operator->(){
+DirectMultipleShootingInternal* DirectMultipleShooting::operator->() {
   return static_cast<DirectMultipleShootingInternal*>(Function::operator->());
 }
 
-void DirectMultipleShooting::getGuess(std::vector<double>& V_init) const{
+void DirectMultipleShooting::getGuess(std::vector<double>& V_init) const {
   (*this)->getGuess(V_init);
 }
 
 void DirectMultipleShooting::getVariableBounds(std::vector<double>& V_min,
-                                               std::vector<double>& V_max) const{
+                                               std::vector<double>& V_max) const {
   (*this)->getVariableBounds(V_min,V_max);
 }
 
 void DirectMultipleShooting::getConstraintBounds(std::vector<double>& G_min,
-                                                 std::vector<double>& G_max) const{
+                                                 std::vector<double>& G_max) const {
   (*this)->getConstraintBounds(G_min,G_max);
 }
 
-void DirectMultipleShooting::setOptimalSolution( const std::vector<double> &V_opt ){
+void DirectMultipleShooting::setOptimalSolution( const std::vector<double> &V_opt ) {
   (*this)->setOptimalSolution(V_opt);
 }
 

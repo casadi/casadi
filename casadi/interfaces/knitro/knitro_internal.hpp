@@ -28,17 +28,17 @@
 #include "casadi/symbolic/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /**
      @copydoc NLPSolver_doc
   */
-  class CASADI_KNITRO_INTERFACE_EXPORT KnitroInternal : public NLPSolverInternal{
+  class CASADI_KNITRO_INTERFACE_EXPORT KnitroInternal : public NLPSolverInternal {
 
   public:
     explicit KnitroInternal(const Function& nlp);
     virtual ~KnitroInternal();
-    virtual KnitroInternal* clone() const{ return new KnitroInternal(*this);}
+    virtual KnitroInternal* clone() const { return new KnitroInternal(*this);}
 
     virtual void init();
     virtual void evaluate();

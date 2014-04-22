@@ -35,7 +35,7 @@ INPUTSCHEME(DPLEInput)
 OUTPUTSCHEME(DPLEOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   SimpleIndefDpleInternal::SimpleIndefDpleInternal(
       const std::vector< Sparsity > & A,
@@ -51,11 +51,11 @@ namespace casadi{
 
   }
 
-  SimpleIndefDpleInternal::~SimpleIndefDpleInternal(){
+  SimpleIndefDpleInternal::~SimpleIndefDpleInternal() {
 
   }
 
-  void SimpleIndefDpleInternal::init(){
+  void SimpleIndefDpleInternal::init() {
 
     DpleInternal::init();
 
@@ -105,7 +105,7 @@ namespace casadi{
 
 
 
-  void SimpleIndefDpleInternal::evaluate(){
+  void SimpleIndefDpleInternal::evaluate() {
     for (int i=0;i<getNumInputs();++i) {
       std::copy(input(i).begin(),input(i).end(),f_.input(i).begin());
     }
@@ -121,12 +121,11 @@ namespace casadi{
 
 
   void SimpleIndefDpleInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied)
-  {
+      std::map<SharedObjectNode*,SharedObject>& already_copied) {
     DpleInternal::deepCopyMembers(already_copied);
   }
 
-  SimpleIndefDpleInternal* SimpleIndefDpleInternal::clone() const{
+  SimpleIndefDpleInternal* SimpleIndefDpleInternal::clone() const {
     // Return a deep copy
     SimpleIndefDpleInternal* node = new SimpleIndefDpleInternal(A_,V_);
     node->setOption(dictionary());

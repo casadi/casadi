@@ -31,9 +31,9 @@
 #include "casadi/integration/integration_tools.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
-class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolverInternal{
+class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolverInternal {
   friend class DirectCollocation;
 
   public:
@@ -42,7 +42,7 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolver
                               const Function& cfcn, const Function& rfcn);
 
     // clone
-    virtual DirectCollocationInternal* clone() const{ return new DirectCollocationInternal(*this);}
+    virtual DirectCollocationInternal* clone() const { return new DirectCollocationInternal(*this);}
 
     // Destructor
     virtual ~DirectCollocationInternal();

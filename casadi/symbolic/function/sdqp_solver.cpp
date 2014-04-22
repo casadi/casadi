@@ -23,21 +23,21 @@
 #include "sdqp_solver_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 
 SDQPSolver::SDQPSolver() {
 }
 
-SDQPSolverInternal* SDQPSolver::operator->(){
+SDQPSolverInternal* SDQPSolver::operator->() {
   return static_cast<SDQPSolverInternal*>(Function::operator->());
 }
 
-const SDQPSolverInternal* SDQPSolver::operator->() const{
+const SDQPSolverInternal* SDQPSolver::operator->() const {
     return static_cast<const SDQPSolverInternal*>(Function::operator->());
 }
 
-bool SDQPSolver::checkNode() const{
+bool SDQPSolver::checkNode() const {
   return dynamic_cast<const SDQPSolverInternal*>(get())!=0;
 }
 

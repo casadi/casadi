@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /// Forward declaration
   class OutputNode;
@@ -38,7 +38,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT MultipleOutput : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT MultipleOutput : public MXNode {
     friend class OutputNode;
   public:
 
@@ -58,11 +58,11 @@ namespace casadi{
     virtual const Sparsity& sparsity(int oind) const=0;
 
     /** \brief  Check if a multiple output node */
-    virtual bool isMultipleOutput() const{return true;}
+    virtual bool isMultipleOutput() const {return true;}
 
   };
 
-  class CASADI_SYMBOLIC_EXPORT OutputNode : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT OutputNode : public MXNode {
   public:
 
     /** \brief  Constructor */
@@ -72,31 +72,31 @@ namespace casadi{
     virtual ~OutputNode();
 
     /** \brief  Clone function */
-    virtual OutputNode* clone() const{ return new OutputNode(*this);}
+    virtual OutputNode* clone() const { return new OutputNode(*this);}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Is the node nonlinear */
-    virtual bool isNonLinear(){return true;}
+    virtual bool isNonLinear() {return true;}
 
     /** \brief  Check if evaluation output */
-    virtual bool isOutputNode() const{return true;}
+    virtual bool isOutputNode() const {return true;}
 
     /** \brief  Get function input */
-    virtual int getFunctionInput() const{ return -1;}
+    virtual int getFunctionInput() const { return -1;}
 
     /** \brief  Get function output */
-    virtual int getFunctionOutput() const{ return oind_;}
+    virtual int getFunctionOutput() const { return oind_;}
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return -1;}
+    virtual int getOp() const { return -1;}
 
     /// Create a horizontal concatenation node
-    virtual MX getHorzcat(const std::vector<MX>& x) const{ return dep()->getHorzcat(x);}
+    virtual MX getHorzcat(const std::vector<MX>& x) const { return dep()->getHorzcat(x);}
 
     /// Create a vertical concatenation node (vectors only)
-    virtual MX getVertcat(const std::vector<MX>& x) const{ return dep()->getVertcat(x);}
+    virtual MX getVertcat(const std::vector<MX>& x) const { return dep()->getVertcat(x);}
 
     /** \brief  Output index */
     int oind_;

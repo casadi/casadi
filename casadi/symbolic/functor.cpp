@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
   Function DerivativeGenerator::operator()(Function& fcn, int nfwd, int nadj, void* user_data) {
     checkNode();

@@ -24,38 +24,38 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
   SubRef::SubRef(const MX& x, const Slice& i, const Slice& j) : i_(i), j_(j) {
     setDependencies(x);
   }
 
-  SubRef* SubRef::clone() const{
+  SubRef* SubRef::clone() const {
     return new SubRef(*this);
   }
 
   void SubRef::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                         std::vector<double>& rtmp){
+                         std::vector<double>& rtmp) {
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   void SubRef::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                          std::vector<SXElement>& rtmp){
+                          std::vector<SXElement>& rtmp) {
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
   void SubRef::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                           std::vector<T>& rtmp){
+                           std::vector<T>& rtmp) {
     input[0]->getSub(*output[0],j_,i_);
   }
 
-  void SubRef::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void SubRef::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     casadi_error("not ready");
   }
 
-  void SubRef::printPart(std::ostream &stream, int part) const{
-    if(part==0){
+  void SubRef::printPart(std::ostream &stream, int part) const {
+    if(part==0) {
       stream << "(";
     } else {
       stream << "[" << i_ << "," << j_ << "])";
@@ -64,12 +64,12 @@ namespace casadi{
 
   void SubRef::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                           MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                          bool output_given){
+                          bool output_given) {
     casadi_error("not ready");
   }
 
   void SubRef::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                 const std::vector<std::string>& res, CodeGenerator& gen) const{
+                                 const std::vector<std::string>& res, CodeGenerator& gen) const {
     casadi_error("not ready");
   }
 

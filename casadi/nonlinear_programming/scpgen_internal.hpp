@@ -30,14 +30,14 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
-class CASADI_NONLINEAR_PROGRAMMING_EXPORT SCPgenInternal : public NLPSolverInternal{
+class CASADI_NONLINEAR_PROGRAMMING_EXPORT SCPgenInternal : public NLPSolverInternal {
 
 public:
   explicit SCPgenInternal(const Function& nlp);
   virtual ~SCPgenInternal();
-  virtual SCPgenInternal* clone() const{ return new SCPgenInternal(*this);}
+  virtual SCPgenInternal* clone() const { return new SCPgenInternal(*this);}
 
   virtual void init();
   virtual void evaluate();
@@ -172,7 +172,7 @@ public:
   int mod_f_, mod_gl_, mod_g_;
   int mod_du_, mod_dlam_g_;
 
-  struct Var{
+  struct Var {
     int n;
     MX v, v_def, v_lam, v_defL;
     MX d, d_def, d_lam, d_defL;

@@ -26,7 +26,7 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
   Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b,
                        linearSolverCreator lsolver, const Dictionary& dict) {

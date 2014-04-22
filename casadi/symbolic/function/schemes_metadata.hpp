@@ -28,7 +28,7 @@
 #include <utility>
 #include <map>
 #include "../casadi_exception.hpp"
-namespace casadi{
+namespace casadi {
 template <class T>
 class IOSchemeVector;class Sparsity;
 enum InputOutputScheme {

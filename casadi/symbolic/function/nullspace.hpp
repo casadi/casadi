@@ -38,7 +38,7 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
   // Forward declaration of internal class
   class NullspaceInternal;
@@ -50,7 +50,7 @@ namespace casadi{
       \date 2014
   */
 
-  class CASADI_SYMBOLIC_EXPORT Nullspace : public Function{
+  class CASADI_SYMBOLIC_EXPORT Nullspace : public Function {
   public:
 
     /// Default constructor

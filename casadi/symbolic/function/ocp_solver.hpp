@@ -27,13 +27,13 @@
 
 #include "function.hpp"
 
-namespace casadi{
+namespace casadi {
 
 
 /// Input arguments of a Mayer Term \n [mayerIn]
 ///   nx: Number of states: from ffcn.input(INTEGRATOR_X0).size() \n
 ///   np: Number of parameters: from option number_of_parameters\n
-enum MayerInput{
+enum MayerInput {
   /// States at the end of integration (nx x 1) [x]
   MAYER_X,
   /// Problem parameters (np x 1) [p]
@@ -49,7 +49,7 @@ enum MayerInput{
 ///   nu: Number of controls: from nc - np \n
 ///   np: Number of parameters: from option number_of_parameters\n
 ///   nh: Number of point constraints: from cfcn.input(0).size()
-enum OCPInput{
+enum OCPInput {
   /// States lower bounds (nx x (ns+1)) [lbx]
   OCP_LBX,
   /// States upper bounds (nx x (ns+1)) [ubx]
@@ -81,7 +81,7 @@ enum OCPInput{
 };
 
 /// Output arguments of an OCP Solver [ocpOut]
-enum OCPOutput{
+enum OCPOutput {
   /// Optimal state trajectory [x_opt]
   OCP_X_OPT,
   /// Optimal control trajectory [u_opt]
@@ -103,7 +103,7 @@ enum OCPOutput{
       \author Joel Andersson
       \date 2011-2013
   */
-  class CASADI_SYMBOLIC_EXPORT OCPSolver : public Function{
+  class CASADI_SYMBOLIC_EXPORT OCPSolver : public Function {
   public:
 
     /// Default constructor

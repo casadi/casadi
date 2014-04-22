@@ -65,7 +65,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static SDPSolver creator(const SDPStructure &st){ return DSDPSolver(st);}
+  static SDPSolver creator(const SDPStructure &st) { return DSDPSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

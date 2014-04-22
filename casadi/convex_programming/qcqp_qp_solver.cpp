@@ -24,9 +24,9 @@
 #include "qcqp_qp_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-QCQPQPSolver::QCQPQPSolver(){
+QCQPQPSolver::QCQPQPSolver() {
 }
 
 
@@ -34,16 +34,16 @@ QCQPQPSolver::QCQPQPSolver(const QPStructure & st)  {
   assignNode(new QCQPQPInternal(st));
 }
 
-QCQPQPInternal* QCQPQPSolver::operator->(){
+QCQPQPInternal* QCQPQPSolver::operator->() {
   return static_cast<QCQPQPInternal*>(Function::operator->());
 }
 
-const QCQPQPInternal* QCQPQPSolver::operator->() const{
+const QCQPQPInternal* QCQPQPSolver::operator->() const {
   return static_cast<const QCQPQPInternal*>(Function::operator->());
 
 }
 
-bool QCQPQPSolver::checkNode() const{
+bool QCQPQPSolver::checkNode() const {
   return dynamic_cast<const QCQPQPInternal*>(get());
 }
 

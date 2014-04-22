@@ -29,13 +29,13 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Split: Split into multiple expressions splitting the nonzeros
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_SYMBOLIC_EXPORT Split : public MultipleOutput{
+  class CASADI_SYMBOLIC_EXPORT Split : public MultipleOutput {
   public:
     /// Constructor
     Split(const MX& x, const std::vector<int>& offset);
@@ -44,10 +44,10 @@ namespace casadi{
     virtual ~Split() = 0;
 
     /** \brief  Number of outputs */
-    virtual int getNumOutputs() const{ return output_sparsity_.size(); }
+    virtual int getNumOutputs() const { return output_sparsity_.size(); }
 
     /** \brief  Get the sparsity of output oind */
-    virtual const Sparsity& sparsity(int oind) const{ return output_sparsity_.at(oind);}
+    virtual const Sparsity& sparsity(int oind) const { return output_sparsity_.at(oind);}
 
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
@@ -77,17 +77,17 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT Horzsplit : public Split{
+  class CASADI_SYMBOLIC_EXPORT Horzsplit : public Split {
   public:
 
     /// Constructor
     Horzsplit(const MX& x, const std::vector<int>& offset);
 
     /// Destructor
-    virtual ~Horzsplit(){}
+    virtual ~Horzsplit() {}
 
     /// Clone function
-    virtual Horzsplit* clone() const{ return new Horzsplit(*this);}
+    virtual Horzsplit* clone() const { return new Horzsplit(*this);}
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -98,7 +98,7 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_HORZSPLIT;}
+    virtual int getOp() const { return OP_HORZSPLIT;}
 
     /// Create a horizontal concatenation node
     virtual MX getHorzcat(const std::vector<MX>& x) const;
@@ -108,17 +108,17 @@ namespace casadi{
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_SYMBOLIC_EXPORT Vertsplit : public Split{
+  class CASADI_SYMBOLIC_EXPORT Vertsplit : public Split {
   public:
 
     /// Constructor
     Vertsplit(const MX& x, const std::vector<int>& offset);
 
     /// Destructor
-    virtual ~Vertsplit(){}
+    virtual ~Vertsplit() {}
 
     /// Clone function
-    virtual Vertsplit* clone() const{ return new Vertsplit(*this);}
+    virtual Vertsplit* clone() const { return new Vertsplit(*this);}
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -129,7 +129,7 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_VERTSPLIT;}
+    virtual int getOp() const { return OP_VERTSPLIT;}
 
     /// Create a vertical concatenation node (vectors only)
     virtual MX getVertcat(const std::vector<MX>& x) const;

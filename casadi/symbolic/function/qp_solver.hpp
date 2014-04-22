@@ -53,10 +53,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
   /// Input arguments of a QP problem [qpIn]
-  enum QPSolverInput{
+  enum QPSolverInput {
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
     /// The matrix is assumed to be symmetrical. [h]
     QP_SOLVER_H,
@@ -79,7 +79,7 @@ namespace casadi{
     QP_SOLVER_NUM_IN};
 
   /// Output arguments of an QP Solver [qpOut]
-  enum QPSolverOutput{
+  enum QPSolverOutput {
     /// The primal solution [x]
     QP_SOLVER_X,
     /// The optimal cost [cost]
@@ -92,7 +92,7 @@ namespace casadi{
 
 
   /// Structure specification of a QP [qpStruct]
-  enum QPStruct{
+  enum QPStruct {
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
     /// The matrix is assumed to be symmetrical. [h]
     QP_STRUCT_H,
@@ -111,7 +111,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT QPSolver : public Function{
+  class CASADI_SYMBOLIC_EXPORT QPSolver : public Function {
   public:
 
     /// Default constructor

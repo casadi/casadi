@@ -34,7 +34,7 @@
 using namespace std;
 namespace casadi {
 
-  DSDPInternal* DSDPInternal::clone() const{
+  DSDPInternal* DSDPInternal::clone() const {
     // Return a deep copy
     DSDPInternal* node = new DSDPInternal(st_);
     if(!node->is_init_)
@@ -42,7 +42,7 @@ namespace casadi {
     return node;
   }
 
-  DSDPInternal::DSDPInternal(const std::vector<Sparsity> &st) : SDPSolverInternal(st){
+  DSDPInternal::DSDPInternal(const std::vector<Sparsity> &st) : SDPSolverInternal(st) {
     casadi_assert_message(
       static_cast<double>(m_)*(static_cast<double>(m_)+1)/2 < std::numeric_limits<int>::max(),
       "Your problem size m is too large to be handled by DSDP.");
@@ -81,15 +81,15 @@ namespace casadi {
     sdpcone_ = 0;
   }
 
-  DSDPInternal::~DSDPInternal(){
-    if(dsdp_!=0){
+  DSDPInternal::~DSDPInternal() {
+    if(dsdp_!=0) {
       DSDPDestroy(dsdp_);
       dsdp_ = 0;
     }
   }
 
-  const char* DSDPInternal::terminationReason(int flag){
-    switch(flag){
+  const char* DSDPInternal::terminationReason(int flag) {
+    switch(flag) {
     case DSDP_CONVERGED: return "DSDP_CONVERGED";
     case DSDP_MAX_IT: return "DSDP_MAX_IT";
     case DSDP_INFEASIBLE_START: return "DSDP_INFEASIBLE_START";
@@ -103,8 +103,8 @@ namespace casadi {
     }
   }
 
-  const char* DSDPInternal::solutionType(int flag){
-    switch(flag){
+  const char* DSDPInternal::solutionType(int flag) {
+    switch(flag) {
     case DSDP_PDFEASIBLE: return  "DSDP_PDFEASIBLE";
     case DSDP_UNBOUNDED: return  "DSDP_UNBOUNDED";
     case DSDP_INFEASIBLE: return  "DSDP_INFEASIBLE";
@@ -113,7 +113,7 @@ namespace casadi {
     }
   }
 
-  void DSDPInternal::init(){
+  void DSDPInternal::init() {
     // Initialize the base classes
     SDPSolverInternal::init();
     log("DSDPInternal::init","Enter");
@@ -135,7 +135,7 @@ namespace casadi {
         for(int cc=0; cc<colind.size()-1; ++cc) {
           int rr;
           // upper triangular part (= lower triangular part for row-major)
-          for(int el=colind[cc]; el<colind[cc+1] && (rr=row[el])<=cc; ++el){
+          for(int el=colind[cc]; el<colind[cc+1] && (rr=row[el])<=cc; ++el) {
             pattern_[i][j][nz++] = cc*(cc + 1)/2 + rr; // DSDP is row-major --> indices swapped
           }
         }
@@ -189,7 +189,7 @@ namespace casadi {
     // Seems unavoidable to do DSDPCreate here
 
     // Destroy existing DSDP instance if already allocated
-    if(dsdp_!=0){
+    if(dsdp_!=0) {
       DSDPDestroy(dsdp_);
       dsdp_ = 0;
     }
@@ -204,7 +204,7 @@ namespace casadi {
     DSDPSetStandardMonitor(dsdp_,getOption("_printlevel"));
 
     DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
-    for(int j=0; j<nb_; ++j){
+    for(int j=0; j<nb_; ++j) {
       log("DSDPInternal::init","Setting");
       SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
       SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);

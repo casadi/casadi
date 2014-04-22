@@ -39,7 +39,7 @@
 
 
 
-namespace casadi{
+namespace casadi {
 
   /** \brief  forward declaration of Node and Matrix */
   class SXNode; // include will follow in the end
@@ -212,13 +212,13 @@ namespace casadi{
     SXElement __pow__(const SXElement& b) const;
     SXElement __constpow__(const SXElement& b) const;
 
-    SXElement __mrdivide__(const SXElement& b) const{  return *this / b;}
+    SXElement __mrdivide__(const SXElement& b) const {  return *this / b;}
     SXElement __mpower__(const SXElement& b) const {return (*this).__pow__(b);}
-    SXElement trans() const{ return *this;}
+    SXElement trans() const { return *this;}
 
     // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
-    SXElement mul(const SXElement& y) const{ return __mul__(y);}
+    SXElement mul(const SXElement& y) const { return __mul__(y);}
     SXElement exp() const;
     SXElement log() const;
     SXElement sqrt() const;
@@ -283,7 +283,7 @@ namespace casadi{
     /// \endcond
 
     /** \brief SXElement nodes are not allowed to be null */
-    inline bool isNull(){return false;}
+    inline bool isNull() {return false;}
 
 #ifndef SWIG
   private:
@@ -372,12 +372,12 @@ namespace casadi{
 
 /// \cond INTERNAL
 // Template specialization
-namespace casadi{
+namespace casadi {
   template<> inline std::string matrixName<SXElement>() { return "SX"; }
 } // namespace casadi
 /// \endcond
 
-namespace std{
+namespace std {
   template<>
   class CASADI_SYMBOLIC_EXPORT numeric_limits<casadi::SXElement>{
   public:

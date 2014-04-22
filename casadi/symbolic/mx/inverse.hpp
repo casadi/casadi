@@ -29,22 +29,22 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Matrix inverse
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT Inverse : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Inverse : public MXNode {
   public:
 
     /// Constructor
     Inverse(const MX& x);
 
     /// Clone function
-    virtual Inverse* clone() const{ return new Inverse(*this);}
+    virtual Inverse* clone() const { return new Inverse(*this);}
 
     /// Destructor
-    virtual ~Inverse(){}
+    virtual ~Inverse() {}
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -55,7 +55,7 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_INVERSE;}
+    virtual int getOp() const { return OP_INVERSE;}
   };
 
 

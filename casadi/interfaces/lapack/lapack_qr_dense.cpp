@@ -24,31 +24,31 @@
 #include "../../symbolic/std_vector_tools.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  LapackQRDense::LapackQRDense(){
+  LapackQRDense::LapackQRDense() {
   }
 
-  LapackQRDense::LapackQRDense(const Sparsity& sparsity, int nrhs){
+  LapackQRDense::LapackQRDense(const Sparsity& sparsity, int nrhs) {
     assignNode(new LapackQRDenseInternal(sparsity,nrhs));
   }
 
-  LapackQRDenseInternal* LapackQRDense::operator->(){
+  LapackQRDenseInternal* LapackQRDense::operator->() {
     return static_cast<LapackQRDenseInternal*>(Function::operator->());
   }
 
-  const LapackQRDenseInternal* LapackQRDense::operator->() const{
+  const LapackQRDenseInternal* LapackQRDense::operator->() const {
     return static_cast<const LapackQRDenseInternal*>(Function::operator->());
   }
 
   LapackQRDenseInternal::LapackQRDenseInternal(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity,nrhs){
+      LinearSolverInternal(sparsity,nrhs) {
   }
 
-  LapackQRDenseInternal::~LapackQRDenseInternal(){
+  LapackQRDenseInternal::~LapackQRDenseInternal() {
   }
 
-  void LapackQRDenseInternal::init(){
+  void LapackQRDenseInternal::init() {
     // Call the base class initializer
     LinearSolverInternal::init();
 
@@ -66,7 +66,7 @@ namespace casadi{
     work_.resize(10*ncol_);
   }
 
-  void LapackQRDenseInternal::prepare(){
+  void LapackQRDenseInternal::prepare() {
     prepared_ = false;
 
     // Get the elements of the matrix, dense format
@@ -83,7 +83,7 @@ namespace casadi{
     prepared_ = true;
   }
 
-  void LapackQRDenseInternal::solve(double* x, int nrhs, bool transpose){
+  void LapackQRDenseInternal::solve(double* x, int nrhs, bool transpose) {
     // Properties of R
     char uploR = 'U';
     char diagR = 'N';
@@ -97,7 +97,7 @@ namespace casadi{
     int k = tau_.size(); // minimum of ncol_ and nrow_
     int lwork = work_.size();
 
-    if(transpose){
+    if(transpose) {
 
       // Solve for transpose(R)
       dtrsm_(&sideR, &uploR, &transR, &diagR, &ncol_, &nrhs, &alphaR,
@@ -125,7 +125,7 @@ namespace casadi{
     }
   }
 
-  LapackQRDenseInternal* LapackQRDenseInternal::clone() const{
+  LapackQRDenseInternal* LapackQRDenseInternal::clone() const {
     return new LapackQRDenseInternal(*this);
   }
 

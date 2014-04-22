@@ -27,12 +27,12 @@
 #include "snopt_solver.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /**
      @copydoc NLPSolver_doc
   */
-  class CASADI_SNOPT_INTERFACE_EXPORT SnoptInternal : public NLPSolverInternal{
+  class CASADI_SNOPT_INTERFACE_EXPORT SnoptInternal : public NLPSolverInternal {
 
   public:
     // Constructor

@@ -29,13 +29,13 @@
 
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   // Forward declaration of internal class
   class ImplicitFunctionInternal;
 
   /// Internal class
-  class CASADI_SYMBOLIC_EXPORT ImplicitFunctionInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT ImplicitFunctionInternal : public FunctionInternal {
   public:
     /** \brief Constructor
      *
@@ -64,7 +64,7 @@ namespace casadi{
     virtual void spEvaluate(bool fwd);
 
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd){ return true;}
+    virtual bool spCanEvaluate(bool fwd) { return true;}
 
     /// Solve the system of equations and calculate derivatives
     virtual void evaluate();

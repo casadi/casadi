@@ -45,10 +45,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
   /// Input arguments of an NLP function [nlpIn]
-  enum NLPInput{
+  enum NLPInput {
     /// Decision variable [x]
     NL_X,
     /// Fixed parameter [p]
@@ -58,7 +58,7 @@ namespace casadi{
   };
 
   /// Output arguments of an NLP function [nlpOut]
-  enum NLPOutput{
+  enum NLPOutput {
     /// Objective function [f]
     NL_F,
     /// Constraint function [g]
@@ -68,7 +68,7 @@ namespace casadi{
   };
 
   /// Input arguments of an NLP objective gradient function [gradFIn]
-  enum GradFInput{
+  enum GradFInput {
     /// Decision variable [x]
     GRADF_X,
     /// Fixed parameter [p]
@@ -78,7 +78,7 @@ namespace casadi{
   };
 
   /// Output arguments of an NLP objective gradient function [gradFOut]
-  enum GradFOutput{
+  enum GradFOutput {
     /// Jacobian of the constraints [grad]
     GRADF_GRAD,
     /// Objective function [f]
@@ -90,7 +90,7 @@ namespace casadi{
   };
 
   /// Input arguments of an NLP Jacobian function [jacGIn]
-  enum JacGInput{
+  enum JacGInput {
     /// Decision variable [x]
     JACG_X,
     /// Fixed parameter [p]
@@ -100,7 +100,7 @@ namespace casadi{
   };
 
   /// Output arguments of an NLP Jacobian function [jacGOut]
-  enum JacGOutput{
+  enum JacGOutput {
     /// Jacobian of the constraints [jac]
     JACG_JAC,
     /// Objective function [f]
@@ -112,7 +112,7 @@ namespace casadi{
   };
 
   /// Input arguments of an NLP Hessian function [hessLagIn]
-  enum HessLagInput{
+  enum HessLagInput {
     /// Decision variable [x]
     HESSLAG_X,
     /// Fixed parameter [p]
@@ -127,7 +127,7 @@ namespace casadi{
   };
 
   /// Output arguments of an NLP Hessian function [hessLagOut]
-  enum HessLagOutput{
+  enum HessLagOutput {
     /// Hessian of the Lagrangian [hess]
     HESSLAG_HESS,
     /// Objective function [f]
@@ -143,7 +143,7 @@ namespace casadi{
   };
 
   /// Input arguments of an NLP Solver [nlpSolverIn]
-  enum NLPSolverInput{
+  enum NLPSolverInput {
     /// Decision variables, initial guess (nx x 1)  [x0]
     NLP_SOLVER_X0,
     /// Value of fixed parameters (np x 1) [p]
@@ -164,7 +164,7 @@ namespace casadi{
   };
 
   /// Output arguments of an NLP Solver [nlpSolverOut]
-  enum NLPSolverOutput{
+  enum NLPSolverOutput {
     /// Decision variables at the optimal solution (nx x 1) [x]
     NLP_SOLVER_X,
     /// Cost function value at the optimal solution (1 x 1) [f]
@@ -189,7 +189,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT NLPSolver : public Function{
+  class CASADI_SYMBOLIC_EXPORT NLPSolver : public Function {
   public:
 
     /// Default constructor

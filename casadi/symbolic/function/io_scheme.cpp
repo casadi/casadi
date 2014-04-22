@@ -23,9 +23,9 @@
 #include "io_scheme.hpp"
 #include "io_scheme_internal.hpp"
 
-namespace casadi{
+namespace casadi {
 
-  IOScheme::IOScheme(){
+  IOScheme::IOScheme() {
   }
 
   IOScheme::IOScheme(InputOutputScheme scheme) {
@@ -47,8 +47,7 @@ namespace casadi{
       const std::string &arg_s12, const std::string &arg_s13,
       const std::string &arg_s14, const std::string &arg_s15,
       const std::string &arg_s16, const std::string &arg_s17,
-      const std::string &arg_s18, const std::string &arg_s19)
-  {
+      const std::string &arg_s18, const std::string &arg_s19) {
     std::vector<std::string> k;
     if (arg_s0!="") { k.push_back(arg_s0);}
     if (arg_s1!="") { k.push_back(arg_s1);}
@@ -73,15 +72,15 @@ namespace casadi{
     assignNode(new IOSchemeCustomInternal(k));
   }
 
-  IOSchemeInternal* IOScheme::operator->(){
+  IOSchemeInternal* IOScheme::operator->() {
     return static_cast<IOSchemeInternal*>(SharedObject::operator->());
   }
 
-  const IOSchemeInternal* IOScheme::operator->() const{
+  const IOSchemeInternal* IOScheme::operator->() const {
     return static_cast<const IOSchemeInternal*>(SharedObject::operator->());
   }
 
-  bool IOScheme::checkNode() const{
+  bool IOScheme::checkNode() const {
     return dynamic_cast<const IOScheme*>(get())!=0;
   }
 

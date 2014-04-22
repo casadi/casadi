@@ -30,31 +30,31 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  Reshape::Reshape(const MX& x, Sparsity sp){
+  Reshape::Reshape(const MX& x, Sparsity sp) {
     casadi_assert(x.size()==sp.size());
     setDependencies(x);
     setSparsity(sp);
   }
 
-  Reshape* Reshape::clone() const{
+  Reshape* Reshape::clone() const {
     return new Reshape(*this);
   }
 
   void Reshape::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                          std::vector<double>& rtmp){
+                          std::vector<double>& rtmp) {
     evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
   }
 
   void Reshape::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                           std::vector<SXElement>& rtmp){
+                           std::vector<SXElement>& rtmp) {
     evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
   void Reshape::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                            std::vector<T>& rtmp){
+                            std::vector<T>& rtmp) {
     // Quick return if inplace
     if(input[0]==output[0]) return;
 
@@ -63,25 +63,25 @@ namespace casadi{
     copy(arg.begin(),arg.end(),res.begin());
   }
 
-  void Reshape::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void Reshape::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     // Quick return if inplace
     if(input[0]==output[0]) return;
 
     bvec_t *res_ptr = get_bvec_t(output[0]->data());
     vector<double>& arg = input[0]->data();
     bvec_t *arg_ptr = get_bvec_t(arg);
-    if(fwd){
+    if(fwd) {
       copy(arg_ptr, arg_ptr+arg.size(), res_ptr);
     } else {
-      for(int k=0; k<arg.size(); ++k){
+      for(int k=0; k<arg.size(); ++k) {
         *arg_ptr++ |= *res_ptr;
         *res_ptr++ = 0;
       }
     }
   }
 
-  void Reshape::printPart(std::ostream &stream, int part) const{
-    if(part==0){
+  void Reshape::printPart(std::ostream &stream, int part) const {
+    if(part==0) {
       stream << "reshape(";
     } else {
       stream << ")";
@@ -90,23 +90,23 @@ namespace casadi{
 
   void Reshape::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                           bool output_given){
+                           bool output_given) {
     // Quick return if inplace
     if(input[0]==output[0]) return;
 
-    if(!output_given){
+    if(!output_given) {
       *output[0] = reshape(*input[0],shape());
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d = 0; d<nfwd; ++d){
+    for(int d = 0; d<nfwd; ++d) {
       *fwdSens[d][0] = reshape(*fwdSeed[d][0],shape());
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
-    for(int d=0; d<nadj; ++d){
+    for(int d=0; d<nadj; ++d) {
       MX& aseed = *adjSeed[d][0];
       MX& asens = *adjSens[d][0];
       asens.addToSum(reshape(aseed,dep().shape()));
@@ -115,7 +115,7 @@ namespace casadi{
   }
 
   void Reshape::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                  const std::vector<std::string>& res, CodeGenerator& gen) const{
+                                  const std::vector<std::string>& res, CodeGenerator& gen) const {
     // Quick return if inplace
     if(arg[0].compare(res[0])==0) return;
 
@@ -123,7 +123,7 @@ namespace casadi{
            << "[i] = " << arg.front() << "[i];" << endl;
   }
 
-  MX Reshape::getReshape(const Sparsity& sp) const{
+  MX Reshape::getReshape(const Sparsity& sp) const {
     return reshape(dep(0),sp);
   }
 

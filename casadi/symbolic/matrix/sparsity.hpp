@@ -56,7 +56,7 @@
   %rename(getNZ_const) getNZ(int, int) const;
 #endif
 
-namespace casadi{
+namespace casadi {
 
   // Forward declaration
   class SparsityInternal;
@@ -95,7 +95,7 @@ namespace casadi{
    * \author Joel Andersson
    * \date 2010
    */
-  class CASADI_SYMBOLIC_EXPORT Sparsity : public SharedObject{
+  class CASADI_SYMBOLIC_EXPORT Sparsity : public SharedObject {
   public:
 
     /// Default constructor
@@ -111,19 +111,19 @@ namespace casadi{
 
     /** \brief Create a scalar sparsity pattern **/
     ///@{
-    static Sparsity scalar(bool dense_scalar=true){ return dense_scalar ? dense(1,1) : sparse(1,1);}
+    static Sparsity scalar(bool dense_scalar=true) { return dense_scalar ? dense(1,1) : sparse(1,1);}
     ///@}
 
     /** \brief Create a dense rectangular sparsity pattern **/
     ///@{
     static Sparsity dense(int nrow, int ncol=1);
-    static Sparsity dense(const std::pair<int,int> &rc){ return dense(rc.first,rc.second);}
+    static Sparsity dense(const std::pair<int,int> &rc) { return dense(rc.first,rc.second);}
     ///@}
 
     /** \brief Create a sparse (empty) rectangular sparsity pattern **/
     ///@{
     static Sparsity sparse(int nrow, int ncol=1);
-    static Sparsity sparse(const std::pair<int,int> &rc){ return sparse(rc.first,rc.second);}
+    static Sparsity sparse(const std::pair<int,int> &rc) { return sparse(rc.first,rc.second);}
     ///@}
 
     /** \brief Create the sparsity pattern for a unit vector of length n and a nonzero on
@@ -140,9 +140,9 @@ namespace casadi{
 
     /** \brief Create diagonal sparsity pattern **/
     ///@{
-    static Sparsity diag(int nrow){ return diag(nrow,nrow);}
+    static Sparsity diag(int nrow) { return diag(nrow,nrow);}
     static Sparsity diag(int nrow, int ncol);
-    static Sparsity diag(const std::pair<int,int> &rc){ return diag(rc.first,rc.second);}
+    static Sparsity diag(const std::pair<int,int> &rc) { return diag(rc.first,rc.second);}
     ///@}
 
     /** \brief Create a single band in a square sparsity pattern
@@ -237,11 +237,11 @@ namespace casadi{
     bool isEqual(const Sparsity& y) const;
     bool isEqual(int nrow, int ncol, const std::vector<int>& colind,
                  const std::vector<int>& row) const;
-    bool operator==(const Sparsity& y) const{ return isEqual(y);}
+    bool operator==(const Sparsity& y) const { return isEqual(y);}
     /// @}
 
     /// Check if two sparsity patterns are difference
-    bool operator!=(const Sparsity& y) const{return !isEqual(y);}
+    bool operator!=(const Sparsity& y) const {return !isEqual(y);}
 
     /// \name Size and element counting
     /// @{
@@ -366,7 +366,7 @@ namespace casadi{
 
 #ifndef SWIG
     /// Transpose the matrix (shorthand)
-    Sparsity T() const{ return transpose();}
+    Sparsity T() const { return transpose();}
 #endif
 
     /** \brief Transpose the matrix and get the reordering of the non-zero entries
@@ -475,7 +475,7 @@ namespace casadi{
     bool isDense() const;
 
     /// Is vector (i.e. size2()==1)
-    bool isVector() const{ return size2()==1; }
+    bool isVector() const { return size2()==1; }
 
     /// Is diagonal?
     bool isDiagonal() const;
@@ -678,16 +678,16 @@ namespace casadi{
   /// \cond INTERNAL
   /** \brief Hash value of an integer */
   template<typename T>
-  inline size_t hash_value(T v){ return size_t(v);}
+  inline size_t hash_value(T v) { return size_t(v);}
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
   template<typename T>
-  inline void hash_combine(std::size_t& seed, T v){
+  inline void hash_combine(std::size_t& seed, T v) {
     seed ^= hash_value(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
   }
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
-  inline void hash_combine(std::size_t& seed, const std::vector<int>& v){
+  inline void hash_combine(std::size_t& seed, const std::vector<int>& v) {
     for(std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed,*i);
   }
 
@@ -700,7 +700,7 @@ namespace casadi{
   // Template instantiations
 #ifndef SWIG
   template<typename DataType>
-  void Sparsity::set(DataType* data, const DataType* val_data, const Sparsity& val_sp) const{
+  void Sparsity::set(DataType* data, const DataType* val_data, const Sparsity& val_sp) const {
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -714,7 +714,7 @@ namespace casadi{
     const int val_nel = val_sz1*val_sz2;
 
     // Check if sparsity matches
-    if(val_sp==*this){
+    if(val_sp==*this) {
       std::copy(val_data,val_data+sz,data);
     } else if (this->isEmpty()) {
       // Quick return
@@ -722,7 +722,7 @@ namespace casadi{
     } else if (val_sp.isEmpty()) {
       // Quick return
       return;
-    } else if(val_nel==1){ // if scalar
+    } else if(val_nel==1) { // if scalar
       std::fill(data,data+sz,val_sz==0 ? DataType(0) : val_data[0]);
     } else {
       // Quick return if empty
@@ -740,7 +740,7 @@ namespace casadi{
       const std::vector<int>& v_rind = val_sp.colind();
 
       // For all cols
-      for(int i=0; i<sz2; ++i){
+      for(int i=0; i<sz2; ++i) {
 
         // Nonzero of the assigning matrix
         int v_el = v_rind[i];
@@ -752,19 +752,19 @@ namespace casadi{
         int v_j = v_el<v_el_end ? v_c[v_el] : sz1;
 
         // Assign all nonzeros
-        for(int el=rind[i]; el!=rind[i+1]; ++el){
+        for(int el=rind[i]; el!=rind[i+1]; ++el) {
 
           //  Get row
           int j=c[el];
 
           // Forward the assigning nonzero
-          while(v_j<j){
+          while(v_j<j) {
             v_el++;
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }
 
           // Assign nonzero
-          if(v_j==j){
+          if(v_j==j) {
             data[el] = val_data[v_el++];
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           } else {
@@ -776,7 +776,7 @@ namespace casadi{
   }
 
   template<typename DataType>
-  void Sparsity::add(DataType* data, const DataType* val_data, const Sparsity& val_sp) const{
+  void Sparsity::add(DataType* data, const DataType* val_data, const Sparsity& val_sp) const {
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -790,8 +790,8 @@ namespace casadi{
     const int val_nel = val_sz1*val_sz2;
 
     // Check if sparsity matches
-    if(val_sp==*this){
-      for(int k=0; k<sz; ++k){
+    if(val_sp==*this) {
+      for(int k=0; k<sz; ++k) {
         data[k] += val_data[k];
       }
     } else if (this->isEmpty()) {
@@ -800,9 +800,9 @@ namespace casadi{
     } else if (val_sp.isEmpty()) {
       // Quick return
       return;
-    }  else if(val_nel==1){ // if scalar
-      if(val_sz!=0){
-        for(int k=0; k<sz; ++k){
+    }  else if(val_nel==1) { // if scalar
+      if(val_sz!=0) {
+        for(int k=0; k<sz; ++k) {
           data[k] += val_data[0];
         }
       }
@@ -823,7 +823,7 @@ namespace casadi{
       const std::vector<int>& v_rind = val_sp.colind();
 
       // For all cols
-      for(int i=0; i<sz2; ++i){
+      for(int i=0; i<sz2; ++i) {
 
         // Nonzero of the assigning matrix
         int v_el = v_rind[i];
@@ -835,19 +835,19 @@ namespace casadi{
         int v_j = v_el<v_el_end ? v_c[v_el] : sz1;
 
         // Assign all nonzeros
-        for(int el=rind[i]; el!=rind[i+1]; ++el){
+        for(int el=rind[i]; el!=rind[i+1]; ++el) {
 
           //  Get row
           int j=c[el];
 
           // Forward the assigning nonzero
-          while(v_j<j){
+          while(v_j<j) {
             v_el++;
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }
 
           // Assign nonzero
-          if(v_j==j){
+          if(v_j==j) {
             data[el] += val_data[v_el++];
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }
@@ -857,7 +857,7 @@ namespace casadi{
   }
 
   template<typename DataType>
-  void Sparsity::bor(DataType* data, const DataType* val_data, const Sparsity& val_sp) const{
+  void Sparsity::bor(DataType* data, const DataType* val_data, const Sparsity& val_sp) const {
     // Get dimensions of this
     const int sz = size();
     const int sz1 = size1();
@@ -871,8 +871,8 @@ namespace casadi{
     const int val_nel = val_sz1*val_sz2;
 
     // Check if sparsity matches
-    if(val_sp==*this){
-      for(int k=0; k<sz; ++k){
+    if(val_sp==*this) {
+      for(int k=0; k<sz; ++k) {
         data[k] |= val_data[k];
       }
     } else if (this->isEmpty()) {
@@ -881,9 +881,9 @@ namespace casadi{
     } else if (val_sp.isEmpty()) {
       // Quick return
       return;
-    }  else if(val_nel==1){ // if scalar
-      if(val_sz!=0){
-        for(int k=0; k<sz; ++k){
+    }  else if(val_nel==1) { // if scalar
+      if(val_sz!=0) {
+        for(int k=0; k<sz; ++k) {
           data[k] |= val_data[0];
         }
       }
@@ -903,7 +903,7 @@ namespace casadi{
       const std::vector<int>& v_rind = val_sp.colind();
 
       // For all columns
-      for(int i=0; i<sz2; ++i){
+      for(int i=0; i<sz2; ++i) {
 
         // Nonzero of the assigning matrix
         int v_el = v_rind[i];
@@ -915,19 +915,19 @@ namespace casadi{
         int v_j = v_el<v_el_end ? v_c[v_el] : sz1;
 
         // Assign all nonzeros
-        for(int el=rind[i]; el!=rind[i+1]; ++el){
+        for(int el=rind[i]; el!=rind[i+1]; ++el) {
 
           //  Get row
           int j=c[el];
 
           // Forward the assigning nonzero
-          while(v_j<j){
+          while(v_j<j) {
             v_el++;
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }
 
           // Assign nonzero
-          if(v_j==j){
+          if(v_j==j) {
             data[el] |= val_data[v_el++];
             v_j = v_el<v_el_end ? v_c[v_el] : sz1;
           }

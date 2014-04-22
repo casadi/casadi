@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
   //Call
 

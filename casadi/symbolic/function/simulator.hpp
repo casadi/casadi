@@ -25,7 +25,7 @@
 
 #include "integrator.hpp"
 
-namespace casadi{
+namespace casadi {
 
 // Forward declaration of internal class
 class SimulatorInternal;
@@ -47,7 +47,7 @@ class SimulatorInternal;
   \date 2010
 */
 
-class CASADI_SYMBOLIC_EXPORT Simulator : public Function{
+class CASADI_SYMBOLIC_EXPORT Simulator : public Function {
 public:
 
   /// Default constructor

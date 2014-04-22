@@ -24,9 +24,9 @@
 #include "nlp_qp_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-NLPQPSolver::NLPQPSolver(){
+NLPQPSolver::NLPQPSolver() {
 }
 
 
@@ -34,16 +34,16 @@ NLPQPSolver::NLPQPSolver(const QPStructure &st)  {
   assignNode(new NLPQPInternal(st));
 }
 
-NLPQPInternal* NLPQPSolver::operator->(){
+NLPQPInternal* NLPQPSolver::operator->() {
   return (NLPQPInternal*)(FX::operator->());
 }
 
-const NLPQPInternal* NLPQPSolver::operator->() const{
+const NLPQPInternal* NLPQPSolver::operator->() const {
   return (const NLPQPInternal*)(FX::operator->());
 
 }
 
-bool NLPQPSolver::checkNode() const{
+bool NLPQPSolver::checkNode() const {
   return dynamic_cast<const NLPQPInternal*>(get());
 }
 

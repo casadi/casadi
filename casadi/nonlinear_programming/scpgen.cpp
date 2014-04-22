@@ -24,24 +24,24 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  SCPgen::SCPgen(){
+  SCPgen::SCPgen() {
   }
 
-  SCPgen::SCPgen(const Function& nlp){
+  SCPgen::SCPgen(const Function& nlp) {
     assignNode(new SCPgenInternal(nlp));
   }
 
-  SCPgenInternal* SCPgen::operator->(){
+  SCPgenInternal* SCPgen::operator->() {
     return static_cast<SCPgenInternal*>(NLPSolver::operator->());
   }
 
-  const SCPgenInternal* SCPgen::operator->() const{
+  const SCPgenInternal* SCPgen::operator->() const {
     return static_cast<const SCPgenInternal*>(NLPSolver::operator->());
   }
 
-  bool SCPgen::checkNode() const{
+  bool SCPgen::checkNode() const {
     return dynamic_cast<const SCPgenInternal*>(get())!=0;
   }
 

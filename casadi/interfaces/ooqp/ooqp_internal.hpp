@@ -27,7 +27,7 @@
 #include "ooqp_solver.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for OOQPSolver
    *
@@ -41,7 +41,7 @@ namespace casadi{
     explicit OOQPInternal();
 
     /** \brief  Clone */
-    virtual OOQPInternal* clone() const{ return new OOQPInternal(*this);}
+    virtual OOQPInternal* clone() const { return new OOQPInternal(*this);}
 
     /** \brief  Create a new Solver */
     explicit OOQPInternal(const std::vector<Sparsity>& st);

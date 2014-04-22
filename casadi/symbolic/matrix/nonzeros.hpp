@@ -23,7 +23,7 @@
 #ifndef NONZEROS_HPP
 #define NONZEROS_HPP
 
-namespace casadi{
+namespace casadi {
 
 
 /** NonZeros class for Matrix
@@ -34,10 +34,10 @@ namespace casadi{
 
 /// Access to a set of nonzeros
 template<typename M, typename K>
-class CASADI_SYMBOLIC_EXPORT NonZeros : public M{
+class CASADI_SYMBOLIC_EXPORT NonZeros : public M {
   public:
     /// Constructor
-    NonZeros(M& mat, const K& k) : M(mat.getNZ(k)), mat_(mat), k_(k){}
+    NonZeros(M& mat, const K& k) : M(mat.getNZ(k)), mat_(mat), k_(k) {}
 
     ///@{
     /// Methods that modify a part of the parent object (A[k] = ?, A[k] += ?, etc.)
@@ -60,7 +60,7 @@ class CASADI_SYMBOLIC_EXPORT NonZeros : public M{
 #ifdef casadi_symbolic_implementation
 // Implementation
 template<typename M, typename K>
-const M& NonZeros<M,K>::operator=(const NonZeros<M,K> &y){
+const M& NonZeros<M,K>::operator=(const NonZeros<M,K> &y) {
   mat_.setNZ(k_,y);
   return y;
 }
@@ -73,28 +73,28 @@ const M& NonZeros<M,K>::operator=(const M &y) {
 }
 
 template<typename M, typename K>
-M NonZeros<M,K>::operator+=(const M &y){
+M NonZeros<M,K>::operator+=(const M &y) {
   M s = *this+y;
   mat_.setNZ(k_,s);
   return s;
 }
 
 template<typename M, typename K>
-M NonZeros<M,K>::operator-=(const M &y){
+M NonZeros<M,K>::operator-=(const M &y) {
   M s = *this-y;
   mat_.setNZ(k_,s);
   return s;
 }
 
 template<typename M, typename K>
-M NonZeros<M,K>::operator*=(const M &y){
+M NonZeros<M,K>::operator*=(const M &y) {
    M s = *this*y;
    mat_.setNZ(k_,s);
    return s;
 }
 
 template<typename M, typename K>
-M NonZeros<M,K>::operator/=(const M &y){
+M NonZeros<M,K>::operator/=(const M &y) {
   M s = *this/y;
   mat_.setNZ(k_,s);
   return s;

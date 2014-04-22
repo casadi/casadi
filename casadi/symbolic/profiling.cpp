@@ -22,7 +22,7 @@
 
 #include "profiling.hpp"
 
-namespace casadi{
+namespace casadi {
 
 #ifdef WITH_PROFILING
 
@@ -50,8 +50,7 @@ namespace casadi{
 #error "Unable to define getRealTime( ) for an unknown OS."
 #endif
 
-double getRealTime( )
-{
+double getRealTime( ) {
 #if defined(_WIN32)
     FILETIME tm;
     ULONGLONG t;
@@ -74,8 +73,7 @@ double getRealTime( )
 #elif defined(__MACH__) && defined(__APPLE__)
     /* OSX. ----------------------------------------------------- */
     static double timeConvert = 0.0;
-    if ( timeConvert == 0.0 )
-    {
+    if ( timeConvert == 0.0 ) {
         mach_timebase_info_data_t timeBase;
         (void)mach_timebase_info( &timeBase );
         timeConvert = static_cast<double>(timeBase.numer)/

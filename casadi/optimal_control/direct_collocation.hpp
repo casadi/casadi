@@ -29,7 +29,7 @@
 
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 
-namespace casadi{
+namespace casadi {
   class DirectCollocationInternal;
 
   /** \brief Direct collocation
@@ -37,7 +37,7 @@ namespace casadi{
    *   \author Joel Andersson
    *   \date 2012
   */
-class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocation : public OCPSolver{
+class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocation : public OCPSolver {
   public:
     /// Default constructor
     DirectCollocation();

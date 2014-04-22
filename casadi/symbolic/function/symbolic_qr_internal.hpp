@@ -28,9 +28,9 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
-  class CASADI_SYMBOLIC_EXPORT SymbolicQRInternal : public LinearSolverInternal{
+  class CASADI_SYMBOLIC_EXPORT SymbolicQRInternal : public LinearSolverInternal {
   public:
     // Constructor
     SymbolicQRInternal(const Sparsity& sparsity, int nrhs);
@@ -39,7 +39,7 @@ namespace casadi{
     virtual ~SymbolicQRInternal();
 
     /** \brief  Clone */
-    virtual SymbolicQRInternal* clone() const{ return new SymbolicQRInternal(*this);}
+    virtual SymbolicQRInternal* clone() const { return new SymbolicQRInternal(*this);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

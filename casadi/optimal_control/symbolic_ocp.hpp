@@ -26,7 +26,7 @@
 #include "variable.hpp"
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 
-namespace casadi{
+namespace casadi {
 
   // Forward declarations
   class XMLNode;
@@ -46,18 +46,18 @@ namespace casadi{
 
       <H3>Equations:  </H3>
       \verbatim
-      explicit or implicit ODE: \dot{x} = ode(t,x,z,u,p_free,pi,pd)
-      or                           0 = ode(t,x,z,\dot{x},u,p_free,pi,pd)
+      explicit or implicit ODE: \dot {x} = ode(t,x,z,u,p_free,pi,pd)
+      or                           0 = ode(t,x,z,\dot {x},u,p_free,pi,pd)
       algebraic equations:            0 = alg(t,x,z,u,p_free,pi,pd)
-      quadratures:              \dot{q} = quad(t,x,z,u,p_free,pi,pd)
+      quadratures:              \dot {q} = quad(t,x,z,u,p_free,pi,pd)
       dependent equations:            y = dep(t,x,z,u,p_free,pi,pd)
       initial equations:              0 = initial(t,x,z,u,p_free,pi,pd)
       \endverbatim
 
       <H3>Objective function terms:  </H3>
       \verbatim
-      Mayer terms:          \sum{mterm_k}
-      Lagrange terms:       \sum{\integral{mterm}}
+      Mayer terms:          \sum {mterm_k}
+      Lagrange terms:       \sum {\integral{mterm}}
       \endverbatim
 
       Note that when parsed, all dynamic equations end up in the implicit category "dae".
@@ -82,7 +82,7 @@ namespace casadi{
       \date 2012
       \author Joel Andersson
   */
-  class CASADI_OPTIMAL_CONTROL_EXPORT SymbolicOCP : public PrintableObject{
+  class CASADI_OPTIMAL_CONTROL_EXPORT SymbolicOCP : public PrintableObject {
   public:
 
     /// Default constructor

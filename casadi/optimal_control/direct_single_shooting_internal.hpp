@@ -31,9 +31,9 @@
 #include "casadi/symbolic/function/sx_function.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
-class CASADI_OPTIMAL_CONTROL_EXPORT DirectSingleShootingInternal : public OCPSolverInternal{
+class CASADI_OPTIMAL_CONTROL_EXPORT DirectSingleShootingInternal : public OCPSolverInternal {
   friend class DirectSingleShooting;
 
   public:

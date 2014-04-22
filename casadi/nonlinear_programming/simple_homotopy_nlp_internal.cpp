@@ -34,11 +34,10 @@
 #include <cfloat>
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   SimpleHomotopyNLPInternal::SimpleHomotopyNLPInternal(const Function& nlp)
-      : HomotopyNLPInternal(nlp)
-  {
+      : HomotopyNLPInternal(nlp) {
     addOption("nlp_solver",         OT_NLPSOLVER,   GenericType(),
               "The NLP solver to be used by the Homotopy solver");
     addOption("nlp_solver_options", OT_DICTIONARY, GenericType(),
@@ -52,10 +51,10 @@ namespace casadi{
   }
 
 
-  SimpleHomotopyNLPInternal::~SimpleHomotopyNLPInternal(){
+  SimpleHomotopyNLPInternal::~SimpleHomotopyNLPInternal() {
   }
 
-  void SimpleHomotopyNLPInternal::init(){
+  void SimpleHomotopyNLPInternal::init() {
     casadi_warning("SimpleHomotopyNLPSolver is experimental");
     // Call the init method of the base class
     HomotopyNLPInternal::init();
@@ -80,7 +79,7 @@ namespace casadi{
     NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");
     nlpsolver_ = nlpsolver_creator(nlp);
 
-    if(hasSetOption("nlp_solver_options")){
+    if(hasSetOption("nlp_solver_options")) {
       nlpsolver_.setOption(getOption("nlp_solver_options"));
     }
 
@@ -91,7 +90,7 @@ namespace casadi{
 
   }
 
-  void SimpleHomotopyNLPInternal::evaluate(){
+  void SimpleHomotopyNLPInternal::evaluate() {
     nlpsolver_.setInput(input(NLP_SOLVER_X0),NLP_SOLVER_X0);
     nlpsolver_.setInput(input(NLP_SOLVER_LAM_X0),NLP_SOLVER_LAM_X0);
     nlpsolver_.setInput(input(NLP_SOLVER_LBX),NLP_SOLVER_LBX);

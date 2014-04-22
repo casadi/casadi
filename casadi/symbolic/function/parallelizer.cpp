@@ -24,20 +24,20 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  Parallelizer::Parallelizer(){
+  Parallelizer::Parallelizer() {
   }
 
-  Parallelizer::Parallelizer(const std::vector<Function>& funcs){
+  Parallelizer::Parallelizer(const std::vector<Function>& funcs) {
     assignNode(new ParallelizerInternal(funcs));
   }
 
-  const ParallelizerInternal* Parallelizer::operator->() const{
+  const ParallelizerInternal* Parallelizer::operator->() const {
     return static_cast<const ParallelizerInternal*>(Function::operator->());
   }
 
-  ParallelizerInternal* Parallelizer::operator->(){
+  ParallelizerInternal* Parallelizer::operator->() {
     return static_cast<ParallelizerInternal*>(Function::operator->());
   }
 

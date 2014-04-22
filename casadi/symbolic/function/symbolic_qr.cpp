@@ -23,24 +23,24 @@
 #include "symbolic_qr_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  SymbolicQR::SymbolicQR(){
+  SymbolicQR::SymbolicQR() {
   }
 
-  SymbolicQR::SymbolicQR(const Sparsity& sp, int nrhs){
+  SymbolicQR::SymbolicQR(const Sparsity& sp, int nrhs) {
     assignNode(new SymbolicQRInternal(sp,nrhs));
   }
 
-  SymbolicQRInternal* SymbolicQR::operator->(){
+  SymbolicQRInternal* SymbolicQR::operator->() {
     return static_cast<SymbolicQRInternal*>(Function::operator->());
   }
 
-  const SymbolicQRInternal* SymbolicQR::operator->() const{
+  const SymbolicQRInternal* SymbolicQR::operator->() const {
     return static_cast<const SymbolicQRInternal*>(Function::operator->());
   }
 
-  bool SymbolicQR::checkNode() const{
+  bool SymbolicQR::checkNode() const {
     return dynamic_cast<const SymbolicQRInternal*>(get())!=0;
   }
 

@@ -29,7 +29,7 @@
 
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
 /** \brief Homotopy NLP solver storage class
   \internal
@@ -37,7 +37,7 @@ namespace casadi{
   \author Joris Gillis
   \date 2013-2014
 */
-  class CASADI_SYMBOLIC_EXPORT HomotopyNLPInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT HomotopyNLPInternal : public FunctionInternal {
 
   public:
     /// Constructor

@@ -29,14 +29,14 @@
 #include <deque>
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
-class CASADI_NONLINEAR_PROGRAMMING_EXPORT StabilizedSQPInternal : public NLPSolverInternal{
+class CASADI_NONLINEAR_PROGRAMMING_EXPORT StabilizedSQPInternal : public NLPSolverInternal {
 
 public:
   explicit StabilizedSQPInternal(const Function& nlp);
   virtual ~StabilizedSQPInternal();
-  virtual StabilizedSQPInternal* clone() const{ return new StabilizedSQPInternal(*this);}
+  virtual StabilizedSQPInternal* clone() const { return new StabilizedSQPInternal(*this);}
 
   virtual void init();
   virtual void evaluate();
@@ -125,7 +125,7 @@ public:
   std::vector<double> gf_, QPgf_;
 
   /// BFGS update function
-  enum BFGSMdoe{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};
+  enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};
   Function bfgs_;
 
   /// Initial Hessian approximation (BFGS)

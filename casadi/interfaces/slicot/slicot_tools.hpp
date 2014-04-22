@@ -26,7 +26,7 @@
 #include "../../symbolic/matrix/matrix.hpp"
 #include <casadi/interfaces/slicot/casadi_slicot_interface_export.h>
 
-namespace casadi{
+namespace casadi {
 
 /// \cond INTERNAL
 #ifndef SWIG

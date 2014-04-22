@@ -25,7 +25,7 @@
 #include "casadi/symbolic/function/qp_solver.hpp"
 #include <casadi/interfaces/cplex/casadi_cplex_interface_export.h>
 
-namespace casadi{
+namespace casadi {
 
 
 // Forward declaration of internal class
@@ -36,7 +36,7 @@ class CplexInternal;
    \author Attila Kozma, Joel Andersson
    \date 2012
    */
-class CASADI_CPLEX_INTERFACE_EXPORT CplexSolver : public QPSolver{
+class CASADI_CPLEX_INTERFACE_EXPORT CplexSolver : public QPSolver {
 public:
 
   /** \brief Default constructor  */
@@ -58,7 +58,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const QPStructure &st){ return CplexSolver(st);}
+  static QPSolver creator(const QPStructure &st) { return CplexSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

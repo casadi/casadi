@@ -26,34 +26,34 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  MultipleOutput::MultipleOutput(){
+  MultipleOutput::MultipleOutput() {
   }
 
-  MultipleOutput::~MultipleOutput(){
+  MultipleOutput::~MultipleOutput() {
   }
 
-  MX MultipleOutput::getOutput(int oind) const{
+  MX MultipleOutput::getOutput(int oind) const {
     MX this_ = shared_from_this<MX>();
     return MX::create(new OutputNode(this_,oind));
   }
 
-  OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind){
+  OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind) {
     setDependencies(parent);
 
     // Save the sparsity pattern
     setSparsity(dep(0)->sparsity(oind));
   }
 
-  OutputNode::~OutputNode(){
+  OutputNode::~OutputNode() {
   }
 
-  void OutputNode::printPart(std::ostream &stream, int part) const{
-    if(part==0){
+  void OutputNode::printPart(std::ostream &stream, int part) const {
+    if(part==0) {
       if(ndep()>1)
         stream << "[";
-    } else if(part==ndep()){
+    } else if(part==ndep()) {
       if(ndep()>1)
         stream << "]";
       stream << "{" << oind_ << "}";

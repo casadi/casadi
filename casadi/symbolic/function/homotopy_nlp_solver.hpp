@@ -47,10 +47,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
   /// Input arguments of an Homotopy NLP function [hnlpIn]
-  enum HNLPInput{
+  enum HNLPInput {
     /// Decision variable [x]
     HNL_X,
     /// Fixed parameter [p]

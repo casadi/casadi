@@ -30,9 +30,9 @@
 #include "integration_tools.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
-  class CASADI_INTEGRATION_EXPORT OldCollocationIntegratorInternal : public IntegratorInternal{
+  class CASADI_INTEGRATION_EXPORT OldCollocationIntegratorInternal : public IntegratorInternal {
 
   public:
 
@@ -60,7 +60,7 @@ namespace casadi{
     virtual void reset();
 
     /// Reset the backward problem and take time to tf
-    virtual void resetB(){}
+    virtual void resetB() {}
 
     ///  Integrate until a specified time point
     virtual void integrate(double t_out);

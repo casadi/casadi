@@ -38,17 +38,17 @@ namespace casadi {
               "Options to be passed to the SDPSOlver");
   }
 
-  SDPSDQPInternal::~SDPSDQPInternal(){
+  SDPSDQPInternal::~SDPSDQPInternal() {
   }
 
-  void SDPSDQPInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void SDPSDQPInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied) {
     SDQPSolverInternal::deepCopyMembers(already_copied);
     sdpsolver_ = deepcopy(sdpsolver_,already_copied);
     cholesky_ = deepcopy(cholesky_,already_copied);
     mapping_ = deepcopy(mapping_,already_copied);
   }
 
-  void SDPSDQPInternal::init(){
+  void SDPSDQPInternal::init() {
     // Initialize the base classes
     SDQPSolverInternal::init();
 
@@ -98,7 +98,7 @@ namespace casadi {
                 "f",mapping_.output("f").sparsity(),
                 "a",horzcat(input(SDQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
 
-    if(hasSetOption("sdp_solver_options")){
+    if(hasSetOption("sdp_solver_options")) {
       sdpsolver_.setOption(getOption("sdp_solver_options"));
     }
 

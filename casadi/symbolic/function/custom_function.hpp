@@ -26,7 +26,7 @@
 #include "function.hpp"
 #include <string>
 
-namespace casadi{
+namespace casadi {
 
 /** \brief  Forward declaration of internal class */
 class CustomFunctionInternal;
@@ -39,7 +39,7 @@ class CustomFunction;
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT CustomFunction : public Function{
+class CASADI_SYMBOLIC_EXPORT CustomFunction : public Function {
 
 public:
 

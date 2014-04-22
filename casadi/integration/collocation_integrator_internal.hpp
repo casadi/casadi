@@ -30,10 +30,10 @@
 #include "integration_tools.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   class CASADI_INTEGRATION_EXPORT CollocationIntegratorInternal :
-        public ImplicitFixedStepIntegratorInternal{
+        public ImplicitFixedStepIntegratorInternal {
   public:
 
     /// Constructor

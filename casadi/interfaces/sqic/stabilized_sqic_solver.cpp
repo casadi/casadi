@@ -24,9 +24,9 @@
 #include "stabilized_sqic_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-StabilizedSQICSolver::StabilizedSQICSolver(){
+StabilizedSQICSolver::StabilizedSQICSolver() {
 }
 
 
@@ -34,16 +34,16 @@ StabilizedSQICSolver::StabilizedSQICSolver(const QPStructure& st)  {
   assignNode(new StabilizedSQICInternal(st));
 }
 
-StabilizedSQICInternal* StabilizedSQICSolver::operator->(){
+StabilizedSQICInternal* StabilizedSQICSolver::operator->() {
   return reinterpret_cast<StabilizedSQICInternal*>(Function::operator->());
 }
 
-const StabilizedSQICInternal* StabilizedSQICSolver::operator->() const{
+const StabilizedSQICInternal* StabilizedSQICSolver::operator->() const {
   return reinterpret_cast<const StabilizedSQICInternal*>(Function::operator->());
 
 }
 
-bool StabilizedSQICSolver::checkNode() const{
+bool StabilizedSQICSolver::checkNode() const {
   return dynamic_cast<const StabilizedSQICInternal*>(get());
 }
 

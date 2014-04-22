@@ -27,7 +27,7 @@
 #include <typeinfo>
 #include "../casadi_exception.hpp"
 
-namespace casadi{
+namespace casadi {
 
   template<typename DataType>
   class CASADI_SYMBOLIC_EXPORT SparseStorage {
@@ -90,19 +90,19 @@ namespace casadi{
     typedef const DataType& const_reference;
 
     /// Get iterators to beginning and end
-    iterator begin(){ return data().begin();}
-    const_iterator begin() const{ return data().begin();}
-    reverse_iterator rbegin(){ return data().rbegin();}
-    const_reverse_iterator rbegin() const{ return data().rbegin();}
-    iterator end(){ return data().end();}
-    const_iterator end() const{ return data().end();}
-    reverse_iterator rend(){ return data().rend();}
-    const_reverse_iterator rend() const{ return data().rend();}
+    iterator begin() { return data().begin();}
+    const_iterator begin() const { return data().begin();}
+    reverse_iterator rbegin() { return data().rbegin();}
+    const_reverse_iterator rbegin() const { return data().rbegin();}
+    iterator end() { return data().end();}
+    const_iterator end() const { return data().end();}
+    reverse_iterator rend() { return data().rend();}
+    const_reverse_iterator rend() const { return data().rend();}
 
     /// Get references to beginning and end
-    reference front(){ return data().front();}
+    reference front() { return data().front();}
     const_reference front() const { return data().front();}
-    reference back(){ return data().back();}
+    reference back() { return data().back();}
     const_reference back() const { return data().back();}
     /// \endcond
 
@@ -110,24 +110,21 @@ namespace casadi{
      *          (assuming that the scalar conversion is valid) */
     template<typename A>
     SparseStorage(const SparseStorage<A>& x) :
-        sparsity_(x.sparsity()), data_(std::vector<DataType>(x.size()))
-    {
+        sparsity_(x.sparsity()), data_(std::vector<DataType>(x.size())) {
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
     SparseStorage(const std::vector<A>& x) :
-      sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<DataType>(x.size()))
-    {
+      sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<DataType>(x.size())) {
       copy(x.begin(),x.end(),begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
     SparseStorage(const std::vector<A>& x,  int nrow, int ncol) :
-      sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<DataType>(x.size()))
-    {
+      sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<DataType>(x.size())) {
       if(x.size() != nrow*ncol)
         throw CasadiException("SparseStorage::SparseStorage(const std::vector<DataType>& x, "
                               "int n, int m): dimension mismatch");
@@ -137,16 +134,16 @@ namespace casadi{
 
 #ifndef SWIG
     /// Get a non-zero element
-    inline const DataType& at(int k) const{
+    inline const DataType& at(int k) const {
       return const_cast<SparseStorage<DataType>*>(this)->at(k);
     }
 
     /// Access a non-zero element
-    inline DataType& at(int k){
-      try{
+    inline DataType& at(int k) {
+      try {
         if (k<0) k+=sparsity_.size();
         return data().at(k);
-      } catch(std::out_of_range& ex){
+      } catch(std::out_of_range& ex) {
         std::stringstream ss;
         ss << "Out of range error in SparseStorage<>::at: " << k
            << " not in range [0," << sparsity_.size() << ")";
@@ -155,11 +152,11 @@ namespace casadi{
     }
 #else // SWIG
     /// Access a non-zero element
-    DataType at(int k){
-      try{
+    DataType at(int k) {
+      try {
         if (k<0) k+=sparsity_.size();
         return data().at(k);
-      } catch(std::out_of_range& ex){
+      } catch(std::out_of_range& ex) {
         std::stringstream ss;
         ss << "Out of range error in SparseStorage<>::at: " << k
            << " not in range [0," << size() << ")";
@@ -180,7 +177,7 @@ namespace casadi{
 #endif // SWIG
 
     /// get an element, do not allocate
-    const DataType getElement(int rr, int cc=0) const{ return elem(rr,cc);}
+    const DataType getElement(int rr, int cc=0) const { return elem(rr,cc);}
 
     /// Returns true if the matrix has a non-zero at location rr,cc
     bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr,cc); }
@@ -202,7 +199,7 @@ namespace casadi{
     const std::vector<DataType>& data() const;
 
     /// Const access the sparsity - reference to data member
-    const Sparsity& sparsity() const{ return sparsity_; }
+    const Sparsity& sparsity() const { return sparsity_; }
 
     /// Access the sparsity, make a copy if there are multiple references to it
     Sparsity& sparsityRef();

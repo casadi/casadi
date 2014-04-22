@@ -27,17 +27,17 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  Inverse::Inverse(const MX& x){
+  Inverse::Inverse(const MX& x) {
     casadi_assert_message(x.size1()==x.size2(),
                           "Inverse: matrix must be square, but you supllied " << x.dimString());
     setDependencies(x);
     setSparsity(Sparsity::dense(x.size1(),x.size2()));
   }
 
-  void Inverse::printPart(std::ostream &stream, int part) const{
-    if(part==0){
+  void Inverse::printPart(std::ostream &stream, int part) const {
+    if(part==0) {
       stream << "inv(";
     } else {
       stream << ")";
@@ -46,24 +46,24 @@ namespace casadi{
 
   void Inverse::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                            MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                           bool output_given){
+                           bool output_given) {
     const MX& X = *input[0];
     MX& inv_X = *output[0];
-    if(!output_given){
+    if(!output_given) {
       inv_X = inv(X);
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
-    for(int d=0; d<nfwd; ++d){
+    for(int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = -mul(inv_X,mul(*fwdSeed[d][0],inv_X));
     }
 
     // Adjoint sensitivities
     int nadj = adjSeed.size();
-    if(nadj>0){
+    if(nadj>0) {
       MX trans_inv_X = inv_X.T();
-      for(int d=0; d<nadj; ++d){
+      for(int d=0; d<nadj; ++d) {
         adjSens[d][0]->addToSum(-mul(trans_inv_X,mul(*adjSeed[d][0],trans_inv_X)));
         *adjSeed[d][0] = MX();
       }

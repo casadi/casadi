@@ -25,7 +25,7 @@
 
 #include "../casadi_math.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Expression interface
   *
@@ -36,66 +36,66 @@ namespace casadi{
   \date 2012
 */
 template<typename ExType>
-class CASADI_SYMBOLIC_EXPORT GenericExpression{
+class CASADI_SYMBOLIC_EXPORT GenericExpression {
   public:
 
 #ifndef SWIG
     /// Addition
-    inline friend ExType operator+(const ExType &x, const ExType &y){ return x.__add__(y); }
+    inline friend ExType operator+(const ExType &x, const ExType &y) { return x.__add__(y); }
 
     /// Subtraction
-    inline friend ExType operator-(const ExType &x, const ExType &y){ return x.__sub__(y); }
+    inline friend ExType operator-(const ExType &x, const ExType &y) { return x.__sub__(y); }
 
     /// Elementwise multiplication
-    inline friend ExType operator*(const ExType &x, const ExType &y){ return x.__mul__(y); }
+    inline friend ExType operator*(const ExType &x, const ExType &y) { return x.__mul__(y); }
 
     /// Elementwise division
-    inline friend ExType operator/(const ExType &x, const ExType &y){ return x.__div__(y); }
+    inline friend ExType operator/(const ExType &x, const ExType &y) { return x.__div__(y); }
 
     /// In-place addition
-    inline ExType& operator+=(const ExType &y){
+    inline ExType& operator+=(const ExType &y) {
       return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);
     }
 
     /// In-place subtraction
-    inline ExType& operator-=(const ExType &y){
+    inline ExType& operator-=(const ExType &y) {
       return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__sub__(y);
     }
 
     /// In-place elementwise multiplication
-    inline ExType& operator*=(const ExType &y){return static_cast<ExType&>(*this) =
+    inline ExType& operator*=(const ExType &y) {return static_cast<ExType&>(*this) =
             static_cast<ExType*>(this)->__mul__(y);}
 
     /// In-place elementwise division
-    inline ExType& operator/=(const ExType &y){return static_cast<ExType&>(*this) =
+    inline ExType& operator/=(const ExType &y) {return static_cast<ExType&>(*this) =
             static_cast<ExType*>(this)->__div__(y);}
 
     /// Logic less than
-    inline friend ExType operator<(const ExType &x, const ExType &y){ return x.__lt__(y); }
+    inline friend ExType operator<(const ExType &x, const ExType &y) { return x.__lt__(y); }
 
     /// Logic less or equal to
-    inline friend ExType operator<=(const ExType &x, const ExType &y){ return x.__le__(y); }
+    inline friend ExType operator<=(const ExType &x, const ExType &y) { return x.__le__(y); }
 
     /// Logic greater than
-    inline friend ExType operator>(const ExType &x, const ExType &y){ return x.__gt__(y); }
+    inline friend ExType operator>(const ExType &x, const ExType &y) { return x.__gt__(y); }
 
     /// Logic greater or equal to
-    inline friend ExType operator>=(const ExType &x, const ExType &y){ return x.__ge__(y); }
+    inline friend ExType operator>=(const ExType &x, const ExType &y) { return x.__ge__(y); }
 
     /// Logic equal to
-    inline friend ExType operator==(const ExType &x, const ExType &y){ return x.__eq__(y); }
+    inline friend ExType operator==(const ExType &x, const ExType &y) { return x.__eq__(y); }
 
     /// Logic not equal to
-    inline friend ExType operator!=(const ExType &x, const ExType &y){ return x.__ne__(y); }
+    inline friend ExType operator!=(const ExType &x, const ExType &y) { return x.__ne__(y); }
 
     /// Logic not
-    inline ExType operator!() const{ return static_cast<const ExType &>(*this).logic_not(); }
+    inline ExType operator!() const { return static_cast<const ExType &>(*this).logic_not(); }
 
     /// Logic and
-    inline friend ExType operator&&(const ExType &x, const ExType &y){ return x.logic_and(y); }
+    inline friend ExType operator&&(const ExType &x, const ExType &y) { return x.logic_and(y); }
 
     /// Logic or
-    inline friend ExType operator||(const ExType &x, const ExType &y){ return x.logic_or(y); }
+    inline friend ExType operator||(const ExType &x, const ExType &y) { return x.logic_or(y); }
 
     #endif // SWIG
 

@@ -28,7 +28,7 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal storage for integrator related data
 
@@ -36,7 +36,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT IntegratorInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT IntegratorInternal : public FunctionInternal {
   public:
     /** \brief  Constructor */
     IntegratorInternal(const Function& f, const Function& g);
@@ -54,7 +54,7 @@ namespace casadi{
     virtual IntegratorInternal* create(const Function& f, const Function& g) const = 0;
 
     /** \brief  Print solver statistics */
-    virtual void printStats(std::ostream &stream) const{}
+    virtual void printStats(std::ostream &stream) const {}
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
     virtual void reset();
@@ -79,7 +79,7 @@ namespace casadi{
     virtual void spEvaluate(bool fwd);
 
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd){ return true;}
+    virtual bool spCanEvaluate(bool fwd) { return true;}
 
     /** Generate a function that calculates \a nfwd forward derivatives
      * and \a nadj adjoint derivatives
@@ -90,7 +90,7 @@ namespace casadi{
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
 
     // Helper structure
-    struct AugOffset{
+    struct AugOffset {
       std::vector<int> x,z,q,p,rx,rz,rq,rp;
     };
 
@@ -112,18 +112,18 @@ namespace casadi{
 
     ///@{
     // Shorthands
-    DMatrix&  x0(){ return input(INTEGRATOR_X0 );}
-    DMatrix&   p(){ return input(INTEGRATOR_P  );}
-    DMatrix&  z0(){ return input(INTEGRATOR_Z0 );}
-    DMatrix& rx0(){ return input(INTEGRATOR_RX0);}
-    DMatrix&  rp(){ return input(INTEGRATOR_RP );}
-    DMatrix& rz0(){ return input(INTEGRATOR_RZ0);}
-    DMatrix&  xf(){ return output(INTEGRATOR_XF );}
-    DMatrix&  qf(){ return output(INTEGRATOR_QF );}
-    DMatrix&  zf(){ return output(INTEGRATOR_ZF );}
-    DMatrix& rxf(){ return output(INTEGRATOR_RXF);}
-    DMatrix& rqf(){ return output(INTEGRATOR_RQF);}
-    DMatrix& rzf(){ return output(INTEGRATOR_RZF);}
+    DMatrix&  x0() { return input(INTEGRATOR_X0 );}
+    DMatrix&   p() { return input(INTEGRATOR_P  );}
+    DMatrix&  z0() { return input(INTEGRATOR_Z0 );}
+    DMatrix& rx0() { return input(INTEGRATOR_RX0);}
+    DMatrix&  rp() { return input(INTEGRATOR_RP );}
+    DMatrix& rz0() { return input(INTEGRATOR_RZ0);}
+    DMatrix&  xf() { return output(INTEGRATOR_XF );}
+    DMatrix&  qf() { return output(INTEGRATOR_QF );}
+    DMatrix&  zf() { return output(INTEGRATOR_ZF );}
+    DMatrix& rxf() { return output(INTEGRATOR_RXF);}
+    DMatrix& rqf() { return output(INTEGRATOR_RQF);}
+    DMatrix& rzf() { return output(INTEGRATOR_RZF);}
     ///@}
 
     /// Number of states for the forward integration

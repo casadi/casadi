@@ -54,10 +54,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
 /// Input arguments of a QP problem [stabilizedQpIn]
-enum StabilizedQPSolverInput{
+enum StabilizedQPSolverInput {
   /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
   /// The matrix is assumed to be symmetrical. [h]
   STABILIZED_QP_SOLVER_H,
@@ -96,7 +96,7 @@ class StabilizedQPSolverInternal;
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT StabilizedQPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT StabilizedQPSolver : public Function {
   public:
 
   /// Default constructor

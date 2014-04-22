@@ -24,9 +24,9 @@
 #include "qpoases_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-QPOasesSolver::QPOasesSolver(){
+QPOasesSolver::QPOasesSolver() {
 }
 
 
@@ -34,16 +34,16 @@ QPOasesSolver::QPOasesSolver(const QPStructure& st)  {
   assignNode(new QPOasesInternal(st));
 }
 
-QPOasesInternal* QPOasesSolver::operator->(){
+QPOasesInternal* QPOasesSolver::operator->() {
   return static_cast<QPOasesInternal*>(Function::operator->());
 }
 
-const QPOasesInternal* QPOasesSolver::operator->() const{
+const QPOasesInternal* QPOasesSolver::operator->() const {
   return static_cast<const QPOasesInternal*>(Function::operator->());
 
 }
 
-bool QPOasesSolver::checkNode() const{
+bool QPOasesSolver::checkNode() const {
   return dynamic_cast<const QPOasesInternal*>(get());
 }
 

@@ -26,11 +26,11 @@
 #include <fstream>
 #include <sstream>
 
-namespace casadi{
+namespace casadi {
 
 using namespace std;
 
-CustomFunction::CustomFunction(){
+CustomFunction::CustomFunction() {
 }
 
 CustomFunction::CustomFunction(const CustomEvaluate &c_fcn,const vector<Sparsity> &inputscheme,
@@ -63,15 +63,15 @@ CustomFunction::CustomFunction(const CustomEvaluate &c_fcn) {
   assignNode(new CustomFunctionInternal(c_fcn,vector<Sparsity>(),vector<Sparsity>()));
 }
 
-CustomFunctionInternal* CustomFunction::operator->(){
+CustomFunctionInternal* CustomFunction::operator->() {
   return static_cast<CustomFunctionInternal*>(Function::operator->());
 }
 
-const CustomFunctionInternal* CustomFunction::operator->() const{
+const CustomFunctionInternal* CustomFunction::operator->() const {
    return static_cast<const CustomFunctionInternal*>(Function::operator->());
 }
 
-bool CustomFunction::checkNode() const{
+bool CustomFunction::checkNode() const {
   return dynamic_cast<const CustomFunctionInternal*>(get())!=0;
 }
 

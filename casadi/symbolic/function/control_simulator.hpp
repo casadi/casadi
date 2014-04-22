@@ -25,10 +25,10 @@
 
 #include "integrator.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /// Input arguments of an ODE/DAE function [controldaeIn]
-  enum ControlledDAEInput{
+  enum ControlledDAEInput {
     /// Global physical time. (1-by-1) [t]
     CONTROL_DAE_T,
     /// State vector (dimension nx-by-1).
@@ -54,7 +54,7 @@ namespace casadi{
   };
 
   /// Input arguments of a control simulator [controlsimulatorIn]
-  enum ControlSimulatorInput{
+  enum ControlSimulatorInput {
     /// Differential or algebraic state at t0  (dimension nx-by-1) [x0]
     CONTROLSIMULATOR_X0,
     /// Parameters that are fixed over the entire horizon  (dimension np-by-1) [p]
@@ -93,7 +93,7 @@ namespace casadi{
       \date 2011
   */
 
-  class CASADI_SYMBOLIC_EXPORT ControlSimulator : public Function{
+  class CASADI_SYMBOLIC_EXPORT ControlSimulator : public Function {
   public:
 
     /// Default constructor

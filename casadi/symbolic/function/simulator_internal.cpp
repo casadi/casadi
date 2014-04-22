@@ -29,30 +29,29 @@
 INPUTSCHEME(IntegratorInput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 
   SimulatorInternal::SimulatorInternal(const Integrator& integrator,
                                        const Function& output_fcn,
                                        const vector<double>& grid) :
-      integrator_(integrator), output_fcn_(output_fcn), grid_(grid)
-  {
+      integrator_(integrator), output_fcn_(output_fcn), grid_(grid) {
     setOption("name","unnamed simulator");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
 
     input_.scheme = SCHEME_IntegratorInput;
   }
 
-  SimulatorInternal::~SimulatorInternal(){
+  SimulatorInternal::~SimulatorInternal() {
   }
 
-  void SimulatorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+  void SimulatorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied) {
     FunctionInternal::deepCopyMembers(already_copied);
     integrator_ = deepcopy(integrator_,already_copied);
     output_fcn_ = deepcopy(output_fcn_,already_copied);
   }
 
-  void SimulatorInternal::init(){
+  void SimulatorInternal::init() {
     // Let the integration time start from the first point of the time grid.
     if (!grid_.empty()) integrator_.setOption("t0",grid_[0]);
     // Let the integration time stop at the last point of the time grid.
@@ -64,7 +63,7 @@ namespace casadi{
     integrator_.init();
 
     // Generate an output function if there is none (returns the whole state)
-    if(output_fcn_.isNull()){
+    if(output_fcn_.isNull()) {
       SX t = SX::sym("t");
       SX x = SX::sym("x",integrator_.input(INTEGRATOR_X0).sparsity());
       SX z = SX::sym("z",integrator_.input(INTEGRATOR_Z0).sparsity());
@@ -90,13 +89,13 @@ namespace casadi{
 
     // Allocate inputs
     setNumInputs(INTEGRATOR_NUM_IN);
-    for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
+    for(int i=0; i<INTEGRATOR_NUM_IN; ++i) {
       input(i) = integrator_.input(i);
     }
 
     // Allocate outputs
     setNumOutputs(output_fcn_->getNumOutputs());
-    for(int i=0; i<getNumOutputs(); ++i){
+    for(int i=0; i<getNumOutputs(); ++i) {
       output(i) = Matrix<double>::zeros(output_fcn_.output(i).numel(),grid_.size());
       if (!output_fcn_.output(i).isEmpty()) {
         casadi_assert_message(output_fcn_.output(i).isVector(),
@@ -131,7 +130,7 @@ namespace casadi{
     output_its_.resize(getNumOutputs());
   }
 
-  void SimulatorInternal::evaluate(){
+  void SimulatorInternal::evaluate() {
 
     // Pass the parameters and initial state
     integrator_.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);
@@ -152,7 +151,7 @@ namespace casadi{
     for(int i=0; i<output_its_.size(); ++i) output_its_[i] = output(i).begin();
 
     // Advance solution in time
-    for(int k=0; k<grid_.size(); ++k){
+    for(int k=0; k<grid_.size(); ++k) {
 
       if (monitored("step")) {
         std::cout << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
@@ -183,7 +182,7 @@ namespace casadi{
       output_fcn_.evaluate();
 
       // Save the outputs of the function
-      for(int i=0; i<getNumOutputs(); ++i){
+      for(int i=0; i<getNumOutputs(); ++i) {
         const Matrix<double> &res = output_fcn_.output(i);
         copy(res.begin(),res.end(),output_its_.at(i));
         output_its_.at(i) += res.size();
@@ -191,7 +190,7 @@ namespace casadi{
     }
 
     // Consistency check
-    for(int i=0; i<output_its_.size(); ++i){
+    for(int i=0; i<output_its_.size(); ++i) {
       casadi_assert(output_its_[i] == output(i).end());
     }
   }

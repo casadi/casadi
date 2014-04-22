@@ -23,21 +23,21 @@
 #include "sdp_solver_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 
 SDPSolver::SDPSolver() {
 }
 
-SDPSolverInternal* SDPSolver::operator->(){
+SDPSolverInternal* SDPSolver::operator->() {
   return static_cast<SDPSolverInternal*>(Function::operator->());
 }
 
-const SDPSolverInternal* SDPSolver::operator->() const{
+const SDPSolverInternal* SDPSolver::operator->() const {
     return static_cast<const SDPSolverInternal*>(Function::operator->());
 }
 
-bool SDPSolver::checkNode() const{
+bool SDPSolver::checkNode() const {
   return dynamic_cast<const SDPSolverInternal*>(get())!=0;
 }
 

@@ -27,7 +27,7 @@
 #include "io_scheme.hpp"
 #include "../casadi_exception.hpp"
 #include "../printable_object.hpp"
-namespace casadi{
+namespace casadi {
 
 /** \brief A vector container with associated IOScheme
   A class
@@ -44,13 +44,13 @@ namespace casadi{
 
   public:
     // Constructor
-    IOSchemeVector(const std::vector<T>& d = std::vector<T>(), const IOScheme& s = IOScheme()) : data(d), scheme(s){}
+    IOSchemeVector(const std::vector<T>& d = std::vector<T>(), const IOScheme& s = IOScheme()) : data(d), scheme(s) {}
 
 #ifndef SWIG
     ///@{
     // Automatic type conversion
-    operator std::vector<T>&(){ return this->data;}
-    operator const std::vector<T>&() const{ return this->data;}
+    operator std::vector<T>&() { return this->data;}
+    operator const std::vector<T>&() const { return this->data;}
     ///@}
     T operator[](int i) const {
       casadi_assert_message(i>=0 && i<this->data.size(),"Index error for " << this->scheme.name() << ": supplied integer must be >=0 and <= " << this->data.size() << " but got " << i << ".");

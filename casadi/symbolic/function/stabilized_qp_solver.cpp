@@ -23,21 +23,21 @@
 #include "stabilized_qp_solver_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 
 StabilizedQPSolver::StabilizedQPSolver() {
 }
 
-StabilizedQPSolverInternal* StabilizedQPSolver::operator->(){
+StabilizedQPSolverInternal* StabilizedQPSolver::operator->() {
   return static_cast<StabilizedQPSolverInternal*>(Function::operator->());
 }
 
-const StabilizedQPSolverInternal* StabilizedQPSolver::operator->() const{
+const StabilizedQPSolverInternal* StabilizedQPSolver::operator->() const {
     return static_cast<const StabilizedQPSolverInternal*>(Function::operator->());
 }
 
-bool StabilizedQPSolver::checkNode() const{
+bool StabilizedQPSolver::checkNode() const {
   return dynamic_cast<const StabilizedQPSolverInternal*>(get())!=0;
 }
 

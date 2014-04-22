@@ -26,7 +26,7 @@
 #include "../../control/dple_solver.hpp"
 #include <casadi/interfaces/slicot/casadi_slicot_interface_export.h>
 
-namespace casadi{
+namespace casadi {
 
   /// Forward declaration of internal class
   class PsdIndefDpleInternal;

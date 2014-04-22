@@ -25,7 +25,7 @@
 
 #include "sparsity.hpp"
 
-namespace casadi{
+namespace casadi {
 
 /**
 \ingroup expression_tools
@@ -37,7 +37,7 @@ namespace casadi{
   CASADI_SYMBOLIC_EXPORT Sparsity reshape(const Sparsity& a, int nrow, int ncol);
 
   /** \brief Transpose the pattern */
-  inline Sparsity transpose(const Sparsity& a){ return a.transpose();}
+  inline Sparsity transpose(const Sparsity& a) { return a.transpose();}
 
   /** \brief Vectorize the pattern */
   CASADI_SYMBOLIC_EXPORT Sparsity vec(const Sparsity& a);

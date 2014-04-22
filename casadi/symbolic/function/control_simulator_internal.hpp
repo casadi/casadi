@@ -29,13 +29,13 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** \brief ControlSimulator data storage class
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT ControlSimulatorInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT ControlSimulatorInternal : public FunctionInternal {
   public:
 
     /** \brief  Constructor */
@@ -46,7 +46,7 @@ namespace casadi{
     virtual ~ControlSimulatorInternal();
 
     /** \brief  Clone */
-    virtual ControlSimulatorInternal* clone() const{
+    virtual ControlSimulatorInternal* clone() const {
         return new ControlSimulatorInternal(deepcopy(dae_),deepcopy(output_fcn_),gridc_);}
 
     /** \brief  initialize */

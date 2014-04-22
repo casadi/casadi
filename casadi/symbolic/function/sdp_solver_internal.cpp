@@ -30,7 +30,7 @@ INPUTSCHEME(SDPInput)
 OUTPUTSCHEME(SDPOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 // Constructor
 SDPSolverInternal::SDPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -158,7 +158,7 @@ void SDPSolverInternal::init() {
 
 }
 
-SDPSolverInternal::~SDPSolverInternal(){
+SDPSolverInternal::~SDPSolverInternal() {
 }
 
 void SDPSolverInternal::printProblem(std::ostream &stream) const {
@@ -176,11 +176,11 @@ void SDPSolverInternal::printProblem(std::ostream &stream) const {
   stream << "SDP Problem statement -- end" << std::endl;
 }
 
-void SDPSolverInternal::evaluate(){
+void SDPSolverInternal::evaluate() {
   throw CasadiException("SDPSolverInternal::evaluate: Not implemented");
 }
 
-void SDPSolverInternal::solve(){
+void SDPSolverInternal::solve() {
   throw CasadiException("SDPSolverInternal::solve: Not implemented");
 }
 

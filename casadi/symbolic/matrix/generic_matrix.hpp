@@ -30,10 +30,10 @@
 #include "sparsity_tools.hpp"
 #include "../casadi_math.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /** Sparsity format for getting and setting inputs and outputs */
-  enum SparsityType{SPARSE,SPARSESYM,DENSE,DENSESYM,DENSETRANS};
+  enum SparsityType {SPARSE,SPARSESYM,DENSE,DENSESYM,DENSETRANS};
 
   /** \brief Matrix base class
 
@@ -64,7 +64,7 @@ namespace casadi{
       \date 2012
   */
   template<typename MatType>
-  class CASADI_SYMBOLIC_EXPORT GenericMatrix{
+  class CASADI_SYMBOLIC_EXPORT GenericMatrix {
   public:
 
     /** \brief Get the number of (structural) non-zero elements */
@@ -103,25 +103,25 @@ namespace casadi{
 
     /** \brief Check if the sparsity is empty, i.e. if one of the dimensions is zero
      * (or optionally both dimensions) */
-    bool isEmpty(bool both=false) const{ return sparsity().isEmpty(both);}
+    bool isEmpty(bool both=false) const { return sparsity().isEmpty(both);}
 
     /** \brief  Check if the matrix expression is dense */
-    bool isDense() const{ return sparsity().isDense();}
+    bool isDense() const { return sparsity().isDense();}
 
     /** \brief  Check if the matrix expression is scalar */
     bool isScalar(bool scalar_and_dense=false) const;
 
     /** \brief  Check if the matrix expression is square */
-    bool isSquare() const{ return sparsity().isSquare();}
+    bool isSquare() const { return sparsity().isSquare();}
 
     /** \brief  Check if the matrix is a vector (i.e. size2()==1) */
-    bool isVector() const{ return sparsity().isVector();}
+    bool isVector() const { return sparsity().isVector();}
 
     /** \brief Check if the matrix is upper triangular */
-    bool isTriu() const{ return sparsity().isTriu();}
+    bool isTriu() const { return sparsity().isTriu();}
 
     /** \brief Check if the matrix is lower triangular */
-    bool isTril() const{ return sparsity().isTril();}
+    bool isTril() const { return sparsity().isTril();}
 
     /** \brief Get the sparsity pattern */
     const Sparsity& sparsity() const;
@@ -209,22 +209,22 @@ namespace casadi{
 
     ///@{
     /** \brief  create a sparse matrix with all zeros */
-    static MatType sparse(int nrow=1, int ncol=1){ return MatType(Sparsity::sparse(nrow,ncol));}
-    static MatType sparse(const std::pair<int,int>& rc){ return sparse(rc.first,rc.second);}
+    static MatType sparse(int nrow=1, int ncol=1) { return MatType(Sparsity::sparse(nrow,ncol));}
+    static MatType sparse(const std::pair<int,int>& rc) { return sparse(rc.first,rc.second);}
     ///@}
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries zero */
-    static MatType zeros(int nrow=1, int ncol=1){ return zeros(Sparsity::dense(nrow,ncol)); }
-    static MatType zeros(const Sparsity& sp){ return MatType(sp,0);}
-    static MatType zeros(const std::pair<int,int>& rc){ return zeros(rc.first,rc.second);}
+    static MatType zeros(int nrow=1, int ncol=1) { return zeros(Sparsity::dense(nrow,ncol)); }
+    static MatType zeros(const Sparsity& sp) { return MatType(sp,0);}
+    static MatType zeros(const std::pair<int,int>& rc) { return zeros(rc.first,rc.second);}
     ///@}
 
     ///@{
     /** \brief Create a dense matrix or a matrix with specified sparsity with all entries one */
-    static MatType ones(int nrow=1, int ncol=1){ return ones(Sparsity::dense(nrow,ncol)); }
-    static MatType ones(const Sparsity& sp){ return MatType(sp,1);}
-    static MatType ones(const std::pair<int,int>& rc){ return ones(rc.first,rc.second);}
+    static MatType ones(int nrow=1, int ncol=1) { return ones(Sparsity::dense(nrow,ncol)); }
+    static MatType ones(const Sparsity& sp) { return MatType(sp,1);}
+    static MatType ones(const std::pair<int,int>& rc) { return ones(rc.first,rc.second);}
     ///@}
 
     /** \brief Matrix-matrix multiplication.
@@ -240,52 +240,52 @@ namespace casadi{
   // Implementations
 
   template<typename MatType>
-  const Sparsity& GenericMatrix<MatType>::sparsity() const{
+  const Sparsity& GenericMatrix<MatType>::sparsity() const {
     return static_cast<const MatType*>(this)->sparsity();
   }
 
   template<typename MatType>
-  Sparsity& GenericMatrix<MatType>::sparsityRef(){
+  Sparsity& GenericMatrix<MatType>::sparsityRef() {
     return static_cast<MatType*>(this)->sparsityRef();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::size() const{
+  int GenericMatrix<MatType>::size() const {
     return sparsity().size();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeL() const{
+  int GenericMatrix<MatType>::sizeL() const {
     return sparsity().sizeL();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeU() const{
+  int GenericMatrix<MatType>::sizeU() const {
     return sparsity().sizeU();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::sizeD() const{
+  int GenericMatrix<MatType>::sizeD() const {
     return sparsity().sizeD();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::numel() const{
+  int GenericMatrix<MatType>::numel() const {
     return sparsity().numel();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::size1() const{
+  int GenericMatrix<MatType>::size1() const {
     return sparsity().size1();
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::size2() const{
+  int GenericMatrix<MatType>::size2() const {
     return sparsity().size2();
   }
 
   template<typename MatType>
-  std::pair<int,int> GenericMatrix<MatType>::shape() const{
+  std::pair<int,int> GenericMatrix<MatType>::shape() const {
     return sparsity().shape();
   }
 
@@ -295,7 +295,7 @@ namespace casadi{
   }
 
   template<typename MatType>
-  bool GenericMatrix<MatType>::isScalar(bool scalar_and_dense) const{
+  bool GenericMatrix<MatType>::isScalar(bool scalar_and_dense) const {
     return sparsity().isScalar(scalar_and_dense);
   }
 
@@ -310,11 +310,11 @@ namespace casadi{
     }
 
     // Check if we can simplify the product
-    if(x.isIdentity()){
+    if(x.isIdentity()) {
       return y;
-    } else if(y.isIdentity()){
+    } else if(y.isIdentity()) {
       return x;
-    } else if(x.isZero() || y.isZero()){
+    } else if(x.isZero() || y.isZero()) {
       // See if one of the arguments can be used as result
       if(y.size()==0 && x.size2()==x.size1()) {
         return y;
@@ -327,7 +327,7 @@ namespace casadi{
           return MatType::zeros(x.size1(),y.size2());
         }
       }
-    } else if(x.isScalar() || y.isScalar()){
+    } else if(x.isScalar() || y.isScalar()) {
       return x*y;
     } else {
       return x.mul_full(y,sp_z);
@@ -335,14 +335,14 @@ namespace casadi{
   }
 
   template<typename MatType>
-  int GenericMatrix<MatType>::size(SparsityType sp) const{
-    if(sp==SPARSE){
+  int GenericMatrix<MatType>::size(SparsityType sp) const {
+    if(sp==SPARSE) {
       return size();
-    } else if(sp==SPARSESYM){
+    } else if(sp==SPARSESYM) {
       return sizeU();
-    } else if(sp==DENSE){
+    } else if(sp==DENSE) {
       return numel();
-    } else if(sp==DENSESYM){
+    } else if(sp==DENSESYM) {
       return (numel()+size2())/2;
     } else {
       throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");
@@ -355,10 +355,10 @@ namespace casadi{
 #ifdef casadi_symbolic_implementation
   template<typename MatType>
   std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name,
-                                                   const Sparsity& sp, int p){
+                                                   const Sparsity& sp, int p) {
     std::vector<MatType> ret(p);
     std::stringstream ss;
-    for(int k=0; k<p; ++k){
+    for(int k=0; k<p; ++k) {
       ss.str("");
       ss << name << k;
       ret[k] = sym(ss.str(),sp);
@@ -368,9 +368,9 @@ namespace casadi{
 
   template<typename MatType>
   std::vector<std::vector<MatType> > GenericMatrix<MatType>::sym(const std::string& name,
-                                                                 const Sparsity& sp, int p, int r){
+                                                                 const Sparsity& sp, int p, int r) {
     std::vector<std::vector<MatType> > ret(r);
-    for(int k=0; k<r; ++k){
+    for(int k=0; k<r; ++k) {
       std::stringstream ss;
       ss << name << "_" << k;
       ret[k] = sym(ss.str(),sp,p);
@@ -379,7 +379,7 @@ namespace casadi{
   }
 
   template<typename MatType>
-  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp){
+  MatType GenericMatrix<MatType>::sym(const std::string& name, const Sparsity& sp) {
     throw CasadiException("\"sym\" not defined for instantiation");
   }
 #endif

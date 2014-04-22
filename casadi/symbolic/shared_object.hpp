@@ -28,7 +28,7 @@
 #include <map>
 #include <vector>
 
-namespace casadi{
+namespace casadi {
 
   // Forward declaration of weak reference class
   class WeakRef;
@@ -75,7 +75,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT SharedObject : public PrintableObject{
+  class CASADI_SYMBOLIC_EXPORT SharedObject : public PrintableObject {
 #ifndef SWIG
     template<class B> friend B shared_cast(SharedObject& A);
     template<class B> friend const B shared_cast(const SharedObject& A);
@@ -197,7 +197,7 @@ namespace casadi{
 #ifndef SWIG
   /// \cond INTERNAL
   /// Internal class for the reference counting framework, see comments on the public class.
-  class CASADI_SYMBOLIC_EXPORT SharedObjectNode{
+  class CASADI_SYMBOLIC_EXPORT SharedObjectNode {
     friend class SharedObject;
   public:
 
@@ -242,13 +242,13 @@ namespace casadi{
 
   protected:
     /** Called in the constructor of singletons to avoid that the counter reaches zero */
-    void initSingleton(){
+    void initSingleton() {
       casadi_assert(count==0);
       count++;
     }
 
     /** Called in the destructor of singletons */
-    void destroySingleton(){
+    void destroySingleton() {
       count--;
     }
 
@@ -277,7 +277,7 @@ namespace casadi{
    * cf. dynamic_cast
    */
   template<class B>
-  B shared_cast(SharedObject& A){
+  B shared_cast(SharedObject& A) {
 
     /// Get a pointer to the node
     SharedObjectNode* ptr = A.get();
@@ -299,7 +299,7 @@ namespace casadi{
    * cf. dynamic_cast (const)
    */
   template<class B>
-  const B shared_cast(const SharedObject& A){
+  const B shared_cast(const SharedObject& A) {
     SharedObject A_copy = A;
     return shared_cast<B>(A_copy);
   }
@@ -307,7 +307,7 @@ namespace casadi{
 
   /// Check if a shared object is of a certain type
   template<class B>
-  bool is_a(const SharedObject& A){
+  bool is_a(const SharedObject& A) {
     casadi_assert(!A.isNull());
     return !shared_cast<B>(A).isNull();
   }
@@ -315,7 +315,7 @@ namespace casadi{
   ///@{
   /// Make a deep copy of an object (Note: default is a shallow copy!)
   template<class A>
-  A deepcopy(const A& a){
+  A deepcopy(const A& a) {
     A ret = a;
     ret.makeUnique();
     return ret;
@@ -323,19 +323,19 @@ namespace casadi{
 
   /// \cond INTERNAL
   template<class A>
-  A deepcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied){
+  A deepcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied) {
     A ret = a;
     ret.makeUnique(already_copied);
     return ret;
   }
 
   template<class A>
-  A getcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied){
+  A getcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied) {
     A ret;
-    if(!a.isNull()){
+    if(!a.isNull()) {
       std::map<SharedObjectNode*,SharedObject>::iterator it =
           already_copied.find(const_cast<SharedObjectNode*>(a.get()));
-      if(it!=already_copied.end()){
+      if(it!=already_copied.end()) {
         ret.assignNode(it->second.get());
       }
     }
@@ -344,9 +344,9 @@ namespace casadi{
 
   template<class A>
   std::vector<A> deepcopy(const std::vector<A>& a,
-                          std::map<SharedObjectNode*,SharedObject>& already_copied){
+                          std::map<SharedObjectNode*,SharedObject>& already_copied) {
     std::vector<A> ret = a;
-    for(typename std::vector<A>::iterator it=ret.begin(); it!=ret.end(); ++it){
+    for(typename std::vector<A>::iterator it=ret.begin(); it!=ret.end(); ++it) {
       it->makeUnique(already_copied);
     }
     return ret;
@@ -357,7 +357,7 @@ namespace casadi{
   /// \cond INTERNAL
   /// Template function implementations
   template<class B>
-  B SharedObjectNode::shared_from_this(){
+  B SharedObjectNode::shared_from_this() {
     B ret;
     ret.assignNode(this);
 
@@ -368,7 +368,7 @@ namespace casadi{
   }
 
   template<class B>
-  const B SharedObjectNode::shared_from_this() const{
+  const B SharedObjectNode::shared_from_this() const {
     B ret;
     ret.assignNode(const_cast<SharedObjectNode*>(this));
 

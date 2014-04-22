@@ -29,7 +29,7 @@
 #include <dsdp5.h>
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for DSDPSolver
    *

@@ -29,22 +29,22 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Matrix inner_prod
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT InnerProd : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT InnerProd : public MXNode {
   public:
 
     /// Constructor
     InnerProd(const MX& x, const MX& y);
 
     /// Clone function
-    virtual InnerProd* clone() const{ return new InnerProd(*this);}
+    virtual InnerProd* clone() const { return new InnerProd(*this);}
 
     /// Destructor
-    virtual ~InnerProd(){}
+    virtual ~InnerProd() {}
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
@@ -74,7 +74,7 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_INNER_PROD;}
+    virtual int getOp() const { return OP_INNER_PROD;}
   };
 
 

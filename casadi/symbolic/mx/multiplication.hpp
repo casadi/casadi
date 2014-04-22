@@ -27,24 +27,24 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief An MX atomic for matrix-matrix product,
              note that the first factor must be provided transposed
       \author Joel Andersson
       \date 2010
   */
   template<bool TrX, bool TrY>
-  class CASADI_SYMBOLIC_EXPORT Multiplication : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Multiplication : public MXNode {
   public:
 
     /** \brief  Constructor */
     Multiplication(const MX& z, const MX& x, const MX& y);
 
     /** \brief  Destructor */
-    virtual ~Multiplication(){}
+    virtual ~Multiplication() {}
 
     /** \brief  Clone function */
-    virtual Multiplication* clone() const{ return new Multiplication(*this);}
+    virtual Multiplication* clone() const { return new Multiplication(*this);}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -74,10 +74,10 @@ namespace casadi{
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_MATMUL;}
+    virtual int getOp() const { return OP_MATMUL;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const{ return 1;}
+    virtual int numInplace() const { return 1;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const
@@ -85,7 +85,7 @@ namespace casadi{
 
     /// Helper class
     template<bool Tr>
-    static MX tr(const MX& x){ return Tr ? x.T() : x;}
+    static MX tr(const MX& x) { return Tr ? x.T() : x;}
   };
 
 
@@ -99,13 +99,13 @@ namespace casadi{
   public:
 
     /** \brief  Constructor */
-    DenseMultiplication(const MX& z, const MX& x, const MX& y) : Multiplication<TrX,TrY>(z,x,y){}
+    DenseMultiplication(const MX& z, const MX& x, const MX& y) : Multiplication<TrX,TrY>(z,x,y) {}
 
     /** \brief  Destructor */
-    virtual ~DenseMultiplication(){}
+    virtual ~DenseMultiplication() {}
 
     /** \brief  Clone function */
-    virtual DenseMultiplication* clone() const{ return new DenseMultiplication(*this);}
+    virtual DenseMultiplication* clone() const { return new DenseMultiplication(*this);}
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,

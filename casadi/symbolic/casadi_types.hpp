@@ -30,7 +30,7 @@
 
 #include "casadi_common.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /// Forward declarations
   class SXElement;

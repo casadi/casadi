@@ -27,34 +27,34 @@
 #include "../../symbolic/casadi_options.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  LapackLUDense::LapackLUDense(){
+  LapackLUDense::LapackLUDense() {
   }
 
-  LapackLUDense::LapackLUDense(const Sparsity& sparsity, int nrhs){
+  LapackLUDense::LapackLUDense(const Sparsity& sparsity, int nrhs) {
     assignNode(new LapackLUDenseInternal(sparsity,nrhs));
   }
 
-  LapackLUDenseInternal* LapackLUDense::operator->(){
+  LapackLUDenseInternal* LapackLUDense::operator->() {
     return static_cast<LapackLUDenseInternal*>(Function::operator->());
   }
 
-  const LapackLUDenseInternal* LapackLUDense::operator->() const{
+  const LapackLUDenseInternal* LapackLUDense::operator->() const {
     return static_cast<const LapackLUDenseInternal*>(Function::operator->());
   }
 
   LapackLUDenseInternal::LapackLUDenseInternal(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity,nrhs){
+      LinearSolverInternal(sparsity,nrhs) {
     // Equilibriate the matrix
     addOption("equilibration",OT_BOOLEAN,true);
     addOption("allow_equilibration_failure",OT_BOOLEAN,false);
   }
 
-  LapackLUDenseInternal::~LapackLUDenseInternal(){
+  LapackLUDenseInternal::~LapackLUDenseInternal() {
   }
 
-  void LapackLUDenseInternal::init(){
+  void LapackLUDenseInternal::init() {
     // Call the base class initializer
     LinearSolverInternal::init();
 
@@ -72,7 +72,7 @@ namespace casadi{
 
     // Equilibriate?
     equilibriate_ = getOption("equilibration").toInt();
-    if(equilibriate_){
+    if(equilibriate_) {
       r_.resize(ncol_);
       c_.resize(nrow_);
     }
@@ -90,7 +90,7 @@ namespace casadi{
     }
   }
 
-  void LapackLUDenseInternal::prepare(){
+  void LapackLUDenseInternal::prepare() {
     double time_start=0;
     if(CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
@@ -101,7 +101,7 @@ namespace casadi{
     // Get the elements of the matrix, dense format
     input(0).get(mat_,DENSE);
 
-    if(equilibriate_){
+    if(equilibriate_) {
       // Calculate the col and row scaling factors
       double colcnd, rowcnd; // ratio of smallest to largest col/row scaling factor
       double amax; // absolute value of the largest matrix element
@@ -111,7 +111,7 @@ namespace casadi{
       if(info < 0)
           throw CasadiException("LapackQRDenseInternal::prepare: "
                                 "dgeequ_ failed to calculate the scaling factors");
-      if(info>0){
+      if(info>0) {
         stringstream ss;
         ss << "LapackLUDenseInternal::prepare: ";
         if(info<=ncol_)  ss << (info-1) << "-th row (zero-based) is exactly zero";
@@ -150,7 +150,7 @@ namespace casadi{
     }
   }
 
-  void LapackLUDenseInternal::solve(double* x, int nrhs, bool transpose){
+  void LapackLUDenseInternal::solve(double* x, int nrhs, bool transpose) {
     double time_start=0;
     if(CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
@@ -158,7 +158,7 @@ namespace casadi{
     }
 
     // Scale the right hand side
-    if(transpose){
+    if(transpose) {
       rowScaling(x,nrhs);
     } else {
       colScaling(x,nrhs);
@@ -172,7 +172,7 @@ namespace casadi{
                                         "failed to solve the linear system");
 
     // Scale the solution
-    if(transpose){
+    if(transpose) {
       colScaling(x,nrhs);
     } else {
       rowScaling(x,nrhs);
@@ -186,7 +186,7 @@ namespace casadi{
     }
   }
 
-  void LapackLUDenseInternal::colScaling(double* x, int nrhs){
+  void LapackLUDenseInternal::colScaling(double* x, int nrhs) {
     // Scale result if this was done to the matrix
     if(equed_=='R' || equed_=='B')
       for(int rhs=0; rhs<nrhs; ++rhs)
@@ -194,7 +194,7 @@ namespace casadi{
           x[i+rhs*nrow_] *= r_[i];
   }
 
-  void LapackLUDenseInternal::rowScaling(double* x, int nrhs){
+  void LapackLUDenseInternal::rowScaling(double* x, int nrhs) {
     // Scale right hand side if this was done to the matrix
     if(equed_=='C' || equed_=='B')
       for(int rhs=0; rhs<nrhs; ++rhs)
@@ -202,7 +202,7 @@ namespace casadi{
           x[i+rhs*nrow_] *= c_[i];
   }
 
-  LapackLUDenseInternal* LapackLUDenseInternal::clone() const{
+  LapackLUDenseInternal* LapackLUDenseInternal::clone() const {
     return new LapackLUDenseInternal(*this);
   }
 

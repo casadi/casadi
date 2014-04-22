@@ -26,19 +26,19 @@
 #include "mx_node.hpp"
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Change the sparsity of an expression
       \author Joel Andersson
       \date 2011-2013
   */
-  class CASADI_SYMBOLIC_EXPORT SetSparse : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT SetSparse : public MXNode {
   public:
 
     /** \brief  Constructor */
     SetSparse(const MX& x, const Sparsity& sp);
 
     /** \brief  Destructor */
-    virtual ~SetSparse(){}
+    virtual ~SetSparse() {}
 
     /** \brief  Clone function */
     virtual SetSparse * clone() const;
@@ -71,7 +71,7 @@ namespace casadi{
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_SET_SPARSE;}
+    virtual int getOp() const { return OP_SET_SPARSE;}
   };
 
 } // namespace casadi

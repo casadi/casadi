@@ -29,22 +29,22 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Matrix transpose
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT Transpose : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Transpose : public MXNode {
   public:
 
     /// Constructor
     Transpose(const MX& x);
 
     /// Clone function
-    virtual Transpose* clone() const{ return new Transpose(*this);}
+    virtual Transpose* clone() const { return new Transpose(*this);}
 
     /// Destructor
-    virtual ~Transpose(){}
+    virtual ~Transpose() {}
 
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
@@ -75,37 +75,37 @@ namespace casadi{
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_TRANSPOSE;}
+    virtual int getOp() const { return OP_TRANSPOSE;}
 
     /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr){ ni=size2()+1; nr=0;}
+    virtual void nTmp(size_t& ni, size_t& nr) { ni=size2()+1; nr=0;}
 
     /// Transpose
-    virtual MX getTranspose() const{ return dep();}
+    virtual MX getTranspose() const { return dep();}
 
     /// Solve for square linear system
-    //virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const{
+    //virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const {
     // return dep()->getSolve(r,!tr,linear_solver);} // FIXME #1001
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth);}
+    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node,depth);}
   };
 
   /** \brief Matrix transpose (dense)
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT DenseTranspose : public Transpose{
+  class CASADI_SYMBOLIC_EXPORT DenseTranspose : public Transpose {
   public:
 
     /// Constructor
-    DenseTranspose(const MX& x) : Transpose(x){}
+    DenseTranspose(const MX& x) : Transpose(x) {}
 
     /// Clone function
-    virtual DenseTranspose* clone() const{ return new DenseTranspose(*this);}
+    virtual DenseTranspose* clone() const { return new DenseTranspose(*this);}
 
     /// Destructor
-    virtual ~DenseTranspose(){}
+    virtual ~DenseTranspose() {}
 
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
@@ -128,7 +128,7 @@ namespace casadi{
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=0;}
+    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=0;}
   };
 
 

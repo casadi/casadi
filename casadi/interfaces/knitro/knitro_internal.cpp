@@ -28,9 +28,9 @@
 #include <cstdlib>
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  KnitroInternal::KnitroInternal(const Function& nlp) : NLPSolverInternal(nlp){
+  KnitroInternal::KnitroInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     casadi_warning("KnitroInternal: the KNITRO interface is still experimental, "
                    "more tests are needed");
 
@@ -103,15 +103,15 @@ namespace casadi{
   }
 
 
-  KnitroInternal::~KnitroInternal(){
+  KnitroInternal::~KnitroInternal() {
     // Free KNITRO memory
-    if(kc_handle_){
+    if(kc_handle_) {
       /*    KTR_free(&kc_handle_);
             kc_handle_ = 0;*/
     }
   }
 
-  void KnitroInternal::init(){
+  void KnitroInternal::init() {
     // Call the init method of the base class
     NLPSolverInternal::init();
 
@@ -151,7 +151,7 @@ namespace casadi{
     // Get/generate required functions
     gradF();
     jacG();
-    if(true){ // NOTE: should be only if HessOpt
+    if(true) { // NOTE: should be only if HessOpt
       hessLag();
     }
 
@@ -162,7 +162,7 @@ namespace casadi{
 
   }
 
-  void KnitroInternal::evaluate(){
+  void KnitroInternal::evaluate() {
     // Allocate KNITRO memory block (move back to init!)
     casadi_assert(kc_handle_==0);
     kc_handle_ = KTR_new();
@@ -176,12 +176,12 @@ namespace casadi{
     // Hessian sparsity
     int nnzH = hessLag_.isNull() ? 0 : hessLag_.output().sizeL();
     vector<int> Hcol(nnzH), Hrow(nnzH);
-    if(nnzH>0){
+    if(nnzH>0) {
       const vector<int> &colind = hessLag_.output().colind();
       const vector<int> &row = hessLag_.output().row();
       int nz=0;
-      for(int cc=0; cc<colind.size()-1; ++cc){
-        for(int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el){
+      for(int cc=0; cc<colind.size()-1; ++cc) {
+        for(int el=colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
           Hcol[nz] = cc;
           Hrow[nz] = row[el];
           nz++;
@@ -198,31 +198,31 @@ namespace casadi{
 
     // Set user set options
     for(std::map<std::string, double>::iterator it=double_param_.begin();
-        it!=double_param_.end(); ++it){
+        it!=double_param_.end(); ++it) {
       status = KTR_set_double_param_by_name(kc_handle_, it->first.c_str(), it->second);
-      if(status!=0){
+      if(status!=0) {
         throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
       }
     }
 
-    for(std::map<std::string, int>::iterator it=int_param_.begin(); it!=int_param_.end(); ++it){
+    for(std::map<std::string, int>::iterator it=int_param_.begin(); it!=int_param_.end(); ++it) {
       status = KTR_set_int_param_by_name(kc_handle_, it->first.c_str(), it->second);
-      if(status!=0){
+      if(status!=0) {
         throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
       }
     }
 
     for(std::map<std::string, std::string>::iterator it=string_param_.begin();
-        it!=string_param_.end(); ++it){
+        it!=string_param_.end(); ++it) {
       status = KTR_set_char_param_by_name(kc_handle_, it->first.c_str(), it->second.c_str());
-      if(status!=0){
+      if(status!=0) {
         throw CasadiException("KnitroInternal::evaluate: cannot set " + it->first);
       }
     }
 
     // Type of constraints
     vector<int> cType(ng_,KTR_CONTYPE_GENERAL);
-    if(hasSetOption("contype")){
+    if(hasSetOption("contype")) {
       vector<int> contype = getOption("contype");
       casadi_assert(contype.size()==cType.size());
       copy(contype.begin(),contype.end(),cType.begin());
@@ -262,7 +262,7 @@ namespace casadi{
     status = KTR_set_grad_callback(kc_handle_, &callback);
     casadi_assert_message(status==0, "KTR_set_grad_callbackfailed");
 
-    if(nnzH>0){
+    if(nnzH>0) {
       status = KTR_set_hess_callback(kc_handle_, &callback);
       casadi_assert_message(status==0, "KTR_set_hess_callbackfailed");
     }
@@ -299,13 +299,13 @@ namespace casadi{
                                const int nnzH, const double* const x, const double* const lambda,
                                double* const obj, double* const c, double* const objGrad,
                                double* const jac, double* const hessian, double* const hessVector,
-                               void *userParams){
-    try{
+                               void *userParams) {
+    try {
       // Get a pointer to the calling object
       KnitroInternal* this_ = static_cast<KnitroInternal*>(userParams);
 
       // Direct to the correct function
-      switch(evalRequestCode){
+      switch(evalRequestCode) {
       case KTR_RC_EVALFC: this_->evalfc(x,*obj,c); break;
       case KTR_RC_EVALGA: this_->evalga(x,objGrad,jac); break;
       case KTR_RC_EVALH:  this_->evalh(x,lambda,hessian); break;
@@ -313,13 +313,13 @@ namespace casadi{
       }
 
       return 0;
-    } catch (exception& ex){
+    } catch (exception& ex) {
       cerr << "KnitroInternal::callback caugth exception: " << ex.what() << endl;
       return -1;
     }
   }
 
-  void KnitroInternal::evalfc(const double* x, double& obj, double *c){
+  void KnitroInternal::evalfc(const double* x, double& obj, double *c) {
     // Pass the argument to the function
     nlp_.setInput(x,NL_X);
     nlp_.setInput(input(NLP_SOLVER_P),NL_P);
@@ -332,17 +332,17 @@ namespace casadi{
     nlp_.output(NL_G).get(c,DENSE);
 
     // Printing
-    if(monitored("eval_f")){
+    if(monitored("eval_f")) {
       cout << "x = " << nlp_.input(NL_X) << endl;
       cout << "f = " << nlp_.output(NL_F) << endl;
     }
-    if(monitored("eval_g")){
+    if(monitored("eval_g")) {
       cout << "x = " << nlp_.input(NL_X) << endl;
       cout << "g = " << nlp_.output(NL_G) << endl;
     }
   }
 
-  void KnitroInternal::evalga(const double* x, double* objGrad, double* jac){
+  void KnitroInternal::evalga(const double* x, double* objGrad, double* jac) {
     // Pass the argument to the function
     gradF_.setInput(x,NL_X);
     gradF_.setInput(input(NLP_SOLVER_P),NL_P);
@@ -354,7 +354,7 @@ namespace casadi{
     gradF_.output().get(objGrad,DENSE);
 
     // Printing
-    if(monitored("eval_grad_f")){
+    if(monitored("eval_grad_f")) {
       cout << "x = " << gradF_.input(NL_X) << endl;
       cout << "grad_f = " << gradF_.output() << endl;
     }
@@ -370,13 +370,13 @@ namespace casadi{
     jacG_.output().get(jac);
 
     // Printing
-    if(monitored("eval_jac_g")){
+    if(monitored("eval_jac_g")) {
       cout << "x = " << jacG_.input(NL_X) << endl;
       cout << "jac_g = " << jacG_.output() << endl;
     }
   }
 
-  void KnitroInternal::evalh(const double* x, const double* lambda, double* hessian){
+  void KnitroInternal::evalh(const double* x, const double* lambda, double* hessian) {
     // Pass the argument to the function
     hessLag_.setInput(x,NL_X);
     hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
@@ -390,7 +390,7 @@ namespace casadi{
     hessLag_.output().get(hessian,SPARSESYM);
 
     // Printing
-    if(monitored("eval_h")){
+    if(monitored("eval_h")) {
       cout << "eval_h" << endl;
       cout << "x = " << hessLag_.input(0) << endl;
       cout << "lambda = " << hessLag_.input(1) << endl;

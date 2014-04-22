@@ -26,7 +26,7 @@
 #include "sx_node.hpp"
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
 /** \brief Represents a scalar symbolic expression
   \author Joel Andersson
@@ -34,17 +34,17 @@ namespace casadi{
   A regular user is not supposed to work with this Node class.
   This user can call SX(name) instead.
 */
-class CASADI_SYMBOLIC_EXPORT SymbolicSX : public SXNode{
+class CASADI_SYMBOLIC_EXPORT SymbolicSX : public SXNode {
 public:
-  explicit SymbolicSX(const std::string &name) : name(name){}
-  virtual ~SymbolicSX(){}
+  explicit SymbolicSX(const std::string &name) : name(name) {}
+  virtual ~SymbolicSX() {}
 
-  virtual bool isSymbolic() const{ return true; }
+  virtual bool isSymbolic() const { return true; }
 
-  virtual const std::string& getName() const{ return name; }
+  virtual const std::string& getName() const { return name; }
 
     /** \brief  Get the operation */
-  virtual int getOp() const{ return OP_PARAMETER;}
+  virtual int getOp() const { return OP_PARAMETER;}
 
   /** \brief  Name */
   std::string name;
@@ -52,7 +52,7 @@ public:
 protected:
 
   /** \brief  print */
-  virtual void print(std::ostream &stream, long& remaining_calls) const{
+  virtual void print(std::ostream &stream, long& remaining_calls) const {
     stream << name;
   }
 };

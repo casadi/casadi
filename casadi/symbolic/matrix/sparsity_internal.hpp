@@ -26,9 +26,9 @@
 #include "sparsity.hpp"
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
-  class CASADI_SYMBOLIC_EXPORT SparsityInternal : public SharedObjectNode{
+  class CASADI_SYMBOLIC_EXPORT SparsityInternal : public SharedObjectNode {
   public:
     /// Construct a sparsity pattern from vectors
     SparsityInternal(int nrow, int ncol, const std::vector<int>& colind,
@@ -95,7 +95,7 @@ namespace casadi{
     int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm,
                           std::vector<int>& rowblock, std::vector<int>& colblock,
                           std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock,
-                          int seed) const{
+                          int seed) const {
       return transpose()->dulmageMendelsohnUpper(colperm,rowperm,colblock,rowblock,
                                                  coarse_colblock,coarse_rowblock,seed);
     }
@@ -332,7 +332,7 @@ namespace casadi{
     std::size_t hash() const;
 
     /// Clone
-    virtual SparsityInternal* clone() const{ return new SparsityInternal(*this); }
+    virtual SparsityInternal* clone() const { return new SparsityInternal(*this); }
 
     /// Print representation
     virtual void repr(std::ostream &stream) const;

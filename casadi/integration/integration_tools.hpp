@@ -31,7 +31,7 @@
 
 #include <casadi/integration/casadi_integration_export.h>
 
-namespace casadi{
+namespace casadi {
 
   ///@{
   /** \brief Obtain collocation points of specific order and scheme
@@ -95,7 +95,7 @@ extern const long double** collocation_points[2];
 #endif // SWIG
 
   // Type of collocation points
-  enum CollocationPoints{LEGENDRE,RADAU};
+  enum CollocationPoints {LEGENDRE,RADAU};
 
   /** \brief Construct an explicit Runge-Kutta integrator
   * \param f dynamical system

@@ -27,14 +27,13 @@
 #include "casadi/symbolic/std_vector_tools.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 DirectMultipleShootingInternal::DirectMultipleShootingInternal(const Function& ffcn,
                                                                const Function& mfcn,
                                                                const Function& cfcn,
                                                                const Function& rfcn) :
-    OCPSolverInternal(ffcn, mfcn, cfcn, rfcn)
-{
+    OCPSolverInternal(ffcn, mfcn, cfcn, rfcn) {
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to casadi::Parallelizer");
   addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(),
             "An NLPSolver creator function");
@@ -46,17 +45,17 @@ DirectMultipleShootingInternal::DirectMultipleShootingInternal(const Function& f
             "Options to be passed to the integrator");
 }
 
-DirectMultipleShootingInternal::~DirectMultipleShootingInternal(){
+DirectMultipleShootingInternal::~DirectMultipleShootingInternal() {
 }
 
-void DirectMultipleShootingInternal::init(){
+void DirectMultipleShootingInternal::init() {
   // Initialize the base classes
   OCPSolverInternal::init();
 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
   integrator_ = integrator_creator(ffcn_,Function());
-  if(hasSetOption("integrator_options")){
+  if(hasSetOption("integrator_options")) {
     integrator_.setOption(getOption("integrator_options"));
   }
 
@@ -97,7 +96,7 @@ void DirectMultipleShootingInternal::init(){
 
   // Disretized variables for each shooting node
   vector<MX> X(nk_+1), U(nk_);
-  for(int k=0; k<=nk_; ++k){ // interior nodes
+  for(int k=0; k<=nk_; ++k) { // interior nodes
     // Local state
     X[k] = V[Slice(v_offset,v_offset+nx_)];
     v_offset += nx_;
@@ -116,7 +115,7 @@ void DirectMultipleShootingInternal::init(){
 
   // Input to the parallel integrator evaluation
   vector<vector<MX> > int_in(nk_);
-  for(int k=0; k<nk_; ++k){
+  for(int k=0; k<nk_; ++k) {
     int_in[k].resize(INTEGRATOR_NUM_IN);
     int_in[k][INTEGRATOR_P] = vertcat(P,U[k]);
     int_in[k][INTEGRATOR_X0] = X[k];
@@ -124,7 +123,7 @@ void DirectMultipleShootingInternal::init(){
 
   // Input to the parallel function evaluation
   vector<vector<MX> > fcn_in(nk_);
-  for(int k=0; k<nk_; ++k){
+  for(int k=0; k<nk_; ++k) {
     fcn_in[k].resize(DAE_NUM_IN);
     fcn_in[k][DAE_T] = (k*tf_)/nk_;
     fcn_in[k][DAE_P] = vertcat(P,U.at(k));
@@ -150,7 +149,7 @@ void DirectMultipleShootingInternal::init(){
   vector<MX> gg(2*nk_);
 
   // Collect the outputs
-  for(int k=0; k<nk_; ++k){
+  for(int k=0; k<nk_; ++k) {
     //append continuity constraints
     gg[2*k] = pI_out[k][INTEGRATOR_XF] - X[k+1];
 
@@ -185,7 +184,7 @@ void DirectMultipleShootingInternal::init(){
   nlp_solver_ = nlp_solver_creator(nlp_);
 
   // Pass user options
-  if(hasSetOption("nlp_solver_options")){
+  if(hasSetOption("nlp_solver_options")) {
     const Dictionary& nlp_solver_options = getOption("nlp_solver_options");
     nlp_solver_.setOption(nlp_solver_options);
   }
@@ -194,7 +193,7 @@ void DirectMultipleShootingInternal::init(){
   nlp_solver_.init();
 }
 
-void DirectMultipleShootingInternal::getGuess(vector<double>& V_init) const{
+void DirectMultipleShootingInternal::getGuess(vector<double>& V_init) const {
   // OCP solution guess
   const Matrix<double> &p_init = input(OCP_P_INIT);
   const Matrix<double> &x_init = input(OCP_X_INIT);
@@ -204,24 +203,24 @@ void DirectMultipleShootingInternal::getGuess(vector<double>& V_init) const{
   int el=0;
 
   // Pass guess for parameters
-  for(int i=0; i<np_; ++i){
+  for(int i=0; i<np_; ++i) {
     V_init[el++] = p_init.elem(i);
   }
 
-  for(int k=0; k<nk_; ++k){
+  for(int k=0; k<nk_; ++k) {
     // Pass guess for state
-    for(int i=0; i<nx_; ++i){
+    for(int i=0; i<nx_; ++i) {
       V_init[el++] = x_init.elem(i,k);
     }
 
     // Pass guess for control
-    for(int i=0; i<nu_; ++i){
+    for(int i=0; i<nu_; ++i) {
       V_init[el++] = u_init.elem(i,k);
     }
   }
 
   // Pass guess for final state
-  for(int i=0; i<nx_; ++i){
+  for(int i=0; i<nx_; ++i) {
     V_init[el++] = x_init.elem(i,nk_);
   }
 
@@ -229,7 +228,7 @@ void DirectMultipleShootingInternal::getGuess(vector<double>& V_init) const{
 }
 
 void DirectMultipleShootingInternal::getVariableBounds(vector<double>& V_min,
-                                                       vector<double>& V_max) const{
+                                                       vector<double>& V_max) const {
   // OCP variable bounds
   const Matrix<double> &p_min = input(OCP_LBP);
   const Matrix<double> &p_max = input(OCP_UBP);
@@ -243,27 +242,27 @@ void DirectMultipleShootingInternal::getVariableBounds(vector<double>& V_min,
   int min_el=0, max_el=0;
 
   // Pass bounds on parameters
-  for(int i=0; i<np_; ++i){
+  for(int i=0; i<np_; ++i) {
     V_min[min_el++] = p_min.elem(i);
     V_max[max_el++] = p_max.elem(i);
   }
 
-  for(int k=0; k<nk_; ++k){
+  for(int k=0; k<nk_; ++k) {
     // Pass bounds on state
-    for(int i=0; i<nx_; ++i){
+    for(int i=0; i<nx_; ++i) {
       V_min[min_el++] = x_min.elem(i,k);
       V_max[max_el++] = x_max.elem(i,k);
     }
 
     // Pass bounds on control
-    for(int i=0; i<nu_; ++i){
+    for(int i=0; i<nu_; ++i) {
       V_min[min_el++] = u_min.elem(i,k);
       V_max[max_el++] = u_max.elem(i,k);
     }
   }
 
   // Pass bounds on final state
-  for(int i=0; i<nx_; ++i){
+  for(int i=0; i<nx_; ++i) {
     V_min[min_el++] = x_min.elem(i,nk_);
     V_max[max_el++] = x_max.elem(i,nk_);
   }
@@ -272,7 +271,7 @@ void DirectMultipleShootingInternal::getVariableBounds(vector<double>& V_min,
 }
 
 void DirectMultipleShootingInternal::getConstraintBounds(vector<double>& G_min,
-                                                         vector<double>& G_max) const{
+                                                         vector<double>& G_max) const {
   // OCP constraint bounds
   const Matrix<double> &h_min = input(OCP_LBH);
   const Matrix<double> &h_max = input(OCP_UBH);
@@ -280,13 +279,13 @@ void DirectMultipleShootingInternal::getConstraintBounds(vector<double>& G_min,
   // Running index
   int min_el=0, max_el=0;
 
-  for(int k=0; k<nk_; ++k){
-    for(int i=0; i<nx_; ++i){
+  for(int k=0; k<nk_; ++k) {
+    for(int i=0; i<nx_; ++i) {
       G_min[min_el++] = 0.;
       G_max[max_el++] = 0.;
     }
 
-    for(int i=0; i<nh_; ++i){
+    for(int i=0; i<nh_; ++i) {
       G_min[min_el++] = h_min.elem(i,k);
       G_max[max_el++] = h_max.elem(i,k);
     }
@@ -294,7 +293,7 @@ void DirectMultipleShootingInternal::getConstraintBounds(vector<double>& G_min,
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
 }
 
-void DirectMultipleShootingInternal::setOptimalSolution(const vector<double> &V_opt){
+void DirectMultipleShootingInternal::setOptimalSolution(const vector<double> &V_opt) {
   // OCP solution
   Matrix<double> &p_opt = output(OCP_P_OPT);
   Matrix<double> &x_opt = output(OCP_X_OPT);
@@ -304,31 +303,31 @@ void DirectMultipleShootingInternal::setOptimalSolution(const vector<double> &V_
   int el=0;
 
   // Pass optimized state
-  for(int i=0; i<np_; ++i){
+  for(int i=0; i<np_; ++i) {
     p_opt(i) = V_opt[el++];
   }
 
-  for(int k=0; k<nk_; ++k){
+  for(int k=0; k<nk_; ++k) {
 
     // Pass optimized state
-    for(int i=0; i<nx_; ++i){
+    for(int i=0; i<nx_; ++i) {
       x_opt(i,k) = V_opt[el++];
     }
 
     // Pass optimized control
-    for(int i=0; i<nu_; ++i){
+    for(int i=0; i<nu_; ++i) {
       u_opt(i,k) = V_opt[el++];
     }
   }
 
   // Pass optimized terminal state
-  for(int i=0; i<nx_; ++i){
+  for(int i=0; i<nx_; ++i) {
     x_opt(i,nk_) = V_opt[el++];
   }
   casadi_assert(el==V_opt.size());
 }
 
-void DirectMultipleShootingInternal::evaluate(){
+void DirectMultipleShootingInternal::evaluate() {
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
   getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),

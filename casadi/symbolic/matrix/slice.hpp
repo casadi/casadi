@@ -29,14 +29,14 @@
 #include <limits>
 #include <iostream>
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Class representing a Slice
    *
    * Note that Python or Octave do not need to use this class.
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
    */
-  class CASADI_SYMBOLIC_EXPORT Slice : public PrintableObject{
+  class CASADI_SYMBOLIC_EXPORT Slice : public PrintableObject {
   public:
     /// Default constructor - all elements
     Slice();
@@ -70,7 +70,7 @@ namespace casadi{
     { return start_==other.start_ && stop_==other.stop_ && step_==other.step_;}
 
     /// Check inequality
-    bool operator!=(const Slice& other) const{ return !(*this == other);}
+    bool operator!=(const Slice& other) const { return !(*this == other);}
 
 #ifndef SWIG
     /// Print a representation of the object to a stream
@@ -91,7 +91,7 @@ namespace casadi{
   /// \cond INTERNAL
   /**  Class representing a non-regular (and thus non-slice) index list
    */
-  class CASADI_SYMBOLIC_EXPORT IndexList{
+  class CASADI_SYMBOLIC_EXPORT IndexList {
   private:
 
   public:

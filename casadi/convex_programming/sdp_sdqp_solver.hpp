@@ -72,7 +72,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static SDQPSolver creator(const SDQPStructure & st){ return SDPSDQPSolver(st);}
+  static SDQPSolver creator(const SDQPStructure & st) { return SDPSDQPSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

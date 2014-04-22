@@ -29,29 +29,27 @@
 #endif // WITH_DL
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   SymbolicQRInternal::SymbolicQRInternal(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity,nrhs)
-  {
+      LinearSolverInternal(sparsity,nrhs) {
     addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");
     addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",
               "Compiler command to be used for compiling generated code");
   }
 
-  SymbolicQRInternal::~SymbolicQRInternal(){
+  SymbolicQRInternal::~SymbolicQRInternal() {
   }
 
   void SymbolicQRInternal::deepCopyMembers(
-    std::map<SharedObjectNode*,SharedObject>& already_copied)
-  {
+      std::map<SharedObjectNode*,SharedObject>& already_copied) {
     LinearSolverInternal::deepCopyMembers(already_copied);
     fact_fcn_ = deepcopy(fact_fcn_,already_copied);
     solv_fcn_N_ = deepcopy(solv_fcn_N_,already_copied);
     solv_fcn_T_ = deepcopy(solv_fcn_T_,already_copied);
   }
 
-  void SymbolicQRInternal::init(){
+  void SymbolicQRInternal::init() {
     // Call the base class initializer
     LinearSolverInternal::init();
 
@@ -60,7 +58,7 @@ namespace casadi{
     string compiler = getOption("compiler");
 
     // Make sure that command processor is available
-    if(codegen){
+    if(codegen) {
 #ifdef WITH_DL
       int flag = system(static_cast<const char*>(0));
       casadi_assert_message(flag!=0, "No command procesor available");
@@ -91,7 +89,7 @@ namespace casadi{
     SXFunction fact_fcn(A,QR);
 
     // Optionally generate c code and load as DLL
-    if(codegen){
+    if(codegen) {
       stringstream ss;
       ss << "symbolic_qr_fact_fcn_" << this;
       fact_fcn_ = dynamicCompilation(fact_fcn,ss.str(),
@@ -129,7 +127,7 @@ namespace casadi{
     SXFunction solv_fcn(solv_in,x);
 
     // Optionally generate c code and load as DLL
-    if(codegen){
+    if(codegen) {
       stringstream ss;
       ss << "symbolic_qr_solv_fcn_N_" << this;
       solv_fcn_N_ = dynamicCompilation(solv_fcn,ss.str(),"QR_solv_N",compiler);
@@ -159,7 +157,7 @@ namespace casadi{
     solv_fcn = SXFunction(solv_in,x);
 
     // Optionally generate c code and load as DLL
-    if(codegen){
+    if(codegen) {
       stringstream ss;
       ss << "symbolic_qr_solv_fcn_T_" << this;
       solv_fcn_T_ = dynamicCompilation(solv_fcn,ss.str(),"QR_solv_T",compiler);
@@ -176,7 +174,7 @@ namespace casadi{
     R_ = DMatrix::zeros(R.sparsity());
   }
 
-  void SymbolicQRInternal::prepare(){
+  void SymbolicQRInternal::prepare() {
     // Factorize
     fact_fcn_.setInput(input(LINSOL_A));
     fact_fcn_.evaluate();
@@ -185,7 +183,7 @@ namespace casadi{
     prepared_ = true;
   }
 
-  void SymbolicQRInternal::solve(double* x, int nrhs, bool transpose){
+  void SymbolicQRInternal::solve(double* x, int nrhs, bool transpose) {
     // Select solve function
     Function& solv = transpose ? solv_fcn_T_ : solv_fcn_N_;
 
@@ -194,7 +192,7 @@ namespace casadi{
     solv.setInput(R_,1);
 
     // Solve for all right hand sides
-    for(int i=0; i<nrhs; ++i){
+    for(int i=0; i<nrhs; ++i) {
       solv.setInput(x,2);
       solv.evaluate();
       solv.getOutput(x);
@@ -202,7 +200,7 @@ namespace casadi{
     }
   }
 
-  void SymbolicQRInternal::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr){
+  void SymbolicQRInternal::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr) {
     // Get arguments
     casadi_assert(input.at(0)!=0);
     SX r = *input.at(0);
@@ -221,7 +219,7 @@ namespace casadi{
     // Solve for every right hand side
     vector<SX> resv;
     v.resize(3);
-    for(int i=0; i<nrhs; ++i){
+    for(int i=0; i<nrhs; ++i) {
       v[2] = r(Slice(),i);
       resv.push_back(solv(v).at(0));
     }
@@ -232,7 +230,7 @@ namespace casadi{
   }
 
   void SymbolicQRInternal::generateDeclarations(std::ostream &stream, const std::string& type,
-                                                CodeGenerator& gen) const{
+                                                CodeGenerator& gen) const {
 
     // Generate code for the embedded functions
     gen.addDependency(fact_fcn_);
@@ -241,7 +239,7 @@ namespace casadi{
   }
 
   void SymbolicQRInternal::generateBody(std::ostream &stream, const std::string& type,
-                                        CodeGenerator& gen) const{
+                                        CodeGenerator& gen) const {
     casadi_warning("Code generation for SymbolicQR still experimental");
 
     // Data structures to hold A, Q and R
@@ -257,7 +255,7 @@ namespace casadi{
 
     // Factorize if needed
     int fact_ind = gen.getDependency(fact_fcn_);
-    stream << "  if(!prepared){" << endl;
+    stream << "  if(!prepared) {" << endl;
     stream << "    for(i=0; i<" << input(LINSOL_A).size() << "; ++i) A[i]=x0[i];" << endl;
     stream << "    f" << fact_ind << "(A,Q,R);" << endl;
     stream << "    prepared = 1;" << endl;
@@ -267,7 +265,7 @@ namespace casadi{
     int solv_ind_N = gen.getDependency(solv_fcn_N_);
     int neq = input(LINSOL_B).size1();
     int nrhs = input(LINSOL_B).size2();
-    stream << "  for(i=0; i<" << nrhs << "; ++i){" << endl;
+    stream << "  for(i=0; i<" << nrhs << "; ++i) {" << endl;
     stream << "    f" << solv_ind_N << "(Q,R,x1,r0);" << endl;
     stream << "    x1+=" << neq << "; r0+=" << neq << ";" << endl;
     stream << "  }" << endl;

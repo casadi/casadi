@@ -24,9 +24,9 @@
 #include <fstream>
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options){
+void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options) {
   // Note: The implementation of this function follows the
   // "Writing .nl Files" paper by David M. Gay (2005)
 
@@ -34,8 +34,8 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   bool verbose=false;
 
   // Read user options
-  for(Dictionary::const_iterator it=options.begin(); it!=options.end(); ++it){
-    if(it->first.compare("verbose")==0){
+  for(Dictionary::const_iterator it=options.begin(); it!=options.end(); ++it) {
+    if(it->first.compare("verbose")==0) {
       verbose = it->second;
     } else {
       stringstream ss;
@@ -52,7 +52,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   // Read the header of the NL-file (first 10 lines)
   const int header_sz = 10;
   vector<string> header(header_sz);
-  for(int k=0; k<header_sz; ++k){
+  for(int k=0; k<header_sz; ++k) {
     getline(nlfile,header[k]);
   }
 
@@ -66,7 +66,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   int n_var, n_con, n_obj, n_eq, n_lcon;
   ss >> n_var >> n_con >> n_obj >> n_eq >> n_lcon;
 
-  if(verbose){
+  if(verbose) {
     cout << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj
          << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
   }
@@ -92,7 +92,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   vector<SXElement> v = x.data();
 
   // Process segments
-  while(true){
+  while(true) {
 
     // Read segment key
     char key;
@@ -102,7 +102,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
     if(nlfile.eof()) break;
 
     // Process segments
-    switch(key){
+    switch(key) {
       // Imported function description
       case 'F':
         if(verbose) cerr << "Imported function description unsupported: ignored" << endl;
@@ -121,7 +121,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         nlfile >> i >> j >> k;
 
         // Make sure that v is long enough
-        if(i >= v.size()){
+        if(i >= v.size()) {
           v.resize(i+1);
         }
 
@@ -129,7 +129,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         v.at(i) = 0;
 
         // Add the linear terms
-        for(int jj=0; jj<j; ++jj){
+        for(int jj=0; jj<j; ++jj) {
           // Linear term
           int pl;
           double cl;
@@ -179,7 +179,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         f.at(i) = readExpressionNL(nlfile,v);
 
         // Negate the expression if we maximize
-        if(sigma!=0){
+        if(sigma!=0) {
           f.at(i) = -f.at(i);
         }
 
@@ -194,7 +194,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         nlfile >> m;
 
         // Process initial guess for the fual variables
-        for(int i=0; i<m; ++i){
+        for(int i=0; i<m; ++i) {
           // Offset and value
           int offset;
           double d;
@@ -215,7 +215,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         nlfile >> m;
 
         // Process initial guess
-        for(int i=0; i<m; ++i){
+        for(int i=0; i<m; ++i) {
           // Offset and value
           int offset;
           double d;
@@ -232,7 +232,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
       case 'r':
       {
         // For all constraints
-        for(int i=0; i<n_con; ++i){
+        for(int i=0; i<n_con; ++i) {
 
           // Read constraint type
           int c_type;
@@ -241,7 +241,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
           // Temporary
           double c;
 
-          switch(c_type){
+          switch(c_type) {
             // Upper and lower bounds
             case 0:
               nlfile >> c;
@@ -293,7 +293,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
       case 'b':
       {
         // For all variable
-        for(int i=0; i<n_var; ++i){
+        for(int i=0; i<n_var; ++i) {
 
           // Read constraint type
           int c_type;
@@ -302,7 +302,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
           // Temporary
           double c;
 
-          switch(c_type){
+          switch(c_type) {
             // Upper and lower bounds
             case 0:
               nlfile >> c;
@@ -354,7 +354,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
 
         // Get the row offsets
         rowind[0]=0;
-        for(int i=0; i<k; ++i){
+        for(int i=0; i<k; ++i) {
           nlfile >> rowind[i+1];
         }
         break;
@@ -368,7 +368,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         nlfile >> i >> k;
 
         // Get terms
-        for(int kk=0; kk<k; ++kk){
+        for(int kk=0; kk<k; ++kk) {
           // Get the term
           int j;
           double c;
@@ -388,7 +388,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         nlfile >> i >> k;
 
         // Get terms
-        for(int kk=0; kk<k; ++kk){
+        for(int kk=0; kk<k; ++kk) {
           // Get the term
           int j;
           double c;
@@ -406,7 +406,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   nlfile.close();
 }
 
-SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SXElement>& v){
+SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SXElement>& v) {
   // Read the instruction
   char inst;
   stream >> inst;
@@ -419,7 +419,7 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
   stringstream msg;
 
   // Process instruction
-  switch(inst){
+  switch(inst) {
     // Symbolic variable
     case 'v':
       // Read the variable number
@@ -444,7 +444,7 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
       stream >> i;
 
       // Process
-      switch(i){
+      switch(i) {
 
         // Unary operations, class 1 in Gay2005
         case 13:  case 14:  case 15:  case 16:  case 34:  case 37:  case 38:  case 39:  case 40:
@@ -455,7 +455,7 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
           SXElement x = readExpressionNL(stream,v);
 
           // Perform operation
-          switch(i){
+          switch(i) {
             case 13:  return floor(x);
             case 14:  return ceil(x);
             case 15:  return abs(x);
@@ -494,7 +494,7 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
           SXElement y = readExpressionNL(stream,v);
 
           // Perform operation
-          switch(i){
+          switch(i) {
             case 0:   return x + y;
             case 1:   return x - y;
             case 2:   return x * y;
@@ -533,12 +533,12 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
 
           // Collect the arguments
           vector<SXElement> args(n);
-          for(int k=0; k<n; ++k){
+          for(int k=0; k<n; ++k) {
             args[k] = readExpressionNL(stream,v);
           }
 
           // Perform the operation
-          switch(i){
+          switch(i) {
             // case 11: return min(args).toScalar(); FIXME // rename?
             // case 12: return max(args).toScalar(); FIXME // rename?
             // case 54: return sum(args).toScalar(); FIXME // rename?
@@ -584,14 +584,14 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
   throw CasadiException("Error in SymbolicNLP::readExpressionNL: " + msg.str());
 }
 
-void SymbolicNLP::print(std::ostream &stream) const{
+void SymbolicNLP::print(std::ostream &stream) const {
   stream << "NLP:" << endl;
   stream << "x = " << x << endl;
   stream << "#f=" << f.size() << endl;
   stream << "#g=" << g.size() << endl;
 }
 
-void SymbolicNLP::repr(std::ostream &stream) const{
+void SymbolicNLP::repr(std::ostream &stream) const {
   stream << "NLP(#f=" << f.size() << ",#g="<< g.size() << ")";
 }
 

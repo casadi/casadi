@@ -31,9 +31,9 @@
 /// \cond INTERNAL
 class SharedObjectNode;
 
-namespace casadi{
+namespace casadi {
 
-class CASADI_SYMBOLIC_EXPORT IOSchemeInternal : public SharedObjectNode{
+class CASADI_SYMBOLIC_EXPORT IOSchemeInternal : public SharedObjectNode {
   public:
 
     /// Name of the scheme
@@ -99,7 +99,7 @@ class CASADI_SYMBOLIC_EXPORT IOSchemeBuiltinInternal : public IOSchemeInternal {
     virtual void repr(std::ostream &stream=std::cout) const;
 
     /// Clone
-    virtual IOSchemeBuiltinInternal* clone() const{ return new IOSchemeBuiltinInternal(scheme_); }
+    virtual IOSchemeBuiltinInternal* clone() const { return new IOSchemeBuiltinInternal(scheme_); }
 
   private:
     InputOutputScheme scheme_;

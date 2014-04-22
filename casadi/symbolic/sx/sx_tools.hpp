@@ -34,7 +34,7 @@
 */
 
 
-namespace casadi{
+namespace casadi {
 
 /**
 \ingroup expression_tools
@@ -74,11 +74,11 @@ namespace casadi{
   /**  \brief Heaviside function
    *
    * \f[
-   * \begin{cases}
+   * \begin {cases}
    * H(x) = 0 & x<0 \\
    * H(x) = 1/2 & x=0 \\
    * H(x) = 1 & x>0 \\
-   * \end{cases}
+   * \end {cases}
    * \f]
    */
   CASADI_SYMBOLIC_EXPORT SX heaviside(const SX &x);
@@ -87,11 +87,11 @@ namespace casadi{
    * \brief rectangle function
    *
    * \f[
-   * \begin{cases}
+   * \begin {cases}
    * \Pi(x) = 1     & |x| < 1/2 \\
    * \Pi(x) = 1/2   & |x| = 1/2  \\
    * \Pi(x) = 0     & |x| > 1/2  \\
-   * \end{cases}
+   * \end {cases}
    * \f]
    *
    * Also called: gate function, block function, band function, pulse function, window function
@@ -102,10 +102,10 @@ namespace casadi{
    * \brief triangle function
    *
    * \f[
-   * \begin{cases}
+   * \begin {cases}
    * \Lambda(x) = 0 &    |x| >= 1  \\
    * \Lambda(x) = 1-|x| &  |x| < 1
-   * \end{cases}
+   * \end {cases}
    * \f]
    *
    */
@@ -116,10 +116,10 @@ namespace casadi{
    *
    *
    * \f[
-   * \begin{cases}
+   * \begin {cases}
    *  R(x) = 0   & x <= 1 \\
    *  R(x) = x   & x > 1 \\
-   * \end{cases}
+   * \end {cases}
    * \f]
    *
    * Also called: slope function
@@ -192,22 +192,22 @@ namespace casadi{
 #ifndef SWIG
 
   template<typename T>
-  SX if_else(const SXElement& cond, const T& if_true, const T &if_false){
+  SX if_else(const SXElement& cond, const T& if_true, const T &if_false) {
     return if_false + (if_true-if_false)*cond;
   }
 
   template<int n, int m>
-  SX blockmatrix(SX array[n][m]){
+  SX blockmatrix(SX array[n][m]) {
     /** \brief  Return matrix */
     SX ret;
 
     /** \brief  loop over cols */
-    for(int i=0; i<n; ++i){
+    for(int i=0; i<n; ++i) {
       /** \brief  Create a col */
       SX col;
 
       /** \brief  append components to the col */
-      for(int j=0; j<m; ++j){
+      for(int j=0; j<m; ++j) {
         col.appendColumns(array[i][j]);
       }
 
@@ -220,12 +220,12 @@ namespace casadi{
 
   /** \brief  Create a block matrix (vector) */
   template<int n>
-  SX blockmatrix(SX array[n]){
+  SX blockmatrix(SX array[n]) {
     /** \brief  Return matrix */
     SX ret;
 
     /** \brief  loop over cols */
-    for(int i=0; i<n; ++i){
+    for(int i=0; i<n; ++i) {
       /** \brief  append components */
       ret.appendColumns(array[i]);
     }
@@ -276,7 +276,7 @@ namespace casadi{
    * Calculate the Taylor expansion of expression 'ex' up to order 'order' with
    * respect to variable 'x' around the point 'a'
    *
-   * \f$(x)=f(a)+f'(a)(x-a)+f''(a)\frac{(x-a)^2}{2!}+f'''(a)\frac{(x-a)^3}{3!}+\ldots\f$
+   * \f$(x)=f(a)+f'(a)(x-a)+f''(a)\frac {(x-a)^2}{2!}+f'''(a)\frac{(x-a)^3}{3!}+\ldots\f$
    *
    * Example usage:
    * \code

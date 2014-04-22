@@ -31,12 +31,12 @@
 #include <vector>
 #include <stack>
 
-namespace casadi{
+namespace casadi {
   /// \cond INTERNAL
   ///@{
   /** \brief Convenience function, convert vectors to vectors of pointers */
   template<class T>
-  std::vector<T*> ptrVec(std::vector<T>& v){
+  std::vector<T*> ptrVec(std::vector<T>& v) {
     std::vector<T*> ret(v.size());
     for(int i=0; i<v.size(); ++i)
       ret[i] = &v[i];
@@ -44,7 +44,7 @@ namespace casadi{
   }
 
   template<class T>
-  const std::vector<T*> ptrVec(const std::vector<T>& v){
+  const std::vector<T*> ptrVec(const std::vector<T>& v) {
     std::vector<T*> ret(v.size());
     for(int i=0; i<v.size(); ++i)
       ret[i] = const_cast<T*>(&v[i]);
@@ -52,7 +52,7 @@ namespace casadi{
   }
 
   template<class T>
-  std::vector<std::vector<T*> > ptrVec(std::vector<std::vector<T> >& v){
+  std::vector<std::vector<T*> > ptrVec(std::vector<std::vector<T> >& v) {
     std::vector<std::vector<T*> > ret(v.size());
     for(int i=0; i<v.size(); ++i)
       ret[i] = ptrVec(v[i]);
@@ -60,7 +60,7 @@ namespace casadi{
   }
 
   template<class T>
-  const std::vector<std::vector<T*> > ptrVec(const std::vector<std::vector<T> >& v){
+  const std::vector<std::vector<T*> > ptrVec(const std::vector<std::vector<T> >& v) {
     std::vector<std::vector<T*> > ret(v.size());
     for(int i=0; i<v.size(); ++i)
       ret[i] = ptrVec(v[i]);
@@ -74,7 +74,7 @@ namespace casadi{
       \date 2010
       Internal class.
   */
-  class CASADI_SYMBOLIC_EXPORT MXNode : public SharedObjectNode{
+  class CASADI_SYMBOLIC_EXPORT MXNode : public SharedObjectNode {
     friend class MX;
 
   public:
@@ -92,16 +92,16 @@ namespace casadi{
     virtual bool __nonzero__() const;
 
     /** \brief Check if identically zero */
-    virtual bool isZero() const{ return false;}
+    virtual bool isZero() const { return false;}
 
     /** \brief Check if identically one */
-    virtual bool isOne() const{ return false;}
+    virtual bool isOne() const { return false;}
 
     /** \brief Check if a certain value */
-    virtual bool isValue(double val) const{ return false;}
+    virtual bool isValue(double val) const { return false;}
 
     /** \brief Check if identity matrix */
-    virtual bool isIdentity() const{ return false;}
+    virtual bool isIdentity() const { return false;}
 
     /** \brief Check if unary operation */
     virtual bool isUnaryOp() const { return false;}
@@ -153,16 +153,16 @@ namespace casadi{
     virtual const std::string& getName() const;
 
     /** \brief  Check if evaluation output */
-    virtual bool isOutputNode() const{return false;}
+    virtual bool isOutputNode() const {return false;}
 
     /** \brief  Check if a multiple output node */
-    virtual bool isMultipleOutput() const{return false;}
+    virtual bool isMultipleOutput() const {return false;}
 
     /** \brief  Get function reference */
     virtual Function& getFunction();
 
     /** \brief  Get function reference */
-    virtual const Function& getFunction() const{ return const_cast<MXNode*>(this)->getFunction();}
+    virtual const Function& getFunction() const { return const_cast<MXNode*>(this)->getFunction();}
 
     /** \brief  Get function input */
     virtual int getFunctionInput() const;
@@ -174,10 +174,10 @@ namespace casadi{
     virtual int getOp() const = 0;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const{ return false;}
+    virtual bool isEqual(const MXNode* node, int depth) const { return false;}
 
     /** \brief Get equality checking depth */
-    inline static bool maxDepth(){ return MX::getEqualityCheckingDepth();}
+    inline static bool maxDepth() { return MX::getEqualityCheckingDepth();}
 
     /** \brief Checks if two nodes have the same operation and have
      * equivalent dependencies up to a given depth */
@@ -191,35 +191,35 @@ namespace casadi{
     int ndep() const;
 
     /** \brief  Does the node depend on other nodes*/
-    virtual bool hasDep() const{return ndep()>0; }
+    virtual bool hasDep() const {return ndep()>0; }
 
     /** \brief  Number of outputs */
-    virtual int getNumOutputs() const{ return 1;}
+    virtual int getNumOutputs() const { return 1;}
 
     /** \brief  Get an output */
     virtual MX getOutput(int oind) const;
 
     /// Get the sparsity
-    const Sparsity& sparsity() const{ return sparsity_;}
+    const Sparsity& sparsity() const { return sparsity_;}
 
     /// Get the sparsity of output oind
     virtual const Sparsity& sparsity(int oind) const;
 
     /// Get shape
-    int numel() const{ return sparsity().numel(); }
-    int size() const{ return sparsity().size(); }
-    int size1() const{ return sparsity().size1(); }
-    int size2() const{ return sparsity().size2(); }
-    std::pair<int,int> shape() const{ return sparsity().shape();}
+    int numel() const { return sparsity().numel(); }
+    int size() const { return sparsity().size(); }
+    int size1() const { return sparsity().size1(); }
+    int size2() const { return sparsity().size2(); }
+    std::pair<int,int> shape() const { return sparsity().shape();}
 
     /** \brief Is the node nonlinear */
-    virtual bool isNonLinear(){return false;}
+    virtual bool isNonLinear() {return false;}
 
     /// Set the sparsity
     void setSparsity(const Sparsity& sparsity);
 
     /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=0;}
+    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=0;}
 
     /// Set unary dependency
     void setDependencies(const MX& dep);
@@ -244,8 +244,8 @@ namespace casadi{
     virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
     /// Convert scalar to matrix
-    inline static MX toMatrix(const MX& x, const Sparsity& sp){
-      if(x.shape()==sp.shape()){
+    inline static MX toMatrix(const MX& x, const Sparsity& sp) {
+      if(x.shape()==sp.shape()) {
         return x;
       } else {
         return MX(sp,x);
@@ -259,7 +259,7 @@ namespace casadi{
     virtual Matrix<double> getMatrixValue() const;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const{ return 0;}
+    virtual int numInplace() const { return 0;}
 
     /// Convert vector of pointers to vector of objects
     template<typename T>
@@ -270,7 +270,7 @@ namespace casadi{
     static std::vector<std::vector<T> > getVector(const std::vector<std::vector<T*> > v);
 
     /// Simplify the expression (ex is a reference to the node)
-    virtual void simplifyMe(MX& ex){}
+    virtual void simplifyMe(MX& ex) {}
 
     /// Get an IMatrix representation of a GetNonzeros or SetNonzeros node
     virtual Matrix<int> mapping() const;
@@ -382,10 +382,10 @@ namespace casadi{
   // Implementations
 
   template<typename T>
-  std::vector<T> MXNode::getVector(const std::vector<T*> v){
+  std::vector<T> MXNode::getVector(const std::vector<T*> v) {
     std::vector<T> ret(v.size());
-    for(int i=0; i<v.size(); i++){
-      if(v[i]!=0){
+    for(int i=0; i<v.size(); i++) {
+      if(v[i]!=0) {
         ret[i] = *v[i];
       }
     }
@@ -393,9 +393,9 @@ namespace casadi{
   }
 
   template<typename T>
-  std::vector<std::vector<T> > MXNode::getVector(const std::vector<std::vector<T*> > v){
+  std::vector<std::vector<T> > MXNode::getVector(const std::vector<std::vector<T*> > v) {
     std::vector<std::vector<T> > ret(v.size());
-    for(int i=0; i<v.size(); i++){
+    for(int i=0; i<v.size(); i++) {
       ret[i] = getVector(v[i]);
     }
     return ret;

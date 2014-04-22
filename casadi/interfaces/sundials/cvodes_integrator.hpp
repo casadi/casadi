@@ -25,7 +25,7 @@
 
 #include "sundials_integrator.hpp"
 
-namespace casadi{
+namespace casadi {
 
 // Forward declaration of internal class
 class CVodesInternal;
@@ -41,7 +41,7 @@ class CVodesInternal;
 
 
 */
-class CASADI_SUNDIALS_INTERFACE_EXPORT CVodesIntegrator : public SundialsIntegrator{
+class CASADI_SUNDIALS_INTERFACE_EXPORT CVodesIntegrator : public SundialsIntegrator {
 public:
 
   /** \brief  Default constructor */
@@ -68,7 +68,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const Function& f, const Function& g){ return CVodesIntegrator(f,g);}
+  static Integrator creator(const Function& f, const Function& g) { return CVodesIntegrator(f,g);}
   #ifdef SWIG
   %nocallback;
   #endif

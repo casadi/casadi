@@ -27,7 +27,7 @@
 #include "../function/linear_solver.hpp"
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief An MX atomic for linear solver solution: x = r * A^-1 or x = r * A^-T
 
       Forward derivatives:
@@ -41,17 +41,17 @@ namespace casadi{
       \date 2013
   */
   template<bool Tr>
-  class CASADI_SYMBOLIC_EXPORT Solve : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Solve : public MXNode {
   public:
 
     /** \brief  Constructor */
     Solve(const MX& r, const MX& A, const LinearSolver& linear_solver);
 
     /** \brief  Destructor */
-    virtual ~Solve(){}
+    virtual ~Solve() {}
 
     /** \brief  Clone function */
-    virtual Solve* clone() const{ return new Solve(*this);}
+    virtual Solve* clone() const { return new Solve(*this);}
 
     /** \brief  Print expression (make sure number of calls is not exceeded) */
     virtual void print(std::ostream &stream, long& remaining_calls) const;
@@ -77,19 +77,19 @@ namespace casadi{
                                    std::vector<int>& itmp, std::vector<double>& rtmp, bool fwd);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_SOLVE;}
+    virtual int getOp() const { return OP_SOLVE;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const{ return 1;}
+    virtual int numInplace() const { return 1;}
 
     /** \brief  Get function reference */
-    virtual Function& getFunction(){ return linear_solver_;}
+    virtual Function& getFunction() { return linear_solver_;}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /// Get number of temporary variables needed
-    virtual void nTmp(size_t& ni, size_t& nr){ ni=0; nr=sparsity().size1();}
+    virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=sparsity().size1();}
 
     /// Linear Solver (may be shared between multiple nodes)
     LinearSolver linear_solver_;

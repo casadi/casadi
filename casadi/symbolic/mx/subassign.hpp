@@ -28,12 +28,12 @@
 #include <stack>
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Reference to a submatrix
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT SubAssign : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT SubAssign : public MXNode {
   public:
 
     /// Constructor
@@ -43,7 +43,7 @@ namespace casadi{
     virtual SubAssign* clone() const;
 
     /// Destructor
-    virtual ~SubAssign(){}
+    virtual ~SubAssign() {}
 
     /// Evaluate the function numerically
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
@@ -73,7 +73,7 @@ namespace casadi{
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_SUBASSIGN;}
+    virtual int getOp() const { return OP_SUBASSIGN;}
 
     /// Data members
     Slice i_, j_;

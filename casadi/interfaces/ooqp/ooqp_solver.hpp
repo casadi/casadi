@@ -63,7 +63,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const QPStructure &st){ return OOQPSolver(st);}
+  static QPSolver creator(const QPStructure &st) { return OOQPSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

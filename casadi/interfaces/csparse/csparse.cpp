@@ -23,24 +23,24 @@
 #include "csparse_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  CSparse::CSparse(){
+  CSparse::CSparse() {
   }
 
-  CSparse::CSparse(const Sparsity& sp, int nrhs){
+  CSparse::CSparse(const Sparsity& sp, int nrhs) {
     assignNode(new CSparseInternal(sp,nrhs));
   }
 
-  CSparseInternal* CSparse::operator->(){
+  CSparseInternal* CSparse::operator->() {
     return static_cast<CSparseInternal*>(Function::operator->());
   }
 
-  const CSparseInternal* CSparse::operator->() const{
+  const CSparseInternal* CSparse::operator->() const {
     return static_cast<const CSparseInternal*>(Function::operator->());
   }
 
-  bool CSparse::checkNode() const{
+  bool CSparse::checkNode() const {
     return dynamic_cast<const CSparseInternal*>(get())!=0;
   }
 

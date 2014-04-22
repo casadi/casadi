@@ -27,7 +27,7 @@
 
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   // Forward declaration
   class WeakRefInternal;
@@ -38,7 +38,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT WeakRef : public SharedObject{
+  class CASADI_SYMBOLIC_EXPORT WeakRef : public SharedObject {
   public:
     friend class SharedObjectNode;
 
@@ -71,7 +71,7 @@ namespace casadi{
  };
 
 #ifndef SWIG
-  class CASADI_SYMBOLIC_EXPORT WeakRefInternal : public SharedObjectNode{
+  class CASADI_SYMBOLIC_EXPORT WeakRefInternal : public SharedObjectNode {
   public:
     // Constructor
     WeakRefInternal(SharedObjectNode* raw);
@@ -80,7 +80,7 @@ namespace casadi{
     ~WeakRefInternal();
 
     // Clone (should never be used)
-    virtual WeakRefInternal* clone() const{ return new WeakRefInternal(*this);}
+    virtual WeakRefInternal* clone() const { return new WeakRefInternal(*this);}
 
     // Raw pointer to the cached object
     SharedObjectNode* raw_;

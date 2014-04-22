@@ -32,7 +32,7 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
 // Forward declaration of internal class
 class IdasInternal;
@@ -44,7 +44,7 @@ class IdasInternal;
    \author Joel Andersson
    \date 2010
 */
-class CASADI_SUNDIALS_INTERFACE_EXPORT IdasIntegrator : public SundialsIntegrator{
+class CASADI_SUNDIALS_INTERFACE_EXPORT IdasIntegrator : public SundialsIntegrator {
 public:
 
   /// Default constructor
@@ -77,7 +77,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const Function& f, const Function& g){ return IdasIntegrator(f,g);}
+  static Integrator creator(const Function& f, const Function& g) { return IdasIntegrator(f,g);}
   #ifdef SWIG
   %nocallback;
   #endif

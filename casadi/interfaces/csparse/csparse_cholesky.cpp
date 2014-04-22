@@ -23,24 +23,24 @@
 #include "csparse_cholesky_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  CSparseCholesky::CSparseCholesky(){
+  CSparseCholesky::CSparseCholesky() {
   }
 
-  CSparseCholesky::CSparseCholesky(const Sparsity& sp, int nrhs){
+  CSparseCholesky::CSparseCholesky(const Sparsity& sp, int nrhs) {
     assignNode(new CSparseCholeskyInternal(sp,nrhs));
   }
 
-  CSparseCholeskyInternal* CSparseCholesky::operator->(){
+  CSparseCholeskyInternal* CSparseCholesky::operator->() {
     return static_cast<CSparseCholeskyInternal*>(Function::operator->());
   }
 
-  const CSparseCholeskyInternal* CSparseCholesky::operator->() const{
+  const CSparseCholeskyInternal* CSparseCholesky::operator->() const {
     return static_cast<const CSparseCholeskyInternal*>(Function::operator->());
   }
 
-  bool CSparseCholesky::checkNode() const{
+  bool CSparseCholesky::checkNode() const {
     return dynamic_cast<const CSparseCholeskyInternal*>(get())!=0;
   }
 

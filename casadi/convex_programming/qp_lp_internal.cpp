@@ -28,7 +28,7 @@
 using namespace std;
 namespace casadi {
 
-QPLPInternal* QPLPInternal::clone() const{
+QPLPInternal* QPLPInternal::clone() const {
   // Return a deep copy
   QPLPInternal* node = new QPLPInternal(st_);
   if(!node->is_init_)
@@ -44,10 +44,10 @@ QPLPInternal::QPLPInternal(const std::vector<Sparsity> &st) : LPSolverInternal(s
 
 }
 
-QPLPInternal::~QPLPInternal(){
+QPLPInternal::~QPLPInternal() {
 }
 
-void QPLPInternal::evaluate(){
+void QPLPInternal::evaluate() {
 
   // Pass inputs of LP to QP form
   qpsolver_.input(QP_SOLVER_A).set(input(LP_SOLVER_A));
@@ -72,7 +72,7 @@ void QPLPInternal::evaluate(){
   output(QP_SOLVER_LAM_X).set(qpsolver_.output(LP_SOLVER_LAM_X));
 }
 
-void QPLPInternal::init(){
+void QPLPInternal::init() {
 
   LPSolverInternal::init();
 
@@ -82,7 +82,7 @@ void QPLPInternal::init(){
                                         "a",input(LP_SOLVER_A).sparsity()));
 
   qpsolver_.setLPOptions();
-  if(hasSetOption("qp_solver_options")){
+  if(hasSetOption("qp_solver_options")) {
     qpsolver_.setOption(getOption("qp_solver_options"));
   }
 

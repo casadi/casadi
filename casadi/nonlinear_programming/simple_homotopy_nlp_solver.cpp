@@ -24,24 +24,24 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver(){
+  SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver() {
   }
 
-  SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver(const Function& nlp){
+  SimpleHomotopyNLPSolver::SimpleHomotopyNLPSolver(const Function& nlp) {
     assignNode(new SimpleHomotopyNLPInternal(nlp));
   }
 
-  SimpleHomotopyNLPInternal* SimpleHomotopyNLPSolver::operator->(){
+  SimpleHomotopyNLPInternal* SimpleHomotopyNLPSolver::operator->() {
     return static_cast<SimpleHomotopyNLPInternal*>(HomotopyNLPSolver::operator->());
   }
 
-  const SimpleHomotopyNLPInternal* SimpleHomotopyNLPSolver::operator->() const{
+  const SimpleHomotopyNLPInternal* SimpleHomotopyNLPSolver::operator->() const {
     return static_cast<const SimpleHomotopyNLPInternal*>(HomotopyNLPSolver::operator->());
   }
 
-  bool SimpleHomotopyNLPSolver::checkNode() const{
+  bool SimpleHomotopyNLPSolver::checkNode() const {
     return dynamic_cast<const SimpleHomotopyNLPInternal*>(get())!=0;
   }
 

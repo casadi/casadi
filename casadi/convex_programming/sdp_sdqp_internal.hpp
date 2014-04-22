@@ -30,7 +30,7 @@
 #include "sdp_sdqp_solver.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for SDPSDQPInternal
    *
@@ -44,7 +44,7 @@ namespace casadi{
     explicit SDPSDQPInternal(const std::vector<Sparsity> &st);
 
     /** \brief Clone */
-    virtual SDPSDQPInternal* clone() const{ return new SDPSDQPInternal(*this);}
+    virtual SDPSDQPInternal* clone() const { return new SDPSDQPInternal(*this);}
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

@@ -31,13 +31,13 @@
 
 #include "casadi_common.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Base class for objects that have a natural string representation
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT PrintableObject{
+  class CASADI_SYMBOLIC_EXPORT PrintableObject {
   public:
 
 #ifndef SWIG
@@ -67,7 +67,7 @@ namespace casadi{
   };
 
 #ifdef SWIG
-  %extend PrintableObject{
+  %extend PrintableObject {
     std::string __str__()  { return $self->getDescription(); }
     std::string __repr__()  { return $self->getRepresentation(); }
   }

@@ -29,19 +29,19 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Get nonzeros of a matrix
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT GetNonzeros : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT GetNonzeros : public MXNode {
   public:
 
     /// Constructor
     GetNonzeros(const Sparsity& sp, const MX& x);
 
     /// Destructor
-    virtual ~GetNonzeros(){}
+    virtual ~GetNonzeros() {}
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -55,26 +55,26 @@ namespace casadi{
     virtual std::vector<int> getAll() const = 0;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_GETNONZEROS;}
+    virtual int getOp() const { return OP_GETNONZEROS;}
 
     /// Get the nonzeros of matrix
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
   };
 
-  class CASADI_SYMBOLIC_EXPORT GetNonzerosVector : public GetNonzeros{
+  class CASADI_SYMBOLIC_EXPORT GetNonzerosVector : public GetNonzeros {
   public:
     /// Constructor
     GetNonzerosVector(const Sparsity& sp, const MX& x,
-                      const std::vector<int>& nz) : GetNonzeros(sp,x), nz_(nz){}
+                      const std::vector<int>& nz) : GetNonzeros(sp,x), nz_(nz) {}
 
     /// Clone function
-    virtual GetNonzerosVector* clone() const{ return new GetNonzerosVector(*this);}
+    virtual GetNonzerosVector* clone() const { return new GetNonzerosVector(*this);}
 
     /// Destructor
-    virtual ~GetNonzerosVector(){}
+    virtual ~GetNonzerosVector() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const{ return nz_;}
+    virtual std::vector<int> getAll() const { return nz_;}
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
@@ -106,20 +106,20 @@ namespace casadi{
   };
 
   // Specialization of the above when nz_ is a Slice
-  class CASADI_SYMBOLIC_EXPORT GetNonzerosSlice : public GetNonzeros{
+  class CASADI_SYMBOLIC_EXPORT GetNonzerosSlice : public GetNonzeros {
   public:
 
     /// Constructor
-    GetNonzerosSlice(const Sparsity& sp, const MX& x, const Slice& s) : GetNonzeros(sp,x), s_(s){}
+    GetNonzerosSlice(const Sparsity& sp, const MX& x, const Slice& s) : GetNonzeros(sp,x), s_(s) {}
 
     /// Clone function
-    virtual GetNonzerosSlice* clone() const{ return new GetNonzerosSlice(*this);}
+    virtual GetNonzerosSlice* clone() const { return new GetNonzerosSlice(*this);}
 
     /// Destructor
-    virtual ~GetNonzerosSlice(){}
+    virtual ~GetNonzerosSlice() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const{ return s_.getAll(s_.stop_);}
+    virtual std::vector<int> getAll() const { return s_.getAll(s_.stop_);}
 
     /// Check if the instance is in fact an identity mapping (that can be simplified)
     bool isIdentity() const;
@@ -157,21 +157,21 @@ namespace casadi{
   };
 
   // Specialization of the above when nz_ is a nested Slice
-  class CASADI_SYMBOLIC_EXPORT GetNonzerosSlice2 : public GetNonzeros{
+  class CASADI_SYMBOLIC_EXPORT GetNonzerosSlice2 : public GetNonzeros {
   public:
 
     /// Constructor
     GetNonzerosSlice2(const Sparsity& sp, const MX& x, const Slice& inner,
-                      const Slice& outer) : GetNonzeros(sp,x), inner_(inner), outer_(outer){}
+                      const Slice& outer) : GetNonzeros(sp,x), inner_(inner), outer_(outer) {}
 
     /// Clone function
-    virtual GetNonzerosSlice2* clone() const{ return new GetNonzerosSlice2(*this);}
+    virtual GetNonzerosSlice2* clone() const { return new GetNonzerosSlice2(*this);}
 
     /// Destructor
-    virtual ~GetNonzerosSlice2(){}
+    virtual ~GetNonzerosSlice2() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const{ return inner_.getAll(outer_,outer_.stop_);}
+    virtual std::vector<int> getAll() const { return inner_.getAll(outer_,outer_.stop_);}
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);

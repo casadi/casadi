@@ -28,13 +28,13 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** @copydoc Nullspace_doc
       \author Joris Gillis
       \date 2014
   */
-  class CASADI_SYMBOLIC_EXPORT NullspaceInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT NullspaceInternal : public FunctionInternal {
   public:
 
     /** \brief  Constructor */
@@ -44,7 +44,7 @@ namespace casadi{
     virtual ~NullspaceInternal();
 
     /** \brief  Clone */
-    virtual NullspaceInternal* clone() const{ return new NullspaceInternal(A_sp_);}
+    virtual NullspaceInternal* clone() const { return new NullspaceInternal(A_sp_);}
 
     /** \brief  initialize */
     virtual void init();

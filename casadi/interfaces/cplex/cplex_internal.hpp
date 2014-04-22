@@ -30,12 +30,12 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** Internal class for CplexSolver
       @copydoc QPSolver_doc
   */
-  class CASADI_CPLEX_INTERFACE_EXPORT CplexInternal : public QPSolverInternal{
+  class CASADI_CPLEX_INTERFACE_EXPORT CplexInternal : public QPSolverInternal {
     friend class CplexSolver;
   public:
     /** \brief Default constructor */

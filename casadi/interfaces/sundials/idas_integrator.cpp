@@ -25,28 +25,28 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-IdasIntegrator::IdasIntegrator(){
+IdasIntegrator::IdasIntegrator() {
 }
 
-IdasIntegrator::IdasIntegrator(const Function& f, const Function& g){
+IdasIntegrator::IdasIntegrator(const Function& f, const Function& g) {
   assignNode(new IdasInternal(f,g));
 }
 
-IdasInternal* IdasIntegrator::operator->(){
+IdasInternal* IdasIntegrator::operator->() {
   return static_cast<IdasInternal*>(Function::operator->());
 }
 
-const IdasInternal* IdasIntegrator::operator->() const{
+const IdasInternal* IdasIntegrator::operator->() const {
   return static_cast<const IdasInternal*>(Function::operator->());
 }
 
-bool IdasIntegrator::checkNode() const{
+bool IdasIntegrator::checkNode() const {
   return dynamic_cast<const IdasInternal*>(get());
 }
 
-void IdasIntegrator::correctInitialConditions(){
+void IdasIntegrator::correctInitialConditions() {
   (*this)->correctInitialConditions();
 }
 

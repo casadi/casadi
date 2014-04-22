@@ -27,14 +27,14 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Represents a symbolic MX
       \author Joel Andersson
       \date 2010
       A regular user is not supposed to work with this Node class.
       This user can call MX(name,n,m) directly.
   */
-  class CASADI_SYMBOLIC_EXPORT SymbolicMX : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT SymbolicMX : public MXNode {
   public:
 
     /** \brief  Constructors */
@@ -44,7 +44,7 @@ namespace casadi{
     explicit SymbolicMX(const std::string& name, const Sparsity & sp);
 
     /// Destructor
-    virtual ~SymbolicMX(){}
+    virtual ~SymbolicMX() {}
 
     /** \brief  Clone function */
     virtual SymbolicMX* clone() const;
@@ -72,7 +72,7 @@ namespace casadi{
     virtual const std::string& getName() const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_PARAMETER;}
+    virtual int getOp() const { return OP_PARAMETER;}
 
   protected:
     // Name of the variable

@@ -39,7 +39,7 @@ extern "C"
               f_int* ldz2, double* wr, double *wi,double* dwork, f_int *ld_work, f_int *info );
 }
 
-namespace casadi{
+namespace casadi {
   void slicot_mb03vd(int n, int p, int ilo, int ihi, double * a, int lda1, int lda2, double * tau,
                      int ldtau, double * dwork) {
      if (dwork==0) {

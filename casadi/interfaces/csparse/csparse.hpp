@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 #include <casadi/interfaces/csparse/casadi_csparse_interface_export.h>
 
-namespace casadi{
+namespace casadi {
 
 
   /** \brief  Forward declaration of internal class */
@@ -51,7 +51,7 @@ namespace casadi{
    * step and is therefore more expensive if A is invariant.
    *
    */
-  class CASADI_CSPARSE_INTERFACE_EXPORT CSparse : public LinearSolver{
+  class CASADI_CSPARSE_INTERFACE_EXPORT CSparse : public LinearSolver {
   public:
 
     /// Default (empty) constructor
@@ -73,7 +73,7 @@ namespace casadi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const Sparsity& sp, int nrhs){ return CSparse(sp,nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs) { return CSparse(sp,nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif

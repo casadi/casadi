@@ -28,14 +28,14 @@
 #include "../std_vector_tools.hpp"
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b, int order, const SX& w){
+  SX gauss_quadrature(SX f, const SX &x, const SX &a, const SX &b, int order, const SX& w) {
     casadi_assert_message(order == 5, "gauss_quadrature: order must be 5");
     casadi_assert_message(w.isEmpty(),"gauss_quadrature: empty weights");
 
     // Change variables to [-1,1]
-    if(!a.toScalar().isEqual(-1) || !b.toScalar().isEqual(1)){
+    if(!a.toScalar().isEqual(-1) || !b.toScalar().isEqual(1)) {
       SX q1 = (b-a)/2;
       SX q2 = (b+a)/2;
 
@@ -75,7 +75,7 @@ namespace casadi{
     return sum;
   }
 
-  SX pw_const(const SX &t, const SX &tval, const SX &val){
+  SX pw_const(const SX &t, const SX &tval, const SX &val) {
     // number of intervals
     int n = val.numel();
 
@@ -83,21 +83,21 @@ namespace casadi{
     casadi_assert_message(tval.numel() == n-1, "dimensions do not match");
 
     SX ret = val.at(0);
-    for(int i=0; i<n-1; ++i){
+    for(int i=0; i<n-1; ++i) {
       ret += (val(0,i+1)-val(0,i)) * (t>=tval(0,i));
     }
 
     return ret;
   }
 
-  SX pw_lin(const SXElement &t, const SX &tval, const SX &val){
+  SX pw_lin(const SXElement &t, const SX &tval, const SX &val) {
     // Number of points
     int N = tval.numel();
     casadi_assert_message(N>=2,"pw_lin: N>=2");
 
     // Gradient for each line segment
     SX g = SX::sparse(1,N-1);
-    for(int i=0; i<N-1; ++i){
+    for(int i=0; i<N-1; ++i) {
       g(0,i) = (val(0,i+1)- val(0,i))/(tval(0,i+1)-tval(0,i));
     }
 
@@ -113,33 +113,33 @@ namespace casadi{
     return pw_const(t, tint, lseg);
   }
 
-  SX if_else(const SX &cond, const SX &if_true, const SX &if_false){
+  SX if_else(const SX &cond, const SX &if_true, const SX &if_false) {
     return if_else_zero(cond,if_true) + if_else_zero(!cond,if_false);
   }
 
-  SX heaviside(const SX& a){
+  SX heaviside(const SX& a) {
     return (1+sign(a))/2;
   }
 
-  SX ramp(const SX& a){
+  SX ramp(const SX& a) {
     return a*heaviside(a);
   }
 
-  SX rectangle(const SX& a){
+  SX rectangle(const SX& a) {
     return 0.5*(sign(a+0.5)-sign(a-0.5));
   }
 
-  SX triangle(const SX& a){
+  SX triangle(const SX& a) {
     return rectangle(a.toScalar()/2)*(1-abs(a.toScalar()));
   }
 
-  void simplify(SX &ex){
+  void simplify(SX &ex) {
     // simplify all non-zero elements
     for(int el=0; el<ex.size(); ++el)
       simplify(ex.at(el));
   }
 
-  void compress(SX &ex, int level){
+  void compress(SX &ex, int level) {
 
     throw CasadiException("SX::compress: Not implemented");
 
@@ -148,7 +148,7 @@ namespace casadi{
   }
 
   std::vector<SX> substitute(const std::vector<SX> &ex, const std::vector<SX> &v,
-                             const std::vector<SX> &vdef){
+                             const std::vector<SX> &vdef) {
     // Assert consistent dimensions
     casadi_assert_warning(v.size()==vdef.size(),"subtitute: number of symbols to replace ( "
                           << v.size() << ") must match number of expressions (" << vdef.size()
@@ -156,8 +156,8 @@ namespace casadi{
 
     // Quick return if all equal
     bool all_equal = true;
-    for(int k=0; k<v.size(); ++k){
-      if(!v[k].isEqual(vdef[k])){
+    for(int k=0; k<v.size(); ++k) {
+      if(!v[k].isEqual(vdef[k])) {
         all_equal = false;
         break;
       }
@@ -165,7 +165,7 @@ namespace casadi{
     if(all_equal) return ex;
 
     // Check sparsities
-    for(int k=0; k<v.size(); ++k){
+    for(int k=0; k<v.size(); ++k) {
       if(v[k].sparsity()!=vdef[k].sparsity()) {
         // Expand vdef to sparsity of v if vdef is scalar
         if (vdef[k].isScalar() && vdef[k].size()==1) {
@@ -186,7 +186,7 @@ namespace casadi{
     return F(vdef);
   }
 
-  SX substitute(const SX &ex, const SX &v, const SX &vdef){
+  SX substitute(const SX &ex, const SX &v, const SX &vdef) {
     return substitute(vector<SX>(1,ex),vector<SX>(1,v),vector<SX>(1,vdef)).front();
   }
 
@@ -205,13 +205,13 @@ namespace casadi{
     return fcn.output();
   }
 
-  void substituteInPlace(const SX &v, SX &vdef, bool reverse){
+  void substituteInPlace(const SX &v, SX &vdef, bool reverse) {
     // Empty vector
     vector<SX> ex;
     substituteInPlace(v,vdef,ex,reverse);
   }
 
-  void substituteInPlace(const SX &v, SX &vdef, std::vector<SX>& ex, bool reverse){
+  void substituteInPlace(const SX &v, SX &vdef, std::vector<SX>& ex, bool reverse) {
     casadi_assert_message(v.isSymbolic(),"the variable is not symbolic");
     casadi_assert_message(v.sparsity() == vdef.sparsity(),"the sparsity patterns of the "
                           "expression and its defining bexpression do not match");
@@ -244,16 +244,16 @@ namespace casadi{
     vector<SXElement>::const_iterator p_it = f->free_vars_.begin();
 
     // Evaluate the algorithm
-    for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
-      switch(it->op){
+    for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
+      switch(it->op) {
       case OP_INPUT:
         // reverse is false, substitute out
         work[it->i0] = vdef.at(it->i2);
         break;
       case OP_OUTPUT:
-        if(it->i0==0){
+        if(it->i0==0) {
           vdef.at(it->i2) = work[it->i1];
-          if(reverse){
+          if(reverse) {
             // Use the new variable henceforth, substitute in
             work[it->i1] = v.at(it->i2);
           }
@@ -266,7 +266,7 @@ namespace casadi{
       case OP_PARAMETER:  work[it->i0] = *p_it++; break;
       default:
         {
-          switch(it->op){
+          switch(it->op) {
             CASADI_MATH_FUN_BUILTIN(work[it->i1],work[it->i2],work[it->i0])
               }
 
@@ -279,7 +279,7 @@ namespace casadi{
   }
 
 #if 0
-  void replaceDerivatives(SX &ex, const SX &var, const SX &dvar){
+  void replaceDerivatives(SX &ex, const SX &var, const SX &dvar) {
     // Initialize with an empty expression
     SXFunction fcn(ex);
 
@@ -292,8 +292,8 @@ namespace casadi{
     std::map<int, SX> replace;
 
     // Go through all nodes and check if any node is a derivative
-    for(int i=0; i<fcn.algorithm.size(); ++i){
-      if(fcn.algorithm[i].op == DER){
+    for(int i=0; i<fcn.algorithm.size(); ++i) {
+      if(fcn.algorithm[i].op == DER) {
 
         // find the corresponding derivative
         std::map<int, SX>::iterator r = dermap.find(fcn.algorithm[i].ch0);
@@ -313,7 +313,7 @@ namespace casadi{
 #endif
 
 #if 0
-  void makeSmooth(SX &ex, SX &bvar, SX &bexpr){
+  void makeSmooth(SX &ex, SX &bvar, SX &bexpr) {
     // Initialize
     SXFunction fcn(SX(),ex);
 
@@ -323,10 +323,10 @@ namespace casadi{
     std::map<int,SXElement> replace;
 
     // Go through all nodes and check if any node is non-smooth
-    for(int i=0; i<fcn->algorithm.size(); ++i){
+    for(int i=0; i<fcn->algorithm.size(); ++i) {
 
       // Check if we have a step node
-      if(fcn->algorithm[i].op == STEP){
+      if(fcn->algorithm[i].op == STEP) {
 
         // Get the index of the child
         int ch0 = fcn->algorithm[i].ch[0];
@@ -337,13 +337,13 @@ namespace casadi{
 #if 0
         // Find out if the switch has already been added
         for(int j=0; j<bexpr.size(); ++j)
-          if(bexpr[j].isEqual(algorithm[i]->child0)){
+          if(bexpr[j].isEqual(algorithm[i]->child0)) {
             sw = bvar[j];
             break;
           }
 #endif
 
-        if(sw.isEmpty()){ // the switch has not yet been added
+        if(sw.isEmpty()) { // the switch has not yet been added
           // Get an approriate name of the switch
           std::stringstream name;
           name << "sw_" << bvar.size2();
@@ -376,7 +376,7 @@ namespace casadi{
   }
 #endif
 
-  SX spy(const SX& A){
+  SX spy(const SX& A) {
     SX s = SX::sparse(A.size1(),A.size2());
     for(int i=0; i<A.size2(); ++i)
       for(int j=0; j<A.size1(); ++j)
@@ -385,7 +385,7 @@ namespace casadi{
     return s;
   }
 
-  bool dependsOn(const SX& ex, const SX &arg){
+  bool dependsOn(const SX& ex, const SX &arg) {
     if(ex.size()==0) return false;
 
     // Construct a temporary algorithm
@@ -440,7 +440,7 @@ namespace casadi{
     return H;
   }
 
-  void expand(const SX& ex2, SX &ww, SX& tt){
+  void expand(const SX& ex2, SX &ww, SX& tt) {
     casadi_assert(ex2.isScalar());
     SXElement ex = ex2.toScalar();
 
@@ -453,10 +453,10 @@ namespace casadi{
     std::stack<SXNode*> to_be_expanded;
     to_be_expanded.push(ex.get());
 
-    while(!to_be_expanded.empty()){ // as long as there are nodes to be expanded
+    while(!to_be_expanded.empty()) { // as long as there are nodes to be expanded
 
       // Check if the last element on the stack is already expanded
-      if (indices.find(to_be_expanded.top()) != indices.end()){
+      if (indices.find(to_be_expanded.top()) != indices.end()) {
         // Remove from stack
         to_be_expanded.pop();
         continue;
@@ -466,10 +466,10 @@ namespace casadi{
       std::vector<double> w; // weights
       std::vector<SXNode*> f; // terms
 
-      if(to_be_expanded.top()->isConstant()){ // constant nodes are seen as multiples of one
+      if(to_be_expanded.top()->isConstant()) { // constant nodes are seen as multiples of one
         w.push_back(to_be_expanded.top()->getValue());
         f.push_back(casadi_limits<SXElement>::one.get());
-      } else if(to_be_expanded.top()->isSymbolic()){
+      } else if(to_be_expanded.top()->isSymbolic()) {
         // symbolic nodes have weight one and itself as factor
         w.push_back(1);
         f.push_back(to_be_expanded.top());
@@ -482,13 +482,13 @@ namespace casadi{
         // If we have a binary node that we can factorize
         if(node->getOp() == OP_ADD || node->getOp() == OP_SUB ||
            (node->getOp() == OP_MUL  && (node->dep(0)->isConstant() ||
-                                         node->dep(1)->isConstant()))){
+                                         node->dep(1)->isConstant()))) {
           // Make sure that both children are factorized, if not - add to stack
-          if (indices.find(node->dep(0).get()) == indices.end()){
+          if (indices.find(node->dep(0).get()) == indices.end()) {
             to_be_expanded.push(node->dep(0).get());
             continue;
           }
-          if (indices.find(node->dep(1).get()) == indices.end()){
+          if (indices.find(node->dep(1).get()) == indices.end()) {
             to_be_expanded.push(node->dep(1).get());
             continue;
           }
@@ -498,9 +498,9 @@ namespace casadi{
           int ind2 = indices[node->dep(1).get()];
 
           // If multiplication
-          if(node->getOp() == OP_MUL){
+          if(node->getOp() == OP_MUL) {
             double fac;
-            if(node->dep(0)->isConstant()){ // Multiplication where the first factor is a constant
+            if(node->dep(0)->isConstant()) { // Multiplication where the first factor is a constant
               fac = node->dep(0)->getValue();
               f = terms[ind2];
               w = weights[ind2];
@@ -512,7 +512,7 @@ namespace casadi{
             for(int i=0; i<w.size(); ++i) w[i] *= fac;
 
           } else { // if addition or subtraction
-            if(node->getOp() == OP_ADD){          // Addition: join both sums
+            if(node->getOp() == OP_ADD) {          // Addition: join both sums
               f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
               w = weights[ind1];    w.insert(w.end(), weights[ind2].begin(), weights[ind2].end());
             } else {      // Subtraction: join both sums with negative weights for second term
@@ -526,10 +526,10 @@ namespace casadi{
             std::vector<SXNode*> f_new;  f_new.reserve(f.size());   // terms
             std::map<SXNode*,int> f_ind; // index in f_new
 
-            for(int i=0; i<w.size(); i++){
+            for(int i=0; i<w.size(); i++) {
               // Try to locate the node
               std::map<SXNode*,int>::iterator it = f_ind.find(f[i]);
-              if(it == f_ind.end()){ // if the term wasn't found
+              if(it == f_ind.end()) { // if the term wasn't found
                 w_new.push_back(w[i]);
                 f_new.push_back(f[i]);
                 f_ind[f[i]] = f_new.size()-1;
@@ -567,7 +567,7 @@ namespace casadi{
     tt = SX(termsv);
   }
 
-  void simplify(SXElement& ex){
+  void simplify(SXElement& ex) {
     // Start by expanding the node to a weighted sum
     SX terms, weights;
     expand(ex,weights,terms);
@@ -635,7 +635,7 @@ namespace casadi{
              mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()).T();
   }
 
-  int countNodes(const SX& A){
+  int countNodes(const SX& A) {
     SXFunction f(SX(),A);
     f.init();
     return f.countNodes();
@@ -652,7 +652,7 @@ namespace casadi{
     return s.str();
   }
 
-  void makeSemiExplicit(const SX& f, const SX& x, SX& fe, SX& fi, SX& xe, SX& xi){
+  void makeSemiExplicit(const SX& f, const SX& x, SX& fe, SX& fi, SX& xe, SX& xi) {
     casadi_assert(f.isDense());
     casadi_assert(x.isDense());
 
@@ -683,13 +683,13 @@ namespace casadi{
 
     // Permuted equations
     vector<SXElement> fp(f.size());
-    for(int i=0; i<fp.size(); ++i){
+    for(int i=0; i<fp.size(); ++i) {
       fp[i] = f.elem(0,colperm[i]);
     }
 
     // Permuted variables
     vector<SXElement> xp(x.size());
-    for(int i=0; i<xp.size(); ++i){
+    for(int i=0; i<xp.size(); ++i) {
       xp[i]= x.elem(0,rowperm[i]);
     }
 
@@ -709,17 +709,17 @@ namespace casadi{
     vector<SXElement> fev, fiv, xev, xiv;
 
     // Loop over blocks
-    for(int b=0; b<nb; ++b){
+    for(int b=0; b<nb; ++b) {
 
       // Get the local equations
       fb.clear();
-      for(int i=colblock[b]; i<colblock[b+1]; ++i){
+      for(int i=colblock[b]; i<colblock[b+1]; ++i) {
         fb.push_back(fp[i]);
       }
 
       // Get the local variables
       xb.clear();
-      for(int i=rowblock[b]; i<rowblock[b+1]; ++i){
+      for(int i=rowblock[b]; i<rowblock[b+1]; ++i) {
         xb.push_back(xp[i]);
       }
 
@@ -743,7 +743,7 @@ namespace casadi{
 
       // Get the subsets of variables that appear nonlinearily
       vector<bool> nonlin(sp_nonlin.size1(),false);
-      for(int el=0; el<sp_nonlin.size(); ++el){
+      for(int el=0; el<sp_nonlin.size(); ++el) {
         nonlin[sp_nonlin.row(el)] = true;
       }
       /*    cout << "nonlin = " << nonlin << endl;*/
@@ -751,7 +751,7 @@ namespace casadi{
       // Separate variables
       xb_lin.clear();
       xb_nonlin.clear();
-      for(int i=0; i<nonlin.size(); ++i){
+      for(int i=0; i<nonlin.size(); ++i) {
         if(nonlin[i])
           xb_nonlin.push_back(xb[i]);
         else
@@ -759,7 +759,7 @@ namespace casadi{
       }
 
       // If there are only nonlinear variables
-      if(xb_lin.empty()){
+      if(xb_lin.empty()) {
         // Substitute the already determined variables
         fb = substitute(SX(fb),SX(xev),SX(fev)).data();
 
@@ -776,10 +776,10 @@ namespace casadi{
         SX rb = -fcnb(SX::zeros(1,xb_lin.size())).at(0);
 
         // Simple solve if there are no nonlinear variables
-        if(xb_nonlin.empty()){
+        if(xb_nonlin.empty()) {
 
           // Check if 1-by-1 block
-          if(Jb.numel()==1){
+          if(Jb.numel()==1) {
             // Simple division if Jb scalar
             rb /= Jb;
           } else {
@@ -837,13 +837,13 @@ namespace casadi{
     xe = SX(xev);
   }
 
-  SX getFree(const SX& ex){
+  SX getFree(const SX& ex) {
     SXFunction f(vector<SX>(),ex);
     f.init();
     return f.getFree();
   }
 
-  SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v, bool transpose_jacobian){
+  SX jacobianTimesVector(const SX &ex, const SX &arg, const SX &v, bool transpose_jacobian) {
     SXFunction f(arg,ex);
     f.init();
 
@@ -854,7 +854,7 @@ namespace casadi{
     casadi_assert(v2 >= 1);
     casadi_assert(ex.size1()==1);
     casadi_assert(arg.size1()==1);
-    if(transpose_jacobian){
+    if(transpose_jacobian) {
       casadi_assert(v1==ex.size2());
     } else {
       casadi_assert(v1==arg.size2());
@@ -869,8 +869,8 @@ namespace casadi{
     vector<SX> resv = f.outputExpr();
     vector<vector<SX> > fseed(nfsens,argv), fsens(nfsens,resv),
         aseed(nasens,resv), asens(nasens,argv);
-    for(int dir=0; dir<v2; ++dir){
-      if(transpose_jacobian){
+    for(int dir=0; dir<v2; ++dir) {
+      if(transpose_jacobian) {
         aseed[dir][0].set(v(dir,Slice(0,v1)));
       } else {
         fseed[dir][0].set(v(dir,Slice(0,v1)));
@@ -882,8 +882,8 @@ namespace casadi{
 
     // Get the results
     vector<SX> dirder(v2);
-    for(int dir=0; dir<v2; ++dir){
-      if(transpose_jacobian){
+    for(int dir=0; dir<v2; ++dir) {
+      if(transpose_jacobian) {
         dirder[dir] = asens[dir][0];
       } else {
         dirder[dir] = fsens[dir][0];
@@ -894,7 +894,7 @@ namespace casadi{
 
   void extractShared(std::vector<SXElement>& ex, std::vector<SXElement>& v,
                      std::vector<SXElement>& vdef,
-                     const std::string& v_prefix, const std::string& v_suffix){
+                     const std::string& v_prefix, const std::string& v_suffix) {
 
     // Sort the expression
     SXFunction f(vector<SX>(),vector<SX>(1,ex));
@@ -922,16 +922,16 @@ namespace casadi{
     vdef.clear();
 
     // Evaluate the algorithm
-    for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+    for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       // Increase usage counters
-      switch(it->op){
+      switch(it->op) {
       case OP_CONST:
       case OP_PARAMETER:
         break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
-          if(usecount[it->i2]==0){
+          if(usecount[it->i2]==0) {
             usecount[it->i2]=1;
-          } else if(usecount[it->i2]==1){
+          } else if(usecount[it->i2]==1) {
             // Get a suitable name
             vdef.push_back(work[it->i2]);
             usecount[it->i2]=-1; // Extracted, do not extract again
@@ -939,16 +939,16 @@ namespace casadi{
         // fall-through
       case OP_OUTPUT:
       default: // Unary operation, binary operation or output
-        if(usecount[it->i1]==0){
+        if(usecount[it->i1]==0) {
           usecount[it->i1]=1;
-        } else if(usecount[it->i1]==1){
+        } else if(usecount[it->i1]==1) {
           vdef.push_back(work[it->i1]);
           usecount[it->i1]=-1; // Extracted, do not extract again
         }
       }
 
       // Perform the operation
-      switch(it->op){
+      switch(it->op) {
       case OP_OUTPUT:
         break;
       case OP_CONST:
@@ -964,14 +964,14 @@ namespace casadi{
 
     // Create intermediate variables
     stringstream v_name;
-    for(int i=0; i<vdef.size(); ++i){
+    for(int i=0; i<vdef.size(); ++i) {
       v_name.str(string());
       v_name << v_prefix << i << v_suffix;
       v.push_back(SXElement::sym(v_name.str()));
     }
 
     // Mark the above expressions
-    for(int i=0; i<vdef.size(); ++i){
+    for(int i=0; i<vdef.size(); ++i) {
       vdef[i].setTemp(i+1);
     }
 
@@ -982,21 +982,21 @@ namespace casadi{
     b_it=f->operations_.begin();
 
     // Evaluate the algorithm
-    for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
-      switch(it->op){
+    for(vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
+      switch(it->op) {
       case OP_OUTPUT:     ex[it->i2] = work[it->i1];      break;
       case OP_CONST:      work2[it->i0] = work[it->i0] = *c_it++; break;
       case OP_PARAMETER:  work2[it->i0] = work[it->i0] = *p_it++; break;
       default:
         {
-          switch(it->op){
+          switch(it->op) {
             CASADI_MATH_FUN_BUILTIN(work[it->i1],work[it->i2],work[it->i0])
               }
           work2[it->i0] = *b_it++;
 
           // Replace with intermediate variables
           int ind = work2[it->i0].getTemp()-1;
-          if(ind>=0){
+          if(ind>=0) {
             vdef.at(ind) = work[it->i0];
             work[it->i0] = v.at(ind);
           }
@@ -1005,12 +1005,12 @@ namespace casadi{
     }
 
     // Unmark the expressions
-    for(vector<SXElement>::iterator it=marked.begin(); it!=marked.end(); ++it){
+    for(vector<SXElement>::iterator it=marked.begin(); it!=marked.end(); ++it) {
       it->setTemp(0);
     }
   }
 
-  void printCompact(const SX& ex, std::ostream &stream){
+  void printCompact(const SX& ex, std::ostream &stream) {
     // Extract shared subexpressions from ex
     vector<SXElement> v,vdef;
     SX ex_extracted = ex;
@@ -1020,29 +1020,29 @@ namespace casadi{
     ex_extracted.print(stream);
 
     // Print the shared subexpressions
-    if(!v.empty()){
+    if(!v.empty()) {
       stream << endl << "where:" << endl;
-      for(int i=0; i<v.size(); ++i){
+      for(int i=0; i<v.size(); ++i) {
         stream << v[i] << " := " << vdef[i] << endl;
       }
     }
   }
 
   void substituteInPlace(const std::vector<SX>& v, std::vector<SX>& vdef, std::vector<SX>& ex,
-                         bool reverse){
+                         bool reverse) {
     casadi_assert(v.size()==vdef.size());
 
     // Quick return if empty or single expression
-    if(v.empty()){
+    if(v.empty()) {
       return;
-    } else if(v.size()==1){
+    } else if(v.size()==1) {
       substituteInPlace(v.front(),vdef.front(),ex,reverse);
       return;
     }
 
     // Count number of scalar variables
     int n =0;
-    for(int i=0; i<v.size(); ++i){
+    for(int i=0; i<v.size(); ++i) {
       casadi_assert_message(v[i].sparsity() == vdef[i].sparsity(),
                             "the sparsity patterns of the expression and its "
                             "defining expression do not match");
@@ -1054,7 +1054,7 @@ namespace casadi{
     SX vdef_all = SX::zeros(1,n);
     vector<SXElement>::iterator it_v = v_all.begin();
     vector<SXElement>::iterator it_vdef = vdef_all.begin();
-    for(int i=0; i<v.size(); ++i){
+    for(int i=0; i<v.size(); ++i) {
       int nv = v[i].size();
       copy(v[i].begin(),v[i].end(),it_v);
       copy(vdef[i].begin(),vdef[i].end(),it_vdef);
@@ -1066,7 +1066,7 @@ namespace casadi{
 
     // Collect the result
     it_vdef = vdef_all.begin();
-    for(int i=0; i<v.size(); ++i){
+    for(int i=0; i<v.size(); ++i) {
       int nv = v[i].size();
       copy(it_vdef,it_vdef+nv,vdef[i].begin());
       it_vdef += nv;

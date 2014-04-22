@@ -29,7 +29,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for NLPImplicitInternal
    *
@@ -46,7 +46,7 @@ namespace casadi{
     virtual ~NLPImplicitInternal();
 
     /** \brief  Clone */
-    virtual NLPImplicitInternal* clone() const{ return new NLPImplicitInternal(*this);}
+    virtual NLPImplicitInternal* clone() const { return new NLPImplicitInternal(*this);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

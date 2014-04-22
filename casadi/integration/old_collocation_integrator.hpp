@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/integrator.hpp"
 #include <casadi/integration/casadi_integration_export.h>
 
-namespace casadi{
+namespace casadi {
 
   class OldCollocationIntegratorInternal;
 

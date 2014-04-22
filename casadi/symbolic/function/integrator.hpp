@@ -57,10 +57,10 @@
 
     \endverbatim
 */
-namespace casadi{
+namespace casadi {
 
   /// Input arguments of an ODE/DAE function [daeIn]
-  enum DAEInput{
+  enum DAEInput {
     /// Differential state [x]
     DAE_X,
     /// Algebraic state [z]
@@ -74,7 +74,7 @@ namespace casadi{
   };
 
   /// Output arguments of an DAE function [daeOut]
-  enum DAEOutput{
+  enum DAEOutput {
     /// Right hand side of the implicit ODE [ode]
     DAE_ODE,
     /// Right hand side of algebraic equations [alg]
@@ -86,7 +86,7 @@ namespace casadi{
   };
 
   /// Input arguments of an ODE/DAE backward integration function [rdaeIn]
-  enum RDAEInput{
+  enum RDAEInput {
     /// Backward differential state [rx]
     RDAE_RX,
     /// Backward algebraic state [rz]
@@ -106,7 +106,7 @@ namespace casadi{
   };
 
   /// Output arguments of an ODE/DAE backward integration function [rdaeOut]
-  enum RDAEOutput{
+  enum RDAEOutput {
     /// Right hand side of ODE. [ode]
     RDAE_ODE,
     /// Right hand side of algebraic equations. [alg]
@@ -118,7 +118,7 @@ namespace casadi{
   };
 
   /// Input arguments of an integrator [integratorIn]
-  enum IntegratorInput{
+  enum IntegratorInput {
     /// Differential state at the initial time [x0]
     INTEGRATOR_X0,
     /// Parameters [p]
@@ -136,7 +136,7 @@ namespace casadi{
   };
 
   /// Output arguments of an integrator [integratorOut]
-  enum IntegratorOutput{
+  enum IntegratorOutput {
     /// Differential state at the final time [xf]
     INTEGRATOR_XF,
     /// Quadrature state at the final time [qf]
@@ -172,7 +172,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT Integrator : public Function{
+  class CASADI_SYMBOLIC_EXPORT Integrator : public Function {
   public:
     /// Default constructor
     Integrator();

@@ -24,16 +24,16 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-OCPSolver::OCPSolver(){
+OCPSolver::OCPSolver() {
 }
 
-const OCPSolverInternal* OCPSolver::operator->() const{
+const OCPSolverInternal* OCPSolver::operator->() const {
   return static_cast<const OCPSolverInternal*>(Function::operator->());
 }
 
-OCPSolverInternal* OCPSolver::operator->(){
+OCPSolverInternal* OCPSolver::operator->() {
   return static_cast<OCPSolverInternal*>(Function::operator->());
 }
 

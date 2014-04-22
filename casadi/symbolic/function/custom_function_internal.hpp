@@ -30,14 +30,14 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** \brief  Internal class for CustomFunction
   \author Joel Andersson
   \date 2010
   A regular user should never work with any Node class. Use CustomFunction directly.
   */
-class CASADI_SYMBOLIC_EXPORT CustomFunctionInternal : public FunctionInternal{
+class CASADI_SYMBOLIC_EXPORT CustomFunctionInternal : public FunctionInternal {
   friend class CustomFunction;
   public:
 
@@ -50,7 +50,7 @@ class CASADI_SYMBOLIC_EXPORT CustomFunctionInternal : public FunctionInternal{
     virtual ~CustomFunctionInternal();
 
     /** \brief  Cloning */
-    virtual CustomFunctionInternal* clone() const{ return new CustomFunctionInternal(*this);}
+    virtual CustomFunctionInternal* clone() const { return new CustomFunctionInternal(*this);}
 
     /** \brief  Evaluate */
     virtual void evaluate();

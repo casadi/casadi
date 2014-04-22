@@ -29,7 +29,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for NewtonImplicitInternal
    *
@@ -47,7 +47,7 @@ namespace casadi{
     virtual ~NewtonImplicitInternal();
 
     /** \brief  Clone */
-    virtual NewtonImplicitInternal* clone() const{ return new NewtonImplicitInternal(*this);}
+    virtual NewtonImplicitInternal* clone() const { return new NewtonImplicitInternal(*this);}
 
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,

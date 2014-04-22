@@ -26,7 +26,7 @@
 #include "casadi/symbolic/function/linear_solver_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_lapack_interface_export.h>
 
-namespace casadi{
+namespace casadi {
 
   /** \brief  Forward declaration of internal class
       @copydoc LinearSolver_doc
@@ -55,7 +55,7 @@ namespace casadi{
    * therefore more expensive if A is invariant.
    *
    */
-  class CASADI_LAPACK_INTERFACE_EXPORT LapackQRDense : public LinearSolver{
+  class CASADI_LAPACK_INTERFACE_EXPORT LapackQRDense : public LinearSolver {
   public:
 
     /// Default (empty) constructor
@@ -72,7 +72,7 @@ namespace casadi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const Sparsity& sp, int nrhs){ return LapackQRDense(sp, nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs) { return LapackQRDense(sp, nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif
@@ -96,7 +96,7 @@ namespace casadi{
                          double *alpha, double *a, int *lda, double *b, int *ldb);
 
   /// Internal class
-  class CASADI_LAPACK_INTERFACE_EXPORT LapackQRDenseInternal : public LinearSolverInternal{
+  class CASADI_LAPACK_INTERFACE_EXPORT LapackQRDenseInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackQRDenseInternal(const Sparsity& sparsity, int nrhs);

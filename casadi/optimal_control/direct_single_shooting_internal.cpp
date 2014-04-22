@@ -27,14 +27,13 @@
 #include "casadi/symbolic/std_vector_tools.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 DirectSingleShootingInternal::DirectSingleShootingInternal(const Function& ffcn,
                                                            const Function& mfcn,
                                                            const Function& cfcn,
-                                                           const Function& rfcn) :
-    OCPSolverInternal(ffcn, mfcn, cfcn, rfcn)
-{
+                                                           const Function& rfcn)
+    : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn) {
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to casadi::Parallelizer");
   addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(),
             "An NLPSolver creator function");
@@ -46,17 +45,17 @@ DirectSingleShootingInternal::DirectSingleShootingInternal(const Function& ffcn,
             "Options to be passed to the integrator");
 }
 
-DirectSingleShootingInternal::~DirectSingleShootingInternal(){
+DirectSingleShootingInternal::~DirectSingleShootingInternal() {
 }
 
-void DirectSingleShootingInternal::init(){
+void DirectSingleShootingInternal::init() {
   // Initialize the base classes
   OCPSolverInternal::init();
 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
   integrator_ = integrator_creator(ffcn_,Function());
-  if(hasSetOption("integrator_options")){
+  if(hasSetOption("integrator_options")) {
     integrator_.setOption(getOption("integrator_options"));
   }
 
@@ -96,7 +95,7 @@ void DirectSingleShootingInternal::init(){
 
   // Control for each shooting interval
   vector<MX> U(nk_);
-  for(int k=0; k<nk_; ++k){ // interior nodes
+  for(int k=0; k<nk_; ++k) { // interior nodes
     U[k] = V[range(offset,offset+nu_)];
     offset += nu_;
   }
@@ -116,7 +115,7 @@ void DirectSingleShootingInternal::init(){
   nlp_g.reserve(nk_*(path_constraints ? 2 : 1));
 
   // For all shooting nodes
-  for(int k=0; k<nk_; ++k){
+  for(int k=0; k<nk_; ++k) {
     // Integrate
     vector<MX> int_out = integrator_.call(integratorIn("x0",X,"p",vertcat(P,U[k])));
 
@@ -127,7 +126,7 @@ void DirectSingleShootingInternal::init(){
     nlp_g.push_back(X);
 
     // Add path constraints
-    if(path_constraints){
+    if(path_constraints) {
       // TODO(Joel): Change signature of cfcn_: remove algebraic variable, add control
       vector<MX> cfcn_out = cfcn_.call(daeIn("x",X,"p",U[k]));
       nlp_g.push_back(cfcn_out.at(0));
@@ -150,7 +149,7 @@ void DirectSingleShootingInternal::init(){
   nlp_solver_ = nlp_solver_creator(nlp_);
 
   // Pass options
-  if(hasSetOption("nlp_solver_options")){
+  if(hasSetOption("nlp_solver_options")) {
     const Dictionary& nlp_solver_options = getOption("nlp_solver_options");
     nlp_solver_.setOption(nlp_solver_options);
   }
@@ -159,7 +158,7 @@ void DirectSingleShootingInternal::init(){
   nlp_solver_.init();
 }
 
-void DirectSingleShootingInternal::getGuess(vector<double>& V_init) const{
+void DirectSingleShootingInternal::getGuess(vector<double>& V_init) const {
   // OCP solution guess
   const Matrix<double> &p_init = input(OCP_P_INIT);
   const Matrix<double> &x_init = input(OCP_X_INIT);
@@ -169,18 +168,18 @@ void DirectSingleShootingInternal::getGuess(vector<double>& V_init) const{
   int el=0;
 
   // Pass guess for parameters
-  for(int i=0; i<np_; ++i){
+  for(int i=0; i<np_; ++i) {
     V_init[el++] = p_init.elem(i);
   }
 
   // Pass guess for the initial state
-  for(int i=0; i<nx_; ++i){
+  for(int i=0; i<nx_; ++i) {
     V_init[el++] = x_init.elem(i,0);
   }
 
   // Pass guess for control
-  for(int k=0; k<nk_; ++k){
-    for(int i=0; i<nu_; ++i){
+  for(int k=0; k<nk_; ++k) {
+    for(int i=0; i<nu_; ++i) {
       V_init[el++] = u_init.elem(i,k);
     }
   }
@@ -189,7 +188,7 @@ void DirectSingleShootingInternal::getGuess(vector<double>& V_init) const{
 }
 
 void DirectSingleShootingInternal::getVariableBounds(vector<double>& V_min,
-                                                     vector<double>& V_max) const{
+                                                     vector<double>& V_max) const {
   // OCP variable bounds
   const Matrix<double> &p_min = input(OCP_LBP);
   const Matrix<double> &p_max = input(OCP_UBP);
@@ -203,20 +202,20 @@ void DirectSingleShootingInternal::getVariableBounds(vector<double>& V_min,
   int min_el=0, max_el=0;
 
   // Pass bounds on parameters
-  for(int i=0; i<np_; ++i){
+  for(int i=0; i<np_; ++i) {
     V_min[min_el++] = p_min.elem(i);
     V_max[max_el++] = p_max.elem(i);
   }
 
   // Pass bounds on initial state
-  for(int i=0; i<nx_; ++i){
+  for(int i=0; i<nx_; ++i) {
     V_min[min_el++] = x_min.elem(i,0);
     V_max[max_el++] = x_max.elem(i,0);
   }
 
   // Pass bounds on control
-  for(int k=0; k<nk_; ++k){
-    for(int i=0; i<nu_; ++i){
+  for(int k=0; k<nk_; ++k) {
+    for(int i=0; i<nu_; ++i) {
       V_min[min_el++] = u_min.elem(i,k);
       V_max[max_el++] = u_max.elem(i,k);
     }
@@ -226,7 +225,7 @@ void DirectSingleShootingInternal::getVariableBounds(vector<double>& V_min,
 }
 
 void DirectSingleShootingInternal::getConstraintBounds(vector<double>& G_min,
-                                                       vector<double>& G_max) const{
+                                                       vector<double>& G_max) const {
   // OCP constraint bounds
   const Matrix<double> &x_min = input(OCP_LBX);
   const Matrix<double> &x_max = input(OCP_UBX);
@@ -236,13 +235,13 @@ void DirectSingleShootingInternal::getConstraintBounds(vector<double>& G_min,
   // Running index
   int min_el=0, max_el=0;
 
-  for(int k=0; k<nk_; ++k){
-    for(int i=0; i<nx_; ++i){
+  for(int k=0; k<nk_; ++k) {
+    for(int i=0; i<nx_; ++i) {
       G_min[min_el++] = x_min.elem(i,k+1);
       G_max[max_el++] = x_max.elem(i,k+1);
     }
 
-    for(int i=0; i<nh_; ++i){
+    for(int i=0; i<nh_; ++i) {
       G_min[min_el++] = h_min.elem(i,k);
       G_max[max_el++] = h_max.elem(i,k);
     }
@@ -250,7 +249,7 @@ void DirectSingleShootingInternal::getConstraintBounds(vector<double>& G_min,
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
 }
 
-void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_opt){
+void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_opt) {
   // OCP solution
   Matrix<double> &p_opt = output(OCP_P_OPT);
   Matrix<double> &x_opt = output(OCP_X_OPT);
@@ -260,18 +259,18 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
   int el=0;
 
   // Pass optimized parameters
-  for(int i=0; i<np_; ++i){
+  for(int i=0; i<np_; ++i) {
     p_opt(i) = V_opt[el++];
   }
 
   // Pass optimized initial state
-  for(int i=0; i<nx_; ++i){
+  for(int i=0; i<nx_; ++i) {
     x_opt(i,0) = V_opt[el++];
   }
 
   // Pass optimized control
-  for(int k=0; k<nk_; ++k){
-    for(int i=0; i<nu_; ++i){
+  for(int k=0; k<nk_; ++k) {
+    for(int i=0; i<nu_; ++i) {
       u_opt(i,k) = V_opt[el++];
     }
   }
@@ -282,10 +281,10 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
 
   // Loop over the constraints
   el = 0;
-  for(int k=0; k<nk_; ++k){
+  for(int k=0; k<nk_; ++k) {
 
     // Get the state trajectory
-    for(int i=0; i<nx_; ++i){
+    for(int i=0; i<nx_; ++i) {
       x_opt(i,k+1) = g_opt[el++];
     }
 
@@ -295,7 +294,7 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
   casadi_assert(el==g_opt.size());
 }
 
-void DirectSingleShootingInternal::evaluate(){
+void DirectSingleShootingInternal::evaluate() {
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_SOLVER_X0).data());
   getVariableBounds(nlp_solver_.input(NLP_SOLVER_LBX).data(),

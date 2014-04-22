@@ -34,8 +34,7 @@ namespace casadi {
 
   NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac,
                                                  const LinearSolver& linsol)
-      : ImplicitFunctionInternal(f,jac,linsol)
-  {
+      : ImplicitFunctionInternal(f,jac,linsol) {
     addOption("abstol",                      OT_REAL,1e-12,
               "Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL,1e-12,
@@ -45,7 +44,7 @@ namespace casadi {
     addOption("monitor",   OT_STRINGVECTOR, GenericType(),  "", "step|stepsize|J|F|normF", true);
   }
 
-  NewtonImplicitInternal::~NewtonImplicitInternal(){
+  NewtonImplicitInternal::~NewtonImplicitInternal() {
   }
 
   void NewtonImplicitInternal::solveNonLinear() {
@@ -61,7 +60,7 @@ namespace casadi {
     }
 
     // Pass the inputs to J
-    for(int i=0; i<getNumInputs(); ++i){
+    for(int i=0; i<getNumInputs(); ++i) {
       if(i!=iin_) jac_.setInput(input(i),i);
     }
 
@@ -75,7 +74,7 @@ namespace casadi {
 
     bool success = true;
 
-    while(true){
+    while(true) {
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
         log("evaluate","Max. iterations reached.");
@@ -188,7 +187,7 @@ namespace casadi {
       std::transform(u.begin(), u.end(), F.begin(), u.begin(), std::minus<double>());
 
       // Get auxiliary outputs
-      for(int i=0; i<getNumOutputs(); ++i){
+      for(int i=0; i<getNumOutputs(); ++i) {
         if(i!=iout_) jac_.getOutput(output(i),1+i);
       }
     }
@@ -204,7 +203,7 @@ namespace casadi {
     casadi_log("NewtonImplicitInternal::solveNonLinear():end after " << iter << " steps");
   }
 
-  void NewtonImplicitInternal::init(){
+  void NewtonImplicitInternal::init() {
 
     // Call the base class initializer
     ImplicitFunctionInternal::init();

@@ -27,18 +27,18 @@
 #include "casadi/symbolic/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
 /**
 @copydoc NLPSolver_doc
 */
-class CASADI_IPOPT_INTERFACE_EXPORT IpoptInternal : public NLPSolverInternal{
+class CASADI_IPOPT_INTERFACE_EXPORT IpoptInternal : public NLPSolverInternal {
 friend class IpoptUserClass;
 
 public:
   explicit IpoptInternal(const Function& nlp);
   virtual ~IpoptInternal();
-  virtual IpoptInternal* clone() const{ return new IpoptInternal(*this);}
+  virtual IpoptInternal* clone() const { return new IpoptInternal(*this);}
 
   // Free Ipopt related memory
   void freeIpopt();

@@ -25,24 +25,24 @@
 #include <cassert>
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-SundialsIntegrator::SundialsIntegrator(){
+SundialsIntegrator::SundialsIntegrator() {
 }
 
-SundialsInternal* SundialsIntegrator::operator->(){
+SundialsInternal* SundialsIntegrator::operator->() {
   return static_cast<SundialsInternal*>(Function::operator->());
 }
 
-const SundialsInternal* SundialsIntegrator::operator->() const{
+const SundialsInternal* SundialsIntegrator::operator->() const {
    return static_cast<const SundialsInternal*>(Function::operator->());
 }
 
-bool SundialsIntegrator::checkNode() const{
+bool SundialsIntegrator::checkNode() const {
   return dynamic_cast<const SundialsInternal*>(get())!=0;
 }
 
-void SundialsIntegrator::setStopTime(double tf){
+void SundialsIntegrator::setStopTime(double tf) {
   (*this)->setStopTime(tf);
 }
 

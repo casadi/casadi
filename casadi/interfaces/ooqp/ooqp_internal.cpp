@@ -39,16 +39,16 @@ extern int gOoqpPrintLevel;
 using namespace std;
 namespace casadi {
 
-  OOQPInternal::OOQPInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
+  OOQPInternal::OOQPInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st) {
     addOption("print_level",OT_INTEGER,0,"Print level. OOQP listens to print_level 0, 10 and 100");
     addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
     addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");
   }
 
-  OOQPInternal::~OOQPInternal(){
+  OOQPInternal::~OOQPInternal() {
   }
 
-  void OOQPInternal::init(){
+  void OOQPInternal::init() {
     // Initialize the base classes
     QPSolverInternal::init();
 
@@ -109,8 +109,8 @@ namespace casadi {
 
     // Get the number of free variables and their types
     int nx = 0, np=0;
-    for(int i=0; i<n_; ++i){
-      if(lbx[i]==ubx[i]){
+    for(int i=0; i<n_; ++i) {
+      if(lbx[i]==ubx[i]) {
         // Save parameter
         p_[np] = lbx[i];
 
@@ -122,14 +122,14 @@ namespace casadi {
 
       } else {
         // True free variable
-        if(lbx[i]==-numeric_limits<double>::infinity()){
+        if(lbx[i]==-numeric_limits<double>::infinity()) {
           xlow_[nx] = 0;
           ixlow_[nx] = 0;
         } else {
           xlow_[nx] = lbx[i];
           ixlow_[nx] = 1;
         }
-        if(ubx[i]==numeric_limits<double>::infinity()){
+        if(ubx[i]==numeric_limits<double>::infinity()) {
           xupp_[nx] = 0;
           ixupp_[nx] = 0;
         } else {
@@ -147,10 +147,10 @@ namespace casadi {
     const vector<int>& H_row = input(QP_SOLVER_H).row();
     int nnzQ = 0;
     // Loop over the columns of the quadratic term
-    for(int cc=0; cc<n_; ++cc){
+    for(int cc=0; cc<n_; ++cc) {
 
       // Loop over nonzero elements of the column
-      for(int el=H_colind[cc]; el<H_colind[cc+1]; ++el){
+      for(int el=H_colind[cc]; el<H_colind[cc+1]; ++el) {
 
         // Only upper triangular part
         int rr=H_row[el];
@@ -160,8 +160,8 @@ namespace casadi {
         int icc=x_index_[cc];
         int irr=x_index_[rr];
 
-        if(icc<0){
-          if(irr<0){
+        if(icc<0) {
+          if(irr<0) {
             // Add contribution to objective
             objParam += icc==irr ? H[el]*sq(p_[-1-icc])/2 : H[el]*p_[-1-irr]*p_[-1-icc];
           } else {
@@ -169,7 +169,7 @@ namespace casadi {
             c_[irr] += H[el]*p_[-1-icc];
           }
         } else {
-          if(irr<0){
+          if(irr<0) {
             // Add contribution to gradient term
             c_[icc] += H[el]*p_[-1-irr];
           } else {
@@ -190,8 +190,8 @@ namespace casadi {
     const vector<int>& AT_colind = AT_.colind();
     const vector<int>& AT_row = AT_.row();
     std::copy(AT_colind.begin(),AT_colind.begin()+nc_,AT_tmp_.begin());
-    for(int cc=0; cc<n_; ++cc){
-      for(int el=A_colind[cc]; el<A_colind[cc+1]; ++el){
+    for(int cc=0; cc<n_; ++cc) {
+      for(int el=A_colind[cc]; el<A_colind[cc+1]; ++el) {
         int rr=A_row[el];
         int elT = AT_tmp_[rr]++;
         AT[elT] = A[el];
@@ -200,18 +200,18 @@ namespace casadi {
 
     // Loop over constraints
     int nA=0, nC=0, /*mz=0,*/ nnzA=0, nnzC=0;
-    for(int j=0; j<nc_; ++j){
-      if(lba[j]==-numeric_limits<double>::infinity() && uba[j]==numeric_limits<double>::infinity()){
+    for(int j=0; j<nc_; ++j) {
+      if(lba[j]==-numeric_limits<double>::infinity() && uba[j]==numeric_limits<double>::infinity()) {
         // Redundant constraint
         c_index_[j] = 0;
-      } else if(lba[j]==uba[j]){
+      } else if(lba[j]==uba[j]) {
         // Equality constraint
         bA_[nA] = lba[j];
 
         // Add to A
-        for(int el=AT_colind[j]; el<AT_colind[j+1]; ++el){
+        for(int el=AT_colind[j]; el<AT_colind[j+1]; ++el) {
           int i=AT_row[el];
-          if(x_index_[i]<0){
+          if(x_index_[i]<0) {
             // Parameter
             bA_[nA] -= AT[el]*p_[-x_index_[i]-1];
           } else {
@@ -224,14 +224,14 @@ namespace casadi {
         c_index_[j] = -1-nA++;
       } else {
         // Inequality constraint
-        if(lba[j]==-numeric_limits<double>::infinity()){
+        if(lba[j]==-numeric_limits<double>::infinity()) {
           clow_[nC] = 0;
           iclow_[nC] = 0;
         } else {
           clow_[nC] = lba[j];
           iclow_[nC] = 1;
         }
-        if(uba[j]==numeric_limits<double>::infinity()){
+        if(uba[j]==numeric_limits<double>::infinity()) {
           cupp_[nC] = 0;
           icupp_[nC] = 0;
         } else {
@@ -240,9 +240,9 @@ namespace casadi {
         }
 
         // Add to C
-        for(int el=AT_colind[j]; el<AT_colind[j+1]; ++el){
+        for(int el=AT_colind[j]; el<AT_colind[j+1]; ++el) {
           int i=AT_row[el];
-          if(x_index_[i]<0){
+          if(x_index_[i]<0) {
             // Parameter
             if(iclow_[nC]==1) clow_[nC] -= AT[el]*p_[-x_index_[i]-1];
             if(icupp_[nC]==1) cupp_[nC] -= AT[el]*p_[-x_index_[i]-1];
@@ -258,7 +258,7 @@ namespace casadi {
     }
 
     // Print problem
-    if(verbose()){
+    if(verbose()) {
       cout << "Attempting to solve the QP:" << endl;
       cout << "   minimize    1/2*x'*Q*x + c'*x" << endl;
       cout << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
@@ -294,7 +294,7 @@ namespace casadi {
     double objectiveValue;
 
     int ierr;
-    if(false){ // Use C interface
+    if(false) { // Use C interface
       // TODO(jgillis): Change to qpsolvehb, see OOQP users guide
       qpsolvesp(getPtr(c_), nx,
                 getPtr(irowQ_),  nnzQ, getPtr(jcolQ_), getPtr(dQ_),
@@ -332,7 +332,7 @@ namespace casadi {
         getPtr(krowC), nC, getPtr(jcolC_), getPtr(dC_),
         getPtr(clow_), getPtr(iclow_), getPtr(cupp_), getPtr(icupp_), &ctx,
         &ierr );
-        if(ierr == 0){
+        if(ierr == 0) {
           Solver* solver = static_cast<Solver *>(ctx.solver);
           gOoqpPrintLevel = print_level_;
           solver->monitorSelf();
@@ -350,9 +350,9 @@ namespace casadi {
       }
     }
 
-    if(ierr>0){
+    if(ierr>0) {
       casadi_warning("Unable to solve problem: " << errFlag(ierr));
-    } else if(ierr<0){
+    } else if(ierr<0) {
       casadi_error("Fatal error: " << errFlag(ierr));
     }
 
@@ -361,9 +361,9 @@ namespace casadi {
 
     // Save primal solution
     vector<double>& x = output(QP_SOLVER_X).data();
-    for(int i=0; i<n_; ++i){
+    for(int i=0; i<n_; ++i) {
       int ii = x_index_[i];
-      if(ii<0){
+      if(ii<0) {
         x[i] = p_[-1-ii];
       } else {
         x[i] = x_[ii];
@@ -372,11 +372,11 @@ namespace casadi {
 
     // Save dual solution (linear bounds)
     vector<double>& lam_a = output(QP_SOLVER_LAM_A).data();
-    for(int j=0; j<nc_; ++j){
+    for(int j=0; j<nc_; ++j) {
       int jj = c_index_[j];
-      if(jj==0){
+      if(jj==0) {
         lam_a[j] = 0;
-      } else if(jj<0){
+      } else if(jj<0) {
         lam_a[j] = -y_[-1-jj];
       } else {
         lam_a[j] = pi_[-1+jj]-lambda_[-1+jj];
@@ -385,16 +385,16 @@ namespace casadi {
 
     // Save dual solution (simple bounds)
     vector<double>& lam_x = output(QP_SOLVER_LAM_X).data();
-    for(int i=0; i<n_; ++i){
+    for(int i=0; i<n_; ++i) {
       int ii = x_index_[i];
-      if(ii<0){
+      if(ii<0) {
         // The dual solution for the fixed parameters follows from the KKT conditions
         lam_x[i] = -g[i];
-        for(int el=H_colind[i]; el<H_colind[i+1]; ++el){
+        for(int el=H_colind[i]; el<H_colind[i+1]; ++el) {
           int j=H_row[el];
           lam_x[i] -= H[el]*x[j];
         }
-        for(int el=A_colind[i]; el<A_colind[i+1]; ++el){
+        for(int el=A_colind[i]; el<A_colind[i+1]; ++el) {
           int j=A_row[el];
           lam_x[i] -= A[el]*lam_a[j];
         }
@@ -404,10 +404,10 @@ namespace casadi {
     }
   }
 
-  const char* OOQPInternal::errFlag(int flag){
+  const char* OOQPInternal::errFlag(int flag) {
     // Find the error
     //const char* msg;
-    switch(flag){
+    switch(flag) {
     case SUCCESSFUL_TERMINATION: return  "SUCCESSFUL_TERMINATION";
     case NOT_FINISHED:           return  "NOT_FINISHED";
     case MAX_ITS_EXCEEDED:       return  "MAX_ITS_EXCEEDED";
@@ -418,12 +418,12 @@ namespace casadi {
   }
 
   std::string OOQPInternal::printBounds(const std::vector<double>& b,
-                                        const std::vector<char>& ib, int n, const char *sign){
+                                        const std::vector<char>& ib, int n, const char *sign) {
     stringstream ss;
     ss << "[";
-    for(int i=0; i<n; ++i){
+    for(int i=0; i<n; ++i) {
       if(i!=0) ss << ",";
-      if(ib[i]==0){
+      if(ib[i]==0) {
         ss << sign << "inf";
       } else {
         ss << b[i];

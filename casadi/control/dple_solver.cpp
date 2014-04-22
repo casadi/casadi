@@ -25,31 +25,31 @@
 #include <cassert>
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  DpleSolver::DpleSolver(){
+  DpleSolver::DpleSolver() {
 
   }
 
-  DpleSolver  DpleSolver::clone() const{
+  DpleSolver  DpleSolver::clone() const {
     DpleSolver ret;
     if(!isNull()) ret.assignNode((*this)->clone());
     return ret;
   }
 
-  void DpleSolver::printStats(ostream &stream) const{
+  void DpleSolver::printStats(ostream &stream) const {
     (*this)->printStats(stream);
   }
 
-  DpleInternal* DpleSolver::operator->(){
+  DpleInternal* DpleSolver::operator->() {
     return static_cast<DpleInternal*>(Function::operator->());
   }
 
-  const DpleInternal* DpleSolver::operator->() const{
+  const DpleInternal* DpleSolver::operator->() const {
     return static_cast<const DpleInternal*>(Function::operator->());
   }
 
-  bool DpleSolver::checkNode() const{
+  bool DpleSolver::checkNode() const {
     return dynamic_cast<const DpleInternal*>(get())!=0;
   }
 

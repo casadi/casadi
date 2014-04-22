@@ -24,48 +24,48 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  WeakRef::WeakRef(int dummy){
+  WeakRef::WeakRef(int dummy) {
     casadi_assert(dummy==0);
   }
 
-  bool WeakRef::alive() const{
+  bool WeakRef::alive() const {
     return !isNull() && (*this)->raw_ != 0;
   }
 
-  SharedObject WeakRef::shared(){
+  SharedObject WeakRef::shared() {
     SharedObject ret;
-    if(alive()){
+    if(alive()) {
       ret.assignNode((*this)->raw_);
     }
     return ret;
   }
 
-  const WeakRefInternal* WeakRef::operator->() const{
+  const WeakRefInternal* WeakRef::operator->() const {
     return static_cast<const WeakRefInternal*>(SharedObject::operator->());
   }
 
-  WeakRefInternal* WeakRef::operator->(){
+  WeakRefInternal* WeakRef::operator->() {
     return static_cast<WeakRefInternal*>(SharedObject::operator->());
   }
 
-  WeakRef::WeakRef(SharedObject shared){
+  WeakRef::WeakRef(SharedObject shared) {
     assignNode(shared.weak()->get());
   }
 
-  WeakRef::WeakRef(SharedObjectNode* raw){
+  WeakRef::WeakRef(SharedObjectNode* raw) {
     assignNode(new WeakRefInternal(raw));
   }
 
-  void WeakRef::kill(){
+  void WeakRef::kill() {
     (*this)->raw_ = 0;
   }
 
-  WeakRefInternal::WeakRefInternal(SharedObjectNode* raw) : raw_(raw){
+  WeakRefInternal::WeakRefInternal(SharedObjectNode* raw) : raw_(raw) {
   }
 
-  WeakRefInternal::~WeakRefInternal(){
+  WeakRefInternal::~WeakRefInternal() {
   }
 
 } // namespace casadi

@@ -27,15 +27,15 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  Determinant::Determinant(const MX& x){
+  Determinant::Determinant(const MX& x) {
     setDependencies(x);
     setSparsity(Sparsity::dense(1,1));
   }
 
-  void Determinant::printPart(std::ostream &stream, int part) const{
-    if(part==0){
+  void Determinant::printPart(std::ostream &stream, int part) const {
+    if(part==0) {
       stream << "det(";
     } else {
       stream << ")";
@@ -44,14 +44,14 @@ namespace casadi{
 
   void Determinant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                                MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                               bool output_given){
+                               bool output_given) {
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
     // Non-differentiated output
     const MX& X = *input[0];
     MX& det_X = *output[0];
-    if(!output_given){
+    if(!output_given) {
       det_X = det(X);
     }
 
@@ -62,12 +62,12 @@ namespace casadi{
     MX trans_inv_X = inv(X).T();
 
     // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
+    for(int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = det_X * inner_prod(trans_inv_X, *fwdSeed[d][0]);
     }
 
     // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
+    for(int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum((*adjSeed[d][0]*det_X) * trans_inv_X);
       *adjSeed[d][0] = MX();
     }

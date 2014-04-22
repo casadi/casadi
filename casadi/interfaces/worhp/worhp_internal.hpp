@@ -43,12 +43,12 @@
 #undef Q
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /**
      @copydoc NLPSolver_doc
   */
-  class CASADI_WORHP_INTERFACE_EXPORT WorhpInternal : public NLPSolverInternal{
+  class CASADI_WORHP_INTERFACE_EXPORT WorhpInternal : public NLPSolverInternal {
 
   public:
     // Constructor

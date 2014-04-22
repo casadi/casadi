@@ -31,10 +31,10 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
 /** \brief  An element of the algorithm, namely an MX node */
-struct MXAlgEl{
+struct MXAlgEl {
   /// Operator index
   int op;
 
@@ -57,7 +57,7 @@ struct MXAlgEl{
 
 /// \endcond
 
-namespace casadi{
+namespace casadi {
 
 /** \brief  Forward declaration of internal class */
 class MXFunctionInternal;
@@ -66,7 +66,7 @@ class MXFunctionInternal;
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT MXFunction : public Function{
+class CASADI_SYMBOLIC_EXPORT MXFunction : public Function {
 public:
 
   /** \brief  Default constructor */
@@ -130,7 +130,7 @@ public:
 /// \endcond
 
   /** \brief Get the number of atomic operations */
-  int getAlgorithmSize() const{ return algorithm().size();}
+  int getAlgorithmSize() const { return algorithm().size();}
 
   /** \brief Get the length of the work vector */
   int getWorkSize() const;

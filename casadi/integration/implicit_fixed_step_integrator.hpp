@@ -25,7 +25,7 @@
 
 #include "fixed_step_integrator.hpp"
 
-namespace casadi{
+namespace casadi {
 
   class ImplicitFixedStepIntegratorInternal;
 

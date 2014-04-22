@@ -29,27 +29,25 @@
 #include "casadi/symbolic/mx/mx_tools.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   FixedStepIntegratorInternal::FixedStepIntegratorInternal(const Function& f,
-                                                           const Function& g) :
-      IntegratorInternal(f,g)
-  {
+                                                           const Function& g)
+      : IntegratorInternal(f,g) {
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
   void FixedStepIntegratorInternal::deepCopyMembers(
-    std::map<SharedObjectNode*,SharedObject>& already_copied)
-  {
+      std::map<SharedObjectNode*,SharedObject>& already_copied) {
     IntegratorInternal::deepCopyMembers(already_copied);
     F_ = deepcopy(F_,already_copied);
     G_ = deepcopy(G_,already_copied);
   }
 
-  FixedStepIntegratorInternal::~FixedStepIntegratorInternal(){
+  FixedStepIntegratorInternal::~FixedStepIntegratorInternal() {
   }
 
-  void FixedStepIntegratorInternal::init(){
+  void FixedStepIntegratorInternal::init() {
     // Call the base class init
     IntegratorInternal::init();
 
@@ -68,13 +66,13 @@ namespace casadi{
     nRZ_ =  RZ_.size();
 
     // Allocate tape if backward states are present
-    if(nrx_>0){
+    if(nrx_>0) {
       x_tape_.resize(nk_+1,vector<double>(nx_));
       Z_tape_.resize(nk_,vector<double>(nZ_));
     }
   }
 
-  void FixedStepIntegratorInternal::integrate(double t_out){
+  void FixedStepIntegratorInternal::integrate(double t_out) {
     // Get discrete time sought
     int k_out = std::ceil((t_out-t0_)/h_);
     k_out = std::min(k_out,nk_); //  make sure that rounding errors does not result in k_out>nk_
@@ -84,7 +82,7 @@ namespace casadi{
     Function& F = getExplicit();
 
     // Take time steps until end time has been reached
-    while(k_<k_out){
+    while(k_<k_out) {
       // Take step
       F.input(DAE_T).set(t_);
       F.input(DAE_X).set(output(INTEGRATOR_XF));
@@ -100,7 +98,7 @@ namespace casadi{
                 std::plus<double>());
 
       // Tape
-      if(nrx_>0){
+      if(nrx_>0) {
         output(INTEGRATOR_XF).get(x_tape_.at(k_+1));
         Z_.get(Z_tape_.at(k_));
       }
@@ -111,7 +109,7 @@ namespace casadi{
     }
   }
 
-  void FixedStepIntegratorInternal::integrateB(double t_out){
+  void FixedStepIntegratorInternal::integrateB(double t_out) {
     // Get discrete time sought
     int k_out = std::floor((t_out-t0_)/h_);
     k_out = std::max(k_out,0); //  make sure that rounding errors does not result in k_out>nk_
@@ -121,7 +119,7 @@ namespace casadi{
     Function& G = getExplicitB();
 
     // Take time steps until end time has been reached
-    while(k_>k_out){
+    while(k_>k_out) {
       // Advance time
       k_--;
       t_ = t0_ + k_*h_;
@@ -145,7 +143,7 @@ namespace casadi{
     }
   }
 
-  void FixedStepIntegratorInternal::reset(){
+  void FixedStepIntegratorInternal::reset() {
     // Reset the base classes
     IntegratorInternal::reset();
 
@@ -156,12 +154,12 @@ namespace casadi{
     calculateInitialConditions();
 
     // Add the first element in the tape
-    if(nrx_>0){
+    if(nrx_>0) {
       output(INTEGRATOR_XF).get(x_tape_.at(0));
     }
   }
 
-  void FixedStepIntegratorInternal::resetB(){
+  void FixedStepIntegratorInternal::resetB() {
     // Reset the base classes
     IntegratorInternal::resetB();
 
@@ -172,11 +170,11 @@ namespace casadi{
     calculateInitialConditionsB();
   }
 
-  void FixedStepIntegratorInternal::calculateInitialConditions(){
+  void FixedStepIntegratorInternal::calculateInitialConditions() {
     Z_.set(numeric_limits<double>::quiet_NaN());
   }
 
-  void FixedStepIntegratorInternal::calculateInitialConditionsB(){
+  void FixedStepIntegratorInternal::calculateInitialConditionsB() {
     RZ_.set(numeric_limits<double>::quiet_NaN());
   }
 

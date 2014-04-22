@@ -25,54 +25,54 @@
 #include <cassert>
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  Integrator::Integrator(){
+  Integrator::Integrator() {
   }
 
-  Integrator  Integrator::clone() const{
+  Integrator  Integrator::clone() const {
     Integrator ret;
     if(!isNull()) ret.assignNode((*this)->clone());
     return ret;
   }
 
-  void Integrator::printStats(ostream &stream) const{
+  void Integrator::printStats(ostream &stream) const {
     (*this)->printStats(stream);
   }
 
-  IntegratorInternal* Integrator::operator->(){
+  IntegratorInternal* Integrator::operator->() {
     return static_cast<IntegratorInternal*>(Function::operator->());
   }
 
-  const IntegratorInternal* Integrator::operator->() const{
+  const IntegratorInternal* Integrator::operator->() const {
     return static_cast<const IntegratorInternal*>(Function::operator->());
   }
 
-  void Integrator::reset(){
+  void Integrator::reset() {
     (*this)->reset();
   }
 
-  void Integrator::integrate(double t_out){
+  void Integrator::integrate(double t_out) {
     (*this)->integrate(t_out);
   }
 
-  bool Integrator::checkNode() const{
+  bool Integrator::checkNode() const {
     return dynamic_cast<const IntegratorInternal*>(get())!=0;
   }
 
-  void Integrator::resetB(){
+  void Integrator::resetB() {
     (*this)->resetB();
   }
 
-  void Integrator::integrateB(double t_out){
+  void Integrator::integrateB(double t_out) {
     (*this)->integrateB(t_out);
   }
 
-  Function Integrator::getDAE(){
+  Function Integrator::getDAE() {
     return (*this)->f_;
   }
 
-  std::pair<Function,Function> Integrator::getAugmented(int nfwd, int nadj){
+  std::pair<Function,Function> Integrator::getAugmented(int nfwd, int nadj) {
     IntegratorInternal::AugOffset offset;
     return (*this)->getAugmented(nfwd,nadj,offset);
   }

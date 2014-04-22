@@ -27,13 +27,13 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Represents any binary operation that involves two matrices
       \author Joel Andersson
       \date 2010
   */
   template<bool ScX, bool ScY>
-  class CASADI_SYMBOLIC_EXPORT BinaryMX : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT BinaryMX : public MXNode {
   public:
     /** \brief  Constructor */
     BinaryMX(Operation op, const MX& x, const MX& y);
@@ -42,13 +42,13 @@ namespace casadi{
     virtual ~BinaryMX();
 
     /** \brief  Clone function */
-    virtual BinaryMX* clone() const{ return new BinaryMX(*this);}
+    virtual BinaryMX* clone() const { return new BinaryMX(*this);}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return op_;}
+    virtual int getOp() const { return op_;}
 
     /** \brief Check if binary operation */
     virtual bool isBinaryOp() const { return true;}
@@ -74,7 +74,7 @@ namespace casadi{
     void evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp, std::vector<T>& rtmp);
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const{ return 2;}
+    virtual int numInplace() const { return 2;}
 
     /** \brief Generate code for the operation */
     void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
@@ -87,9 +87,9 @@ namespace casadi{
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const{
-      if(op_==node->getOp()){
-        if(dep(0).isEqual(node->dep(0),depth-1) && dep(1).isEqual(node->dep(1),depth-1)){
+    virtual bool isEqual(const MXNode* node, int depth) const {
+      if(op_==node->getOp()) {
+        if(dep(0).isEqual(node->dep(0),depth-1) && dep(1).isEqual(node->dep(1),depth-1)) {
           // If arguments are equal
           return true;
         } else {

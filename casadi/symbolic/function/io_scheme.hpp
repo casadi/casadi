@@ -29,7 +29,7 @@
 #include <vector>
 #include <iostream>
 
-namespace casadi{
+namespace casadi {
 
   // Forward declaration
   class IOSchemeInternal;
@@ -39,7 +39,7 @@ namespace casadi{
    * \author Joris Gillis
    * \date 2013
    */
-class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
+class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject {
 
   public:
 
@@ -143,8 +143,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
         const std::string arg_s16="",M arg_m16=M(),
         const std::string arg_s17="",M arg_m17=M(),
         const std::string arg_s18="",M arg_m18=M(),
-        const std::string arg_s19="",M arg_m19=M())
-    {
+        const std::string arg_s19="",M arg_m19=M()) {
       std::vector<std::string> k;
       std::vector<M> v;
       if (arg_s0!="") { k.push_back(arg_s0);  v.push_back(arg_m0); }
@@ -184,8 +183,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
       const std::string &arg_s12="", const std::string &arg_s13="",
       const std::string &arg_s14="", const std::string &arg_s15="",
       const std::string &arg_s16="", const std::string &arg_s17="",
-      const std::string &arg_s18="", const std::string &arg_s19="")
-  {
+      const std::string &arg_s18="", const std::string &arg_s19="") {
     std::vector<std::string> k;
     if (arg_s0!="") { k.push_back(arg_s0);}
     if (arg_s1!="") { k.push_back(arg_s1);}
@@ -212,7 +210,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
   #endif // SWIG
 
   template<class M>
-    std::vector<M> operator()(const std::vector<M> arg_m,const std::vector<std::string> & arg_s){
+    std::vector<M> operator()(const std::vector<M> arg_m,const std::vector<std::string> & arg_s) {
     casadi_assert(arg_m.size()==size());
     std::vector<M> ret;
     for (int i=0;i<arg_s.size();++i) {
@@ -224,7 +222,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject{
   }
 
   template<class M>
-    IOSchemeVector<M> operator()(const std::vector<std::string> arg_s,const std::vector<M> & arg_m){
+    IOSchemeVector<M> operator()(const std::vector<std::string> arg_s,const std::vector<M> & arg_m) {
     casadi_assert(arg_s.size()==arg_m.size());
     std::vector<M> v(size());
     for (int i=0;i<arg_s.size();++i) {

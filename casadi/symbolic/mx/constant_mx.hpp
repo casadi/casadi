@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
 /** \brief Represents an MX that is only composed of a constant.
         \author Joel Andersson
@@ -39,7 +39,7 @@ namespace casadi{
         This user can call MX(double) directly, or even rely on implicit typecasting.
         \sa zeros , ones
 */
-  class CASADI_SYMBOLIC_EXPORT ConstantMX : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT ConstantMX : public MXNode {
   public:
     /// Destructor
     explicit ConstantMX(const Sparsity& sp);
@@ -76,7 +76,7 @@ namespace casadi{
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_CONST;}
+    virtual int getOp() const { return OP_CONST;}
 
     /// Get the value (only for scalar constant nodes)
     virtual double getValue() const = 0;
@@ -95,33 +95,33 @@ namespace casadi{
   };
 
   /// A constant given as a DMatrix
-  class CASADI_SYMBOLIC_EXPORT ConstantDMatrix : public ConstantMX{
+  class CASADI_SYMBOLIC_EXPORT ConstantDMatrix : public ConstantMX {
   public:
 
     /** \brief  Constructor */
-    explicit ConstantDMatrix(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x){}
+    explicit ConstantDMatrix(const Matrix<double>& x) : ConstantMX(x.sparsity()), x_(x) {}
 
     /// Destructor
-    virtual ~ConstantDMatrix(){}
+    virtual ~ConstantDMatrix() {}
 
     /** \brief  Clone function */
-    virtual ConstantDMatrix* clone() const{ return new ConstantDMatrix(*this);}
+    virtual ConstantDMatrix* clone() const { return new ConstantDMatrix(*this);}
 
     /** \brief  Print a part of the expression */
-    virtual void printPart(std::ostream &stream, int part) const{
+    virtual void printPart(std::ostream &stream, int part) const {
       x_.print(stream);
     }
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                           std::vector<double>& rtmp){
+                           std::vector<double>& rtmp) {
       output[0]->set(x_);
       ConstantMX::evaluateD(input,output,itmp,rtmp);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                            std::vector<SXElement>& rtmp){
+                            std::vector<SXElement>& rtmp) {
       output[0]->set(SX(x_));
       ConstantMX::evaluateSX(input,output,itmp,rtmp);
     }
@@ -137,10 +137,10 @@ namespace casadi{
     virtual bool isIdentity() const;
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const{return x_.toScalar();}
+    virtual double getValue() const {return x_.toScalar();}
 
     /// Get the value (only for constant nodes)
-    virtual Matrix<double> getMatrixValue() const{ return x_;}
+    virtual Matrix<double> getMatrixValue() const { return x_;}
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const;
@@ -150,48 +150,48 @@ namespace casadi{
   };
 
   /// A zero-by-zero matrix
-  class CASADI_SYMBOLIC_EXPORT ZeroByZero : public ConstantMX{
+  class CASADI_SYMBOLIC_EXPORT ZeroByZero : public ConstantMX {
   private:
     /** \brief Private constructor (singleton design pattern) */
-    explicit ZeroByZero() : ConstantMX(Sparsity::sparse(0,0)){
+    explicit ZeroByZero() : ConstantMX(Sparsity::sparse(0,0)) {
       initSingleton();
     }
 
   public:
     /** \brief Get a pointer to the singleton */
-    static ZeroByZero* getInstance(){
+    static ZeroByZero* getInstance() {
       static ZeroByZero instance;
       return &instance;
     }
 
     /// Destructor
-    virtual ~ZeroByZero(){
+    virtual ~ZeroByZero() {
       destroySingleton();
     }
 
     /** \brief  Clone function */
-    virtual ZeroByZero* clone() const{ return getInstance();}
+    virtual ZeroByZero* clone() const { return getInstance();}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief  Evaluate the function numerically */
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                           std::vector<double>& rtmp){}
+                           std::vector<double>& rtmp) {}
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                            std::vector<SXElement>& rtmp){}
+                            std::vector<SXElement>& rtmp) {}
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
-                                   const std::vector<std::string>& res, CodeGenerator& gen) const{}
+                                   const std::vector<std::string>& res, CodeGenerator& gen) const {}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const{ return 0;}
+    virtual double getValue() const { return 0;}
 
     /// Get the value (only for constant nodes)
-    virtual DMatrix getMatrixValue() const{ return DMatrix(); }
+    virtual DMatrix getMatrixValue() const { return DMatrix(); }
 
     /// Get densification
     virtual MX getSetSparse(const Sparsity& sp) const;
@@ -217,31 +217,31 @@ namespace casadi{
 
   /** \brief Constant known at runtime */
   template<typename T>
-  struct RuntimeConst{
+  struct RuntimeConst {
     const T value;
-    RuntimeConst(){}
-    RuntimeConst(T v) : value(v){}
+    RuntimeConst() {}
+    RuntimeConst(T v) : value(v) {}
   };
 
   /** \brief  Constant known at compiletime */
   template<int v>
-  struct CompiletimeConst{
+  struct CompiletimeConst {
     static const int value = v;
   };
 
   /// A constant with all entries identical
   template<typename Value>
-  class CASADI_SYMBOLIC_EXPORT Constant : public ConstantMX{
+  class CASADI_SYMBOLIC_EXPORT Constant : public ConstantMX {
   public:
 
     /** \brief  Constructor */
-    explicit Constant(const Sparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v){}
+    explicit Constant(const Sparsity& sp, Value v = Value()) : ConstantMX(sp), v_(v) {}
 
     /// Destructor
-    virtual ~Constant(){}
+    virtual ~Constant() {}
 
     /** \brief  Clone function */
-    virtual Constant* clone() const{ return new Constant<Value>(*this);}
+    virtual Constant* clone() const { return new Constant<Value>(*this);}
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -259,18 +259,18 @@ namespace casadi{
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /** \brief  Check if a particular integer value */
-    virtual bool isZero() const{ return v_.value==0;}
-    virtual bool isOne() const{ return v_.value==1;}
-    virtual bool isIdentity() const{ return v_.value==1 && sparsity().isDiagonal();}
-    virtual bool isValue(double val) const{ return v_.value==val;}
+    virtual bool isZero() const { return v_.value==0;}
+    virtual bool isOne() const { return v_.value==1;}
+    virtual bool isIdentity() const { return v_.value==1 && sparsity().isDiagonal();}
+    virtual bool isValue(double val) const { return v_.value==val;}
 
     /// Get the value (only for scalar constant nodes)
-    virtual double getValue() const{
+    virtual double getValue() const {
       return v_.value;
     }
 
     /// Get the value (only for constant nodes)
-    virtual Matrix<double> getMatrixValue() const{
+    virtual Matrix<double> getMatrixValue() const {
       return Matrix<double>(sparsity(),v_.value);
     }
 
@@ -306,10 +306,10 @@ namespace casadi{
   };
 
   template<typename Value>
-  MX Constant<Value>::getHorzcat(const std::vector<MX>& x) const{
+  MX Constant<Value>::getHorzcat(const std::vector<MX>& x) const {
     // Check if all arguments have the same constant value
-    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
-      if(!(*i)->isValue(v_.value)){
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
+      if(!(*i)->isValue(v_.value)) {
         // Not all the same value, fall back to base class
         return ConstantMX::getHorzcat(x);
       }
@@ -317,17 +317,17 @@ namespace casadi{
 
     // Assemble the sparsity pattern
     Sparsity sp = sparsity();
-    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
       sp.appendColumns(i->sparsity());
     }
     return MX(sp,v_.value);
   }
 
   template<typename Value>
-  MX Constant<Value>::getVertcat(const std::vector<MX>& x) const{
+  MX Constant<Value>::getVertcat(const std::vector<MX>& x) const {
     // Check if all arguments have the same constant value
-    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
-      if(!(*i)->isValue(v_.value)){
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
+      if(!(*i)->isValue(v_.value)) {
         // Not all the same value, fall back to base class
         return ConstantMX::getVertcat(x);
       }
@@ -335,24 +335,24 @@ namespace casadi{
 
     // Assemble the sparsity pattern
     Sparsity sp = sparsity();
-    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i){
+    for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
       sp.append(i->sparsity());
     }
     return MX(sp,v_.value);
   }
 
   template<typename Value>
-  MX Constant<Value>::getReshape(const Sparsity& sp) const{
+  MX Constant<Value>::getReshape(const Sparsity& sp) const {
     return MX::create(new Constant<Value>(sp,v_));
   }
 
   template<typename Value>
-  MX Constant<Value>::getTranspose() const{
+  MX Constant<Value>::getTranspose() const {
     return MX::create(new Constant<Value>(sparsity().transpose(),v_));
   }
 
   template<typename Value>
-  MX Constant<Value>::getUnary(int op) const{
+  MX Constant<Value>::getUnary(int op) const {
     // Constant folding
     double ret(0);
     casadi_math<double>::fun(op,v_.value,0.0,ret);
@@ -373,7 +373,7 @@ namespace casadi{
   }
 
   template<typename Value>
-  MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const{
+  MX Constant<Value>::getBinary(int op, const MX& y, bool ScX, bool ScY) const {
     casadi_assert(sparsity()==y.sparsity() || ScX || ScY);
 
     if (ScX && !operation_checker<Function0Checker>(op)) {
@@ -399,7 +399,7 @@ namespace casadi{
       }
     }
 
-    switch(op){
+    switch(op) {
     case OP_ADD:
       if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(y,size1(),size2()) : y;
       break;
@@ -425,7 +425,7 @@ namespace casadi{
 
     // Constant folding
     // NOTE: ugly, should use a function instead of a cast
-    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0){
+    if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
       double y_value = y.size()>0 ? y->getValue() : 0;
       double ret;
       casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,y_value,ret);
@@ -439,14 +439,14 @@ namespace casadi{
 
   template<typename Value>
   void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                  std::vector<int>& itmp, std::vector<double>& rtmp){
+                                  std::vector<int>& itmp, std::vector<double>& rtmp) {
     output[0]->set(static_cast<double>(v_.value));
     ConstantMX::evaluateD(input,output,itmp,rtmp);
   }
 
   template<typename Value>
   void Constant<Value>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                                   std::vector<SXElement>& rtmp){
+                                   std::vector<SXElement>& rtmp) {
     output[0]->set(SXElement(v_.value));
     ConstantMX::evaluateSX(input,output,itmp,rtmp);
   }
@@ -454,7 +454,7 @@ namespace casadi{
   template<typename Value>
   void Constant<Value>::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                           const std::vector<std::string>& res,
-                                          CodeGenerator& gen) const{
+                                          CodeGenerator& gen) const {
     // Copy the constant to the work vector
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
     stream << res.at(0) << "[i]=";
@@ -467,10 +467,10 @@ namespace casadi{
 
   template<typename Value>
   MX Constant<Value>::getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const {
-    if(v_.value!=0){
+    if(v_.value!=0) {
       // Check if any "holes"
-      for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k){
-        if(*k<0){
+      for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k) {
+        if(*k<0) {
           // Do not simplify
           return MXNode::getGetNonzeros(sp,nz);
         }
@@ -490,8 +490,8 @@ namespace casadi{
   }
 
   template<typename Value>
-  MX Constant<Value>::getSetSparse(const Sparsity& sp) const{
-    if(isZero()){
+  MX Constant<Value>::getSetSparse(const Sparsity& sp) const {
+    if(isZero()) {
       return MX::create(new Constant<Value>(sp,v_));
     } else if (sp.isDense()) {
       DMatrix v = getMatrixValue();
@@ -503,28 +503,28 @@ namespace casadi{
   }
 
   template<typename Value>
-  void Constant<Value>::printPart(std::ostream &stream, int part) const{
-    if(sparsity().isScalar()){
+  void Constant<Value>::printPart(std::ostream &stream, int part) const {
+    if(sparsity().isScalar()) {
       // Print scalar
-      if(sparsity().size()==0){
+      if(sparsity().size()==0) {
         stream << "00";
       } else {
         stream << v_.value;
       }
-    } else if(sparsity().isEmpty()){
+    } else if(sparsity().isEmpty()) {
       // Print empty
       sparsity().printCompact(stream);
     } else {
       // Print value
-      if(v_.value==0){
+      if(v_.value==0) {
         stream << "zeros(";
-      } else if(v_.value==1){
+      } else if(v_.value==1) {
         stream << "ones(";
-      } else if(v_.value!=v_.value){
+      } else if(v_.value!=v_.value) {
         stream << "nan(";
-      } else if(v_.value==std::numeric_limits<double>::infinity()){
+      } else if(v_.value==std::numeric_limits<double>::infinity()) {
         stream << "inf(";
-      } else if(v_.value==-std::numeric_limits<double>::infinity()){
+      } else if(v_.value==-std::numeric_limits<double>::infinity()) {
         stream << "-inf(";
       } else {
         stream << "all_" << v_.value << "(";

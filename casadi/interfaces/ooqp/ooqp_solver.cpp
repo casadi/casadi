@@ -24,9 +24,9 @@
 #include "ooqp_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-OOQPSolver::OOQPSolver(){
+OOQPSolver::OOQPSolver() {
 }
 
 
@@ -34,16 +34,16 @@ OOQPSolver::OOQPSolver(const QPStructure& st)  {
   assignNode(new OOQPInternal(st));
 }
 
-OOQPInternal* OOQPSolver::operator->(){
+OOQPInternal* OOQPSolver::operator->() {
   return reinterpret_cast<OOQPInternal*>(Function::operator->());
 }
 
-const OOQPInternal* OOQPSolver::operator->() const{
+const OOQPInternal* OOQPSolver::operator->() const {
   return reinterpret_cast<const OOQPInternal*>(Function::operator->());
 
 }
 
-bool OOQPSolver::checkNode() const{
+bool OOQPSolver::checkNode() const {
   return dynamic_cast<const OOQPInternal*>(get());
 }
 

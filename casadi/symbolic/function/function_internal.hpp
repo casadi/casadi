@@ -38,7 +38,7 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   class MXFunction;
 
@@ -81,10 +81,10 @@ namespace casadi{
     virtual void spEvaluateViaJacSparsity(bool fwd);
 
     /** \brief  Is the class able to propagate seeds through the algorithm? */
-    virtual bool spCanEvaluate(bool fwd){ return false;}
+    virtual bool spCanEvaluate(bool fwd) { return false;}
 
     /** \brief  Reset the sparsity propagation */
-    virtual void spInit(bool fwd){}
+    virtual void spInit(bool fwd) {}
 
     /** \brief  Evaluate symbolically, SXElement type, possibly nonmatching sparsity patterns */
     virtual void evalSX(const std::vector<SX>& arg, std::vector<SX>& res,
@@ -298,27 +298,27 @@ namespace casadi{
 
     ///@{
     /** \brief Access input/output scheme */
-    inline const IOScheme& inputScheme() const{ return input_.scheme;}
-    inline const IOScheme& outputScheme() const{ return output_.scheme;}
-    inline IOScheme& inputScheme(){ return input_.scheme;}
-    inline IOScheme& outputScheme(){ return output_.scheme;}
+    inline const IOScheme& inputScheme() const { return input_.scheme;}
+    inline const IOScheme& outputScheme() const { return output_.scheme;}
+    inline IOScheme& inputScheme() { return input_.scheme;}
+    inline IOScheme& outputScheme() { return output_.scheme;}
     ///@}
 
     ///@{
     /// Input/output structures of the function */
-    inline const IOSchemeVector<DMatrix>& input_struct() const{ return input_;}
-    inline const IOSchemeVector<DMatrix>& output_struct() const{ return output_;}
-    inline IOSchemeVector<DMatrix>& input_struct(){ return input_;}
-    inline IOSchemeVector<DMatrix>& output_struct(){ return output_;}
+    inline const IOSchemeVector<DMatrix>& input_struct() const { return input_;}
+    inline const IOSchemeVector<DMatrix>& output_struct() const { return output_;}
+    inline IOSchemeVector<DMatrix>& input_struct() { return input_;}
+    inline IOSchemeVector<DMatrix>& output_struct() { return output_;}
     ///@}
 
     ///@{
     /// Input/output access without checking (faster, but unsafe)
-    inline const Matrix<double>& inputNoCheck(int iind=0) const{ return inputS<false>(iind);}
-    inline const Matrix<double>& outputNoCheck(int oind=0) const{ return outputS<false>(oind);}
+    inline const Matrix<double>& inputNoCheck(int iind=0) const { return inputS<false>(iind);}
+    inline const Matrix<double>& outputNoCheck(int oind=0) const { return outputS<false>(oind);}
 
-    inline Matrix<double>& inputNoCheck(int iind=0){ return inputS<false>(iind);}
-    inline Matrix<double>& outputNoCheck(int oind=0){ return outputS<false>(oind);}
+    inline Matrix<double>& inputNoCheck(int iind=0) { return inputS<false>(iind);}
+    inline Matrix<double>& outputNoCheck(int oind=0) { return outputS<false>(oind);}
     ///@}
 
     /** \brief  Log the status of the solver */

@@ -25,24 +25,24 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  WorhpSolver::WorhpSolver(){
+  WorhpSolver::WorhpSolver() {
   }
 
-  WorhpSolver::WorhpSolver(const Function& nlp){
+  WorhpSolver::WorhpSolver(const Function& nlp) {
     assignNode(new WorhpInternal(nlp));
   }
 
-  WorhpInternal* WorhpSolver::operator->(){
+  WorhpInternal* WorhpSolver::operator->() {
     return static_cast<WorhpInternal*>(NLPSolver::operator->());
   }
 
-  const WorhpInternal* WorhpSolver::operator->() const{
+  const WorhpInternal* WorhpSolver::operator->() const {
     return static_cast<const WorhpInternal*>(NLPSolver::operator->());
   }
 
-  bool WorhpSolver::checkNode() const{
+  bool WorhpSolver::checkNode() const {
     return dynamic_cast<const WorhpInternal*>(get());
   }
 

@@ -26,7 +26,6 @@ find_package(PythonInterp)
 set(STYLE_FILTER)
 
 # disable unwanted filters
-set(STYLE_FILTER ${STYLE_FILTER}-whitespace/braces,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/semicolon,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/blank_line,)
 set(STYLE_FILTER ${STYLE_FILTER}-whitespace/comma,)

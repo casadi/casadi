@@ -25,19 +25,19 @@
 
 /// \cond INTERNAL
 
-extern "C"{
+extern "C" {
 #include "external_packages/CSparse/Include/cs.h"
 }
 
 #include "csparse_cholesky.hpp"
 #include "casadi/symbolic/function/linear_solver_internal.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /**
      @copydoc LinearSolver_doc
   */
-  class CASADI_CSPARSE_INTERFACE_EXPORT CSparseCholeskyInternal : public LinearSolverInternal{
+  class CASADI_CSPARSE_INTERFACE_EXPORT CSparseCholeskyInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     CSparseCholeskyInternal(const Sparsity& sp, int nrhs);

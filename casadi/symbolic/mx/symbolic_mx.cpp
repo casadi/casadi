@@ -25,7 +25,7 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
   SymbolicMX::SymbolicMX(const std::string& name, int nrow, int ncol) : name_(name) {
     setSparsity(Sparsity::dense(nrow,ncol));
@@ -35,32 +35,32 @@ namespace casadi{
     setSparsity(sp);
   }
 
-  SymbolicMX* SymbolicMX::clone() const{
+  SymbolicMX* SymbolicMX::clone() const {
     return new SymbolicMX(*this);
   }
 
-  void SymbolicMX::printPart(std::ostream &stream, int part) const{
+  void SymbolicMX::printPart(std::ostream &stream, int part) const {
     stream << name_;
   }
 
   void SymbolicMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                             std::vector<int>& itmp, std::vector<double>& rtmp){
+                             std::vector<int>& itmp, std::vector<double>& rtmp) {
   }
 
   void SymbolicMX::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                              std::vector<SXElement>& rtmp){
+                              std::vector<SXElement>& rtmp) {
   }
 
   void SymbolicMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                               MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                              bool output_given){
+                              bool output_given) {
   }
 
-  const std::string& SymbolicMX::getName() const{
+  const std::string& SymbolicMX::getName() const {
     return name_;
   }
 
-  void SymbolicMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void SymbolicMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     bvec_t *outputd = get_bvec_t(output[0]->data());
     fill_n(outputd,output[0]->size(),0);
   }

@@ -26,20 +26,20 @@
 #include "../mx/mx_tools.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  HomotopyNLPSolver::HomotopyNLPSolver(){
+  HomotopyNLPSolver::HomotopyNLPSolver() {
   }
 
-  HomotopyNLPInternal* HomotopyNLPSolver::operator->(){
+  HomotopyNLPInternal* HomotopyNLPSolver::operator->() {
     return static_cast<HomotopyNLPInternal*>(Function::operator->());
   }
 
-  const HomotopyNLPInternal* HomotopyNLPSolver::operator->() const{
+  const HomotopyNLPInternal* HomotopyNLPSolver::operator->() const {
     return static_cast<const HomotopyNLPInternal*>(Function::operator->());
   }
 
-  bool HomotopyNLPSolver::checkNode() const{
+  bool HomotopyNLPSolver::checkNode() const {
     return dynamic_cast<const HomotopyNLPInternal*>(get())!=0;
   }
 

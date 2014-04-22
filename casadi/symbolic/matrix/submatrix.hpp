@@ -23,7 +23,7 @@
 #ifndef SUBMATRIX_HPP
 #define SUBMATRIX_HPP
 
-namespace casadi{
+namespace casadi {
 
 
   /** SubMatrix class for Matrix
@@ -34,10 +34,10 @@ namespace casadi{
 
   /// submatrix
   template<typename M, typename I, typename J>
-  class CASADI_SYMBOLIC_EXPORT SubMatrix : public M{
+  class CASADI_SYMBOLIC_EXPORT SubMatrix : public M {
   public:
     /// Constructor
-    SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i,j)), mat_(mat), i_(i), j_(j){}
+    SubMatrix(M& mat, const I& i, const J& j) : M(mat.sub(i,j)), mat_(mat), i_(i), j_(j) {}
 
     ///@{
     /// Methods that modify a part of the parent object (A(i,j) = ?, A(i,j) += ?, etc.)
@@ -74,28 +74,28 @@ namespace casadi{
   }
 
   template<typename M, typename I, typename J>
-  M SubMatrix<M,I,J>::operator+=(const M &y){
+  M SubMatrix<M,I,J>::operator+=(const M &y) {
     M s = *this+y;
     mat_.setSub(s,i_,j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
-  M SubMatrix<M,I,J>::operator-=(const M &y){
+  M SubMatrix<M,I,J>::operator-=(const M &y) {
     M s = *this-y;
     mat_.setSub(s,i_,j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
-  M SubMatrix<M,I,J>::operator*=(const M &y){
+  M SubMatrix<M,I,J>::operator*=(const M &y) {
     M s = *this*y;
     mat_.setSub(s,i_,j_);
     return s;
   }
 
   template<typename M, typename I, typename J>
-  M SubMatrix<M,I,J>::operator/=(const M &y){
+  M SubMatrix<M,I,J>::operator/=(const M &y) {
     M s = *this/y;
     mat_.setSub(s,i_,j_);
     return s;

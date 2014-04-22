@@ -35,7 +35,7 @@
 #include "matrix/sparse_storage_impl.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   INSTANTIATE_SUBMATRIX(Matrix<SXElement>)
   INSTANTIATE_NONZEROS(Matrix<SXElement>)

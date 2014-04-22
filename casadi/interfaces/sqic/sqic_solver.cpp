@@ -24,9 +24,9 @@
 #include "sqic_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-SQICSolver::SQICSolver(){
+SQICSolver::SQICSolver() {
 }
 
 
@@ -34,16 +34,16 @@ SQICSolver::SQICSolver(const QPStructure& st)  {
   assignNode(new SQICInternal(st));
 }
 
-SQICInternal* SQICSolver::operator->(){
+SQICInternal* SQICSolver::operator->() {
   return reinterpret_cast<SQICInternal*>(Function::operator->());
 }
 
-const SQICInternal* SQICSolver::operator->() const{
+const SQICInternal* SQICSolver::operator->() const {
   return reinterpret_cast<const SQICInternal*>(Function::operator->());
 
 }
 
-bool SQICSolver::checkNode() const{
+bool SQICSolver::checkNode() const {
   return dynamic_cast<const SQICInternal*>(get());
 }
 

@@ -26,40 +26,40 @@
 
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  ostream& operator<<(ostream &stream, const PrintableObject& obj){
+  ostream& operator<<(ostream &stream, const PrintableObject& obj) {
     obj.repr(stream);
     return stream;
   }
 
-  void PrintableObject::repr(std::ostream &stream) const{
+  void PrintableObject::repr(std::ostream &stream) const {
     // Print description by default
     print(stream);
   }
 
-  void PrintableObject::print(std::ostream &stream) const{
+  void PrintableObject::print(std::ostream &stream) const {
     // Print name by default
     stream << typeid(this).name();
   }
 
-  string str(const PrintableObject& obj){
+  string str(const PrintableObject& obj) {
     stringstream ss;
     obj.print(ss);
     return ss.str();
   }
 
-  string repr(const PrintableObject& obj){
+  string repr(const PrintableObject& obj) {
     stringstream ss;
     obj.repr(ss);
     return ss.str();
   }
 
-  std::string PrintableObject::getDescription() const{
+  std::string PrintableObject::getDescription() const {
     return casadi::str(*this);
   }
 
-  std::string PrintableObject::getRepresentation() const{
+  std::string PrintableObject::getRepresentation() const {
     return casadi::repr(*this);
   }
 

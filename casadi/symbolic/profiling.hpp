@@ -29,7 +29,7 @@
 
 #include "casadi_common.hpp"
 
-namespace casadi{
+namespace casadi {
 /// \cond INTERNAL
 
 /*

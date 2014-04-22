@@ -24,36 +24,36 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  KnitroSolver::KnitroSolver(){
+  KnitroSolver::KnitroSolver() {
   }
 
-  KnitroSolver::KnitroSolver(const Function& nlp){
+  KnitroSolver::KnitroSolver(const Function& nlp) {
     assignNode(new KnitroInternal(nlp));
   }
 
-  KnitroInternal* KnitroSolver::operator->(){
+  KnitroInternal* KnitroSolver::operator->() {
     return static_cast<KnitroInternal*>(NLPSolver::operator->());
   }
 
-  const KnitroInternal* KnitroSolver::operator->() const{
+  const KnitroInternal* KnitroSolver::operator->() const {
     return static_cast<const KnitroInternal*>(NLPSolver::operator->());
   }
 
-  bool KnitroSolver::checkNode() const{
+  bool KnitroSolver::checkNode() const {
     return dynamic_cast<const KnitroInternal*>(get());
   }
 
-  void KnitroSolver::setIntParam(const std::string& name, int val){
+  void KnitroSolver::setIntParam(const std::string& name, int val) {
     (*this)->int_param_[name] = val;
   }
 
-  void KnitroSolver::setDoubleParam(const std::string& name, double val){
+  void KnitroSolver::setDoubleParam(const std::string& name, double val) {
     (*this)->double_param_[name] = val;
   }
 
-  void KnitroSolver::setStringParam(const std::string& name, const std::string& val){
+  void KnitroSolver::setStringParam(const std::string& name, const std::string& val) {
     (*this)->string_param_[name] = val;
   }
 

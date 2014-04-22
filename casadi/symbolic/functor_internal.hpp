@@ -26,7 +26,7 @@
 #include "functor.hpp"
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
 
   /** \brief Internal class for Callback

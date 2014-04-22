@@ -24,24 +24,24 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  OldCollocationIntegrator::OldCollocationIntegrator(){
+  OldCollocationIntegrator::OldCollocationIntegrator() {
   }
 
-  OldCollocationIntegrator::OldCollocationIntegrator(const Function& f, const Function& g){
+  OldCollocationIntegrator::OldCollocationIntegrator(const Function& f, const Function& g) {
     assignNode(new OldCollocationIntegratorInternal(f,g));
   }
 
-  OldCollocationIntegratorInternal* OldCollocationIntegrator::operator->(){
+  OldCollocationIntegratorInternal* OldCollocationIntegrator::operator->() {
     return static_cast<OldCollocationIntegratorInternal*>(Integrator::operator->());
   }
 
-  const OldCollocationIntegratorInternal* OldCollocationIntegrator::operator->() const{
+  const OldCollocationIntegratorInternal* OldCollocationIntegrator::operator->() const {
     return static_cast<const OldCollocationIntegratorInternal*>(Integrator::operator->());
   }
 
-  bool OldCollocationIntegrator::checkNode() const{
+  bool OldCollocationIntegrator::checkNode() const {
     return dynamic_cast<const OldCollocationIntegratorInternal*>(get())!=0;
   }
 

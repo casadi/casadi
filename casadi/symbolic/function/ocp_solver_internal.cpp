@@ -29,11 +29,11 @@ OUTPUTSCHEME(OCPOutput)
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
 OCPSolverInternal::OCPSolverInternal(const Function& ffcn, const Function& mfcn,
                                      const Function& cfcn, const Function& rfcn) :
-    ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn){
+    ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn) {
   addOption("number_of_parameters",  OT_INTEGER,                0);
   addOption("number_of_grid_points", OT_INTEGER,               20);
   addOption("final_time",            OT_REAL,                 1.0);
@@ -42,11 +42,11 @@ OCPSolverInternal::OCPSolverInternal(const Function& ffcn, const Function& mfcn,
   output_.scheme = SCHEME_OCPOutput;
 }
 
-OCPSolverInternal::~OCPSolverInternal(){
+OCPSolverInternal::~OCPSolverInternal() {
 }
 
 
-void OCPSolverInternal::init(){
+void OCPSolverInternal::init() {
   // Initialize the functions
   ffcn_.init();
   mfcn_.init();

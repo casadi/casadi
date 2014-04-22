@@ -44,29 +44,29 @@
 #define CACHING_MAP std::map
 #endif // USE_CXX11
 
-namespace casadi{
+namespace casadi {
 
 /** \brief Represents a constant SX
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT ConstantSX : public SXNode{
+class CASADI_SYMBOLIC_EXPORT ConstantSX : public SXNode {
 public:
 
 // Destructor
-virtual ~ConstantSX(){}
+virtual ~ConstantSX() {}
 
 /** \brief  Get the value must be defined */
 virtual double getValue() const = 0;
 
 /** \brief  Properties */
-virtual bool isConstant() const{ return true; }
+virtual bool isConstant() const { return true; }
 
 /** \brief  Get the operation */
-virtual int getOp() const{ return OP_CONST;}
+virtual int getOp() const { return OP_CONST;}
 
 /** \brief Check if two nodes are equivalent up to a given depth */
-virtual bool isEqual(const SXNode* node, int depth) const{
+virtual bool isEqual(const SXNode* node, int depth) const {
   const ConstantSX* n = dynamic_cast<const ConstantSX*>(node);
   return n && n->getValue()==getValue();
 }
@@ -74,7 +74,7 @@ virtual bool isEqual(const SXNode* node, int depth) const{
 protected:
 
 /** \brief  print */
-virtual void print(std::ostream &stream, long& remaining_calls) const{
+virtual void print(std::ostream &stream, long& remaining_calls) const {
   stream << getValue();
 }
 
@@ -86,27 +86,27 @@ virtual void print(std::ostream &stream, long& remaining_calls) const{
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX{
+class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX {
   private:
     /// Constructor is private, use "create" below
-    explicit RealtypeSX(double value) : value(value){}
+    explicit RealtypeSX(double value) : value(value) {}
 
   public:
 
     /// Destructor
-    virtual ~RealtypeSX(){
+    virtual ~RealtypeSX() {
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
       (void)num_erased;
     }
 
     /// Static creator function (use instead of constructor)
-    inline static RealtypeSX* create(double value){
+    inline static RealtypeSX* create(double value) {
       // Try to find the constant
       CACHING_MAP<double,RealtypeSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
-      if(it==cached_constants_.end()){
+      if(it==cached_constants_.end()) {
         // Allocate a new object
         RealtypeSX* n = new RealtypeSX(value);
 
@@ -122,11 +122,11 @@ class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX{
 
     ///@{
     /** \brief  Get the value */
-    virtual double getValue() const{ return value;}
-    virtual int getIntValue() const{ return static_cast<int>(value);}
+    virtual double getValue() const { return value;}
+    virtual int getIntValue() const { return static_cast<int>(value);}
     ///@}
 
-    virtual bool isAlmostZero(double tol) const{ return fabs(value)<=tol; }
+    virtual bool isAlmostZero(double tol) const { return fabs(value)<=tol; }
 
   protected:
     /** \brief Hash map of all constants currently allocated
@@ -142,27 +142,27 @@ class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX{
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX{
+class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX {
   private:
     /// Constructor is private, use "create" below
-    explicit IntegerSX(int value) : value(value){}
+    explicit IntegerSX(int value) : value(value) {}
 
   public:
 
     /// Destructor
-    virtual ~IntegerSX(){
+    virtual ~IntegerSX() {
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
       (void)num_erased;
     }
 
     /// Static creator function (use instead of constructor)
-    inline static IntegerSX* create(int value){
+    inline static IntegerSX* create(int value) {
       // Try to find the constant
       CACHING_MAP<int,IntegerSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
-      if(it==cached_constants_.end()){
+      if(it==cached_constants_.end()) {
         // Allocate a new object
         IntegerSX* n = new IntegerSX(value);
 
@@ -178,12 +178,12 @@ class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX{
 
     ///@{
     /** \brief  evaluate function */
-    virtual double getValue() const{  return value; }
-    virtual int getIntValue() const{  return value; }
+    virtual double getValue() const {  return value; }
+    virtual int getIntValue() const {  return value; }
     ///@}
 
     /** \brief  Properties */
-    virtual bool isInteger() const{ return true; }
+    virtual bool isInteger() const { return true; }
 
   protected:
 
@@ -199,23 +199,23 @@ class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX{
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT ZeroSX : public ConstantSX{
+class CASADI_SYMBOLIC_EXPORT ZeroSX : public ConstantSX {
 public:
 
-  virtual ~ZeroSX(){}
-  explicit ZeroSX(){}
+  virtual ~ZeroSX() {}
+  explicit ZeroSX() {}
 
   ///@{
   /** \brief  Get the value */
-  virtual double getValue() const{ return 0;}
-  virtual int getIntValue() const{ return 0;}
+  virtual double getValue() const { return 0;}
+  virtual int getIntValue() const { return 0;}
   ///@}
 
   ///@{
   /** \brief  Properties */
-  virtual bool isInteger() const{ return true; }
-  virtual bool isZero() const{ return true; }
-  virtual bool isAlmostZero(double tol) const{ return true; }
+  virtual bool isInteger() const { return true; }
+  virtual bool isZero() const { return true; }
+  virtual bool isAlmostZero(double tol) const { return true; }
   ///@}
 };
 
@@ -224,19 +224,19 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT OneSX : public ConstantSX{
+class CASADI_SYMBOLIC_EXPORT OneSX : public ConstantSX {
 public:
 
-  explicit OneSX(){}
-  virtual ~OneSX(){}
+  explicit OneSX() {}
+  virtual ~OneSX() {}
 
   /** \brief  Get the value */
-  virtual double getValue() const{ return 1;}
-  virtual int getIntValue() const{ return 1;}
+  virtual double getValue() const { return 1;}
+  virtual int getIntValue() const { return 1;}
 
   /** \brief  Properties */
-  virtual bool isInteger() const{ return true; }
-  virtual bool isOne() const{ return true; }
+  virtual bool isInteger() const { return true; }
+  virtual bool isOne() const { return true; }
 
 };
 
@@ -245,22 +245,22 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT MinusOneSX : public ConstantSX{
+class CASADI_SYMBOLIC_EXPORT MinusOneSX : public ConstantSX {
 public:
 
-  explicit MinusOneSX(){}
-  virtual ~MinusOneSX(){}
+  explicit MinusOneSX() {}
+  virtual ~MinusOneSX() {}
 
   ///@{
   /** \brief  Get the value */
-  virtual double getValue() const{ return -1;}
-  virtual int getIntValue() const{ return -1;}
+  virtual double getValue() const { return -1;}
+  virtual int getIntValue() const { return -1;}
   ///@}
 
   ///@{
   /** \brief  Properties */
-  virtual bool isInteger() const{ return true; }
-  virtual bool isMinusOne() const{ return true; }
+  virtual bool isInteger() const { return true; }
+  virtual bool isMinusOne() const { return true; }
   ///@}
 
 };
@@ -270,17 +270,17 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT InfSX : public ConstantSX{
+class CASADI_SYMBOLIC_EXPORT InfSX : public ConstantSX {
 public:
 
-  explicit InfSX(){}
-  virtual ~InfSX(){}
+  explicit InfSX() {}
+  virtual ~InfSX() {}
 
   /** \brief  Get the value */
-  virtual double getValue() const{ return std::numeric_limits<double>::infinity();}
+  virtual double getValue() const { return std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
-  virtual bool isInf() const{ return true; }
+  virtual bool isInf() const { return true; }
 
 };
 
@@ -289,17 +289,17 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT MinusInfSX : public ConstantSX{
+class CASADI_SYMBOLIC_EXPORT MinusInfSX : public ConstantSX {
 public:
 
-  explicit MinusInfSX(){}
-  virtual ~MinusInfSX(){}
+  explicit MinusInfSX() {}
+  virtual ~MinusInfSX() {}
 
   /** \brief  Get the value */
-  virtual double getValue() const{ return -std::numeric_limits<double>::infinity();}
+  virtual double getValue() const { return -std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
-  virtual bool isMinusInf() const{ return true; }
+  virtual bool isMinusInf() const { return true; }
 
 };
 
@@ -308,17 +308,17 @@ public:
   \author Joel Andersson
   \date 2010
 */
-class CASADI_SYMBOLIC_EXPORT NanSX : public ConstantSX{
+class CASADI_SYMBOLIC_EXPORT NanSX : public ConstantSX {
 public:
 
-  explicit NanSX(){this->count++;}
-  virtual ~NanSX(){this->count--;}
+  explicit NanSX() {this->count++;}
+  virtual ~NanSX() {this->count--;}
 
   /** \brief  Get the value */
-  virtual double getValue() const{ return std::numeric_limits<double>::quiet_NaN();}
+  virtual double getValue() const { return std::numeric_limits<double>::quiet_NaN();}
 
   /** \brief  Properties */
-  virtual bool isNan() const{ return true; }
+  virtual bool isNan() const { return true; }
 
 };
 

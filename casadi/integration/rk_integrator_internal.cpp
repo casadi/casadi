@@ -24,21 +24,20 @@
 #include "casadi/symbolic/mx/mx_tools.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) :
       FixedStepIntegratorInternal(f,g) { }
 
   void RKIntegratorInternal::deepCopyMembers(
-    std::map<SharedObjectNode*,SharedObject>& already_copied)
-  {
+      std::map<SharedObjectNode*,SharedObject>& already_copied) {
     FixedStepIntegratorInternal::deepCopyMembers(already_copied);
   }
 
-  RKIntegratorInternal::~RKIntegratorInternal(){
+  RKIntegratorInternal::~RKIntegratorInternal() {
   }
 
-  void RKIntegratorInternal::init(){
+  void RKIntegratorInternal::init() {
     // Call the base class init
     FixedStepIntegratorInternal::init();
 
@@ -47,7 +46,7 @@ namespace casadi{
                           "Explicit Runge-Kutta integrators do not support algebraic variables");
   }
 
-  void RKIntegratorInternal::setupFG(){
+  void RKIntegratorInternal::setupFG() {
 
     // Symbolic inputs
     MX x0 = MX::sym("x0",f_.input(DAE_X).sparsity());
@@ -118,7 +117,7 @@ namespace casadi{
     }
 
     // Backward integration
-    if(!g_.isNull()){
+    if(!g_.isNull()) {
       // Symbolic inputs
       MX rx0 = MX::sym("x0",g_.input(RDAE_RX).sparsity());
       MX rp = MX::sym("p",g_.input(RDAE_RP).sparsity());

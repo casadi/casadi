@@ -28,7 +28,7 @@
 
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 
-namespace casadi{
+namespace casadi {
   class DirectMultipleShootingInternal;
 
 
@@ -45,7 +45,7 @@ namespace casadi{
    *   \author Joel Andersson
    *   \date 2011
   */
-class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShooting : public OCPSolver{
+class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShooting : public OCPSolver {
   public:
     /// Default constructor
     DirectMultipleShooting();

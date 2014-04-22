@@ -24,22 +24,22 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-CplexSolver::CplexSolver(){}
+CplexSolver::CplexSolver() {}
 
-CplexSolver::CplexSolver(const QPStructure &st){
+CplexSolver::CplexSolver(const QPStructure &st) {
   assignNode(new CplexInternal(st));
 }
 
 CplexInternal* CplexSolver::operator->() {
   return reinterpret_cast<CplexInternal*>(Function::operator->());
 }
-const CplexInternal* CplexSolver::operator->() const{
+const CplexInternal* CplexSolver::operator->() const {
   return reinterpret_cast<const CplexInternal*>(Function::operator->());
 }
 
-bool CplexSolver::checkNode() const{
+bool CplexSolver::checkNode() const {
   return dynamic_cast<const CplexInternal*>(get());
 }
 

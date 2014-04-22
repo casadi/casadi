@@ -35,10 +35,10 @@
  *
  */
 
-namespace casadi{
+namespace casadi {
 
 /// Input arguments of a linear solver [linsolIn]
-enum LinsolInput{
+enum LinsolInput {
   /// The square matrix A: sparse, (n x n). [A]
   LINSOL_A,
   /// The right-hand-side matrix b: dense,  (n x m) [B]
@@ -46,7 +46,7 @@ enum LinsolInput{
   LINSOL_NUM_IN};
 
 /// Output arguments of a linear solver [linsolOut]
-enum LinsolOutput{
+enum LinsolOutput {
   /// Solution to the linear system of equations [X]
   LINSOL_X,
   LINSOL_NUM_OUT};
@@ -60,7 +60,7 @@ enum LinsolOutput{
    \author Joel Andersson
    \date 2010-2013
   */
-  class CASADI_SYMBOLIC_EXPORT LinearSolver : public Function{
+  class CASADI_SYMBOLIC_EXPORT LinearSolver : public Function {
   public:
 
     /// \cond INTERNAL

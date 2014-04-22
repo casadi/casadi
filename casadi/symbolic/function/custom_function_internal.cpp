@@ -26,15 +26,14 @@
 #include <fstream>
 #include <sstream>
 
-namespace casadi{
+namespace casadi {
 
 using namespace std;
 
 CustomFunctionInternal::CustomFunctionInternal(
     const CustomEvaluate &c_fcn,
     const std::vector<casadi::Sparsity> &inputscheme,
-    const std::vector<casadi::Sparsity> &outputscheme) : evaluate_(c_fcn)
-{
+    const std::vector<casadi::Sparsity> &outputscheme) : evaluate_(c_fcn) {
   setNumInputs(inputscheme.size());
   setNumOutputs(outputscheme.size());
 
@@ -52,17 +51,17 @@ CustomFunctionInternal::CustomFunctionInternal(
 
 }
 
-CustomFunctionInternal::~CustomFunctionInternal(){
+CustomFunctionInternal::~CustomFunctionInternal() {
   // Explicitly remove the pointer to this (as the counter would otherwise be decreased)
   ref_.assignNodeNoCount(0);
 }
 
-void CustomFunctionInternal::evaluate(){
+void CustomFunctionInternal::evaluate() {
   casadi_assert_message(!evaluate_.isNull(), "CustomFunctionInternal::evaluate: pointer is null");
   evaluate_(ref_,user_data_);
 }
 
-void CustomFunctionInternal::init(){
+void CustomFunctionInternal::init() {
   FunctionInternal::init();
 }
 

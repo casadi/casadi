@@ -28,7 +28,7 @@ INPUTSCHEME(QPSolverInput)
 OUTPUTSCHEME(QPSolverOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   // Constructor
   QPSolverInternal::QPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -89,14 +89,14 @@ namespace casadi{
     FunctionInternal::init();
   }
 
-  QPSolverInternal::~QPSolverInternal(){
+  QPSolverInternal::~QPSolverInternal() {
   }
 
-  void QPSolverInternal::evaluate(){
+  void QPSolverInternal::evaluate() {
     throw CasadiException("QPSolverInternal::evaluate: Not implemented");
   }
 
-  void QPSolverInternal::solve(){
+  void QPSolverInternal::solve() {
     throw CasadiException("QPSolverInternal::solve: Not implemented");
   }
 

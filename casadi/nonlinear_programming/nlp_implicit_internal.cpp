@@ -37,12 +37,11 @@ namespace casadi {
               "Options to be passed to the NLPSolver");
   }
 
-  NLPImplicitInternal::~NLPImplicitInternal(){
+  NLPImplicitInternal::~NLPImplicitInternal() {
   }
 
   void NLPImplicitInternal::deepCopyMembers(
-    std::map<SharedObjectNode*,SharedObject>& already_copied)
-  {
+      std::map<SharedObjectNode*,SharedObject>& already_copied) {
     ImplicitFunctionInternal::deepCopyMembers(already_copied);
     nlp_solver_ = deepcopy(nlp_solver_,already_copied);
   }
@@ -56,7 +55,7 @@ namespace casadi {
     // Simple constraints
     vector<double>& lbx = nlp_solver_.input(NLP_SOLVER_LBX).data();
     vector<double>& ubx = nlp_solver_.input(NLP_SOLVER_UBX).data();
-    for(int k=0; k<u_c_.size(); ++k){
+    for(int k=0; k<u_c_.size(); ++k) {
       lbx[k] = u_c_[k] <= 0 ? -std::numeric_limits<double>::infinity() : 0;
       ubx[k] = u_c_[k] >= 0 ?  std::numeric_limits<double>::infinity() : 0;
     }
@@ -66,8 +65,8 @@ namespace casadi {
 
     // Add auxiliary inputs
     vector<double>::iterator nlp_p = nlp_solver_.input(NLP_SOLVER_P).begin();
-    for(int i=0; i<getNumInputs(); ++i){
-      if(i!=iin_){
+    for(int i=0; i<getNumInputs(); ++i) {
+      if(i!=iin_) {
         std::copy(input(i).begin(),input(i).end(),nlp_p);
         nlp_p += input(i).size();
       }
@@ -81,18 +80,18 @@ namespace casadi {
     output(iout_).set(nlp_solver_.output(NLP_SOLVER_X));
 
     // Evaluate auxilary outputs, if necessary
-    if(getNumOutputs()>0){
+    if(getNumOutputs()>0) {
       f_.setInput(output(iout_),iin_);
       for(int i=0; i<getNumInputs(); ++i)
         if(i!=iin_) f_.setInput(input(i),i);
       f_.evaluate();
-      for(int i=0; i<getNumOutputs(); ++i){
+      for(int i=0; i<getNumOutputs(); ++i) {
         if(i!=iout_) f_.getOutput(output(i),i);
       }
     }
   }
 
-  void NLPImplicitInternal::init(){
+  void NLPImplicitInternal::init() {
 
     // Call the base class initializer
     ImplicitFunctionInternal::init();
@@ -125,7 +124,7 @@ namespace casadi {
     // Create an nlpsolver instance
     NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
     nlp_solver_ = nlp_solvercreator(nlp);
-    if(hasSetOption("nlp_solver_options")){
+    if(hasSetOption("nlp_solver_options")) {
       nlp_solver_.setOption(getOption("nlp_solver_options"));
     }
 

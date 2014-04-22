@@ -28,15 +28,15 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   template<typename T>
-  class CASADI_SYMBOLIC_EXPORT GenericTypeInternal : public SharedObjectNode{
+  class CASADI_SYMBOLIC_EXPORT GenericTypeInternal : public SharedObjectNode {
     public:
-      explicit GenericTypeInternal(const T& d) : d_(d){}
-      virtual ~GenericTypeInternal(){}
-      virtual GenericTypeInternal<T>* clone() const{ return new GenericTypeInternal(d_);}
-      virtual void print(std::ostream &stream) const{ stream << d_; }
+      explicit GenericTypeInternal(const T& d) : d_(d) {}
+      virtual ~GenericTypeInternal() {}
+      virtual GenericTypeInternal<T>* clone() const { return new GenericTypeInternal(d_);}
+      virtual void print(std::ostream &stream) const { stream << d_; }
       T d_;
   };
 
@@ -44,7 +44,7 @@ namespace casadi{
 
   // Implementations of public functions
   template<typename T>
-  bool GenericType::is_a() const{
+  bool GenericType::is_a() const {
     return dynamic_cast<const GenericTypeInternal<T>*>(get()) != 0;
   }
 

@@ -30,7 +30,7 @@
 #include <string>
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 
   NullspaceInternal::NullspaceInternal(const Sparsity& A_sp) : A_sp_(A_sp) {
@@ -39,11 +39,11 @@ namespace casadi{
 
   }
 
-  NullspaceInternal::~NullspaceInternal(){
+  NullspaceInternal::~NullspaceInternal() {
   }
 
 
-  void NullspaceInternal::init(){
+  void NullspaceInternal::init() {
 
     dense_ = getOption("dense");
 
@@ -71,7 +71,7 @@ namespace casadi{
 
   }
 
-  void NullspaceInternal::evaluate(){
+  void NullspaceInternal::evaluate() {
     throw CasadiException("NullspaceInternal::evaluate: Not implemented");
   }
 

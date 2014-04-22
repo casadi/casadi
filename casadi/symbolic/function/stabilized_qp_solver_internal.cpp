@@ -28,12 +28,11 @@ INPUTSCHEME(StabilizedQPSolverInput)
 OUTPUTSCHEME(QPSolverOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   // Constructor
-  StabilizedQPSolverInternal::StabilizedQPSolverInternal(const std::vector<Sparsity> &st) :
-      st_(st)
-  {
+  StabilizedQPSolverInternal::StabilizedQPSolverInternal(const std::vector<Sparsity> &st)
+      : st_(st) {
     // Get structure
     casadi_assert_message(st_.size()==QP_STRUCT_NUM,"Problem structure mismatch");
     const Sparsity& A = st_[QP_STRUCT_A];
@@ -90,14 +89,14 @@ namespace casadi{
     FunctionInternal::init();
   }
 
-  StabilizedQPSolverInternal::~StabilizedQPSolverInternal(){
+  StabilizedQPSolverInternal::~StabilizedQPSolverInternal() {
   }
 
-  void StabilizedQPSolverInternal::evaluate(){
+  void StabilizedQPSolverInternal::evaluate() {
     throw CasadiException("StabilizedQPSolverInternal::evaluate: Not implemented");
   }
 
-  void StabilizedQPSolverInternal::solve(){
+  void StabilizedQPSolverInternal::solve() {
     throw CasadiException("StabilizedQPSolverInternal::solve: Not implemented");
   }
 
@@ -105,7 +104,7 @@ namespace casadi{
     // Check box constraints
     const vector<double>& lbx = input(STABILIZED_QP_SOLVER_LBX).data();
     const vector<double>& ubx = input(STABILIZED_QP_SOLVER_UBX).data();
-    for(int i=0; i<lbx.size(); ++i){
+    for(int i=0; i<lbx.size(); ++i) {
       casadi_assert_message(lbx.at(i)<=ubx.at(i),
                             "LBX[" << i << "]== <= UBX[" << i << "] was violated. "
                             "Got LBX["<<i<<"]=" << lbx.at(i)
@@ -115,7 +114,7 @@ namespace casadi{
     // Check linear constraint bounds
     const vector<double>& lba = input(STABILIZED_QP_SOLVER_LBA).data();
     const vector<double>& uba = input(STABILIZED_QP_SOLVER_UBA).data();
-    for(int i=0; i<lba.size(); ++i){
+    for(int i=0; i<lba.size(); ++i) {
       casadi_assert_message(lba.at(i)<=uba.at(i),
                             "LBA[" << i << "]== <= UBA[" << i << "] was violated. "
                             "Got LBA["<<i<<"]=" << lba.at(i)

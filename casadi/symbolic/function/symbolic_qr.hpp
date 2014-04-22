@@ -25,7 +25,7 @@
 
 #include "linear_solver.hpp"
 
-namespace casadi{
+namespace casadi {
 
   // Forward declaration of internal class
   class SymbolicQRInternal;
@@ -36,7 +36,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT SymbolicQR : public LinearSolver{
+  class CASADI_SYMBOLIC_EXPORT SymbolicQR : public LinearSolver {
   public:
 
     /// Default (empty) constructor
@@ -58,7 +58,7 @@ namespace casadi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const Sparsity& sp, int nrhs){ return SymbolicQR(sp,nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs) { return SymbolicQR(sp,nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif

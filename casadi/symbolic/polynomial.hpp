@@ -25,13 +25,13 @@
 
 # include "printable_object.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Helper class for differentiating and integrating polynomials
       \author Joel Andersson
       \date 2014
   */
-  class CASADI_SYMBOLIC_EXPORT Polynomial : public PrintableObject{
+  class CASADI_SYMBOLIC_EXPORT Polynomial : public PrintableObject {
   public:
     /// Floating point type
     typedef long double real_t;
@@ -50,14 +50,14 @@ namespace casadi{
 
     /// Construct from a vector of polynomial coefficients
     template<typename T>
-    Polynomial(const std::vector<T>& coeff) : p_(coeff.begin(),coeff.end()){}
+    Polynomial(const std::vector<T>& coeff) : p_(coeff.begin(),coeff.end()) {}
 
     /// Evaluate numerically
     template<typename T>
-    T operator()(const T& x) const{
+    T operator()(const T& x) const {
       std::vector<real_t>::const_reverse_iterator it = p_.rbegin();
       T ret = *it++;
-      while(it!=p_.rend()){
+      while(it!=p_.rend()) {
         ret *= x;
         ret += *it++;
       }

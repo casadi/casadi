@@ -30,7 +30,7 @@
 #include "../casadi_math.hpp"
 #include "../casadi_exception.hpp"
 
-namespace casadi{
+namespace casadi {
 
 /**
 \ingroup expression_tools
@@ -69,13 +69,13 @@ namespace casadi{
 
   /** \brief Check if two expressions are equal, assuming that they are comparable */
   template<typename MatType>
-  bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y){
+  bool isEqual(const GenericMatrix<MatType>& x, const GenericMatrix<MatType>& y) {
     return static_cast<const MatType&>(x).isEqual(static_cast<const MatType&>(y));
   }
 
 #ifndef SWIG
   template<typename MatType>
-  MatType linspace(const GenericMatrix<MatType> &a_, const GenericMatrix<MatType> &b_, int nsteps){
+  MatType linspace(const GenericMatrix<MatType> &a_, const GenericMatrix<MatType> &b_, int nsteps) {
     const MatType& a = static_cast<const MatType&>(a_);
     const MatType& b = static_cast<const MatType&>(b_);
     std::vector<MatType> ret(nsteps);

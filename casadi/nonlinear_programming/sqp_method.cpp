@@ -24,24 +24,24 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  SQPMethod::SQPMethod(){
+  SQPMethod::SQPMethod() {
   }
 
-  SQPMethod::SQPMethod(const Function& nlp){
+  SQPMethod::SQPMethod(const Function& nlp) {
     assignNode(new SQPInternal(nlp));
   }
 
-  SQPInternal* SQPMethod::operator->(){
+  SQPInternal* SQPMethod::operator->() {
     return static_cast<SQPInternal*>(NLPSolver::operator->());
   }
 
-  const SQPInternal* SQPMethod::operator->() const{
+  const SQPInternal* SQPMethod::operator->() const {
     return static_cast<const SQPInternal*>(NLPSolver::operator->());
   }
 
-  bool SQPMethod::checkNode() const{
+  bool SQPMethod::checkNode() const {
     return dynamic_cast<const SQPInternal*>(get())!=0;
   }
 

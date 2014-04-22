@@ -39,7 +39,7 @@ INPUTSCHEME(DPLEInput)
 OUTPUTSCHEME(DPLEOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   PsdIndefDpleInternal::PsdIndefDpleInternal(const std::vector< Sparsity > & A,
                                              const std::vector< Sparsity > &V, int nfwd, int nadj)
@@ -57,11 +57,11 @@ namespace casadi{
               "Options to be passed to the linear solver.");
   }
 
-  PsdIndefDpleInternal::~PsdIndefDpleInternal(){
+  PsdIndefDpleInternal::~PsdIndefDpleInternal() {
 
   }
 
-  void PsdIndefDpleInternal::init(){
+  void PsdIndefDpleInternal::init() {
 
     DpleInternal::init();
 
@@ -97,7 +97,7 @@ namespace casadi{
     // There can be at most n partitions
     partition_.reserve(n_);
 
-    if(hasSetOption("linear_solver")){
+    if(hasSetOption("linear_solver")) {
       linearSolverCreator linear_solver_creator = getOption("linear_solver");
 
       // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
@@ -209,7 +209,7 @@ namespace casadi{
   /// \endcond
 
 
-  void PsdIndefDpleInternal::evaluate(){
+  void PsdIndefDpleInternal::evaluate() {
     // Obtain a periodic Schur form
 
     // Set up timers for profiling
@@ -1018,7 +1018,7 @@ namespace casadi{
     DpleInternal::deepCopyMembers(already_copied);
   }
 
-  PsdIndefDpleInternal* PsdIndefDpleInternal::clone() const{
+  PsdIndefDpleInternal* PsdIndefDpleInternal::clone() const {
     // Return a deep copy
     PsdIndefDpleInternal* node = new PsdIndefDpleInternal(A_,V_, nfwd_, nadj_);
     node->setOption(dictionary());

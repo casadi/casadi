@@ -36,7 +36,7 @@
 using namespace std;
 namespace casadi {
 
-StabilizedSQICInternal* StabilizedSQICInternal::clone() const{
+StabilizedSQICInternal* StabilizedSQICInternal::clone() const {
   // Return a deep copy
   StabilizedSQICInternal* node = new StabilizedSQICInternal(st_);
   if(!node->is_init_)
@@ -45,11 +45,11 @@ StabilizedSQICInternal* StabilizedSQICInternal::clone() const{
 }
 
 StabilizedSQICInternal::StabilizedSQICInternal(const std::vector<Sparsity>& st)
-    : StabilizedQPSolverInternal(st){
+    : StabilizedQPSolverInternal(st) {
   is_init_ = false;
 }
 
-StabilizedSQICInternal::~StabilizedSQICInternal(){
+StabilizedSQICInternal::~StabilizedSQICInternal() {
   sqicDestroy();
 }
 
@@ -100,7 +100,7 @@ void StabilizedSQICInternal::evaluate() {
   output(QP_SOLVER_COST)[0]+= x_[n_+nc_];
 }
 
-void StabilizedSQICInternal::init(){
+void StabilizedSQICInternal::init() {
    // Call the init method of the base class
   StabilizedQPSolverInternal::init();
 
@@ -162,7 +162,7 @@ void StabilizedSQICInternal::init(){
        &input(STABILIZED_QP_SOLVER_H).data()[0]);
 }
 
-map<int,string> StabilizedSQICInternal::calc_flagmap(){
+map<int,string> StabilizedSQICInternal::calc_flagmap() {
   map<int,string> f;
 
   return f;
@@ -170,12 +170,12 @@ map<int,string> StabilizedSQICInternal::calc_flagmap(){
 
 map<int,string> StabilizedSQICInternal::flagmap = StabilizedSQICInternal::calc_flagmap();
 
-void StabilizedSQICInternal::sqic_error(const string& module, int flag){
+void StabilizedSQICInternal::sqic_error(const string& module, int flag) {
   // Find the error
   map<int,string>::const_iterator it = flagmap.find(flag);
 
   stringstream ss;
-  if(it == flagmap.end()){
+  if(it == flagmap.end()) {
     ss << "Unknown error (" << flag << ") from module \"" << module << "\".";
   } else {
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";

@@ -28,22 +28,22 @@
 #include <stack>
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
   /** \brief Assertion
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT Assertion : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Assertion : public MXNode {
   public:
 
     /// Constructor
     Assertion(const MX& x, const MX& y, const std::string & s);
 
     /// Clone function
-    virtual Assertion* clone() const{ return new Assertion(*this);}
+    virtual Assertion* clone() const { return new Assertion(*this);}
 
     /// Destructor
-    virtual ~Assertion(){}
+    virtual ~Assertion() {}
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -62,7 +62,7 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_ASSERTION;}
+    virtual int getOp() const { return OP_ASSERTION;}
 
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 

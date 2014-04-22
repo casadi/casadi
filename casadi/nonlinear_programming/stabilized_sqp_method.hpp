@@ -27,7 +27,7 @@
 
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 
-namespace casadi{
+namespace casadi {
 
   class StabilizedSQPInternal;
 
@@ -45,8 +45,8 @@ namespace casadi{
     /// \brief Create an NLP solver instance
     explicit StabilizedSQPMethod(const Function& nlp
                                  /**< NLP function:
-                                    \f$ [\mathbb{R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto
-                                    [\mathbb{R} \times \mathbb{R}^{n_g}]\f$*/
+                                    \f$ [\mathbb {R}^{n_x} \times \mathbb{R}^{n_p}] \mapsto
+                                    [\mathbb {R} \times \mathbb{R}^{n_g}]\f$*/
                                  );
 
     /// Access functions of the node
@@ -60,7 +60,7 @@ namespace casadi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static NLPSolver creator(const Function& nlp){ return StabilizedSQPMethod(nlp);}
+    static NLPSolver creator(const Function& nlp) { return StabilizedSQPMethod(nlp);}
 #ifdef SWIG
     %nocallback;
 #endif

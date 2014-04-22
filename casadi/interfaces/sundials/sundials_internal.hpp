@@ -32,9 +32,9 @@
 #include <sundials/sundials_types.h>
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
-class CASADI_SUNDIALS_INTERFACE_EXPORT SundialsInternal : public IntegratorInternal{
+class CASADI_SUNDIALS_INTERFACE_EXPORT SundialsInternal : public IntegratorInternal {
 public:
   /** \brief  Constructor */
   SundialsInternal(const Function& f, const Function& g);
@@ -72,13 +72,13 @@ public:
   int ncheck_;
 
   /// Supported linear solvers in Sundials
-  enum LinearSolverType{SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
+  enum LinearSolverType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
 
   /// Supported iterative solvers in Sundials
-  enum IterativeSolverType{SD_GMRES,SD_BCGSTAB,SD_TFQMR};
+  enum IterativeSolverType {SD_GMRES,SD_BCGSTAB,SD_TFQMR};
 
   /// Linear solver data (dense)
-  struct LinSolDataDense{};
+  struct LinSolDataDense {};
 
   /// Linear solver
   LinearSolverType linsol_f_, linsol_g_;

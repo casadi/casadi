@@ -26,7 +26,7 @@
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"
 #include <vector>
-namespace casadi{
+namespace casadi {
 
   /** \brief  Forward declaration */
   class MXNode;
@@ -53,7 +53,7 @@ namespace casadi{
   */
   class CASADI_SYMBOLIC_EXPORT MX : public GenericExpression<MX>,
                                     public GenericMatrix<MX>,
-                                    public SharedObject{
+                                    public SharedObject {
   public:
 
     /** \brief  Default constructor */
@@ -108,42 +108,42 @@ namespace casadi{
     /// Indexing for interfaced languages
 
     /// get a non-zero
-    const MX nz_indexed_one_based(int k) const{ return at(k-1);}
-    const MX nz_indexed_zero_based(int k) const{ return at(k);}
-    const MX nz_indexed(const IndexList &k) const{
+    const MX nz_indexed_one_based(int k) const { return at(k-1);}
+    const MX nz_indexed_zero_based(int k) const { return at(k);}
+    const MX nz_indexed(const IndexList &k) const {
       return (*this)[k.getAll(size())];
     }
-    const MX nz_indexed(const Slice &k) const{
+    const MX nz_indexed(const Slice &k) const {
       return (*this)[k.getAll(size())];
     }
-    const MX nz_indexed(const Matrix<int> &k) const{
+    const MX nz_indexed(const Matrix<int> &k) const {
       return (*this)[k];
     }
 
     /// get a matrix element
-    const MX indexed_one_based(int rr, int cc) const{ return (*this)(rr-1,cc-1);}
-    const MX indexed_zero_based(int rr, int cc) const{ return (*this)(rr,cc);}
-    const MX indexed(const IndexList &rr, const IndexList &cc) const{
+    const MX indexed_one_based(int rr, int cc) const { return (*this)(rr-1,cc-1);}
+    const MX indexed_zero_based(int rr, int cc) const { return (*this)(rr,cc);}
+    const MX indexed(const IndexList &rr, const IndexList &cc) const {
       return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
-    const MX indexed(const Slice &rr, const Slice &cc) const{
+    const MX indexed(const Slice &rr, const Slice &cc) const {
       return (*this)(rr.getAll(size1()),cc.getAll(size2()));
     }
-    const MX indexed(const Matrix<int> &k) const{
+    const MX indexed(const Matrix<int> &k) const {
       return (*this)(k);
     }
-    const MX indexed(const Sparsity &sp) const{
+    const MX indexed(const Sparsity &sp) const {
       return (*this)(sp);
     }
-    const MX indexed(const Slice &rr, const Matrix<int>& cc) const{ return (*this)(rr,cc); }
-    const MX indexed(const Matrix<int>& rr, const IndexList& cc) const{
+    const MX indexed(const Slice &rr, const Matrix<int>& cc) const { return (*this)(rr,cc); }
+    const MX indexed(const Matrix<int>& rr, const IndexList& cc) const {
       return (*this)(rr,cc.getAll(size2()));
     }
-    const MX indexed(const Matrix<int>& rr, const Slice& cc) const{ return (*this)(rr,cc); }
-    const MX indexed(const IndexList& rr, const Matrix<int>& cc) const{
+    const MX indexed(const Matrix<int>& rr, const Slice& cc) const { return (*this)(rr,cc); }
+    const MX indexed(const IndexList& rr, const Matrix<int>& cc) const {
       return (*this)(rr.getAll(size1()),cc);
     }
-    const MX indexed(const Matrix<int>& rr, const Matrix<int>& cc) const{
+    const MX indexed(const Matrix<int>& rr, const Matrix<int>& cc) const {
       return (*this)(rr,cc);
     }
 
@@ -158,82 +158,82 @@ namespace casadi{
                             "Matrix must be a dense vector, but got " << dimString() << ".");
       return (*this)(rr);
     }
-    const MX indexed(const IndexList &rr) const{
+    const MX indexed(const IndexList &rr) const {
       casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got "
                             << dimString() << ".");
       return (*this)(rr.getAll(size1()));
     }
-    const MX indexed(const Slice &rr) const{
+    const MX indexed(const Slice &rr) const {
       casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got "
                             << dimString() << ".");
       return (*this)(rr.getAll(size1()));
     }
 
     /// set a non-zero
-    void nz_indexed_one_based_assignment(int k, const MX &m){ at(k-1) = m(0,0);}
-    void nz_indexed_zero_based_assignment(int k, const MX &m){ at(k) = m(0,0);}
-    void nz_indexed_assignment(const IndexList &k, const MX &m){
+    void nz_indexed_one_based_assignment(int k, const MX &m) { at(k-1) = m(0,0);}
+    void nz_indexed_zero_based_assignment(int k, const MX &m) { at(k) = m(0,0);}
+    void nz_indexed_assignment(const IndexList &k, const MX &m) {
       (*this)[k.getAll(size())] = m;
     }
-    void nz_indexed_assignment(const Slice &k, const MX &m){
+    void nz_indexed_assignment(const Slice &k, const MX &m) {
       (*this)[k.getAll(size())] = m;
     }
-    void nz_indexed_assignment(const Matrix<int> &k, const MX &m){
+    void nz_indexed_assignment(const Matrix<int> &k, const MX &m) {
       (*this)[k] = m;
     }
 
     /// set a matrix element
-    void indexed_one_based_assignment(int rr, int cc, const MX &m){ (*this)(rr-1,cc-1) = m;}
-    void indexed_zero_based_assignment(int rr, int cc, const MX &m){ (*this)(rr,cc) = m;}
-    void indexed_assignment(const IndexList &rr, const IndexList &cc, const MX &m){
+    void indexed_one_based_assignment(int rr, int cc, const MX &m) { (*this)(rr-1,cc-1) = m;}
+    void indexed_zero_based_assignment(int rr, int cc, const MX &m) { (*this)(rr,cc) = m;}
+    void indexed_assignment(const IndexList &rr, const IndexList &cc, const MX &m) {
       setSub(m,rr.getAll(size1()),cc.getAll(size2()));
     }
 
-    void indexed_assignment(const Slice &rr, const Slice &cc, const MX &m){
+    void indexed_assignment(const Slice &rr, const Slice &cc, const MX &m) {
       (*this)(rr.getAll(size1()),cc.getAll(size2())) = m;
     }
 
-    void indexed_zero_based_assignment(const Matrix<int>& k, const MX &m){
+    void indexed_zero_based_assignment(const Matrix<int>& k, const MX &m) {
       (*this)[k] = m;
     }
-    void indexed_assignment(const Sparsity& sp, const MX &m){
+    void indexed_assignment(const Sparsity& sp, const MX &m) {
       (*this)(sp) = m;
     }
-    void indexed_assignment(const Matrix<int> &rr, const Slice& cc, const MX& m){
+    void indexed_assignment(const Matrix<int> &rr, const Slice& cc, const MX& m) {
       (*this)(rr,cc.getAll(size2())) = m;
     }
-    void indexed_assignment( const Slice& rr, const Matrix<int>& cc, const MX& m){
+    void indexed_assignment( const Slice& rr, const Matrix<int>& cc, const MX& m) {
       (*this)(rr.getAll(size1()),cc) = m;
     }
-    void indexed_assignment(const Matrix<int>& rr, const IndexList& cc, const MX& m){
+    void indexed_assignment(const Matrix<int>& rr, const IndexList& cc, const MX& m) {
       (*this)(rr,cc.getAll(size2())) = m;
     }
-    void indexed_assignment(const IndexList& rr, const Matrix<int>& cc, const MX& m){
+    void indexed_assignment(const IndexList& rr, const Matrix<int>& cc, const MX& m) {
       (*this)(rr.getAll(size1()),cc) = m;
     }
-    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const MX& m){
+    void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const MX& m) {
       (*this)(rr,cc) = m;
     }
     ///@}
 
     // set a vector element
-    void indexed_one_based_assignment(int rr, const MX &m){
+    void indexed_one_based_assignment(int rr, const MX &m) {
       casadi_assert_message(isDense() && isVector(),
                             "Matrix must be a dense vector, but got " << dimString() << ".");
       (*this)(rr-1) = m;
     }
-    void indexed_zero_based_assignment(int rr, const MX &m){
+    void indexed_zero_based_assignment(int rr, const MX &m) {
       casadi_assert_message(isDense() && isVector(),
                             "Matrix must be a dense vector, but got " << dimString() << ".");
       (*this)(rr) = m;
     }
-    void indexed_assignment(const IndexList &rr, const MX &m){
+    void indexed_assignment(const IndexList &rr, const MX &m) {
       casadi_assert_message(isDense() && isVector(),
                             "Matrix must be a dense vector, but got " << dimString() << ".");
       (*this)(rr.getAll(size1())) = m;
     }
 
-    void indexed_assignment(const Slice &rr, const MX &m){
+    void indexed_assignment(const Slice &rr, const MX &m) {
       (*this
       )(rr.getAll(size1())) = m;
     }
@@ -445,11 +445,11 @@ namespace casadi{
 
     MX getNZ(int k) const;
     MX getNZ(const std::vector<int>& k) const;
-    MX getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
+    MX getNZ(const Slice& k) const { return getNZ(k.getAll(size()));}
     MX getNZ(const Matrix<int>& k) const;
     void setNZ(int k, const MX& el);
     void setNZ(const std::vector<int>& k, const MX& el);
-    void setNZ(const Slice& k, const MX& m){ setNZ(k.getAll(size()),m);}
+    void setNZ(const Slice& k, const MX& m) { setNZ(k.getAll(size()),m);}
     void setNZ(const Matrix<int>& k, const MX& m);
     /// \endcond
 
@@ -539,7 +539,7 @@ namespace casadi{
 
 #ifndef SWIG
     /// Transpose the matrix (shorthand)
-    MX T() const{ return trans();}
+    MX T() const { return trans();}
 #endif
 
     /** \brief Get an IMatrix representation of a GetNonzeros or SetNonzeros node */

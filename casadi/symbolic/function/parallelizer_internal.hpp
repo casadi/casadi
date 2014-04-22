@@ -29,13 +29,13 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** \brief  Internal node class for Parallelizer
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT ParallelizerInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT ParallelizerInternal : public FunctionInternal {
     friend class Parallelizer;
 
   protected:
@@ -44,9 +44,9 @@ namespace casadi{
 
   public:
     /// clone
-    virtual ParallelizerInternal* clone() const{
+    virtual ParallelizerInternal* clone() const {
       ParallelizerInternal* ret = new ParallelizerInternal(*this);
-      for(std::vector<Function>::iterator it=ret->funcs_.begin(); it!=ret->funcs_.end(); ++it){
+      for(std::vector<Function>::iterator it=ret->funcs_.begin(); it!=ret->funcs_.end(); ++it) {
         it->makeUnique();
       }
       return ret;
@@ -73,7 +73,7 @@ namespace casadi{
     void spEvaluateTask(bool use_fwd, int task);
 
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd){ return true;}
+    virtual bool spCanEvaluate(bool fwd) { return true;}
 
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual Function getDerivative(int nfwd, int nadj);
@@ -103,7 +103,7 @@ namespace casadi{
     std::vector<int> copy_of_;
 
     /// Parallelization modes
-    enum Mode{SERIAL,OPENMP,MPI};
+    enum Mode {SERIAL,OPENMP,MPI};
 
     /// Mode
     Mode mode_;

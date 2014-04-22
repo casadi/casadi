@@ -64,7 +64,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static LPSolver creator(const LPStructure & st){ return QPLPSolver(st);}
+  static LPSolver creator(const LPStructure & st) { return QPLPSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

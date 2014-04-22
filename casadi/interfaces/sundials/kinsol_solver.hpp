@@ -27,7 +27,7 @@
 #include "casadi/symbolic/function/linear_solver.hpp"
 #include <casadi/interfaces/sundials/casadi_sundials_interface_export.h>
 
-namespace casadi{
+namespace casadi {
 
   // Forward declaration of internal class
   class KinsolInternal;
@@ -52,7 +52,7 @@ namespace casadi{
    * \see ImplicitFunction for more information
    *
    */
-  class CASADI_SUNDIALS_INTERFACE_EXPORT KinsolSolver : public ImplicitFunction{
+  class CASADI_SUNDIALS_INTERFACE_EXPORT KinsolSolver : public ImplicitFunction {
   public:
 
     /** \brief  Default constructor */
@@ -80,7 +80,7 @@ namespace casadi{
     %callback("%s_cb");
 #endif
     static ImplicitFunction creator(const Function& f, const Function& jac,
-                                    const LinearSolver& linsol){ return KinsolSolver(f,jac,linsol);}
+                                    const LinearSolver& linsol) { return KinsolSolver(f,jac,linsol);}
 #ifdef SWIG
     %nocallback;
 #endif

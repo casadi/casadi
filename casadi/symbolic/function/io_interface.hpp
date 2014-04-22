@@ -29,7 +29,7 @@
 #include "../function/schemes_helpers.hpp"
 #include "../function/io_scheme.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Interface for accessing input and output data structures
       \author Joel Andersson
@@ -45,14 +45,14 @@ namespace casadi{
      */
     ///@{
     /// Access input argument
-    inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind);}
+    inline const Matrix<double>& input(int iind=0) const { return inputS<true>(iind);}
     inline const Matrix<double>& input(const std::string &iname) const
     { return input(inputSchemeEntry(iname)); }
 #ifdef SWIG
     %rename(inputRef) input;
 #endif
-    inline Matrix<double>& input(int iind=0){ return inputS<true>(iind);}
-    inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
+    inline Matrix<double>& input(int iind=0) { return inputS<true>(iind);}
+    inline Matrix<double>& input(const std::string &iname) { return input(inputSchemeEntry(iname));}
     ///@}
 
     /** \brief [UNSAFE] Obtain reference to outputs
@@ -60,13 +60,13 @@ namespace casadi{
      */
     ///@{
     /// Access output argument
-    inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind);}
+    inline const Matrix<double>& output(int oind=0) const { return outputS<true>(oind);}
     inline const Matrix<double>& output(const std::string &oname) const
     { return output(outputSchemeEntry(oname));}
 #ifdef SWIG
     %rename(outputRef) output;
 #endif
-    inline Matrix<double>& output(int oind=0){ return outputS<true>(oind);}
+    inline Matrix<double>& output(int oind=0) { return outputS<true>(oind);}
     inline Matrix<double>& output(const std::string &oname)
     { return output(outputSchemeEntry(oname));}
     ///@}
@@ -92,11 +92,11 @@ namespace casadi{
 
     /** \brief  Access an input */
     template<bool check>
-    DMatrix& inputS(int i){
-      if(check){
-        try{
+    DMatrix& inputS(int i) {
+      if(check) {
+        try {
           return static_cast<Derived*>(this)->input_struct().data.at(i);
-        } catch(std::out_of_range&){
+        } catch(std::out_of_range&) {
           std::stringstream ss;
           ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
              << ": input " << i << " not in interval [0," << getNumInputs() << ")";
@@ -111,17 +111,17 @@ namespace casadi{
 
     /** \brief  Const access an input */
     template<bool check>
-    inline const DMatrix& inputS(int i) const{
+    inline const DMatrix& inputS(int i) const {
       return const_cast<IOInterface<Derived>*>(this)->inputS<check>(i);
     }
 
     /** \brief  Access an output*/
     template<bool check>
-    DMatrix& outputS(int i){
-      if(check){
-        try{
+    DMatrix& outputS(int i) {
+      if(check) {
+        try {
           return static_cast<Derived*>(this)->output_struct().data.at(i);
-        } catch(std::out_of_range&){
+        } catch(std::out_of_range&) {
           std::stringstream ss;
           ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
              << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
@@ -136,20 +136,20 @@ namespace casadi{
 
     /** \brief  Const access an output*/
     template<bool check>
-    inline const DMatrix& outputS(int i) const{
+    inline const DMatrix& outputS(int i) const {
       return const_cast<IOInterface<Derived>*>(this)->outputS<check>(i);
     }
 
     /// \endcond
 
     /** \brief Set input scheme */
-    void setInputScheme(const casadi::IOScheme &scheme){
+    void setInputScheme(const casadi::IOScheme &scheme) {
       casadi_assert(scheme.compatibleSize(getNumInputs()));
       static_cast<Derived*>(this)->inputScheme() = scheme;
     }
 
     /** \brief Set output scheme */
-    void setOutputScheme(const casadi::IOScheme &scheme){
+    void setOutputScheme(const casadi::IOScheme &scheme) {
       casadi_assert(scheme.compatibleSize(getNumOutputs()));
       static_cast<Derived*>(this)->outputScheme() = scheme;
     }
@@ -184,7 +184,7 @@ namespace casadi{
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
-    int schemeEntry(const casadi::IOScheme &scheme,const std::string &name,bool input) const{
+    int schemeEntry(const casadi::IOScheme &scheme,const std::string &name,bool input) const {
       if (scheme.isNull()) casadi_error("Unable to look up '" <<  name<< "' in "
                                         << (input? "input": "output") << "scheme, as the "
                                         <<  (input? "input": "output")

@@ -32,9 +32,9 @@ INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f,g){
+SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f,g) {
   addOption("max_num_steps",               OT_INTEGER,          10000,
             "Maximum number of integrator steps");
   addOption("reltol",                      OT_REAL,             1e-6,
@@ -123,10 +123,10 @@ SundialsInternal::SundialsInternal(const Function& f, const Function& g) : Integ
             "[default: equal to linear_solver_options]");
 }
 
-SundialsInternal::~SundialsInternal(){
+SundialsInternal::~SundialsInternal() {
 }
 
-void SundialsInternal::init(){
+void SundialsInternal::init() {
   // Call the base class method
   IntegratorInternal::init();
 
@@ -156,7 +156,7 @@ void SundialsInternal::init(){
       hasSetOption("max_krylovB") ? static_cast<int>(getOption("max_krylovB")): max_krylov_;
 
   // Linear solver for forward integration
-  if(getOption("linear_solver_type")=="dense"){
+  if(getOption("linear_solver_type")=="dense") {
     linsol_f_ = SD_DENSE;
   } else if(getOption("linear_solver_type")=="banded") {
     linsol_f_ = SD_BANDED;
@@ -164,7 +164,7 @@ void SundialsInternal::init(){
     linsol_f_ = SD_ITERATIVE;
 
     // Iterative solver
-    if(getOption("iterative_solver")=="gmres"){
+    if(getOption("iterative_solver")=="gmres") {
       itsol_f_ = SD_GMRES;
     } else if(getOption("iterative_solver")=="bcgstab") {
       itsol_f_ = SD_BCGSTAB;
@@ -195,7 +195,7 @@ void SundialsInternal::init(){
   std::string pretypeB = hasSetOption("pretypeB") ? getOption("pretypeB"): getOption("pretype");
 
   // Linear solver for backward integration
-  if(linear_solver_typeB=="dense"){
+  if(linear_solver_typeB=="dense") {
     linsol_g_ = SD_DENSE;
   } else if(linear_solver_typeB=="banded") {
     linsol_g_ = SD_BANDED;
@@ -203,7 +203,7 @@ void SundialsInternal::init(){
     linsol_g_ = SD_ITERATIVE;
 
     // Iterative solver
-    if(iterative_solverB=="gmres"){
+    if(iterative_solverB=="gmres") {
       itsol_g_ = SD_GMRES;
     } else if(iterative_solverB=="bcgstab") {
       itsol_g_ = SD_BCGSTAB;
@@ -264,24 +264,24 @@ void SundialsInternal::init(){
       << jacB_.output().size2() << ")");
   }
 
-  if(hasSetOption("linear_solver") && !jac_.isNull()){
+  if(hasSetOption("linear_solver") && !jac_.isNull()) {
     // Create a linear solver
     linearSolverCreator creator = getOption("linear_solver");
     linsol_ = creator(jac_.output().sparsity(),1);
     // Pass options
-    if(hasSetOption("linear_solver_options")){
+    if(hasSetOption("linear_solver_options")) {
       linsol_.setOption(getOption("linear_solver_options"));
     }
     linsol_.init();
   }
 
-  if((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()){
+  if((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()) {
     // Create a linear solver
     linearSolverCreator creator =
         hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
     linsolB_ = creator(jacB_.output().sparsity(),1);
     // Pass options
-    if(hasSetOption("linear_solver_optionsB")){
+    if(hasSetOption("linear_solver_optionsB")) {
       linsolB_.setOption(getOption("linear_solver_optionsB"));
     } else if (hasSetOption("linear_solver_options")) {
       linsolB_.setOption(getOption("linear_solver_options"));
@@ -290,7 +290,7 @@ void SundialsInternal::init(){
   }
 }
 
-void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
+void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied) {
   IntegratorInternal::deepCopyMembers(already_copied);
   linsol_ = deepcopy(linsol_,already_copied);
   linsolB_ = deepcopy(linsolB_,already_copied);
@@ -300,7 +300,7 @@ void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>&
   g_fwd_ = deepcopy(g_fwd_,already_copied);
 }
 
-void SundialsInternal::reset(){
+void SundialsInternal::reset() {
   // Reset the base classes
   IntegratorInternal::reset();
 }

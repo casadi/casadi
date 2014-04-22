@@ -28,7 +28,7 @@ INPUTSCHEME(LPSolverInput)
 OUTPUTSCHEME(LPSolverOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 // Constructor
 LPSolverInternal::LPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -65,14 +65,14 @@ void LPSolverInternal::init() {
   FunctionInternal::init();
 }
 
-LPSolverInternal::~LPSolverInternal(){
+LPSolverInternal::~LPSolverInternal() {
 }
 
-void LPSolverInternal::evaluate(){
+void LPSolverInternal::evaluate() {
   throw CasadiException("LPSolverInternal::evaluate: Not implemented");
 }
 
-void LPSolverInternal::solve(){
+void LPSolverInternal::solve() {
   throw CasadiException("LPSolverInternal::solve: Not implemented");
 }
 

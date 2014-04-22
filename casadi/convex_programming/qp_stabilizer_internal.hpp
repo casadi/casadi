@@ -29,7 +29,7 @@
 #include "qp_stabilizer.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for QPStabilizerInternal
    *
@@ -46,7 +46,7 @@ namespace casadi{
     virtual ~QPStabilizerInternal();
 
     /** \brief  Clone */
-    virtual QPStabilizerInternal* clone() const{ return new QPStabilizerInternal(*this);}
+    virtual QPStabilizerInternal* clone() const { return new QPStabilizerInternal(*this);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

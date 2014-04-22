@@ -30,7 +30,7 @@
 #include "../function/linear_solver.hpp"
 #include "../function/symbolic_qr.hpp"
 
-namespace casadi{
+namespace casadi {
 
 /**
 \ingroup expression_tools

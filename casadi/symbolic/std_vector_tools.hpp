@@ -41,7 +41,7 @@
     \date 2010-2011
 */
 
-namespace std{
+namespace std {
 
 #ifndef SWIG
   /// Enables flushing an std::vector to a stream (prints representation)
@@ -60,7 +60,7 @@ namespace std{
 
 } // namespace std
 
-namespace casadi{
+namespace casadi {
 
   #ifndef SWIG
   /** Range function
@@ -258,7 +258,7 @@ namespace casadi{
                             int ind19=-1, const T& val19=T());
   #else // SWIG
   #ifdef SWIGPYTHON
-%pythoncode %{
+%pythoncode %{ #NOLINT(whitespace/braces)
    def makeVector(T,size,*elems):
       assert len(elems) % 2 == 0, \
         "The number of provided indices does not the number of provided values"
@@ -298,23 +298,23 @@ namespace casadi{
 // Implementations
 #ifndef SWIG
 //#ifdef casadi_symbolic_EXPORTS
-namespace std{
+namespace std {
 
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
-  ostream& operator<<(ostream &stream, const vector<T> &v){
+  ostream& operator<<(ostream &stream, const vector<T> &v) {
     casadi::repr(v,stream);
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const pair<T1,T2> &p){
+  ostream& operator<<(ostream &stream, const pair<T1,T2> &p) {
     stream << "(" << p.first << "," << p.second << ")";
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const std::map<T1,T2> &p){
+  ostream& operator<<(ostream &stream, const std::map<T1,T2> &p) {
     stream << "{";
     typedef typename std::map<T1,T2>::const_iterator it_type;
     int count = 0;
@@ -327,7 +327,7 @@ namespace std{
   }
 
   template<typename T2>
-  ostream& operator<<(ostream &stream, const std::map<std::string,T2> &p){
+  ostream& operator<<(ostream &stream, const std::map<std::string,T2> &p) {
     stream << "{";
     typedef typename std::map<std::string,T2>::const_iterator it_type;
     int count = 0;
@@ -341,11 +341,11 @@ namespace std{
 
 } // namespace std
 
-namespace casadi{
+namespace casadi {
 
   template<typename T>
-  void repr(const std::vector<T> &v, std::ostream &stream){
-    if(v.empty()){
+  void repr(const std::vector<T> &v, std::ostream &stream) {
+    if(v.empty()) {
       stream << "[]";
     } else {
       // Print elements, python style
@@ -358,11 +358,11 @@ namespace casadi{
   }
 
   template<typename T>
-  void print(const std::vector<T> &v, std::ostream &stream){
+  void print(const std::vector<T> &v, std::ostream &stream) {
     // print vector style
     stream << "[" << v.size() << "]"; // Print dimension
 
-    if(v.empty()){
+    if(v.empty()) {
       stream << "()";
     } else {
       // Print elements, ublas stype
@@ -457,40 +457,40 @@ namespace casadi{
   }
 
   template<typename T>
-  std::string getRepresentation(const std::vector<T> &v){
+  std::string getRepresentation(const std::vector<T> &v) {
     std::stringstream ss;
     repr(v,ss);
     return ss.str();
   }
 
   template<typename T>
-  std::string getDescription(const std::vector<T> &v){
+  std::string getDescription(const std::vector<T> &v) {
     std::stringstream ss;
     print(v,ss);
     return ss.str();
   }
 
   template<typename T>
-  void write_matlab(std::ostream &stream, const std::vector<T> &v){
+  void write_matlab(std::ostream &stream, const std::vector<T> &v) {
     std::copy(v.begin(), v.end(), std::ostream_iterator<T>(stream, " "));
   }
 
   template<typename T>
-  void write_matlab(std::ostream &stream, const std::vector<std::vector<T> > &v){
-    for(unsigned int i=0; i<v.size(); ++i){
+  void write_matlab(std::ostream &stream, const std::vector<std::vector<T> > &v) {
+    for(unsigned int i=0; i<v.size(); ++i) {
       std::copy(v[i].begin(), v[i].end(), std::ostream_iterator<T>(stream, " "));
       stream << std::endl;
     }
   }
 
   template<typename T>
-  void read_matlab(std::istream &stream, std::vector<T> &v){
+  void read_matlab(std::istream &stream, std::vector<T> &v) {
     v.clear();
 
     while(!stream.eof()) {
       T val;
       stream >> val;
-      if(stream.fail()){
+      if(stream.fail()) {
         stream.clear();
         std::string s;
         stream >> s;
@@ -504,7 +504,7 @@ namespace casadi{
   }
 
   template<typename T>
-  void read_matlab(std::ifstream &file, std::vector<std::vector<T> > &v){
+  void read_matlab(std::ifstream &file, std::vector<std::vector<T> > &v) {
     v.clear();
     std::string line;
     while(!getline(file, line, '\n').eof()) {
@@ -514,7 +514,7 @@ namespace casadi{
       while(!reader.eof()) {
         T val;
         reader >> val;
-        if(reader.fail()){
+        if(reader.fail()) {
           reader.clear();
           std::string s;
           reader >> s;
@@ -530,7 +530,7 @@ namespace casadi{
   }
 
   template<typename T, typename F, typename L>
-  void linspace(std::vector<T> &v, const F& first, const L& last){
+  void linspace(std::vector<T> &v, const F& first, const L& last) {
     if(v.size()<2)
         throw CasadiException("std::linspace: vector must contain at least two elements");
 
@@ -544,7 +544,7 @@ namespace casadi{
   }
 
   template<typename T>
-  T* getPtr(std::vector<T> &v){
+  T* getPtr(std::vector<T> &v) {
     if(v.empty())
       return 0;
     else
@@ -552,7 +552,7 @@ namespace casadi{
   }
 
   template<typename T>
-  const T* getPtr(const std::vector<T> &v){
+  const T* getPtr(const std::vector<T> &v) {
     if(v.empty())
       return 0;
     else
@@ -614,7 +614,7 @@ namespace casadi{
                             int ind16, const T& val16,
                             int ind17, const T& val17,
                             int ind18, const T& val18,
-                            int ind19, const T& val19){
+                            int ind19, const T& val19) {
 
     // Maximum size supported
     const int max_size = 20;
@@ -629,7 +629,7 @@ namespace casadi{
     std::vector<T> ret(size);
 
     // Assign all values
-    for(int i=0; i<max_size; ++i){
+    for(int i=0; i<max_size; ++i) {
       // Break if not assigned
       if(ind[i]<0) break;
 
@@ -651,48 +651,48 @@ namespace casadi{
   }
 
   template<typename T>
-  T inner_prod(const std::vector<T>& a, const std::vector<T>& b){
+  T inner_prod(const std::vector<T>& a, const std::vector<T>& b) {
     T ret = 0;
-    for(int k=0; k<a.size(); ++k){
+    for(int k=0; k<a.size(); ++k) {
       ret += a[k]*b[k];
     }
     return ret;
   }
 
   template<typename T>
-  T norm_inf(const std::vector<T>& x){
+  T norm_inf(const std::vector<T>& x) {
     T ret = 0;
-    for(int k=0; k<x.size(); ++k){
+    for(int k=0; k<x.size(); ++k) {
       ret = fmax(ret,fabs(x[k]));
     }
     return ret;
   }
 
   template<typename T>
-  T norm_1(const std::vector<T>& x){
+  T norm_1(const std::vector<T>& x) {
     T ret = 0;
-    for(int k=0; k<x.size(); ++k){
+    for(int k=0; k<x.size(); ++k) {
       ret += fabs(x[k]);
     }
     return ret;
   }
 
   template<typename T>
-  T norm_2(const std::vector<T>& x){
+  T norm_2(const std::vector<T>& x) {
     T ret = 0;
-    for(int k=0; k<x.size(); ++k){
+    for(int k=0; k<x.size(); ++k) {
       ret += x[k]*x[k];
     }
     return sqrt(ret);
   }
 
   template<typename T>
-  std::vector<T> toVector(const T& v0){
+  std::vector<T> toVector(const T& v0) {
     return std::vector<T>(1,v0);
   }
 
   template<typename T>
-  std::vector<T> toVector(const T& v0, const T& v1){
+  std::vector<T> toVector(const T& v0, const T& v1) {
     std::vector<T> ret(2);
     ret[0] = v0;
     ret[1] = v1;
@@ -700,7 +700,7 @@ namespace casadi{
   }
 
   template<typename T>
-  std::vector<T> toVector(const T& v0, const T& v1, const T& v2){
+  std::vector<T> toVector(const T& v0, const T& v1, const T& v2) {
     std::vector<T> ret(3);
     ret[0] = v0;
     ret[1] = v1;
@@ -709,12 +709,12 @@ namespace casadi{
   }
 
   template<typename T>
-  bvec_t* get_bvec_t(std::vector<T>& v){
+  bvec_t* get_bvec_t(std::vector<T>& v) {
     casadi_assert_message(0,"get_bvec_t only supported for double");
   }
 
   template<typename T>
-  const bvec_t* get_bvec_t(const std::vector<T>& v){
+  const bvec_t* get_bvec_t(const std::vector<T>& v) {
     casadi_assert_message(0,"get_bvec_t only supported for double");
   }
 

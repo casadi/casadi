@@ -25,7 +25,7 @@
 
 #include "implicit_fixed_step_integrator.hpp"
 
-namespace casadi{
+namespace casadi {
 
   class CollocationIntegratorInternal;
 
@@ -40,7 +40,7 @@ namespace casadi{
      \author Joel Andersson
      \date 2014
   */
-  class CASADI_INTEGRATION_EXPORT CollocationIntegrator : public ImplicitFixedStepIntegrator{
+  class CASADI_INTEGRATION_EXPORT CollocationIntegrator : public ImplicitFixedStepIntegrator {
   public:
     /** \brief  Default constructor */
     CollocationIntegrator();

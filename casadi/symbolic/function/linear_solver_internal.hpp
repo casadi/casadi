@@ -28,12 +28,12 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** Internal class
       @copydoc LinearSolver_doc
   */
-  class CASADI_SYMBOLIC_EXPORT LinearSolverInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT LinearSolverInternal : public FunctionInternal {
   public:
     /// Constructor
     LinearSolverInternal(const Sparsity& sparsity, int nrhs);
@@ -42,7 +42,7 @@ namespace casadi{
     virtual ~LinearSolverInternal();
 
     /// Clone
-    virtual LinearSolverInternal* clone() const{ return new LinearSolverInternal(*this);}
+    virtual LinearSolverInternal* clone() const { return new LinearSolverInternal(*this);}
 
     /// Initialize
     virtual void init();
@@ -51,7 +51,7 @@ namespace casadi{
     virtual void evaluate();
 
     /// Prepare the factorization
-    virtual void prepare(){}
+    virtual void prepare() {}
 
     /// Solve the system of equations, using internal vector
     virtual void solve(bool transpose);
@@ -90,11 +90,11 @@ namespace casadi{
     bool prepared_;
 
     /// Get sparsity pattern
-    int nrow() const{ return input(LINSOL_A).size1();}
-    int ncol() const{ return input(LINSOL_A).size2();}
-    int nnz() const{ return input(LINSOL_A).size();}
-    const std::vector<int>& row() const{ return input(LINSOL_A).row();}
-    const std::vector<int>& colind() const{ return input(LINSOL_A).colind();}
+    int nrow() const { return input(LINSOL_A).size1();}
+    int ncol() const { return input(LINSOL_A).size2();}
+    int nnz() const { return input(LINSOL_A).size();}
+    const std::vector<int>& row() const { return input(LINSOL_A).row();}
+    const std::vector<int>& colind() const { return input(LINSOL_A).colind();}
   };
 
 

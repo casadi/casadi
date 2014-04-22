@@ -28,13 +28,13 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Simulator data storage class
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT SimulatorInternal : public FunctionInternal{
+  class CASADI_SYMBOLIC_EXPORT SimulatorInternal : public FunctionInternal {
   public:
 
     /** \brief  Constructor */
@@ -45,7 +45,7 @@ namespace casadi{
     virtual ~SimulatorInternal();
 
     /** \brief  Clone */
-    virtual SimulatorInternal* clone() const{ return new SimulatorInternal(*this);}
+    virtual SimulatorInternal* clone() const { return new SimulatorInternal(*this);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

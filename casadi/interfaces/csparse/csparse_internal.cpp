@@ -26,26 +26,26 @@
 #include "casadi/symbolic/casadi_options.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   CSparseInternal::CSparseInternal(const Sparsity& sparsity, int nrhs)
-      : LinearSolverInternal(sparsity,nrhs){
+      : LinearSolverInternal(sparsity,nrhs) {
     N_ = 0;
     S_ = 0;
   }
 
-  CSparseInternal::CSparseInternal(const CSparseInternal& linsol) : LinearSolverInternal(linsol){
+  CSparseInternal::CSparseInternal(const CSparseInternal& linsol) : LinearSolverInternal(linsol) {
     N_ = 0;
     S_ = 0;
     is_init_ = false;
   }
 
-  CSparseInternal::~CSparseInternal(){
+  CSparseInternal::~CSparseInternal() {
     if(S_) cs_sfree(S_);
     if(N_) cs_nfree(N_);
   }
 
-  void CSparseInternal::init(){
+  void CSparseInternal::init() {
     // Call the init method of the base class
     LinearSolverInternal::init();
 
@@ -73,14 +73,14 @@ namespace casadi{
     }
   }
 
-  void CSparseInternal::prepare(){
+  void CSparseInternal::prepare() {
     double time_start=0;
     if(CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
       profileWriteEntry(CasadiOptions::profilingLog,this);
     }
-    if(!called_once_){
-      if(verbose()){
+    if(!called_once_) {
+      if(verbose()) {
         cout << "CSparseInternal::prepare: symbolic factorization" << endl;
       }
 
@@ -97,12 +97,12 @@ namespace casadi{
     const vector<double>& linsys_nz = input().data();
 
     // Make sure that all entries of the linear system are valid
-    for(int k=0; k<linsys_nz.size(); ++k){
+    for(int k=0; k<linsys_nz.size(); ++k) {
       casadi_assert_message(!isnan(linsys_nz[k]),"Nonzero " << k << " is not-a-number");
       casadi_assert_message(!isinf(linsys_nz[k]),"Nonzero " << k << " is infinite");
     }
 
-    if(verbose()){
+    if(verbose()) {
       cout << "CSparseInternal::prepare: numeric factorization" << endl;
       cout << "linear system to be factorized = " << endl;
       input(0).printSparse();
@@ -112,17 +112,17 @@ namespace casadi{
 
     if(N_) cs_nfree(N_);
     N_ = cs_lu(&A_, S_, tol) ;                 // numeric LU factorization
-    if(N_==0){
+    if(N_==0) {
       DMatrix temp = input();
       temp.sparsify();
-      if(temp.sparsity().isSingular()){
+      if(temp.sparsity().isSingular()) {
         stringstream ss;
         ss << "CSparseInternal::prepare: factorization failed due to matrix"
           " being singular. Matrix contains numerical zeros which are "
             "structurally non-zero. Promoting these zeros to be structural "
             "zeros, the matrix was found to be structurally rank deficient."
             " sprank: " << rank(temp.sparsity()) << " <-> " << temp.size2() << endl;
-        if(verbose()){
+        if(verbose()) {
           ss << "Sparsity of the linear system: " << endl;
           input(LINSOL_A).sparsity().print(ss); // print detailed
         }
@@ -131,7 +131,7 @@ namespace casadi{
         stringstream ss;
         ss << "CSparseInternal::prepare: factorization failed, check if Jacobian is singular"
            << endl;
-        if(verbose()){
+        if(verbose()) {
           ss << "Sparsity of the linear system: " << endl;
           input(LINSOL_A).sparsity().print(ss); // print detailed
         }
@@ -151,7 +151,7 @@ namespace casadi{
     }
   }
 
-  void CSparseInternal::solve(double* x, int nrhs, bool transpose){
+  void CSparseInternal::solve(double* x, int nrhs, bool transpose) {
     double time_start=0;
     if(CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
@@ -164,8 +164,8 @@ namespace casadi{
 
     double *t = &temp_.front();
 
-    for(int k=0; k<nrhs; ++k){
-      if(transpose){
+    for(int k=0; k<nrhs; ++k) {
+      if(transpose) {
         cs_pvec (S_->q, x, t, A_.n) ;       // t = P2*b
         casadi_assert(N_->U!=0);
         cs_utsolve (N_->U, t) ;              // t = U'\t
@@ -190,7 +190,7 @@ namespace casadi{
   }
 
 
-  CSparseInternal* CSparseInternal::clone() const{
+  CSparseInternal* CSparseInternal::clone() const {
     return new CSparseInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size2());
   }
 

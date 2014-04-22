@@ -24,24 +24,24 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  RKIntegrator::RKIntegrator(){
+  RKIntegrator::RKIntegrator() {
   }
 
-  RKIntegrator::RKIntegrator(const Function& f, const Function& g){
+  RKIntegrator::RKIntegrator(const Function& f, const Function& g) {
     assignNode(new RKIntegratorInternal(f,g));
   }
 
-  RKIntegratorInternal* RKIntegrator::operator->(){
+  RKIntegratorInternal* RKIntegrator::operator->() {
     return static_cast<RKIntegratorInternal*>(Integrator::operator->());
   }
 
-  const RKIntegratorInternal* RKIntegrator::operator->() const{
+  const RKIntegratorInternal* RKIntegrator::operator->() const {
     return static_cast<const RKIntegratorInternal*>(Integrator::operator->());
   }
 
-  bool RKIntegrator::checkNode() const{
+  bool RKIntegrator::checkNode() const {
     return dynamic_cast<const RKIntegratorInternal*>(get())!=0;
   }
 

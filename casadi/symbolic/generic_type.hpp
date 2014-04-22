@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-namespace casadi{
+namespace casadi {
 
   /** \brief  Types of options */
   enum opt_type {
@@ -62,7 +62,7 @@ namespace casadi{
   \author Joel Andersson
   \date 2010
   Return type when getting an option, can be converted into bool, int, string, vector, etc */
-  class CASADI_SYMBOLIC_EXPORT GenericType : public SharedObject{
+  class CASADI_SYMBOLIC_EXPORT GenericType : public SharedObject {
     public:
     GenericType();
     GenericType(bool b);
@@ -111,14 +111,14 @@ namespace casadi{
 
     /// Implicit typecasting
     #ifndef SWIG
-    operator bool() const{ return toBool();}
-    operator int() const{ return toInt();}
-    operator double() const{ return toDouble();}
-    operator const std::string& () const{ return toString();}
-    operator const std::vector<int>& () const{ return toIntVector();}
-    operator const std::vector<double>& () const{ return toDoubleVector();}
-    operator const std::vector<std::string>& () const{ return toStringVector();}
-    operator const Function& () const{ return toFunction();}
+    operator bool() const { return toBool();}
+    operator int() const { return toInt();}
+    operator double() const { return toDouble();}
+    operator const std::string& () const { return toString();}
+    operator const std::vector<int>& () const { return toIntVector();}
+    operator const std::vector<double>& () const { return toDoubleVector();}
+    operator const std::vector<std::string>& () const { return toStringVector();}
+    operator const Function& () const { return toFunction();}
     //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
 

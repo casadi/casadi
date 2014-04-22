@@ -23,21 +23,21 @@
 #include "qcqp_solver_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 
 QCQPSolver::QCQPSolver() {
 }
 
-QCQPSolverInternal* QCQPSolver::operator->(){
+QCQPSolverInternal* QCQPSolver::operator->() {
   return static_cast<QCQPSolverInternal*>(Function::operator->());
 }
 
-const QCQPSolverInternal* QCQPSolver::operator->() const{
+const QCQPSolverInternal* QCQPSolver::operator->() const {
     return static_cast<const QCQPSolverInternal*>(Function::operator->());
 }
 
-bool QCQPSolver::checkNode() const{
+bool QCQPSolver::checkNode() const {
   return dynamic_cast<const QCQPSolverInternal*>(get())!=0;
 }
 

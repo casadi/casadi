@@ -27,12 +27,12 @@
 #include <fstream>
 #include <sstream>
 
-namespace casadi{
+namespace casadi {
 
 using namespace std;
 
 ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) :
-    bin_name_(bin_name){
+    bin_name_(bin_name) {
 #ifdef WITH_DL
 
   // Load the dll
@@ -75,7 +75,7 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   setNumOutputs(n_out);
 
   // Get the sparsity pattern
-  for(int i=0; i<n_in+n_out; ++i){
+  for(int i=0; i<n_in+n_out; ++i) {
     // Get sparsity from file
     int nrow, ncol, *colind, *row;
     flag = getSparsity(i,&nrow,&ncol,&colind,&row);
@@ -94,7 +94,7 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
     Sparsity sp = Sparsity(nrow,ncol,colindv,rowv);
 
     // Save to inputs/outputs
-    if(i<n_in){
+    if(i<n_in) {
       input(i) = Matrix<double>(sp,0);
     } else {
       output(i-n_in) = Matrix<double>(sp,0);
@@ -107,11 +107,11 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 
 }
 
-ExternalFunctionInternal* ExternalFunctionInternal::clone() const{
+ExternalFunctionInternal* ExternalFunctionInternal::clone() const {
   throw CasadiException("Error ExternalFunctionInternal cannot be cloned");
 }
 
-ExternalFunctionInternal::~ExternalFunctionInternal(){
+ExternalFunctionInternal::~ExternalFunctionInternal() {
 #ifdef WITH_DL
   // close the dll
 #ifdef _WIN32
@@ -122,14 +122,14 @@ ExternalFunctionInternal::~ExternalFunctionInternal(){
 #endif // WITH_DL
 }
 
-void ExternalFunctionInternal::evaluate(){
+void ExternalFunctionInternal::evaluate() {
 #ifdef WITH_DL
   int flag = evaluate_(getPtr(input_array_),getPtr(output_array_));
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");
 #endif // WITH_DL
 }
 
-void ExternalFunctionInternal::init(){
+void ExternalFunctionInternal::init() {
   // Call the init function of the base class
   FunctionInternal::init();
 

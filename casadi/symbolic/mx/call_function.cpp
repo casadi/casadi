@@ -41,7 +41,7 @@ namespace casadi {
     arg.resize(num_in);
 
     // Replace nulls with zeros of the right dimension
-    for(int i=0; i<arg.size(); ++i){
+    for(int i=0; i<arg.size(); ++i) {
       if(arg[i].isEmpty(true)) arg[i] = MX::zeros(fcn_.input(i).sparsity());
     }
 
@@ -66,7 +66,7 @@ namespace casadi {
     return fcn_.getNumOutputs();
   }
 
-  const Sparsity& CallFunction::sparsity(int oind) const{
+  const Sparsity& CallFunction::sparsity(int oind) const {
     return fcn_.output(oind).sparsity();
   }
 
@@ -97,11 +97,11 @@ namespace casadi {
 
   void CallFunction::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                        const std::vector<std::string>& res,
-                                       CodeGenerator& gen) const{
+                                       CodeGenerator& gen) const {
     fcn_->generateOperation(this,stream,arg,res,gen);
   }
 
-  void CallFunction::nTmp(size_t& ni, size_t& nr){
+  void CallFunction::nTmp(size_t& ni, size_t& nr) {
     fcn_->nTmp(this,ni,nr);
   }
 

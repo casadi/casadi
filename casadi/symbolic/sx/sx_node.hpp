@@ -33,13 +33,13 @@
 
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief  Internal node class for SX
       \author Joel Andersson
       \date 2010
   */
-  class SXNode{
+  class SXNode {
     friend class SXElement;
     friend class Matrix<SXElement>;
 
@@ -81,7 +81,7 @@ namespace casadi{
     virtual bool isEqual(const SXNode* node, int depth) const;
 
     /** \brief  Number of dependencies */
-    virtual int ndep() const{ return 0;}
+    virtual int ndep() const { return 0;}
 
     /** \brief  get the reference of a child */
     virtual const SXElement& dep(int i) const;
@@ -90,7 +90,7 @@ namespace casadi{
     virtual SXElement& dep(int i);
 
     /** \brief  Initialize the node (currently used only to give a similar interface to MXNode) */
-    void init(){}
+    void init() {}
 
     /** \brief  Check if smooth */
     virtual bool isSmooth() const;

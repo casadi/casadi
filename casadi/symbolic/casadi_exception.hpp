@@ -31,7 +31,7 @@
 
 #include "casadi_common.hpp"
 
-namespace casadi{
+namespace casadi {
 
 /** \brief  Casadi exception class
         \author Joel Andersson
@@ -49,31 +49,31 @@ namespace casadi{
                 }
         \endcode
 */
-class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
+class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception {
   public:
   //! \brief Default constructor
-  CasadiException(){
+  CasadiException() {
   }
 
   //! \brief Form message string
-  explicit CasadiException(const std::string& msg) : msg_(msg){}
+  explicit CasadiException(const std::string& msg) : msg_(msg) {}
 
   //! \brief Destructor
-  ~CasadiException() throw(){}
+  ~CasadiException() throw() {}
 
   //! \brief Display error
-  virtual const char* what() const throw(){
+  virtual const char* what() const throw() {
     return msg_.c_str();
   }
 
   //! \brief Append a message
-  CasadiException& operator<<(const std::string& msg){
+  CasadiException& operator<<(const std::string& msg) {
     msg_ += msg;
     return *this;
   }
 
   //! \brief Append an exception
-  CasadiException& operator<<(const std::exception& ex){
+  CasadiException& operator<<(const std::exception& ex) {
     msg_ += " => ";
     msg_ += ex.what();
     return *this;
@@ -104,7 +104,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
     " of file " CASADI_ASSERT_STR(__FILE__)
 
 #define casadi_log(msg) \
-  if(verbose()){ \
+  if(verbose()) { \
     std::stringstream ss_internal_; \
     ss_internal_ << msg; \
     std::cout << "CasADi log message: " << ss_internal_.str() << std::endl; \
@@ -121,9 +121,9 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
 #define casadi_assert_message(x,msg) \
 { \
   bool is_ok; \
-  try{ \
+  try { \
     is_ok = x; \
-  } catch(std::exception& ex){ \
+  } catch(std::exception& ex) { \
       throw casadi::CasadiException(std::string("When trying to check the assertion \"" \
         CASADI_ASSERT_STR(x) "\"" CASADI_ASSERT_WHERE ", caught: \n")+ex.what()); \
   } \
@@ -144,7 +144,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception{
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
 #define casadi_assert_warning(x,msg) \
-if((x)==false){ \
+if((x)==false) { \
   std::cerr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) \
     "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;  \
 }

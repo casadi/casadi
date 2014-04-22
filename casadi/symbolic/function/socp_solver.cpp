@@ -23,21 +23,21 @@
 #include "socp_solver_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 
 SOCPSolver::SOCPSolver() {
 }
 
-SOCPSolverInternal* SOCPSolver::operator->(){
+SOCPSolverInternal* SOCPSolver::operator->() {
   return static_cast<SOCPSolverInternal*>(Function::operator->());
 }
 
-const SOCPSolverInternal* SOCPSolver::operator->() const{
+const SOCPSolverInternal* SOCPSolver::operator->() const {
     return static_cast<const SOCPSolverInternal*>(Function::operator->());
 }
 
-bool SOCPSolver::checkNode() const{
+bool SOCPSolver::checkNode() const {
   return dynamic_cast<const SOCPSolverInternal*>(get())!=0;
 }
 

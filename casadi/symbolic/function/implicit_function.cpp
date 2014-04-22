@@ -23,31 +23,31 @@
 #include "implicit_function_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  ImplicitFunctionInternal* ImplicitFunction::operator->(){
+  ImplicitFunctionInternal* ImplicitFunction::operator->() {
     return static_cast<ImplicitFunctionInternal*>(Function::operator->());
   }
 
-  const ImplicitFunctionInternal* ImplicitFunction::operator->() const{
+  const ImplicitFunctionInternal* ImplicitFunction::operator->() const {
     return static_cast<const ImplicitFunctionInternal*>(Function::operator->());
   }
 
-  bool ImplicitFunction::checkNode() const{
+  bool ImplicitFunction::checkNode() const {
     return dynamic_cast<const ImplicitFunctionInternal*>(get())!=0;
   }
 
-  Function& ImplicitFunction::getF(){
+  Function& ImplicitFunction::getF() {
     casadi_assert(checkNode());
     return (*this)->f_;
   }
 
-  Function& ImplicitFunction::getJac(){
+  Function& ImplicitFunction::getJac() {
     casadi_assert(checkNode());
     return (*this)->jac_;
   }
 
-  LinearSolver& ImplicitFunction::getLinsol(){
+  LinearSolver& ImplicitFunction::getLinsol() {
     casadi_assert(checkNode());
     return (*this)->linsol_;
   }

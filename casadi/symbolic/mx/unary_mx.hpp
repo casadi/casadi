@@ -26,19 +26,19 @@
 #include "mx_node.hpp"
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Represents a general unary operation on an MX
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_SYMBOLIC_EXPORT UnaryMX : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT UnaryMX : public MXNode {
   public:
 
     /** \brief  Constructor is private, use "create" below */
     UnaryMX(Operation op, MX x);
 
     /** \brief  Destructor */
-    virtual ~UnaryMX(){}
+    virtual ~UnaryMX() {}
 
     /** \brief  Clone function */
     virtual UnaryMX * clone() const;
@@ -66,14 +66,14 @@ namespace casadi{
     virtual bool isUnaryOp() const { return true;}
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return op_;}
+    virtual int getOp() const { return op_;}
 
     /** \brief Generate code for the operation */
     virtual void generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                    const std::vector<std::string>& res, CodeGenerator& gen) const;
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    virtual int numInplace() const{ return 1;}
+    virtual int numInplace() const { return 1;}
 
     /// Get a unary operation
     virtual MX getUnary(int op) const;
@@ -82,7 +82,7 @@ namespace casadi{
     virtual MX getBinary(int op, const MX& y, bool scX, bool scY) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const{ return sameOpAndDeps(node,depth);}
+    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node,depth);}
 
     //! \brief operation
     Operation op_;

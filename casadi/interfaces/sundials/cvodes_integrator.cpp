@@ -24,24 +24,24 @@
 #include "cvodes_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-CVodesIntegrator::CVodesIntegrator(){
+CVodesIntegrator::CVodesIntegrator() {
 }
 
-CVodesIntegrator::CVodesIntegrator(const Function& f, const Function& g){
+CVodesIntegrator::CVodesIntegrator(const Function& f, const Function& g) {
   assignNode(new CVodesInternal(f,g));
 }
 
-CVodesInternal* CVodesIntegrator::operator->(){
+CVodesInternal* CVodesIntegrator::operator->() {
   return static_cast<CVodesInternal*>(Function::operator->());
 }
 
-const CVodesInternal* CVodesIntegrator::operator->() const{
+const CVodesInternal* CVodesIntegrator::operator->() const {
   return static_cast<const CVodesInternal*>(Function::operator->());
 }
 
-bool CVodesIntegrator::checkNode() const{
+bool CVodesIntegrator::checkNode() const {
   return dynamic_cast<const CVodesInternal*>(get());
 }
 

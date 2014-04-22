@@ -28,26 +28,24 @@
 using namespace std;
 namespace casadi {
 
-  QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st) :
-      StabilizedQPSolverInternal(st)
-  {
+  QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st)
+      : StabilizedQPSolverInternal(st) {
     addOption("qp_solver",         OT_QPSOLVER,   GenericType(),
               "The QP solver used to solve the stabilized QPs.");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the QP solver instance");
   }
 
-  QPStabilizerInternal::~QPStabilizerInternal(){
+  QPStabilizerInternal::~QPStabilizerInternal() {
   }
 
   void QPStabilizerInternal::deepCopyMembers(
-    std::map<SharedObjectNode*,SharedObject>& already_copied)
-  {
+      std::map<SharedObjectNode*,SharedObject>& already_copied) {
     StabilizedQPSolverInternal::deepCopyMembers(already_copied);
     qp_solver_ = deepcopy(qp_solver_,already_copied);
   }
 
-  void QPStabilizerInternal::init(){
+  void QPStabilizerInternal::init() {
     // Initialize the base classes
     StabilizedQPSolverInternal::init();
 
@@ -58,7 +56,7 @@ namespace casadi {
     qp_solver_ = qp_solver_creator(qpStruct("h",H_sparsity_qp,"a",A_sparsity_qp));
 
     // Pass options if provided
-    if(hasSetOption("qp_solver_options")){
+    if(hasSetOption("qp_solver_options")) {
       Dictionary qp_solver_options = getOption("qp_solver_options");
       qp_solver_.setOption(qp_solver_options);
     }

@@ -23,21 +23,21 @@
 #include "lp_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 
 LPSolver::LPSolver() {
 }
 
-LPSolverInternal* LPSolver::operator->(){
+LPSolverInternal* LPSolver::operator->() {
   return static_cast<LPSolverInternal*>(Function::operator->());
 }
 
-const LPSolverInternal* LPSolver::operator->() const{
+const LPSolverInternal* LPSolver::operator->() const {
     return static_cast<const LPSolverInternal*>(Function::operator->());
 }
 
-bool LPSolver::checkNode() const{
+bool LPSolver::checkNode() const {
   return dynamic_cast<const LPSolverInternal*>(get())!=0;
 }
 

@@ -34,7 +34,7 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** \brief  Internal node class for MXFunction
       \author Joel Andersson
@@ -129,7 +129,7 @@ namespace casadi{
     DMatrixPtrV mx_output_;
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
-    virtual std::vector<MX> symbolicInput() const{ return inputv_;}
+    virtual std::vector<MX> symbolicInput() const { return inputv_;}
 
     /// Get a vector of symbolic variables corresponding to the outputs
     virtual std::vector<MX> symbolicOutput(const std::vector<MX>& arg);
@@ -138,7 +138,7 @@ namespace casadi{
     virtual void spEvaluate(bool fwd);
 
     /// Is the class able to propagate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd){ return true;}
+    virtual bool spCanEvaluate(bool fwd) { return true;}
 
     /// Reset the sparsity propagation
     virtual void spInit(bool fwd);

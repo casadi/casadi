@@ -27,7 +27,7 @@
 
 #include <casadi/integration/casadi_integration_export.h>
 
-namespace casadi{
+namespace casadi {
 
   class FixedStepIntegratorInternal;
 

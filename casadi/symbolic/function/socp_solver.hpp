@@ -56,10 +56,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
 /// Input arguments of a SOCP problem [socpIn]
-enum SOCPInput{
+enum SOCPInput {
   /// The horizontal stack of all matrices Gi: ( n x N) [g]
   SOCP_SOLVER_G,
   /// The vertical stack of all vectors hi: ( N x 1) [h]
@@ -83,7 +83,7 @@ enum SOCPInput{
   SOCP_SOLVER_NUM_IN};
 
 /// Output arguments of an SOCP Solver [socpOut]
-enum SOCPOutput{
+enum SOCPOutput {
   /// The primal solution (n x 1) [x]
   SOCP_SOLVER_X,
   /// The primal optimal cost (1 x 1) [cost]
@@ -95,7 +95,7 @@ enum SOCPOutput{
   SOCP_SOLVER_NUM_OUT};
 
 /// Structure specification of an SOCP [socpStruct]
-enum SOCPStruct{
+enum SOCPStruct {
   /// The horizontal stack of all matrices Gi: ( n x N) [g]
   SOCP_STRUCT_G,
   /// The matrix A: ( nc x n) [a]
@@ -113,7 +113,7 @@ class SOCPSolverInternal;
   \author Joris Gillis
   \date 2013
 */
-class CASADI_SYMBOLIC_EXPORT SOCPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT SOCPSolver : public Function {
   public:
 
   /// Default constructor

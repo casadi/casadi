@@ -36,13 +36,13 @@
 #include <ctime>
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
 /** \brief Interface to the Sundials CVodes integrators
 
   @copydoc DAE_doc
 */
-class CASADI_SUNDIALS_INTERFACE_EXPORT CVodesInternal : public SundialsInternal{
+class CASADI_SUNDIALS_INTERFACE_EXPORT CVodesInternal : public SundialsInternal {
   friend class CVodesIntegrator;
 public:
   /** \brief  Constructor */

@@ -25,24 +25,24 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  SnoptSolver::SnoptSolver(){
+  SnoptSolver::SnoptSolver() {
   }
 
-  SnoptSolver::SnoptSolver(const Function& nlp){
+  SnoptSolver::SnoptSolver(const Function& nlp) {
     assignNode(new SnoptInternal(nlp));
   }
 
-  SnoptInternal* SnoptSolver::operator->(){
+  SnoptInternal* SnoptSolver::operator->() {
     return static_cast<SnoptInternal*>(NLPSolver::operator->());
   }
 
-  const SnoptInternal* SnoptSolver::operator->() const{
+  const SnoptInternal* SnoptSolver::operator->() const {
     return static_cast<const SnoptInternal*>(NLPSolver::operator->());
   }
 
-  bool SnoptSolver::checkNode() const{
+  bool SnoptSolver::checkNode() const {
     return dynamic_cast<const SnoptInternal*>(get());
   }
 

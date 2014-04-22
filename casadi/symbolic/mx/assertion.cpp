@@ -27,11 +27,10 @@
 
 using namespace std;
 
-namespace casadi{
+namespace casadi {
 
-  Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message):
-      fail_message_(fail_message)
-  {
+  Assertion::Assertion(const MX& x, const MX& y, const std::string & fail_message)
+      : fail_message_(fail_message) {
     casadi_assert_message(y.isScalar(),
                           "Assertion:: assertion expression y must be scalar, but got "
                           << y.dimString());
@@ -39,10 +38,10 @@ namespace casadi{
     setSparsity(x.sparsity());
   }
 
-  void Assertion::printPart(std::ostream &stream, int part) const{
-    if(part==0){
+  void Assertion::printPart(std::ostream &stream, int part) const {
+    if(part==0) {
       stream << "assertion(";
-    } else if(part==1){
+    } else if(part==1) {
        stream << ",";
     } else {
       stream << ")";
@@ -51,34 +50,34 @@ namespace casadi{
 
   void Assertion::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                              MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                             bool output_given){
+                             bool output_given) {
     int nfwd = fwdSens.size();
     int nadj = adjSeed.size();
 
     // Non-differentiated output
-    if(!output_given){
+    if(!output_given) {
       *output[0] = (*input[0]).attachAssert(*input[1],fail_message_);
     }
 
     // Forward sensitivities
-    for(int d=0; d<nfwd; ++d){
+    for(int d=0; d<nfwd; ++d) {
       *fwdSens[d][0] = *fwdSeed[d][0];
     }
 
     // Adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
+    for(int d=0; d<nadj; ++d) {
       adjSens[d][0]->addToSum(*adjSeed[d][0]);
       *adjSeed[d][0] = MX();
     }
   }
 
   void Assertion::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
-                             std::vector<SXElement>& rtmp){
+                             std::vector<SXElement>& rtmp) {
     *output[0] = *input[0];
   }
 
   void Assertion::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
-                            std::vector<double>& rtmp){
+                            std::vector<double>& rtmp) {
     if ((*input[1]).at(0)!=1) {
       casadi_error("Assertion error: " << fail_message_);
     }
@@ -86,12 +85,12 @@ namespace casadi{
     *output[0] = *input[0];
   }
 
-  void Assertion::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+  void Assertion::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     bvec_t *input0 = get_bvec_t(input[0]->data());
     //    bvec_t *input1 = get_bvec_t(input[1]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    for(int el=0; el<output[0]->size(); ++el){
-      if(fwd){
+    for(int el=0; el<output[0]->size(); ++el) {
+      if(fwd) {
         outputd[el] = input0[el];
       } else {
         bvec_t s = outputd[el];

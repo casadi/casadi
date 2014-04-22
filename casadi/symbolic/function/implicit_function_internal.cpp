@@ -30,11 +30,11 @@
 #include "../profiling.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
   ImplicitFunctionInternal::ImplicitFunctionInternal(const Function& f, const Function& jac,
                                                      const LinearSolver& linsol) : f_(f), jac_(jac),
-                                                                                   linsol_(linsol){
+                                                                                   linsol_(linsol) {
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
@@ -48,18 +48,18 @@ namespace casadi{
               "Index of the output that corresponds to the actual root-finding");
   }
 
-  ImplicitFunctionInternal::~ImplicitFunctionInternal(){
+  ImplicitFunctionInternal::~ImplicitFunctionInternal() {
   }
 
   void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,
-                                                 SharedObject>& already_copied){
+                                                 SharedObject>& already_copied) {
     FunctionInternal::deepCopyMembers(already_copied);
     f_ = deepcopy(f_,already_copied);
     jac_ = deepcopy(jac_,already_copied);
     linsol_ = deepcopy(linsol_,already_copied);
   }
 
-  void ImplicitFunctionInternal::init(){
+  void ImplicitFunctionInternal::init() {
 
     // Initialize the residual function
     f_.init(false);
@@ -86,13 +86,13 @@ namespace casadi{
 
     // Allocate inputs
     setNumInputs(f_.getNumInputs());
-    for(int i=0; i<getNumInputs(); ++i){
+    for(int i=0; i<getNumInputs(); ++i) {
       input(i) = f_.input(i);
     }
 
     // Allocate output
     setNumOutputs(f_.getNumOutputs());
-    for(int i=0; i<getNumOutputs(); ++i){
+    for(int i=0; i<getNumOutputs(); ++i) {
       output(i) = f_.output(i);
     }
 
@@ -114,15 +114,15 @@ namespace casadi{
       "sprank(J)=" << sprank(jac_.output()) << " (instead of "<< jac_.output().size1() << ")");
 
     // Get the linear solver creator function
-    if(linsol_.isNull()){
-      if(hasSetOption("linear_solver")){
+    if(linsol_.isNull()) {
+      if(hasSetOption("linear_solver")) {
         linearSolverCreator linear_solver_creator = getOption("linear_solver");
 
         // Allocate an NLP solver
         linsol_ = linear_solver_creator(jac_.output().sparsity(),1);
 
         // Pass options
-        if(hasSetOption("linear_solver_options")){
+        if(hasSetOption("linear_solver_options")) {
           const Dictionary& linear_solver_options = getOption("linear_solver_options");
           linsol_.setOption(linear_solver_options);
         }
@@ -147,7 +147,7 @@ namespace casadi{
                           << u_c_.size() << " and n = " << n_);
   }
 
-  void ImplicitFunctionInternal::evaluate(){
+  void ImplicitFunctionInternal::evaluate() {
 
     // Mark factorization as out-of-date. TODO: make this conditional
     fact_up_to_date_ = false;
@@ -162,15 +162,15 @@ namespace casadi{
   void ImplicitFunctionInternal::evaluateMX(
       MXNode* node, const MXPtrV& arg, MXPtrV& res,
       const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens,
-      bool output_given){
+      bool output_given) {
     // Evaluate non-differentiated
     vector<MX> argv = MXNode::getVector(arg);
     MX z; // the solution to the system of equations
-    if(output_given){
+    if(output_given) {
       z = *res[iout_];
     } else {
       vector<MX> resv = callSelf(argv);
-      for(int i=0; i<resv.size(); ++i){
+      for(int i=0; i<resv.size(); ++i) {
         if(res[i]!=0) *res[i] = resv[i];
       }
       z = resv[iout_];
@@ -199,18 +199,18 @@ namespace casadi{
     Function f_der = f_.derivative(nfwd,nadj);
 
     // Forward sensitivities, collect arguments for calling f_der
-    for(int d=0; d<nfwd; ++d){
+    for(int d=0; d<nfwd; ++d) {
       argv = MXNode::getVector(fseed[d]);
       argv[iin_] = MX::zeros(input(iin_).sparsity());
       v.insert(v.end(),argv.begin(),argv.end());
     }
 
     // Adjoint sensitivities, solve to get arguments for calling f_der
-    if(nadj>0){
-      for(int d=0; d<nadj; ++d){
-        for(int i=0; i<getNumOutputs(); ++i){
-          if(aseed[d][i]!=0){
-            if(i==iout_){
+    if(nadj>0) {
+      for(int d=0; d<nadj; ++d) {
+        for(int i=0; i<getNumOutputs(); ++i) {
+          if(aseed[d][i]!=0) {
+            if(i==iout_) {
               rhs.push_back(*aseed[d][i]);
               col_offset.push_back(col_offset.back()+1);
               rhs_loc.push_back(v.size()); // where to store it
@@ -225,7 +225,7 @@ namespace casadi{
 
       // Solve for all right-hand-sides at once
       rhs = horzsplit(J->getSolve(horzcat(rhs),true,linsol_),col_offset);
-      for(int d=0; d<rhs.size(); ++d){
+      for(int d=0; d<rhs.size(); ++d) {
         v[rhs_loc[d]] = rhs[d];
       }
       col_offset.resize(1);
@@ -240,16 +240,16 @@ namespace casadi{
     v_it += getNumOutputs();
 
     // Forward directional derivatives
-    if(nfwd>0){
-      for(int d=0; d<nfwd; ++d){
-        for(int i=0; i<getNumOutputs(); ++i){
-          if(i==iout_){
+    if(nfwd>0) {
+      for(int d=0; d<nfwd; ++d) {
+        for(int i=0; i<getNumOutputs(); ++i) {
+          if(i==iout_) {
             // Collect the arguments
             rhs.push_back(*v_it++);
             col_offset.push_back(col_offset.back()+1);
           } else {
             // Auxiliary output
-            if(fsens[d][i]!=0){
+            if(fsens[d][i]!=0) {
               *fsens[d][i] = *v_it++;
             }
           }
@@ -258,8 +258,8 @@ namespace casadi{
 
       // Solve for all the forward derivatives at once
       rhs = horzsplit(J->getSolve(horzcat(rhs),false,linsol_),col_offset);
-      for(int d=0; d<nfwd; ++d){
-        if(fsens[d][iout_]!=0){
+      for(int d=0; d<nfwd; ++d) {
+        if(fsens[d][iout_]!=0) {
           *fsens[d][iout_] = -rhs[d];
         }
       }
@@ -269,9 +269,9 @@ namespace casadi{
     }
 
     // Collect adjoint sensitivities
-    for(int d=0; d<nadj; ++d){
-      for(int i=0; i<asens[d].size(); ++i, ++v_it){
-        if(i!=iin_ && asens[d][i]!=0 && !v_it->isNull()){
+    for(int d=0; d<nadj; ++d) {
+      for(int i=0; i<asens[d].size(); ++i, ++v_it) {
+        if(i!=iin_ && asens[d][i]!=0 && !v_it->isNull()) {
           *asens[d][i] += - *v_it;
         }
       }
@@ -279,16 +279,16 @@ namespace casadi{
     casadi_assert(v_it==v.end());
   }
 
-  void ImplicitFunctionInternal::spEvaluate(bool fwd){
+  void ImplicitFunctionInternal::spEvaluate(bool fwd) {
 
     // Initialize the callback for sparsity propagation
     f_.spInit(fwd);
 
-    if(fwd){
+    if(fwd) {
 
       // Pass inputs to function
       f_.input(iin_).setZeroBV();
-      for(int i=0; i<getNumInputs(); ++i){
+      for(int i=0; i<getNumInputs(); ++i) {
         if(i!=iin_) f_.input(i).setBV(input(i));
       }
 
@@ -300,10 +300,10 @@ namespace casadi{
       linsol_.spSolve(output(iout_),f_.output(iout_),false);
 
       // Propagate to auxiliary outputs
-      if(getNumOutputs()>1){
+      if(getNumOutputs()>1) {
         f_.output(iout_).setBV(output(iout_));
         f_.spEvaluate(true);
-        for(int i=0; i<getNumOutputs(); ++i){
+        for(int i=0; i<getNumOutputs(); ++i) {
           if(i!=iout_) output(i).setBV(f_.output(i));
         }
       }
@@ -311,17 +311,17 @@ namespace casadi{
     } else {
 
       // Propagate dependencies from auxiliary outputs
-      if(getNumOutputs()>1){
+      if(getNumOutputs()>1) {
         f_.output(iout_).setZeroBV();
-        for(int i=0; i<getNumOutputs(); ++i){
+        for(int i=0; i<getNumOutputs(); ++i) {
           if(i!=iout_) f_.output(i).setBV(output(i));
         }
         f_.spEvaluate(false);
-        for(int i=0; i<getNumInputs(); ++i){
+        for(int i=0; i<getNumInputs(); ++i) {
           input(i).setBV(f_.input(i));
         }
       } else {
-        for(int i=0; i<getNumInputs(); ++i){
+        for(int i=0; i<getNumInputs(); ++i) {
           input(i).setZeroBV();
         }
       }
@@ -337,7 +337,7 @@ namespace casadi{
       f_.spEvaluate(false);
 
       // Collect influence on inputs
-      for(int i=0; i<getNumInputs(); ++i){
+      for(int i=0; i<getNumInputs(); ++i) {
         if(i!=iin_) input(i).borBV(f_.input(i));
       }
 

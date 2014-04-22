@@ -24,9 +24,9 @@
 #include "dsdp_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-DSDPSolver::DSDPSolver(){
+DSDPSolver::DSDPSolver() {
 }
 
 
@@ -34,16 +34,16 @@ DSDPSolver::DSDPSolver(const SDPStructure &st)  {
   assignNode(new DSDPInternal(st));
 }
 
-DSDPInternal* DSDPSolver::operator->(){
+DSDPInternal* DSDPSolver::operator->() {
   return static_cast<DSDPInternal*>(Function::operator->());
 }
 
-const DSDPInternal* DSDPSolver::operator->() const{
+const DSDPInternal* DSDPSolver::operator->() const {
   return static_cast<const DSDPInternal*>(Function::operator->());
 
 }
 
-bool DSDPSolver::checkNode() const{
+bool DSDPSolver::checkNode() const {
   return dynamic_cast<const DSDPInternal*>(get());
 }
 

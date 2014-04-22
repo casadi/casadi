@@ -36,7 +36,7 @@
 using namespace std;
 namespace casadi {
 
-SQICInternal* SQICInternal::clone() const{
+SQICInternal* SQICInternal::clone() const {
   // Return a deep copy
   SQICInternal* node = new SQICInternal(st_);
   if(!node->is_init_)
@@ -44,11 +44,11 @@ SQICInternal* SQICInternal::clone() const{
   return node;
 }
 
-SQICInternal::SQICInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
+SQICInternal::SQICInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st) {
   is_init_ = false;
 }
 
-SQICInternal::~SQICInternal(){
+SQICInternal::~SQICInternal() {
   sqicDestroy();
 }
 
@@ -87,7 +87,7 @@ void SQICInternal::evaluate() {
   output(QP_SOLVER_COST)[0]+= x_[n_+nc_];
 }
 
-void SQICInternal::init(){
+void SQICInternal::init() {
    // Call the init method of the base class
   QPSolverInternal::init();
 
@@ -149,7 +149,7 @@ void SQICInternal::init(){
 
 }
 
-map<int,string> SQICInternal::calc_flagmap(){
+map<int,string> SQICInternal::calc_flagmap() {
   map<int,string> f;
 
   return f;
@@ -157,12 +157,12 @@ map<int,string> SQICInternal::calc_flagmap(){
 
 map<int,string> SQICInternal::flagmap = SQICInternal::calc_flagmap();
 
-void SQICInternal::sqic_error(const string& module, int flag){
+void SQICInternal::sqic_error(const string& module, int flag) {
   // Find the error
   map<int,string>::const_iterator it = flagmap.find(flag);
 
   stringstream ss;
-  if(it == flagmap.end()){
+  if(it == flagmap.end()) {
     ss << "Unknown error (" << flag << ") from module \"" << module << "\".";
   } else {
     ss << "Module \"" << module << "\" returned flag \"" << it->second << "\".";

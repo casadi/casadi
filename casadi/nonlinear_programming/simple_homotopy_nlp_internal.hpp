@@ -28,14 +28,14 @@
 #include "casadi/symbolic/function/stabilized_qp_solver.hpp"
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
-class CASADI_NONLINEAR_PROGRAMMING_EXPORT SimpleHomotopyNLPInternal : public HomotopyNLPInternal{
+class CASADI_NONLINEAR_PROGRAMMING_EXPORT SimpleHomotopyNLPInternal : public HomotopyNLPInternal {
 
 public:
   explicit SimpleHomotopyNLPInternal(const Function& hnlp);
   virtual ~SimpleHomotopyNLPInternal();
-  virtual SimpleHomotopyNLPInternal* clone() const{ return new SimpleHomotopyNLPInternal(*this);}
+  virtual SimpleHomotopyNLPInternal* clone() const { return new SimpleHomotopyNLPInternal(*this);}
 
   virtual void init();
   virtual void evaluate();

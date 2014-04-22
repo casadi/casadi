@@ -24,9 +24,9 @@
 #include "nlp_implicit_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  NLPImplicitSolver::NLPImplicitSolver(){
+  NLPImplicitSolver::NLPImplicitSolver() {
   }
 
   NLPImplicitSolver::NLPImplicitSolver(const Function& f, const Function& jac,
@@ -34,19 +34,19 @@ namespace casadi{
     assignNode(new NLPImplicitInternal(f,jac,linsol));
   }
 
-  NLPImplicitInternal* NLPImplicitSolver::operator->(){
+  NLPImplicitInternal* NLPImplicitSolver::operator->() {
     return static_cast<NLPImplicitInternal*>(Function::operator->());
   }
 
-  const NLPImplicitInternal* NLPImplicitSolver::operator->() const{
+  const NLPImplicitInternal* NLPImplicitSolver::operator->() const {
     return static_cast<const NLPImplicitInternal*>(Function::operator->());
   }
 
-  bool NLPImplicitSolver::checkNode() const{
+  bool NLPImplicitSolver::checkNode() const {
     return dynamic_cast<const NLPImplicitInternal*>(get());
   }
 
-  NLPSolver& NLPImplicitSolver::getNLPSolver(){
+  NLPSolver& NLPImplicitSolver::getNLPSolver() {
     casadi_assert(checkNode());
     return (*this)->nlp_solver_;
   }

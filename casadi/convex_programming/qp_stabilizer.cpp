@@ -24,9 +24,9 @@
 #include "qp_stabilizer.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-QPStabilizer::QPStabilizer(){
+QPStabilizer::QPStabilizer() {
 }
 
 
@@ -34,15 +34,15 @@ QPStabilizer::QPStabilizer(const QPStructure & st)  {
   assignNode(new QPStabilizerInternal(st));
 }
 
-QPStabilizerInternal* QPStabilizer::operator->(){
+QPStabilizerInternal* QPStabilizer::operator->() {
   return static_cast<QPStabilizerInternal*>(Function::operator->());
 }
 
-const QPStabilizerInternal* QPStabilizer::operator->() const{
+const QPStabilizerInternal* QPStabilizer::operator->() const {
   return static_cast<const QPStabilizerInternal*>(Function::operator->());
 }
 
-bool QPStabilizer::checkNode() const{
+bool QPStabilizer::checkNode() const {
   return dynamic_cast<const QPStabilizerInternal*>(get());
 }
 

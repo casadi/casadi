@@ -24,9 +24,9 @@
 #include "qp_lp_solver.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-QPLPSolver::QPLPSolver(){
+QPLPSolver::QPLPSolver() {
 }
 
 
@@ -34,16 +34,16 @@ QPLPSolver::QPLPSolver(const LPStructure & st)  {
   assignNode(new QPLPInternal(st));
 }
 
-QPLPInternal* QPLPSolver::operator->(){
+QPLPInternal* QPLPSolver::operator->() {
   return static_cast<QPLPInternal*>(Function::operator->());
 }
 
-const QPLPInternal* QPLPSolver::operator->() const{
+const QPLPInternal* QPLPSolver::operator->() const {
   return static_cast<const QPLPInternal*>(Function::operator->());
 
 }
 
-bool QPLPSolver::checkNode() const{
+bool QPLPSolver::checkNode() const {
   return dynamic_cast<const QPLPInternal*>(get());
 }
 

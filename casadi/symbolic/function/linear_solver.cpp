@@ -23,57 +23,57 @@
 #include "linear_solver_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  LinearSolver::LinearSolver(){
+  LinearSolver::LinearSolver() {
   }
 
-  LinearSolver::LinearSolver(const Sparsity& sp, int nrhs){
+  LinearSolver::LinearSolver(const Sparsity& sp, int nrhs) {
     assignNode(new LinearSolverInternal(sp,nrhs));
   }
 
-  LinearSolverInternal* LinearSolver::operator->(){
+  LinearSolverInternal* LinearSolver::operator->() {
     return static_cast<LinearSolverInternal*>(Function::operator->());
   }
 
-  const LinearSolverInternal* LinearSolver::operator->() const{
+  const LinearSolverInternal* LinearSolver::operator->() const {
     return static_cast<const LinearSolverInternal*>(Function::operator->());
   }
 
-  void LinearSolver::prepare(){
+  void LinearSolver::prepare() {
     assertInit();
     (*this)->prepare();
   }
 
-  void LinearSolver::solve(double* x, int nrhs, bool transpose){
+  void LinearSolver::solve(double* x, int nrhs, bool transpose) {
     assertInit();
     (*this)->solve(x,nrhs,transpose);
   }
 
-  void LinearSolver::solve(bool transpose){
+  void LinearSolver::solve(bool transpose) {
     assertInit();
     (*this)->solve(transpose);
   }
 
-  MX LinearSolver::solve(const MX& A, const MX& B, bool transpose){
+  MX LinearSolver::solve(const MX& A, const MX& B, bool transpose) {
     assertInit();
     return (*this)->solve(A,B,transpose);
   }
 
-  bool LinearSolver::prepared() const{
+  bool LinearSolver::prepared() const {
     assertInit();
     return (*this)->prepared_;
   }
 
-  bool LinearSolver::checkNode() const{
+  bool LinearSolver::checkNode() const {
     return dynamic_cast<const LinearSolverInternal*>(get())!=0;
   }
 
-  void LinearSolver::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const{
+  void LinearSolver::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const {
     (*this)->spSolve(X,B,transpose);
   }
 
-  void LinearSolver::spSolve(DMatrix& X, const DMatrix& B, bool transpose) const{
+  void LinearSolver::spSolve(DMatrix& X, const DMatrix& B, bool transpose) const {
     (*this)->spSolve(X,B,transpose);
   }
 

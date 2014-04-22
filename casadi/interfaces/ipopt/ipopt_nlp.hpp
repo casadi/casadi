@@ -43,10 +43,9 @@
 
 /// \cond INTERNAL
 using namespace Ipopt;
-namespace casadi{
+namespace casadi {
 
-class CASADI_IPOPT_INTERFACE_EXPORT IpoptUserClass : public TNLP
-{
+class CASADI_IPOPT_INTERFACE_EXPORT IpoptUserClass : public TNLP {
 #ifdef WITH_IPOPT_CALLBACK
 friend class TNLPAdapter;
 #endif // WITH_IPOPT_CALLBACK

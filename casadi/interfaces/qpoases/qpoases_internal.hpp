@@ -29,7 +29,7 @@
 #include <qpOASES.hpp>
 
 /// \cond INTERNAL
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal class for QPOasesSolver
    *
@@ -58,7 +58,7 @@ public:
   protected:
 
     /// QP Solver
-    union{
+    union {
       qpOASES::QProblemB *qp_;
     };
 

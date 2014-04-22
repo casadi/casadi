@@ -27,7 +27,7 @@
 
 #include "function.hpp"
 
-namespace casadi{
+namespace casadi {
 
   // Forward declaration of internal class
   class ParallelizerInternal;
@@ -36,7 +36,7 @@ namespace casadi{
       \author Joel Andersson
       \date 2011
   */
-  class CASADI_SYMBOLIC_EXPORT Parallelizer : public Function{
+  class CASADI_SYMBOLIC_EXPORT Parallelizer : public Function {
   public:
 
     /// Default constructor

@@ -27,7 +27,7 @@
 
 #include "shared_object.hpp"
 
-namespace casadi{
+namespace casadi {
 
   /// Function pointer to a derivative generator function
   typedef Function (*DerivativeGeneratorCPtr)(Function& fcn, int nfwd, int nadj, void* user_data);

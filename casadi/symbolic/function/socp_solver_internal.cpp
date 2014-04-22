@@ -31,7 +31,7 @@ INPUTSCHEME(SOCPInput)
 OUTPUTSCHEME(SOCPOutput)
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
 // Constructor
 SOCPSolverInternal::SOCPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
@@ -94,14 +94,14 @@ void SOCPSolverInternal::init() {
 
 }
 
-SOCPSolverInternal::~SOCPSolverInternal(){
+SOCPSolverInternal::~SOCPSolverInternal() {
 }
 
-void SOCPSolverInternal::evaluate(){
+void SOCPSolverInternal::evaluate() {
   throw CasadiException("SOCPSolverInternal::evaluate: Not implemented");
 }
 
-void SOCPSolverInternal::solve(){
+void SOCPSolverInternal::solve() {
   throw CasadiException("SOCPSolverInternal::solve: Not implemented");
 }
 

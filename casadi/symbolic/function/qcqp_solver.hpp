@@ -56,10 +56,10 @@
 
 */
 
-namespace casadi{
+namespace casadi {
 
 /// Input arguments of a QP problem [qcqpIn]
-enum QCQPSolverInput{
+enum QCQPSolverInput {
   /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
   /// The matrix is assumed to be symmetrical. [h]
   QCQP_SOLVER_H,
@@ -89,7 +89,7 @@ enum QCQPSolverInput{
   QCQP_SOLVER_NUM_IN};
 
 /// Output arguments of an QP Solver [qcqpOut]
-enum QCQPSolverOutput{
+enum QCQPSolverOutput {
   /// The primal solution [x]
   QCQP_SOLVER_X,
   /// The optimal cost [cost]
@@ -102,7 +102,7 @@ enum QCQPSolverOutput{
 
 
 /// Structure specification of a QP [qcqpStruct]
-enum QCQPStruct{
+enum QCQPStruct {
   /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
   /// The matrix is assumed to be symmetrical. [h]
   QCQP_STRUCT_H,
@@ -124,7 +124,7 @@ class QCQPSolverInternal;
   \author Joris Gillis
   \date 2013
 */
-class CASADI_SYMBOLIC_EXPORT QCQPSolver : public Function{
+class CASADI_SYMBOLIC_EXPORT QCQPSolver : public Function {
   public:
 
   /// Default constructor

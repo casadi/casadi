@@ -25,7 +25,7 @@
 
 #include "fixed_step_integrator.hpp"
 
-namespace casadi{
+namespace casadi {
 
   class RKIntegratorInternal;
 
@@ -65,7 +65,7 @@ namespace casadi{
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static Integrator creator(const Function& f, const Function& g){ return RKIntegrator(f,g);}
+    static Integrator creator(const Function& f, const Function& g) { return RKIntegrator(f,g);}
 #ifdef SWIG
     %nocallback;
 #endif

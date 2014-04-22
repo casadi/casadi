@@ -29,22 +29,22 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
   /** \brief Matrix determinant
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_SYMBOLIC_EXPORT Determinant : public MXNode{
+  class CASADI_SYMBOLIC_EXPORT Determinant : public MXNode {
   public:
 
     /// Constructor
     Determinant(const MX& x);
 
     /// Clone function
-    virtual Determinant* clone() const{ return new Determinant(*this);}
+    virtual Determinant* clone() const { return new Determinant(*this);}
 
     /// Destructor
-    virtual ~Determinant(){}
+    virtual ~Determinant() {}
 
     /// Evaluate the function symbolically (MX)
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -55,7 +55,7 @@ namespace casadi{
     virtual void printPart(std::ostream &stream, int part) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_DETERMINANT;}
+    virtual int getOp() const { return OP_DETERMINANT;}
   };
 
 

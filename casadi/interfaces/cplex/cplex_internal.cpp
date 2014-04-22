@@ -30,11 +30,11 @@
 
 #include "ilcplex/cplex.h"
 
-namespace casadi{
+namespace casadi {
 
   using namespace std;
 
-  CplexInternal::CplexInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st){
+  CplexInternal::CplexInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st) {
     // Options available
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",
               "automatic|primal_simplex|dual_simplex|network|barrier|sifting|concurrent|crossover");
@@ -57,7 +57,7 @@ namespace casadi{
     env_ = 0;
     lp_ = 0;
   }
-  void CplexInternal::init(){
+  void CplexInternal::init() {
     // Free any existing Cplex instance
     freeCplex();
 
@@ -76,12 +76,12 @@ namespace casadi{
                           << status);
 
     // Turn on some debug messages if requested
-    if (verbose()){
+    if (verbose()) {
       CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_ON);
-    } else{
+    } else {
       CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_OFF);
     }
-    if (status){
+    if (status) {
       std::cout << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
     }
 
@@ -91,7 +91,7 @@ namespace casadi{
     // Feasibility tolerance
     status = CPXsetdblparam(env_, CPX_PARAM_EPRHS, tol_);
     // We start with barrier if crossover was chosen.
-    if (qp_method_ == 7){
+    if (qp_method_ == 7) {
       status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 4);
       // Warm-start is default with this algorithm
       setOption("warm_start", true);
@@ -104,11 +104,11 @@ namespace casadi{
     status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, getOption("barrier_maxiter"));
     // Setting simplex iteration limit
     status = CPXsetintparam(env_, CPX_PARAM_ITLIM, getOption("simplex_maxiter"));
-    if (qp_method_ == 7){
+    if (qp_method_ == 7) {
       // Setting crossover algorithm
       status = CPXsetintparam(env_, CPX_PARAM_BARCROSSALG, 1);
     }
-    if(!static_cast<bool>(getOption("convex"))){
+    if(!static_cast<bool>(getOption("convex"))) {
       // Enabling non-convex QPs
       status = CPXsetintparam(env_, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
     }
@@ -153,14 +153,14 @@ namespace casadi{
     lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
   }
 
-  void CplexInternal::evaluate(){
+  void CplexInternal::evaluate() {
 
     if (inputs_check_) checkInputs();
 
     int status;
 
     // We change method in crossover
-    if ( is_warm_ && qp_method_ == 7){
+    if ( is_warm_ && qp_method_ == 7) {
       status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 1);
     }
 
@@ -168,11 +168,11 @@ namespace casadi{
     const vector<double>& lba = input(QP_SOLVER_LBA).data();
     const vector<double>& uba = input(QP_SOLVER_UBA).data();
 
-    for(int i = 0; i < nc_; ++i){
+    for(int i = 0; i < nc_; ++i) {
       // CPX_INFBOUND
 
       // Equality
-      if(uba[i] - lba[i] < 1e-20){
+      if(uba[i] - lba[i] < 1e-20) {
         sense_[i] = 'E';
         rhs_[i] = lba[i];
         rngval_[i] = 0.;
@@ -211,7 +211,7 @@ namespace casadi{
     const double* qmatval = input(QP_SOLVER_H).ptr();
     status = CPXcopyquad(env_, lp_, qmatbeg, getPtr(qmatcnt_), qmatind, qmatval);
 
-    if (dump_to_file_){
+    if (dump_to_file_) {
       const char* fn = string(getOption("dump_filename")).c_str();
       CPXwriteprob(env_, lp_, fn, "LP");
     }
@@ -219,7 +219,7 @@ namespace casadi{
     // Warm-starting if possible
     const double* x0 = input(QP_SOLVER_X0).ptr();
     const double* lam_x0 = input(QP_SOLVER_LAM_X0).ptr();
-    if (qp_method_ != 0 && qp_method_ != 4 && is_warm_){
+    if (qp_method_ != 0 && qp_method_ != 4 && is_warm_) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
       CPXcopystart(env_, lp_, getPtr(cstat_), getPtr(rstat_), x0, NULL, NULL, lam_x0);
     } else {
@@ -229,7 +229,7 @@ namespace casadi{
     // Optimize...
     status = CPXqpopt(env_, lp_);
 
-    if (status){
+    if (status) {
       casadi_error("CPLEX: Failed to solve QP...");
     }
     // Retrieving solution
@@ -245,11 +245,11 @@ namespace casadi{
                           output(QP_SOLVER_LAM_X).ptr()
                           );
 
-    if(status){
+    if(status) {
       cout << "CPLEX: Failed to get solution.\n";
     }
     // Retrieving the basis
-    if (qp_method_ != 0 && qp_method_ != 4){
+    if (qp_method_ != 0 && qp_method_ != 4) {
       status = CPXgetbase(env_, lp_, getPtr(cstat_), getPtr(rstat_));
     }
 
@@ -261,8 +261,8 @@ namespace casadi{
 
     int solnstat = CPXgetstat (env_, lp_);
     stringstream errormsg; // NOTE: Why not print directly to cout and cerr?
-    if(verbose()){
-      if (solnstat == CPX_STAT_OPTIMAL){
+    if(verbose()) {
+      if (solnstat == CPX_STAT_OPTIMAL) {
         errormsg << "CPLEX: solution status: Optimal solution found.\n";
       } else if (solnstat == CPX_STAT_UNBOUNDED) {
         errormsg << "CPLEX: solution status: Model is unbounded\n";
@@ -270,13 +270,13 @@ namespace casadi{
         errormsg << "CPLEX: solution status: Model is infeasible\n";
       } else if (solnstat == CPX_STAT_INForUNBD) {
         errormsg << "CPLEX: solution status: Model is infeasible or unbounded\n";
-      } else if (solnstat == CPX_STAT_OPTIMAL_INFEAS){
+      } else if (solnstat == CPX_STAT_OPTIMAL_INFEAS) {
         errormsg << "CPLEX: solution status: Optimal solution "
             "is available but with infeasibilities\n";
-      } else if (solnstat == CPX_STAT_NUM_BEST){
+      } else if (solnstat == CPX_STAT_NUM_BEST) {
         errormsg << "CPLEX: solution status: Solution available, but not "
             "proved optimal due to numeric difficulties.\n";
-      } else if (solnstat == CPX_STAT_FIRSTORDER){
+      } else if (solnstat == CPX_STAT_FIRSTORDER) {
         errormsg << "CPLEX: solution status: Solution satisfies first-order optimality "
             "conditions, but is not necessarily globally optimal.\n";
       } else {
@@ -289,18 +289,18 @@ namespace casadi{
       //status = CPXgetdblquality(env_, lp_, &cn, CPX_KAPPA);
       //cout << "CPLEX: Basis condition number: " << cn << endl;
     }
-    if (solnstat != CPX_STAT_OPTIMAL){
+    if (solnstat != CPX_STAT_OPTIMAL) {
       //    throw CasadiException(errormsg.c_str());
     }
 
     // Next time we warm start
-    if (static_cast<bool>(getOption("warm_start"))){
+    if (static_cast<bool>(getOption("warm_start"))) {
       is_warm_ = true;
     }
 
   }
 
-  CplexInternal* CplexInternal::clone() const{
+  CplexInternal* CplexInternal::clone() const {
     // Return a deepcopy
     CplexInternal* node = new CplexInternal(st_);
     if(!node->is_init_)
@@ -308,27 +308,27 @@ namespace casadi{
     return node;
   }
 
-  CplexInternal::~CplexInternal(){
+  CplexInternal::~CplexInternal() {
     freeCplex();
   }
 
-  void CplexInternal::freeCplex(){
+  void CplexInternal::freeCplex() {
     // Return flag
     int status;
 
     // Only free if Cplex problem if it has been allocated
-    if(lp_!=0){
+    if(lp_!=0) {
       status = CPXfreeprob (env_, &lp_);
-      if(status!=0){
+      if(status!=0) {
         std::cerr << "CPXfreeprob failed, error code " << status << ".\n";
       }
       lp_ = 0;
     }
 
     // Closing down license
-    if(env_!=0){
+    if(env_!=0) {
       status = CPXcloseCPLEX(&env_);
-      if(status!=0){
+      if(status!=0) {
         std::cerr << "CPXcloseCPLEX failed, error code " << status << ".\n";
       }
       env_ = 0;

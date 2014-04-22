@@ -64,7 +64,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static SOCPSolver creator(const SOCPStructure & st){ return SDPSOCPSolver(st);}
+  static SOCPSolver creator(const SOCPStructure & st) { return SDPSOCPSolver(st);}
   #ifdef SWIG
   %nocallback;
   #endif

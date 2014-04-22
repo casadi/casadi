@@ -24,20 +24,20 @@
 #include "nullspace_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  Nullspace::Nullspace(){
+  Nullspace::Nullspace() {
   }
 
-  NullspaceInternal* Nullspace::operator->(){
+  NullspaceInternal* Nullspace::operator->() {
     return static_cast<NullspaceInternal*>(Function::operator->());
   }
 
-  const NullspaceInternal* Nullspace::operator->() const{
+  const NullspaceInternal* Nullspace::operator->() const {
     return static_cast<const NullspaceInternal*>(Function::operator->());
   }
 
-  bool Nullspace::checkNode() const{
+  bool Nullspace::checkNode() const {
     return dynamic_cast<const NullspaceInternal*>(get())!=0;
   }
 

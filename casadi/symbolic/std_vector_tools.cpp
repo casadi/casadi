@@ -24,21 +24,21 @@
 
 #include "std_vector_tools.hpp"
 
-namespace casadi{
-  std::vector<int> range(int start, int stop, int step, int len){
+namespace casadi {
+  std::vector<int> range(int start, int stop, int step, int len) {
     start = std::min(start,len);
     stop = std::min(stop,len);
     int nret = (stop-start)/step + ((stop-start)%step!=0);
     std::vector<int> ret(nret);
     int ind = start;
-    for(std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it){
+    for(std::vector<int>::iterator it=ret.begin(); it!=ret.end(); ++it) {
       *it = ind;
       ind += step;
     }
     return ret;
   }
 
-  std::vector<int> range(int stop){
+  std::vector<int> range(int stop) {
     return range(0,stop);
   }
 
@@ -71,8 +71,8 @@ namespace casadi{
     return lookup;
   }
 
-  bvec_t* get_bvec_t(std::vector<double>& v){
-    if(v.empty()){
+  bvec_t* get_bvec_t(std::vector<double>& v) {
+    if(v.empty()) {
       return 0;
     } else {
       return reinterpret_cast<bvec_t*>(&v.front());
@@ -80,8 +80,8 @@ namespace casadi{
   }
 
   /// Get an pointer of sets of booleans from a double vector
-  const bvec_t* get_bvec_t(const std::vector<double>& v){
-    if(v.empty()){
+  const bvec_t* get_bvec_t(const std::vector<double>& v) {
+    if(v.empty()) {
       return 0;
     } else {
       return reinterpret_cast<const bvec_t*>(&v.front());
@@ -89,4 +89,3 @@ namespace casadi{
   }
 
 } // namespace casadi
-

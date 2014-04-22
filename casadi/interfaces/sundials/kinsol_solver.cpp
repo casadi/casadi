@@ -24,24 +24,24 @@
 #include "kinsol_internal.hpp"
 
 using namespace std;
-namespace casadi{
+namespace casadi {
 
-  KinsolSolver::KinsolSolver(){
+  KinsolSolver::KinsolSolver() {
   }
 
-  KinsolSolver::KinsolSolver(const Function& f, const Function& jac, const LinearSolver& linsol){
+  KinsolSolver::KinsolSolver(const Function& f, const Function& jac, const LinearSolver& linsol) {
     assignNode(new KinsolInternal(f,jac,linsol));
   }
 
-  KinsolInternal* KinsolSolver::operator->(){
+  KinsolInternal* KinsolSolver::operator->() {
     return static_cast<KinsolInternal*>(Function::operator->());
   }
 
-  const KinsolInternal* KinsolSolver::operator->() const{
+  const KinsolInternal* KinsolSolver::operator->() const {
     return static_cast<const KinsolInternal*>(Function::operator->());
   }
 
-  bool KinsolSolver::checkNode() const{
+  bool KinsolSolver::checkNode() const {
     return dynamic_cast<const KinsolInternal*>(get());
   }
 

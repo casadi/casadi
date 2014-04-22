@@ -29,7 +29,7 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /** \brief Internal storage for DpleSolver related data
 
@@ -37,7 +37,7 @@ namespace casadi{
      \author Joris Gillis
       \date 2014
   */
-  class CASADI_CONTROL_EXPORT DpleInternal : public FunctionInternal{
+  class CASADI_CONTROL_EXPORT DpleInternal : public FunctionInternal {
   public:
     /** \brief  Constructor
      *  \param[in] A  List of sparsities of A_i
@@ -60,7 +60,7 @@ namespace casadi{
                                  const std::vector< Sparsity > &V) const = 0;
 
     /** \brief  Print solver statistics */
-    virtual void printStats(std::ostream &stream) const{}
+    virtual void printStats(std::ostream &stream) const {}
 
     /** \brief  evaluate */
     virtual void evaluate()=0;

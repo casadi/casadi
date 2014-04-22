@@ -28,20 +28,20 @@
 
 /// \cond INTERNAL
 
-namespace casadi{
+namespace casadi {
 
   /**
       \author Joel Andersson
       \date 2010-2013
   */
-  class CASADI_SYMBOLIC_EXPORT CallFunction : public MultipleOutput{
+  class CASADI_SYMBOLIC_EXPORT CallFunction : public MultipleOutput {
   public:
 
     /** \brief  Constructor */
     explicit CallFunction(const Function& fcn, std::vector<MX> arg);
 
     /** \brief  Destructor */
-    virtual ~CallFunction(){}
+    virtual ~CallFunction() {}
 
     /** \brief  Clone function */
     virtual CallFunction* clone() const;
@@ -74,10 +74,10 @@ namespace casadi{
     virtual Function& getFunction();
 
     /** \brief  Get function input */
-    virtual int getFunctionInput() const{ return -1;}
+    virtual int getFunctionInput() const { return -1;}
 
     /** \brief  Get function output */
-    virtual int getFunctionOutput() const{ return -1;}
+    virtual int getFunctionOutput() const { return -1;}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -89,7 +89,7 @@ namespace casadi{
     virtual const Sparsity& sparsity(int oind) const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_CALL;}
+    virtual int getOp() const { return OP_CALL;}
 
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr);
