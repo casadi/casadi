@@ -2154,13 +2154,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -2310,8 +2310,9 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::CollocationIntegrator::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::CollocationIntegrator::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -2371,8 +2372,12 @@ Get the dictionary.
 
 %feature("docstring") casadi::CollocationIntegrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -2578,15 +2583,17 @@ Print the pointer to the internal class
 ";
 
 %feature("docstring") casadi::CollocationIntegrator::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
 %feature("docstring") casadi::CollocationIntegrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -2689,13 +2696,16 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| convex       | OT_BOOLEAN   | true         | Indicates if | casadi::Impl |
-|              |              |              | the QP is    | icitFixedSte |
-|              |              |              | convex or    | pIntegratorI |
-|              |              |              | not (affects | nternal      |
-|              |              |              | only the     |              |
-|              |              |              | barrier      |              |
-|              |              |              | method).     |              |
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
+| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Impl |
+| ter          |              |              | number of    | icitFixedSte |
+|              |              |              | barrier      | pIntegratorI |
+|              |              |              | iterations.  | nternal      |
 +--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
@@ -2713,11 +2723,6 @@ Joel Andersson
 |              |              |              | also be      | al           |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | (eval_f|eval | casadi::Coll |
 |              | TOR          | )            | _djac)       | ocationInteg |
 |              |              |              |              | ratorInterna |
@@ -2731,10 +2736,9 @@ Joel Andersson
 | nite_element |              |              | finite       | dStepIntegra |
 | s            |              |              | elements     | torInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -2905,8 +2909,10 @@ a weak reference to the object.
 ";
 
 %feature("docstring") casadi::CollocationIntegrator::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -2919,8 +2925,10 @@ Get the type name of a certain option.
 %feature("docstring") casadi::CollocationIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -5230,8 +5238,9 @@ check if there is an option str
 ";
 
 %feature("docstring") casadi::ControlSimulator::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -5275,8 +5284,12 @@ corresponding to the Jacobian and the same number of inputs.
 
 %feature("docstring") casadi::ControlSimulator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -5463,8 +5476,9 @@ the same as evaluate()
 ";
 
 %feature("docstring") casadi::ControlSimulator::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -5519,7 +5533,7 @@ are the time steps provided by the supplied grid. Controls are constant
 inbetween major time-steps  Minor time-steps. These are time steps linearly
 interpolated from one major time-step to the next. The option 'nf' regulates
 how many minor time-steps are taken.  Integration time-steps. Time steps
-that the supplied integrator might choose to integrate the continous
+that the supplied integrator might choose to integrate the continuous
 dynamics. They are not important what ControlSimulator is concerned.  np
 Number of parameters nu Number of controls ns The number of major grid
 points, as supplied in the constructor nf The number of minor grid points
@@ -5578,10 +5592,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -5757,7 +5770,7 @@ Evaluate.
 
 %feature("docstring") casadi::ControlSimulator::getMajorIndex "
 
-Get the index i such that gridminor[i] == gridmajor.
+Get the index i such that gridminor[i] == gridmajor
 
 ";
 
@@ -6063,8 +6076,10 @@ There is no guarantee that consecutive calls return identical objects
 %feature("docstring") casadi::ControlSimulator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -6182,8 +6197,10 @@ Get a list of all option names
 ";
 
 %feature("docstring") casadi::ControlSimulator::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -6244,13 +6261,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -6388,8 +6405,10 @@ the output elements).
 ";
 
 %feature("docstring") casadi::CplexSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -6421,13 +6440,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -6613,22 +6632,6 @@ Kozma, Joel Andersson
 |              |              |              | barrier      |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | true         | Indicates if | casadi::Cple |
-|              |              |              | the QP is    | xInternal    |
-|              |              |              | convex or    |              |
-|              |              |              | not (affects |              |
-|              |              |              | only the     |              |
-|              |              |              | barrier      |              |
-|              |              |              | method).     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| dep_check    | OT_STRING    | \"off\"        | Detect       | casadi::Cple |
-|              |              |              | redundant    | xInternal    |
-|              |              |              | constraints. |              |
-|              |              |              | (automatic:- |              |
-|              |              |              | 1|off:0|begi |              |
-|              |              |              | n:1|end:2|bo |              |
-|              |              |              | th:3)        |              |
-+--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
 |              |              |              | derivative,  |              |
@@ -6652,22 +6655,17 @@ Kozma, Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_method    | OT_STRING    | \"automatic\"  | Determines   | casadi::Cple |
-|              |              |              | which CPLEX  | xInternal    |
-|              |              |              | algorithm to |              |
-|              |              |              | use. (automa |              |
-|              |              |              | tic|primal_s |              |
-|              |              |              | implex|dual_ |              |
-|              |              |              | simplex|netw |              |
-|              |              |              | ork|barrier| |              |
-|              |              |              | sifting|conc |              |
-|              |              |              | urrent|cross |              |
-|              |              |              | over)        |              |
+| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::Cple |
+|              |              | )            | argument     | xInternal    |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | simplex_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Cple |
 | ter          |              |              | number of    | xInternal    |
@@ -6681,15 +6679,6 @@ Kozma, Joel Andersson
 |              |              | )            | or pass      | tionInternal |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| warm_start   | OT_BOOLEAN   | false        | Use warm     | casadi::Cple |
-|              |              |              | start with   | xInternal    |
-|              |              |              | simplex      |              |
-|              |              |              | methods      |              |
-|              |              |              | (affects     |              |
-|              |              |              | only the     |              |
-|              |              |              | simplex      |              |
-|              |              |              | methods).    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -6721,8 +6710,10 @@ corresponding to the Jacobian and the same number of inputs.
 %feature("docstring") casadi::CplexSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -6902,8 +6893,12 @@ Copy all options from another object.
 
 %feature("docstring") casadi::CplexSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -7029,8 +7024,9 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 ";
 
 %feature("docstring") casadi::CplexSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -7210,7 +7206,9 @@ oname:  output name. Only allowed when an output scheme is set.
 ";
 
 %feature("docstring") casadi::CplexSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -7343,8 +7341,10 @@ Get the dictionary.
 ";
 
 %feature("docstring") casadi::CSparse::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -7510,7 +7510,9 @@ get an option value
 ";
 
 %feature("docstring") casadi::CSparse::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -7577,10 +7579,9 @@ therefore more expensive if A is invariant.
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -7865,8 +7866,9 @@ it is initialized
 ";
 
 %feature("docstring") casadi::CSparse::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -7931,8 +7933,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 %feature("docstring") casadi::CSparse::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -8220,8 +8226,10 @@ Print options to a stream.
 %feature("docstring") casadi::CSparse::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -8231,13 +8239,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -8301,15 +8309,21 @@ Obtain a numeric Cholesky factorization.
 %feature("docstring") casadi::CSparseCholesky::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
 %feature("docstring") casadi::CSparseCholesky::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -8320,8 +8334,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::CSparseCholesky::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -8683,8 +8698,10 @@ Access input/output scheme.
 ";
 
 %feature("docstring") casadi::CSparseCholesky::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -8757,7 +8774,7 @@ numerically singular, the prepare step will fail.
 CSparseCholesky is an casadi::Function mapping from 2 inputs [ A (matrix),b
 (vector)] to one output [x (vector)].
 
-A = LL' Ax = b LL'x = b L'x = L^-1 b
+*  A = LL' *    Ax = b *    LL'x = b *    L'x = L^-1 b *
 
 The usual procedure to use CSparseCholesky is:  init()
 
@@ -8809,10 +8826,9 @@ therefore more expensive if A is invariant.
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -9052,7 +9068,7 @@ Generate C code for the function.
 
 %feature("docstring") casadi::CSparseCholesky::solveL "
 
-Solve the system of equations Lx = b.
+Solve the system of equations Lx = b
 
 ";
 
@@ -9068,8 +9084,9 @@ reference to the object.
 ";
 
 %feature("docstring") casadi::CSparseCholesky::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -9105,13 +9122,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -9424,8 +9441,12 @@ Get the description of a certain option.
 
 %feature("docstring") casadi::CustomFunction::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -9449,13 +9470,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -9466,8 +9487,9 @@ returned.
 ";
 
 %feature("docstring") casadi::CustomFunction::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -9505,7 +9527,9 @@ adjoint directions.
 ";
 
 %feature("docstring") casadi::CustomFunction::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -9710,8 +9734,10 @@ reference to the object.
 %feature("docstring") casadi::CustomFunction::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -9752,10 +9778,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -10020,8 +10045,10 @@ internally
 ";
 
 %feature("docstring") casadi::CustomFunction::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -10345,6 +10372,12 @@ times t_i.
 | bration_fail |              |              |              | esInternal   |
 | ure          |              |              |              |              |
 +--------------+--------------+--------------+--------------+--------------+
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
 |              |              |              | derivative,  |              |
@@ -10369,11 +10402,6 @@ times t_i.
 | rB           | VER          | )            | equal to lin | ialsInternal |
 |              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | [default:    | casadi::Sund |
 | r_optionsB   | Y            | )            | equal to lin | ialsInternal |
 |              |              |              | ear_solver_o |              |
@@ -10394,10 +10422,9 @@ times t_i.
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
 | dthB         |              | )            | equal to upp | ialsInternal |
@@ -10498,8 +10525,9 @@ Access input/output scheme.
 ";
 
 %feature("docstring") casadi::CVodesIntegrator::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -10581,8 +10609,10 @@ There is no guarantee that consecutive calls return identical objects
 ";
 
 %feature("docstring") casadi::CVodesIntegrator::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -10875,8 +10905,9 @@ Get the type of a certain option.
 ";
 
 %feature("docstring") casadi::CVodesIntegrator::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -10887,8 +10918,9 @@ Assert that it is initialized
 
 %feature("docstring") casadi::CVodesIntegrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -11043,8 +11075,10 @@ Generate the sparsity of a Jacobian block
 %feature("docstring") casadi::CVodesIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -11155,8 +11189,12 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::CVodesIntegrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -11324,13 +11362,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -13029,8 +13067,9 @@ Get the description of a certain option.
 ";
 
 %feature("docstring") casadi::DirectCollocation::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -13095,13 +13134,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -13294,13 +13333,10 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| convex       | OT_BOOLEAN   | true         | Indicates if | casadi::Dire |
-|              |              |              | the QP is    | ctCollocatio |
-|              |              |              | convex or    | nInternal    |
-|              |              |              | not (affects |              |
-|              |              |              | only the     |              |
-|              |              |              | barrier      |              |
-|              |              |              | method).     |              |
+| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Dire |
+| ter          |              |              | number of    | ctCollocatio |
+|              |              |              | barrier      | nInternal    |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
@@ -13329,10 +13365,9 @@ Joel Andersson
 | rameters     |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -13464,8 +13499,10 @@ oname:  output name. Only allowed when an output scheme is set.
 ";
 
 %feature("docstring") casadi::DirectCollocation::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -13786,8 +13823,10 @@ There is no guarantee that consecutive calls return identical objects
 %feature("docstring") casadi::DirectCollocation::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -13847,8 +13886,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::DirectCollocation::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -13860,8 +13900,12 @@ Add modules to be monitored.
 
 %feature("docstring") casadi::DirectCollocation::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -14163,8 +14207,9 @@ Get the variables.
 
 ";
 
-%feature("docstring") casadi::DirectMultipleShooting::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::DirectMultipleShooting::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -14282,8 +14327,10 @@ Get the type of a certain option.
 %feature("docstring") casadi::DirectMultipleShooting::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -14388,8 +14435,12 @@ a weak reference to the object.
 
 %feature("docstring") casadi::DirectMultipleShooting::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -14511,10 +14562,9 @@ Joel Andersson
 |              |              |              | llelizer     | ootingIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -14582,13 +14632,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -14603,7 +14653,8 @@ counting: improper.
 
 ";
 
-%feature("docstring") casadi::DirectMultipleShooting::spEvaluate "[INTERNAL]  Propagate the sparsity pattern through a set of directional
+%feature("docstring") casadi::DirectMultipleShooting::spEvaluate "[INTERNAL]  Propagate the sparsity pattern through a set of directional.
+
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
 
@@ -14888,8 +14939,9 @@ internally
 %feature("docstring") casadi::DirectMultipleShooting::getNLPSolver "";
 
 %feature("docstring") casadi::DirectMultipleShooting::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -15312,8 +15364,9 @@ the same as evaluate()
 ";
 
 %feature("docstring") casadi::DirectSingleShooting::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -15355,8 +15408,12 @@ Check if the node is pointing to the right type of object.
 
 %feature("docstring") casadi::DirectSingleShooting::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -15440,13 +15497,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -15557,10 +15614,9 @@ Joel Andersson
 | ion          |              | )            | casadi::Para | ctSingleShoo |
 |              |              |              | llelizer     | tingInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -15644,8 +15700,10 @@ Access input argument
 ";
 
 %feature("docstring") casadi::DirectSingleShooting::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -15846,8 +15904,9 @@ weak reference to the object.
 
 ";
 
-%feature("docstring") casadi::DirectSingleShooting::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::DirectSingleShooting::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -15907,8 +15966,10 @@ Get total number of elements in all of the matrix-valued inputs.
 %feature("docstring") casadi::DirectSingleShooting::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -16383,8 +16444,10 @@ pointer to the internal class
 ";
 
 %feature("docstring") casadi::DpleSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -16511,8 +16574,12 @@ Get all statistics obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::DpleSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -16607,13 +16674,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -16682,7 +16749,9 @@ changes, the init function should be called again.
 ";
 
 %feature("docstring") casadi::DpleSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -16708,8 +16777,9 @@ Input/output structures of the function
 ";
 
 %feature("docstring") casadi::DpleSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -16886,10 +16956,9 @@ P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 |              |              |              | positive     | Internal     |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -16951,8 +17020,10 @@ with another instance.
 %feature("docstring") casadi::DpleSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -17098,13 +17169,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -17268,8 +17339,9 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::DSDPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -17446,8 +17518,10 @@ changes, the init function should be called again.
 ";
 
 %feature("docstring") casadi::DSDPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -17709,10 +17783,9 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -17948,15 +18021,19 @@ the same as evaluate()
 ";
 
 %feature("docstring") casadi::DSDPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
 %feature("docstring") casadi::DSDPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -17998,8 +18075,12 @@ Copy all options from another object.
 
 %feature("docstring") casadi::DSDPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -18978,8 +19059,10 @@ Get total number of elements in all of the matrix-valued outputs.
 ";
 
 %feature("docstring") casadi::ExternalFunction::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -19058,8 +19141,12 @@ corresponding to the Jacobian and the same number of inputs.
 
 %feature("docstring") casadi::ExternalFunction::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -19129,10 +19216,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -19242,8 +19328,10 @@ content with another instance.
 %feature("docstring") casadi::ExternalFunction::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -19287,8 +19375,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::ExternalFunction::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -19360,8 +19449,9 @@ Access input/output scheme.
 ";
 
 %feature("docstring") casadi::ExternalFunction::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -19650,13 +19740,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -19899,8 +19989,12 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::FixedStepIntegrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -19921,8 +20015,10 @@ adheres to SCHEME_NLPINput
 %feature("docstring") casadi::FixedStepIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -19939,8 +20035,10 @@ Get output scheme.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -20017,8 +20115,9 @@ internally
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::FixedStepIntegrator::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -20028,13 +20127,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -20092,8 +20191,9 @@ Evaluate the function symbolically or numerically.
 
 %feature("docstring") casadi::FixedStepIntegrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -20399,6 +20499,12 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
 |              |              |              | derivative,  |              |
@@ -20415,11 +20521,6 @@ Joel Andersson
 |              |              |              | also be      | al           |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -20428,10 +20529,9 @@ Joel Andersson
 | nite_element |              |              | finite       | dStepIntegra |
 | s            |              |              | elements     | torInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -20512,8 +20612,9 @@ Get total number of elements in all of the matrix-valued outputs.
 ";
 
 %feature("docstring") casadi::FixedStepIntegrator::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -20909,8 +21010,10 @@ corresponding to the Jacobian and the same number of inputs.
 %feature("docstring") casadi::Function::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -20942,8 +21045,10 @@ Set a certain option by giving its index into the allowed values.
 ";
 
 %feature("docstring") casadi::Function::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -21098,13 +21203,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -21152,7 +21257,9 @@ the same as evaluate()
 ";
 
 %feature("docstring") casadi::Function::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -21305,8 +21412,12 @@ Copy all options from another object.
 
 %feature("docstring") casadi::Function::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -21434,7 +21545,7 @@ General function.
 
 A general function $f$ in casadi can be multi-input, multi-output. Number of
 inputs: nin getNumInputs() Number of outputs: nout getNumOutputs()  We can
-view this function as a being composed of a (nin, nout) grid of single-
+view this function as a being composed of a ( nin, nout) grid of single-
 input, single-output primitive functions. Each such primitive function
 $f_{i,j} \\\\forall i \\\\in [0,nin-1], j \\\\in [0,nout-1]$ can map as
 $\\\\mathbf{R}^{n,m}\\\\to\\\\mathbf{R}^{p,q}$, in which n,m,p,q can take
@@ -21442,9 +21553,9 @@ different values for every (i,j) pair.  When passing input, you specify
 which partition $i$ is active. You pass the numbers vectorized, as a vector
 of size $(n*m)$. When requesting output, you specify which partition $j$ is
 active. You get the numbers vectorized, as a vector of size $(p*q)$.  To
-calculate jacobians, you need to have $(m=1,q=1)$.
+calculate Jacobians, you need to have $(m=1,q=1)$.
 
-Write the jacobian as $J_{i,j} = \\\\nabla f_{i,j} = \\\\frac{\\\\partial
+Write the Jacobian as $J_{i,j} = \\\\nabla f_{i,j} = \\\\frac{\\\\partial
 f_{i,j}(\\\\vec{x})}{\\\\partial \\\\vec{x}}$.
 
 Using $\\\\vec{v} \\\\in \\\\mathbf{R}^n$ as a forward seed: setFwdSeed(v,i)
@@ -21460,7 +21571,7 @@ f_{i,j})^T . \\\\vec{w}$
 Some quantities in these formulas must be transposed: input col: transpose $
 \\\\vec{v} $ and $\\\\vec{s}_a$ output col: transpose $ \\\\vec{w} $ and
 $\\\\vec{s}_f$  NOTE: Functions are allowed to modify their input arguments
-when evaluating: implicitFunction, IDAS solver Futher releases may disallow
+when evaluating: implicitFunction, IDAS solver Further releases may disallow
 this.
 
 Joel Andersson
@@ -21484,10 +21595,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -21697,8 +21807,9 @@ Get the type of a certain option.
 ";
 
 %feature("docstring") casadi::Function::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -21895,7 +22006,7 @@ Matrix division from left.
 
 %feature("docstring") casadi::GenericExpression::__truediv__ "
 
-Division (with future.division in effect)
+Division (with __future__.division in effect)
 
 ";
 
@@ -24734,13 +24845,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -24762,8 +24873,9 @@ Print the pointer to the internal class
 ";
 
 %feature("docstring") casadi::HomotopyNLPSolver::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -25083,10 +25195,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -25135,8 +25246,10 @@ Get total number of elements in all of the matrix-valued inputs.
 ";
 
 %feature("docstring") casadi::HomotopyNLPSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -25261,8 +25374,12 @@ Set the number of function inputs.
 
 %feature("docstring") casadi::HomotopyNLPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -25362,8 +25479,10 @@ Access input argument
 %feature("docstring") casadi::HomotopyNLPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -25379,8 +25498,9 @@ the same as evaluate()
 ";
 
 %feature("docstring") casadi::HomotopyNLPSolver::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -26485,8 +26605,10 @@ Assert that it is initialized
 %feature("docstring") casadi::IdasIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -26563,8 +26685,10 @@ adjoint sensitivities.
 ";
 
 %feature("docstring") casadi::IdasIntegrator::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -26598,8 +26722,12 @@ Add modules to be monitored.
 
 %feature("docstring") casadi::IdasIntegrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -26734,7 +26862,9 @@ values.
 ";
 
 %feature("docstring") casadi::IdasIntegrator::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -26863,8 +26993,9 @@ internally
 
 %feature("docstring") casadi::IdasIntegrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -26975,6 +27106,12 @@ Joel Andersson
 | abstolv      | OT_REALVECTO |              |              | casadi::Idas |
 |              | R            |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
 | calc_icB     | OT_BOOLEAN   | GenericType( | backwards    | casadi::Idas |
 |              |              | )            | system       | Internal     |
 |              |              |              | [default:    |              |
@@ -27015,11 +27152,6 @@ Joel Andersson
 | rB           | VER          | )            | equal to lin | ialsInternal |
 |              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | [default:    | casadi::Sund |
 | r_optionsB   | Y            | )            | equal to lin | ialsInternal |
 |              |              |              | ear_solver_o |              |
@@ -27040,10 +27172,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
 | dthB         |              | )            | equal to upp | ialsInternal |
@@ -27117,7 +27248,7 @@ Default constructor.
 
 Create an integrator for a fully implicit DAE with quadrature states.
 
-Create an integrator for a fully implicit DAE with quadrature states (nz is
+Create an integrator for a fully implicit DAE with quadrature states ( nz is
 the number of states not to be included in the state vector)
 
 Parameters:
@@ -27274,8 +27405,9 @@ Input/output structures of the function
 ";
 
 %feature("docstring") casadi::IdasIntegrator::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -27441,13 +27573,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -27478,8 +27610,9 @@ Print solver statistics.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -27567,13 +27700,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -27602,8 +27735,10 @@ Swap content with another instance.
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -27627,8 +27762,9 @@ Set the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::spInit "[INTERNAL]  Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::spInit "[INTERNAL]  Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -27731,13 +27867,16 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| convex       | OT_BOOLEAN   | true         | Indicates if | casadi::Impl |
-|              |              |              | the QP is    | icitFixedSte |
-|              |              |              | convex or    | pIntegratorI |
-|              |              |              | not (affects | nternal      |
-|              |              |              | only the     |              |
-|              |              |              | barrier      |              |
-|              |              |              | method).     |              |
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
+| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Impl |
+| ter          |              |              | number of    | icitFixedSte |
+|              |              |              | barrier      | pIntegratorI |
+|              |              |              | iterations.  | nternal      |
 +--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
@@ -27755,11 +27894,6 @@ Joel Andersson
 |              |              |              | also be      | al           |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -27768,10 +27902,9 @@ Joel Andersson
 | nite_element |              |              | finite       | dStepIntegra |
 | s            |              |              | elements     | torInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -28091,8 +28224,12 @@ check if the user has there is an option str
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -28243,7 +28380,8 @@ Print options to a stream.
 
 ";
 
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::spEvaluate "[INTERNAL]  Propagate the sparsity pattern through a set of directional
+%feature("docstring") casadi::ImplicitFixedStepIntegrator::spEvaluate "[INTERNAL]  Propagate the sparsity pattern through a set of directional.
+
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
 
@@ -28376,8 +28514,9 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -28555,8 +28694,9 @@ get an option value
 ";
 
 %feature("docstring") casadi::ImplicitFunction::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -28575,8 +28715,9 @@ are kept internally
 ";
 
 %feature("docstring") casadi::ImplicitFunction::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -28675,8 +28816,10 @@ Evaluate the function symbolically or numerically.
 %feature("docstring") casadi::ImplicitFunction::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -28752,13 +28895,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -28843,10 +28986,9 @@ Joel Andersson
 | ion          |              | )            | casadi::Para | icitFunction |
 |              |              |              | llelizer     | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -28889,8 +29031,10 @@ iname:  input name. Only allowed when an input scheme is set.
 ";
 
 %feature("docstring") casadi::ImplicitFunction::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -29114,8 +29258,12 @@ Get the dictionary.
 
 %feature("docstring") casadi::ImplicitFunction::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -30075,15 +30223,20 @@ properties of a node
 
 /*  Option Functionality  */ %feature("docstring")
 casadi::Integrator::spCanEvaluate " [INTERNAL]  Is the class able to
-propagate seeds through the algorithm? (for usage, see the example
-propagating_sparsity.cpp)
+propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
 %feature("docstring") casadi::Integrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -30132,7 +30285,9 @@ corresponding to the Jacobian and the same number of inputs.
 ";
 
 %feature("docstring") casadi::Integrator::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -30216,8 +30371,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::Integrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -30461,6 +30617,12 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
 |              |              |              | derivative,  |              |
@@ -30477,19 +30639,13 @@ Joel Andersson
 |              |              |              | also be      | al           |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -30843,8 +30999,10 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring") casadi::Integrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -30962,13 +31120,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -31035,8 +31193,10 @@ Const access an output.
 ";
 
 %feature("docstring") casadi::Integrator::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -34615,10 +34775,9 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | quality_func | OT_STRING    | none         | The          | casadi::Ipop |
 | tion_balanci |              |              | balancing    | tInternal    |
@@ -35439,8 +35598,9 @@ Remove modules to be monitored.
 ";
 
 %feature("docstring") casadi::IpoptSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -35450,13 +35610,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -35724,7 +35884,9 @@ oname:  output name. Only allowed when an output scheme is set.
 ";
 
 %feature("docstring") casadi::IpoptSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -35778,8 +35940,10 @@ adjoint directions.
 %feature("docstring") casadi::IpoptSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -35873,8 +36037,10 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::IpoptSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -36074,8 +36240,12 @@ reference to the object.
 
 %feature("docstring") casadi::IpoptSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -36163,8 +36333,8 @@ Specify the number of variables that appear in the Hessian
 ";
 
 %feature("docstring") casadi::IpoptUserClass::eval_jac_g "[INTERNAL]
-Method to return: 1) The structure of the jacobian (if \"values\" is NULL)
-2) The values of the jacobian (if \"values\" is not NULL)
+Method to return: 1) The structure of the Jacobian (if \"values\" is NULL)
+2) The values of the Jacobian (if \"values\" is not NULL)
 
 ";
 
@@ -36179,8 +36349,8 @@ Method to return the bounds for my problem
 ";
 
 %feature("docstring") casadi::IpoptUserClass::eval_h "[INTERNAL]  Method to
-return: 1) The structure of the hessian of the lagrangian (if \"values\" is
-NULL) 2) The values of the hessian of the lagrangian (if \"values\" is not
+return: 1) The structure of the hessian of the Lagrangian (if \"values\" is
+NULL) 2) The values of the hessian of the Lagrangian (if \"values\" is not
 NULL)
 
 ";
@@ -36530,13 +36700,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -36555,7 +36725,9 @@ are kept internally
 ";
 
 %feature("docstring") casadi::KinsolSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -36788,8 +36960,9 @@ Set input scheme.
 ";
 
 %feature("docstring") casadi::KinsolSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -36895,8 +37068,10 @@ reference count.
 %feature("docstring") casadi::KinsolSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -36993,10 +37168,9 @@ See:   ImplicitFunction for more information
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | casadi::Kins |
 |              |              |              | ight|both)   | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | u_scale      | OT_REALVECTO |              |              | casadi::Kins |
 |              | R            |              |              | olInternal   |
@@ -37096,8 +37270,12 @@ Get all statistics obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::KinsolSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -37217,8 +37395,10 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 ";
 
 %feature("docstring") casadi::KinsolSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -37308,8 +37488,12 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 %feature("docstring") casadi::KnitroSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -37662,6 +37846,9 @@ np: number of parameters
 |              |              |              | change       |              |
 |              |              |              | tolerance    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| codegen      | OT_BOOLEAN   | false        | C-code       | casadi::Knit |
+|              |              |              | generation   | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
 | con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
 | md           | Y            | )            | to be passed | olverInterna |
 |              |              |              | to IPOPT     | l            |
@@ -37696,11 +37883,6 @@ np: number of parameters
 | llback       |              | )            | ntation of   | olverInterna |
 |              |              |              | Callback .   | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (eval_f|eval | casadi::Knit |
-|              | TOR          | )            | _g|eval_jac_ | roInternal   |
-|              |              |              | g|eval_grad_ |              |
-|              |              |              | f|eval_h)    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -37713,31 +37895,15 @@ np: number of parameters
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-+-------------+------------------------+
-|     Id      |        Used in         |
-+=============+========================+
-| eval_f      | casadi::KnitroInternal |
-+-------------+------------------------+
-| eval_g      | casadi::KnitroInternal |
-+-------------+------------------------+
-| eval_grad_f | casadi::KnitroInternal |
-+-------------+------------------------+
-| eval_h      | casadi::KnitroInternal |
-+-------------+------------------------+
-| eval_jac_g  | casadi::KnitroInternal |
-+-------------+------------------------+
 
 Diagrams
 
@@ -38005,8 +38171,9 @@ Access the Hessian of the Lagrangian function.
 ";
 
 %feature("docstring") casadi::KnitroSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -38088,8 +38255,10 @@ Set KNITRO integer parameters.
 ";
 
 %feature("docstring") casadi::KnitroSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -38123,8 +38292,10 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 %feature("docstring") casadi::KnitroSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -38365,13 +38536,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -38415,7 +38586,9 @@ Is initialized?
 ";
 
 %feature("docstring") casadi::KnitroSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -38803,13 +38976,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -38866,8 +39039,9 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::LapackLUDense::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -39180,10 +39354,9 @@ therefore more expensive if A is invariant.
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -39232,8 +39405,10 @@ Get total number of elements in all of the matrix-valued inputs.
 ";
 
 %feature("docstring") casadi::LapackLUDense::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -39431,15 +39606,19 @@ check if the user has there is an option str
 ";
 
 %feature("docstring") casadi::LapackLUDense::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
 %feature("docstring") casadi::LapackLUDense::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -39451,8 +39630,12 @@ Copy all options from another object.
 
 %feature("docstring") casadi::LapackLUDense::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -39566,8 +39749,9 @@ representation of the object.
 ";
 
 %feature("docstring") casadi::LapackQRDense::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -39580,8 +39764,10 @@ Set the number of function inputs.
 %feature("docstring") casadi::LapackQRDense::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -39726,7 +39912,7 @@ If A is structurally singular, an error will be thrown during init. If A is
 numerically singular, the prepare step will fail.
 
 This class solves the linear system A.x=b by making an QR factorization of
-A:  A = Q.R, with Q orthogonal and R upper triangular
+A: A = Q.R, with Q orthogonal and R upper triangular
 
 LapackQRDense is an casadi::Function mapping from 2 inputs [ A (matrix),b
 (vector)] to one output [x (vector)].
@@ -39781,10 +39967,9 @@ therefore more expensive if A is invariant.
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -39986,13 +40171,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -40039,8 +40224,10 @@ Get total number of elements in all of the matrix-valued inputs.
 ";
 
 %feature("docstring") casadi::LapackQRDense::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -40360,8 +40547,12 @@ the output elements).
 
 %feature("docstring") casadi::LapackQRDense::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -40393,7 +40584,9 @@ get an option value
 ";
 
 %feature("docstring") casadi::LapackQRDense::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -40519,8 +40712,10 @@ Access input/output scheme.
 ";
 
 %feature("docstring") casadi::LinearSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -40538,13 +40733,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -40843,8 +41038,10 @@ check if the user has there is an option str
 %feature("docstring") casadi::LinearSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -40916,10 +41113,9 @@ numerically singular, the prepare step will fail. Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -40932,7 +41128,9 @@ Diagrams
 C++ includes: linear_solver.hpp ";
 
 %feature("docstring") casadi::LinearSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -41117,8 +41315,9 @@ sparsity through a linear solve
 ";
 
 %feature("docstring") casadi::LinearSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -41341,8 +41540,12 @@ Const access an output.
 
 %feature("docstring") casadi::LinearSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -41596,8 +41799,10 @@ check if the user has there is an option str
 ";
 
 %feature("docstring") casadi::LPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -41689,8 +41894,9 @@ Get total number of elements in all of the matrix-valued inputs.
 ";
 
 %feature("docstring") casadi::LPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -41749,8 +41955,12 @@ oname:  output name. Only allowed when an output scheme is set.
 
 %feature("docstring") casadi::LPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -41774,7 +41984,9 @@ another instance.
 ";
 
 %feature("docstring") casadi::LPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -41945,8 +42157,10 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 %feature("docstring") casadi::LPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -41997,13 +42211,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -42273,10 +42487,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -46126,8 +46339,10 @@ Return a string with a description (for SWIG)
 ";
 
 %feature("docstring") casadi::MXFunction::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -46139,8 +46354,10 @@ representation of the object.
 %feature("docstring") casadi::MXFunction::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -46325,13 +46542,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -46387,8 +46604,12 @@ Get the description of a certain option.
 
 %feature("docstring") casadi::MXFunction::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -46436,8 +46657,9 @@ the output elements).
 ";
 
 %feature("docstring") casadi::MXFunction::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -46495,10 +46717,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -46729,7 +46950,9 @@ Const access an input.
 ";
 
 %feature("docstring") casadi::MXFunction::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -47511,8 +47734,9 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring") casadi::NewtonImplicitSolver::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -47638,8 +47862,9 @@ the same as evaluate()
 
 ";
 
-%feature("docstring") casadi::NewtonImplicitSolver::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::NewtonImplicitSolver::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -47674,8 +47899,12 @@ Generate the sparsity of a Jacobian block
 
 %feature("docstring") casadi::NewtonImplicitSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -47772,10 +48001,9 @@ Joris Gillis
 | ion          |              | )            | casadi::Para | icitFunction |
 |              |              |              | llelizer     | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -48009,13 +48237,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -48255,8 +48483,10 @@ Print a description of the object.
 %feature("docstring") casadi::NewtonImplicitSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -48279,8 +48509,10 @@ Set output scheme.
 ";
 
 %feature("docstring") casadi::NewtonImplicitSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -48549,13 +48781,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -48583,8 +48815,12 @@ Input/output structures of the function
 
 %feature("docstring") casadi::NLPImplicitSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -48797,8 +49033,10 @@ Print options to a stream.
 %feature("docstring") casadi::NLPImplicitSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -48831,8 +49069,9 @@ Set the number of function outputs.
 ";
 
 %feature("docstring") casadi::NLPImplicitSolver::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -49008,8 +49247,9 @@ are kept internally
 ";
 
 %feature("docstring") casadi::NLPImplicitSolver::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -49159,20 +49399,17 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::NLPI |
+| ter          |              |              | number of    | mplicitInter |
+|              |              |              | barrier      | nal          |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | constraints  | OT_INTEGERVE | GenericType( | 1: ui >=     | casadi::Impl |
 |              | CTOR         | )            | 0.0, -1: ui  | icitFunction |
 |              |              |              | <= 0.0, 2:   | Internal     |
 |              |              |              | ui > 0.0,    |              |
 |              |              |              | -2: ui <     |              |
 |              |              |              | 0.0.         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | true         | Indicates if | casadi::NLPI |
-|              |              |              | the QP is    | mplicitInter |
-|              |              |              | convex or    | nal          |
-|              |              |              | not (affects |              |
-|              |              |              | only the     |              |
-|              |              |              | barrier      |              |
-|              |              |              | method).     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
@@ -49193,10 +49430,9 @@ Joris Gillis
 | ion          |              | )            | casadi::Para | icitFunction |
 |              |              |              | llelizer     | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -49246,8 +49482,10 @@ Get the default of a certain option
 ";
 
 %feature("docstring") casadi::NLPImplicitSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -49510,8 +49748,10 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::NLPQPSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -49709,13 +49949,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -49836,8 +50076,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 %feature("docstring") casadi::NLPQPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -49933,8 +50177,9 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring") casadi::NLPQPSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -50059,7 +50304,9 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 ";
 
 %feature("docstring") casadi::NLPQPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -50106,8 +50353,10 @@ if the numerical values of the supplied bounds make sense.
 %feature("docstring") casadi::NLPQPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -50200,10 +50449,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -50437,13 +50685,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -50762,10 +51010,9 @@ Joel Andersson
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -50783,8 +51030,10 @@ representation of the object.
 ";
 
 %feature("docstring") casadi::NLPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -50881,8 +51130,10 @@ Get the allowed values of a certain option.
 %feature("docstring") casadi::NLPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -51113,8 +51364,9 @@ Get the enum value corresponding to th certain option.
 ";
 
 %feature("docstring") casadi::NLPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -51190,7 +51442,9 @@ Get, if necessary generate, the sparsity of a Jacobian block
 ";
 
 %feature("docstring") casadi::NLPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -51285,8 +51539,12 @@ description of the object.
 
 %feature("docstring") casadi::NLPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -52636,7 +52894,7 @@ function input.
 ";
 
 %feature("docstring") casadi::Norm2 "[INTERNAL]  Represents a 2-norm
-(spectran norm)
+(spectral norm)
 
 Joel Andersson
 
@@ -54016,14 +54274,19 @@ iname:  input name. Only allowed when an input scheme is set.
 
 %feature("docstring") casadi::Nullspace::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
 %feature("docstring") casadi::Nullspace::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -54061,8 +54324,10 @@ corresponding to the Jacobian and the same number of inputs.
 %feature("docstring") casadi::Nullspace::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -54512,7 +54777,9 @@ Get total number of elements in all of the matrix-valued inputs.
 ";
 
 %feature("docstring") casadi::Nullspace::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -54600,13 +54867,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -54667,10 +54934,9 @@ basis Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -54778,8 +55044,10 @@ check if the user has there is an option str
 ";
 
 %feature("docstring") casadi::Nullspace::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -54930,7 +55198,9 @@ Get the index into allowed options of a certain option.
 ";
 
 %feature("docstring") casadi::OCPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -55041,10 +55311,9 @@ Joel Andersson
 | rameters     |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -55145,8 +55414,10 @@ adjoint directions.
 %feature("docstring") casadi::OCPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -55312,8 +55583,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 %feature("docstring") casadi::OCPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -55544,13 +55819,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -55600,8 +55875,10 @@ Get the description of a certain option.
 ";
 
 %feature("docstring") casadi::OCPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -55811,8 +56088,9 @@ Default constructor.
 ";
 
 %feature("docstring") casadi::OCPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -55886,13 +56164,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -56208,6 +56486,12 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::OldC |
 | enerator     | EGENERATOR   | )            | directional  | ollocationIn |
 |              |              |              | derivative,  | tegratorInte |
@@ -56224,19 +56508,13 @@ Joel Andersson
 |              |              |              | also be      | al           |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -56278,8 +56556,10 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 %feature("docstring") casadi::OldCollocationIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -56385,14 +56665,16 @@ are kept internally
 
 ";
 
-%feature("docstring") casadi::OldCollocationIntegrator::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::OldCollocationIntegrator::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
 %feature("docstring") casadi::OldCollocationIntegrator::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -56528,8 +56810,9 @@ the index into allowed options of a certain option.
 
 %feature("docstring") casadi::OldCollocationIntegrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -56813,8 +57096,12 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::OldCollocationIntegrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -56830,7 +57117,8 @@ Get the DAE.
 
 ";
 
-%feature("docstring") casadi::OldCollocationIntegrator::spEvaluate "[INTERNAL]  Propagate the sparsity pattern through a set of directional
+%feature("docstring") casadi::OldCollocationIntegrator::spEvaluate "[INTERNAL]  Propagate the sparsity pattern through a set of directional.
+
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
 
@@ -57099,8 +57387,12 @@ the same as evaluate()
 
 %feature("docstring") casadi::OOQPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -57199,8 +57491,10 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring") casadi::OOQPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -57210,13 +57504,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -57365,8 +57659,9 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::OOQPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -57639,7 +57934,9 @@ get function name with all non alphanumeric characters converted to '_'
 ";
 
 %feature("docstring") casadi::OOQPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -57859,10 +58156,9 @@ reInit();
 |              |              |              | 0, 10 and    |              |
 |              |              |              | 100          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -57914,8 +58210,10 @@ Get the number of function outputs.
 ";
 
 %feature("docstring") casadi::OOQPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -58950,8 +59248,12 @@ Copy all options from another object.
 
 %feature("docstring") casadi::Parallelizer::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -59057,8 +59359,10 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring") casadi::Parallelizer::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -59233,8 +59537,9 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 ";
 
 %feature("docstring") casadi::Parallelizer::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -59351,13 +59656,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -59387,8 +59692,10 @@ Get all statistics obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::Parallelizer::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -59454,10 +59761,9 @@ Joel Andersson
 | ion          |              |              | mp|mpi)      | llelizerInte |
 |              |              |              |              | rnal         |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -59754,7 +60060,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::Parallelizer::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -60089,8 +60397,12 @@ Get the number of function outputs.
 
 %feature("docstring") casadi::PsdIndefDpleSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -60409,8 +60721,9 @@ Evaluate the function symbolically or numerically.
 ";
 
 %feature("docstring") casadi::PsdIndefDpleSolver::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -60436,8 +60749,9 @@ V:  List of sparsities of V_i
 ";
 
 %feature("docstring") casadi::PsdIndefDpleSolver::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -60524,8 +60838,10 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring") casadi::PsdIndefDpleSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -60657,13 +60973,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -60697,7 +61013,7 @@ adheres to SCHEME_NLPINput
 
 %feature("docstring") casadi::PsdIndefDpleSolver "
 
-An efficient solver for Discrete Periodic Lyapunov Eaauqtions using SLICOT.
+An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT.
 
 Given matrices $A_k$ and symmetric $V_k, k = 0..K-1$
 
@@ -60708,7 +61024,7 @@ provides all of $P_k$ that satisfy:
 P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 1..K-1
 
-Uses Periodic Schur Decomposition (psd) and does not assume positive
+Uses Periodic Schur Decomposition ('psd') and does not assume positive
 definiteness. Based on Periodic Lyapunov equations: some applications and
 new algorithms. Int. J. Control, vol. 67, pp. 69-87, 1997.
 
@@ -60742,6 +61058,12 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::PsdI |
+|              |              |              | provided     | ndefDpleInte |
+|              |              |              | with         | rnal         |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
 | const_dim    | OT_BOOLEAN   | true         | Assume       | casadi::Dple |
 |              |              |              | constant     | Internal     |
 |              |              |              | dimension of |              |
@@ -60768,19 +61090,6 @@ Joris Gillis
 |              |              |              | 1-eps_unstab |              |
 |              |              |              | le           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | User-defined | casadi::PsdI |
-| r            | VER          | )            | linear       | ndefDpleInte |
-|              |              |              | solver       | rnal         |
-|              |              |              | class.       |              |
-|              |              |              | Needed for s |              |
-|              |              |              | ensitivities |              |
-|              |              |              | .            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::PsdI |
-| r_options    | Y            | )            | be passed to | ndefDpleInte |
-|              |              |              | the linear   | rnal         |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -60789,10 +61098,9 @@ Joris Gillis
 |              |              |              | positive     | Internal     |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -60810,8 +61118,10 @@ representation of the object.
 ";
 
 %feature("docstring") casadi::PsdIndefDpleSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -60952,8 +61262,10 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::QCQPQPSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -61200,7 +61512,9 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 ";
 
 %feature("docstring") casadi::QCQPQPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -61423,10 +61737,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -61703,8 +62016,10 @@ Get the type name of a certain option.
 %feature("docstring") casadi::QCQPQPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -61714,13 +62029,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -61776,8 +62091,9 @@ changes, the init function should be called again.
 ";
 
 %feature("docstring") casadi::QCQPQPSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -61789,8 +62105,12 @@ Return a string with a description (for SWIG)
 
 %feature("docstring") casadi::QCQPQPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -62093,8 +62413,10 @@ Get the allowed values of a certain option.
 %feature("docstring") casadi::QCQPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -62193,13 +62515,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -62466,8 +62788,12 @@ adjoint directions.
 
 %feature("docstring") casadi::QCQPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -62478,8 +62804,10 @@ Get the number of function outputs.
 ";
 
 %feature("docstring") casadi::QCQPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -62520,7 +62848,9 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::QCQPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -62598,8 +62928,9 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring") casadi::QCQPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -62727,10 +63058,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -62933,8 +63263,10 @@ the same as evaluate()
 %feature("docstring") casadi::QPLPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -62983,8 +63315,10 @@ reference count.
 ";
 
 %feature("docstring") casadi::QPLPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -63125,10 +63459,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -63322,8 +63655,9 @@ Set the number of function inputs.
 ";
 
 %feature("docstring") casadi::QPLPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -63424,7 +63758,9 @@ Check if the node is pointing to the right type of object.
 ";
 
 %feature("docstring") casadi::QPLPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -63450,8 +63786,12 @@ Get output scheme.
 
 %feature("docstring") casadi::QPLPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -63666,13 +64006,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -64219,10 +64559,9 @@ Joris Gillis, Joel Andersson
 |              |              |              | w|medium|hig |              |
 |              |              |              | h)           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -64259,7 +64598,9 @@ the pointer to the internal class
 ";
 
 %feature("docstring") casadi::QPOasesSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -64515,16 +64856,22 @@ Generate C code for the function.
 
 %feature("docstring") casadi::QPOasesSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
 %feature("docstring") casadi::QPOasesSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -64554,8 +64901,10 @@ reference to the object.
 ";
 
 %feature("docstring") casadi::QPOasesSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -64618,8 +64967,9 @@ Get total number of elements in all of the matrix-valued inputs.
 ";
 
 %feature("docstring") casadi::QPOasesSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -64640,13 +64990,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -65145,10 +65495,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -65258,8 +65607,12 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 %feature("docstring") casadi::QPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -65363,7 +65716,9 @@ the output elements).
 ";
 
 %feature("docstring") casadi::QPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -65463,8 +65818,9 @@ corresponding to the Hessian and the gradients.
 ";
 
 %feature("docstring") casadi::QPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -65521,13 +65877,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -65562,14 +65918,18 @@ Get the allowed values of a certain option.
 %feature("docstring") casadi::QPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
 %feature("docstring") casadi::QPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -65971,7 +66331,9 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring") casadi::QPStabilizer::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -66140,10 +66502,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -66232,8 +66593,12 @@ Const access an input.
 
 %feature("docstring") casadi::QPStabilizer::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -66279,8 +66644,10 @@ Set options that make the QP solver more suitable for solving LPs.
 %feature("docstring") casadi::QPStabilizer::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -66541,8 +66908,9 @@ There is no guarantee that consecutive calls return identical objects
 ";
 
 %feature("docstring") casadi::QPStabilizer::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -66552,13 +66920,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -66639,8 +67007,10 @@ Copy all options from another object.
 ";
 
 %feature("docstring") casadi::QPStabilizer::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -67472,8 +67842,9 @@ vertical concatenation node (vectors only)
 /*  Option Functionality  */ %feature("docstring")
 casadi::RKIntegrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -67795,13 +68166,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -67900,8 +68271,9 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::RKIntegrator::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -68187,6 +68559,12 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
 |              |              |              | derivative,  |              |
@@ -68203,11 +68581,6 @@ Joel Andersson
 |              |              |              | also be      | al           |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -68216,10 +68589,9 @@ Joel Andersson
 | nite_element |              |              | finite       | dStepIntegra |
 | s            |              |              | elements     | torInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -68332,8 +68704,10 @@ Input/output structures of the function
 ";
 
 %feature("docstring") casadi::RKIntegrator::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -68441,7 +68815,9 @@ Check if the node is pointing to the right type of object.
 ";
 
 %feature("docstring") casadi::RKIntegrator::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -68460,8 +68836,10 @@ the same as evaluate()
 %feature("docstring") casadi::RKIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -68479,8 +68857,12 @@ Integrate forward until a specified time point.
 
 %feature("docstring") casadi::RKIntegrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -70177,8 +70559,10 @@ iname:  input name. Only allowed when an input scheme is set.
 ";
 
 %feature("docstring") casadi::SCPgen::spEvaluate "[INTERNAL]  Propagate the
-sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -70338,8 +70722,10 @@ oname:  output name. Only allowed when an output scheme is set.
 %feature("docstring") casadi::SCPgen::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -70577,10 +70963,9 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -70683,13 +71068,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -70752,8 +71137,12 @@ Get all statistics obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::SCPgen::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -70769,7 +71158,9 @@ input/output scheme.
 ";
 
 %feature("docstring") casadi::SCPgen::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -71028,8 +71419,9 @@ Access the Hessian of the Lagrangian function.
 ";
 
 %feature("docstring") casadi::SCPgen::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -71163,8 +71555,10 @@ description of the object.
 %feature("docstring") casadi::SDPSDQPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -71229,7 +71623,9 @@ Get a list of all option names
 ";
 
 %feature("docstring") casadi::SDPSDQPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -71352,8 +71748,12 @@ corresponding to the Jacobian and the same number of inputs.
 
 %feature("docstring") casadi::SDPSDQPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -71532,8 +71932,9 @@ get an option value
 ";
 
 %feature("docstring") casadi::SDPSDQPSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -71636,13 +72037,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -71653,8 +72054,10 @@ returned.
 ";
 
 %feature("docstring") casadi::SDPSDQPSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -71762,10 +72165,9 @@ Joris Gillis
 | ion          |              | )            | casadi::Para | DQPInternal  |
 |              |              |              | llelizer     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -72124,13 +72526,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -72559,7 +72961,9 @@ Get the enum value corresponding to th certain option.
 ";
 
 %feature("docstring") casadi::SDPSOCPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -72664,13 +73068,10 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| convex       | OT_BOOLEAN   | true         | Indicates if | casadi::SDPS |
-|              |              |              | the QP is    | OCPInternal  |
-|              |              |              | convex or    |              |
-|              |              |              | not (affects |              |
-|              |              |              | only the     |              |
+| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::SDPS |
+| ter          |              |              | number of    | OCPInternal  |
 |              |              |              | barrier      |              |
-|              |              |              | method).     |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
@@ -72697,10 +73098,9 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -72754,8 +73154,12 @@ Return a string with a description (for SWIG)
 
 %feature("docstring") casadi::SDPSOCPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -72858,8 +73262,10 @@ oname:  output name. Only allowed when an output scheme is set.
 ";
 
 %feature("docstring") casadi::SDPSOCPSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -72874,8 +73280,10 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 %feature("docstring") casadi::SDPSOCPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -72943,8 +73351,9 @@ Get total number of elements in all of the matrix-valued inputs.
 ";
 
 %feature("docstring") casadi::SDPSOCPSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -73282,10 +73691,9 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -73440,8 +73848,9 @@ node to a node class pointer (or null)
 ";
 
 %feature("docstring") casadi::SDPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -73520,13 +73929,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -73772,15 +74181,19 @@ There is no guarantee that consecutive calls return identical objects
 ";
 
 %feature("docstring") casadi::SDPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
 %feature("docstring") casadi::SDPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -73961,8 +74374,12 @@ input/output scheme.
 
 %feature("docstring") casadi::SDPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -73973,8 +74390,10 @@ Evaluate the function symbolically or numerically.
 ";
 
 %feature("docstring") casadi::SDPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -74248,14 +74667,17 @@ that it is initialized
 ";
 
 %feature("docstring") casadi::SDQPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
 %feature("docstring") casadi::SDQPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -74474,10 +74896,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | SolverIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -74567,7 +74988,9 @@ Get all statistics obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::SDQPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -74690,13 +75113,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -74792,8 +75215,10 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 %feature("docstring") casadi::SDQPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -74920,8 +75345,12 @@ Set a certain option by giving an enum value.
 
 %feature("docstring") casadi::SDQPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -77785,7 +78214,8 @@ Create an NLP solver instance.
 
 ";
 
-%feature("docstring") casadi::SimpleHomotopyNLPSolver::spEvaluate "[INTERNAL]  Propagate the sparsity pattern through a set of directional
+%feature("docstring") casadi::SimpleHomotopyNLPSolver::spEvaluate "[INTERNAL]  Propagate the sparsity pattern through a set of directional.
+
 derivatives forward or backward (for usage, see the example
 propagating_sparsity.cpp)
 
@@ -78193,10 +78623,9 @@ Joris Gillis
 |              |              | red_object\"  | object       | leHomotopyNL |
 |              |              |              |              | PInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -78247,13 +78676,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -78274,8 +78703,9 @@ Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::SimpleHomotopyNLPSolver::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::SimpleHomotopyNLPSolver::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -78498,8 +78928,12 @@ Get a weak reference to the object.
 
 %feature("docstring") casadi::SimpleHomotopyNLPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -78514,8 +78948,9 @@ Get a single statistic obtained at the end of the last evaluate call.
 ";
 
 %feature("docstring") casadi::SimpleHomotopyNLPSolver::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -78663,8 +79098,10 @@ Get the allowed values of a certain option.
 %feature("docstring") casadi::SimpleHomotopyNLPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -79024,10 +79461,9 @@ Joris Gillis
 |              |              |              | positive     | Internal     |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -79092,8 +79528,12 @@ corresponding to the Jacobian and the same number of inputs.
 
 %feature("docstring") casadi::SimpleIndefDpleSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -79111,8 +79551,9 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::SimpleIndefDpleSolver::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::SimpleIndefDpleSolver::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -79168,8 +79609,10 @@ Copy all options from another object.
 ";
 
 %feature("docstring") casadi::SimpleIndefDpleSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -79382,8 +79825,10 @@ iname:  input name. Only allowed when an input scheme is set.
 %feature("docstring") casadi::SimpleIndefDpleSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -79448,8 +79893,9 @@ iname:  input name. Only allowed when an input scheme is set.
 ";
 
 %feature("docstring") casadi::SimpleIndefDpleSolver::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -79463,13 +79909,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -79687,8 +80133,12 @@ the output elements).
 
 %feature("docstring") casadi::Simulator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -79880,10 +80330,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -80046,8 +80495,9 @@ Input/output structures of the function
 ";
 
 %feature("docstring") casadi::Simulator::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -80155,8 +80605,10 @@ adheres to SCHEME_NLPINput
 %feature("docstring") casadi::Simulator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -80224,8 +80676,10 @@ values.
 ";
 
 %feature("docstring") casadi::Simulator::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -80440,13 +80894,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -80483,7 +80937,9 @@ Is initialized?
 ";
 
 %feature("docstring") casadi::Simulator::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -80613,7 +81069,7 @@ C++ includes: slice.hpp ";
 >  casadi::Slice::Slice()
 ------------------------------------------------------------------------
 
-Defailt constructor - all elements.
+Default constructor - all elements.
 
 >  casadi::Slice::Slice(int i)
 ------------------------------------------------------------------------
@@ -80754,7 +81210,7 @@ reference count.
 
 %feature("docstring") casadi::SnoptSolver::setOptionsFromFile "
 
-Read options from worhp parameter xml.
+Read options from snopt parameter xml.
 
 ";
 
@@ -80821,8 +81277,10 @@ Remove modules to be monitored.
 ";
 
 %feature("docstring") casadi::SnoptSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -80906,7 +81364,9 @@ Generate C code for the function.
 ";
 
 %feature("docstring") casadi::SnoptSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -81057,13 +81517,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -81180,8 +81640,12 @@ after solving.
 
 %feature("docstring") casadi::SnoptSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -81194,8 +81658,10 @@ Return a string with a representation (for SWIG)
 %feature("docstring") casadi::SnoptSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -81284,8 +81750,9 @@ iname:  input name. Only allowed when an input scheme is set.
 ";
 
 %feature("docstring") casadi::SnoptSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -81459,10 +81926,9 @@ np: number of parameters
 |              |              |              | execution    |              |
 |              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -81993,7 +82459,8 @@ Print a representation of the object.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::SOCPQCQPSolver::spInit " [INTERNAL]  Reset the sparsity propagation
+casadi::SOCPQCQPSolver::spInit " [INTERNAL]  Reset the sparsity propagation.
+
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
@@ -82116,10 +82583,9 @@ Joris Gillis
 | parallelizat | OT_STRING    | \"serial\"     | (serial|open | casadi::SOCP |
 | ion          |              |              | mp|mpi)      | QCQPInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -82214,8 +82680,9 @@ Access input/output scheme.
 ";
 
 %feature("docstring") casadi::SOCPQCQPSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -82249,8 +82716,10 @@ Get the allowed values of a certain option.
 ";
 
 %feature("docstring") casadi::SOCPQCQPSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -82356,8 +82825,10 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 %feature("docstring") casadi::SOCPQCQPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -82712,8 +83183,12 @@ Get the number of function inputs.
 
 %feature("docstring") casadi::SOCPQCQPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -82765,13 +83240,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -82992,7 +83467,9 @@ Get input scheme.
 ";
 
 %feature("docstring") casadi::SOCPSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -83018,8 +83495,12 @@ Get output scheme.
 
 %feature("docstring") casadi::SOCPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -83226,13 +83707,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -83418,8 +83899,10 @@ the same as evaluate()
 %feature("docstring") casadi::SOCPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -83474,8 +83957,10 @@ Get the type name of a certain option.
 ";
 
 %feature("docstring") casadi::SOCPSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -83624,10 +84109,9 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -83822,8 +84306,9 @@ oname:  output name. Only allowed when an output scheme is set.
 ";
 
 %feature("docstring") casadi::SOCPSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -84654,7 +85139,7 @@ integers:
 
 \"colind\" [length size2()+1], which contains the index to the first non-
 zero element on or after the corresponding column. All the non-zero elements
-of a particular i are thus the elements with index el that fullfills:
+of a particular i are thus the elements with index el that fulfills:
 colind[i] <= el < colind[i+1].
 
 \"row\" [same length as the number of non-zero elements, size()] The rows
@@ -86187,8 +86672,9 @@ input/output scheme.
 ";
 
 %feature("docstring") casadi::SQICSolver::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -86198,7 +86684,9 @@ that it is initialized
 ";
 
 %feature("docstring") casadi::SQICSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -86339,13 +86827,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -86534,8 +87022,10 @@ pointer to the internal class
 %feature("docstring") casadi::SQICSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -86625,10 +87115,9 @@ Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -86688,8 +87177,12 @@ Print options to a stream.
 
 %feature("docstring") casadi::SQICSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -86845,8 +87338,10 @@ Get total number of elements in all of the matrix-valued outputs.
 ";
 
 %feature("docstring") casadi::SQICSolver::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -86934,8 +87429,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 %feature("docstring") casadi::SQPMethod::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -87053,8 +87552,10 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 %feature("docstring") casadi::SQPMethod::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -87342,8 +87843,9 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 ";
 
 %feature("docstring") casadi::SQPMethod::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -87369,13 +87871,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -87640,17 +88142,14 @@ Attila Kozma, Joel Andersson and Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::SQPI |
+| ter          |              |              | number of    | nternal      |
+|              |              |              | barrier      |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
 | md           | Y            | )            | to be passed | olverInterna |
 |              |              |              | to IPOPT     | l            |
-+--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | true         | Indicates if | casadi::SQPI |
-|              |              |              | the QP is    | nternal      |
-|              |              |              | convex or    |              |
-|              |              |              | not (affects |              |
-|              |              |              | only the     |              |
-|              |              |              | barrier      |              |
-|              |              |              | method).     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
@@ -87691,10 +88190,9 @@ Attila Kozma, Joel Andersson and Joris Gillis
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -87751,8 +88249,10 @@ representation of the object.
 ";
 
 %feature("docstring") casadi::SQPMethod::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -88033,7 +88533,9 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring") casadi::SQPMethod::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -88171,10 +88673,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -88337,8 +88838,9 @@ check if the user has there is an option str
 ";
 
 %feature("docstring") casadi::StabilizedQPSolver::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -88506,15 +89008,20 @@ Assert that it is initialized
 ";
 
 %feature("docstring") casadi::StabilizedQPSolver::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
 %feature("docstring") casadi::StabilizedQPSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -88613,13 +89120,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -88630,8 +89137,10 @@ returned.
 ";
 
 %feature("docstring") casadi::StabilizedQPSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -88736,8 +89245,10 @@ are kept internally
 %feature("docstring") casadi::StabilizedQPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -89140,10 +89651,9 @@ casadi::StabilizedSQICSolver "
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -89184,13 +89694,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -89201,8 +89711,10 @@ returned.
 ";
 
 %feature("docstring") casadi::StabilizedSQICSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -89423,8 +89935,9 @@ Set output scheme.
 ";
 
 %feature("docstring") casadi::StabilizedSQICSolver::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -89465,8 +89978,10 @@ get function name with all non alphanumeric characters converted to '_'
 %feature("docstring") casadi::StabilizedSQICSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -89795,8 +90310,9 @@ Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring") casadi::StabilizedSQICSolver::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::StabilizedSQICSolver::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -89966,8 +90482,12 @@ Const access an input.
 
 %feature("docstring") casadi::StabilizedSQICSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -90027,8 +90547,10 @@ Get total number of elements in all of the matrix-valued outputs.
 ";
 
 %feature("docstring") casadi::StabilizedSQPMethod::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -90050,8 +90572,9 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::StabilizedSQPMethod::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm? (for
-usage, see the example propagating_sparsity.cpp)
+%feature("docstring") casadi::StabilizedSQPMethod::spCanEvaluate "[INTERNAL]  Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -90345,8 +90868,12 @@ get function name with all non alphanumeric characters converted to '_'
 
 %feature("docstring") casadi::StabilizedSQPMethod::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -90568,13 +91095,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -90755,10 +91282,9 @@ Slava Kung
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -90801,8 +91327,10 @@ Get a list of all option names
 %feature("docstring") casadi::StabilizedSQPMethod::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -90944,8 +91472,9 @@ adheres to SCHEME_NLPINput
 ";
 
 %feature("docstring") casadi::StabilizedSQPMethod::spInit "[INTERNAL]
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+Reset the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -92163,13 +92692,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -92265,8 +92794,9 @@ a description of the object.
 ";
 
 %feature("docstring") casadi::SundialsIntegrator::spCanEvaluate "[INTERNAL]
-Is the class able to propagate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp)
+Is the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -92336,8 +92866,9 @@ the same as evaluate()
 ";
 
 %feature("docstring") casadi::SundialsIntegrator::spInit "[INTERNAL]  Reset
-the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp)
+the sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -92426,8 +92957,9 @@ values.
 
 %feature("docstring") casadi::SundialsIntegrator::resetB "
 
-Reset the backward problem Time will be set to tf and backward state to
-input(INTEGRATOR_RX0)
+Reset the backward problem.
+
+Time will be set to tf and backward state to input(INTEGRATOR_RX0)
 
 ";
 
@@ -92650,6 +93182,12 @@ dependency on rx, rz and rp.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
+|              |              |              | provided     | gratorIntern |
+|              |              |              | with         | al           |
+|              |              |              | setArTol to  |              |
+|              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
 | enerator     | EGENERATOR   | )            | directional  | tionInternal |
 |              |              |              | derivative,  |              |
@@ -92674,11 +93212,6 @@ dependency on rx, rz and rp.
 | rB           | VER          | )            | equal to lin | ialsInternal |
 |              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
-| r_options    | Y            | )            | be passed to | gratorIntern |
-|              |              |              | the linear   | al           |
-|              |              |              | solver.      |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | [default:    | casadi::Sund |
 | r_optionsB   | Y            | )            | equal to lin | ialsInternal |
 |              |              |              | ear_solver_o |              |
@@ -92699,10 +93232,9 @@ dependency on rx, rz and rp.
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
 | dthB         |              | )            | equal to upp | ialsInternal |
@@ -92950,8 +93482,10 @@ check if the user has there is an option str
 ";
 
 %feature("docstring") casadi::SundialsIntegrator::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -93015,8 +93549,10 @@ the reference count.
 %feature("docstring") casadi::SundialsIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -93034,8 +93570,12 @@ Get the type name of a certain option.
 
 %feature("docstring") casadi::SundialsIntegrator::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -93550,7 +94090,9 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 ";
 
 %feature("docstring") casadi::SXFunction::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -93862,8 +94404,10 @@ changes, the init function should be called again.
 %feature("docstring") casadi::SXFunction::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -93927,8 +94471,10 @@ Get a list of all option names
 ";
 
 %feature("docstring") casadi::SXFunction::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -94031,8 +94577,9 @@ are kept internally
 ";
 
 %feature("docstring") casadi::SXFunction::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -94270,8 +94817,12 @@ Input/output structures of the function
 
 %feature("docstring") casadi::SXFunction::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -94281,13 +94832,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -94343,10 +94894,9 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -95654,8 +96204,10 @@ Print options to a stream.
 ";
 
 %feature("docstring") casadi::SymbolicQR::spEvaluate "[INTERNAL]  Propagate
-the sparsity pattern through a set of directional derivatives forward or
-backward (for usage, see the example propagating_sparsity.cpp)
+the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -95834,8 +96386,10 @@ representation of the object.
 %feature("docstring") casadi::SymbolicQR::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -95910,8 +96464,12 @@ Get all statistics obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::SymbolicQR::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -95948,7 +96506,9 @@ with another instance.
 ";
 
 %feature("docstring") casadi::SymbolicQR::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -96066,13 +96626,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -96393,10 +96953,9 @@ numerically singular, the prepare step will fail. Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Func |
-|              |              | strict       | termination  | tionInternal |
-|              |              |              | criteria in  |              |
-|              |              |              | IP method.   |              |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
+| rn           |              | scaleIntern  | scaling on   | tionInternal |
+|              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
 |              |              | )            | or pass      | tionInternal |
@@ -96481,8 +97040,9 @@ input/output scheme.
 ";
 
 %feature("docstring") casadi::SymbolicQR::spCanEvaluate "[INTERNAL]  Is the
-class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -99082,8 +99642,9 @@ Input/output structures of the function
 ";
 
 %feature("docstring") casadi::WorhpSolver::spCanEvaluate "[INTERNAL]  Is
-the class able to propagate seeds through the algorithm? (for usage, see the
-example propagating_sparsity.cpp)
+the class able to propagate seeds through the algorithm?
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -99899,6 +100460,10 @@ np: number of parameters
 | eps          | OT_REAL      | 0.000        | Machine      | casadi::Worh |
 |              |              |              | epsilon      | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
+| eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::Worh |
+|              |              |              | unstability  | pInternal    |
+|              |              |              | detection    |              |
++--------------+--------------+--------------+--------------+--------------+
 | expand       | OT_BOOLEAN   | False        | Expand the   | casadi::Worh |
 |              |              |              | NLP function | pInternal    |
 |              |              |              | in terms of  |              |
@@ -100241,12 +100806,12 @@ np: number of parameters
 |              |              |              | solver       |              |
 |              |              |              | output.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | False        | Enable       | casadi::Worh |
-| rn           |              |              | scaling on   | pInternal    |
+| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Worh |
+| rn           |              | scaleIntern  | scaling on   | pInternal    |
 |              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_strict    | OT_BOOLEAN   | worhp_p_.qp. | Use strict   | casadi::Worh |
-|              |              | strict       | termination  | pInternal    |
+| qp_strict    | OT_BOOLEAN   | True         | Use strict   | casadi::Worh |
+|              |              |              | termination  | pInternal    |
 |              |              |              | criteria in  |              |
 |              |              |              | IP method.   |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -100273,21 +100838,6 @@ np: number of parameters
 |              |              |              | not satisfy  |              |
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-+-------------+-----------------------+
-|     Id      |        Used in        |
-+=============+=======================+
-| eval_f      | casadi::WorhpInternal |
-+-------------+-----------------------+
-| eval_g      | casadi::WorhpInternal |
-+-------------+-----------------------+
-| eval_grad_f | casadi::WorhpInternal |
-+-------------+-----------------------+
-| eval_h      | casadi::WorhpInternal |
-+-------------+-----------------------+
-| eval_jac_g  | casadi::WorhpInternal |
-+-------------+-----------------------+
 
 >List of available stats
 +--------------------+-----------------------+
@@ -100607,8 +101157,12 @@ are kept internally
 
 %feature("docstring") casadi::WorhpSolver::callParallel "
 
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer.
+Evaluate symbolically in parallel (matrix graph)
+
+Parameters:
+-----------
+
+paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
@@ -100836,8 +101390,10 @@ pointer to the internal class
 %feature("docstring") casadi::WorhpSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives NOTE: Does not take ownership, only weak references to the
-derivatives are kept internally
+derivatives.
+
+NOTE: Does not take ownership, only weak references to the derivatives are
+kept internally
 
 ";
 
@@ -100860,7 +101416,9 @@ the same as evaluate()
 ";
 
 %feature("docstring") casadi::WorhpSolver::spInit "[INTERNAL]  Reset the
-sparsity propagation (for usage, see the example propagating_sparsity.cpp)
+sparsity propagation.
+
+(for usage, see the example propagating_sparsity.cpp)
 
 ";
 
@@ -101077,8 +101635,10 @@ Check if the node is pointing to the right type of object.
 ";
 
 %feature("docstring") casadi::WorhpSolver::spEvaluate "[INTERNAL]
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp)
+Propagate the sparsity pattern through a set of directional.
+
+derivatives forward or backward (for usage, see the example
+propagating_sparsity.cpp)
 
 ";
 
@@ -101116,13 +101676,13 @@ Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
 
 Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and (1+nfwd)*n_out +
-nadj*n_in outputs. The first n_in inputs corresponds to nondifferentiated
-inputs. The next nfwd*n_in inputs corresponds to forward seeds, one
-direction at a time and the last nadj*n_out inputs corresponds to adjoint
-seeds, one direction at a time. The first n_out outputs corresponds to
-nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
+nadj*n_in outputs. The first n_in inputs correspond to nondifferentiated
+inputs. The next nfwd*n_in inputs correspond to forward seeds, one direction
+at a time and the last nadj*n_out inputs correspond to adjoint seeds, one
+direction at a time. The first n_out outputs correspond to nondifferentiated
+outputs. The next nfwd*n_out outputs correspond to forward sensitivities,
+one direction at a time and the last nadj*n_in outputs corresponds to
+adjoint sensitivities, one direction at a time.
 
 (n_in = getNumInputs(), n_out = getNumOutputs())
 
@@ -102028,7 +102588,7 @@ CasADi additions.
 
 %feature("docstring") casadi::dense_mul_tn "[INTERNAL] ";
 
-%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibriate the system.
+%feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
 
 ";
 
@@ -102251,7 +102811,7 @@ depend.
 ";
 
 %feature("docstring") casadi::cos "[INTERNAL]  Pre-C99 elementary functions
-from the math.h (cmath) header.
+from the 'math.h' ('cmath') header.
 
 ";
 
@@ -102264,7 +102824,7 @@ matrix (lapack)
 [INTERNAL] ";
 
 %feature("docstring") casadi::tanh "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -102322,12 +102882,12 @@ Convert a lower triangular matrix to a symmetric one.
 >  T casadi::asinh(const T &x)
 ------------------------------------------------------------------------
 [INTERNAL] 
-Pre-C99 elementary functions from the math.h (cmath) header.
+Pre-C99 elementary functions from the 'math.h' ('cmath') header.
 
 >  double casadi::asinh(double x)
 ------------------------------------------------------------------------
 [INTERNAL]  throw ()
-Pre-C99 elementary functions from the math.h (cmath) header.
+Pre-C99 elementary functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -102616,7 +103176,7 @@ Integrate f from a to b using Gaussian quadrature with n points.
 ";
 
 %feature("docstring") casadi::ceil "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -102699,7 +103259,7 @@ Substitute variable var with expression expr in multiple expressions.
 ";
 
 %feature("docstring") casadi::abs "[INTERNAL]  Pre-C99 elementary functions
-from the math.h (cmath) header.
+from the 'math.h' ('cmath') header.
 
 ";
 
@@ -102710,7 +103270,7 @@ Matlab's cross command.
 ";
 
 %feature("docstring") casadi::acos "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -102872,7 +103432,7 @@ Print matrix, matlab style.
 ";
 
 %feature("docstring") casadi::isinf "[INTERNAL]  throw () C99 elementary
-functions from the math.h header.
+functions from the 'math.h' header.
 
 ";
 
@@ -103045,7 +103605,7 @@ Checks if vector does not contain NaN or Inf.
 ";
 
 %feature("docstring") casadi::log10 "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -103132,7 +103692,7 @@ Get lower triangular part.
 ";
 
 %feature("docstring") casadi::dgeequ_ "[INTERNAL]  Calculate col and row
-scalings.
+scaling.
 
 ";
 
@@ -103475,7 +104035,7 @@ Creates a block matrix in which each element (i,j) is a_ij*b
 ";
 
 %feature("docstring") casadi::sin "[INTERNAL]  Pre-C99 elementary functions
-from the math.h (cmath) header.
+from the 'math.h' ('cmath') header.
 
 ";
 
@@ -103583,12 +104143,12 @@ Get all the free variables in an expression.
 >  T casadi::acosh(const T &x)
 ------------------------------------------------------------------------
 [INTERNAL] 
-Pre-C99 elementary functions from the math.h (cmath) header.
+Pre-C99 elementary functions from the 'math.h' ('cmath') header.
 
 >  double casadi::acosh(double x)
 ------------------------------------------------------------------------
 [INTERNAL]  throw ()
-Pre-C99 elementary functions from the math.h (cmath) header.
+Pre-C99 elementary functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -103597,17 +104157,17 @@ Pre-C99 elementary functions from the math.h (cmath) header.
 >  T casadi::erf(const T &x)
 ------------------------------------------------------------------------
 [INTERNAL] 
-C99 elementary functions from the math.h header.
+C99 elementary functions from the 'math.h' header.
 
 >  double casadi::erf(double x)
 ------------------------------------------------------------------------
 [INTERNAL]  throw ()
-C99 elementary functions from the math.h header.
+C99 elementary functions from the 'math.h' header.
 
 ";
 
 %feature("docstring") casadi::pow "[INTERNAL]  Pre-C99 elementary functions
-from the math.h (cmath) header.
+from the 'math.h' ('cmath') header.
 
 ";
 
@@ -103718,12 +104278,12 @@ Output arguments of an NLP Jacobian function
 >  T casadi::atanh(const T &x)
 ------------------------------------------------------------------------
 [INTERNAL] 
-Pre-C99 elementary functions from the math.h (cmath) header.
+Pre-C99 elementary functions from the 'math.h' ('cmath') header.
 
 >  double casadi::atanh(double x)
 ------------------------------------------------------------------------
 [INTERNAL]  throw ()
-Pre-C99 elementary functions from the math.h (cmath) header.
+Pre-C99 elementary functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -103905,7 +104465,7 @@ Get typename.
 ";
 
 %feature("docstring") casadi::atan "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -104046,7 +104606,7 @@ Output arguments of an SDQP Solver
 %feature("docstring") casadi::matrixName< SXElement > " [INTERNAL] ";
 
 %feature("docstring") casadi::atan2 "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -104174,7 +104734,7 @@ interval
 ";
 
 %feature("docstring") casadi::sinh "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -104488,7 +105048,7 @@ Check if the vector is non-decreasing.
 ";
 
 %feature("docstring") casadi::cosh "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -104515,7 +105075,7 @@ Get typename.
 %feature("docstring") casadi::str "";
 
 %feature("docstring") casadi::fabs "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -104556,7 +105116,7 @@ Output arguments of an SOCP Solver
 ";
 
 %feature("docstring") casadi::log "[INTERNAL]  Pre-C99 elementary functions
-from the math.h (cmath) header.
+from the 'math.h' ('cmath') header.
 
 ";
 
@@ -104733,7 +105293,7 @@ Output arguments of a linear solver
 ";
 
 %feature("docstring") casadi::sqrt "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -104757,7 +105317,7 @@ invert_indices:  Output indices such that 'sorted_values[indices=values'
 ";
 
 %feature("docstring") casadi::tan "[INTERNAL]  Pre-C99 elementary functions
-from the math.h (cmath) header.
+from the 'math.h' ('cmath') header.
 
 ";
 
@@ -104894,14 +105454,14 @@ equation using an LU-factorized matrix (lapack)
 >  T casadi::fmin(double x, const T &n)
 ------------------------------------------------------------------------
 [INTERNAL] 
-C99 elementary functions from the math.h header.
+C99 elementary functions from the 'math.h' header.
 
 >  double casadi::fmin(double x, double y)
 
 >  int casadi::fmin(int x, int y)
 ------------------------------------------------------------------------
 [INTERNAL]  throw ()
-C99 elementary functions from the math.h header.
+C99 elementary functions from the 'math.h' header.
 
 ";
 
@@ -104924,7 +105484,7 @@ Structure specification of an LP
 %feature("docstring") casadi::describeInput "";
 
 %feature("docstring") casadi::exp "[INTERNAL]  Pre-C99 elementary functions
-from the math.h (cmath) header.
+from the 'math.h' ('cmath') header.
 
 ";
 
@@ -105157,7 +105717,7 @@ return.
 ";
 
 %feature("docstring") casadi::floor "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -105180,7 +105740,7 @@ Output arguments of an NLP function
 ";
 
 %feature("docstring") casadi::isnan "[INTERNAL]  throw () C99 elementary
-functions from the math.h header.
+functions from the 'math.h' header.
 
 ";
 
@@ -105232,14 +105792,14 @@ copysign function
 >  T casadi::fmax(double x, const T &n)
 ------------------------------------------------------------------------
 [INTERNAL] 
-C99 elementary functions from the math.h header.
+C99 elementary functions from the 'math.h' header.
 
 >  double casadi::fmax(double x, double y)
 
 >  int casadi::fmax(int x, int y)
 ------------------------------------------------------------------------
 [INTERNAL]  throw ()
-C99 elementary functions from the math.h header.
+C99 elementary functions from the 'math.h' header.
 
 ";
 
@@ -105262,7 +105822,7 @@ to string.
 ";
 
 %feature("docstring") casadi::asin "[INTERNAL]  Pre-C99 elementary
-functions from the math.h (cmath) header.
+functions from the 'math.h' ('cmath') header.
 
 ";
 
