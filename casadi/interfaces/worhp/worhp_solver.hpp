@@ -46,7 +46,7 @@ namespace casadi {
     explicit WorhpSolver(const Function& nlp
                          /**< nlp function: \f$ [\mathbb {R}^{n_x} \times \mathbb{R}^{n_p}]
                           * \mapsto [\mathbb {R} \times \mathbb{R}^{n_g}]\f$*/
-                         );
+                        );  // NOLINT(whitespace/parens)
 
     /// Access functions of the node
     WorhpInternal* operator->();

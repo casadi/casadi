@@ -58,7 +58,8 @@ namespace casadi {
         case WORHP_BOOL_T:
           bool default_bool;
           WorhpGetBoolParam(&worhp_p_, name, &default_bool);
-          addOption(WorhpGetParamName(i+1), OT_BOOLEAN, default_bool, WorhpGetParamDescription(i+1));
+          addOption(WorhpGetParamName(i+1), OT_BOOLEAN, default_bool,
+                    WorhpGetParamDescription(i+1));
           break;
         case WORHP_DOUBLE_T:
           double default_double;
@@ -89,7 +90,8 @@ namespace casadi {
       "MA86: experimental, only available if provided by the user:7|"
       "MA97:experimental, only available if provided by the user:8");
     setOptionByEnumValue("qp_ipLsMethod", worhp_p_.qp.ipLsMethod);
-    addOption("qp_ipMinAlpha", OT_REAL, worhp_p_.qp.ipMinAlpha, "IP line search minimum step size.");
+    addOption("qp_ipMinAlpha", OT_REAL, worhp_p_.qp.ipMinAlpha,
+              "IP line search minimum step size.");
     addOption("qp_ipTryRelax", OT_BOOLEAN, worhp_p_.qp.ipTryRelax,
       "Enable relaxation strategy when encountering an error.");
     addOption("qp_ipRelaxDiv", OT_REAL, worhp_p_.qp.ipRelaxDiv,
@@ -794,8 +796,7 @@ namespace casadi {
     }
   }
 
-  bool WorhpInternal::eval_g(const double* x, double* g)
-  {
+  bool WorhpInternal::eval_g(const double* x, double* g) {
     try {
       log("eval_g started");
       double time1 = clock();
@@ -832,8 +833,7 @@ namespace casadi {
     }
   }
 
-  bool WorhpInternal::eval_grad_f(const double* x, double scale , double* grad_f)
-  {
+  bool WorhpInternal::eval_grad_f(const double* x, double scale , double* grad_f) {
     try {
       log("eval_grad_f started");
       double time1 = clock();
