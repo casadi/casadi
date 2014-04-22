@@ -67,7 +67,7 @@ namespace casadi{
      * 3 -> Network optimizer
      * 4 -> Barrier
      * 5 -> Sifting
-     * 6 -> Concurent
+     * 6 -> Concurrent
      * 7 -> Crossover
      */
     /// Stores which QP algorithm to use
@@ -85,7 +85,7 @@ namespace casadi{
     /// Nature of problem (always minimization)
     int objsen_;
 
-    /// Determines relation >,<,= in the lin. constraints
+    /// Determines relation >,<,= in the linear constraints
     std::vector<char> sense_;
 
     /// Coefficients of matrix A (constraint Jacobian)
@@ -106,7 +106,7 @@ namespace casadi{
     /// Storage for basis info of slack variables
     std::vector<int> rstat_;
 
-    /// CPLEX-environment
+    /// CPLEX environment
     CPXENVptr env_;
     CPXLPptr lp_;
 
