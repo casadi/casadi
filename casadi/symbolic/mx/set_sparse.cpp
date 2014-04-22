@@ -108,8 +108,8 @@ namespace casadi {
     // Codegen the operation
     int sp_arg = gen.getSparsity(dep(0).sparsity());
     int sp_res = gen.addSparsity(sparsity());
-    stream << "  casadi_copy_sparse(" << arg.front() << ",s" << sp_arg << "," << res.front()
-           << ",s" << sp_res << ");" << std::endl;
+    stream << "  casadi_copy_sparse(" << arg.front() << ", s" << sp_arg << ", " << res.front()
+           << ", s" << sp_res << ");" << std::endl;
   }
 
 

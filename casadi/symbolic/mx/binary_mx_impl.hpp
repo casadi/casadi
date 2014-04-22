@@ -72,7 +72,7 @@ namespace casadi {
     if(output_given) {
       f = *output[0];
     } else {
-      casadi_math<MX>::fun(op_,*input[0], *input[1], f);
+      casadi_math<MX>::fun(op_, *input[0], *input[1], f);
     }
 
     // Number of forward directions
@@ -81,7 +81,7 @@ namespace casadi {
     if(nfwd>0 || nadj>0) {
       // Get partial derivatives
       MX pd[2];
-      casadi_math<MX>::der(op_,*input[0], *input[1], f, pd);
+      casadi_math<MX>::der(op_, *input[0], *input[1], f, pd);
 
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d) {

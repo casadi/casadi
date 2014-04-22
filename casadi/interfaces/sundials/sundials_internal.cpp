@@ -51,11 +51,11 @@ SundialsInternal::SundialsInternal(const Function& f, const Function& g) : Integ
   addOption("lower_bandwidth",             OT_INTEGER,          GenericType(),
             "Lower band-width of banded Jacobian (estimations)");
   addOption("linear_solver_type",          OT_STRING,           "dense",
-            "","user_defined|dense|banded|iterative");
+            "", "user_defined|dense|banded|iterative");
   addOption("iterative_solver",            OT_STRING,           "gmres",
-            "","gmres|bcgstab|tfqmr");
+            "", "gmres|bcgstab|tfqmr");
   addOption("pretype",                     OT_STRING,           "none",
-            "","none|left|right|both");
+            "", "none|left|right|both");
   addOption("max_krylov",                  OT_INTEGER,          10,
             "Maximum Krylov subspace size");
   addOption("sensitivity_method",          OT_STRING,           "simultaneous", "",
@@ -92,7 +92,7 @@ SundialsInternal::SundialsInternal(const Function& f, const Function& g) : Integ
   addOption("steps_per_checkpoint",        OT_INTEGER,          20,
             "Number of steps between two consecutive checkpoints");
   addOption("interpolation_type",          OT_STRING,           "hermite",
-            "Type of interpolation for the adjoint sensitivities","hermite|polynomial");
+            "Type of interpolation for the adjoint sensitivities", "hermite|polynomial");
   addOption("upper_bandwidthB",            OT_INTEGER,          GenericType(),
             "Upper band-width of banded jacobians for backward integration "
             "[default: equal to upper_bandwidth]");
@@ -100,11 +100,11 @@ SundialsInternal::SundialsInternal(const Function& f, const Function& g) : Integ
             "lower band-width of banded jacobians for backward integration "
             "[default: equal to lower_bandwidth]");
   addOption("linear_solver_typeB",         OT_STRING,           GenericType(),
-            "","user_defined|dense|banded|iterative");
+            "", "user_defined|dense|banded|iterative");
   addOption("iterative_solverB",           OT_STRING,           GenericType(),
-            "","gmres|bcgstab|tfqmr");
+            "", "gmres|bcgstab|tfqmr");
   addOption("pretypeB",                    OT_STRING,           GenericType(),
-            "","none|left|right|both");
+            "", "none|left|right|both");
   addOption("max_krylovB",                 OT_INTEGER,          GenericType(),
             "Maximum krylov subspace size");
   addOption("reltolB",                     OT_REAL,             GenericType(),

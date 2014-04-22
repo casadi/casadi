@@ -228,7 +228,7 @@ namespace casadi {
     Matrix(const std::vector<A>& x,  int nrow, int ncol) : sparsity_(Sparsity::dense(nrow, ncol)),
         data_(std::vector<DataType>(x.size())) {
       if(x.size() != nrow*ncol)
-          throw CasadiException("Matrix::Matrix(const std::vector<DataType>& x,"
+          throw CasadiException("Matrix::Matrix(const std::vector<DataType>& x, "
                                 " int n, int m): dimension mismatch");
       copy(x.begin(), x.end(), begin());
     }
@@ -247,7 +247,7 @@ namespace casadi {
         return data().at(k);
       } catch(std::out_of_range& ex) {
         std::stringstream ss;
-        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0," << size() << ")";
+        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << size() << ")";
         throw CasadiException(ss.str());
       }
     }
@@ -259,7 +259,7 @@ namespace casadi {
         return data().at(k);
       } catch(std::out_of_range& ex) {
         std::stringstream ss;
-        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0," << size() << ")";
+        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0, " << size() << ")";
         throw CasadiException(ss.str());
       }
     }

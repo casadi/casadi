@@ -363,7 +363,7 @@ namespace casadi {
     }
 
     // Create the parent
-    MX P = MX::sym("P",index[deps.size()],1);
+    MX P = MX::sym("P", index[deps.size()], 1);
 
     std::vector<MX> Ps = vertsplit(P, index);
 
@@ -383,7 +383,7 @@ namespace casadi {
     }
 
     // Create the parent
-    MX P = MX::sym("P",index[deps.size()],1);
+    MX P = MX::sym("P", index[deps.size()], 1);
     std::vector<MX> Ps = vertsplit(P, index);
 
     children.resize(deps.size());
@@ -830,7 +830,7 @@ namespace casadi {
     // Extract shared subexpressions from ex
     vector<MX> v, vdef;
     vector<MX> ex_extracted(1, ex);
-    extractShared(ex_extracted, v, vdef, "@","");
+    extractShared(ex_extracted, v, vdef, "@", "");
 
     // Print the expression without shared subexpressions
     ex_extracted.front().print(stream);
@@ -846,21 +846,21 @@ namespace casadi {
 
   MX jacobian(const MX& ex, const MX &arg) {
     MXFunction temp(arg, ex); // make a runtime
-    temp.setOption("name","helper_jacobian_MX");
+    temp.setOption("name", "helper_jacobian_MX");
     temp.init();
     return temp.jac();
   }
 
   MX gradient(const MX& ex, const MX &arg) {
     MXFunction temp(arg, ex); // make a runtime
-    temp.setOption("name","helper_gradient_MX");
+    temp.setOption("name", "helper_gradient_MX");
     temp.init();
     return temp.grad();
   }
 
   MX tangent(const MX& ex, const MX &arg) {
     MXFunction temp(arg, ex); // make a runtime
-    temp.setOption("name","helper_tangent_MX");
+    temp.setOption("name", "helper_tangent_MX");
     temp.init();
     return temp.tang();
   }
@@ -945,7 +945,7 @@ namespace casadi {
     std::vector<MX> syms(boundary.size());
 
     for (int i=0;i<syms.size();++i) {
-      syms[i] = MX::sym("x",boundary[i].sparsity());
+      syms[i] = MX::sym("x", boundary[i].sparsity());
     }
 
     // Substitute symbols for boundary nodes
@@ -996,9 +996,9 @@ namespace casadi {
   }
 
   MX nullspace(const MX& A) {
-    SX n = SX::sym("A",A.sparsity());
+    SX n = SX::sym("A", A.sparsity());
     SXFunction f(n, nullspace(n));
-    f.setOption("name","nullspace");
+    f.setOption("name", "nullspace");
     f.init();
     return f(A).at(0);
   }

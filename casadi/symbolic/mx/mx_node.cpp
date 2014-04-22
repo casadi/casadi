@@ -213,7 +213,7 @@ namespace casadi {
     casadi_assert(ndep()>1);
     casadi_assert(part>0);
     casadi_assert(part<ndep());
-    stream << ",";
+    stream << ", ";
   }
 
   Function& MXNode::getFunction() {
@@ -652,8 +652,8 @@ namespace casadi {
       size2()==y.size2() && size1()==y.size1(),
       "MXNode::inner_prod: Dimension mismatch. inner_prod requires its "
       "two arguments to have equal shapes, but got ("
-      << size2() << "," << size1() << ") and ("
-      << y.size2() << "," << y.size1() << ").");
+      << size2() << ", " << size1() << ") and ("
+      << y.size2() << ", " << y.size1() << ").");
     if(sparsity()==y.sparsity()) {
       if(sparsity().size()==0) {
         return 0;
@@ -695,7 +695,7 @@ namespace casadi {
         vector<MX> x_split(x.begin(), i);
         for(; i!=x.end(); ++i) {
           if(i->getOp()==OP_HORZCAT) {
-            x_split.insert(x_split.end(),(*i)->dep_.begin(), (*i)->dep_.end());
+            x_split.insert(x_split.end(), (*i)->dep_.begin(), (*i)->dep_.end());
           } else {
             x_split.push_back(*i);
           }
@@ -716,7 +716,7 @@ namespace casadi {
         vector<MX> x_split(x.begin(), i);
         for(; i!=x.end(); ++i) {
           if(i->getOp()==OP_VERTCAT) {
-            x_split.insert(x_split.end(),(*i)->dep_.begin(), (*i)->dep_.end());
+            x_split.insert(x_split.end(), (*i)->dep_.begin(), (*i)->dep_.end());
           } else {
             x_split.push_back(*i);
           }

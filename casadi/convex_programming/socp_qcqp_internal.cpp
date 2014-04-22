@@ -178,8 +178,8 @@ void SOCPQCQPInternal::init() {
   // Create an socpsolver instance
   SOCPSolverCreator socpsolver_creator = getOption("socp_solver");
   socpsolver_ = socpsolver_creator(
-    socpStruct("g",horzcat(socp_g),
-               "a",horzcat(input(QCQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
+    socpStruct("g", horzcat(socp_g),
+               "a", horzcat(input(QCQP_SOLVER_A).sparsity(), Sparsity::sparse(nc_, 1))));
 
   //socpsolver_.setQCQPOptions();
   if(hasSetOption("socp_solver_options")) {
@@ -189,7 +189,7 @@ void SOCPQCQPInternal::init() {
   for (int i=0;i<nq_+1;++i) {
     ni[i] = n_+1;
   }
-  socpsolver_.setOption("ni",ni);
+  socpsolver_.setOption("ni", ni);
 
   // Initialize the SOCP solver
   socpsolver_.init();

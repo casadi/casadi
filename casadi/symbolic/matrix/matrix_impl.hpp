@@ -98,7 +98,7 @@ namespace casadi {
     std::vector< Matrix<DataType> > temp;
 
     if (!inBounds(ii, size2())) {
-      casadi_error("Slicing [ii,k] out of bounds. Your ii contains "
+      casadi_error("Slicing [ii, k] out of bounds. Your ii contains "
                    << *std::min_element(ii.begin(), ii.end()) << " up to "
                    << *std::max_element(ii.begin(), ii.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
@@ -122,7 +122,7 @@ namespace casadi {
     std::vector< Matrix<DataType> > temp;
 
     if (!inBounds(jj, size1())) {
-      casadi_error("Slicing [ii,k] out of bounds. Your jj contains "
+      casadi_error("Slicing [ii, k] out of bounds. Your jj contains "
                    << *std::min_element(jj.begin(), jj.end()) << " up to "
                    << *std::max_element(jj.begin(), jj.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
@@ -197,13 +197,13 @@ namespace casadi {
                           << cc.size() << ", while rhs is " << m.dimString());
 
     if (!inBounds(rr, size1())) {
-      casadi_error("setSub[.,rr,cc] out of bounds. Your rr contains "
+      casadi_error("setSub[., rr, cc] out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
     if (!inBounds(cc, size2())) {
-      casadi_error("setSub [.,rr,cc] out of bounds. Your cc contains "
+      casadi_error("setSub [., rr, cc] out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
@@ -248,7 +248,7 @@ namespace casadi {
 
     if (!inBounds(jj, size1())) {
       casadi_error(
-        "setSub[.,i,jj] out of bounds. Your jj contains "
+        "setSub[., i, jj] out of bounds. Your jj contains "
         << *std::min_element(jj.begin(), jj.end()) << " up to "
         << *std::max_element(jj.begin(), jj.end())
         << ", which is outside of the matrix shape " << dimString() << ".");
@@ -258,8 +258,8 @@ namespace casadi {
 
     casadi_assert_message(
       result_sparsity == m.sparsity(),
-      "setSub(Imatrix" << i.dimString() << ",Ivector(length=" << jj.size()
-      << "),Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(IMatrix,"
+      "setSub(Imatrix" << i.dimString() << ", Ivector(length=" << jj.size()
+      << "), Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(IMatrix, "
       << jj.size() << ",1) = " << result_sparsity.dimString()
       << " must match the sparsity of Matrix<DataType> = "  << m.dimString()
       << ".");
@@ -286,7 +286,7 @@ namespace casadi {
     }
 
     if (!inBounds(ii, size2())) {
-      casadi_error("setSub[.,ii,j] out of bounds. Your ii contains "
+      casadi_error("setSub[., ii, j] out of bounds. Your ii contains "
                    << *std::min_element(ii.begin(), ii.end()) << " up to "
                    << *std::max_element(ii.begin(), ii.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
@@ -297,8 +297,8 @@ namespace casadi {
 
     casadi_assert_message(
         result_sparsity == m.sparsity(),
-        "setSub(Ivector(length=" << ii.size() << "),Imatrix" << j.dimString()
-        << ",Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(Imatrix,1,"
+        "setSub(Ivector(length=" << ii.size() << "), Imatrix" << j.dimString()
+        << ", Matrix<DataType>)::Dimension mismatch. The sparsity of repmat(Imatrix,1, "
         << ii.size() << ") = " << result_sparsity.dimString()
         << " must match the sparsity of Matrix<DataType> = " << m.dimString() << ".");
 
@@ -372,7 +372,7 @@ namespace casadi {
     } catch(std::out_of_range& ex) {
       std::stringstream ss;
       ss << "Out of range error in Matrix<>::getNZ: " << k
-         << " not all in range [0," << size() << ")";
+         << " not all in range [0, " << size() << ")";
       throw CasadiException(ss.str());
     }
   }
@@ -388,7 +388,7 @@ namespace casadi {
     } catch(std::out_of_range& ex) {
       std::stringstream ss;
       ss << "Out of range error in Matrix<>::getNZ: " << k
-         << " not all in range [0," << size() << ")";
+         << " not all in range [0, " << size() << ")";
       throw CasadiException(ss.str());
     }
   }
@@ -601,7 +601,7 @@ namespace casadi {
     stream << "[";
     for(int rr=0; rr<size1(); ++rr) {
       // Add delimiter
-      if(rr!=0) stream << ",";
+      if(rr!=0) stream << ", ";
 
       // Check if nonzero
       if(el<r.size() && rr==r[el]) {
@@ -651,7 +651,7 @@ namespace casadi {
       // Loop over columns
       for(int cc=0; cc<size2(); ++cc) {
         // Separating comma
-        if(cc>0) stream << ",";
+        if(cc>0) stream << ", ";
 
         // Check if nonzero
         if(cind[cc]<colind(cc+1) && row(cind[cc])==rr) {
@@ -663,7 +663,7 @@ namespace casadi {
 
       // End of row
       if(rr<size1()-1) {
-        stream << "],";
+        stream << "], ";
         if(!oneliner) stream << std::endl;
       } else {
         stream << "]]";
@@ -685,7 +685,7 @@ namespace casadi {
       for(int cc=0; cc<size2(); ++cc) {
         for(int el=colind(cc); el<colind(cc+1); ++el) {
           int rr=row(el);
-          stream << " (" << rr << "," << cc << ") -> " << at(el) << std::endl;
+          stream << " (" << rr << ", " << cc << ") -> " << at(el) << std::endl;
         }
       }
     }
@@ -1389,13 +1389,13 @@ namespace casadi {
   template<typename DataType>
   void Matrix<DataType>::remove(const std::vector<int>& rr, const std::vector<int>& cc) {
     if (!inBounds(rr, size1())) {
-      casadi_error("Remove(rr,cc) out of bounds. Your rr contains "
+      casadi_error("Remove(rr, cc) out of bounds. Your rr contains "
                    << *std::min_element(rr.begin(), rr.end()) << " up to "
                    << *std::max_element(rr.begin(), rr.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
     if (!inBounds(cc, size2())) {
-      casadi_error("Remove(rr,cc) out of bounds. Your cc contains "
+      casadi_error("Remove(rr, cc) out of bounds. Your cc contains "
                    << *std::min_element(cc.begin(), cc.end()) << " up to "
                    << *std::max_element(cc.begin(), cc.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
@@ -1840,7 +1840,7 @@ namespace casadi {
 
     if (!(x.size2() == y.size2() && x.size1() == y.size1())) {
       std::stringstream ss;
-      casadi_math<DataType>::print(op, ss, "lhs","rhs");
+      casadi_math<DataType>::print(op, ss, "lhs", "rhs");
       casadi_error("matrix_matrix: dimension mismatch in element-wise matrix operation "
                    << ss.str() <<"." << std::endl << "Left argument has shape " << x.dimString()
                    << ", right has shape " << y.dimString() << ". They should be equal."
@@ -1914,7 +1914,7 @@ namespace casadi {
                                              const std::vector<DataType>& d,
                                              int nrow, int ncol) {
     casadi_assert_message(col.size()==row.size() && col.size()==d.size(),
-                          "Argument error in Matrix<DataType>::sparse(row,col,d): "
+                          "Argument error in Matrix<DataType>::sparse(row, col, d): "
                           "supplied lists must all be of equal length, but got: "
                           << row.size() << ", " << col.size()  << " and " << d.size());
     std::vector<int> mapping;
@@ -1932,7 +1932,7 @@ namespace casadi {
   template<typename DataType>
   Matrix<DataType> Matrix<DataType>::repmat(const Matrix<DataType>& x, const Sparsity& sp) {
     casadi_assert_message(x.isScalar(),
-                          "repmat(Matrix<DataType> x,Sparsity sp) only defined for scalar x");
+                          "repmat(Matrix<DataType> x, Sparsity sp) only defined for scalar x");
     return Matrix<DataType>(sp, x.toScalar());
   }
 

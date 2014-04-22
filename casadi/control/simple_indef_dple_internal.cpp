@@ -42,7 +42,7 @@ namespace casadi {
       const std::vector< Sparsity > &V) : DpleInternal(A, V) {
 
     // set default options
-    setOption("name","unnamed_simple_indef_dple_solver"); // name of the function
+    setOption("name", "unnamed_simple_indef_dple_solver"); // name of the function
 
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
@@ -67,8 +67,8 @@ namespace casadi {
     n_ = A_[0].size1();
 
 
-    MX As = MX::sym("A",n_,K_*n_);
-    MX Vs = MX::sym("V",n_,K_*n_);
+    MX As = MX::sym("A", n_, K_*n_);
+    MX Vs = MX::sym("V", n_, K_*n_);
 
     std::vector< MX > Vss = horzsplit(Vs, n_);
     std::vector< MX > Ass = horzsplit(As, n_);

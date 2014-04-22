@@ -97,7 +97,7 @@ namespace casadi {
     ImplicitFunctionInternal::init();
 
     // Free variable in the NLP
-    MX u = MX::sym("u",input(iin_).sparsity());
+    MX u = MX::sym("u", input(iin_).sparsity());
 
     // So that we can pass it on to createParent
     std::vector<Sparsity> sps;
@@ -119,7 +119,7 @@ namespace casadi {
     MX nlp_g = f_.call(args_call).at(iout_);
 
     // We're going to use two-argument objective and constraints to allow the use of parameters
-    MXFunction nlp(nlpIn("x",u,"p",p),nlpOut("f",nlp_f,"g",nlp_g));
+    MXFunction nlp(nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));
 
     // Create an nlpsolver instance
     NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");

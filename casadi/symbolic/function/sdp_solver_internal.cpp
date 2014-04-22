@@ -34,14 +34,14 @@ namespace casadi {
 
 // Constructor
 SDPSolverInternal::SDPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
-  addOption("calc_p",OT_BOOLEAN, true,
+  addOption("calc_p", OT_BOOLEAN, true,
             "Indicate if the P-part of primal solution should be allocated and calculated. "
             "You may want to avoid calculating this variable for problems with n large, "
             "as is always dense (m x m).");
-  addOption("calc_dual",OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. "
+  addOption("calc_dual", OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. "
             "You may want to avoid calculating this variable for problems with n large, "
             "as is always dense (m x m).");
-  addOption("print_problem",OT_BOOLEAN,false,"Print out problem statement for debugging.");
+  addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");
 
   casadi_assert_message(st_.size()==SDP_STRUCT_NUM, "Problem structure mismatch");
 
@@ -117,7 +117,7 @@ void SDPSolverInternal::init() {
   // Make a mapping function from dense blocks to inversely-permuted block diagonal P
   std::vector< SX > full_blocks;
   for (int i=0;i<nb_;++i) {
-    full_blocks.push_back(SX::sym("block",block_sizes_[i],block_sizes_[i]));
+    full_blocks.push_back(SX::sym("block", block_sizes_[i], block_sizes_[i]));
   }
 
   Pmapper_ = SXFunction(full_blocks, blkdiag(full_blocks)(lookupvector(p, p.size()),
@@ -126,8 +126,8 @@ void SDPSolverInternal::init() {
 
   if (nb_>0) {
     // Make a mapping function from (G, F) -> (G[p, p]_j, F_i[p, p]j)
-    SX G = SX::sym("G",input(SDP_SOLVER_G).sparsity());
-    SX F = SX::sym("F",input(SDP_SOLVER_F).sparsity());
+    SX G = SX::sym("G", input(SDP_SOLVER_G).sparsity());
+    SX F = SX::sym("F", input(SDP_SOLVER_F).sparsity());
 
     std::vector<SX> in;
     in.push_back(G);

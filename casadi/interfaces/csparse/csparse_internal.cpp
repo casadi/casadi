@@ -68,8 +68,8 @@ namespace casadi {
       profileWriteName(CasadiOptions::profilingLog, this, "CSparse",
                        ProfilingData_FunctionType_Other, 2);
 
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare", -1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve", -1);
     }
   }
 

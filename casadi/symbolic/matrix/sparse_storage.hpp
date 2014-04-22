@@ -146,7 +146,7 @@ namespace casadi {
       } catch(std::out_of_range& ex) {
         std::stringstream ss;
         ss << "Out of range error in SparseStorage<>::at: " << k
-           << " not in range [0," << sparsity_.size() << ")";
+           << " not in range [0, " << sparsity_.size() << ")";
         throw CasadiException(ss.str());
       }
     }
@@ -159,7 +159,7 @@ namespace casadi {
       } catch(std::out_of_range& ex) {
         std::stringstream ss;
         ss << "Out of range error in SparseStorage<>::at: " << k
-           << " not in range [0," << size() << ")";
+           << " not in range [0, " << size() << ")";
         throw CasadiException(ss.str());
       }
     }

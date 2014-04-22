@@ -585,7 +585,7 @@ void OptionsFunctionalityNode::setOptionByAllowedIndex(const std::string &name, 
                         << "' has no list of allowed values.");
   const std::vector<GenericType> &vec = it->second;
   casadi_assert_message(i>=0 && i<= vec.size()-1, "setOptionAllowedIndex('" << name
-                        << "'," << i << "): index out of bounds. There are "
+                        << "', " << i << "): index out of bounds. There are "
                         << vec.size() << " allowed values.");
   setOption(name, vec[i]);
 }

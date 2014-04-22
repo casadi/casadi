@@ -94,15 +94,15 @@ namespace casadi {
   template<typename MatType>
   MatType cross(const GenericMatrix<MatType> &a, const GenericMatrix<MatType> &b, int dim) {
     casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),
-                          "cross(a,b): Inconsistent dimensions. Dimension of a ("
+                          "cross(a, b): Inconsistent dimensions. Dimension of a ("
                           << a.dimString() << " ) must equal that of b ("
                           << b.dimString() << ").");
 
     casadi_assert_message(a.size1()==3 || a.size2()==3,
-                          "cross(a,b): One of the dimensions of a should have length 3, but got "
+                          "cross(a, b): One of the dimensions of a should have length 3, but got "
                           << a.dimString() << ".");
     casadi_assert_message(dim==-1 || dim==1 || dim==2,
-                          "cross(a,b,dim): Dim must be 1, 2 or -1 (automatic).");
+                          "cross(a, b, dim): Dim must be 1, 2 or -1 (automatic).");
 
     std::vector<MatType> ret(3);
 

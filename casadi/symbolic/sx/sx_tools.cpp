@@ -173,7 +173,7 @@ namespace casadi {
           vdef_mod[k] = SX(v[k].sparsity(), vdef[k].at(0));
           return substitute(ex, v, vdef_mod);
         } else {
-          casadi_error("subsitute(ex,v,vdef): sparsities of v and vdef must match. Got v: "
+          casadi_error("subsitute(ex, v, vdef): sparsities of v and vdef must match. Got v: "
                        << v[k].dimString() << " and " << "vdef: " << vdef[k].dimString() << ".");
         }
       }
@@ -725,7 +725,7 @@ namespace casadi {
 
       // We shall find out which variables enter nonlinearily in the equations,
       // for this we need a function that will depend on all the variables
-      SXFunction fcnb_all(xb, inner_prod(SX(fb), SX::sym("dum1",fb.size())));
+      SXFunction fcnb_all(xb, inner_prod(SX(fb), SX::sym("dum1", fb.size())));
       fcnb_all.init();
 
       // Take the gradient of this function to find out
@@ -737,7 +737,7 @@ namespace casadi {
 
       // Multiply this expression with a new dummy vector and take the jacobian to
       // find out which variables enter nonlinearily
-      SXFunction fcnb_nonlin(xb, inner_prod(fcnb_dep, SX::sym("dum2",fcnb_dep.size())));
+      SXFunction fcnb_nonlin(xb, inner_prod(fcnb_dep, SX::sym("dum2", fcnb_dep.size())));
       fcnb_nonlin.init();
       Sparsity sp_nonlin = fcnb_nonlin.jacSparsity().transpose();
 
@@ -1014,7 +1014,7 @@ namespace casadi {
     // Extract shared subexpressions from ex
     vector<SXElement> v, vdef;
     SX ex_extracted = ex;
-    extractShared(ex_extracted.data(), v, vdef, "@","");
+    extractShared(ex_extracted.data(), v, vdef, "@", "");
 
     // Print the expression without shared subexpressions
     ex_extracted.print(stream);

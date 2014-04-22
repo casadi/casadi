@@ -140,8 +140,8 @@ namespace casadi {
     casadi_assert_message(f.output(DAE_QUAD).isEmpty(),
                           "Supplied function cannot have quadrature states.");
 
-    MX X = MX::sym("X",f.input(DAE_X).sparsity());
-    MX P = MX::sym("P",f.input(DAE_P).sparsity());
+    MX X = MX::sym("X", f.input(DAE_X).sparsity());
+    MX P = MX::sym("P", f.input(DAE_P).sparsity());
     MX X0 = X;
     MX t = 0;
     MX dt = tf/ne;
@@ -165,8 +165,8 @@ namespace casadi {
         for (int jj=0;jj<j;++jj) {
           XL+=k.at(jj)*A.at(j-1).at(jj);
         }
-        //std::cout << "help: " << A.at(j-1) << "," << c.at(j) << std::endl;
-        k[j] = dt*f.call(daeIn("x",X+XL,"p",P,"t",t+dt*c.at(j)))[DAE_ODE];
+        //std::cout << "help: " << A.at(j-1) << ", " << c.at(j) << std::endl;
+        k[j] = dt*f.call(daeIn("x", X+XL, "p", P, "t", t+dt*c.at(j)))[DAE_ODE];
       }
 
       for (int j=0;j<order;++j) {
@@ -176,7 +176,7 @@ namespace casadi {
       t+= dt;
     }
 
-    MXFunction ret(integratorIn("x0",X0,"p",P),integratorOut("xf",X));
+    MXFunction ret(integratorIn("x0", X0, "p", P), integratorOut("xf", X));
 
     return ret;
   }
@@ -254,9 +254,9 @@ namespace casadi {
     int np = f.input(DAE_P).size();
 
     //Variables for one finite element
-    MX X = MX::sym("X",nx);
-    MX P = MX::sym("P",np);
-    MX V = MX::sym("V",order*(nx+nz)); // Unknowns
+    MX X = MX::sym("X", nx);
+    MX P = MX::sym("P", np);
+    MX V = MX::sym("V", order*(nx+nz)); // Unknowns
 
     MX X0 = X;
 
@@ -304,9 +304,9 @@ namespace casadi {
       std::vector<MX> f_out;
       MX t_l = t0_l+tau_root[j]*h;
       if (nz>0) {
-        f_out = f.call(daeIn("t",t_l,"x",Xc[j],"p",P,"z",Zc[j-1]));
+        f_out = f.call(daeIn("t", t_l, "x", Xc[j], "p", P, "z", Zc[j-1]));
       } else {
-        f_out = f.call(daeIn("t",t_l,"x",Xc[j],"p",P));
+        f_out = f.call(daeIn("t", t_l, "x", Xc[j], "p", P));
       }
       V_eq.push_back(h*f_out[DAE_ODE]-xp_j);
       V_eq.push_back(f_out[DAE_ALG]);
@@ -371,7 +371,7 @@ namespace casadi {
     }
 
     // Create a ruturn function with Integrator signature
-    MXFunction ret = MXFunction(integratorIn("x0",X0,"p",P),integratorOut("xf",X));
+    MXFunction ret = MXFunction(integratorIn("x0", X0, "p", P), integratorOut("xf", X));
     ret.init();
 
     return ret;

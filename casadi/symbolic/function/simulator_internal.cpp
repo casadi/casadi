@@ -36,7 +36,7 @@ namespace casadi {
                                        const Function& output_fcn,
                                        const vector<double>& grid) :
       integrator_(integrator), output_fcn_(output_fcn), grid_(grid) {
-    setOption("name","unnamed simulator");
+    setOption("name", "unnamed simulator");
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
 
     input_.scheme = SCHEME_IntegratorInput;
@@ -53,9 +53,9 @@ namespace casadi {
 
   void SimulatorInternal::init() {
     // Let the integration time start from the first point of the time grid.
-    if (!grid_.empty()) integrator_.setOption("t0",grid_[0]);
+    if (!grid_.empty()) integrator_.setOption("t0", grid_[0]);
     // Let the integration time stop at the last point of the time grid.
-    if (!grid_.empty()) integrator_.setOption("tf",grid_[grid_.size()-1]);
+    if (!grid_.empty()) integrator_.setOption("tf", grid_[grid_.size()-1]);
 
     casadi_assert_message(isNonDecreasing(grid_), "The supplied time grid must be non-decreasing.");
 
@@ -65,9 +65,9 @@ namespace casadi {
     // Generate an output function if there is none (returns the whole state)
     if(output_fcn_.isNull()) {
       SX t = SX::sym("t");
-      SX x = SX::sym("x",integrator_.input(INTEGRATOR_X0).sparsity());
-      SX z = SX::sym("z",integrator_.input(INTEGRATOR_Z0).sparsity());
-      SX p = SX::sym("p",integrator_.input(INTEGRATOR_P).sparsity());
+      SX x = SX::sym("x", integrator_.input(INTEGRATOR_X0).sparsity());
+      SX z = SX::sym("z", integrator_.input(INTEGRATOR_Z0).sparsity());
+      SX p = SX::sym("p", integrator_.input(INTEGRATOR_P).sparsity());
 
       vector<SX> arg(DAE_NUM_IN);
       arg[DAE_T] = t;

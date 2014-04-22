@@ -32,7 +32,7 @@ using namespace std;
 namespace casadi {
 
   ParallelizerInternal::ParallelizerInternal(const std::vector<Function>& funcs) : funcs_(funcs) {
-    addOption("parallelization", OT_STRING, "serial","","serial|openmp|mpi");
+    addOption("parallelization", OT_STRING, "serial", "", "serial|openmp|mpi");
   }
 
   ParallelizerInternal::~ParallelizerInternal() {

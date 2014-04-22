@@ -37,7 +37,7 @@ namespace casadi {
 
   IntegratorInternal::IntegratorInternal(const Function& f, const Function& g) : f_(f), g_(g) {
     // set default options
-    setOption("name","unnamed_integrator"); // name of the function
+    setOption("name", "unnamed_integrator"); // name of the function
 
     // Additional options
     addOption("print_stats",              OT_BOOLEAN,     false,
@@ -167,7 +167,7 @@ namespace casadi {
       std::stringstream ss;
       ss << "Integrator dimensions: nx=" << nx_ << ", nz="<< nz_
          << ", nq=" << nq_ << ", np=" << np_;
-      log("IntegratorInternal::init",ss.str());
+      log("IntegratorInternal::init", ss.str());
     }
 
     // read options
@@ -195,7 +195,7 @@ namespace casadi {
 
   std::pair<Function, Function> IntegratorInternal::getAugmented(int nfwd, int nadj,
                                                                 AugOffset& offset) {
-    log("IntegratorInternal::getAugmented","call");
+    log("IntegratorInternal::getAugmented", "call");
 
     //    cout << "here" << endl;
 
@@ -206,13 +206,13 @@ namespace casadi {
     offset = getAugOffset(nfwd, nadj);
 
     // Create augmented problem
-    MX aug_t = MX::sym("aug_t",f_.input(DAE_T).sparsity());
-    MX aug_x = MX::sym("aug_x",x0().size1(),offset.x.back());
-    MX aug_z = MX::sym("aug_z",std::max(z0().size1(),rz0().size1()),offset.z.back());
-    MX aug_p = MX::sym("aug_p",std::max(p().size1(),rp().size1()),offset.p.back());
-    MX aug_rx = MX::sym("aug_rx",x0().size1(),offset.rx.back());
-    MX aug_rz = MX::sym("aug_rz",std::max(z0().size1(),rz0().size1()),offset.rz.back());
-    MX aug_rp = MX::sym("aug_rp",std::max(qf().size1(),rp().size1()),offset.rp.back());
+    MX aug_t = MX::sym("aug_t", f_.input(DAE_T).sparsity());
+    MX aug_x = MX::sym("aug_x", x0().size1(), offset.x.back());
+    MX aug_z = MX::sym("aug_z", std::max(z0().size1(), rz0().size1()), offset.z.back());
+    MX aug_p = MX::sym("aug_p", std::max(p().size1(), rp().size1()), offset.p.back());
+    MX aug_rx = MX::sym("aug_rx", x0().size1(), offset.rx.back());
+    MX aug_rz = MX::sym("aug_rz", std::max(z0().size1(), rz0().size1()), offset.rz.back());
+    MX aug_rp = MX::sym("aug_rp", std::max(qf().size1(), rp().size1()), offset.rp.back());
 
     // Split up the augmented vectors
     vector<MX> aug_x_split = horzsplit(aug_x, offset.x);
@@ -481,7 +481,7 @@ namespace casadi {
   }
 
   void IntegratorInternal::spEvaluate(bool fwd) {
-    log("IntegratorInternal::spEvaluate","begin");
+    log("IntegratorInternal::spEvaluate", "begin");
 
     // Temporary vectors
     bvec_t *tmp_f1, *tmp_f2, *tmp_g1= NULL, *tmp_g2=NULL;
@@ -630,7 +630,7 @@ namespace casadi {
       z0().setZeroBV();
     }
 
-    log("IntegratorInternal::spEvaluate","end");
+    log("IntegratorInternal::spEvaluate", "end");
   }
 
   IntegratorInternal::AugOffset IntegratorInternal::getAugOffset(int nfwd, int nadj) {
@@ -684,7 +684,7 @@ namespace casadi {
   }
 
   Function IntegratorInternal::getDerivative(int nfwd, int nadj) {
-    log("IntegratorInternal::getDerivative","begin");
+    log("IntegratorInternal::getDerivative", "begin");
 
     // Form the augmented DAE
     AugOffset offset;
@@ -864,7 +864,7 @@ namespace casadi {
       if(nrz_>0) dd[INTEGRATOR_RZ0] = *zf_aug_it++;
       ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
-    log("IntegratorInternal::getDerivative","end");
+    log("IntegratorInternal::getDerivative", "end");
 
     // Create derivative function and return
     return MXFunction(ret_in, ret_out);
@@ -874,13 +874,13 @@ namespace casadi {
     vector<MX> arg = symbolicInput();
     vector<MX> res = shared_from_this<Function>().call(arg);
     MXFunction f(arg, res);
-    f.setOption("ad_mode","forward");
+    f.setOption("ad_mode", "forward");
     f.init();
     return f.jacobian(iind, oind, compact, symmetric);
   }
 
   void IntegratorInternal::reset() {
-    log("IntegratorInternal::reset","begin");
+    log("IntegratorInternal::reset", "begin");
 
     // Go to the start time
     t_ = t0_;
@@ -892,11 +892,11 @@ namespace casadi {
     // Reset summation states
     qf().set(0.0);
 
-    log("IntegratorInternal::reset","end");
+    log("IntegratorInternal::reset", "end");
   }
 
   void IntegratorInternal::resetB() {
-    log("IntegratorInternal::resetB","begin");
+    log("IntegratorInternal::resetB", "begin");
 
     // Go to the end time
     t_ = tf_;
@@ -908,7 +908,7 @@ namespace casadi {
     // Reset summation states
     rqf().set(0.0);
 
-    log("IntegratorInternal::resetB","end");
+    log("IntegratorInternal::resetB", "end");
   }
 
   void IntegratorInternal::setDerivativeOptions(Integrator& integrator, const AugOffset& offset) {

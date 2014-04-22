@@ -60,8 +60,8 @@ void DirectSingleShootingInternal::init() {
   }
 
   // Set t0 and tf
-  integrator_.setOption("t0",0);
-  integrator_.setOption("tf",tf_/nk_);
+  integrator_.setOption("t0", 0);
+  integrator_.setOption("tf", tf_/nk_);
   integrator_.init();
 
   // Path constraints present?
@@ -82,7 +82,7 @@ void DirectSingleShootingInternal::init() {
   // .....
   // nx x 1  (controls in interval i=nk-1)
 
-  MX V = MX::sym("V",NV);
+  MX V = MX::sym("V", NV);
   int offset = 0;
 
   // Global parameters
@@ -117,7 +117,7 @@ void DirectSingleShootingInternal::init() {
   // For all shooting nodes
   for(int k=0; k<nk_; ++k) {
     // Integrate
-    vector<MX> int_out = integrator_.call(integratorIn("x0",X,"p",vertcat(P,U[k])));
+    vector<MX> int_out = integrator_.call(integratorIn("x0", X, "p", vertcat(P, U[k])));
 
     // Store expression for state trajectory
     X = int_out[INTEGRATOR_XF];
@@ -128,18 +128,18 @@ void DirectSingleShootingInternal::init() {
     // Add path constraints
     if(path_constraints) {
       // TODO(Joel): Change signature of cfcn_: remove algebraic variable, add control
-      vector<MX> cfcn_out = cfcn_.call(daeIn("x",X,"p",U[k]));
+      vector<MX> cfcn_out = cfcn_.call(daeIn("x", X, "p", U[k]));
       nlp_g.push_back(cfcn_out.at(0));
     }
   }
 
   // Terminal cost
-  MX jk = mfcn_.call(mayerIn("x",X,"p",P)).at(0);
+  MX jk = mfcn_.call(mayerIn("x", X, "p", P)).at(0);
   nlp_j += jk;
 
   // NLP
-  nlp_ = MXFunction(nlpIn("x",V),nlpOut("f",nlp_j,"g",vertcat(nlp_g)));
-  nlp_.setOption("name","nlp");
+  nlp_ = MXFunction(nlpIn("x", V), nlpOut("f", nlp_j, "g", vertcat(nlp_g)));
+  nlp_.setOption("name", "nlp");
   nlp_.init();
 
   // Get the NLP creator function

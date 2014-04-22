@@ -128,7 +128,7 @@ void DirectCollocationInternal::init() {
   nlp_nx += nx_;                       // Final state
 
   // NLP variable vector
-  MX nlp_x = MX::sym("x",nlp_nx);
+  MX nlp_x = MX::sym("x", nlp_nx);
   int offset = 0;
 
   // Get collocated states and parametrized control
@@ -173,7 +173,7 @@ void DirectCollocationInternal::init() {
         }
 
         // Add collocation equations to the NLP
-        MX fk = ffcn_.call(daeIn("x",X[k][j],"p",U[k]))[DAE_ODE];
+        MX fk = ffcn_.call(daeIn("x", X[k][j], "p", U[k]))[DAE_ODE];
         nlp_g.push_back(h*fk - xp_jk);
     }
 
@@ -188,7 +188,7 @@ void DirectCollocationInternal::init() {
 
     // Add path constraints
     if(nh_>0) {
-      MX pk = cfcn_.call(daeIn("x",X[k+1][0],"p",U[k])).at(0);
+      MX pk = cfcn_.call(daeIn("x", X[k+1][0], "p", U[k])).at(0);
       nlp_g.push_back(pk);
     }
 
@@ -198,11 +198,11 @@ void DirectCollocationInternal::init() {
   }
 
   // Add end cost
-  MX Jk = mfcn_.call(mayerIn("x",X[nk_][0])).at(0);
+  MX Jk = mfcn_.call(mayerIn("x", X[nk_][0])).at(0);
   nlp_j += Jk;
 
   // Objective function of the NLP
-  nlp_ = MXFunction(nlpIn("x",nlp_x), nlpOut("f",nlp_j,"g",vertcat(nlp_g)));
+  nlp_ = MXFunction(nlpIn("x", nlp_x), nlpOut("f", nlp_j, "g", vertcat(nlp_g)));
 
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");

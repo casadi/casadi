@@ -43,7 +43,7 @@ namespace casadi {
     addOption("interpolation_order",           OT_INTEGER,  3,
               "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",
-              "Collocation scheme","radau|legendre");
+              "Collocation scheme", "radau|legendre");
     addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(),
               "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
@@ -62,7 +62,7 @@ namespace casadi {
               "An ODE/DAE integrator that can be used to generate a startup trajectory");
     addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(),
               "Options to be passed to the startup integrator");
-    setOption("name","unnamed_old_collocation_integrator");
+    setOption("name", "unnamed_old_collocation_integrator");
   }
 
   void OldCollocationIntegratorInternal::deepCopyMembers(
@@ -152,23 +152,23 @@ namespace casadi {
     casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9, "Check on collocation coefficients");
 
     // Initial state
-    MX X0 = MX::sym("X0",x0().sparsity());
+    MX X0 = MX::sym("X0", x0().sparsity());
 
     // Parameters
-    MX P = MX::sym("P",p().sparsity());
+    MX P = MX::sym("P", p().sparsity());
 
     // Backward state
-    MX RX0 = MX::sym("RX0",rx0().sparsity());
+    MX RX0 = MX::sym("RX0", rx0().sparsity());
 
     // Backward parameters
-    MX RP = MX::sym("RP",rp().sparsity());
+    MX RP = MX::sym("RP", rp().sparsity());
 
     // Collocated differential states and algebraic variables
     int nX = (nk*(deg+1)+1)*(nx_+nrx_);
     int nZ = nk*deg*(nz_+nrz_);
 
     // Unknowns
-    MX V = MX::sym("V",nX+nZ);
+    MX V = MX::sym("V", nX+nZ);
     int offset = 0;
 
     // Get collocated states, algebraic variables and times
@@ -352,11 +352,11 @@ namespace casadi {
     Function ifcn = MXFunction(ifcn_in, ifcn_out);
     std::stringstream ss_ifcn;
     ss_ifcn << "collocation_implicit_residual_" << getOption("name");
-    ifcn.setOption("name",ss_ifcn.str());
+    ifcn.setOption("name", ss_ifcn.str());
     ifcn.init();
     if(expand_f) {
       ifcn = SXFunction(shared_cast<MXFunction>(ifcn));
-      ifcn.setOption("name",ss_ifcn.str());
+      ifcn.setOption("name", ss_ifcn.str());
       ifcn.init();
     }
 
@@ -367,7 +367,7 @@ namespace casadi {
     implicit_solver_ = implicit_function_creator(ifcn, Function(), LinearSolver());
     std::stringstream ss_implicit_solver;
     ss_implicit_solver << "collocation_implicitsolver_" << getOption("name");
-    implicit_solver_.setOption("name",ss_implicit_solver.str());
+    implicit_solver_.setOption("name", ss_implicit_solver.str());
 
     // Pass options
     if(hasSetOption("implicit_solver_options")) {
@@ -387,8 +387,8 @@ namespace casadi {
       startup_integrator_ = startup_integrator_creator(f_, g_);
 
       // Pass options
-      startup_integrator_.setOption("t0",coll_time_.front().front());
-      startup_integrator_.setOption("tf",coll_time_.back().back());
+      startup_integrator_.setOption("t0", coll_time_.front().front());
+      startup_integrator_.setOption("tf", coll_time_.back().back());
 
       std::stringstream ss_startup_integrator;
       ss_startup_integrator << "collocation_startup_" << getOption("name");

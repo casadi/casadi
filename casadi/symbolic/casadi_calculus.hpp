@@ -425,14 +425,14 @@ namespace casadi {
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T* y, T* f, int n) {
       for(int i=0; i<n; ++i) {
-        BinaryOperation<I>::fcn(*x++,*y++, *f++);
+        BinaryOperation<I>::fcn(*x++, *y++, *f++);
       }
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T* x, const T* y, const T* f, T* d, int n) {
       for(int i=0; i<n; ++i, d+=2) {
-        BinaryOperation<I>::der(*x++,*y++, *f++, d);
+        BinaryOperation<I>::der(*x++, *y++, *f++, d);
       }
     }
   };
@@ -461,14 +461,14 @@ namespace casadi {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T* y, T* f, int n) {
       for(int i=0; i<n; ++i) {
-        BinaryOperation<I>::fcn(x,*y++, *f++);
+        BinaryOperation<I>::fcn(x, *y++, *f++);
       }
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T& x, const T* y, const T* f, T* d, int n) {
       for(int i=0; i<n; ++i, d+=2) {
-        BinaryOperation<I>::der(x,*y++, *f++, d);
+        BinaryOperation<I>::der(x, *y++, *f++, d);
       }
     }
   };

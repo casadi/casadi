@@ -45,7 +45,7 @@ using namespace std;
 namespace casadi {
 
   FunctionInternal::FunctionInternal() {
-    setOption("name","unnamed_function"); // name of the function
+    setOption("name", "unnamed_function"); // name of the function
     addOption("verbose",                  OT_BOOLEAN,             false,
               "Verbose evaluation -- for debugging");
     addOption("ad_mode",                  OT_STRING,              "automatic",
@@ -56,7 +56,7 @@ namespace casadi {
               "A user-defined field that can be used to identify "
               "the function or pass additional information");
     addOption("monitor",                  OT_STRINGVECTOR,        GenericType(),
-              "Monitors to be activated","inputs|outputs");
+              "Monitors to be activated", "inputs|outputs");
     addOption("regularity_check",         OT_BOOLEAN,             true,
               "Throw exceptions when NaN or Inf appears during evaluation");
     addOption("inputs_check",             OT_BOOLEAN,             true,
@@ -183,7 +183,7 @@ namespace casadi {
     // Give it a suitable name
     stringstream ss;
     ss << "gradient_" << getOption("name") << "_" << iind << "_" << oind;
-    ret.setOption("name",ss.str());
+    ret.setOption("name", ss.str());
 
     // Same input scheme
     ret.setInputScheme(input_.scheme);
@@ -212,7 +212,7 @@ namespace casadi {
     // Give it a suitable name
     stringstream ss;
     ss << "tangent_" << getOption("name") << "_" << iind << "_" << oind;
-    ret.setOption("name",ss.str());
+    ret.setOption("name", ss.str());
 
     // Same input scheme
     ret.setInputScheme(input_.scheme);
@@ -242,7 +242,7 @@ namespace casadi {
     // Give it a suitable name
     stringstream ss;
     ss << "hessian_" << getOption("name") << "_" << iind << "_" << oind;
-    ret.setOption("name",ss.str());
+    ret.setOption("name", ss.str());
 
     // Same input scheme
     ret.setInputScheme(input_.scheme);
@@ -278,12 +278,12 @@ namespace casadi {
     vector<MX> res = shared_from_this<Function>().call(arg);
 
     MXFunction f = MXFunction(arg, res);
-    f.setOption("name","wrap_" + string(getOption("name")));
+    f.setOption("name", "wrap_" + string(getOption("name")));
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
-    f.setOption("ad_mode",getOption("ad_mode")); // Why?
+    f.setOption("ad_mode", getOption("ad_mode")); // Why?
     if (hasSetOption("derivative_generator"))
-        f.setOption("derivative_generator",getOption("derivative_generator"));
+        f.setOption("derivative_generator", getOption("derivative_generator"));
 
     return f;
   }
@@ -294,7 +294,7 @@ namespace casadi {
     // Create gradient function
     log("FunctionInternal::getHessian generating gradient");
     Function g = gradient(iind, oind);
-    g.setOption("verbose",getOption("verbose"));
+    g.setOption("verbose", getOption("verbose"));
     g.setInputScheme(input_.scheme);
     g.init();
 
@@ -1517,8 +1517,8 @@ namespace casadi {
       // Give it a suitable name
       stringstream ss;
       ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
-      ret.setOption("name",ss.str());
-      ret.setOption("verbose",getOption("verbose"));
+      ret.setOption("name", ss.str());
+      ret.setOption("verbose", getOption("verbose"));
 
       // Same input scheme
       ret.setInputScheme(input_.scheme);
@@ -1610,7 +1610,7 @@ namespace casadi {
     // Give it a suitable name
     stringstream ss;
     ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
-    ret.setOption("name",ss.str());
+    ret.setOption("name", ss.str());
 
     // Names of inputs
     std::vector<std::string> i_names;
@@ -1910,7 +1910,7 @@ namespace casadi {
           arg[i].size2()==input(i).size2() && arg[i].size1()==input(i).size1(),
           "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function."
           << std::endl << input_.scheme.describeInput(i) <<  " has shape (" << input(i).size2()
-          << "," << input(i).size1() << ") while a shape (" << arg[i].size2() << ","
+          << ", " << input(i).size1() << ") while a shape (" << arg[i].size2() << ", "
           << arg[i].size1() << ") was supplied.");
       }
       createCall(arg, res, fseed, fsens, aseed, asens);
@@ -1965,8 +1965,8 @@ namespace casadi {
         // Give it a suitable name
         stringstream ss;
         ss << "jacobian_" << getOption("name");
-        ret.setOption("name",ss.str());
-        ret.setOption("verbose",getOption("verbose"));
+        ret.setOption("name", ss.str());
+        ret.setOption("verbose", getOption("verbose"));
 
         // Same input scheme
         ret.setInputScheme(input_.scheme);
@@ -2021,7 +2021,7 @@ namespace casadi {
       }
 
       // Create symbolic primitive
-      arg = MX::sym("x",sp_arg);
+      arg = MX::sym("x", sp_arg);
 
       // Split up and fix shape
       argv = horzsplit(arg, col_offset);
@@ -2048,7 +2048,7 @@ namespace casadi {
 
     // Create a SISO function
     MXFunction f(arg, res);
-    f.setOption("ad_mode",getOption("ad_mode"));
+    f.setOption("ad_mode", getOption("ad_mode"));
     f.init();
 
     // Form an expression for the full Jacobian
@@ -2064,7 +2064,7 @@ namespace casadi {
     } else {
       // Form a SIMO function
       MXFunction J_simo(arg, resv);
-      J_simo.setOption("name","J_simo");
+      J_simo.setOption("name", "J_simo");
       J_simo.init();
 
       // The inputs of J_simo in terms of jac_argv
@@ -2105,7 +2105,7 @@ namespace casadi {
     generateIO(gen);
 
     // Generate the actual function
-    generateFunction(gen.function_, "evaluate", "const d*","d*","d",gen);
+    generateFunction(gen.function_, "evaluate", "const d*", "d*", "d", gen);
 
     // Flush the code generator
     gen.flush(cfile);
@@ -2120,13 +2120,13 @@ namespace casadi {
 
     // Pass inputs
     for(int i=0; i<n_i; ++i) {
-      if(i!=0) cfile << ",";
+      if(i!=0) cfile << ", ";
       cfile << "x[" << i << "]";
     }
 
     // Pass outputs
     for(int i=0; i<n_o; ++i) {
-      if(i+n_i!= 0) cfile << ",";
+      if(i+n_i!= 0) cfile << ", ";
       cfile << "r[" << i << "]";
     }
 
@@ -2141,7 +2141,7 @@ namespace casadi {
 
       cfile << "#include <stdio.h>" << std::endl;
       cfile << "int main() {" << std::endl;
-      cfile << "  int i,j;" << std::endl;
+      cfile << "  int i, j;" << std::endl;
 
       // Declare input buffers
       for(int i=0; i<n_in; ++i) {
@@ -2167,14 +2167,14 @@ namespace casadi {
       for(int i=0; i<n_in; ++i) {
         cfile << "t_x" << i;
         if(i+1<n_in+n_out)
-          cfile << ",";
+          cfile << ", ";
       }
 
       // Pass output buffers
       for(int i=0; i<n_out; ++i) {
         cfile << "t_r" << i;
         if(i+1<n_out)
-          cfile << ",";
+          cfile << ", ";
       }
       cfile << "); " << std::endl;
 
@@ -2183,7 +2183,7 @@ namespace casadi {
       for(int i=0; i<n_out; ++i) {
         int n = output(i).sparsity().size();
         for(int j=0; j<n && j<5; ++j) {
-          cfile << "    printf(\"%g \",t_r" << i << "[" << j << "]);" << std::endl;
+          cfile << "    printf(\"%g \", t_r" << i << "[" << j << "]);" << std::endl;
         }
         cfile << "    printf(\"\\n\");" << std::endl;
       }
@@ -2215,14 +2215,14 @@ namespace casadi {
     for(int i=0; i<n_in; ++i) {
       stream << input_type << " x" << i;
       if(i+1<n_in+n_out)
-        stream << ",";
+        stream << ", ";
     }
 
     // Declare outputs
     for(int i=0; i<n_out; ++i) {
       stream << output_type << " r" << i;
       if(i+1<n_out)
-        stream << ",";
+        stream << ", ";
     }
     stream << ") { " << std::endl;
 
@@ -2377,7 +2377,7 @@ namespace casadi {
 
     // Load it
     ExternalFunction f_gen("./" + dlname);
-    f_gen.setOption("name",fname + "_gen");
+    f_gen.setOption("name", fname + "_gen");
 
     // Initialize it if f was initialized
     if(f_is_init) {
@@ -2614,8 +2614,8 @@ namespace casadi {
 
         int sp_arg = gen.getSparsity(node->dep(i).sparsity());
         int sp_input = gen.addSparsity(input(i).sparsity());
-        stream << "  casadi_copy_sparse(" << arg[i] << ",s" << sp_arg << "," << arg_mod[i]
-               << ",s" << sp_input << ");" << std::endl;
+        stream << "  casadi_copy_sparse(" << arg[i] << ", s" << sp_arg << ", " << arg_mod[i]
+               << ", s" << sp_input << ");" << std::endl;
       }
     }
 
@@ -2626,7 +2626,7 @@ namespace casadi {
     // Pass inputs to the function input buffers
     for(int i=0; i<arg.size(); ++i) {
       stream << arg_mod.at(i);
-      if(i+1<arg.size()+res.size()) stream << ",";
+      if(i+1<arg.size()+res.size()) stream << ", ";
     }
 
     // Separate arguments and results with an extra space
@@ -2635,7 +2635,7 @@ namespace casadi {
     // Pass results to the function input buffers
     for(int i=0; i<res.size(); ++i) {
       stream << res.at(i);
-      if(i+1<res.size()) stream << ",";
+      if(i+1<res.size()) stream << ", ";
     }
 
     // Finalize the function call
@@ -2740,7 +2740,7 @@ namespace casadi {
     } else if (part == getNumInputs()) {
       stream << "])";
     } else {
-      stream << ",";
+      stream << ", ";
     }
   }
 

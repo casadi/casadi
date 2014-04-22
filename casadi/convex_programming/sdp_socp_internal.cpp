@@ -102,10 +102,10 @@ void SDPSOCPInternal::init() {
   */
 
 
-  MX G = MX::sym("G",input(SOCP_SOLVER_G).sparsity());
-  MX H = MX::sym("H",input(SOCP_SOLVER_H).sparsity());
-  MX E = MX::sym("E",input(SOCP_SOLVER_E).sparsity());
-  MX F = MX::sym("F",input(SOCP_SOLVER_F).sparsity());
+  MX G = MX::sym("G", input(SOCP_SOLVER_G).sparsity());
+  MX H = MX::sym("H", input(SOCP_SOLVER_H).sparsity());
+  MX E = MX::sym("E", input(SOCP_SOLVER_E).sparsity());
+  MX F = MX::sym("F", input(SOCP_SOLVER_F).sparsity());
 
 
   int i_start;
@@ -154,14 +154,14 @@ void SDPSOCPInternal::init() {
   mapping_ = MXFunction(syms, out);
   mapping_.init();
 
-  log("SDPSOCPInternal::init","Created mapping function");
+  log("SDPSOCPInternal::init", "Created mapping function");
 
   // Create an sdpsolver instance
   SDPSolverCreator sdpsolver_creator = getOption("sdp_solver");
   sdpsolver_ = sdpsolver_creator(
-    sdpStruct("a",input(SOCP_SOLVER_A).sparsity(),
-              "f",mapping_.output(0).sparsity(),
-              "g",mapping_.output(1).sparsity()));
+    sdpStruct("a", input(SOCP_SOLVER_A).sparsity(),
+              "f", mapping_.output(0).sparsity(),
+              "g", mapping_.output(1).sparsity()));
 
   sdpsolver_.setSOCPOptions();
   if(hasSetOption("sdp_solver_options")) {
@@ -171,7 +171,7 @@ void SDPSOCPInternal::init() {
   // Initialize the SDP solver
   sdpsolver_.init();
 
-  log("SDPSOCPInternal::init","Initialized SDP solver");
+  log("SDPSOCPInternal::init", "Initialized SDP solver");
 }
 
 } // namespace casadi

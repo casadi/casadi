@@ -79,7 +79,7 @@ namespace casadi {
         // Get the attributes
         string name        = vnode.getAttribute("name");
         int valueReference;
-        vnode.readAttribute("valueReference",valueReference);
+        vnode.readAttribute("valueReference", valueReference);
         string variability = vnode.getAttribute("variability");
         string causality   = vnode.getAttribute("causality");
         string alias       = vnode.getAttribute("alias");
@@ -140,20 +140,20 @@ namespace casadi {
           // Other properties
           if(vnode.hasChild("Real")) {
             const XMLNode& props = vnode["Real"];
-            props.readAttribute("unit",var.unit,false);
-            props.readAttribute("displayUnit",var.displayUnit,false);
+            props.readAttribute("unit", var.unit, false);
+            props.readAttribute("displayUnit", var.displayUnit, false);
             double dmin = -numeric_limits<double>::infinity();
-            props.readAttribute("min",dmin,false);
+            props.readAttribute("min", dmin, false);
             var.min = dmin;
             double dmax =  numeric_limits<double>::infinity();
-            props.readAttribute("max",dmax,false);
+            props.readAttribute("max", dmax, false);
             var.max = dmax;
             double dinitialGuess = 0;
-            props.readAttribute("initialGuess",dinitialGuess,false);
+            props.readAttribute("initialGuess", dinitialGuess, false);
             var.initialGuess = dinitialGuess;
-            props.readAttribute("start",var.start,false);
-            props.readAttribute("nominal",var.nominal,false);
-            props.readAttribute("free",var.free,false);
+            props.readAttribute("start", var.start, false);
+            props.readAttribute("nominal", var.nominal, false);
+            props.readAttribute("free", var.free, false);
           }
 
           // Variable category
@@ -301,11 +301,11 @@ namespace casadi {
       for(int i=0; i<tp.size(); ++i) {
         // Get index
         int index;
-        tpnode[i].readAttribute("index",index);
+        tpnode[i].readAttribute("index", index);
 
         // Get value
         double value;
-        tpnode[i].readAttribute("value",value);
+        tpnode[i].readAttribute("value", value);
         tp[i] = value;
 
         if(!ignore_timed_variables_) {
@@ -531,7 +531,7 @@ namespace casadi {
       } else {
         // Get the index of the time point
         int index;
-        node.readAttribute("timePointIndex",index);
+        node.readAttribute("timePointIndex", index);
         return readVariable(node[0]).atTime(tp[index]);
       }
     }
@@ -718,7 +718,7 @@ namespace casadi {
       this->q.append(qv.v);
 
       // Add the Lagrange term to the list of quadratures
-      setOde(qv.v,*it);
+      setOde(qv.v, *it);
 
       // Add to the list of Mayer terms
       this->mterm.append(qv.v);
@@ -814,14 +814,14 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    setOde(this->x,*it++);
+    setOde(this->x, *it++);
     this->alg = *it++;
-    setOde(this->q,*it++);
-    setBeq(this->y,*it++);
+    setOde(this->q, *it++);
+    setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
-    setBeq(this->pd,*it++);
+    setBeq(this->pd, *it++);
     casadi_assert(it==ex.end());
   }
 
@@ -884,10 +884,10 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    setOde(this->x,*it++);
+    setOde(this->x, *it++);
     this->alg = *it++;
-    setOde(this->q,*it++);
-    setBeq(this->y,*it++);
+    setOde(this->q, *it++);
+    setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
@@ -953,10 +953,10 @@ namespace casadi {
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
     this->dae = *it++;
-    setOde(this->x,*it++);
+    setOde(this->x, *it++);
     this->alg = *it++;
-    setOde(this->q,*it++);
-    setBeq(this->y,*it++);
+    setOde(this->q, *it++);
+    setBeq(this->y, *it++);
     this->initial = *it++;
     this->mterm = *it++;
     this->lterm = *it++;
@@ -1130,17 +1130,17 @@ namespace casadi {
                             "Cannot find an explicit expression for variable(s) " << xb);
 
       // Divide fb into a part which depends on vb and a part which doesn't according to
-      // "fb == mul(Jb,vb) + fb_res"
+      // "fb == mul(Jb, vb) + fb_res"
       SX fb_res = substitute(fb, der(xb), SX::zeros(xb.sparsity()));
       SX fb_exp;
 
       // Solve for vb
       if (bs <= 3) {
         // Calculate inverse and multiply for very small matrices
-        fb_exp = mul(inv(Jb),-fb_res);
+        fb_exp = mul(inv(Jb), -fb_res);
       } else {
         // QR factorization
-        fb_exp = solve(Jb,-fb_res);
+        fb_exp = solve(Jb, -fb_res);
       }
 
       // Add to explicitly determined equations and variables
@@ -1219,17 +1219,17 @@ namespace casadi {
       } else { // The variables that we wish to determine enter linearly
 
         // Divide fb into a part which depends on vb and a part which doesn't
-        // according to "fb == mul(Jb,vb) + fb_res"
+        // according to "fb == mul(Jb, vb) + fb_res"
         SX fb_res = substitute(fb, zb, SX::zeros(zb.sparsity()));
 
         // Solve for vb
         SX fb_exp;
         if (bs <= 3) {
           // Calculate inverse and multiply for very small matrices
-          fb_exp = mul(inv(Jb),-fb_res);
+          fb_exp = mul(inv(Jb), -fb_res);
         } else {
           // QR factorization
-          fb_exp = solve(Jb,-fb_res);
+          fb_exp = solve(Jb, -fb_res);
         }
 
         // Add to explicitly determined equations and variables

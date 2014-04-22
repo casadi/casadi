@@ -29,7 +29,7 @@ std::string describeInput(InputOutputScheme scheme, int i) {
   std::stringstream ss;
   ss << "Input argument #" << i;
   if (scheme!=SCHEME_unknown) {
-    ss << " (" << getSchemeEntryEnumName(scheme,i) <<  " aka '" << getSchemeEntryName(scheme,i) << "')";
+    ss << " (" << getSchemeEntryEnumName(scheme, i) <<  " aka '" << getSchemeEntryName(scheme, i) << "')";
   }
   return ss.str();
 }
@@ -38,7 +38,7 @@ std::string describeOutput(InputOutputScheme scheme, int i) {
   std::stringstream ss;
   ss << "Output argument #" << i;
   if (scheme!=SCHEME_unknown) {
-    ss << " (" << getSchemeEntryEnumName(scheme,i) <<  " aka '" << getSchemeEntryName(scheme,i) << "')";
+    ss << " (" << getSchemeEntryEnumName(scheme, i) <<  " aka '" << getSchemeEntryName(scheme, i) << "')";
   }
   return ss.str();
 }

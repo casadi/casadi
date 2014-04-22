@@ -38,8 +38,8 @@ namespace casadi {
     addOption("interpolation_order",           OT_INTEGER,  3,
               "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",
-              "Collocation scheme","radau|legendre");
-    setOption("name","unnamed_collocation_integrator");
+              "Collocation scheme", "radau|legendre");
+    setOption("name", "unnamed_collocation_integrator");
   }
 
   void CollocationIntegratorInternal::deepCopyMembers(
@@ -102,12 +102,12 @@ namespace casadi {
     }
 
     // Symbolic inputs
-    MX x0 = MX::sym("x0",f_.input(DAE_X).sparsity());
-    MX p = MX::sym("p",f_.input(DAE_P).sparsity());
-    MX t = MX::sym("t",f_.input(DAE_T).sparsity());
+    MX x0 = MX::sym("x0", f_.input(DAE_X).sparsity());
+    MX p = MX::sym("p", f_.input(DAE_P).sparsity());
+    MX t = MX::sym("t", f_.input(DAE_T).sparsity());
 
     // Implicitly defined variables (z and x)
-    MX v = MX::sym("v",deg_*(nx_+nz_));
+    MX v = MX::sym("v", deg_*(nx_+nz_));
     vector<int> v_offset(1, 0);
     for(int d=0; d<deg_; ++d) {
       v_offset.push_back(v_offset.back()+nx_);
@@ -189,11 +189,11 @@ namespace casadi {
     if(!g_.isNull()) {
 
       // Symbolic inputs
-      MX rx0 = MX::sym("x0",g_.input(RDAE_RX).sparsity());
-      MX rp = MX::sym("p",g_.input(RDAE_RP).sparsity());
+      MX rx0 = MX::sym("x0", g_.input(RDAE_RX).sparsity());
+      MX rp = MX::sym("p", g_.input(RDAE_RP).sparsity());
 
       // Implicitly defined variables (rz and rx)
-      MX rv = MX::sym("v",deg_*(nrx_+nrz_));
+      MX rv = MX::sym("v", deg_*(nrx_+nrz_));
       vector<int> rv_offset(1, 0);
       for(int d=0; d<deg_; ++d) {
         rv_offset.push_back(rv_offset.back()+nrx_);

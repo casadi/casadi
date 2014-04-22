@@ -83,7 +83,7 @@ namespace casadi {
       name << "f" << ind;
 
       // Print to file
-      f->generateFunction(dependencies_, name.str(), "const d*","d*","d",*this);
+      f->generateFunction(dependencies_, name.str(), "const d*", "d*", "d", *this);
     }
 
     return ind;
@@ -92,7 +92,7 @@ namespace casadi {
   void CodeGenerator::printVector(std::ostream &s, const std::string& name, const vector<int>& v) {
     s << "int " << name << "[] = {";
     for(int i=0; i<v.size(); ++i) {
-      if(i!=0) s << ",";
+      if(i!=0) s << ", ";
       s << v[i];
     }
     s << "};" << endl;
@@ -102,7 +102,7 @@ namespace casadi {
                                   const vector<double>& v) {
     s << "d " << name << "[] = {";
     for(int i=0; i<v.size(); ++i) {
-      if(i!=0) s << ",";
+      if(i!=0) s << ", ";
       printConstant(s, v[i]);
     }
     s << "};" << endl;
@@ -326,7 +326,7 @@ namespace casadi {
                                         const std::string& y, int inc_y) {
     addAuxiliary(AUX_DOT);
     stringstream ss;
-    ss << "casadi_dot(" << n << "," << x << "," << inc_x << "," << y << "," << inc_y << ")";
+    ss << "casadi_dot(" << n << ", " << x << ", " << inc_x << ", " << y << ", " << inc_y << ")";
     return ss.str();
   }
 

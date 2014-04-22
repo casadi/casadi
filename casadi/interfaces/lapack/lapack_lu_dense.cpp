@@ -47,8 +47,8 @@ namespace casadi {
   LapackLUDenseInternal::LapackLUDenseInternal(const Sparsity& sparsity, int nrhs) :
       LinearSolverInternal(sparsity, nrhs) {
     // Equilibriate the matrix
-    addOption("equilibration",OT_BOOLEAN,true);
-    addOption("allow_equilibration_failure",OT_BOOLEAN,false);
+    addOption("equilibration", OT_BOOLEAN, true);
+    addOption("allow_equilibration_failure", OT_BOOLEAN, false);
   }
 
   LapackLUDenseInternal::~LapackLUDenseInternal() {
@@ -85,8 +85,8 @@ namespace casadi {
       profileWriteName(CasadiOptions::profilingLog, this, "LapackLUDense",
                        ProfilingData_FunctionType_Other, 2);
 
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare", -1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve", -1);
     }
   }
 
@@ -106,7 +106,7 @@ namespace casadi {
       double colcnd, rowcnd; // ratio of smallest to largest col/row scaling factor
       double amax; // absolute value of the largest matrix element
       int info = -100;
-      dgeequ_(&ncol_,&nrow_, getPtr(mat_), &ncol_, getPtr(r_),
+      dgeequ_(&ncol_, &nrow_, getPtr(mat_), &ncol_, getPtr(r_),
               getPtr(c_), &colcnd, &rowcnd, &amax, &info);
       if(info < 0)
           throw CasadiException("LapackQRDenseInternal::prepare: "
@@ -127,7 +127,7 @@ namespace casadi {
 
       // Equilibriate the matrix if scaling was successful
       if(info!=0)
-        dlaqge_(&ncol_,&nrow_, getPtr(mat_), &ncol_, getPtr(r_), getPtr(c_),
+        dlaqge_(&ncol_, &nrow_, getPtr(mat_), &ncol_, getPtr(r_), getPtr(c_),
                 &colcnd, &rowcnd, &amax, &equed_);
       else
         equed_ = 'N';

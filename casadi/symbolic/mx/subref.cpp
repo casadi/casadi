@@ -58,7 +58,7 @@ namespace casadi {
     if(part==0) {
       stream << "(";
     } else {
-      stream << "[" << i_ << "," << j_ << "])";
+      stream << "[" << i_ << ", " << j_ << "])";
     }
   }
 

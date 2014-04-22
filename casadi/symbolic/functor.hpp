@@ -59,7 +59,7 @@ namespace casadi {
   *   def c(f, nadj, nadir):
   *     print f
   *
-  *   ff.setOption("derivative_generator",c)
+  *   ff.setOption("derivative_generator", c)
   * \endcode
   *
   */
@@ -112,7 +112,7 @@ namespace casadi {
   *     print f
   *     return 0
   *
-  *   solver.setOption("iteration_callback",c)
+  *   solver.setOption("iteration_callback", c)
   * \endcode
   *
   */

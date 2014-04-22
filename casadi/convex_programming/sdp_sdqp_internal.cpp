@@ -61,8 +61,8 @@ namespace casadi {
     MX f_socp = sqrt(inner_prod(h_socp, h_socp));
     MX en_socp = 0.5/f_socp;
 
-    MX f_sdqp = MX::sym("f",input(SDQP_SOLVER_F).sparsity());
-    MX g_sdqp = MX::sym("g",input(SDQP_SOLVER_G).sparsity());
+    MX f_sdqp = MX::sym("f", input(SDQP_SOLVER_F).sparsity());
+    MX g_sdqp = MX::sym("g", input(SDQP_SOLVER_G).sparsity());
 
     std::vector<MX> fi(n_+1);
     MX znp = MX::sparse(n_+1, n_+1);
@@ -83,20 +83,20 @@ namespace casadi {
 
     g = blkdiag(g_sdqp, g);
 
-    IOScheme mappingIn("g_socp","h_socp","f_sdqp","g_sdqp");
-    IOScheme mappingOut("f","g");
+    IOScheme mappingIn("g_socp", "h_socp", "f_sdqp", "g_sdqp");
+    IOScheme mappingOut("f", "g");
 
-    mapping_ = MXFunction(mappingIn("g_socp",g_socp,"h_socp",h_socp,
-                                    "f_sdqp",f_sdqp,"g_sdqp",g_sdqp),
-                          mappingOut("f",horzcat(fi),"g",g));
+    mapping_ = MXFunction(mappingIn("g_socp", g_socp, "h_socp", h_socp,
+                                    "f_sdqp", f_sdqp, "g_sdqp", g_sdqp),
+                          mappingOut("f", horzcat(fi), "g", g));
     mapping_.init();
 
     // Create an sdpsolver instance
     SDPSolverCreator sdpsolver_creator = getOption("sdp_solver");
     sdpsolver_ = sdpsolver_creator(
-      sdpStruct("g",mapping_.output("g").sparsity(),
-                "f",mapping_.output("f").sparsity(),
-                "a",horzcat(input(SDQP_SOLVER_A).sparsity(),Sparsity::sparse(nc_,1))));
+      sdpStruct("g", mapping_.output("g").sparsity(),
+                "f", mapping_.output("f").sparsity(),
+                "a", horzcat(input(SDQP_SOLVER_A).sparsity(), Sparsity::sparse(nc_, 1))));
 
     if(hasSetOption("sdp_solver_options")) {
       sdpsolver_.setOption(getOption("sdp_solver_options"));
@@ -132,7 +132,7 @@ namespace casadi {
     std::copy(input(SDQP_SOLVER_C).begin(),
               input(SDQP_SOLVER_C).end(),
               mapping_.input("h_socp").begin());
-    cholesky_.solveL(&mapping_.input("h_socp").data().front(),1,true);
+    cholesky_.solveL(&mapping_.input("h_socp").data().front(), 1, true);
     for (int k=0;k<mapping_.input("h_socp").size();++k) {
       mapping_.input("h_socp").at(k)*= 0.5;
     }
@@ -145,8 +145,8 @@ namespace casadi {
     std::copy(input(SDQP_SOLVER_A).begin(),
               input(SDQP_SOLVER_A).end(),
               sdpsolver_.input(SDP_SOLVER_A).begin());
-    sdpsolver_.setInput(mapping_.output("f"),SDP_SOLVER_F);
-    sdpsolver_.setInput(mapping_.output("g"),SDP_SOLVER_G);
+    sdpsolver_.setInput(mapping_.output("f"), SDP_SOLVER_F);
+    sdpsolver_.setInput(mapping_.output("g"), SDP_SOLVER_G);
     std::copy(input(SDQP_SOLVER_LBA).begin(),
               input(SDQP_SOLVER_LBA).end(),
               sdpsolver_.input(SDP_SOLVER_LBA).begin());

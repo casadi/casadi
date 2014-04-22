@@ -35,9 +35,9 @@ namespace casadi {
 
 // Constructor
 SOCPSolverInternal::SOCPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
-  addOption("ni",OT_INTEGERVECTOR, GenericType(),
+  addOption("ni", OT_INTEGERVECTOR, GenericType(),
             "Provide the size of each SOC constraint. Must sum up to N.");
-  addOption("print_problem",OT_BOOLEAN,false,"Print out problem statement for debugging.");
+  addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");
 
   input_.scheme = SCHEME_SOCPInput;
   output_.scheme = SCHEME_SOCPOutput;

@@ -40,7 +40,7 @@ namespace casadi {
     if(part==0) {
       stream << "inner_prod(";
     } else if(part==1) {
-      stream << ",";
+      stream << ", ";
     } else {
       stream << ")";
     }

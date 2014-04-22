@@ -121,8 +121,8 @@ void SQICInternal::init() {
   for (int i=0;i<locA_.size();++i) locA_[i]+=1;
 
   // helper functions for augmented linear constraint matrix
-  MX a = MX::sym("A",st_[QP_STRUCT_A]);
-  MX g = MX::sym("g",n_);
+  MX a = MX::sym("A", st_[QP_STRUCT_A]);
+  MX g = MX::sym("g", n_);
   std::vector<MX> ins;
   ins.push_back(a);
   ins.push_back(g);
@@ -177,7 +177,7 @@ void SQICInternal::generateNativeCode(std::ostream& file) const {
   std::istringstream stream(resource_sqic_input);
   std::string line;
   while (std::getline(stream, line)) {
-    size_t b_i = line.find("bind ( C,");
+    size_t b_i = line.find("bind ( C, ");
     if (b_i!=std::string::npos) {
       file << line.substr(0, b_i) << std::endl;
     } else {
@@ -197,7 +197,7 @@ void SQICInternal::generateNativeCode(std::ostream& file) const {
 
   file << "  real(rp)                  :: Obj" << std::endl;
 
-  file << "  real(rp), allocatable:: bl(:), bu(:), x(:), valA(:), valH(:) ,pi(:), rc(:)"
+  file << "  real(rp), allocatable:: bl(:), bu(:), x(:), valA(:), valH(:) , pi(:), rc(:)"
        << std::endl;
   file << "  integer(ip), allocatable:: indA(:), locA(:), indH(:), locH(:), hEtype(:), hs(:)"
        << std::endl;

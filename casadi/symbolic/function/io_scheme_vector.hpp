@@ -69,7 +69,7 @@ namespace casadi {
       stream << "IOSchemeVector(" ;
       for (int i=0;i<this->data.size();++i) {
         stream << this->scheme.entry(i) << "=" << this->data[i];
-        if (i<this->data.size()-1) stream << ",";
+        if (i<this->data.size()-1) stream << ", ";
       }
 
       stream << ";" << this->scheme.name() <<  ")";

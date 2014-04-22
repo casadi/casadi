@@ -80,9 +80,9 @@ void QCQPQPInternal::init() {
 
   // Create an qcqpsolver instance
   QCQPSolverCreator qcqpsolver_creator = getOption("qcqp_solver");
-  qcqpsolver_ = qcqpsolver_creator(qcqpStruct("h",input(QP_SOLVER_H).sparsity(),
-                                              "p",Sparsity::sparse(n_,0),
-                                              "a",input(QP_SOLVER_A).sparsity()));
+  qcqpsolver_ = qcqpsolver_creator(qcqpStruct("h", input(QP_SOLVER_H).sparsity(),
+                                              "p", Sparsity::sparse(n_, 0),
+                                              "a", input(QP_SOLVER_A).sparsity()));
 
   qcqpsolver_.setQPOptions();
   if(hasSetOption("qcqp_solver_options")) {

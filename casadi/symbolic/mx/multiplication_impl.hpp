@@ -55,7 +55,7 @@ namespace casadi {
       stream << "+mul(";
     } else if(part==2) {
       if(TrX) stream << "'";
-      stream << ",";
+      stream << ", ";
     } else {
       if(TrY) stream << "'";
       stream << "))";
@@ -81,7 +81,7 @@ namespace casadi {
     if(input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
-    Matrix<T>::mul_no_alloc_tn(*input[1],*input[2], *output[0]);
+    Matrix<T>::mul_no_alloc_tn(*input[1], *input[2], *output[0]);
   }
 
   template<bool TrX, bool TrY>
@@ -126,9 +126,9 @@ namespace casadi {
     const size_t n = this->size();
     if(fwd) {
       if(zd!=rd) copy(zd, zd+n, rd);
-      DMatrix::mul_sparsity<true>(*input[1],*input[2], *input[0]);
+      DMatrix::mul_sparsity<true>(*input[1], *input[2], *input[0]);
     } else {
-      DMatrix::mul_sparsity<false>(*input[1],*input[2], *output[0]);
+      DMatrix::mul_sparsity<false>(*input[1], *input[2], *output[0]);
       if(zd!=rd) {
         for(int i=0; i<n; ++i) {
           zd[i] |= rd[i];
@@ -155,9 +155,9 @@ namespace casadi {
     // Perform sparse matrix multiplication
     gen.addAuxiliary(CodeGenerator::AUX_MM_TN_SPARSE);
     stream << "  casadi_mm_tn_sparse(";
-    stream << arg.at(1) << ",s" << gen.getSparsity(dep(1).sparsity()) << ",";
-    stream << arg.at(2) << ",s" << gen.getSparsity(dep(2).sparsity()) << ",";
-    stream << res.front() << ",s" << gen.getSparsity(sparsity()) << ");" << endl;
+    stream << arg.at(1) << ", s" << gen.getSparsity(dep(1).sparsity()) << ", ";
+    stream << arg.at(2) << ", s" << gen.getSparsity(dep(2).sparsity()) << ", ";
+    stream << res.front() << ", s" << gen.getSparsity(sparsity()) << ");" << endl;
   }
 
   template<bool TrX, bool TrY>

@@ -60,8 +60,8 @@ void DirectMultipleShootingInternal::init() {
   }
 
   // Set t0 and tf
-  integrator_.setOption("t0",0);
-  integrator_.setOption("tf",tf_/nk_);
+  integrator_.setOption("t0", 0);
+  integrator_.setOption("tf", tf_/nk_);
   integrator_.init();
 
   // Path constraints present?
@@ -86,7 +86,7 @@ void DirectMultipleShootingInternal::init() {
   // ------
   // nx x 1  (states at time i=nk)
 
-  MX V = MX::sym("V",NV);
+  MX V = MX::sym("V", NV);
 
   // Global parameters
   MX P = V(Slice(0, np_));
@@ -173,8 +173,8 @@ void DirectMultipleShootingInternal::init() {
   }
 
   // NLP
-  nlp_ = MXFunction(nlpIn("x",V),nlpOut("f",f,"g",g));
-  nlp_.setOption("ad_mode","forward");
+  nlp_ = MXFunction(nlpIn("x", V), nlpOut("f", f, "g", g));
+  nlp_.setOption("ad_mode", "forward");
   nlp_.init();
 
   // Get the NLP creator function

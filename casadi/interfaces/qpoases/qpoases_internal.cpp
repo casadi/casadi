@@ -53,7 +53,7 @@ QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QPSolverInte
 
   addOption("printLevel",             OT_STRING,  PrintLevel_to_string(ops.printLevel),
             "Defines the amount of text output during QP solution, "
-            "see Section 5.7","none|low|medium|high");
+            "see Section 5.7", "none|low|medium|high");
   addOption("enableRamping",          OT_BOOLEAN, BooleanType_to_bool(ops.enableRamping),
             "Enables ramping.");
   addOption("enableFarBounds",        OT_BOOLEAN, BooleanType_to_bool(ops.enableFarBounds),
@@ -68,7 +68,7 @@ QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QPSolverInte
             "Enables nonzero curvature  tests.");
   addOption("enableDriftCorrection",  OT_INTEGER, static_cast<int>(ops.enableDriftCorrection),
             "Specifies the frequency of drift corrections: 0: turns them off.");
-  addOption("enableCholeskyRefactorisation",OT_INTEGER,
+  addOption("enableCholeskyRefactorisation", OT_INTEGER,
             static_cast<int>(ops.enableCholeskyRefactorisation),
             "Specifies the frequency of a full re-factorisation of projected "
             "Hessian matrix: 0: turns them off,  1: uses them at each iteration etc.");

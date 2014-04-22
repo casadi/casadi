@@ -72,7 +72,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   }
 
   // Allocate variables
-  x = SX::sym("x",n_var);
+  x = SX::sym("x", n_var);
 
   // Allocate f and c
   f = SX::zeros(n_obj);

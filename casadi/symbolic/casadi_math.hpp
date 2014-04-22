@@ -503,7 +503,7 @@ inline void casadi_math<T>::printSep(unsigned char op, std::ostream &stream) {
     case OP_NE:        stream << "!=";       break;
     case OP_AND:       stream << "&&";       break;
     case OP_OR:        stream << "||";       break;
-    case OP_IF_ELSE_ZERO: stream << "?";      break;
+    case OP_IF_ELSE_ZERO: stream << "?";     break;
     default:           stream << ",";        break;
   }
 }

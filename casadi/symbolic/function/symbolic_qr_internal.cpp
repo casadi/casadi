@@ -68,7 +68,7 @@ namespace casadi {
     }
 
     // Symbolic expression for A
-    SX A = SX::sym("A",input(0).sparsity());
+    SX A = SX::sym("A", input(0).sparsity());
 
     // Get the inverted column permutation
     std::vector<int> inv_colperm(colperm_.size());
@@ -93,13 +93,13 @@ namespace casadi {
       stringstream ss;
       ss << "symbolic_qr_fact_fcn_" << this;
       fact_fcn_ = dynamicCompilation(fact_fcn, ss.str(),
-                                     "Symbolic QR factorization function",compiler);
+                                     "Symbolic QR factorization function", compiler);
     } else {
       fact_fcn_ = fact_fcn;
     }
 
     // Initialize factorization function
-    fact_fcn_.setOption("name","QR_fact");
+    fact_fcn_.setOption("name", "QR_fact");
     fact_fcn_.init();
 
     // Symbolic expressions for solve function
@@ -130,13 +130,13 @@ namespace casadi {
     if(codegen) {
       stringstream ss;
       ss << "symbolic_qr_solv_fcn_N_" << this;
-      solv_fcn_N_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_N",compiler);
+      solv_fcn_N_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_N", compiler);
     } else {
       solv_fcn_N_ = solv_fcn;
     }
 
     // Initialize solve function
-    solv_fcn_N_.setOption("name","QR_solv");
+    solv_fcn_N_.setOption("name", "QR_solv");
     solv_fcn_N_.init();
 
     // Solve transposed
@@ -160,13 +160,13 @@ namespace casadi {
     if(codegen) {
       stringstream ss;
       ss << "symbolic_qr_solv_fcn_T_" << this;
-      solv_fcn_T_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_T",compiler);
+      solv_fcn_T_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_T", compiler);
     } else {
       solv_fcn_T_ = solv_fcn;
     }
 
     // Initialize solve function
-    solv_fcn_T_.setOption("name","QR_solv_T");
+    solv_fcn_T_.setOption("name", "QR_solv_T");
     solv_fcn_T_.init();
 
     // Allocate storage for QR factorization
@@ -257,7 +257,7 @@ namespace casadi {
     int fact_ind = gen.getDependency(fact_fcn_);
     stream << "  if(!prepared) {" << endl;
     stream << "    for(i=0; i<" << input(LINSOL_A).size() << "; ++i) A[i]=x0[i];" << endl;
-    stream << "    f" << fact_ind << "(A,Q,R);" << endl;
+    stream << "    f" << fact_ind << "(A, Q, R);" << endl;
     stream << "    prepared = 1;" << endl;
     stream << "  }" << endl;
 
@@ -266,7 +266,7 @@ namespace casadi {
     int neq = input(LINSOL_B).size1();
     int nrhs = input(LINSOL_B).size2();
     stream << "  for(i=0; i<" << nrhs << "; ++i) {" << endl;
-    stream << "    f" << solv_ind_N << "(Q,R,x1,r0);" << endl;
+    stream << "    f" << solv_ind_N << "(Q, R, x1, r0);" << endl;
     stream << "    x1+=" << neq << "; r0+=" << neq << ";" << endl;
     stream << "  }" << endl;
   }

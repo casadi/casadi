@@ -46,10 +46,10 @@ namespace casadi {
       : DpleInternal(A, V, nfwd, nadj) {
 
     // set default options
-    setOption("name","unnamed_psd_indef_dple_solver"); // name of the function
+    setOption("name", "unnamed_psd_indef_dple_solver"); // name of the function
 
-    setOption("pos_def",false);
-    setOption("const_dim",true);
+    setOption("pos_def", false);
+    setOption("const_dim", true);
 
     addOption("linear_solver",            OT_LINEARSOLVER, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
@@ -157,10 +157,10 @@ namespace casadi {
       profileWriteName(CasadiOptions::profilingLog, this, "PsdIndefSolver",
                        ProfilingData_FunctionType_Other, 4);
 
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "periodic schur form",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "nominal",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 2, "forward",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog, this, 3, "adjoint",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "periodic schur form", -1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "nominal", -1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 2, "forward", -1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 3, "adjoint", -1);
     }
 
   }

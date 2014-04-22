@@ -148,9 +148,9 @@ namespace casadi {
   XFunctionInternal<PublicType, DerivedType, MatType, NodeType>::XFunctionInternal(
       const std::vector<MatType>& inputv,
       const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv) {
-    addOption("topological_sorting",OT_STRING,"depth-first","Topological sorting algorithm",
+    addOption("topological_sorting", OT_STRING, "depth-first", "Topological sorting algorithm",
               "depth-first|breadth-first");
-    addOption("live_variables",OT_BOOLEAN,true,"Reuse variables in the work vector");
+    addOption("live_variables", OT_BOOLEAN, true, "Reuse variables in the work vector");
 
     // Make sure that inputs are symbolic
     for(int i=0; i<inputv.size(); ++i) {
@@ -392,7 +392,7 @@ namespace casadi {
     for(int i=0; i<lind.size()-1; ++i) {
       int l = (lind[i+1] - lind[i]);
       //if(l>10)    std::cout << "#level " << i << ": " << l << std::endl;
-      std::cout << l << ",";
+      std::cout << l << ", ";
       if(l>maxl) maxl= l;
     }
     std::cout << std::endl << "maxl = " << maxl << std::endl;
@@ -436,7 +436,7 @@ namespace casadi {
 
       }
 
-      std::cout << l << ",";
+      std::cout << l << ", ";
       if(l>maxl) maxl= l;
     }
     std::cout << std::endl << "maxl (before) = " << maxl << std::endl;
@@ -495,7 +495,7 @@ namespace casadi {
 
       }
 
-      std::cout << l << ",";
+      std::cout << l << ", ";
       if(l>maxl) maxl= l;
     }
     std::cout << std::endl << "maxl = " << maxl << std::endl;

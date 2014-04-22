@@ -133,7 +133,7 @@ namespace casadi {
         if(G_sx.getNumInputs()>1) {
           nlp_in[NL_P] = G_sx.inputExpr(1);
         } else {
-          nlp_in[NL_P] = SX::sym("p",1,0);
+          nlp_in[NL_P] = SX::sym("p", 1, 0);
         }
 
         // Expression for f and g
@@ -155,7 +155,7 @@ namespace casadi {
           if(G_mx.getNumInputs()>1) {
             nlp_in[NL_P] = G_mx.inputExpr(1);
           } else {
-            nlp_in[NL_P] = MX::sym("p",1,0);
+            nlp_in[NL_P] = MX::sym("p", 1, 0);
           }
           nlp_out[NL_G] = G_mx.outputExpr(0);
           if(!F_mx.isNull()) { // Both are MXFunction, make sure they use the same variables
@@ -169,7 +169,7 @@ namespace casadi {
             if(F_mx.getNumInputs()>1) {
               nlp_in[NL_P] = F_mx.inputExpr(1);
             } else {
-              nlp_in[NL_P] = MX::sym("p",1,0);
+              nlp_in[NL_P] = MX::sym("p", 1, 0);
             }
             nlp_out[NL_F] = F_mx.outputExpr(0);
             nlp_out[NL_G] = G.call(F_mx.inputExpr()).front();

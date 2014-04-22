@@ -43,11 +43,11 @@ namespace casadi {
 
   SXFunctionInternal::SXFunctionInternal(const vector<SX >& inputv, const vector<SX >& outputv) :
     XFunctionInternal<SXFunction, SXFunctionInternal, SX, SXNode>(inputv, outputv) {
-    setOption("name","unnamed_sx_function");
-    addOption("just_in_time_sparsity", OT_BOOLEAN,false,
+    setOption("name", "unnamed_sx_function");
+    addOption("just_in_time_sparsity", OT_BOOLEAN, false,
               "Propagate sparsity patterns using just-in-time "
               "compilation to a CPU or GPU using OpenCL");
-    addOption("just_in_time_opencl", OT_BOOLEAN,false,
+    addOption("just_in_time_opencl", OT_BOOLEAN, false,
               "Just-in-time compilation for numeric evaluation using OpenCL (experimental)");
 
     // Check for duplicate entries among the input expressions
@@ -173,7 +173,7 @@ namespace casadi {
 
     // Create function
     SXFunction gfcn(inputv_.at(iind), g);
-    gfcn.setOption("verbose",getOption("verbose"));
+    gfcn.setOption("verbose", getOption("verbose"));
     gfcn.init();
 
     // Calculate jacobian of gradient
@@ -1177,7 +1177,7 @@ namespace casadi {
 
     // Generate the function
     CodeGenerator gen;
-    generateFunction(ss, "evaluate", "__global const double*","__global double*","double",gen);
+    generateFunction(ss, "evaluate", "__global const double*", "__global double*", "double", gen);
 
     // Form c-string
     std::string s = ss.str();

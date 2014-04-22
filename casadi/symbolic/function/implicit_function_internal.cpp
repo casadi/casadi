@@ -39,7 +39,7 @@ namespace casadi {
               "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
-    addOption("constraints",              OT_INTEGERVECTOR,GenericType(),
+    addOption("constraints",              OT_INTEGERVECTOR, GenericType(),
               "Constrain the unknowns. 0 (default): no constraint on ui, "
               "1: ui >= 0.0, -1: ui <= 0.0, 2: ui > 0.0, -2: ui < 0.0.");
     addOption("implicit_input",           OT_INTEGER,      0,

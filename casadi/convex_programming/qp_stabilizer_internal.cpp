@@ -53,7 +53,7 @@ namespace casadi {
     Sparsity H_sparsity_qp = blkdiag(st_[QP_STRUCT_H], Sparsity::diag(nc_));
     Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpStruct("h",H_sparsity_qp,"a",A_sparsity_qp));
+    qp_solver_ = qp_solver_creator(qpStruct("h", H_sparsity_qp, "a", A_sparsity_qp));
 
     // Pass options if provided
     if(hasSetOption("qp_solver_options")) {

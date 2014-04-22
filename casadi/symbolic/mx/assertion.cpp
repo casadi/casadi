@@ -42,7 +42,7 @@ namespace casadi {
     if(part==0) {
       stream << "assertion(";
     } else if(part==1) {
-       stream << ",";
+       stream << ", ";
     } else {
       stream << ")";
     }

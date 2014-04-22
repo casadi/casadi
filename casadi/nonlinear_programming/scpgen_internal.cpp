@@ -238,7 +238,7 @@ namespace casadi {
       }
 
       // Lagrange multipliers for the nonlinear constraints
-      g_lam = MX::sym("g_lam",ng_);
+      g_lam = MX::sym("g_lam", ng_);
 
       if(verbose_) {
         cout << "Allocated intermediate variables." << endl;
@@ -318,7 +318,7 @@ namespace casadi {
 
     // Generate c code and load as DLL
     if(codegen_) {
-      res_fcn_ = dynamicCompilation(res_fcn, "res_fcn","residual function",compiler);
+      res_fcn_ = dynamicCompilation(res_fcn, "res_fcn", "residual function", compiler);
     } else {
       res_fcn_ = res_fcn;
     }
@@ -433,7 +433,7 @@ namespace casadi {
 
     // Generate c code and load as DLL
     if(codegen_) {
-      mat_fcn_ = dynamicCompilation(mat_fcn, "mat_fcn","Matrices function",compiler);
+      mat_fcn_ = dynamicCompilation(mat_fcn, "mat_fcn", "Matrices function", compiler);
     } else {
       mat_fcn_ = mat_fcn;
     }
@@ -481,7 +481,7 @@ namespace casadi {
     casadi_assert(n==vec_fcn_out.size());
 
     MXFunction vec_fcn(mfcn_in, vec_fcn_out);
-    vec_fcn.setOption("name","vec_fcn");
+    vec_fcn.setOption("name", "vec_fcn");
     vec_fcn.init();
     if(verbose_) {
       cout << "Generated linearization function ( " << vec_fcn.getAlgorithmSize()
@@ -490,16 +490,16 @@ namespace casadi {
 
     // Generate c code and load as DLL
     if(codegen_) {
-      vec_fcn_ = dynamicCompilation(vec_fcn, "vec_fcn","linearization function",compiler);
+      vec_fcn_ = dynamicCompilation(vec_fcn, "vec_fcn", "linearization function", compiler);
     } else {
       vec_fcn_ = vec_fcn;
     }
 
     // Expression a + A*du in Lifted Newton (Section 2.1 in Alberspeyer2010)
-    MX du = MX::sym("du",nx_);   // Step in u
+    MX du = MX::sym("du", nx_);   // Step in u
     MX g_dlam;               // Step lambda_g
     if(!gauss_newton_) {
-      g_dlam = MX::sym("g_dlam",g_lam.sparsity());
+      g_dlam = MX::sym("g_dlam", g_lam.sparsity());
     }
 
     // Interpret the Jacobian-vector multiplication as a forward directional derivative
@@ -539,7 +539,7 @@ namespace casadi {
 
     // Step expansion function
     MXFunction exp_fcn(mfcn_in, exp_fcn_out);
-    exp_fcn.setOption("name","exp_fcn");
+    exp_fcn.setOption("name", "exp_fcn");
     exp_fcn.init();
     if(verbose_) {
       cout << "Generated step expansion function ( " << exp_fcn.getAlgorithmSize() << " nodes)."
@@ -548,7 +548,7 @@ namespace casadi {
 
     // Generate c code and load as DLL
     if(codegen_) {
-      exp_fcn_ = dynamicCompilation(exp_fcn, "exp_fcn","step expansion function",compiler);
+      exp_fcn_ = dynamicCompilation(exp_fcn, "exp_fcn", "step expansion function", compiler);
     } else {
       exp_fcn_ = exp_fcn;
     }
@@ -561,7 +561,7 @@ namespace casadi {
 
     // Allocate a QP solver
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpStruct("h",qpH_.sparsity(),"a",qpA_.sparsity()));
+    qp_solver_ = qp_solver_creator(qpStruct("h", qpH_.sparsity(), "a", qpA_.sparsity()));
 
     // Set options if provided
     if(hasSetOption("qp_solver_options")) {

@@ -40,9 +40,9 @@ using namespace std;
 namespace casadi {
 
   OOQPInternal::OOQPInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st) {
-    addOption("print_level",OT_INTEGER,0,"Print level. OOQP listens to print_level 0, 10 and 100");
-    addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
-    addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");
+    addOption("print_level", OT_INTEGER,0, "Print level. OOQP listens to print_level 0, 10 and 100");
+    addOption("mutol", OT_REAL,1e-8, "tolerance as provided with setMuTol to OOQP");
+    addOption("artol", OT_REAL,1e-8, "tolerance as provided with setArTol to OOQP");
   }
 
   OOQPInternal::~OOQPInternal() {
@@ -267,18 +267,18 @@ namespace casadi {
           tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
                                      vector<int>(jcolQ_.begin(), jcolQ_.begin()+nnzQ),
                                      vector<double>(dQ_.begin(), dQ_.begin()+nnzQ), nx, nx)) << endl;
-      cout << "c = " << vector<double>(c_.begin(),c_.begin()+nx) << endl;
-      cout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),irowA_.begin()+nnzA),
+      cout << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
+      cout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(), irowA_.begin()+nnzA),
                                         vector<int>(jcolA_.begin(), jcolA_.begin()+nnzA),
                                         vector<double>(dA_.begin(), dA_.begin()+nnzA), nA, nx) << endl;
-      cout << "b = " << vector<double>(bA_.begin(),bA_.begin()+nA) << endl;
-      cout << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),irowC_.begin()+nnzC),
+      cout << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
+      cout << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(), irowC_.begin()+nnzC),
                                         vector<int>(jcolC_.begin(), jcolC_.begin()+nnzC),
                                         vector<double>(dC_.begin(), dC_.begin()+nnzC), nC, nx) << endl;
-      cout << "d = " << printBounds(clow_,iclow_,nC,"-") << endl;
-      cout << "f = " << printBounds(cupp_,icupp_,nC,"") << endl;
-      cout << "l = " << printBounds(xlow_,ixlow_,nx,"-") << endl;
-      cout << "u = " << printBounds(xupp_,ixupp_,nx,"") << endl;
+      cout << "d = " << printBounds(clow_, iclow_, nC, "-") << endl;
+      cout << "f = " << printBounds(cupp_, icupp_, nC, "") << endl;
+      cout << "l = " << printBounds(xlow_, ixlow_, nx, "-") << endl;
+      cout << "u = " << printBounds(xupp_, ixupp_, nx, "") << endl;
     }
 
     // Reset the solution
@@ -422,7 +422,7 @@ namespace casadi {
     stringstream ss;
     ss << "[";
     for(int i=0; i<n; ++i) {
-      if(i!=0) ss << ",";
+      if(i!=0) ss << ", ";
       if(ib[i]==0) {
         ss << sign << "inf";
       } else {

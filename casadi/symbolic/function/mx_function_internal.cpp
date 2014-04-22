@@ -499,7 +499,7 @@ namespace casadi {
       } else {
         stream << "{";
         for(int i=0; i<el.res.size(); ++i) {
-          if(i!=0) stream << ",";
+          if(i!=0) stream << ", ";
           if(el.res[i]>=0) {
             stream << "@" << el.res[i];
           } else {
@@ -1117,7 +1117,7 @@ namespace casadi {
     f.setInputScheme(getInputScheme());
     f.setOutputScheme(getOutputScheme());
     string name = getOption("name");
-    f.setOption("name","expand_" + name);
+    f.setOption("name", "expand_" + name);
     return f;
   }
 
@@ -1198,8 +1198,8 @@ namespace casadi {
     stream << endl;
 
     // Temporary variables and vectors
-    stream << "  int i,j,k,*ii,*jj,*kk;" << endl;
-    stream << "  d r,s,t,*rr,*ss,*tt;" << endl;
+    stream << "  int i, j, k, *ii, *jj, *kk;" << endl;
+    stream << "  d r, s, t, *rr, *ss, *tt;" << endl;
     stream << "  static int iii[" << itmp_.size() << "];" << endl;
     stream << "  static d rrr[" << rtmp_.size() << "];" << endl;
 
@@ -1259,9 +1259,9 @@ namespace casadi {
 
       // Print the operation
       if(it->op==OP_OUTPUT) {
-        gen.copyVector(stream, arg.front(), output(it->res.front()).size(), res.front(), "i",true);
+        gen.copyVector(stream, arg.front(), output(it->res.front()).size(), res.front(), "i", true);
       } else if(it->op==OP_INPUT) {
-        gen.copyVector(stream, arg.front(), input(it->arg.front()).size(), res.front(), "i",false);
+        gen.copyVector(stream, arg.front(), input(it->arg.front()).size(), res.front(), "i", false);
       } else {
         it->data->generateOperation(stream, arg, res, gen);
       }
@@ -1345,13 +1345,13 @@ namespace casadi {
     vector<MX> f_out = f_G;
     f_out.insert(f_out.end(), g.begin(), g.end());
     vdef_fcn = MXFunction(f_in, f_out);
-    vdef_fcn.setOption("name","lifting_variable_definition");
+    vdef_fcn.setOption("name", "lifting_variable_definition");
 
     // Initial guess of intermediate variables
     f_in = inputv_;
     f_out = x_init;
     vinit_fcn = MXFunction(f_in, f_out);
-    vinit_fcn.setOption("name","lifting_variable_guess");
+    vinit_fcn.setOption("name", "lifting_variable_guess");
   }
 
 } // namespace casadi

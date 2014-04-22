@@ -92,12 +92,12 @@ void NLPQPInternal::init() {
   QPSolverInternal::init();
 
   // Create a symbolic matrix for the decision variables
-  SXMatrix X = ssym("X",n_,1);
+  SXMatrix X = ssym("X", n_,1);
 
   // Parameters to the problem
-  SXMatrix H = ssym("H",input(QP_SOLVER_H).sparsity());
-  SXMatrix G = ssym("G",input(QP_SOLVER_G).sparsity());
-  SXMatrix A = ssym("A",input(QP_SOLVER_A).sparsity());
+  SXMatrix H = ssym("H", input(QP_SOLVER_H).sparsity());
+  SXMatrix G = ssym("G", input(QP_SOLVER_G).sparsity());
+  SXMatrix A = ssym("A", input(QP_SOLVER_A).sparsity());
 
   // Put parameters in a vector
   std::vector< SXMatrix > par;
@@ -106,9 +106,9 @@ void NLPQPInternal::init() {
   par.push_back(A.data());
 
   // The nlp looks exactly like a mathematical description of the NLP
-  SXFunction QP_SOLVER_nlp(nlpIn("x",X,"p",vertcat(par)),
-		    nlpOut("f",mul(trans(G),X) + 0.5*mul(mul(trans(X),H),X),
-			   "g",mul(A,X)));
+  SXFunction QP_SOLVER_nlp(nlpIn("x", X, "p", vertcat(par)),
+		    nlpOut("f", mul(trans(G), X) + 0.5*mul(mul(trans(X), H), X),
+			   "g", mul(A, X)));
 
   // Create an nlpsolver instance
   NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");

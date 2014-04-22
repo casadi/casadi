@@ -2128,13 +2128,13 @@ namespace casadi {
 
   vector<int> SparsityInternal::erase(const vector<int>& jj, const vector<int>& ii) {
     if (!inBounds(jj, nrow_)) {
-      casadi_error("Slicing [jj,ii] out of bounds. Your jj contains " <<
+      casadi_error("Slicing [jj, ii] out of bounds. Your jj contains " <<
                    *std::min_element(jj.begin(), jj.end()) << " up to " <<
                    *std::max_element(jj.begin(), jj.end()) <<
                    ", which is outside of the matrix shape " << dimString() << ".");
     }
     if (!inBounds(ii, ncol_)) {
-      casadi_error("Slicing [jj,ii] out of bounds. Your ii contains "
+      casadi_error("Slicing [jj, ii] out of bounds. Your ii contains "
                    << *std::min_element(ii.begin(), ii.end()) << " up to "
                    << *std::max_element(ii.begin(), ii.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
@@ -2219,13 +2219,13 @@ namespace casadi {
 
   vector<int> SparsityInternal::getNZ(const vector<int>& jj, const vector<int>& ii) const {
     if (!inBounds(jj, nrow_)) {
-      casadi_error("Slicing [jj,ii] out of bounds. Your jj contains "
+      casadi_error("Slicing [jj, ii] out of bounds. Your jj contains "
                    << *std::min_element(jj.begin(), jj.end()) << " up to "
                    << *std::max_element(jj.begin(), jj.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
     if (!inBounds(ii, ncol_)) {
-      casadi_error("Slicing [jj,ii] out of bounds. Your ii contains "
+      casadi_error("Slicing [jj, ii] out of bounds. Your ii contains "
                    << *std::min_element(ii.begin(), ii.end()) << " up to "
                    << *std::max_element(ii.begin(), ii.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
@@ -2261,13 +2261,13 @@ namespace casadi {
   Sparsity SparsityInternal::sub(const vector<int>& jj, const vector<int>& ii,
                                  vector<int>& mapping) const {
     if (!inBounds(jj, nrow_)) {
-      casadi_error("Slicing [jj,ii] out of bounds. Your jj contains "
+      casadi_error("Slicing [jj, ii] out of bounds. Your jj contains "
                    << *std::min_element(jj.begin(), jj.end()) << " up to "
                    << *std::max_element(jj.begin(), jj.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
     }
     if (!inBounds(ii, ncol_)) {
-      casadi_error("Slicing [jj,ii] out of bounds. Your ii contains "
+      casadi_error("Slicing [jj, ii] out of bounds. Your ii contains "
                    << *std::min_element(ii.begin(), ii.end()) << " up to "
                    << *std::max_element(ii.begin(), ii.end())
                    << ", which is outside of the matrix shape " << dimString() << ".");
@@ -2275,7 +2275,7 @@ namespace casadi {
 
     if (static_cast<double>(ii.size())*static_cast<double>(jj.size()) > size()) {
       // Typical use case:
-      // a = SX::sym("a",sp_diag(50000))
+      // a = SX::sym("a", sp_diag(50000))
       // a[:, :]
       return sub2(jj, ii, mapping);
     } else {
@@ -2699,9 +2699,9 @@ namespace casadi {
 
     // Check consistency
     casadi_assert_message(rr>=0 && rr<nrow_, "Row index " << rr
-                          << " out of bounds [0," << nrow_ << ")");
+                          << " out of bounds [0, " << nrow_ << ")");
     casadi_assert_message(cc>=0 && cc<ncol_, "Column index " << cc
-                          << " out of bounds [0," << ncol_ << ")");
+                          << " out of bounds [0, " << ncol_ << ")");
 
     // Quick return if matrix is dense
     if(isDense()) return rr+cc*nrow_;
@@ -3608,7 +3608,7 @@ namespace casadi {
     bool first = true;
     for(int i=0; i<ncol_; ++i) {
       for(int el=colind_[i]; el<colind_[i+1]; ++el) {
-        if(!first) mfile << ",";
+        if(!first) mfile << ", ";
         mfile << (i+index_offset);
         first = false;
       }
@@ -3619,14 +3619,14 @@ namespace casadi {
     mfile << "j = [";
     first = true;
     for(vector<int>::const_iterator j=row_.begin(); j!=row_.end(); ++j) {
-      if(!first) mfile << ",";
+      if(!first) mfile << ", ";
       mfile << (*j+index_offset);
       first = false;
     }
     mfile << "];" << endl;
 
     // Generate matrix
-    mfile << "A = sparse(i,j,ones(size(i)),m,n)';" << endl;
+    mfile << "A = sparse(i, j, ones(size(i)), m, n)';" << endl;
 
     // Issue spy command
     mfile << "spy(A);" << endl;

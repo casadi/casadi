@@ -149,7 +149,7 @@ namespace casadi {
     } else if(part==ndep()) {
       stream << ")";
     } else {
-      stream << ",";
+      stream << ", ";
     }
   }
 
@@ -207,7 +207,7 @@ namespace casadi {
     } else if(part==ndep()) {
       stream << ")";
     } else {
-      stream << ",";
+      stream << ", ";
     }
   }
 

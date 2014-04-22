@@ -259,7 +259,7 @@ namespace casadi {
   #else // SWIG
   #ifdef SWIGPYTHON
 %pythoncode %{ #NOLINT(whitespace/braces)
-   def makeVector(T, size,*elems):
+   def makeVector(T, size, *elems):
       assert len(elems) % 2 == 0, \
         "The number of provided indices does not the number of provided values"
       num_elem = len(elems)/2
@@ -309,7 +309,7 @@ namespace std {
 
   template<typename T1, typename T2>
   ostream& operator<<(ostream &stream, const pair<T1, T2> &p) {
-    stream << "(" << p.first << "," << p.second << ")";
+    stream << "(" << p.first << ", " << p.second << ")";
     return stream;
   }
 
@@ -352,7 +352,7 @@ namespace casadi {
       stream << "[";
       stream << v.front();
       for(unsigned int i=1; i<v.size(); ++i)
-        stream << "," << v[i];
+        stream << ", " << v[i];
       stream << "]";
     }
   }
@@ -368,7 +368,7 @@ namespace casadi {
       // Print elements, ublas stype
       stream << "(";
       for(unsigned int i=0; i<v.size()-1; ++i)
-        stream << v[i] << ",";
+        stream << v[i] << ", ";
       if(!v.empty()) stream << v.back();
       stream << ")";
     }

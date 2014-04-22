@@ -59,9 +59,9 @@ namespace casadi {
 
     // Allocate an NLP solver
     implicit_solver_ = implicit_function_creator(F_, Function(), LinearSolver());
-    implicit_solver_.setOption("name",string(getOption("name")) + "_implicit_solver");
-    implicit_solver_.setOption("implicit_input",DAE_Z);
-    implicit_solver_.setOption("implicit_output",DAE_ALG);
+    implicit_solver_.setOption("name", string(getOption("name")) + "_implicit_solver");
+    implicit_solver_.setOption("implicit_input", DAE_Z);
+    implicit_solver_.setOption("implicit_output", DAE_ALG);
 
     // Pass options
     if(hasSetOption("implicit_solver_options")) {
@@ -82,8 +82,8 @@ namespace casadi {
       backward_implicit_solver_ = backward_implicit_function_creator(G_, Function(), LinearSolver());
       backward_implicit_solver_.setOption("name",
                                           string(getOption("name")) + "_backward_implicit_solver");
-      backward_implicit_solver_.setOption("implicit_input",RDAE_RZ);
-      backward_implicit_solver_.setOption("implicit_output",RDAE_ALG);
+      backward_implicit_solver_.setOption("implicit_input", RDAE_RZ);
+      backward_implicit_solver_.setOption("implicit_output", RDAE_ALG);
 
       // Pass options
       if(hasSetOption("implicit_solver_options")) {

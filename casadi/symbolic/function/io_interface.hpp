@@ -99,7 +99,7 @@ namespace casadi {
         } catch(std::out_of_range&) {
           std::stringstream ss;
           ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
-             << ": input " << i << " not in interval [0," << getNumInputs() << ")";
+             << ": input " << i << " not in interval [0, " << getNumInputs() << ")";
           if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl
                                                                << "Did you forget to initialize?";
           throw CasadiException(ss.str());
@@ -124,7 +124,7 @@ namespace casadi {
         } catch(std::out_of_range&) {
           std::stringstream ss;
           ss <<  "In function " << static_cast<const Derived*>(this)->getOption("name")
-             << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
+             << ": output " << i << " not in interval [0, " << getNumOutputs() << ")";
           if (!static_cast<const Derived*>(this)->isInit()) ss << std::endl
                                                                << "Did you forget to initialize?";
           throw CasadiException(ss.str());

@@ -156,7 +156,7 @@ namespace casadi {
     Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_) : jacG().output().sparsity();
 
     StabilizedQPSolverCreator stabilized_qp_solver_creator = getOption("stabilized_qp_solver");
-    stabilized_qp_solver_ = stabilized_qp_solver_creator(qpStruct("h",H_sparsity,"a",A_sparsity));
+    stabilized_qp_solver_ = stabilized_qp_solver_creator(qpStruct("h", H_sparsity, "a", A_sparsity));
 
     // Set options if provided
     if(hasSetOption("stabilized_qp_solver_options")) {
@@ -228,11 +228,11 @@ namespace casadi {
     // Create Hessian update function
     if(!exact_hessian_) {
       // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
-      SX Bk = SX::sym("Bk",H_sparsity);
-      SX x = SX::sym("x",input(NLP_SOLVER_X0).sparsity());
-      SX x_old = SX::sym("x",x.sparsity());
-      SX gLag = SX::sym("gLag",x.sparsity());
-      SX gLag_old = SX::sym("gLag_old",x.sparsity());
+      SX Bk = SX::sym("Bk", H_sparsity);
+      SX x = SX::sym("x", input(NLP_SOLVER_X0).sparsity());
+      SX x_old = SX::sym("x", x.sparsity());
+      SX gLag = SX::sym("gLag", x.sparsity());
+      SX gLag_old = SX::sym("gLag_old", x.sparsity());
 
       SX sk = x - x_old;
       SX yk = gLag - gLag_old;
@@ -779,7 +779,7 @@ namespace casadi {
         gsk_[i] = gk_[i]-s_[i];
       //normc_ = norm_2(gk_);
       //normcs_ = norm_2(gsk_);
-      dvMax_ = std::max(std::min(std::pow(beta_,(ls_iter-1))*dvMax_, 100.), 1e-8);
+      dvMax_ = std::max(std::min(std::pow(beta_, (ls_iter-1))*dvMax_, 100.), 1e-8);
     }
 
     // Save results to outputs

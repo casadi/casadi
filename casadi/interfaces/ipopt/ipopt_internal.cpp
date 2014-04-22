@@ -197,7 +197,7 @@ namespace casadi {
           new Ipopt::SmartPtr<Ipopt::SensApplication>();
       app_sens_ = static_cast<void*>(app_sens);
       *app_sens =
-          new Ipopt::SensApplication((*app)->Jnlst(),(*app)->Options(), (*app)->RegOptions());
+          new Ipopt::SensApplication((*app)->Jnlst(), (*app)->Options(), (*app)->RegOptions());
 
       // Register sIPOPT options
       Ipopt::RegisterOptions_sIPOPT((*app)->RegOptions());
@@ -999,13 +999,13 @@ namespace casadi {
 
   void IpoptInternal::setQPOptions() {
     // Can be enabled when a new bugfixed version of Ipopt comes out
-    //setOption("mehrotra_algorithm","yes");
-    //setOption("mu_oracle","probing");
+    //setOption("mehrotra_algorithm", "yes");
+    //setOption("mu_oracle", "probing");
 
     setOption("fixed_variable_treatment", "relax_bounds");
-    setOption("jac_c_constant","yes");
-    setOption("jac_d_constant","yes");
-    setOption("hessian_constant","yes");
+    setOption("jac_c_constant", "yes");
+    setOption("jac_d_constant", "yes");
+    setOption("hessian_constant", "yes");
   }
 
   DMatrix IpoptInternal::getReducedHessian() {

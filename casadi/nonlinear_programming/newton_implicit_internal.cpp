@@ -35,9 +35,9 @@ namespace casadi {
   NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac,
                                                  const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {
-    addOption("abstol",                      OT_REAL,1e-12,
+    addOption("abstol",                      OT_REAL, 1e-12,
               "Stopping criterion tolerance on max(|F|)");
-    addOption("abstolStep",                  OT_REAL,1e-12,
+    addOption("abstolStep",                  OT_REAL, 1e-12,
               "Stopping criterion tolerance on step size");
     addOption("max_iter",  OT_INTEGER, 1000,
               "Maximum number of Newton iterations to perform before returning.");
@@ -77,7 +77,7 @@ namespace casadi {
     while(true) {
       // Break if maximum number of iterations already reached
       if (iter >= max_iter_) {
-        log("evaluate","Max. iterations reached.");
+        log("evaluate", "Max. iterations reached.");
         stats_["return_status"] = "max_iteration_reached";
         success = false;
         break;
@@ -120,7 +120,7 @@ namespace casadi {
       if (monitored("normF"))
         std::cout << "  F (min, max, 1-norm, 2-norm) = "
                   << (*std::min_element(F.data().begin(), F.data().end()))
-                  << ", " << (*std::max_element(F.data().begin(),F.data().end()))
+                  << ", " << (*std::max_element(F.data().begin(), F.data().end()))
                   << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
       if (monitored("J")) std::cout << "  J = " << J << std::endl;
 

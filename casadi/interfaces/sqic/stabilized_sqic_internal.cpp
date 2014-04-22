@@ -135,8 +135,8 @@ void StabilizedSQICInternal::init() {
   for (int i=0;i<locA_.size();++i) locA_[i]+=1;
 
   // helper functions for augmented linear constraint matrix
-  MX a = MX::sym("A",st_[QP_STRUCT_A]);
-  MX g = MX::sym("g",n_);
+  MX a = MX::sym("A", st_[QP_STRUCT_A]);
+  MX g = MX::sym("g", n_);
   std::vector<MX> ins;
   ins.push_back(a);
   ins.push_back(g);
@@ -191,7 +191,7 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
   std::istringstream stream(resource_sqic_input);
   std::string line;
   while (std::getline(stream, line)) {
-    size_t b_i = line.find("bind ( C,");
+    size_t b_i = line.find("bind ( C, ");
     if (b_i!=std::string::npos) {
       file << line.substr(0, b_i) << std::endl;
     } else {
@@ -211,7 +211,7 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
 
   file << "  real(rp)                  :: Obj, mu" << std::endl;
 
-  file << "  real(rp), allocatable:: bl(:), bu(:), x(:), valA(:), valH(:) ,pi(:), piE(:), rc(:)"
+  file << "  real(rp), allocatable:: bl(:), bu(:), x(:), valA(:), valH(:) , pi(:), piE(:), rc(:)"
        << std::endl;
   file << "  integer(ip), allocatable:: indA(:), locA(:), indH(:), locH(:), hEtype(:), hs(:)"
        << std::endl;
@@ -291,7 +291,7 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
          << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
          << std::endl;
   }*/
-  file << "  call sqicSolveStabilized (Obj,mu,lenpi,piE)" << std::endl;
+  file << "  call sqicSolveStabilized (Obj, mu, lenpi, piE)" << std::endl;
   /**for (int i=0;i<input(QP_SOLVER_X0).size();++i) {
     file << "  x(" << i +1 << ") = " << input(QP_SOLVER_X0).at(i) << std::endl;
   }
@@ -303,7 +303,7 @@ void StabilizedSQICInternal::generateNativeCode(std::ostream& file) const {
          << ((i<input(QP_SOLVER_LAM_X0).size()) ? -input(QP_SOLVER_LAM_X0).at(i) : 0.0)
          << std::endl;
   }
-  file << "  call sqicSolveStabilized (Obj,mu,lenpi,piE)" << std::endl;**/
+  file << "  call sqicSolveStabilized (Obj, mu, lenpi, piE)" << std::endl;**/
   file << "  deallocate ( bl, bu )" << std::endl;
   file << "  deallocate ( hEtype )" << std::endl;
   file << "  deallocate ( locA, valA, indA )" << std::endl;

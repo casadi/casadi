@@ -60,19 +60,19 @@ namespace casadi {
     HomotopyNLPInternal::init();
 
     // Bundle p and tau together;
-    MX P = MX::sym("p",hnlp_.input(HNL_P).size()+1);
+    MX P = MX::sym("p", hnlp_.input(HNL_P).size()+1);
     std::vector<int> split;
     split.push_back(0);
     split.push_back(np_);
     split.push_back(np_+1);
     std::vector<MX> p_tau = vertsplit(P, split);
-    MX x = MX::sym("x",hnlp_.input(HNL_X).size());
+    MX x = MX::sym("x", hnlp_.input(HNL_X).size());
 
-    std::vector<MX> nlp_in = nlpIn("x",x,"p",P);
+    std::vector<MX> nlp_in = nlpIn("x", x, "p", P);
 
     MXFunction nlp(
-                    nlpIn("x",x,"p",P),
-                    hnlp_.call(hnlpIn("x",x,"p",p_tau[0],"tau",p_tau[1]))
+                    nlpIn("x", x, "p", P),
+                    hnlp_.call(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1]))
                   );
 
     // Create an nlpsolver instance

@@ -58,7 +58,7 @@ namespace casadi {
         stream << "]";
       stream << "{" << oind_ << "}";
     } else {
-      stream << ",";
+      stream << ", ";
     }
   }
 

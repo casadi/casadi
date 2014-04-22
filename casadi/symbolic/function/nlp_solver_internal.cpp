@@ -35,7 +35,7 @@ namespace casadi {
   NLPSolverInternal::NLPSolverInternal(const Function& nlp) : nlp_(nlp) {
 
     // Set default options
-    setOption("name","unnamed NLP solver"); // name of the function
+    setOption("name", "unnamed NLP solver"); // name of the function
 
     // Options available in all NLP solvers
     addOption("expand",             OT_BOOLEAN,  false,
@@ -62,7 +62,7 @@ namespace casadi {
               "If set to true, errors thrown by iteration_callback will be ignored.");
     addOption("ignore_check_vec",   OT_BOOLEAN,  false,
               "If set to true, the input shape of F will not be checked.");
-    addOption("warn_initial_bounds",OT_BOOLEAN,  false,
+    addOption("warn_initial_bounds", OT_BOOLEAN,  false,
               "Warn if the initial guess does not satisfy LBX and UBX");
 
     // Legacy options, will go away. See #566.
@@ -205,7 +205,7 @@ namespace casadi {
     double tol = 1e-8;
     if (hasOption("constr_viol_tol")) tol = getOption("constr_viol_tol");
     FunctionInternal::reportConstraints(stream, output(NLP_SOLVER_G), input(NLP_SOLVER_LBG),
-                                        input(NLP_SOLVER_UBG), "constraints",tol);
+                                        input(NLP_SOLVER_UBG), "constraints", tol);
   }
 
   Function& NLPSolverInternal::gradF() {
@@ -231,7 +231,7 @@ namespace casadi {
       jacF = nlp_.jacobian(NL_X, NL_F);
       log("Jacobian function generated");
     }
-    jacF.setOption("name","jac_f");
+    jacF.setOption("name", "jac_f");
     jacF.init(false);
     casadi_assert_message(jacF.getNumInputs()==GRADF_NUM_IN,
                           "Wrong number of inputs to the gradient function. "
@@ -254,7 +254,7 @@ namespace casadi {
       gradF = nlp_.gradient(NL_X, NL_F);
       log("Gradient function generated");
     }
-    gradF.setOption("name","grad_f");
+    gradF.setOption("name", "grad_f");
     gradF.init(false);
     casadi_assert_message(gradF.getNumInputs()==GRADF_NUM_IN,
                           "Wrong number of inputs to the gradient function. "
@@ -288,7 +288,7 @@ namespace casadi {
       jacG = nlp_.jacobian(NL_X, NL_G);
       log("Jacobian function generated");
     }
-    jacG.setOption("name","jac_g");
+    jacG.setOption("name", "jac_g");
     jacG.init(false);
     casadi_assert_message(jacG.getNumInputs()==JACG_NUM_IN,
                           "Wrong number of inputs to the Jacobian function. "
@@ -318,7 +318,7 @@ namespace casadi {
       gradLag = nlp_.derivative(0, 1);
       log("Gradient function generated");
     }
-    gradLag.setOption("name","grad_lag");
+    gradLag.setOption("name", "grad_lag");
     gradLag.init(false);
     log("Gradient function initialized");
     return gradLag;
@@ -341,7 +341,7 @@ namespace casadi {
       hessLag = gradLag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
       log("Hessian function generated");
     }
-    hessLag.setOption("name","hess_lag");
+    hessLag.setOption("name", "hess_lag");
     hessLag.init(false);
     casadi_assert_message(hessLag.getNumInputs()==HESSLAG_NUM_IN,
                           "Wrong number of inputs to the Hessian function. "

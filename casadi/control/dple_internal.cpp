@@ -40,15 +40,15 @@ namespace casadi {
       A_(A), V_(V), nfwd_(nfwd), nadj_(nadj) {
 
     // set default options
-    setOption("name","unnamed_dple_solver"); // name of the function
+    setOption("name", "unnamed_dple_solver"); // name of the function
 
-    addOption("const_dim",OT_BOOLEAN,true,"Assume constant dimension of P");
-    addOption("pos_def",OT_BOOLEAN,false,"Assume P positive definite");
+    addOption("const_dim", OT_BOOLEAN, true, "Assume constant dimension of P");
+    addOption("pos_def", OT_BOOLEAN, false, "Assume P positive definite");
 
-    addOption("error_unstable",OT_BOOLEAN,false,
-              "Throw an exception when it is detected that Product(A_i,i=N..1) "
+    addOption("error_unstable", OT_BOOLEAN, false,
+              "Throw an exception when it is detected that Product(A_i, i=N..1) "
               "has eigenvalues greater than 1-eps_unstable");
-    addOption("eps_unstable",OT_REAL,1e-4,"A margin for unstability detection");
+    addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
     if (nfwd_==0 && nadj_==0) {
       input_.scheme = SCHEME_DPLEInput;

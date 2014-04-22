@@ -39,10 +39,10 @@ namespace casadi {
   ControlSimulatorInternal::ControlSimulatorInternal(
       const Function& control_dae, const Function& output_fcn, const vector<double>& gridc) :
       control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc) {
-    setOption("name","unnamed controlsimulator");
-    addOption("nf",OT_INTEGER,1,"Number of minor grained integration steps per major interval. "
+    setOption("name", "unnamed controlsimulator");
+    addOption("nf", OT_INTEGER, 1, "Number of minor grained integration steps per major interval. "
               "nf>0 must hold. This option is not used when 'minor_grid' is provided.");
-    addOption("minor_grid",OT_INTEGERVECTOR,GenericType(),
+    addOption("minor_grid", OT_INTEGERVECTOR, GenericType(),
               "The local grid used on each major interval, with time "
               "normalized to 1. By default, option 'nf' is used to "
               "construct a linearly spaced grid.");
@@ -93,9 +93,9 @@ namespace casadi {
     // Cast control_dae in a form that integrator can manage
     vector<MX> dae_in_(DAE_NUM_IN);
 
-    dae_in_[DAE_T]    = MX::sym("tau",control_dae_.input(CONTROL_DAE_T).sparsity());
-    dae_in_[DAE_X]    = MX::sym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
-    dae_in_[DAE_Z]    = MX::sym("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
+    dae_in_[DAE_T]    = MX::sym("tau", control_dae_.input(CONTROL_DAE_T).sparsity());
+    dae_in_[DAE_X]    = MX::sym("x", control_dae_.input(CONTROL_DAE_X).sparsity());
+    dae_in_[DAE_Z]    = MX::sym("z", control_dae_.input(CONTROL_DAE_Z).sparsity());
 
     np_ = control_dae_.input(CONTROL_DAE_P).size();
 
@@ -123,7 +123,7 @@ namespace casadi {
 
     // Structure of DAE_P : T0 TF P Ustart Uend Y_MAJOR
 
-    dae_in_[DAE_P]    = MX::sym("P",2+np_+nu_+nu_end+ny_,1);
+    dae_in_[DAE_P]    = MX::sym("P", 2+np_+nu_+nu_end+ny_, 1);
 
     int iT0 = 0;
     int iTF = 1;
@@ -164,7 +164,7 @@ namespace casadi {
 
 
     std::vector<MX> dae_out(
-      daeOut("ode",(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]));
+      daeOut("ode", (dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]));
 
     int i=1;
     while( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}
@@ -216,7 +216,7 @@ namespace casadi {
     }
 
     // Let the integration time start from the np_first point of the time grid.
-    if (!gridc_.empty()) integrator_.setOption("t0",gridc_[0]);
+    if (!gridc_.empty()) integrator_.setOption("t0", gridc_[0]);
 
     // Initialize the integrator
     integrator_.init();
@@ -224,15 +224,15 @@ namespace casadi {
     // Generate an output function if there is none (returns the whole state)
     if(orig_output_fcn_.isNull()) {
 
-      SX t        = SX::sym("t",control_dae_.input(CONTROL_DAE_T).sparsity());
-      SX t0       = SX::sym("t0",control_dae_.input(CONTROL_DAE_T0).sparsity());
-      SX tf       = SX::sym("tf",control_dae_.input(CONTROL_DAE_TF).sparsity());
-      SX x        = SX::sym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
-      SX z        = SX::sym("z",control_dae_.input(CONTROL_DAE_Z).sparsity());
-      SX p        = SX::sym("p",control_dae_.input(CONTROL_DAE_P).sparsity());
-      SX u        = SX::sym("u",control_dae_.input(CONTROL_DAE_U).sparsity());
-      SX u_interp = SX::sym("u_interp",control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
-      SX x0       = SX::sym("x0",control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity());
+      SX t        = SX::sym("t", control_dae_.input(CONTROL_DAE_T).sparsity());
+      SX t0       = SX::sym("t0", control_dae_.input(CONTROL_DAE_T0).sparsity());
+      SX tf       = SX::sym("tf", control_dae_.input(CONTROL_DAE_TF).sparsity());
+      SX x        = SX::sym("x", control_dae_.input(CONTROL_DAE_X).sparsity());
+      SX z        = SX::sym("z", control_dae_.input(CONTROL_DAE_Z).sparsity());
+      SX p        = SX::sym("p", control_dae_.input(CONTROL_DAE_P).sparsity());
+      SX u        = SX::sym("u", control_dae_.input(CONTROL_DAE_U).sparsity());
+      SX u_interp = SX::sym("u_interp", control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
+      SX x0       = SX::sym("x0", control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity());
 
       vector<SX> arg(CONTROL_DAE_NUM_IN);
       arg[CONTROL_DAE_T]  = t;
@@ -250,7 +250,7 @@ namespace casadi {
 
       // Create the output function
       output_fcn_ = SXFunction(arg, out);
-      output_fcn_.setOption("name","output");
+      output_fcn_.setOption("name", "output");
       output_.scheme = SCHEME_IntegratorOutput;
     } else {
       output_fcn_ = orig_output_fcn_;
@@ -346,8 +346,8 @@ namespace casadi {
 
     // Variables on which the chain of simulator calls (all_output_) depend
     MX Xk = MX::sym("Xk", input(CONTROLSIMULATOR_X0).size());
-    MX P = MX::sym("P",input(CONTROLSIMULATOR_P).size());
-    MX U = MX::sym("U",input(CONTROLSIMULATOR_U).sparsity());
+    MX P = MX::sym("P", input(CONTROLSIMULATOR_P).size());
+    MX U = MX::sym("U", input(CONTROLSIMULATOR_U).sparsity());
 
     // Group these variables as an input list for all_output_
     vector<MX> all_output_in(CONTROLSIMULATOR_NUM_IN);

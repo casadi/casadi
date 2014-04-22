@@ -47,18 +47,18 @@ namespace casadi {
       static_cast<double>(m_)*(static_cast<double>(m_)+1)/2 < std::numeric_limits<int>::max(),
       "Your problem size m is too large to be handled by DSDP.");
 
-    addOption("gapTol",OT_REAL,1e-8,
+    addOption("gapTol", OT_REAL, 1e-8,
               "Convergence criterion based on distance between primal and dual objective");
-    addOption("maxIter",OT_INTEGER,500,"Maximum number of iterations");
-    addOption("dualTol",OT_REAL,1e-4,
+    addOption("maxIter", OT_INTEGER, 500, "Maximum number of iterations");
+    addOption("dualTol", OT_REAL, 1e-4,
               "Tolerance for dual infeasibility "
               "(translates to primal infeasibility in dsdp terms)");
-    addOption("primalTol",OT_REAL,1e-4,
+    addOption("primalTol", OT_REAL, 1e-4,
               "Tolerance for primal infeasibility "
               "(translates to dual infeasibility in dsdp terms)");
-    addOption("stepTol",OT_REAL,5e-2,
+    addOption("stepTol", OT_REAL, 5e-2,
               "Terminate the solver if the step length in the primal is below this tolerance. ");
-    addOption("infinity",OT_REAL,1e30,"Treat numbers higher than this as infinity");
+    addOption("infinity", OT_REAL, 1e30, "Treat numbers higher than this as infinity");
     addOption("_use_penalty", OT_BOOLEAN, true,
               "Modifies the algorithm to use a penality gamma on r.");
     addOption("_penalty", OT_REAL, 1e5,
@@ -66,14 +66,14 @@ namespace casadi {
               "parameter heavily influences the ability of DSDP to treat "
               "linear equalities. The DSDP standard default (1e8) will make "
               "a problem with linear equality return unusable solutions.");
-    addOption("_rho", OT_REAL,4.0,"Potential parameter. Must be >=1");
-    addOption("_zbar", OT_REAL,1e10,"Initial upper bound on the objective of the dual problem.");
-    addOption("_reuse",OT_INTEGER,4,
+    addOption("_rho", OT_REAL, 4.0, "Potential parameter. Must be >=1");
+    addOption("_zbar", OT_REAL, 1e10, "Initial upper bound on the objective of the dual problem.");
+    addOption("_reuse", OT_INTEGER, 4,
               "Maximum on the number of times the Schur complement matrix is reused");
-    addOption("_printlevel",OT_INTEGER,1,
+    addOption("_printlevel", OT_INTEGER, 1,
               "A printlevel of zero will disable all output. "
               "Another number indicates how often a line is printed.");
-    addOption("_loglevel",OT_INTEGER,0,
+    addOption("_loglevel", OT_INTEGER, 0,
               "An integer that specifies how much logging is done on stdout.");
 
     // Set DSDP memory blocks to null
@@ -116,7 +116,7 @@ namespace casadi {
   void DSDPInternal::init() {
     // Initialize the base classes
     SDPSolverInternal::init();
-    log("DSDPInternal::init","Enter");
+    log("DSDPInternal::init", "Enter");
 
     // Fill the data structures that hold DSDP-style sparse symmetric matrix
     pattern_.resize(n_+1);
@@ -145,9 +145,9 @@ namespace casadi {
 
     if (nc_>0) {
       // Fill in the linear program structure
-      MX A = MX::sym("A",input(SDP_SOLVER_A).sparsity());
-      MX LBA = MX::sym("LBA",input(SDP_SOLVER_LBA).sparsity());
-      MX UBA = MX::sym("UBA",input(SDP_SOLVER_UBA).sparsity());
+      MX A = MX::sym("A", input(SDP_SOLVER_A).sparsity());
+      MX LBA = MX::sym("LBA", input(SDP_SOLVER_LBA).sparsity());
+      MX UBA = MX::sym("UBA", input(SDP_SOLVER_UBA).sparsity());
 
       std::vector< MX >  syms;
       syms.push_back(A);
@@ -205,7 +205,7 @@ namespace casadi {
 
     DSDPCreateSDPCone(dsdp_, nb_, &sdpcone_);
     for(int j=0; j<nb_; ++j) {
-      log("DSDPInternal::init","Setting");
+      log("DSDPInternal::init", "Setting");
       SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
       SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
     }
@@ -223,7 +223,7 @@ namespace casadi {
     DSDPSetPotentialParameter(dsdp_, getOption("_rho"));
     DSDPSetZBar(dsdp_, getOption("_zbar"));
     DSDPReuseMatrix(dsdp_, getOption("_reuse") ? 1: 0);
-    DSDPLogInfoAllow(getOption("_loglevel"),0);
+    DSDPLogInfoAllow(getOption("_loglevel"), 0);
 
     // Copy bounds
     for (int i=0;i<n_;++i) {
