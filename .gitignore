@@ -32,6 +32,7 @@ octave-core
 *.out
 *.orig
 *.pyc
+*~
 documentation/examples/ctemplate/compiler.sh
 documentation/examples/ctemplate/linker.sh
 casadi/symbolic/casadi_meta.cpp
