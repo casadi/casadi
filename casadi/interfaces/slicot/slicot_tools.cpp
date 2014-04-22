@@ -28,15 +28,14 @@
 // Need an 8-byte integer since libslicot0 is compiled with  fdefault-integer-8
 typedef long long int f_int;
 
-extern "C"
-{
+extern "C" {
   int mb03vd_(f_int* n, f_int* p, f_int* ilo, f_int* ihi, double *a, f_int* lda1, f_int* lda2,
               double* tau, f_int* ldtau, double* dwork, f_int *info);
   int mb03vy_(f_int* n, f_int* p, f_int* ilo, f_int* ihi, double *a, f_int* lda1, f_int* lda2,
-              const double* tau, f_int* ldtau, double* dwork, f_int *ld_work, f_int *info );
+              const double* tau, f_int* ldtau, double* dwork, f_int *ld_work, f_int *info);
   int mb03wd_(char* job, char* compz, f_int* n, f_int* p, f_int* ilo, f_int* ihi, f_int* iloz,
               f_int* ihiz, double *h, f_int* ldh1, f_int* ldh2, double* z, f_int* ldz1,
-              f_int* ldz2, double* wr, double *wi, double* dwork, f_int *ld_work, f_int *info );
+              f_int* ldz2, double* wr, double *wi, double* dwork, f_int *ld_work, f_int *info);
 }
 
 namespace casadi {
@@ -54,9 +53,9 @@ namespace casadi {
      f_int lda1_ = lda1;
      f_int lda2_ = lda2;
      f_int ldtau_ = ldtau;
-     f_int ret_=0;
+     f_int ret_ = 0;
 
-     mb03vd_(&n_,&p_,&ilo_,&ihi_, a,&lda1_,&lda2_, tau,&ldtau_, dwork, &ret_);
+     mb03vd_(&n_, &p_, &ilo_, &ihi_, a, &lda1_, &lda2_, tau, &ldtau_, dwork, &ret_);
 
      if (ret_<0) {
        casadi_error("mb03vd wrong arguments:" << ret_);
@@ -83,9 +82,9 @@ namespace casadi {
      f_int ldtau_ = ldtau;
      f_int ldwork_ = ldwork;
      f_int ret_=0;
-     mb03vy_(&n_,&p_,&ilo_,&ihi_, a,&lda1_,&lda2_, tau,&ldtau_, dwork,&ldwork_, &ret_);
+     mb03vy_(&n_, &p_, &ilo_, &ihi_, a, &lda1_, &lda2_, tau, &ldtau_, dwork, &ldwork_, &ret_);
 
-     if (ret_<0) {
+     if (ret_ < 0) {
        casadi_error("mb03vy wrong arguments:" << ret_);
      } else if (ret_>0) {
        casadi_error("mb03vy error code:" << ret_);
@@ -114,9 +113,9 @@ if (dwork==0) {
      f_int ldz1_ = ldz1;
      f_int ldz2_ = ldz2;
      f_int ldwork_ = ldwork;
-     f_int ret_=0;
-     mb03wd_(&job,&compz,&n_,&p_,&ilo_,&ihi_,&iloz_,&ihiz_, h,&ldh1_,&ldh2_, z,&ldz1_, &ldz2_,
-             wr, wi, dwork,&ldwork_, &ret_);
+     f_int ret_ = 0;
+     mb03wd_(&job, &compz, &n_, &p_, &ilo_, &ihi_, &iloz_, &ihiz_, h, &ldh1_, &ldh2_,
+             z, &ldz1_, &ldz2_, wr, wi, dwork,&ldwork_, &ret_);
 
      if (ret_<0) {
        casadi_error("mb03wd wrong arguments:" << ret_);
@@ -168,8 +167,8 @@ if (dwork==0) {
 
     slicot_mb03vy(n, K, 1, n, &z[0], n, n, &dwork[mem_base], n-1, &dwork[0], mem_needed);
 
-    slicot_mb03wd('S','V', n, K, 1, n, 1, n,&t[0], n, n,&z[0], n, n,&eig_real[0], &eig_imag[0],
-                  &dwork[0], mem_needed);
+    slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, &t[0], n, n, &z[0], n, n,
+                  &eig_real[0], &eig_imag[0], &dwork[0], mem_needed);
 
   }
 
