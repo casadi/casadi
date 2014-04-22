@@ -50,11 +50,11 @@ namespace std {
 
   /// Enables flushing an std::pair to a stream (prints representation)
   template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const pair<T1,T2> &p);
+  ostream& operator<<(ostream &stream, const pair<T1, T2> &p);
 
   /// Enables flushing an std::map to a stream (prints representation)
   template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const std::map<T1,T2> &p);
+  ostream& operator<<(ostream &stream, const std::map<T1, T2> &p);
 
 #endif //SWIG
 
@@ -79,7 +79,7 @@ namespace casadi {
   /** Range function
   * \param stop
   *
-  * \return list [0,1,2...stop-1]
+  * \return list [0, 1, 2...stop-1]
   */
   CASADI_SYMBOLIC_EXPORT std::vector<int> range(int stop);
 
@@ -100,7 +100,7 @@ namespace casadi {
   template<typename T>
   bool inBounds(const std::vector<T> &v, int lower, int upper);
 
-  /** \brief Returns the list of all i in [0,size[ not found in supplied list
+  /** \brief Returns the list of all i in [0, size[ not found in supplied list
   *
   * The supplied vector may contain duplicates and may be non-monotonous
   * The supplied vector will be checked for bounds
@@ -124,7 +124,7 @@ namespace casadi {
   Apply a function f to each element in a vector
   */
   template<class T>
-  std::vector<T> applymap(T (*f)(const T& ),const std::vector<T>&);
+  std::vector<T> applymap(T (*f)(const T& ), const std::vector<T>&);
 
   /**
   Apply a function f to each element in a vector
@@ -223,7 +223,7 @@ namespace casadi {
   * \param[in] invert_indices Output indices such that 'sorted_values[indices=values'
   **/
   template<typename T>
-  void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices,
+  void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,
             bool invert_indices =false);
   #endif //SWIG
 
@@ -259,7 +259,7 @@ namespace casadi {
   #else // SWIG
   #ifdef SWIGPYTHON
 %pythoncode %{ #NOLINT(whitespace/braces)
-   def makeVector(T,size,*elems):
+   def makeVector(T, size,*elems):
       assert len(elems) % 2 == 0, \
         "The number of provided indices does not the number of provided values"
       num_elem = len(elems)/2
@@ -303,20 +303,20 @@ namespace std {
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
   ostream& operator<<(ostream &stream, const vector<T> &v) {
-    casadi::repr(v,stream);
+    casadi::repr(v, stream);
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const pair<T1,T2> &p) {
+  ostream& operator<<(ostream &stream, const pair<T1, T2> &p) {
     stream << "(" << p.first << "," << p.second << ")";
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream &stream, const std::map<T1,T2> &p) {
+  ostream& operator<<(ostream &stream, const std::map<T1, T2> &p) {
     stream << "{";
-    typedef typename std::map<T1,T2>::const_iterator it_type;
+    typedef typename std::map<T1, T2>::const_iterator it_type;
     int count = 0;
     for (it_type it = p.begin();it!=p.end();++it) {
       stream << it->first << ": " << it->second;
@@ -327,9 +327,9 @@ namespace std {
   }
 
   template<typename T2>
-  ostream& operator<<(ostream &stream, const std::map<std::string,T2> &p) {
+  ostream& operator<<(ostream &stream, const std::map<std::string, T2> &p) {
     stream << "{";
-    typedef typename std::map<std::string,T2>::const_iterator it_type;
+    typedef typename std::map<std::string, T2>::const_iterator it_type;
     int count = 0;
     for (it_type it = p.begin();it!=p.end();++it) {
       stream << '"' << it->first << '"' << ": " << it->second;
@@ -376,29 +376,29 @@ namespace casadi {
 
   #ifndef SWIG
   template<class T>
-  std::vector<T> applymap(T (*f)(const T&) ,const std::vector<T>& comp) {
+  std::vector<T> applymap(T (*f)(const T&) , const std::vector<T>& comp) {
     std::vector<T> ret(comp.size());
-    std::transform(comp.begin(),comp.end(),ret.begin(),f);
+    std::transform(comp.begin(), comp.end(), ret.begin(), f);
     return ret;
   }
 
   template<class T>
   void applymap(void (*f)(T &), std::vector<T>& comp) {
-    std::for_each(comp.begin(),comp.end(),f);
+    std::for_each(comp.begin(), comp.end(), f);
   }
   #endif //SWIG
 
   template<typename T>
   bool inBounds(const std::vector<T> &v, int upper) {
-    return inBounds(v,0,upper);
+    return inBounds(v, 0, upper);
   }
 
   template<typename T>
   bool inBounds(const std::vector<T> &v, int lower, int upper) {
     if (v.size()==0) return true;
-    int max = *std::max_element(v.begin(),v.end());
+    int max = *std::max_element(v.begin(), v.end());
     if (max >= upper) return false;
-    int min = *std::min_element(v.begin(),v.end());
+    int min = *std::min_element(v.begin(), v.end());
     return (min >= lower);
   }
 
@@ -459,14 +459,14 @@ namespace casadi {
   template<typename T>
   std::string getRepresentation(const std::vector<T> &v) {
     std::stringstream ss;
-    repr(v,ss);
+    repr(v, ss);
     return ss.str();
   }
 
   template<typename T>
   std::string getDescription(const std::vector<T> &v) {
     std::stringstream ss;
-    print(v,ss);
+    print(v, ss);
     return ss.str();
   }
 
@@ -563,8 +563,8 @@ namespace casadi {
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values,
             std::vector<int> &indices, bool invert_indices) {
 
-    // Create a list of (value,index) pairs
-    std::vector< std::pair<T,int> > pvalues(values.size());
+    // Create a list of (value, index) pairs
+    std::vector< std::pair<T, int> > pvalues(values.size());
 
     for (int i=0;i<values.size();++i) {
       pvalues[i].first  = values[i];
@@ -572,7 +572,7 @@ namespace casadi {
     }
 
     // Sort this list by the values
-    std::sort(pvalues.begin(),pvalues.end());
+    std::sort(pvalues.begin(), pvalues.end());
 
     // Read out the results
     sorted_values.resize(values.size());
@@ -620,10 +620,10 @@ namespace casadi {
     const int max_size = 20;
 
     // Collect all arguments
-    int ind[max_size] = {ind0,ind1,ind2,ind3,ind4,ind5,ind6,ind7,ind8,ind9,
-                         ind10,ind11,ind12,ind13,ind14,ind15,ind16,ind17,ind18,ind19};
-    T val[max_size] = {val0,val1,val2,val3,val4,val5,val6,val7,val8,val9,
-                       val10,val11,val12,val13,val14,val15,val16,val17,val18,val19};
+    int ind[max_size] = {ind0, ind1, ind2, ind3, ind4, ind5, ind6, ind7, ind8, ind9,
+                         ind10, ind11, ind12, ind13, ind14, ind15, ind16, ind17, ind18, ind19};
+    T val[max_size] = {val0, val1, val2, val3, val4, val5, val6, val7, val8, val9,
+                       val10, val11, val12, val13, val14, val15, val16, val17, val18, val19};
 
     // Return value
     std::vector<T> ret(size);
@@ -663,7 +663,7 @@ namespace casadi {
   T norm_inf(const std::vector<T>& x) {
     T ret = 0;
     for(int k=0; k<x.size(); ++k) {
-      ret = fmax(ret,fabs(x[k]));
+      ret = fmax(ret, fabs(x[k]));
     }
     return ret;
   }
@@ -688,7 +688,7 @@ namespace casadi {
 
   template<typename T>
   std::vector<T> toVector(const T& v0) {
-    return std::vector<T>(1,v0);
+    return std::vector<T>(1, v0);
   }
 
   template<typename T>
@@ -710,12 +710,12 @@ namespace casadi {
 
   template<typename T>
   bvec_t* get_bvec_t(std::vector<T>& v) {
-    casadi_assert_message(0,"get_bvec_t only supported for double");
+    casadi_assert_message(0, "get_bvec_t only supported for double");
   }
 
   template<typename T>
   const bvec_t* get_bvec_t(const std::vector<T>& v) {
-    casadi_assert_message(0,"get_bvec_t only supported for double");
+    casadi_assert_message(0, "get_bvec_t only supported for double");
   }
 
 } // namespace casadi
@@ -726,18 +726,18 @@ namespace casadi {
 #ifdef SWIG
 
 // map the template name to the instantiated name
-#define VTT_INST(T,function_name) \
+#define VTT_INST(T, function_name) \
 %template(function_name) casadi::function_name<T>;
 
 // Define template instantiations
 #define VECTOR_TOOLS_TEMPLATES(T) \
-VTT_INST(T,isIncreasing) \
-VTT_INST(T,isDecreasing) \
-VTT_INST(T,isNonIncreasing) \
-VTT_INST(T,isNonDecreasing) \
-VTT_INST(T,isMonotone) \
-VTT_INST(T,isStrictlyMonotone) \
-VTT_INST(T,isRegular) \
+VTT_INST(T, isIncreasing) \
+VTT_INST(T, isDecreasing) \
+VTT_INST(T, isNonIncreasing) \
+VTT_INST(T, isNonDecreasing) \
+VTT_INST(T, isMonotone) \
+VTT_INST(T, isStrictlyMonotone) \
+VTT_INST(T, isRegular) \
 
 #endif //SWIG
 

@@ -56,12 +56,12 @@ namespace casadi {
 
   SXElement Variable::atTime(double t, bool allocate) const {
     casadi_assert(!allocate);
-    return const_cast<Variable*>(this)->atTime(t,false);
+    return const_cast<Variable*>(this)->atTime(t, false);
   }
 
   SXElement Variable::atTime(double t, bool allocate) {
     // Find an existing element
-    map<double,SXElement>::const_iterator it = timed_.find(t);
+    map<double, SXElement>::const_iterator it = timed_.find(t);
 
     // If not found
     if(it==timed_.end()) {

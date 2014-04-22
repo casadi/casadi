@@ -68,7 +68,7 @@ namespace casadi {
    In this format, the structural non-zero elements are stored in column-major order, starting from
    the upper left corner of the matrix and ending in the lower right corner.
 
-   In addition to the dimension (size1(),size2()), (i.e. the number of rows and the number of
+   In addition to the dimension (size1(), size2()), (i.e. the number of rows and the number of
    columns respectively), there are also two vectors of integers:
 
    1. "colind" [length size2()+1], which contains the index to the first non-zero element on or
@@ -79,7 +79,7 @@ namespace casadi {
    structural non-zeros.
 
    Note that with this format, it is cheap to loop over all the non-zero elements of a particular
-   column, at constant time per element, but expensive to jump to access a location (i,j).
+   column, at constant time per element, but expensive to jump to access a location (i, j).
 
    If the matrix is dense, i.e. length(row) == size1()*size2(), the format reduces to standard dense
    column major format, which allows access to an arbitrary element in constant time.
@@ -111,19 +111,19 @@ namespace casadi {
 
     /** \brief Create a scalar sparsity pattern **/
     ///@{
-    static Sparsity scalar(bool dense_scalar=true) { return dense_scalar ? dense(1,1) : sparse(1,1);}
+    static Sparsity scalar(bool dense_scalar=true) { return dense_scalar ? dense(1, 1) : sparse(1, 1);}
     ///@}
 
     /** \brief Create a dense rectangular sparsity pattern **/
     ///@{
     static Sparsity dense(int nrow, int ncol=1);
-    static Sparsity dense(const std::pair<int,int> &rc) { return dense(rc.first,rc.second);}
+    static Sparsity dense(const std::pair<int, int> &rc) { return dense(rc.first, rc.second);}
     ///@}
 
     /** \brief Create a sparse (empty) rectangular sparsity pattern **/
     ///@{
     static Sparsity sparse(int nrow, int ncol=1);
-    static Sparsity sparse(const std::pair<int,int> &rc) { return sparse(rc.first,rc.second);}
+    static Sparsity sparse(const std::pair<int, int> &rc) { return sparse(rc.first, rc.second);}
     ///@}
 
     /** \brief Create the sparsity pattern for a unit vector of length n and a nonzero on
@@ -140,27 +140,27 @@ namespace casadi {
 
     /** \brief Create diagonal sparsity pattern **/
     ///@{
-    static Sparsity diag(int nrow) { return diag(nrow,nrow);}
+    static Sparsity diag(int nrow) { return diag(nrow, nrow);}
     static Sparsity diag(int nrow, int ncol);
-    static Sparsity diag(const std::pair<int,int> &rc) { return diag(rc.first,rc.second);}
+    static Sparsity diag(const std::pair<int, int> &rc) { return diag(rc.first, rc.second);}
     ///@}
 
     /** \brief Create a single band in a square sparsity pattern
      *
-     * sp_band(n,0) is equivalent to sp_diag(n) \n
-     * sp_band(n,-1) has a band below the diagonal \n
+     * sp_band(n, 0) is equivalent to sp_diag(n) \n
+     * sp_band(n, -1) has a band below the diagonal \n
      * \param p indicate
      **/
     static Sparsity band(int n, int p);
 
     /** \brief Create banded square sparsity pattern
      *
-     * sp_band(n,0) is equivalent to sp_diag(n) \n
-     * sp_band(n,1) is tri-diagonal matrix \n
+     * sp_band(n, 0) is equivalent to sp_diag(n) \n
+     * sp_band(n, 1) is tri-diagonal matrix \n
      **/
     static Sparsity banded(int n, int p);
 
-    /** \brief Construct a block sparsity pattern from (row,col) vectors */
+    /** \brief Construct a block sparsity pattern from (row, col) vectors */
     static Sparsity rowcol(const std::vector<int>& row,
                            const std::vector<int>& col,
                            int nrow, int ncol);
@@ -268,19 +268,19 @@ namespace casadi {
     int size() const;
 
     /** \brief Number of non-zeros in the upper triangular half,
-     * i.e. the number of elements (i,j) with j>=i */
+     * i.e. the number of elements (i, j) with j>=i */
     int sizeU() const;
 
     /** \brief Number of non-zeros in the lower triangular half,
-     * i.e. the number of elements (i,j) with j<=i */
+     * i.e. the number of elements (i, j) with j<=i */
     int sizeL() const;
 
-    /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i,j) with j==i */
+    /** \brief Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i */
     int sizeD() const;
 
 #ifndef SWIG
     /** \brief  Get the shape */
-    std::pair<int,int> shape() const;
+    std::pair<int, int> shape() const;
 #endif
     /// @}
 
@@ -324,7 +324,7 @@ namespace casadi {
         return -1 if the element does not exist */
     int getNZ(int rr, int cc) const;
 
-    /// Returns true if the pattern has a non-zero at location rr,cc
+    /// Returns true if the pattern has a non-zero at location rr, cc
     bool hasNZ(int rr, int cc) const;
 
     /** \brief Get a set of non-zero element
@@ -425,7 +425,7 @@ namespace casadi {
         for each non-zero */
     Sparsity patternProduct(
       const Sparsity& x_trans,
-      std::vector< std::vector< std::pair<int,int> > >& SWIG_OUTPUT(mapping)) const;
+      std::vector< std::vector< std::pair<int, int> > >& SWIG_OUTPUT(mapping)) const;
     Sparsity patternProduct(const Sparsity& x_trans) const;
 
     /// @}
@@ -437,13 +437,13 @@ namespace casadi {
         Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros
 
         For the matrices A to B
-        A(m,n)
+        A(m, n)
         length(jj)=m , length(ii)=n
-        B(nrow,ncol)
+        B(nrow, ncol)
 
-        A=enlarge(m,n,ii,jj) makes sure that
+        A=enlarge(m, n, ii, jj) makes sure that
 
-        B[jj,ii] == A
+        B[jj, ii] == A
     */
     void enlarge(int nrow, int ncol, const std::vector<int>& jj, const std::vector<int>& ii);
 
@@ -516,7 +516,7 @@ namespace casadi {
 
 /// \cond INTERNAL
 #ifndef SWIG
-    typedef CACHING_MULTIMAP<std::size_t,WeakRef> CachingMap;
+    typedef CACHING_MULTIMAP<std::size_t, WeakRef> CachingMap;
 
     /// Cached sparsity patterns
     static CachingMap& getCache();
@@ -537,7 +537,7 @@ namespace casadi {
         See Direct Methods for Sparse Linear Systems by Davis (2006).
         If the parameter ata is false, the algorithm is equivalent to Matlab's etree(A), except that
         the indices are zero-based. If ata is true, the algorithm is equivalent to Matlab's
-        etree(A,'row').
+        etree(A, 'row').
     */
     std::vector<int> eliminationTree(bool ata=false) const;
 
@@ -559,9 +559,9 @@ namespace casadi {
 
         In the case that the matrix is symmetric, the result has a particular interpretation:
         Given a symmetric matrix A and
-        n = A.stronglyConnectedComponents(p,r)
+        n = A.stronglyConnectedComponents(p, r)
 
-        => A[p,p] will appear block-diagonal with n blocks and
+        => A[p, p] will appear block-diagonal with n blocks and
         with the indices of the block boundaries to be found in r.
 
     */
@@ -688,7 +688,7 @@ namespace casadi {
 
   /** \brief Generate a hash value incrementally (function taken from boost) */
   inline void hash_combine(std::size_t& seed, const std::vector<int>& v) {
-    for(std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed,*i);
+    for(std::vector<int>::const_iterator i=v.begin(); i!=v.end(); ++i) hash_combine(seed, *i);
   }
 
   /** \brief Hash a sparsity pattern */
@@ -715,7 +715,7 @@ namespace casadi {
 
     // Check if sparsity matches
     if(val_sp==*this) {
-      std::copy(val_data,val_data+sz,data);
+      std::copy(val_data, val_data+sz, data);
     } else if (this->isEmpty()) {
       // Quick return
       return;
@@ -723,7 +723,7 @@ namespace casadi {
       // Quick return
       return;
     } else if(val_nel==1) { // if scalar
-      std::fill(data,data+sz,val_sz==0 ? DataType(0) : val_data[0]);
+      std::fill(data, data+sz, val_sz==0 ? DataType(0) : val_data[0]);
     } else {
       // Quick return if empty
       if(nel==0 && val_nel==0) return;

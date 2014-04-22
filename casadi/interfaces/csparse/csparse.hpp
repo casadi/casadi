@@ -37,7 +37,7 @@ namespace casadi {
    @copydoc LinearSolver_doc
    *
    * CSparse is an casadi::Function mapping from 2 inputs
-   * [ A (matrix),b (vector)] to one output [x (vector)].
+   * [ A (matrix), b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use CSparse is: \n
    *  -# init()
@@ -73,7 +73,7 @@ namespace casadi {
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const Sparsity& sp, int nrhs) { return CSparse(sp,nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs) { return CSparse(sp, nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif

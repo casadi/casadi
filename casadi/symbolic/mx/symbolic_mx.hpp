@@ -32,7 +32,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
       A regular user is not supposed to work with this Node class.
-      This user can call MX(name,n,m) directly.
+      This user can call MX(name, n, m) directly.
   */
   class CASADI_SYMBOLIC_EXPORT SymbolicMX : public MXNode {
   public:

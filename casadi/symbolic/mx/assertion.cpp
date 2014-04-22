@@ -34,7 +34,7 @@ namespace casadi {
     casadi_assert_message(y.isScalar(),
                           "Assertion:: assertion expression y must be scalar, but got "
                           << y.dimString());
-    setDependencies(x,y);
+    setDependencies(x, y);
     setSparsity(x.sparsity());
   }
 
@@ -56,7 +56,7 @@ namespace casadi {
 
     // Non-differentiated output
     if(!output_given) {
-      *output[0] = (*input[0]).attachAssert(*input[1],fail_message_);
+      *output[0] = (*input[0]).attachAssert(*input[1], fail_message_);
     }
 
     // Forward sensitivities

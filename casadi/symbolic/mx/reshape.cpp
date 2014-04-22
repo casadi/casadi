@@ -44,12 +44,12 @@ namespace casadi {
 
   void Reshape::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                           std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void Reshape::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                            std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -60,7 +60,7 @@ namespace casadi {
 
     vector<T>& res = output[0]->data();
     const vector<T>& arg = input[0]->data();
-    copy(arg.begin(),arg.end(),res.begin());
+    copy(arg.begin(), arg.end(), res.begin());
   }
 
   void Reshape::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
@@ -95,13 +95,13 @@ namespace casadi {
     if(input[0]==output[0]) return;
 
     if(!output_given) {
-      *output[0] = reshape(*input[0],shape());
+      *output[0] = reshape(*input[0], shape());
     }
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
     for(int d = 0; d<nfwd; ++d) {
-      *fwdSens[d][0] = reshape(*fwdSeed[d][0],shape());
+      *fwdSens[d][0] = reshape(*fwdSeed[d][0], shape());
     }
 
     // Adjoint sensitivities
@@ -109,7 +109,7 @@ namespace casadi {
     for(int d=0; d<nadj; ++d) {
       MX& aseed = *adjSeed[d][0];
       MX& asens = *adjSens[d][0];
-      asens.addToSum(reshape(aseed,dep().shape()));
+      asens.addToSum(reshape(aseed, dep().shape()));
       aseed = MX();
     }
   }
@@ -124,7 +124,7 @@ namespace casadi {
   }
 
   MX Reshape::getReshape(const Sparsity& sp) const {
-    return reshape(dep(0),sp);
+    return reshape(dep(0), sp);
   }
 
 } // namespace casadi

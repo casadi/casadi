@@ -54,7 +54,7 @@ void DirectMultipleShootingInternal::init() {
 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
-  integrator_ = integrator_creator(ffcn_,Function());
+  integrator_ = integrator_creator(ffcn_, Function());
   if(hasSetOption("integrator_options")) {
     integrator_.setOption(getOption("integrator_options"));
   }
@@ -89,7 +89,7 @@ void DirectMultipleShootingInternal::init() {
   MX V = MX::sym("V",NV);
 
   // Global parameters
-  MX P = V(Slice(0,np_));
+  MX P = V(Slice(0, np_));
 
   // offset in the variable vector
   int v_offset=np_;
@@ -98,14 +98,14 @@ void DirectMultipleShootingInternal::init() {
   vector<MX> X(nk_+1), U(nk_);
   for(int k=0; k<=nk_; ++k) { // interior nodes
     // Local state
-    X[k] = V[Slice(v_offset,v_offset+nx_)];
+    X[k] = V[Slice(v_offset, v_offset+nx_)];
     v_offset += nx_;
 
     // Variables below do not appear at the end point
     if(k==nk_) break;
 
     // Local control
-    U[k] = V[Slice(v_offset,v_offset+nu_)];
+    U[k] = V[Slice(v_offset, v_offset+nu_)];
     v_offset += nu_;
   }
 
@@ -117,7 +117,7 @@ void DirectMultipleShootingInternal::init() {
   vector<vector<MX> > int_in(nk_);
   for(int k=0; k<nk_; ++k) {
     int_in[k].resize(INTEGRATOR_NUM_IN);
-    int_in[k][INTEGRATOR_P] = vertcat(P,U[k]);
+    int_in[k][INTEGRATOR_P] = vertcat(P, U[k]);
     int_in[k][INTEGRATOR_X0] = X[k];
   }
 
@@ -126,7 +126,7 @@ void DirectMultipleShootingInternal::init() {
   for(int k=0; k<nk_; ++k) {
     fcn_in[k].resize(DAE_NUM_IN);
     fcn_in[k][DAE_T] = (k*tf_)/nk_;
-    fcn_in[k][DAE_P] = vertcat(P,U.at(k));
+    fcn_in[k][DAE_P] = vertcat(P, U.at(k));
     fcn_in[k][DAE_X] = X[k];
   }
 
@@ -138,12 +138,12 @@ void DirectMultipleShootingInternal::init() {
     paropt["parallelization"] = getOption("parallelization");
 
   // Evaluate function in parallel
-  vector<vector<MX> > pI_out = integrator_.callParallel(int_in,paropt);
+  vector<vector<MX> > pI_out = integrator_.callParallel(int_in, paropt);
 
   // Evaluate path constraints in parallel
   vector<vector<MX> > pC_out;
   if(path_constraints)
-    pC_out = cfcn_.callParallel(fcn_in,paropt);
+    pC_out = cfcn_.callParallel(fcn_in, paropt);
 
   //Constraint function
   vector<MX> gg(2*nk_);
@@ -210,18 +210,18 @@ void DirectMultipleShootingInternal::getGuess(vector<double>& V_init) const {
   for(int k=0; k<nk_; ++k) {
     // Pass guess for state
     for(int i=0; i<nx_; ++i) {
-      V_init[el++] = x_init.elem(i,k);
+      V_init[el++] = x_init.elem(i, k);
     }
 
     // Pass guess for control
     for(int i=0; i<nu_; ++i) {
-      V_init[el++] = u_init.elem(i,k);
+      V_init[el++] = u_init.elem(i, k);
     }
   }
 
   // Pass guess for final state
   for(int i=0; i<nx_; ++i) {
-    V_init[el++] = x_init.elem(i,nk_);
+    V_init[el++] = x_init.elem(i, nk_);
   }
 
   casadi_assert(el==V_init.size());
@@ -250,21 +250,21 @@ void DirectMultipleShootingInternal::getVariableBounds(vector<double>& V_min,
   for(int k=0; k<nk_; ++k) {
     // Pass bounds on state
     for(int i=0; i<nx_; ++i) {
-      V_min[min_el++] = x_min.elem(i,k);
-      V_max[max_el++] = x_max.elem(i,k);
+      V_min[min_el++] = x_min.elem(i, k);
+      V_max[max_el++] = x_max.elem(i, k);
     }
 
     // Pass bounds on control
     for(int i=0; i<nu_; ++i) {
-      V_min[min_el++] = u_min.elem(i,k);
-      V_max[max_el++] = u_max.elem(i,k);
+      V_min[min_el++] = u_min.elem(i, k);
+      V_max[max_el++] = u_max.elem(i, k);
     }
   }
 
   // Pass bounds on final state
   for(int i=0; i<nx_; ++i) {
-    V_min[min_el++] = x_min.elem(i,nk_);
-    V_max[max_el++] = x_max.elem(i,nk_);
+    V_min[min_el++] = x_min.elem(i, nk_);
+    V_max[max_el++] = x_max.elem(i, nk_);
   }
 
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
@@ -286,8 +286,8 @@ void DirectMultipleShootingInternal::getConstraintBounds(vector<double>& G_min,
     }
 
     for(int i=0; i<nh_; ++i) {
-      G_min[min_el++] = h_min.elem(i,k);
-      G_max[max_el++] = h_max.elem(i,k);
+      G_min[min_el++] = h_min.elem(i, k);
+      G_max[max_el++] = h_max.elem(i, k);
     }
   }
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
@@ -311,18 +311,18 @@ void DirectMultipleShootingInternal::setOptimalSolution(const vector<double> &V_
 
     // Pass optimized state
     for(int i=0; i<nx_; ++i) {
-      x_opt(i,k) = V_opt[el++];
+      x_opt(i, k) = V_opt[el++];
     }
 
     // Pass optimized control
     for(int i=0; i<nu_; ++i) {
-      u_opt(i,k) = V_opt[el++];
+      u_opt(i, k) = V_opt[el++];
     }
   }
 
   // Pass optimized terminal state
   for(int i=0; i<nx_; ++i) {
-    x_opt(i,nk_) = V_opt[el++];
+    x_opt(i, nk_) = V_opt[el++];
   }
   casadi_assert(el==V_opt.size());
 }
@@ -351,11 +351,11 @@ void DirectMultipleShootingInternal::evaluate() {
 void DirectMultipleShootingInternal::reportConstraints(std::ostream &stream) {
   stream << "Reporting DirectMultipleShooting constraints" << endl;
 
-  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX),
+  FunctionInternal::reportConstraints(stream, output(OCP_X_OPT), input(OCP_LBX), input(OCP_UBX),
                                       "states");
-  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU),
+  FunctionInternal::reportConstraints(stream, output(OCP_U_OPT), input(OCP_LBU), input(OCP_UBU),
                                       "controls");
-  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP),
+  FunctionInternal::reportConstraints(stream, output(OCP_P_OPT), input(OCP_LBP), input(OCP_UBP),
                                       "parameters");
 
 }

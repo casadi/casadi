@@ -58,7 +58,7 @@ namespace casadi {
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const Sparsity& sp, int nrhs) { return SymbolicQR(sp,nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs) { return SymbolicQR(sp, nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif

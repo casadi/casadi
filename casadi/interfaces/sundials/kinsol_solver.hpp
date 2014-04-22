@@ -80,7 +80,7 @@ namespace casadi {
     %callback("%s_cb");
 #endif
     static ImplicitFunction creator(const Function& f, const Function& jac,
-                                    const LinearSolver& linsol) { return KinsolSolver(f,jac,linsol);}
+                                    const LinearSolver& linsol) { return KinsolSolver(f, jac, linsol);}
 #ifdef SWIG
     %nocallback;
 #endif

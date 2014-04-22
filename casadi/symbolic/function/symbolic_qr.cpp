@@ -29,7 +29,7 @@ namespace casadi {
   }
 
   SymbolicQR::SymbolicQR(const Sparsity& sp, int nrhs) {
-    assignNode(new SymbolicQRInternal(sp,nrhs));
+    assignNode(new SymbolicQRInternal(sp, nrhs));
   }
 
   SymbolicQRInternal* SymbolicQR::operator->() {

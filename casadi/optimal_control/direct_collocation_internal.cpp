@@ -58,16 +58,16 @@ void DirectCollocationInternal::init() {
   deg_ = getOption("interpolation_order");
 
   // All collocation time points
-  std::vector<double> tau_root = collocationPoints(deg_,getOption("collocation_scheme"));
+  std::vector<double> tau_root = collocationPoints(deg_, getOption("collocation_scheme"));
 
   // Size of the finite elements
   double h = tf_/nk_;
 
   // Coefficients of the collocation equation
-  vector<vector<MX> > C(deg_+1,vector<MX>(deg_+1));
+  vector<vector<MX> > C(deg_+1, vector<MX>(deg_+1));
 
   // Coefficients of the collocation equation as DMatrix
-  DMatrix C_num = DMatrix::zeros(deg_+1,deg_+1);
+  DMatrix C_num = DMatrix::zeros(deg_+1, deg_+1);
 
   // Coefficients of the continuity equation
   vector<MX> D(deg_+1);
@@ -88,7 +88,7 @@ void DirectCollocationInternal::init() {
       }
     }
 
-    SXFunction lfcn(tau,L);
+    SXFunction lfcn(tau, L);
     lfcn.init();
 
     // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
@@ -105,12 +105,12 @@ void DirectCollocationInternal::init() {
       tfcn.setInput(tau_root[j2]);
       tfcn.evaluate();
       C[j][j2] = tfcn.output();
-      C_num(j,j2) = tfcn.output();
+      C_num(j, j2) = tfcn.output();
     }
   }
 
-  C_num(std::vector<int>(1,0),ALL) = 0;
-  C_num(0,0)   = 1;
+  C_num(std::vector<int>(1, 0), ALL) = 0;
+  C_num(0, 0)   = 1;
 
   // All collocation time points
   vector<vector<double> > T(nk_);
@@ -139,18 +139,18 @@ void DirectCollocationInternal::init() {
         X[k].resize(deg_+1);
     for(int j=0; j<=deg_; ++j) {
         // Get the expression for the state vector
-        X[k][j] = nlp_x[Slice(offset,offset+nx_)];
+        X[k][j] = nlp_x[Slice(offset, offset+nx_)];
         offset += nx_;
     }
 
     // Parametrized controls
-    U[k] = nlp_x[Slice(offset,offset+nu_)];
+    U[k] = nlp_x[Slice(offset, offset+nu_)];
     offset += nu_;
   }
 
   // State at end time
   X[nk_].resize(1);
-  X[nk_][0] = nlp_x[Slice(offset,offset+nx_)];
+  X[nk_][0] = nlp_x[Slice(offset, offset+nx_)];
   offset += nx_;
   casadi_assert(offset==nlp_nx);
 
@@ -193,7 +193,7 @@ void DirectCollocationInternal::init() {
     }
 
     // Add integral objective function term
-        //    [Jk] = lfcn.call([X[k+1,0], U[k]])
+        //    [Jk] = lfcn.call([X[k+1, 0], U[k]])
         //    nlp_j += Jk
   }
 
@@ -238,19 +238,19 @@ void DirectCollocationInternal::getGuess(vector<double>& V_init) const {
     // Pass guess for state
     for(int j=0; j<=deg_; ++j) {
       for(int i=0; i<nx_; ++i) {
-         V_init[el++] = x_init.elem(i,k);
+         V_init[el++] = x_init.elem(i, k);
       }
     }
 
     // Pass guess for control
     for(int i=0; i<nu_; ++i) {
-      V_init[el++] = u_init.elem(i,k);
+      V_init[el++] = u_init.elem(i, k);
     }
   }
 
   // Pass guess for final state
   for(int i=0; i<nx_; ++i) {
-    V_init[el++] = x_init.elem(i,nk_);
+    V_init[el++] = x_init.elem(i, nk_);
   }
 
   casadi_assert(el==V_init.size());
@@ -279,29 +279,29 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min,
 
     // Pass bounds on state
     for(int i=0; i<nx_; ++i) {
-      V_min[min_el++] = x_min.elem(i,k);
-      V_max[max_el++] = x_max.elem(i,k);
+      V_min[min_el++] = x_min.elem(i, k);
+      V_max[max_el++] = x_max.elem(i, k);
     }
 
     // Pass bounds on collocation points
     for(int j=0; j<deg_; ++j) {
       for(int i=0; i<nx_; ++i) {
-        V_min[min_el++] = std::min(x_min.elem(i,k),x_min.elem(i,k+1));
-        V_max[max_el++] = std::max(x_max.elem(i,k),x_max.elem(i,k+1));
+        V_min[min_el++] = std::min(x_min.elem(i, k), x_min.elem(i, k+1));
+        V_max[max_el++] = std::max(x_max.elem(i, k), x_max.elem(i, k+1));
       }
     }
 
     // Pass bounds on control
     for(int i=0; i<nu_; ++i) {
-      V_min[min_el++] = u_min.elem(i,k);
-      V_max[max_el++] = u_max.elem(i,k);
+      V_min[min_el++] = u_min.elem(i, k);
+      V_max[max_el++] = u_max.elem(i, k);
     }
   }
 
   // Pass bounds on final state
   for(int i=0; i<nx_; ++i) {
-    V_min[min_el++] = x_min.elem(i,nk_);
-    V_max[max_el++] = x_max.elem(i,nk_);
+    V_min[min_el++] = x_min.elem(i, nk_);
+    V_max[max_el++] = x_max.elem(i, nk_);
   }
 
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
@@ -325,8 +325,8 @@ void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min,
     }
 
     for(int i=0; i<nh_; ++i) {
-      G_min[min_el++] = h_min.elem(i,k);
-      G_max[max_el++] = h_max.elem(i,k);
+      G_min[min_el++] = h_min.elem(i, k);
+      G_max[max_el++] = h_max.elem(i, k);
     }
   }
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
@@ -350,7 +350,7 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
 
     // Pass optimized state
     for(int i=0; i<nx_; ++i) {
-      x_opt(i,k) = V_opt[el++];
+      x_opt(i, k) = V_opt[el++];
     }
 
     // Skip collocation points
@@ -358,13 +358,13 @@ void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt 
 
     // Pass optimized control
     for(int i=0; i<nu_; ++i) {
-      u_opt(i,k) = V_opt[el++];
+      u_opt(i, k) = V_opt[el++];
     }
   }
 
   // Pass optimized terminal state
   for(int i=0; i<nx_; ++i) {
-    x_opt(i,nk_) = V_opt[el++];
+    x_opt(i, nk_) = V_opt[el++];
   }
   casadi_assert(el==V_opt.size());
 }
@@ -393,11 +393,11 @@ void DirectCollocationInternal::evaluate() {
 void DirectCollocationInternal::reportConstraints(std::ostream &stream) {
   stream << "Reporting Collocation constraints" << endl;
 
-  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX),
+  FunctionInternal::reportConstraints(stream, output(OCP_X_OPT), input(OCP_LBX), input(OCP_UBX),
                                       "states");
-  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU),
+  FunctionInternal::reportConstraints(stream, output(OCP_U_OPT), input(OCP_LBU), input(OCP_UBU),
                                       "controls");
-  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP),
+  FunctionInternal::reportConstraints(stream, output(OCP_P_OPT), input(OCP_LBP), input(OCP_UBP),
                                       "parameters");
 
 }

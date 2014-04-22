@@ -30,7 +30,7 @@ namespace casadi {
 
   NLPImplicitInternal::NLPImplicitInternal(const Function& f, const Function& jac,
                                            const LinearSolver& linsol)
-      : ImplicitFunctionInternal(f,jac,linsol) {
+      : ImplicitFunctionInternal(f, jac, linsol) {
     addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(),
               "The NLPSolver used to solve the implicit system.");
     addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
@@ -41,9 +41,9 @@ namespace casadi {
   }
 
   void NLPImplicitInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     ImplicitFunctionInternal::deepCopyMembers(already_copied);
-    nlp_solver_ = deepcopy(nlp_solver_,already_copied);
+    nlp_solver_ = deepcopy(nlp_solver_, already_copied);
   }
 
   void NLPImplicitInternal::solveNonLinear() {
@@ -67,7 +67,7 @@ namespace casadi {
     vector<double>::iterator nlp_p = nlp_solver_.input(NLP_SOLVER_P).begin();
     for(int i=0; i<getNumInputs(); ++i) {
       if(i!=iin_) {
-        std::copy(input(i).begin(),input(i).end(),nlp_p);
+        std::copy(input(i).begin(), input(i).end(), nlp_p);
         nlp_p += input(i).size();
       }
     }
@@ -81,12 +81,12 @@ namespace casadi {
 
     // Evaluate auxilary outputs, if necessary
     if(getNumOutputs()>0) {
-      f_.setInput(output(iout_),iin_);
+      f_.setInput(output(iout_), iin_);
       for(int i=0; i<getNumInputs(); ++i)
-        if(i!=iin_) f_.setInput(input(i),i);
+        if(i!=iin_) f_.setInput(input(i), i);
       f_.evaluate();
       for(int i=0; i<getNumOutputs(); ++i) {
-        if(i!=iout_) f_.getOutput(output(i),i);
+        if(i!=iout_) f_.getOutput(output(i), i);
       }
     }
   }
@@ -106,7 +106,7 @@ namespace casadi {
 
     // u groups all parameters in an MX
     std::vector< MX > inputs;
-    MX p = createParent(sps,inputs);
+    MX p = createParent(sps, inputs);
 
     // Dummy NLP objective
     MX nlp_f = 0;

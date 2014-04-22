@@ -171,7 +171,7 @@ namespace casadi {
      *  a = x*x
      *  b = x*x
      *
-     *  a.isEqual(b,0)  will return false, but a.isEqual(b,1) will return true
+     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
      */
     bool isEqual(const SXElement& scalar, int depth=0) const;
 

@@ -49,7 +49,7 @@ public:
   /** \brief  Get an attribute by its name */
   std::string getAttribute(const std::string& attribute_name) const {
     std::string ret;
-    readAttribute(attribute_name,ret,true);
+    readAttribute(attribute_name, ret, true);
     return ret;
   }
 
@@ -64,7 +64,7 @@ public:
       casadi_assert_message(!assert_existance,
                             "Error in XMLNode::readAttribute: could not find " + attribute_name);
     } else {
-      readString(it->second,val);
+      readString(it->second, val);
     }
   }
 
@@ -103,7 +103,7 @@ public:
 
   /** \brief  Get value of text field */
   template<typename T>
-  void getText(T& val) const { readString(text_,val);}
+  void getText(T& val) const { readString(text_, val);}
 
   /** \brief  Read the string value of a string (i.e. copy) */
   static void readString(const std::string& str, std::string& val);
@@ -129,7 +129,7 @@ public:
 
     std::map<std::string, std::string>  attributes_;
     std::vector<XMLNode>                children_;
-    std::map<std::string,int>           child_indices_; // the index of the children
+    std::map<std::string, int>           child_indices_; // the index of the children
                                                         // sorted by their name
 
     std::string name_;

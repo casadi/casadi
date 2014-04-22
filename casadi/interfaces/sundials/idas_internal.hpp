@@ -58,10 +58,10 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal {
 
   /** \brief  Create a new integrator */
   virtual IdasInternal* create(const Function& f, const Function& g) const
-  { return new IdasInternal(f,g);}
+  { return new IdasInternal(f, g);}
 
   /** \brief  Deep copy data members */
-  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+  virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
   /** \brief  Destructor */
   virtual ~IdasInternal();
@@ -104,8 +104,8 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal {
   *   Structure:
   *
   * \verbatim
-  *   | diff(gx,rx) + cj*diff(gx,dot(rx))  |   diff(gx,rz) |
-  *   | diff(gz,rx)                        |   diff(gz,rz) |
+  *   | diff(gx, rx) + cj*diff(gx, dot(rx))  |   diff(gx, rz) |
+  *   | diff(gz, rx)                        |   diff(gz, rz) |
   * \endverbatim
   */
   template<typename FunctionType>
@@ -158,7 +158,7 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal {
              N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void bjac(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz,
             N_Vector xzdot, N_Vector rr, DlsMat Jac,
-            N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
+            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void bjacB(long NeqB, long mupperB, long mlowerB, double tt, double cjB, N_Vector xz,
              N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, DlsMat JacB,
              N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
@@ -209,7 +209,7 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal {
                            void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int bjac_wrapper(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz,
                           N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data,
-                          N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
+                          N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, double cjB,
                            N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
                            N_Vector resvalB, DlsMat JacB, void *user_data,

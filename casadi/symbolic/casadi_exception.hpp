@@ -88,8 +88,8 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception {
 #ifdef CASADI_NDEBUG
 // Release mode
 #define casadi_assert(x)
-#define casadi_assert_message(x,msg)
-#define casadi_assert_warning(x,msg)
+#define casadi_assert_message(x, msg)
+#define casadi_assert_warning(x, msg)
 #define casadi_warning(msg)
 #define casadi_error(msg)
 
@@ -118,7 +118,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception {
  }
 
 // This assertion checks for illegal user inputs. It will not be checked if CASADI_NDEBUG is defined
-#define casadi_assert_message(x,msg) \
+#define casadi_assert_message(x, msg) \
 { \
   bool is_ok; \
   try { \
@@ -143,7 +143,7 @@ class CASADI_SYMBOLIC_EXPORT CasadiException : public std::exception {
     << std::endl << "Please notify the CasADi developers.")
 
 // This is for warnings to be issued when casadi is not in release mode and an assertion fails
-#define casadi_assert_warning(x,msg) \
+#define casadi_assert_warning(x, msg) \
 if((x)==false) { \
   std::cerr << "CasADi warning: \"" << msg << "\" (assertion \"" CASADI_ASSERT_STR(x) \
     "\"" CASADI_ASSERT_WHERE " failed.)" << std::endl;  \

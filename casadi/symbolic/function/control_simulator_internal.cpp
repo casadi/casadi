@@ -70,7 +70,7 @@ namespace casadi {
 
     if (!control_dae_.isInit()) control_dae_.init();
 
-    casadi_assert_message(!gridc_.empty(),"The supplied time grid must not be empty.");
+    casadi_assert_message(!gridc_.empty(), "The supplied time grid must not be empty.");
 
     casadi_assert_message(isIncreasing(gridc_),
                           "The supplied time grid must be strictly increasing. "
@@ -83,7 +83,7 @@ namespace casadi {
       control_dae_in_[CONTROL_DAE_X]    = dae_in_[DAE_X];
       control_dae_in_[CONTROL_DAE_Z]    = dae_in_[DAE_Z];
       control_dae_in_[CONTROL_DAE_P]    = dae_in_[DAE_P];
-      control_dae_ = MXFunction(control_dae_in_,control_dae_.call(dae_in_));
+      control_dae_ = MXFunction(control_dae_in_, control_dae_.call(dae_in_));
       control_dae_.init();
     }
     casadi_assert_message(control_dae_.getNumInputs()==CONTROL_DAE_NUM_IN,
@@ -117,7 +117,7 @@ namespace casadi {
     }
 
     int nu_end   = control_dae_.input(CONTROL_DAE_U_INTERP).size();
-    nu_ = std::max(nu_end,nu_);
+    nu_ = std::max(nu_end, nu_);
 
     ny_ = control_dae_.input(CONTROL_DAE_X).size();
 
@@ -127,8 +127,8 @@ namespace casadi {
 
     int iT0 = 0;
     int iTF = 1;
-    IMatrix iP  = 2+IMatrix(control_dae_.input(CONTROL_DAE_P).sparsity(),range(np_));
-    IMatrix iUstart  = 2+np_ + IMatrix(u_sparsity,range(nu_));
+    IMatrix iP  = 2+IMatrix(control_dae_.input(CONTROL_DAE_P).sparsity(), range(np_));
+    IMatrix iUstart  = 2+np_ + IMatrix(u_sparsity, range(nu_));
     IMatrix iUend    = 2+np_ + nu_ + IMatrix(control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),
                                              range(nu_end));
     IMatrix iYM;
@@ -169,13 +169,13 @@ namespace casadi {
     int i=1;
     while( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}
 
-    dae_ = MXFunction(dae_in_,dae_out);
+    dae_ = MXFunction(dae_in_, dae_out);
 
     dae_.init();
 
     // Create an integrator instance
     integratorCreator integrator_creator = getOption("integrator");
-    integrator_ = integrator_creator(dae_,Function());
+    integrator_ = integrator_creator(dae_, Function());
     if(hasSetOption("integrator_options")) {
       integrator_.setOption(getOption("integrator_options"));
     }
@@ -186,7 +186,7 @@ namespace casadi {
     // Number of fine-grained steps
     nf_ = getOption("nf");
 
-    casadi_assert_message(nf_>0,"Option 'nf' must be greater than zero.");
+    casadi_assert_message(nf_>0, "Option 'nf' must be greater than zero.");
 
     if (hasSetOption("minor_grid")) {
       gridlocal_ = getOption("minor_grid");
@@ -195,7 +195,7 @@ namespace casadi {
                             "Option 'minor_grid' must have more then one element.");
     } else {
       gridlocal_.resize(nf_+1);
-      linspace(gridlocal_,0,1);
+      linspace(gridlocal_, 0, 1);
     }
 
 
@@ -249,7 +249,7 @@ namespace casadi {
       out[INTEGRATOR_XF] = x;
 
       // Create the output function
-      output_fcn_ = SXFunction(arg,out);
+      output_fcn_ = SXFunction(arg, out);
       output_fcn_.setOption("name","output");
       output_.scheme = SCHEME_IntegratorOutput;
     } else {
@@ -272,9 +272,9 @@ namespace casadi {
 
     vector<MX> output_fcn_call_ = output_fcn_.call(output_fcn_in_);
 
-    copy(output_fcn_call_.begin(),output_fcn_call_.end(),output_fcn_out_.begin()+2);
+    copy(output_fcn_call_.begin(), output_fcn_call_.end(), output_fcn_out_.begin()+2);
 
-    output_fcn_ = MXFunction(output_fcn_in_,output_fcn_out_);
+    output_fcn_ = MXFunction(output_fcn_in_, output_fcn_out_);
 
     // Initialize the output function again
     output_fcn_.init();
@@ -318,13 +318,13 @@ namespace casadi {
       output_fcn_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
     // Transform the output_fcn_ with CONTROL_DAE input scheme to a DAE input scheme
-    output_fcn_ = MXFunction(dae_in_,output_fcn_.call(output_fcn_in_));
+    output_fcn_ = MXFunction(dae_in_, output_fcn_.call(output_fcn_in_));
 
     // Initialize the output function again
     output_fcn_.init();
 
     // Create the simulator
-    simulator_ = Simulator(integrator_,output_fcn_,gridlocal_);
+    simulator_ = Simulator(integrator_, output_fcn_, gridlocal_);
     if(hasSetOption("simulator_options")) {
       simulator_.setOption(getOption("simulator_options"));
     }
@@ -334,12 +334,12 @@ namespace casadi {
     setNumInputs(CONTROLSIMULATOR_NUM_IN);
     input(CONTROLSIMULATOR_X0)  = DMatrix(dae_.input(DAE_X));
     input(CONTROLSIMULATOR_P)   = control_dae_.input(CONTROL_DAE_P);
-    input(CONTROLSIMULATOR_U)   = DMatrix::zeros(nu_,ns_-1+(control_endpoint?1:0));
+    input(CONTROLSIMULATOR_U)   = DMatrix::zeros(nu_, ns_-1+(control_endpoint?1:0));
 
     // Allocate outputs
     setNumOutputs(output_fcn_.getNumOutputs()-2);
     for(int i=0; i<getNumOutputs(); ++i)
-      output(i) = Matrix<double>::zeros(output_fcn_.output(i+2).numel(),(ns_-1)*nf_+1);
+      output(i) = Matrix<double>::zeros(output_fcn_.output(i+2).numel(), (ns_-1)*nf_+1);
 
     // Call base class method
     FunctionInternal::init();
@@ -374,13 +374,13 @@ namespace casadi {
       P_eval[0] = MX(gridc_[k]);
       P_eval[1] = MX(gridc_[k+1]);
       if (nu_>0) {
-        P_eval[3] = U(range(nu_),k);
+        P_eval[3] = U(range(nu_), k);
       }
       if (control_dae_.input(CONTROL_DAE_U_INTERP).size()>0) {
         if (k+1==U.size2()) {
           P_eval[4] = P_eval[3];
         } else {
-          P_eval[4] = U(Slice(0,nu_),k+1);
+          P_eval[4] = U(Slice(0, nu_), k+1);
         }
       }
       P_eval[5] = Xk;
@@ -390,13 +390,13 @@ namespace casadi {
       simulator_out = simulator_.call(simulator_in);
 
       // Remember the end state and dstate for next iteration in this loop
-      Xk = simulator_out[0](ALL,simulator_out[0].size2()-1);
+      Xk = simulator_out[0](ALL, simulator_out[0].size2()-1);
 
       // Copy all the outputs (but not those 2 extra we introduced)
       for (int i=0;i<simulator_out.size()-2;++i) {
-        simulator_outputs[i].push_back(simulator_out[i+2](ALL,Slice(0,nf_)));
+        simulator_outputs[i].push_back(simulator_out[i+2](ALL, Slice(0, nf_)));
         if (k+1==ns_-1) {  // Output of the last minor step of the last major step
-          simulator_outputs[i].push_back(simulator_out[i+2](ALL,nf_));
+          simulator_outputs[i].push_back(simulator_out[i+2](ALL, nf_));
         }
       }
 
@@ -410,7 +410,7 @@ namespace casadi {
     }
 
     // Finally, construct all_output_
-    all_output_ = MXFunction(all_output_in,all_output_out);
+    all_output_ = MXFunction(all_output_in, all_output_out);
     all_output_.init();
 
   }
@@ -432,7 +432,7 @@ namespace casadi {
   }
 
   Matrix<double> ControlSimulatorInternal::getVFine() const {
-    Matrix<double> ret = Matrix<double>::zeros(nu_,grid_.size()-1);
+    Matrix<double> ret = Matrix<double>::zeros(nu_, grid_.size()-1);
     for (int i=0;i<ns_-1;++i) {
       for (int k=0;k<nf_;++k) {
         copy(input(CONTROLSIMULATOR_U).data().begin()+i*nu_,
@@ -444,7 +444,7 @@ namespace casadi {
   }
 
   std::vector< int > ControlSimulatorInternal::getCoarseIndex() const {
-    return range(0,grid_.size(),nf_);
+    return range(0, grid_.size(), nf_);
   }
 
 } // namespace casadi

@@ -41,7 +41,7 @@ namespace casadi {
    * <tt>A = L.U</tt>, with L lower and U upper triangular
    *
    * LapackLUDense is an casadi::Function mapping from 2 inputs 
-   * [ A (matrix),b (vector)] to one output [x (vector)].
+   * [ A (matrix), b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use LapackLUDense is: \n
    *  -# init()
@@ -72,7 +72,7 @@ namespace casadi {
 #ifdef SWIG
     %callback("%s_cb");
 #endif
-    static LinearSolver creator(const Sparsity& sp, int nrhs) { return LapackLUDense(sp,nrhs);}
+    static LinearSolver creator(const Sparsity& sp, int nrhs) { return LapackLUDense(sp, nrhs);}
 #ifdef SWIG
     %nocallback;
 #endif

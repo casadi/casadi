@@ -56,7 +56,7 @@ namespace casadi {
 
     Sparsity dense;
     if (dense_) {
-      dense = Sparsity::dense(n_,n_-m_);
+      dense = Sparsity::dense(n_, n_-m_);
     }
 
     FunctionInternal::init();

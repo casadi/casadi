@@ -34,7 +34,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f,g) {
+SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f, g) {
   addOption("max_num_steps",               OT_INTEGER,          10000,
             "Maximum number of integrator steps");
   addOption("reltol",                      OT_REAL,             1e-6,
@@ -267,7 +267,7 @@ void SundialsInternal::init() {
   if(hasSetOption("linear_solver") && !jac_.isNull()) {
     // Create a linear solver
     linearSolverCreator creator = getOption("linear_solver");
-    linsol_ = creator(jac_.output().sparsity(),1);
+    linsol_ = creator(jac_.output().sparsity(), 1);
     // Pass options
     if(hasSetOption("linear_solver_options")) {
       linsol_.setOption(getOption("linear_solver_options"));
@@ -279,7 +279,7 @@ void SundialsInternal::init() {
     // Create a linear solver
     linearSolverCreator creator =
         hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
-    linsolB_ = creator(jacB_.output().sparsity(),1);
+    linsolB_ = creator(jacB_.output().sparsity(), 1);
     // Pass options
     if(hasSetOption("linear_solver_optionsB")) {
       linsolB_.setOption(getOption("linear_solver_optionsB"));
@@ -290,14 +290,14 @@ void SundialsInternal::init() {
   }
 }
 
-void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied) {
+void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
   IntegratorInternal::deepCopyMembers(already_copied);
-  linsol_ = deepcopy(linsol_,already_copied);
-  linsolB_ = deepcopy(linsolB_,already_copied);
-  jac_ = deepcopy(jac_,already_copied);
-  jacB_ = deepcopy(jacB_,already_copied);
-  f_fwd_ = deepcopy(f_fwd_,already_copied);
-  g_fwd_ = deepcopy(g_fwd_,already_copied);
+  linsol_ = deepcopy(linsol_, already_copied);
+  linsolB_ = deepcopy(linsolB_, already_copied);
+  jac_ = deepcopy(jac_, already_copied);
+  jacB_ = deepcopy(jacB_, already_copied);
+  f_fwd_ = deepcopy(f_fwd_, already_copied);
+  g_fwd_ = deepcopy(g_fwd_, already_copied);
 }
 
 void SundialsInternal::reset() {

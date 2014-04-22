@@ -50,7 +50,7 @@ namespace casadi {
 
     /// Construct from a vector of polynomial coefficients
     template<typename T>
-    Polynomial(const std::vector<T>& coeff) : p_(coeff.begin(),coeff.end()) {}
+    Polynomial(const std::vector<T>& coeff) : p_(coeff.begin(), coeff.end()) {}
 
     /// Evaluate numerically
     template<typename T>

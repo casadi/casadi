@@ -41,11 +41,11 @@ namespace casadi {
   SDPSDQPInternal::~SDPSDQPInternal() {
   }
 
-  void SDPSDQPInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied) {
+  void SDPSDQPInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
     SDQPSolverInternal::deepCopyMembers(already_copied);
-    sdpsolver_ = deepcopy(sdpsolver_,already_copied);
-    cholesky_ = deepcopy(cholesky_,already_copied);
-    mapping_ = deepcopy(mapping_,already_copied);
+    sdpsolver_ = deepcopy(sdpsolver_, already_copied);
+    cholesky_ = deepcopy(cholesky_, already_copied);
+    mapping_ = deepcopy(mapping_, already_copied);
   }
 
   void SDPSDQPInternal::init() {
@@ -58,30 +58,30 @@ namespace casadi {
     MX g_socp = MX::sym("x", cholesky_.getFactorizationSparsity(true));
     MX h_socp = MX::sym("h", n_);
 
-    MX f_socp = sqrt(inner_prod(h_socp,h_socp));
+    MX f_socp = sqrt(inner_prod(h_socp, h_socp));
     MX en_socp = 0.5/f_socp;
 
     MX f_sdqp = MX::sym("f",input(SDQP_SOLVER_F).sparsity());
     MX g_sdqp = MX::sym("g",input(SDQP_SOLVER_G).sparsity());
 
     std::vector<MX> fi(n_+1);
-    MX znp = MX::sparse(n_+1,n_+1);
+    MX znp = MX::sparse(n_+1, n_+1);
     for (int k=0;k<n_;++k) {
-      MX gk = vertcat(g_socp(ALL,k),DMatrix::sparse(1,1));
-      MX fk = -blockcat(znp,gk,gk.T(),DMatrix::sparse(1,1));
+      MX gk = vertcat(g_socp(ALL, k), DMatrix::sparse(1, 1));
+      MX fk = -blockcat(znp, gk, gk.T(), DMatrix::sparse(1, 1));
       // TODO(Joel): replace with ALL
-      fi.push_back(blkdiag(f_sdqp(ALL,Slice(f_sdqp.size1()*k,f_sdqp.size1()*(k+1))),fk));
+      fi.push_back(blkdiag(f_sdqp(ALL, Slice(f_sdqp.size1()*k, f_sdqp.size1()*(k+1))), fk));
     }
     MX fin = en_socp*DMatrix::eye(n_+2);
-    fin(n_,n_+1) = en_socp;
-    fin(n_+1,n_) = en_socp;
+    fin(n_, n_+1) = en_socp;
+    fin(n_+1, n_) = en_socp;
 
-    fi.push_back(blkdiag(DMatrix::sparse(f_sdqp.size1(),f_sdqp.size1()),-fin));
+    fi.push_back(blkdiag(DMatrix::sparse(f_sdqp.size1(), f_sdqp.size1()), -fin));
 
-    MX h0 = vertcat(h_socp,DMatrix::sparse(1,1));
-    MX g = blockcat(f_socp*DMatrix::eye(n_+1),h0,h0.T(),f_socp);
+    MX h0 = vertcat(h_socp, DMatrix::sparse(1, 1));
+    MX g = blockcat(f_socp*DMatrix::eye(n_+1), h0, h0.T(), f_socp);
 
-    g = blkdiag(g_sdqp,g);
+    g = blkdiag(g_sdqp, g);
 
     IOScheme mappingIn("g_socp","h_socp","f_sdqp","g_sdqp");
     IOScheme mappingOut("f","g");
@@ -109,17 +109,17 @@ namespace casadi {
 
     // Output arguments
     setNumOutputs(SDQP_SOLVER_NUM_OUT);
-    output(SDQP_SOLVER_X) = DMatrix::zeros(n_,1);
+    output(SDQP_SOLVER_X) = DMatrix::zeros(n_, 1);
 
     std::vector<int> r = range(input(SDQP_SOLVER_G).size1());
     output(SDQP_SOLVER_P) = sdpsolver_.output(SDP_SOLVER_P).isEmpty() ? DMatrix() :
-        sdpsolver_.output(SDP_SOLVER_P)(r,r);
+        sdpsolver_.output(SDP_SOLVER_P)(r, r);
     output(SDQP_SOLVER_DUAL) = sdpsolver_.output(SDP_SOLVER_DUAL).isEmpty() ? DMatrix() :
-        sdpsolver_.output(SDP_SOLVER_DUAL)(r,r);
+        sdpsolver_.output(SDP_SOLVER_DUAL)(r, r);
     output(SDQP_SOLVER_COST) = 0.0;
     output(SDQP_SOLVER_DUAL_COST) = 0.0;
-    output(SDQP_SOLVER_LAM_X) = DMatrix::zeros(n_,1);
-    output(SDQP_SOLVER_LAM_A) = DMatrix::zeros(nc_,1);
+    output(SDQP_SOLVER_LAM_X) = DMatrix::zeros(n_, 1);
+    output(SDQP_SOLVER_LAM_A) = DMatrix::zeros(nc_, 1);
   }
 
   void SDPSDQPInternal::evaluate() {
@@ -128,7 +128,7 @@ namespace casadi {
       cholesky_.input().at(k)*=0.5;
     }
     cholesky_.prepare();
-    mapping_.setInput(cholesky_.getFactorization(true),"g_socp");
+    mapping_.setInput(cholesky_.getFactorization(true), "g_socp");
     std::copy(input(SDQP_SOLVER_C).begin(),
               input(SDQP_SOLVER_C).end(),
               mapping_.input("h_socp").begin());
@@ -137,8 +137,8 @@ namespace casadi {
       mapping_.input("h_socp").at(k)*= 0.5;
     }
 
-    mapping_.setInput(input(SDQP_SOLVER_F),"f_sdqp");
-    mapping_.setInput(input(SDQP_SOLVER_G),"g_sdqp");
+    mapping_.setInput(input(SDQP_SOLVER_F), "f_sdqp");
+    mapping_.setInput(input(SDQP_SOLVER_G), "g_sdqp");
 
     mapping_.evaluate();
 

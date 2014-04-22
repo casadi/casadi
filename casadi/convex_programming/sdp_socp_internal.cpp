@@ -52,31 +52,31 @@ SDPSOCPInternal::~SDPSOCPInternal() {
 void SDPSOCPInternal::evaluate() {
   if (print_problem_) printProblem();
 
-  mapping_.setInput(input(SOCP_SOLVER_G),0);
-  mapping_.setInput(input(SOCP_SOLVER_H),1);
-  mapping_.setInput(input(SOCP_SOLVER_E),2);
-  mapping_.setInput(input(SOCP_SOLVER_F),3);
+  mapping_.setInput(input(SOCP_SOLVER_G), 0);
+  mapping_.setInput(input(SOCP_SOLVER_H), 1);
+  mapping_.setInput(input(SOCP_SOLVER_E), 2);
+  mapping_.setInput(input(SOCP_SOLVER_F), 3);
 
   mapping_.evaluate();
 
-  sdpsolver_.setInput(mapping_.output(0),SDP_SOLVER_F);
-  sdpsolver_.setInput(mapping_.output(1),SDP_SOLVER_G);
-  sdpsolver_.setInput(input(SOCP_SOLVER_A),SDP_SOLVER_A);
-  sdpsolver_.setInput(input(SOCP_SOLVER_C),SDP_SOLVER_C);
-  sdpsolver_.setInput(input(SOCP_SOLVER_LBX),SDP_SOLVER_LBX);
-  sdpsolver_.setInput(input(SOCP_SOLVER_UBX),SDP_SOLVER_UBX);
-  sdpsolver_.setInput(input(SOCP_SOLVER_LBA),SDP_SOLVER_LBA);
-  sdpsolver_.setInput(input(SOCP_SOLVER_UBA),SDP_SOLVER_UBA);
+  sdpsolver_.setInput(mapping_.output(0), SDP_SOLVER_F);
+  sdpsolver_.setInput(mapping_.output(1), SDP_SOLVER_G);
+  sdpsolver_.setInput(input(SOCP_SOLVER_A), SDP_SOLVER_A);
+  sdpsolver_.setInput(input(SOCP_SOLVER_C), SDP_SOLVER_C);
+  sdpsolver_.setInput(input(SOCP_SOLVER_LBX), SDP_SOLVER_LBX);
+  sdpsolver_.setInput(input(SOCP_SOLVER_UBX), SDP_SOLVER_UBX);
+  sdpsolver_.setInput(input(SOCP_SOLVER_LBA), SDP_SOLVER_LBA);
+  sdpsolver_.setInput(input(SOCP_SOLVER_UBA), SDP_SOLVER_UBA);
 
   sdpsolver_.evaluate();
 
   // Pass the stats
   stats_["sdp_solver_stats"] = sdpsolver_.getStats();
 
-  setOutput(sdpsolver_.output(SDP_SOLVER_X),SOCP_SOLVER_X);
-  setOutput(sdpsolver_.output(SDP_SOLVER_COST),SOCP_SOLVER_COST);
-  setOutput(sdpsolver_.output(SDP_SOLVER_LAM_X),SOCP_SOLVER_LAM_X);
-  setOutput(sdpsolver_.output(SDP_SOLVER_LAM_A),SOCP_SOLVER_LAM_A);
+  setOutput(sdpsolver_.output(SDP_SOLVER_X), SOCP_SOLVER_X);
+  setOutput(sdpsolver_.output(SDP_SOLVER_COST), SOCP_SOLVER_COST);
+  setOutput(sdpsolver_.output(SDP_SOLVER_LAM_X), SOCP_SOLVER_LAM_X);
+  setOutput(sdpsolver_.output(SDP_SOLVER_LAM_A), SOCP_SOLVER_LAM_A);
 }
 
 void SDPSOCPInternal::init() {
@@ -94,8 +94,8 @@ void SDPSOCPInternal::init() {
   *
   *        <=>
   *
-  *  | ei[k]I     Gi(:,k)'  |
-  *  | Gi(:,k)     ei[k]  |
+  *  | ei[k]I     Gi(:, k)'  |
+  *  | Gi(:, k)     ei[k]  |
   *
   *      | k  (n)      \   i  (for each cone)
   *      v              \
@@ -122,9 +122,9 @@ void SDPSOCPInternal::init() {
     i_start = 0;
     // Loop over all SOCP constraints
     for (int i=0;i<ni_.size();++i) {
-      MX Gik = G(Slice(k),Slice(i_start,i_start+ni_[i])).T();
+      MX Gik = G(Slice(k), Slice(i_start, i_start+ni_[i])).T();
       MX Eik = E[n_*i+k];
-      Fi_d.push_back(blockcat(Eik*MX::eye(ni_[i]),Gik,Gik.T(),Eik));
+      Fi_d.push_back(blockcat(Eik*MX::eye(ni_[i]), Gik, Gik.T(), Eik));
       i_start += ni_[i];
     }
     Fi.push_back(blkdiag(Fi_d));
@@ -136,8 +136,8 @@ void SDPSOCPInternal::init() {
   // Loop over all SOCP constraints
   for (int i=0;i<ni_.size();++i) {
     MX Fi  = F[i];
-    MX Hi  = H[range(i_start,i_start+ni_[i])];
-    G_d.push_back(blockcat(Fi*MX::eye(ni_[i]),Hi,Hi.T(),Fi));
+    MX Hi  = H[range(i_start, i_start+ni_[i])];
+    G_d.push_back(blockcat(Fi*MX::eye(ni_[i]), Hi, Hi.T(), Fi));
     i_start += ni_[i];
   }
 
@@ -151,7 +151,7 @@ void SDPSOCPInternal::init() {
   syms.push_back(E);
   syms.push_back(F);
 
-  mapping_ = MXFunction(syms,out);
+  mapping_ = MXFunction(syms, out);
   mapping_.init();
 
   log("SDPSOCPInternal::init","Created mapping function");

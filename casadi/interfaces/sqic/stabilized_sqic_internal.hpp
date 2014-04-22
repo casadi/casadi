@@ -63,10 +63,10 @@ public:
     static void sqic_error(const std::string& module, int flag);
 
     /// Calculate the error message map
-    static std::map<int,std::string> calc_flagmap();
+    static std::map<int, std::string> calc_flagmap();
 
     /// Error message map
-    static std::map<int,std::string> flagmap;
+    static std::map<int, std::string> flagmap;
   protected:
 
     /// Flag: is already initialized

@@ -33,7 +33,7 @@ namespace casadi {
   // Constructor
   QPSolverInternal::QPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
 
-    casadi_assert_message(st_.size()==QP_STRUCT_NUM,"Problem structure mismatch");
+    casadi_assert_message(st_.size()==QP_STRUCT_NUM, "Problem structure mismatch");
 
     const Sparsity& A = st_[QP_STRUCT_A];
     const Sparsity& H = st_[QP_STRUCT_H];
@@ -57,8 +57,8 @@ namespace casadi {
       );
 
     // Sparsity
-    Sparsity x_sparsity = Sparsity::dense(n_,1);
-    Sparsity bounds_sparsity = Sparsity::dense(nc_,1);
+    Sparsity x_sparsity = Sparsity::dense(n_, 1);
+    Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
 
     // Input arguments
     setNumInputs(QP_SOLVER_NUM_IN);

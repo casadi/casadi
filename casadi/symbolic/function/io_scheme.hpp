@@ -55,7 +55,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject {
 
     #ifndef SWIGPYTHON
     IOScheme(
-        const std::string &arg_s0,const std::string &arg_s1="",
+        const std::string &arg_s0, const std::string &arg_s1="",
         const std::string &arg_s2="",const std::string &arg_s3="",
         const std::string &arg_s4="",const std::string &arg_s5="",
         const std::string &arg_s6="",const std::string &arg_s7="",
@@ -166,7 +166,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject {
       if (arg_s17!="") { k.push_back(arg_s17);  v.push_back(arg_m17); }
       if (arg_s18!="") { k.push_back(arg_s18);  v.push_back(arg_m18); }
       if (arg_s19!="") { k.push_back(arg_s19);  v.push_back(arg_m19); }
-      return operator()(k,v);
+      return operator()(k, v);
     }
     #endif // SWIG
 
@@ -205,12 +205,12 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject {
     if (arg_s17!="") { k.push_back(arg_s17);  }
     if (arg_s18!="") { k.push_back(arg_s18);  }
     if (arg_s19!="") { k.push_back(arg_s19);   }
-    return operator()(arg_m0,k);
+    return operator()(arg_m0, k);
   }
   #endif // SWIG
 
   template<class M>
-    std::vector<M> operator()(const std::vector<M> arg_m,const std::vector<std::string> & arg_s) {
+    std::vector<M> operator()(const std::vector<M> arg_m, const std::vector<std::string> & arg_s) {
     casadi_assert(arg_m.size()==size());
     std::vector<M> ret;
     for (int i=0;i<arg_s.size();++i) {
@@ -222,7 +222,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject {
   }
 
   template<class M>
-    IOSchemeVector<M> operator()(const std::vector<std::string> arg_s,const std::vector<M> & arg_m) {
+    IOSchemeVector<M> operator()(const std::vector<std::string> arg_s, const std::vector<M> & arg_m) {
     casadi_assert(arg_s.size()==arg_m.size());
     std::vector<M> v(size());
     for (int i=0;i<arg_s.size();++i) {
@@ -230,7 +230,7 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject {
       v[k]=arg_m[i];
     }
 
-    return IOSchemeVector<M>(v,*this);
+    return IOSchemeVector<M>(v, *this);
   }
 
 };

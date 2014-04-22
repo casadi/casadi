@@ -27,7 +27,7 @@ using namespace std;
 namespace casadi {
 
   SubAssign::SubAssign(const MX& x, const MX& y, const Slice& i, const Slice& j) : i_(i), j_(j) {
-    setDependencies(x,y);
+    setDependencies(x, y);
     casadi_error("not ready");
   }
 
@@ -37,12 +37,12 @@ namespace casadi {
 
   void SubAssign::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                             std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void SubAssign::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                              std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>

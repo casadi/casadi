@@ -85,10 +85,10 @@ namespace casadi {
 
     /// Solve for square linear system
     //virtual MX getSolve(const MX& r, bool tr, const LinearSolver& linear_solver) const {
-    // return dep()->getSolve(r,!tr,linear_solver);} // FIXME #1001
+    // return dep()->getSolve(r, !tr, linear_solver);} // FIXME #1001
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node,depth);}
+    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node, depth);}
   };
 
   /** \brief Matrix transpose (dense)

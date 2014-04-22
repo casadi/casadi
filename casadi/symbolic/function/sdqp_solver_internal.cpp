@@ -40,7 +40,7 @@ SDQPSolverInternal::SDQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
   addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
             "Options to be passed to the SDPSOlver");
 
-  casadi_assert_message(st_.size()==SDQP_STRUCT_NUM,"Problem structure mismatch");
+  casadi_assert_message(st_.size()==SDQP_STRUCT_NUM, "Problem structure mismatch");
 
   const Sparsity& A = st_[SDQP_STRUCT_A];
   const Sparsity& G = st_[SDQP_STRUCT_G];
@@ -74,10 +74,10 @@ SDQPSolverInternal::SDQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
 
   // Input arguments
   setNumInputs(SDQP_SOLVER_NUM_IN);
-  input(SDQP_SOLVER_H) = DMatrix(H,0);
-  input(SDQP_SOLVER_G) = DMatrix(G,0);
-  input(SDQP_SOLVER_F) = DMatrix(F,0);
-  input(SDQP_SOLVER_A) = DMatrix(A,0);
+  input(SDQP_SOLVER_H) = DMatrix(H, 0);
+  input(SDQP_SOLVER_G) = DMatrix(G, 0);
+  input(SDQP_SOLVER_F) = DMatrix(F, 0);
+  input(SDQP_SOLVER_A) = DMatrix(A, 0);
   input(SDQP_SOLVER_C) = DMatrix::zeros(n_);
   input(SDQP_SOLVER_LBX) = -DMatrix::inf(n_);
   input(SDQP_SOLVER_UBX) = DMatrix::inf(n_);
@@ -85,7 +85,7 @@ SDQPSolverInternal::SDQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
   input(SDQP_SOLVER_UBA) = DMatrix::inf(nc_);
 
   for (int i=0;i<n_;i++) {
-    Sparsity s = input(SDQP_SOLVER_F)(ALL,Slice(i*m_,(i+1)*m_)).sparsity();
+    Sparsity s = input(SDQP_SOLVER_F)(ALL, Slice(i*m_, (i+1)*m_)).sparsity();
     casadi_assert_message(s==s.transpose(),
                           "SDQPSolverInternal: Each supplied Fi must be symmetric. "
                           "But got " << s.dimString() <<  " for i = " << i << ".");

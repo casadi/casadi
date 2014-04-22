@@ -41,7 +41,7 @@ namespace casadi {
       \date 2010
   */
   class CASADI_SYMBOLIC_EXPORT MXFunctionInternal :
-        public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
+        public XFunctionInternal<MXFunction, MXFunctionInternal, MX, MXNode>{
     friend class MXFunction;
 
   public:
@@ -54,7 +54,7 @@ namespace casadi {
     virtual MXFunctionInternal* clone() const;
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Destructor */
     virtual ~MXFunctionInternal();
@@ -90,7 +90,7 @@ namespace casadi {
     std::vector<AlgEl> algorithm_;
 
     /** \brief  Working vector for numeric calculation */
-    std::vector<std::pair<DMatrix,int> > work_;
+    std::vector<std::pair<DMatrix, int> > work_;
 
     /** \brief  Temporary vectors needed for the evaluation (integer) */
     std::vector<int> itmp_;
@@ -99,7 +99,7 @@ namespace casadi {
     std::vector<double> rtmp_;
 
     /** \brief  "Tape" with spilled variables */
-    std::vector<std::pair<std::pair<int,int>,DMatrix> > tape_;
+    std::vector<std::pair<std::pair<int, int>, DMatrix> > tape_;
 
     /// Free variables
     std::vector<MX> free_vars_;
@@ -147,7 +147,7 @@ namespace casadi {
     void printWork(std::ostream &stream=std::cout);
 
     /// Allocate tape
-    void allocTape(std::vector<std::pair<std::pair<int,int>,MX> >& tape);
+    void allocTape(std::vector<std::pair<std::pair<int, int>, MX> >& tape);
 
     // print an element of an algorithm
     void print(std::ostream &stream, const AlgEl& el) const;

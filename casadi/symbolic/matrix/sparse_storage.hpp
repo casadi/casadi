@@ -56,7 +56,7 @@ namespace casadi {
     /// Sparse matrix with a given sparsity and non-zero elements.
     SparseStorage(const Sparsity& sparsity, const std::vector<DataType>& d);
 
-    /** \brief Check if the dimensions and colind,row vectors are compatible.
+    /** \brief Check if the dimensions and colind, row vectors are compatible.
      * \param complete  set to true to also check elementwise
      * throws an error as possible result
      */
@@ -111,24 +111,24 @@ namespace casadi {
     template<typename A>
     SparseStorage(const SparseStorage<A>& x) :
         sparsity_(x.sparsity()), data_(std::vector<DataType>(x.size())) {
-      copy(x.begin(),x.end(),begin());
+      copy(x.begin(), x.end(), begin());
     }
 
     /** \brief  Create an expression from an stl vector  */
     template<typename A>
     SparseStorage(const std::vector<A>& x) :
-      sparsity_(Sparsity::dense(x.size(),1)), data_(std::vector<DataType>(x.size())) {
-      copy(x.begin(),x.end(),begin());
+      sparsity_(Sparsity::dense(x.size(), 1)), data_(std::vector<DataType>(x.size())) {
+      copy(x.begin(), x.end(), begin());
     }
 
     /** \brief  Create a non-vector expression from an stl vector */
     template<typename A>
     SparseStorage(const std::vector<A>& x,  int nrow, int ncol) :
-      sparsity_(Sparsity::dense(nrow,ncol)), data_(std::vector<DataType>(x.size())) {
+      sparsity_(Sparsity::dense(nrow, ncol)), data_(std::vector<DataType>(x.size())) {
       if(x.size() != nrow*ncol)
         throw CasadiException("SparseStorage::SparseStorage(const std::vector<DataType>& x, "
                               "int n, int m): dimension mismatch");
-      copy(x.begin(),x.end(),begin());
+      copy(x.begin(), x.end(), begin());
     }
 
 
@@ -173,14 +173,14 @@ namespace casadi {
     DataType& elem(int rr, int cc=0);
 #else // SWIG
     /// Access a non-zero element
-    DataType elem(int rr, int cc=0) { return elem(rr,cc);}
+    DataType elem(int rr, int cc=0) { return elem(rr, cc);}
 #endif // SWIG
 
     /// get an element, do not allocate
-    const DataType getElement(int rr, int cc=0) const { return elem(rr,cc);}
+    const DataType getElement(int rr, int cc=0) const { return elem(rr, cc);}
 
-    /// Returns true if the matrix has a non-zero at location rr,cc
-    bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr,cc); }
+    /// Returns true if the matrix has a non-zero at location rr, cc
+    bool hasNZ(int rr, int cc) const { return sparsity().hasNZ(rr, cc); }
 
     // Get the sparsity pattern
     const std::vector<int>& row() const;

@@ -51,12 +51,12 @@ namespace casadi {
     virtual PsdIndefDpleInternal* clone() const;
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
     virtual PsdIndefDpleInternal* create(const std::vector< Sparsity > & A,
                                          const std::vector< Sparsity > &V) const
-    { return new PsdIndefDpleInternal(A,V); }
+    { return new PsdIndefDpleInternal(A, V); }
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

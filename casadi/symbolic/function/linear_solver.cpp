@@ -29,7 +29,7 @@ namespace casadi {
   }
 
   LinearSolver::LinearSolver(const Sparsity& sp, int nrhs) {
-    assignNode(new LinearSolverInternal(sp,nrhs));
+    assignNode(new LinearSolverInternal(sp, nrhs));
   }
 
   LinearSolverInternal* LinearSolver::operator->() {
@@ -47,7 +47,7 @@ namespace casadi {
 
   void LinearSolver::solve(double* x, int nrhs, bool transpose) {
     assertInit();
-    (*this)->solve(x,nrhs,transpose);
+    (*this)->solve(x, nrhs, transpose);
   }
 
   void LinearSolver::solve(bool transpose) {
@@ -57,7 +57,7 @@ namespace casadi {
 
   MX LinearSolver::solve(const MX& A, const MX& B, bool transpose) {
     assertInit();
-    return (*this)->solve(A,B,transpose);
+    return (*this)->solve(A, B, transpose);
   }
 
   bool LinearSolver::prepared() const {
@@ -70,11 +70,11 @@ namespace casadi {
   }
 
   void LinearSolver::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const {
-    (*this)->spSolve(X,B,transpose);
+    (*this)->spSolve(X, B, transpose);
   }
 
   void LinearSolver::spSolve(DMatrix& X, const DMatrix& B, bool transpose) const {
-    (*this)->spSolve(X,B,transpose);
+    (*this)->spSolve(X, B, transpose);
   }
 
 

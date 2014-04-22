@@ -52,7 +52,7 @@ namespace casadi {
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
                                              const LinearSolver& linsol) const
-    { return new NewtonImplicitInternal(f,jac,linsol);}
+    { return new NewtonImplicitInternal(f, jac, linsol);}
 
     /** \brief  Initialize */
     virtual void init();

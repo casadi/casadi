@@ -58,7 +58,7 @@ namespace casadi {
 
     // Forward sensitivities
     if(!fwdSens.empty()) {
-      MX zero_sens = MX::sparse(size1(),size2());
+      MX zero_sens = MX::sparse(size1(), size2());
       for(int d=0; d<fwdSens.size(); ++d) {
         if(fwdSens[d][0]!=0) {
           *fwdSens[d][0] = zero_sens;
@@ -76,14 +76,14 @@ namespace casadi {
 
   void ConstantMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    fill_n(outputd,output[0]->size(),0);
+    fill_n(outputd, output[0]->size(), 0);
   }
 
   void ConstantDMatrix::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                           const std::vector<std::string>& res,
                                           CodeGenerator& gen) const {
     // Print the constant
-    int ind = gen.getConstant(x_.data(),true);
+    int ind = gen.getConstant(x_.data(), true);
 
     // Copy the constant to the work vector
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
@@ -105,7 +105,7 @@ namespace casadi {
       case 0: return new Constant<CompiletimeConst<0> >(sp);
       case 1: return new Constant<CompiletimeConst<1> >(sp);
       case -1: return new Constant<CompiletimeConst<(-1)> >(sp);
-      default: return new Constant<RuntimeConst<int> >(sp,val);
+      default: return new Constant<RuntimeConst<int> >(sp, val);
       }
     }
   }
@@ -116,18 +116,18 @@ namespace casadi {
     } else {
       int intval(val);
       if(intval-val==0) {
-        return create(sp,intval);
+        return create(sp, intval);
       } else {
-        return new Constant<RuntimeConst<double> >(sp,val);
+        return new Constant<RuntimeConst<double> >(sp, val);
       }
     }
   }
 
   ConstantMX* ConstantMX::create(const Matrix<double>& val) {
     if(val.size()==0) {
-      return create(val.sparsity(),0);
+      return create(val.sparsity(), 0);
     } else if(val.isScalar()) {
-      return create(val.sparsity(),val.toScalar());
+      return create(val.sparsity(), val.toScalar());
     } else {
       // Check if all values are the same
       const vector<double> vdata = val.data();
@@ -140,7 +140,7 @@ namespace casadi {
       }
 
       // All values identical if reached this point
-      return create(val.sparsity(),v);
+      return create(val.sparsity(), v);
     }
   }
 
@@ -165,7 +165,7 @@ namespace casadi {
   //     // Constant folding
   //     DMatrix xv = getMatrixValue();
   //     DMatrix yv = y->getMatrixValue();
-  //     return mul(xv,yv);
+  //     return mul(xv, yv);
   //   } else {
   //     return MXNode::getMultiplication(y);
   //   }
@@ -176,7 +176,7 @@ namespace casadi {
       // Constant folding
       DMatrix xv = getMatrixValue();
       DMatrix yv = y->getMatrixValue();
-      return inner_prod(xv,yv);
+      return inner_prod(xv, yv);
     } else {
       return MXNode::getInnerProd(y);
     }
@@ -191,7 +191,7 @@ namespace casadi {
     if(this->sparsity()!=node->sparsity()) return false;
 
     // Check indices
-    if(!std::equal(x_.begin(),x_.end(),n->x_.begin())) return false;
+    if(!std::equal(x_.begin(), x_.end(), n->x_.begin())) return false;
 
     return true;
   }

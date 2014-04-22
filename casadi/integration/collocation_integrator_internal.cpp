@@ -34,7 +34,7 @@ namespace casadi {
 
   CollocationIntegratorInternal::CollocationIntegratorInternal(const Function& f,
                                                                const Function& g)
-      : ImplicitFixedStepIntegratorInternal(f,g) {
+      : ImplicitFixedStepIntegratorInternal(f, g) {
     addOption("interpolation_order",           OT_INTEGER,  3,
               "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",
@@ -43,7 +43,7 @@ namespace casadi {
   }
 
   void CollocationIntegratorInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     ImplicitFixedStepIntegratorInternal::deepCopyMembers(already_copied);
   }
 
@@ -63,16 +63,16 @@ namespace casadi {
     deg_ = getOption("interpolation_order");
 
     // All collocation time points
-    std::vector<long double> tau_root = collocationPointsL(deg_,getOption("collocation_scheme"));
+    std::vector<long double> tau_root = collocationPointsL(deg_, getOption("collocation_scheme"));
 
     // Coefficients of the collocation equation
-    vector<vector<double> > C(deg_+1,vector<double>(deg_+1,0));
+    vector<vector<double> > C(deg_+1, vector<double>(deg_+1, 0));
 
     // Coefficients of the continuity equation
-    vector<double> D(deg_+1,0);
+    vector<double> D(deg_+1, 0);
 
     // Coefficients of the quadratures
-    vector<double> B(deg_+1,0);
+    vector<double> B(deg_+1, 0);
 
     // For all collocation points
     for(int j=0; j<deg_+1; ++j) {
@@ -81,7 +81,7 @@ namespace casadi {
       Polynomial p = 1;
       for(int r=0; r<deg_+1; ++r) {
         if(r!=j) {
-          p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
+          p *= Polynomial(-tau_root[r], 1)/(tau_root[j]-tau_root[r]);
         }
       }
 
@@ -108,19 +108,19 @@ namespace casadi {
 
     // Implicitly defined variables (z and x)
     MX v = MX::sym("v",deg_*(nx_+nz_));
-    vector<int> v_offset(1,0);
+    vector<int> v_offset(1, 0);
     for(int d=0; d<deg_; ++d) {
       v_offset.push_back(v_offset.back()+nx_);
       v_offset.push_back(v_offset.back()+nz_);
     }
-    vector<MX> vv = vertsplit(v,v_offset);
+    vector<MX> vv = vertsplit(v, v_offset);
     vector<MX>::const_iterator vv_it = vv.begin();
 
     // Collocated states
     vector<MX> x(deg_+1), z(deg_+1);
     for(int d=1; d<=deg_; ++d) {
-      x[d] = reshape(*vv_it++,this->x0().shape());
-      z[d] = reshape(*vv_it++,this->z0().shape());
+      x[d] = reshape(*vv_it++, this->x0().shape());
+      z[d] = reshape(*vv_it++, this->z0().shape());
     }
     casadi_assert(vv_it==vv.end());
 
@@ -180,7 +180,7 @@ namespace casadi {
     F_out[DAE_ODE] = xf;
     F_out[DAE_ALG] = vertcat(eq);
     F_out[DAE_QUAD] = qf;
-    F_ = MXFunction(F_in,F_out);
+    F_ = MXFunction(F_in, F_out);
     F_.init();
 
     // Backwards dynamics
@@ -194,19 +194,19 @@ namespace casadi {
 
       // Implicitly defined variables (rz and rx)
       MX rv = MX::sym("v",deg_*(nrx_+nrz_));
-      vector<int> rv_offset(1,0);
+      vector<int> rv_offset(1, 0);
       for(int d=0; d<deg_; ++d) {
         rv_offset.push_back(rv_offset.back()+nrx_);
         rv_offset.push_back(rv_offset.back()+nrz_);
       }
-      vector<MX> rvv = vertsplit(rv,rv_offset);
+      vector<MX> rvv = vertsplit(rv, rv_offset);
       vector<MX>::const_iterator rvv_it = rvv.begin();
 
       // Collocated states
       vector<MX> rx(deg_+1), rz(deg_+1);
       for(int d=1; d<=deg_; ++d) {
-        rx[d] = reshape(*rvv_it++,this->rx0().shape());
-        rz[d] = reshape(*rvv_it++,this->rz0().shape());
+        rx[d] = reshape(*rvv_it++, this->rx0().shape());
+        rz[d] = reshape(*rvv_it++, this->rz0().shape());
       }
       casadi_assert(rvv_it==rvv.end());
 
@@ -265,7 +265,7 @@ namespace casadi {
       G_out[RDAE_ODE] = rxf;
       G_out[RDAE_ALG] = vertcat(eq);
       G_out[RDAE_QUAD] = rqf;
-      G_ = MXFunction(G_in,G_out);
+      G_ = MXFunction(G_in, G_out);
       G_.init();
     }
   }
@@ -280,9 +280,9 @@ namespace casadi {
     vector<double>::const_iterator z_it = input(INTEGRATOR_Z0).begin();
     vector<double>::iterator Z_it = Z_.begin();
     for(int d=0; d<deg_; ++d) {
-      copy(x0_it,x0_it+nx_,Z_it);
+      copy(x0_it, x0_it+nx_, Z_it);
       Z_it += nx_;
-      copy(z_it,z_it+nz_,Z_it);
+      copy(z_it, z_it+nz_, Z_it);
       Z_it += nz_;
     }
     casadi_assert(Z_it==Z_.end());
@@ -293,9 +293,9 @@ namespace casadi {
     vector<double>::const_iterator rz_it = input(INTEGRATOR_RZ0).begin();
     vector<double>::iterator RZ_it = RZ_.begin();
     for(int d=0; d<deg_; ++d) {
-      copy(rx0_it,rx0_it+nrx_,RZ_it);
+      copy(rx0_it, rx0_it+nrx_, RZ_it);
       RZ_it += nrx_;
-      copy(rz_it,rz_it+nrz_,RZ_it);
+      copy(rz_it, rz_it+nrz_, RZ_it);
       RZ_it += nrz_;
     }
     casadi_assert(RZ_it==RZ_.end());

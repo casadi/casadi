@@ -212,7 +212,7 @@ virtual ~OptionsFunctionalityNode();
   void printOptions(std::ostream &stream=std::cout) const;
 
   /** \brief  Print all information there is to know about a certain option */
-  void printOption(const std::string &name,std::ostream &stream = std::cout) const;
+  void printOption(const std::string &name, std::ostream &stream = std::cout) const;
 
   /** \brief  get an option value */
   GenericType getOption(const std::string &str) const;
@@ -249,7 +249,7 @@ virtual ~OptionsFunctionalityNode();
 
 
   /** \brief A distance metric between two words */
-  static double wordDistance(const std::string &a,const std::string &b);
+  static double wordDistance(const std::string &a, const std::string &b);
 
 protected:
 

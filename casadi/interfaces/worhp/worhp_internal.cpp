@@ -47,28 +47,28 @@ namespace casadi {
     ss << "Armijo recovery strategies. Vector of size " << NAres;
 
     std::vector<int> ares(NAres);
-    std::copy(worhp_p_.Ares,worhp_p_.Ares+NAres,ares.begin());
+    std::copy(worhp_p_.Ares, worhp_p_.Ares+NAres, ares.begin());
     addOption("Ares",OT_INTEGERVECTOR,ares,ss.str());
 
     for (int i=0;i<WorhpGetParamCount();++i) {
       WorhpType type = WorhpGetParamType(i+1);
       const char* name = WorhpGetParamName(i+1);
-      if (strcmp(name,"Ares")==0) continue;
+      if (strcmp(name, "Ares")==0) continue;
       switch(type) {
         case WORHP_BOOL_T:
           bool default_bool;
           WorhpGetBoolParam(&worhp_p_, name, &default_bool);
-          addOption(WorhpGetParamName(i+1),OT_BOOLEAN,default_bool,WorhpGetParamDescription(i+1));
+          addOption(WorhpGetParamName(i+1), OT_BOOLEAN, default_bool, WorhpGetParamDescription(i+1));
           break;
         case WORHP_DOUBLE_T:
           double default_double;
           WorhpGetDoubleParam(&worhp_p_, name, &default_double);
-          addOption(WorhpGetParamName(i+1),OT_REAL,default_double,WorhpGetParamDescription(i+1));
+          addOption(WorhpGetParamName(i+1), OT_REAL, default_double, WorhpGetParamDescription(i+1));
           break;
         case WORHP_INT_T:
           int default_int;
           WorhpGetIntParam(&worhp_p_, name, &default_int);
-          addOption(WorhpGetParamName(i+1),OT_INTEGER,default_int,WorhpGetParamDescription(i+1));
+          addOption(WorhpGetParamName(i+1), OT_INTEGER, default_int, WorhpGetParamDescription(i+1));
           break;
         default:
           break;// do nothing
@@ -187,7 +187,7 @@ namespace casadi {
 
     if (hasSetOption("Ares")) {
       std::vector<int> ares = getOption("Ares");
-      std::copy(ares.begin(),ares.begin()+NAres,worhp_p_.Ares);
+      std::copy(ares.begin(), ares.begin()+NAres, worhp_p_.Ares);
     }
 
     // Read options
@@ -353,7 +353,7 @@ namespace casadi {
      for (int i=0;i<WorhpGetParamCount();++i) {
       WorhpType type = WorhpGetParamType(i+1);
       const char* name = WorhpGetParamName(i+1);
-      if (strcmp(name,"Ares")==0) continue;
+      if (strcmp(name, "Ares")==0) continue;
 
       switch(type) {
         case WORHP_BOOL_T:
@@ -469,14 +469,14 @@ namespace casadi {
     }
 
     // Pass inputs to WORHP data structures
-    x0.getArray(worhp_o_.X,worhp_o_.n);
-    lbx.getArray(worhp_o_.XL,worhp_o_.n);
-    ubx.getArray(worhp_o_.XU,worhp_o_.n);
-    lam_x0.getArray(worhp_o_.Lambda,worhp_o_.n);
+    x0.getArray(worhp_o_.X, worhp_o_.n);
+    lbx.getArray(worhp_o_.XL, worhp_o_.n);
+    ubx.getArray(worhp_o_.XU, worhp_o_.n);
+    lam_x0.getArray(worhp_o_.Lambda, worhp_o_.n);
     if (worhp_o_.m>0) {
-      lam_g0.getArray(worhp_o_.Mu,worhp_o_.m);
-      lbg.getArray(worhp_o_.GL,worhp_o_.m);
-      ubg.getArray(worhp_o_.GU,worhp_o_.m);
+      lam_g0.getArray(worhp_o_.Mu, worhp_o_.m);
+      lbg.getArray(worhp_o_.GL, worhp_o_.m);
+      ubg.getArray(worhp_o_.GU, worhp_o_.m);
     }
 
     // Replace infinite bounds with worhp_p_.Infty
@@ -513,15 +513,15 @@ namespace casadi {
             double time1 = clock();
             // Copy outputs
             if (!output(NLP_SOLVER_X).isEmpty())
-              output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n);
+              output(NLP_SOLVER_X).setArray(worhp_o_.X, worhp_o_.n);
             if (!output(NLP_SOLVER_F).isEmpty())
               output(NLP_SOLVER_F).set(worhp_o_.F);
             if (!output(NLP_SOLVER_G).isEmpty())
-              output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m);
+              output(NLP_SOLVER_G).setArray(worhp_o_.G, worhp_o_.m);
             if (!output(NLP_SOLVER_LAM_X).isEmpty())
-              output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
+              output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda, worhp_o_.n);
             if (!output(NLP_SOLVER_LAM_G).isEmpty())
-              output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m);
+              output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu, worhp_o_.m);
 
             Dictionary iteration;
             iteration["iter"] = worhp_w_.MajorIter;
@@ -535,7 +535,7 @@ namespace casadi {
             double time2 = clock();
             t_callback_prepare_ += (time2-time1)/CLOCKS_PER_SEC;
             time1 = clock();
-            int ret = callback_(ref_,user_data_);
+            int ret = callback_(ref_, user_data_);
             time2 = clock();
             t_callback_fun_ += (time2-time1)/CLOCKS_PER_SEC;
 
@@ -565,7 +565,7 @@ namespace casadi {
       }
 
       if (GetUserAction(&worhp_c_, evalDG)) {
-        eval_jac_g(worhp_o_.X,worhp_w_.DG.val);
+        eval_jac_g(worhp_o_.X, worhp_w_.DG.val);
         DoneUserAction(&worhp_c_, evalDG);
       }
 
@@ -583,11 +583,11 @@ namespace casadi {
     t_mainloop_ += (time2-time1)/CLOCKS_PER_SEC;
 
     // Copy outputs
-    output(NLP_SOLVER_X).setArray(worhp_o_.X,worhp_o_.n,DENSE);
+    output(NLP_SOLVER_X).setArray(worhp_o_.X, worhp_o_.n, DENSE);
     output(NLP_SOLVER_F).set(worhp_o_.F);
-    output(NLP_SOLVER_G).setArray(worhp_o_.G,worhp_o_.m,DENSE);
-    output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda,worhp_o_.n);
-    output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu,worhp_o_.m,DENSE);
+    output(NLP_SOLVER_G).setArray(worhp_o_.G, worhp_o_.m, DENSE);
+    output(NLP_SOLVER_LAM_X).setArray(worhp_o_.Lambda, worhp_o_.n);
+    output(NLP_SOLVER_LAM_G).setArray(worhp_o_.Mu, worhp_o_.m, DENSE);
 
     StatusMsg(&worhp_o_, &worhp_w_, &worhp_p_, &worhp_c_);
 
@@ -647,16 +647,16 @@ namespace casadi {
       double time1 = clock();
 
       // Make sure generated
-      casadi_assert_warning(!hessLag_.isNull(),"Hessian function not pregenerated");
+      casadi_assert_warning(!hessLag_.isNull(), "Hessian function not pregenerated");
 
       // Get Hessian
       Function& hessLag = this->hessLag();
 
       // Pass input
-      hessLag.setInput(x,HESSLAG_X);
-      hessLag.setInput(input(NLP_SOLVER_P),HESSLAG_P);
-      hessLag.setInput(obj_factor,HESSLAG_LAM_F);
-      hessLag.setInput(lambda,HESSLAG_LAM_G);
+      hessLag.setInput(x, HESSLAG_X);
+      hessLag.setInput(input(NLP_SOLVER_P), HESSLAG_P);
+      hessLag.setInput(obj_factor, HESSLAG_LAM_F);
+      hessLag.setInput(lambda, HESSLAG_LAM_G);
 
       // Evaluate
       hessLag.evaluate();
@@ -710,7 +710,7 @@ namespace casadi {
     }
   }
 
-  bool WorhpInternal::eval_jac_g(const double* x,double* values) {
+  bool WorhpInternal::eval_jac_g(const double* x, double* values) {
     try {
       log("eval_jac_g started");
 
@@ -729,15 +729,15 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      jacG.setInput(x,JACG_X);
-      jacG.setInput(input(NLP_SOLVER_P),JACG_P);
+      jacG.setInput(x, JACG_X);
+      jacG.setInput(input(NLP_SOLVER_P), JACG_P);
 
       // Evaluate the function
       jacG.evaluate();
 
       const DMatrix& J = jacG.output(JACG_JAC);
 
-      std::copy(J.data().begin(),J.data().end(),values);
+      std::copy(J.data().begin(), J.data().end(), values);
 
       if(monitored("eval_jac_g")) {
         cout << "x = " << jacG_.input().data() << endl;
@@ -765,13 +765,13 @@ namespace casadi {
 
       // Pass the argument to the function
       nlp_.setInput(x, NL_X);
-      nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+      nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate the function
       nlp_.evaluate();
 
       // Get the result
-      nlp_.getOutput(obj_value,NL_F);
+      nlp_.getOutput(obj_value, NL_F);
 
       // Printing
       if(monitored("eval_f")) {
@@ -802,14 +802,14 @@ namespace casadi {
 
       if(worhp_o_.m>0) {
         // Pass the argument to the function
-        nlp_.setInput(x,NL_X);
-        nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+        nlp_.setInput(x, NL_X);
+        nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
         // Evaluate the function and tape
         nlp_.evaluate();
 
         // Ge the result
-        nlp_.getOutput(g,NL_G);
+        nlp_.getOutput(g, NL_G);
 
         // Printing
         if(monitored("eval_g")) {
@@ -839,14 +839,14 @@ namespace casadi {
       double time1 = clock();
 
       // Pass the argument to the function
-      gradF_.setInput(x,NL_X);
-      gradF_.setInput(input(NLP_SOLVER_P),NL_P);
+      gradF_.setInput(x, NL_X);
+      gradF_.setInput(input(NLP_SOLVER_P), NL_P);
 
       // Evaluate, adjoint mode
       gradF_.evaluate();
 
       // Get the result
-      gradF_.output().get(grad_f,DENSE);
+      gradF_.output().get(grad_f, DENSE);
 
       // Scale
       for(int i=0; i<nx_; ++i) {
@@ -891,22 +891,22 @@ namespace casadi {
     for (int i=0;i<WorhpGetParamCount();++i) {
       WorhpType type = WorhpGetParamType(i+1);
       const char* name = WorhpGetParamName(i+1);
-      if (strcmp(name,"Ares")==0) continue;
+      if (strcmp(name, "Ares")==0) continue;
       switch(type) {
         case WORHP_BOOL_T:
           bool default_bool;
           WorhpGetBoolParam(&worhp_p_, name, &default_bool);
-          setOption(WorhpGetParamName(i+1),default_bool);
+          setOption(WorhpGetParamName(i+1), default_bool);
           break;
         case WORHP_DOUBLE_T:
           double default_double;
           WorhpGetDoubleParam(&worhp_p_, name, &default_double);
-          setOption(WorhpGetParamName(i+1),default_double);
+          setOption(WorhpGetParamName(i+1), default_double);
           break;
         case WORHP_INT_T:
           int default_int;
           WorhpGetIntParam(&worhp_p_, name, &default_int);
-          setOption(WorhpGetParamName(i+1),default_int);
+          setOption(WorhpGetParamName(i+1), default_int);
           break;
         default:
           break; // do nothing
@@ -947,8 +947,8 @@ namespace casadi {
     std::cout << "readparams status: " << status << std::endl;
   }
 
-  map<int,string> WorhpInternal::calc_flagmap() {
-  map<int,string> f;
+  map<int, string> WorhpInternal::calc_flagmap() {
+  map<int, string> f;
   f[TerminateSuccess] = "TerminateSuccess";
   f[OptimalSolution] = "OptimalSolution";
   f[SearchDirectionZero] = "SearchDirectionZero";
@@ -986,6 +986,6 @@ namespace casadi {
   return f;
 }
 
-map<int,string> WorhpInternal::flagmap = WorhpInternal::calc_flagmap();
+map<int, string> WorhpInternal::flagmap = WorhpInternal::calc_flagmap();
 
 } // namespace casadi

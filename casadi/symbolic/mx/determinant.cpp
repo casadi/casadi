@@ -31,7 +31,7 @@ namespace casadi {
 
   Determinant::Determinant(const MX& x) {
     setDependencies(x);
-    setSparsity(Sparsity::dense(1,1));
+    setSparsity(Sparsity::dense(1, 1));
   }
 
   void Determinant::printPart(std::ostream &stream, int part) const {

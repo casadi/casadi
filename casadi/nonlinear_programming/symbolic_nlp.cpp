@@ -53,7 +53,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   const int header_sz = 10;
   vector<string> header(header_sz);
   for(int k=0; k<header_sz; ++k) {
-    getline(nlfile,header[k]);
+    getline(nlfile, header[k]);
   }
 
   // Assert that the file is not in binary form
@@ -79,12 +79,12 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   g = SX::zeros(n_con);
 
   // Allocate bounds for x and primal initial guess
-  x_lb = DMatrix(x.sparsity(),-numeric_limits<double>::infinity());
+  x_lb = DMatrix(x.sparsity(), -numeric_limits<double>::infinity());
   x_ub = DMatrix(x.sparsity(), numeric_limits<double>::infinity());
   x_init = DMatrix(x.sparsity(), 0.0);
 
   // Allocate bounds for g and dual initial guess
-  g_lb = DMatrix(g.sparsity(),-numeric_limits<double>::infinity());
+  g_lb = DMatrix(g.sparsity(), -numeric_limits<double>::infinity());
   g_ub = DMatrix(g.sparsity(), numeric_limits<double>::infinity());
   lambda_init = DMatrix(g.sparsity(), 0.0);
 
@@ -136,12 +136,12 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
           nlfile >> pl >> cl;
 
           // Add to variable definition (assuming it has already been defined)
-          casadi_assert_message(!v.at(pl).isNan(),"Circular dependencies not supported");
+          casadi_assert_message(!v.at(pl).isNan(), "Circular dependencies not supported");
           v[i] += cl*v[pl];
         }
 
         // Finally, add the nonlinear term
-        v[i] += readExpressionNL(nlfile,v);
+        v[i] += readExpressionNL(nlfile, v);
 
         break;
       }
@@ -154,7 +154,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         nlfile >> i;
 
         // Parse and save expression
-        g.at(i) = readExpressionNL(nlfile,v);
+        g.at(i) = readExpressionNL(nlfile, v);
 
         break;
       }
@@ -176,7 +176,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
         nlfile >> sigma;
 
         // Parse and save expression
-        f.at(i) = readExpressionNL(nlfile,v);
+        f.at(i) = readExpressionNL(nlfile, v);
 
         // Negate the expression if we maximize
         if(sigma!=0) {
@@ -364,7 +364,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
       case 'J':
       {
         // Get constraint number and number of terms
-        int i,k;
+        int i, k;
         nlfile >> i >> k;
 
         // Get terms
@@ -384,7 +384,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
       case 'G':
       {
         // Get objective number and number of terms
-        int i,k;
+        int i, k;
         nlfile >> i >> k;
 
         // Get terms
@@ -452,7 +452,7 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
         case 51:  case 52:  case 53:
         {
           // Read dependency
-          SXElement x = readExpressionNL(stream,v);
+          SXElement x = readExpressionNL(stream, v);
 
           // Perform operation
           switch(i) {
@@ -490,8 +490,8 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
         case 57:  case 58:  case 73:
         {
           // Read dependencies
-          SXElement x = readExpressionNL(stream,v);
-          SXElement y = readExpressionNL(stream,v);
+          SXElement x = readExpressionNL(stream, v);
+          SXElement y = readExpressionNL(stream, v);
 
           // Perform operation
           switch(i) {
@@ -499,8 +499,8 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
             case 1:   return x - y;
             case 2:   return x * y;
             case 3:   return x / y;
-            // case 4:   return rem(x,y); FIXME
-            case 5:   return pow(x,y);
+            // case 4:   return rem(x, y); FIXME
+            case 5:   return pow(x, y);
             // case 6:   return x < y; // TODO(Joel): Verify this,
                                        // what is the difference to 'le' == 23 below?
             case 20:  return logic_or(x, y);
@@ -511,12 +511,12 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
             case 28:  return x >= y;
             case 29:  return x > y;
             case 30:  return x != y;
-            case 48:  return atan2(x,y);
-            // case 55:  return intdiv(x,y); // FIXME
-            // case 56:  return precision(x,y); // FIXME
-            // case 57:  return round(x,y); // FIXME
-            // case 58:  return trunc(x,y); // FIXME
-            // case 73:  return iff(x,y); // FIXME
+            case 48:  return atan2(x, y);
+            // case 55:  return intdiv(x, y); // FIXME
+            // case 56:  return precision(x, y); // FIXME
+            // case 57:  return round(x, y); // FIXME
+            // case 58:  return trunc(x, y); // FIXME
+            // case 73:  return iff(x, y); // FIXME
 
             default:
               msg << "Unknown binary operation: \"" << i << "\"";
@@ -524,7 +524,7 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
           break;
         }
 
-        // N-ary operator, classes 2,6 and 11 in Gay2005
+        // N-ary operator, classes 2, 6 and 11 in Gay2005
         case 11: case 12: case 54: case 59: case 60: case 61: case 70: case 71: case 74:
         {
           // Number of elements in the sum
@@ -534,7 +534,7 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
           // Collect the arguments
           vector<SXElement> args(n);
           for(int k=0; k<n; ++k) {
-            args[k] = readExpressionNL(stream,v);
+            args[k] = readExpressionNL(stream, v);
           }
 
           // Perform the operation

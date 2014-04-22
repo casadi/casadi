@@ -32,7 +32,7 @@ namespace casadi {
 
   InnerProd::InnerProd(const MX& x, const MX& y) {
     casadi_assert(x.sparsity()==y.sparsity());
-    setDependencies(x,y);
+    setDependencies(x, y);
     setSparsity(Sparsity::scalar());
   }
 
@@ -71,12 +71,12 @@ namespace casadi {
 
   void InnerProd::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                             std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void InnerProd::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                              std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -89,7 +89,7 @@ namespace casadi {
     const int n = arg0.size();
 
     // Perform the inner product
-    res = casadi_dot(n,getPtr(arg0),1,getPtr(arg1),1);
+    res = casadi_dot(n, getPtr(arg0), 1, getPtr(arg1), 1);
   }
 
   void InnerProd::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
@@ -114,7 +114,7 @@ namespace casadi {
   void InnerProd::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                     const std::vector<std::string>& res, CodeGenerator& gen) const {
     stream << "  *" << res.front() << " = "
-           << gen.casadi_dot(dep().size(),arg.at(0),1,arg.at(1),1) << ";" << endl;
+           << gen.casadi_dot(dep().size(), arg.at(0), 1, arg.at(1), 1) << ";" << endl;
   }
 
 } // namespace casadi

@@ -32,16 +32,16 @@
 namespace casadi {
 
   /// Time variability of a variable (see Fritzon page 89)
-  enum Variability {CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
+  enum Variability {CONSTANT, PARAMETER, DISCRETE, CONTINUOUS};
 
   /// Causality of a variable
-  enum Causality {INPUT,OUTPUT,INTERNAL};
+  enum Causality {INPUT, OUTPUT, INTERNAL};
 
   /// Dynamics of the variable
-  enum Dynamics {ALGEBRAIC,DIFFERENTIAL};
+  enum Dynamics {ALGEBRAIC, DIFFERENTIAL};
 
   /// Dynamics of the variable
-  enum Alias {NO_ALIAS,ALIAS,NEGATED_ALIAS};
+  enum Alias {NO_ALIAS, ALIAS, NEGATED_ALIAS};
 
   /// Variable category
   enum Category {
@@ -149,7 +149,7 @@ namespace casadi {
   private:
 #ifndef SWIG
     // Timed variables
-    std::map<double,SXElement> timed_;
+    std::map<double, SXElement> timed_;
 
     // Print
     virtual void repr(std::ostream &stream) const;

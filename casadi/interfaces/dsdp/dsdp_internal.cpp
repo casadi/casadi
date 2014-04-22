@@ -139,7 +139,7 @@ namespace casadi {
             pattern_[i][j][nz++] = cc*(cc + 1)/2 + rr; // DSDP is row-major --> indices swapped
           }
         }
-        mapping_.output(i*nb_+j).get(values_[i][j],SPARSESYM);
+        mapping_.output(i*nb_+j).get(values_[i][j], SPARSESYM);
       }
     }
 
@@ -158,10 +158,10 @@ namespace casadi {
       // There is a way to deal with this properly, but requires modifying the dsdp source
       // We already did this for the variable bounds
       double dsdp_inf = getOption("infinity");
-      MX lba = horzcat(fmax(fmin(LBA,dsdp_inf),-dsdp_inf),A).T();
-      MX uba = horzcat(fmax(fmin(UBA,dsdp_inf),-dsdp_inf),A).T();
+      MX lba = horzcat(fmax(fmin(LBA, dsdp_inf), -dsdp_inf), A).T();
+      MX uba = horzcat(fmax(fmin(UBA, dsdp_inf), -dsdp_inf), A).T();
 
-      mappingA_ = MXFunction(syms,horzcat(-lba,uba).T());
+      mappingA_ = MXFunction(syms, horzcat(-lba, uba).T());
       mappingA_.init();
     }
 
@@ -198,12 +198,12 @@ namespace casadi {
     DSDPCreate(n_, &dsdp_);
     DSDPSetGapTolerance(dsdp_, getOption("gapTol"));
     DSDPSetMaxIts(dsdp_, getOption("maxIter"));
-    DSDPSetPTolerance(dsdp_,getOption("dualTol"));
-    DSDPSetRTolerance(dsdp_,getOption("primalTol"));
-    DSDPSetStepTolerance(dsdp_,getOption("stepTol"));
-    DSDPSetStandardMonitor(dsdp_,getOption("_printlevel"));
+    DSDPSetPTolerance(dsdp_, getOption("dualTol"));
+    DSDPSetRTolerance(dsdp_, getOption("primalTol"));
+    DSDPSetStepTolerance(dsdp_, getOption("stepTol"));
+    DSDPSetStandardMonitor(dsdp_, getOption("_printlevel"));
 
-    DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
+    DSDPCreateSDPCone(dsdp_, nb_, &sdpcone_);
     for(int j=0; j<nb_; ++j) {
       log("DSDPInternal::init","Setting");
       SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
@@ -218,32 +218,32 @@ namespace casadi {
     DSDPCreateBCone( dsdp_, &bcone_);
     BConeAllocateBounds( bcone_, n_);
 
-    DSDPUsePenalty(dsdp_,getOption("_use_penalty") ? 1: 0);
+    DSDPUsePenalty(dsdp_, getOption("_use_penalty") ? 1: 0);
     DSDPSetPenaltyParameter(dsdp_, getOption("_penalty") );
     DSDPSetPotentialParameter(dsdp_, getOption("_rho"));
     DSDPSetZBar(dsdp_, getOption("_zbar"));
-    DSDPReuseMatrix(dsdp_,getOption("_reuse") ? 1: 0);
+    DSDPReuseMatrix(dsdp_, getOption("_reuse") ? 1: 0);
     DSDPLogInfoAllow(getOption("_loglevel"),0);
 
     // Copy bounds
     for (int i=0;i<n_;++i) {
       if(input(SDP_SOLVER_LBX).at(i)==-std::numeric_limits< double >::infinity()) {
-        BConeSetUnboundedLower(bcone_,i+1);
+        BConeSetUnboundedLower(bcone_, i+1);
       } else {
-        BConeSetLowerBound(bcone_,i+1,input(SDP_SOLVER_LBX).at(i));
+        BConeSetLowerBound(bcone_, i+1, input(SDP_SOLVER_LBX).at(i));
       }
       if(input(SDP_SOLVER_UBX).at(i)==std::numeric_limits< double >::infinity()) {
-        BConeSetUnboundedUpper(bcone_,i+1);
+        BConeSetUnboundedUpper(bcone_, i+1);
       } else {
-        BConeSetUpperBound(bcone_,i+1,input(SDP_SOLVER_UBX).at(i));
+        BConeSetUpperBound(bcone_, i+1, input(SDP_SOLVER_UBX).at(i));
       }
     }
 
     if (nc_>0) {
       // Copy linear constraints
-      mappingA_.setInput(input(SDP_SOLVER_A),0);
-      mappingA_.setInput(input(SDP_SOLVER_LBA),1);
-      mappingA_.setInput(input(SDP_SOLVER_UBA),2);
+      mappingA_.setInput(input(SDP_SOLVER_A), 0);
+      mappingA_.setInput(input(SDP_SOLVER_LBA), 1);
+      mappingA_.setInput(input(SDP_SOLVER_UBA), 2);
       mappingA_.evaluate();
 
       // TODO(Joris): this can be made non-allocating bu hacking into DSDP source code
@@ -269,13 +269,13 @@ namespace casadi {
 
     if (nb_>0) {
       // Get Ai from supplied A
-      mapping_.setInput(input(SDP_SOLVER_G),0);
-      mapping_.setInput(input(SDP_SOLVER_F),1);
+      mapping_.setInput(input(SDP_SOLVER_G), 0);
+      mapping_.setInput(input(SDP_SOLVER_F), 1);
       mapping_.evaluate();
 
       for (int i=0;i<n_+1;++i) {
         for (int j=0;j<nb_;++j) {
-          mapping_.output(i*nb_+j).get(values_[i][j],SPARSESYM);
+          mapping_.output(i*nb_+j).get(values_[i][j], SPARSESYM);
         }
       }
     }
@@ -285,7 +285,7 @@ namespace casadi {
     DSDPSetup(dsdp_);
     int info = DSDPSolve(dsdp_);
 
-    casadi_assert_message(info==0,"DSDPSolver failed");
+    casadi_assert_message(info==0, "DSDPSolver failed");
 
     // Get termination reason
     DSDPTerminationReason reason;
@@ -294,10 +294,10 @@ namespace casadi {
 
     // Get solution type
     DSDPSolutionType pdfeasible;
-    DSDPGetSolutionType(dsdp_,&pdfeasible);
+    DSDPGetSolutionType(dsdp_, &pdfeasible);
     stats_["solution_type"] =  solutionType(pdfeasible);
 
-    info = DSDPGetY(dsdp_,&output(SDP_SOLVER_X).at(0),n_);
+    info = DSDPGetY(dsdp_, &output(SDP_SOLVER_X).at(0), n_);
 
     double temp;
     DSDPGetDDObjective(dsdp_, &temp);
@@ -309,7 +309,7 @@ namespace casadi {
       for (int j=0;j<nb_;++j) {
         info = SDPConeComputeX(sdpcone_, j, block_sizes_[j],
                                getPtr(store_X_[j]), store_X_[j].size());
-        Pmapper_.input(j).set(store_X_[j],SPARSESYM);
+        Pmapper_.input(j).set(store_X_[j], SPARSESYM);
       }
       Pmapper_.evaluate();
       std::copy(Pmapper_.output().data().begin(),
@@ -321,7 +321,7 @@ namespace casadi {
       for (int j=0;j<nb_;++j) {
         info = SDPConeComputeS(sdpcone_, j, 1.0,  output(SDP_SOLVER_X).ptr(), n_, 0,
                                block_sizes_[j] , getPtr(store_P_[j]), store_P_[j].size());
-        Pmapper_.input(j).set(store_P_[j],SPARSESYM);
+        Pmapper_.input(j).set(store_P_[j], SPARSESYM);
       }
       Pmapper_.evaluate();
       std::copy(Pmapper_.output().data().begin(),

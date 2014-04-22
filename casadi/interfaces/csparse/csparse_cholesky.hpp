@@ -37,7 +37,7 @@ class CSparseCholeskyInternal;
  @copydoc LinearSolver_doc
 *
 * CSparseCholesky is an casadi::Function mapping from 2 inputs
-* [ A (matrix),b (vector)] to one output [x (vector)].
+* [ A (matrix), b (vector)] to one output [x (vector)].
 *
 * \verbatim
 *  A = LL'

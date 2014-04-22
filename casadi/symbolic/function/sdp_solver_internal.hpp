@@ -79,7 +79,7 @@ class CASADI_SYMBOLIC_EXPORT SDPSolverInternal : public FunctionInternal {
     std::vector<int> block_boundaries_;
     std::vector<int> block_sizes_;
 
-    /** A mapping from (G,F) -> (G[p,p]_j,F_i[p,p]j)
+    /** A mapping from (G, F) -> (G[p, p]_j, F_i[p, p]j)
     *  input(0) = G
     *  input(1) = F
     *  output(j) = Gj
@@ -88,7 +88,7 @@ class CASADI_SYMBOLIC_EXPORT SDPSolverInternal : public FunctionInternal {
     Function mapping_;
 
     /** Make a mapping function from dense blocks to inversely-permuted block diagonal P
-    ** block_j(Pmapper.output()[p,p]) = Pmapper_.input(j)
+    ** block_j(Pmapper.output()[p, p]) = Pmapper_.input(j)
     */
     Function Pmapper_;
 

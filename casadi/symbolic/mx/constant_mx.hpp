@@ -116,14 +116,14 @@ namespace casadi {
     virtual void evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                            std::vector<double>& rtmp) {
       output[0]->set(x_);
-      ConstantMX::evaluateD(input,output,itmp,rtmp);
+      ConstantMX::evaluateD(input, output, itmp, rtmp);
     }
 
     /** \brief  Evaluate the function symbolically (SX) */
     virtual void evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                             std::vector<SXElement>& rtmp) {
       output[0]->set(SX(x_));
-      ConstantMX::evaluateSX(input,output,itmp,rtmp);
+      ConstantMX::evaluateSX(input, output, itmp, rtmp);
     }
 
     /** \brief Generate code for the operation */
@@ -153,7 +153,7 @@ namespace casadi {
   class CASADI_SYMBOLIC_EXPORT ZeroByZero : public ConstantMX {
   private:
     /** \brief Private constructor (singleton design pattern) */
-    explicit ZeroByZero() : ConstantMX(Sparsity::sparse(0,0)) {
+    explicit ZeroByZero() : ConstantMX(Sparsity::sparse(0, 0)) {
       initSingleton();
     }
 
@@ -271,7 +271,7 @@ namespace casadi {
 
     /// Get the value (only for constant nodes)
     virtual Matrix<double> getMatrixValue() const {
-      return Matrix<double>(sparsity(),v_.value);
+      return Matrix<double>(sparsity(), v_.value);
     }
 
     /// Get densification
@@ -320,7 +320,7 @@ namespace casadi {
     for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
       sp.appendColumns(i->sparsity());
     }
-    return MX(sp,v_.value);
+    return MX(sp, v_.value);
   }
 
   template<typename Value>
@@ -338,37 +338,37 @@ namespace casadi {
     for(std::vector<MX>::const_iterator i=x.begin()+1; i!=x.end(); ++i) {
       sp.append(i->sparsity());
     }
-    return MX(sp,v_.value);
+    return MX(sp, v_.value);
   }
 
   template<typename Value>
   MX Constant<Value>::getReshape(const Sparsity& sp) const {
-    return MX::create(new Constant<Value>(sp,v_));
+    return MX::create(new Constant<Value>(sp, v_));
   }
 
   template<typename Value>
   MX Constant<Value>::getTranspose() const {
-    return MX::create(new Constant<Value>(sparsity().transpose(),v_));
+    return MX::create(new Constant<Value>(sparsity().transpose(), v_));
   }
 
   template<typename Value>
   MX Constant<Value>::getUnary(int op) const {
     // Constant folding
     double ret(0);
-    casadi_math<double>::fun(op,v_.value,0.0,ret);
+    casadi_math<double>::fun(op, v_.value, 0.0, ret);
     if (operation_checker<F0XChecker>(op) || sparsity().isDense()) {
-      return MX(sparsity(),ret);
+      return MX(sparsity(), ret);
     } else {
       if (v_.value==0) {
         if (isZero() && operation_checker<F0XChecker>(op)) {
-          return MX(sparsity(),ret);
+          return MX(sparsity(), ret);
         } else {
-          return MX::repmat(ret,size1(),size2());
+          return MX::repmat(ret, size1(), size2());
         }
       }
       double ret2;
-      casadi_math<double>::fun(op,0,0.0,ret2);
-      return DMatrix(sparsity(),ret)+DMatrix(sparsity().patternInverse(),ret2);
+      casadi_math<double>::fun(op, 0, 0.0, ret2);
+      return DMatrix(sparsity(), ret)+DMatrix(sparsity().patternInverse(), ret2);
     }
   }
 
@@ -378,33 +378,33 @@ namespace casadi {
 
     if (ScX && !operation_checker<Function0Checker>(op)) {
       double ret;
-      casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,0,ret);
+      casadi_math<double>::fun(op, size()> 0 ? v_.value: 0, 0, ret);
 
       if (ret!=0) {
-        Sparsity f = Sparsity::dense(y.size1(),y.size2());
+        Sparsity f = Sparsity::dense(y.size1(), y.size2());
         MX yy = y.setSparse(f);
-        return MX(f,shared_from_this<MX>())->getBinary(op,yy,false,false);
+        return MX(f, shared_from_this<MX>())->getBinary(op, yy, false, false);
       }
     } else if (ScY && !operation_checker<F0XChecker>(op)) {
       bool grow = true;
       if (y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
         double ret;
-        casadi_math<double>::fun(op, 0,y.size()>0 ? y->getValue() : 0,ret);
+        casadi_math<double>::fun(op, 0, y.size()>0 ? y->getValue() : 0, ret);
         grow = ret!=0;
       }
       if (grow) {
-        Sparsity f = Sparsity::dense(size1(),size2());
+        Sparsity f = Sparsity::dense(size1(), size2());
         MX xx = shared_from_this<MX>().setSparse(f);
-        return xx->getBinary(op,MX(f,y),false,false);
+        return xx->getBinary(op, MX(f, y), false, false);
       }
     }
 
     switch(op) {
     case OP_ADD:
-      if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(y,size1(),size2()) : y;
+      if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(y, size1(), size2()) : y;
       break;
     case OP_SUB:
-      if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(-y,size1(),size2()) : -y;
+      if(v_.value==0) return ScY && !y->isZero() ? MX::repmat(-y, size1(), size2()) : -y;
       break;
     case OP_MUL:
       if(v_.value==1) return y;
@@ -428,27 +428,27 @@ namespace casadi {
     if(y->getOp()==OP_CONST && dynamic_cast<const ConstantDMatrix*>(y.get())==0) {
       double y_value = y.size()>0 ? y->getValue() : 0;
       double ret;
-      casadi_math<double>::fun(op,size()> 0 ? v_.value: 0,y_value,ret);
+      casadi_math<double>::fun(op, size()> 0 ? v_.value: 0, y_value, ret);
 
-      return MX(y.sparsity(),ret);
+      return MX(y.sparsity(), ret);
     }
 
     // Fallback
-    return MXNode::getBinary(op,y,ScX,ScY);
+    return MXNode::getBinary(op, y, ScX, ScY);
   }
 
   template<typename Value>
   void Constant<Value>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                                   std::vector<int>& itmp, std::vector<double>& rtmp) {
     output[0]->set(static_cast<double>(v_.value));
-    ConstantMX::evaluateD(input,output,itmp,rtmp);
+    ConstantMX::evaluateD(input, output, itmp, rtmp);
   }
 
   template<typename Value>
   void Constant<Value>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                                    std::vector<SXElement>& rtmp) {
     output[0]->set(SXElement(v_.value));
-    ConstantMX::evaluateSX(input,output,itmp,rtmp);
+    ConstantMX::evaluateSX(input, output, itmp, rtmp);
   }
 
   template<typename Value>
@@ -472,11 +472,11 @@ namespace casadi {
       for(std::vector<int>::const_iterator k=nz.begin(); k!=nz.end(); ++k) {
         if(*k<0) {
           // Do not simplify
-          return MXNode::getGetNonzeros(sp,nz);
+          return MXNode::getGetNonzeros(sp, nz);
         }
       }
     }
-    return MX::create(new Constant<Value>(sp,v_));
+    return MX::create(new Constant<Value>(sp, v_));
   }
 
   template<typename Value>
@@ -486,13 +486,13 @@ namespace casadi {
     }
 
     // Fall-back
-    return MXNode::getSetNonzeros(y,nz);
+    return MXNode::getSetNonzeros(y, nz);
   }
 
   template<typename Value>
   MX Constant<Value>::getSetSparse(const Sparsity& sp) const {
     if(isZero()) {
-      return MX::create(new Constant<Value>(sp,v_));
+      return MX::create(new Constant<Value>(sp, v_));
     } else if (sp.isDense()) {
       DMatrix v = getMatrixValue();
       v.densify();

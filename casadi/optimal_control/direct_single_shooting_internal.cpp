@@ -54,7 +54,7 @@ void DirectSingleShootingInternal::init() {
 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
-  integrator_ = integrator_creator(ffcn_,Function());
+  integrator_ = integrator_creator(ffcn_, Function());
   if(hasSetOption("integrator_options")) {
     integrator_.setOption(getOption("integrator_options"));
   }
@@ -86,17 +86,17 @@ void DirectSingleShootingInternal::init() {
   int offset = 0;
 
   // Global parameters
-  MX P = V[Slice(0,np_)];
+  MX P = V[Slice(0, np_)];
   offset += np_;
 
   // Initial state
-  MX X0 = V[Slice(offset,offset+nx_)];
+  MX X0 = V[Slice(offset, offset+nx_)];
   offset += nx_;
 
   // Control for each shooting interval
   vector<MX> U(nk_);
   for(int k=0; k<nk_; ++k) { // interior nodes
-    U[k] = V[range(offset,offset+nu_)];
+    U[k] = V[range(offset, offset+nu_)];
     offset += nu_;
   }
 
@@ -174,13 +174,13 @@ void DirectSingleShootingInternal::getGuess(vector<double>& V_init) const {
 
   // Pass guess for the initial state
   for(int i=0; i<nx_; ++i) {
-    V_init[el++] = x_init.elem(i,0);
+    V_init[el++] = x_init.elem(i, 0);
   }
 
   // Pass guess for control
   for(int k=0; k<nk_; ++k) {
     for(int i=0; i<nu_; ++i) {
-      V_init[el++] = u_init.elem(i,k);
+      V_init[el++] = u_init.elem(i, k);
     }
   }
 
@@ -209,15 +209,15 @@ void DirectSingleShootingInternal::getVariableBounds(vector<double>& V_min,
 
   // Pass bounds on initial state
   for(int i=0; i<nx_; ++i) {
-    V_min[min_el++] = x_min.elem(i,0);
-    V_max[max_el++] = x_max.elem(i,0);
+    V_min[min_el++] = x_min.elem(i, 0);
+    V_max[max_el++] = x_max.elem(i, 0);
   }
 
   // Pass bounds on control
   for(int k=0; k<nk_; ++k) {
     for(int i=0; i<nu_; ++i) {
-      V_min[min_el++] = u_min.elem(i,k);
-      V_max[max_el++] = u_max.elem(i,k);
+      V_min[min_el++] = u_min.elem(i, k);
+      V_max[max_el++] = u_max.elem(i, k);
     }
   }
 
@@ -237,13 +237,13 @@ void DirectSingleShootingInternal::getConstraintBounds(vector<double>& G_min,
 
   for(int k=0; k<nk_; ++k) {
     for(int i=0; i<nx_; ++i) {
-      G_min[min_el++] = x_min.elem(i,k+1);
-      G_max[max_el++] = x_max.elem(i,k+1);
+      G_min[min_el++] = x_min.elem(i, k+1);
+      G_max[max_el++] = x_max.elem(i, k+1);
     }
 
     for(int i=0; i<nh_; ++i) {
-      G_min[min_el++] = h_min.elem(i,k);
-      G_max[max_el++] = h_max.elem(i,k);
+      G_min[min_el++] = h_min.elem(i, k);
+      G_max[max_el++] = h_max.elem(i, k);
     }
   }
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
@@ -265,13 +265,13 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
 
   // Pass optimized initial state
   for(int i=0; i<nx_; ++i) {
-    x_opt(i,0) = V_opt[el++];
+    x_opt(i, 0) = V_opt[el++];
   }
 
   // Pass optimized control
   for(int k=0; k<nk_; ++k) {
     for(int i=0; i<nu_; ++i) {
-      u_opt(i,k) = V_opt[el++];
+      u_opt(i, k) = V_opt[el++];
     }
   }
   casadi_assert(el==V_opt.size());
@@ -285,7 +285,7 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
 
     // Get the state trajectory
     for(int i=0; i<nx_; ++i) {
-      x_opt(i,k+1) = g_opt[el++];
+      x_opt(i, k+1) = g_opt[el++];
     }
 
     // Skip the path constraints (for now)
@@ -318,11 +318,11 @@ void DirectSingleShootingInternal::evaluate() {
 void DirectSingleShootingInternal::reportConstraints(std::ostream &stream) {
   stream << "Reporting DirectSingleShooting constraints" << endl;
 
-  FunctionInternal::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX),
+  FunctionInternal::reportConstraints(stream, output(OCP_X_OPT), input(OCP_LBX), input(OCP_UBX),
                                       "states");
-  FunctionInternal::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU),
+  FunctionInternal::reportConstraints(stream, output(OCP_U_OPT), input(OCP_LBU), input(OCP_UBU),
                                       "controls");
-  FunctionInternal::reportConstraints(stream,output(OCP_P_OPT),input(OCP_LBP),input(OCP_UBP),
+  FunctionInternal::reportConstraints(stream, output(OCP_P_OPT), input(OCP_LBP), input(OCP_UBP),
                                       "parameters");
 
 }

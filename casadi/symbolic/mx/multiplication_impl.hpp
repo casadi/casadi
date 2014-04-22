@@ -34,21 +34,21 @@ using namespace std;
 namespace casadi {
 
   template<bool TrX, bool TrY>
-  Multiplication<TrX,TrY>::Multiplication(const MX& z, const MX& x, const MX& y) {
+  Multiplication<TrX, TrY>::Multiplication(const MX& z, const MX& x, const MX& y) {
     casadi_assert_message(TrX || !TrY, "Illegal combination");
     casadi_assert_message(TrX, "Not implemented");
-    casadi_assert_message(!TrY,"Not implemented");
+    casadi_assert_message(!TrY, "Not implemented");
     casadi_assert_message(
       x.size1() == y.size1() && x.size2() == z.size1() && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply trans("
       << x.dimString() << ") with " << y.dimString()
       << " and add the result to " << z.dimString());
-    setDependencies(z,x,y);
+    setDependencies(z, x, y);
     setSparsity(z.sparsity());
   }
 
   template<bool TrX, bool TrY>
-  void Multiplication<TrX,TrY>::printPart(std::ostream &stream, int part) const {
+  void Multiplication<TrX, TrY>::printPart(std::ostream &stream, int part) const {
     if(part==0) {
       stream << "(";
     } else if(part==1) {
@@ -63,34 +63,34 @@ namespace casadi {
   }
 
   template<bool TrX, bool TrY>
-  void Multiplication<TrX,TrY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
+  void Multiplication<TrX, TrY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                                           std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   template<bool TrX, bool TrY>
-  void Multiplication<TrX,TrY>::evaluateSX(const SXPtrV& input, SXPtrV& output,
+  void Multiplication<TrX, TrY>::evaluateSX(const SXPtrV& input, SXPtrV& output,
                                            std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<bool TrX, bool TrY>
   template<typename T, typename MatV, typename MatVV>
-  void Multiplication<TrX,TrY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
+  void Multiplication<TrX, TrY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
                                             std::vector<T>& rtmp) {
     if(input[0]!=output[0]) {
-      copy(input[0]->begin(),input[0]->end(),output[0]->begin());
+      copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
-    Matrix<T>::mul_no_alloc_tn(*input[1],*input[2],*output[0]);
+    Matrix<T>::mul_no_alloc_tn(*input[1],*input[2], *output[0]);
   }
 
   template<bool TrX, bool TrY>
-  void Multiplication<TrX,TrY>::evaluateMX(const MXPtrV& input, MXPtrV& output,
+  void Multiplication<TrX, TrY>::evaluateMX(const MXPtrV& input, MXPtrV& output,
                                            const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
                                            const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                                            bool output_given) {
     if(!output_given)
-      *output[0] = *input[0] + mul(tr<TrX>(*input[1]),tr<TrY>(*input[2]),(*input[0]).sparsity());
+      *output[0] = *input[0] + mul(tr<TrX>(*input[1]), tr<TrY>(*input[2]), (*input[0]).sparsity());
 
     // Forward sensitivities
     int nfwd = fwdSens.size();
@@ -119,16 +119,16 @@ namespace casadi {
   }
 
   template<bool TrX, bool TrY>
-  void Multiplication<TrX,TrY>::propagateSparsity(DMatrixPtrV& input,
+  void Multiplication<TrX, TrY>::propagateSparsity(DMatrixPtrV& input,
                                                   DMatrixPtrV& output, bool fwd) {
     bvec_t *zd = get_bvec_t(input[0]->data());
     bvec_t *rd = get_bvec_t(output[0]->data());
     const size_t n = this->size();
     if(fwd) {
-      if(zd!=rd) copy(zd,zd+n,rd);
-      DMatrix::mul_sparsity<true>(*input[1],*input[2],*input[0]);
+      if(zd!=rd) copy(zd, zd+n, rd);
+      DMatrix::mul_sparsity<true>(*input[1],*input[2], *input[0]);
     } else {
-      DMatrix::mul_sparsity<false>(*input[1],*input[2],*output[0]);
+      DMatrix::mul_sparsity<false>(*input[1],*input[2], *output[0]);
       if(zd!=rd) {
         for(int i=0; i<n; ++i) {
           zd[i] |= rd[i];
@@ -139,7 +139,7 @@ namespace casadi {
   }
 
   template<bool TrX, bool TrY>
-  void Multiplication<TrX,TrY>::generateOperation(std::ostream &stream,
+  void Multiplication<TrX, TrY>::generateOperation(std::ostream &stream,
                                                   const std::vector<std::string>& arg,
                                                   const std::vector<std::string>& res,
                                                   CodeGenerator& gen) const {
@@ -161,7 +161,7 @@ namespace casadi {
   }
 
   template<bool TrX, bool TrY>
-  void DenseMultiplication<TrX,TrY>::generateOperation(std::ostream &stream,
+  void DenseMultiplication<TrX, TrY>::generateOperation(std::ostream &stream,
                                                        const std::vector<std::string>& arg,
                                                        const std::vector<std::string>& res,
                                                        CodeGenerator& gen) const {

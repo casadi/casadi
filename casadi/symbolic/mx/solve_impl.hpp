@@ -34,8 +34,8 @@ namespace casadi {
   template<bool Tr>
   Solve<Tr>::Solve(const MX& r, const MX& A, const LinearSolver& linear_solver) :
       linear_solver_(linear_solver) {
-    casadi_assert_message(r.size1() == A.size2(),"Solve::Solve: dimension mismatch.");
-    setDependencies(r,A);
+    casadi_assert_message(r.size1() == A.size2(), "Solve::Solve: dimension mismatch.");
+    setDependencies(r, A);
     setSparsity(r.sparsity());
   }
 
@@ -56,10 +56,10 @@ namespace casadi {
     if(remaining_calls>0) {
       remaining_calls--;
       stream << "(";
-      dep(1)->print(stream,remaining_calls);
+      dep(1)->print(stream, remaining_calls);
       if(Tr) stream << "'";
       stream << "\\";
-      dep(0)->print(stream,remaining_calls);
+      dep(0)->print(stream, remaining_calls);
       stream << ")";
     } else {
       stream << "...";
@@ -69,26 +69,26 @@ namespace casadi {
   template<bool Tr>
   void Solve<Tr>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                             std::vector<double>& rtmp) {
-    linear_solver_->evaluateDGen(input,output,Tr);
+    linear_solver_->evaluateDGen(input, output, Tr);
   }
 
   template<bool Tr>
   void Solve<Tr>::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                              std::vector<SXElement>& rtmp) {
-    linear_solver_->evaluateSXGen(input,output,Tr);
+    linear_solver_->evaluateSXGen(input, output, Tr);
   }
 
   template<bool Tr>
   void Solve<Tr>::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                              MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                              bool output_given) {
-    linear_solver_->evaluateMXGen(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,Tr);
+    linear_solver_->evaluateMXGen(input, output, fwdSeed, fwdSens, adjSeed, adjSens, output_given, Tr);
   }
 
   template<bool Tr>
   void Solve<Tr>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                                     std::vector<double>& rtmp, bool fwd) {
-    linear_solver_->propagateSparsityGen(input,output,itmp,rtmp,fwd,Tr);
+    linear_solver_->propagateSparsityGen(input, output, itmp, rtmp, fwd, Tr);
   }
 
   template<bool Tr>

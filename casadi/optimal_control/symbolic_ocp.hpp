@@ -46,12 +46,12 @@ namespace casadi {
 
       <H3>Equations:  </H3>
       \verbatim
-      explicit or implicit ODE: \dot {x} = ode(t,x,z,u,p_free,pi,pd)
-      or                           0 = ode(t,x,z,\dot {x},u,p_free,pi,pd)
-      algebraic equations:            0 = alg(t,x,z,u,p_free,pi,pd)
-      quadratures:              \dot {q} = quad(t,x,z,u,p_free,pi,pd)
-      dependent equations:            y = dep(t,x,z,u,p_free,pi,pd)
-      initial equations:              0 = initial(t,x,z,u,p_free,pi,pd)
+      explicit or implicit ODE: \dot {x} = ode(t, x, z, u, p_free, pi, pd)
+      or                           0 = ode(t, x, z,\dot {x}, u, p_free, pi, pd)
+      algebraic equations:            0 = alg(t, x, z, u, p_free, pi, pd)
+      quadratures:              \dot {q} = quad(t, x, z, u, p_free, pi, pd)
+      dependent equations:            y = dep(t, x, z, u, p_free, pi, pd)
+      initial equations:              0 = initial(t, x, z, u, p_free, pi, pd)
       \endverbatim
 
       <H3>Objective function terms:  </H3>
@@ -98,9 +98,9 @@ namespace casadi {
     /** \brief Differential-algebraic equation (DAE) with corresponding state vector and initial
      * conditions
      * DAE in fully-implicit form and corresponding states and algebraic variables.
-     * dae and s have matching dimensions and <tt>0 == dae(der(s),s,...)</tt>
+     * dae and s have matching dimensions and <tt>0 == dae(der(s), s, ...)</tt>
      * implicitly defines <tt>der(s)</tt>.
-     * At <tt>t==0</tt>, <tt>0 == initial(der(s),s,...)</tt> holds in addition to the dae.
+     * At <tt>t==0</tt>, <tt>0 == initial(der(s), s, ...)</tt> holds in addition to the dae.
      */
     SX s, dae, initial;
 
@@ -111,7 +111,7 @@ namespace casadi {
 
     /** \brief Algebraic equations and corresponding algebraic variables
      * \a alg and \a z have matching dimensions and 
-     * <tt>0 == alg(z,...)</tt> implicitly defines \a z.
+     * <tt>0 == alg(z, ...)</tt> implicitly defines \a z.
      */
     SX z, alg;
 
@@ -431,7 +431,7 @@ namespace casadi {
     static std::string qualifiedName(const XMLNode& nn);
 
     /// Find of variable by name
-    typedef std::map<std::string,Variable> VarMap;
+    typedef std::map<std::string, Variable> VarMap;
     VarMap varmap_;
 
     /// Allow timed variables?

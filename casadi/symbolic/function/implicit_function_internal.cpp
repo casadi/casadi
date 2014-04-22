@@ -54,9 +54,9 @@ namespace casadi {
   void ImplicitFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,
                                                  SharedObject>& already_copied) {
     FunctionInternal::deepCopyMembers(already_copied);
-    f_ = deepcopy(f_,already_copied);
-    jac_ = deepcopy(jac_,already_copied);
-    linsol_ = deepcopy(linsol_,already_copied);
+    f_ = deepcopy(f_, already_copied);
+    jac_ = deepcopy(jac_, already_copied);
+    linsol_ = deepcopy(linsol_, already_copied);
   }
 
   void ImplicitFunctionInternal::init() {
@@ -104,7 +104,7 @@ namespace casadi {
     FunctionInternal::init();
 
     // Generate Jacobian if not provided
-    if(jac_.isNull()) jac_ = f_.jacobian(iin_,iout_);
+    if(jac_.isNull()) jac_ = f_.jacobian(iin_, iout_);
     jac_.init(false);
 
     // Check for structural singularity in the Jacobian
@@ -119,7 +119,7 @@ namespace casadi {
         linearSolverCreator linear_solver_creator = getOption("linear_solver");
 
         // Allocate an NLP solver
-        linsol_ = linear_solver_creator(jac_.output().sparsity(),1);
+        linsol_ = linear_solver_creator(jac_.output().sparsity(), 1);
 
         // Pass options
         if(hasSetOption("linear_solver_options")) {
@@ -182,27 +182,27 @@ namespace casadi {
     if(nfwd==0 && nadj==0) return;
 
     // Temporaries
-    vector<int> col_offset(1,0);
+    vector<int> col_offset(1, 0);
     vector<MX> rhs;
     vector<int> rhs_loc;
 
     // Arguments when calling f/f_der
     vector<MX> v;
     v.reserve(getNumInputs()*(1+nfwd) + nadj);
-    v.insert(v.end(),argv.begin(),argv.end());
+    v.insert(v.end(), argv.begin(), argv.end());
     v[iin_] = z;
 
     // Get an expression for the Jacobian
     MX J = jac_.call(v).front();
 
     // Directional derivatives of f
-    Function f_der = f_.derivative(nfwd,nadj);
+    Function f_der = f_.derivative(nfwd, nadj);
 
     // Forward sensitivities, collect arguments for calling f_der
     for(int d=0; d<nfwd; ++d) {
       argv = MXNode::getVector(fseed[d]);
       argv[iin_] = MX::zeros(input(iin_).sparsity());
-      v.insert(v.end(),argv.begin(),argv.end());
+      v.insert(v.end(), argv.begin(), argv.end());
     }
 
     // Adjoint sensitivities, solve to get arguments for calling f_der
@@ -224,7 +224,7 @@ namespace casadi {
       }
 
       // Solve for all right-hand-sides at once
-      rhs = horzsplit(J->getSolve(horzcat(rhs),true,linsol_),col_offset);
+      rhs = horzsplit(J->getSolve(horzcat(rhs), true, linsol_), col_offset);
       for(int d=0; d<rhs.size(); ++d) {
         v[rhs_loc[d]] = rhs[d];
       }
@@ -257,7 +257,7 @@ namespace casadi {
       }
 
       // Solve for all the forward derivatives at once
-      rhs = horzsplit(J->getSolve(horzcat(rhs),false,linsol_),col_offset);
+      rhs = horzsplit(J->getSolve(horzcat(rhs), false, linsol_), col_offset);
       for(int d=0; d<nfwd; ++d) {
         if(fsens[d][iout_]!=0) {
           *fsens[d][iout_] = -rhs[d];
@@ -297,7 +297,7 @@ namespace casadi {
 
       // "Solve" in order to propagate to z
       output(iout_).setZeroBV();
-      linsol_.spSolve(output(iout_),f_.output(iout_),false);
+      linsol_.spSolve(output(iout_), f_.output(iout_), false);
 
       // Propagate to auxiliary outputs
       if(getNumOutputs()>1) {
@@ -331,7 +331,7 @@ namespace casadi {
 
       // "Solve" in order to get seed
       f_.output(iout_).setZeroBV();
-      linsol_.spSolve(f_.output(iout_),input(iin_),true);
+      linsol_.spSolve(f_.output(iout_), input(iin_), true);
 
       // Propagate dependencies through the function
       f_.spEvaluate(false);

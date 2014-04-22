@@ -103,7 +103,7 @@ class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX {
     /// Static creator function (use instead of constructor)
     inline static RealtypeSX* create(double value) {
       // Try to find the constant
-      CACHING_MAP<double,RealtypeSX*>::iterator it = cached_constants_.find(value);
+      CACHING_MAP<double, RealtypeSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
       if(it==cached_constants_.end()) {
@@ -111,7 +111,7 @@ class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX {
         RealtypeSX* n = new RealtypeSX(value);
 
         // Add to hash_table
-        cached_constants_.insert(it,std::make_pair(value,n));
+        cached_constants_.insert(it, std::make_pair(value, n));
 
         // Return it to caller
         return n;
@@ -131,7 +131,7 @@ class CASADI_SYMBOLIC_EXPORT RealtypeSX : public ConstantSX {
   protected:
     /** \brief Hash map of all constants currently allocated
      * (storage is allocated for it in sx_element.cpp) */
-    static CACHING_MAP<double,RealtypeSX*> cached_constants_;
+    static CACHING_MAP<double, RealtypeSX*> cached_constants_;
 
     /** \brief  Data members */
     double value;
@@ -159,7 +159,7 @@ class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX {
     /// Static creator function (use instead of constructor)
     inline static IntegerSX* create(int value) {
       // Try to find the constant
-      CACHING_MAP<int,IntegerSX*>::iterator it = cached_constants_.find(value);
+      CACHING_MAP<int, IntegerSX*>::iterator it = cached_constants_.find(value);
 
       // If not found, add it,
       if(it==cached_constants_.end()) {
@@ -167,7 +167,7 @@ class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX {
         IntegerSX* n = new IntegerSX(value);
 
         // Add to hash_table
-        cached_constants_.insert(it,std::make_pair(value,n));
+        cached_constants_.insert(it, std::make_pair(value, n));
 
         // Return it to caller
         return n;
@@ -189,7 +189,7 @@ class CASADI_SYMBOLIC_EXPORT IntegerSX : public ConstantSX {
 
     /** \brief Hash map of all constants currently allocated
      * (storage is allocated for it in sx_element.cpp) */
-    static CACHING_MAP<int,IntegerSX*> cached_constants_;
+    static CACHING_MAP<int, IntegerSX*> cached_constants_;
 
     /** \brief  Data members */
     int value;

@@ -214,7 +214,7 @@ GenericType::GenericType(const vector<int>& iv) : type_(OT_INTEGERVECTOR) {
 
 GenericType::GenericType(const vector<bool>& b_vec) : type_(OT_BOOLVECTOR) {
   vector<int> i_vec(b_vec.size());
-  copy(b_vec.begin(),b_vec.end(), i_vec.begin());
+  copy(b_vec.begin(), b_vec.end(), i_vec.begin());
   assignNode(new IntVectorType(i_vec));
 }
 
@@ -261,7 +261,7 @@ bool GenericType::toBool() const {
   } else if (isInt()) {
     return static_cast<bool>(toInt());
   } else {
-    casadi_assert_message(isBool(),"type mismatch");
+    casadi_assert_message(isBool(), "type mismatch");
     return false;
   }
 }
@@ -269,12 +269,12 @@ bool GenericType::toBool() const {
 int GenericType::toInt() const {
   if(isDouble()) {
     double v = toDouble();
-    casadi_assert_message(v == std::floor(v),"The value is not an integer");
+    casadi_assert_message(v == std::floor(v), "The value is not an integer");
     return static_cast<int>(v);
   } else if (isBool()) {
     return static_cast<int>(toBool());
   } else {
-    casadi_assert_message(isInt(),"type mismatch");
+    casadi_assert_message(isInt(), "type mismatch");
     return static_cast<const IntType*>(get())->d_;
   }
 }
@@ -283,58 +283,58 @@ double GenericType::toDouble() const {
   if(isInt()) {
     return static_cast<double>(toInt());
   } else {
-    casadi_assert_message(isDouble(),"type mismatch");
+    casadi_assert_message(isDouble(), "type mismatch");
     return static_cast<const DoubleType*>(get())->d_;
   }
 }
 
 const string& GenericType::toString() const {
-  casadi_assert_message(isString(),"type mismatch");
+  casadi_assert_message(isString(), "type mismatch");
   return static_cast<const StringType*>(get())->d_;
 }
 
 const vector<int>& GenericType::toIntVector() const {
-  casadi_assert_message(isIntVector(),"type mismatch");
+  casadi_assert_message(isIntVector(), "type mismatch");
   return static_cast<const IntVectorType*>(get())->d_;
 }
 
 const vector<double>& GenericType::toDoubleVector() const {
-  casadi_assert_message(isDoubleVector(),"type mismatch");
+  casadi_assert_message(isDoubleVector(), "type mismatch");
   return static_cast<const DoubleVectorType*>(get())->d_;
 }
 
 vector<int>& GenericType::toIntVector() {
-  casadi_assert_message(isIntVector(),"type mismatch");
+  casadi_assert_message(isIntVector(), "type mismatch");
   return static_cast<IntVectorType*>(get())->d_;
 }
 
 vector<double>& GenericType::toDoubleVector() {
-  casadi_assert_message(isDoubleVector(),"type mismatch");
+  casadi_assert_message(isDoubleVector(), "type mismatch");
   return static_cast<DoubleVectorType*>(get())->d_;
 }
 
 const vector<string>& GenericType::toStringVector() const {
-  casadi_assert_message(isStringVector(),"type mismatch");
+  casadi_assert_message(isStringVector(), "type mismatch");
   return static_cast<const StringVectorType*>(get())->d_;
 }
 
 const SharedObject& GenericType::toSharedObject() const {
-  casadi_assert_message(isSharedObject(),"type mismatch");
+  casadi_assert_message(isSharedObject(), "type mismatch");
   return static_cast<const SharedObjectType*>(get())->d_;
 }
 
 const Dictionary& GenericType::toDictionary() const {
-  casadi_assert_message(isDictionary(),"type mismatch");
+  casadi_assert_message(isDictionary(), "type mismatch");
   return static_cast<const DictionaryType*>(get())->d_;
 }
 
 Dictionary& GenericType::toDictionary() {
-  casadi_assert_message(isDictionary(),"type mismatch");
+  casadi_assert_message(isDictionary(), "type mismatch");
   return static_cast<DictionaryType*>(get())->d_;
 }
 
 const Function& GenericType::toFunction() const {
-  casadi_assert_message(isFunction(),"type mismatch");
+  casadi_assert_message(isFunction(), "type mismatch");
   return static_cast<const FunctionType*>(get())->d_;
 }
 
@@ -422,66 +422,66 @@ GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTIO
 }
 
 GenericType::operator NLPSolverCreator() const {
-  casadi_assert_message(is_a<NLPSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<NLPSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<NLPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator LPSolverCreator() const {
-  casadi_assert_message(is_a<LPSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<LPSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<LPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator SDPSolverCreator() const {
-  casadi_assert_message(is_a<SDPSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<SDPSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<SDPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator SDQPSolverCreator() const {
-  casadi_assert_message(is_a<SDQPSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<SDQPSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<SDQPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator SOCPSolverCreator() const {
-  casadi_assert_message(is_a<SOCPSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<SOCPSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<SOCPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator QCQPSolverCreator() const {
-  casadi_assert_message(is_a<QCQPSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<QCQPSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<QCQPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator linearSolverCreator() const {
-  casadi_assert_message(is_a<linearSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<linearSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<linearSolverCreator>*>(get())->d_;
 }
 GenericType::operator integratorCreator() const {
-  casadi_assert_message(is_a<integratorCreator>(),"type mismatch");
+  casadi_assert_message(is_a<integratorCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<integratorCreator>*>(get())->d_;
 }
 
 GenericType::operator QPSolverCreator() const {
-  casadi_assert_message(is_a<QPSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<QPSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<QPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator StabilizedQPSolverCreator() const {
-  casadi_assert_message(is_a<StabilizedQPSolverCreator>(),"type mismatch");
+  casadi_assert_message(is_a<StabilizedQPSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<StabilizedQPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator implicitFunctionCreator() const {
-  casadi_assert_message(is_a<implicitFunctionCreator>(),"type mismatch");
+  casadi_assert_message(is_a<implicitFunctionCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<implicitFunctionCreator>*>(get())->d_;
 }
 
   GenericType::operator const DerivativeGenerator &() const {
-    casadi_assert_message(is_a<DerivativeGenerator>(),"type mismatch");
+    casadi_assert_message(is_a<DerivativeGenerator>(), "type mismatch");
     return static_cast<const GenericTypeInternal<DerivativeGenerator>*>(get())->d_;
   }
 
 GenericType::operator const Callback &() const {
-  casadi_assert_message(is_a<Callback>(),"type mismatch");
+  casadi_assert_message(is_a<Callback>(), "type mismatch");
   return static_cast<const GenericTypeInternal<Callback>*>(get())->d_;
 }
 
@@ -490,22 +490,22 @@ GenericType::GenericType(const Dictionary& dict) : type_(OT_DICTIONARY) {
 }
 
 GenericType::operator const GenericType::Dictionary& () const {
-  casadi_assert_message(is_a<Dictionary>(),"type mismatch");
+  casadi_assert_message(is_a<Dictionary>(), "type mismatch");
   return static_cast<const GenericTypeInternal<Dictionary>*>(get())->d_;
 }
 
 GenericType::operator GenericType::Dictionary& () {
-  casadi_assert_message(is_a<Dictionary>(),"type mismatch");
+  casadi_assert_message(is_a<Dictionary>(), "type mismatch");
   return static_cast<GenericTypeInternal<Dictionary>*>(get())->d_;
 }
 
 //GenericType::operator void*() const {
-//  casadi_assert_message(is_a<void*>(),"type mismatch");
+//  casadi_assert_message(is_a<void*>(), "type mismatch");
 //  return static_cast<const GenericTypeInternal<void*>*>(get())->d_;
 //}
 
 void * GenericType::toVoidPointer() const {
-  casadi_assert_message(is_a<void*>(),"type mismatch");
+  casadi_assert_message(is_a<void*>(), "type mismatch");
   return static_cast<const GenericTypeInternal<void*>*>(get())->d_;
 }
 

@@ -30,7 +30,7 @@ namespace casadi {
   }
 
   LapackQRDense::LapackQRDense(const Sparsity& sparsity, int nrhs) {
-    assignNode(new LapackQRDenseInternal(sparsity,nrhs));
+    assignNode(new LapackQRDenseInternal(sparsity, nrhs));
   }
 
   LapackQRDenseInternal* LapackQRDense::operator->() {
@@ -42,7 +42,7 @@ namespace casadi {
   }
 
   LapackQRDenseInternal::LapackQRDenseInternal(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity,nrhs) {
+      LinearSolverInternal(sparsity, nrhs) {
   }
 
   LapackQRDenseInternal::~LapackQRDenseInternal() {
@@ -70,7 +70,7 @@ namespace casadi {
     prepared_ = false;
 
     // Get the elements of the matrix, dense format
-    input(0).get(mat_,DENSE);
+    input(0).get(mat_, DENSE);
 
     // Factorize the matrix
     int info = -100;

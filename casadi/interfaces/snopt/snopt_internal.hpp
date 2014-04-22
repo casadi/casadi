@@ -62,8 +62,8 @@ namespace casadi {
     /// Exact Hessian?
     bool exact_hessian_;
 
-    std::map<int,std::string> status_;
-    std::map<std::string,opt_type> ops_;
+    std::map<int, std::string> status_;
+    std::map<std::string, opt_type> ops_;
 
     std::string formatStatus(int status) const;
 

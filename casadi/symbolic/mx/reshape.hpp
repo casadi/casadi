@@ -84,7 +84,7 @@ namespace casadi {
 
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const
-    { return sameOpAndDeps(node,depth) && sparsity()==node->sparsity();}
+    { return sameOpAndDeps(node, depth) && sparsity()==node->sparsity();}
   };
 
 } // namespace casadi

@@ -49,7 +49,7 @@ namespace casadi {
     virtual QPStabilizerInternal* clone() const { return new QPStabilizerInternal(*this);}
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief Initialize */
     virtual void init();

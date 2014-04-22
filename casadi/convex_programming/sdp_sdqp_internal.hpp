@@ -47,7 +47,7 @@ namespace casadi {
     virtual SDPSDQPInternal* clone() const { return new SDPSDQPInternal(*this);}
 
     /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief Destructor */
     virtual ~SDPSDQPInternal();

@@ -39,7 +39,7 @@ namespace casadi {
 
   /** \brief  concatenate vertically
   *
-  *  horzcat(horzsplit(x,...)) = x
+  *  horzcat(horzsplit(x, ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT MX horzcat(const std::vector<MX>& x);
 
@@ -47,7 +47,7 @@ namespace casadi {
   * \param output_offset List of all start cols for each group
   *      the last col group will run to the end.
   *
-  *   horzcat(horzsplit(x,...)) = x
+  *   horzcat(horzsplit(x, ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> horzsplit(const MX& x,
                                                    const std::vector<int>& output_offset);
@@ -55,13 +55,13 @@ namespace casadi {
   /** \brief  split vertically, retaining fixed-sized groups of cols
   * \param incr Size of each group of cols
   *
-  *  horzcat(horzsplit(x,...)) = x
+  *  horzcat(horzsplit(x, ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> horzsplit(const MX& x, int incr=1);
 
   /** \brief  concatenate horizontally
   *
-  *   vertcat(vertsplit(x,...)) = x
+  *   vertcat(vertsplit(x, ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT MX vertcat(const std::vector<MX>& comp);
 
@@ -69,7 +69,7 @@ namespace casadi {
   * \param output_offset List of all start rows for each group
   *      the last row group will run to the end.
   *
-  *   vertcat(vertsplit(x,...)) = x
+  *   vertcat(vertsplit(x, ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> vertsplit(const MX& x,
                                                    const std::vector<int>& output_offset);
@@ -77,13 +77,13 @@ namespace casadi {
   /** \brief  split horizontally, retaining fixed-sized groups of rows
   * \param incr Size of each group of rows
   *
-  *   vertcat(vertsplit(x,...)) = x
+  *   vertcat(vertsplit(x, ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector<MX> vertsplit(const MX& x, int incr=1);
 
   /** \brief Construct a matrix from a list of list of blocks.
   *
-  *   blockcat(blocksplit(x,...,...)) = x
+  *   blockcat(blocksplit(x,..., ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT MX blockcat(const std::vector< std::vector<MX > > &v);
 
@@ -91,7 +91,7 @@ namespace casadi {
   * \brief vert_offset Defines the boundaries of the block cols
   * \brief horz_offset Defines the boundaries of the block rows
   *
-  *   blockcat(blocksplit(x,...,...)) = x
+  *   blockcat(blocksplit(x,..., ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector< std::vector<MX > >
     blocksplit(const MX& x, const std::vector<int>& vert_offset,
@@ -101,14 +101,14 @@ namespace casadi {
   * \brief vert_incr Defines the increment for block boundaries in col dimension
   * \brief horz_incr Defines the increment for block boundaries in row dimension
   *
-  *   blockcat(blocksplit(x,...,...)) = x
+  *   blockcat(blocksplit(x,..., ...)) = x
   */
   CASADI_SYMBOLIC_EXPORT std::vector< std::vector<MX > >
     blocksplit(const MX& x, int vert_incr = 1, int horz_incr = 1);
 
 #ifndef SWIG
   /** \brief Construct a matrix from a list of list of blocks.*/
-  CASADI_SYMBOLIC_EXPORT MX blockcat(const MX &A,const MX &B,const MX &C,const MX &D);
+  CASADI_SYMBOLIC_EXPORT MX blockcat(const MX &A, const MX &B, const MX &C, const MX &D);
 #endif // SWIG
 
   /** \brief Concatenate vertically while vectorizing all arguments */
@@ -181,13 +181,13 @@ namespace casadi {
 #endif // SWIG
 
   //! \brief Returns a reshaped version of the MX, dimensions as a vector
-  CASADI_SYMBOLIC_EXPORT MX reshape(const MX &x, std::pair<int,int> rc);
+  CASADI_SYMBOLIC_EXPORT MX reshape(const MX &x, std::pair<int, int> rc);
 
   //! \brief Reshape the MX
   CASADI_SYMBOLIC_EXPORT MX reshape(const MX &x, const Sparsity& sp);
 
   /** \brief Returns a vectorized version of the MX
-      Same as reshape(x, x.numel(),1)
+      Same as reshape(x, x.numel(), 1)
 
       a c
       b d
@@ -394,7 +394,7 @@ namespace casadi {
 
   /** \brief Kronecker tensor product
   *
-  * Creates a block matrix in which each element (i,j) is a_ij*b
+  * Creates a block matrix in which each element (i, j) is a_ij*b
   */
   CASADI_SYMBOLIC_EXPORT MX kron(const MX& a, const MX& b);
 
@@ -406,8 +406,8 @@ namespace casadi {
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   *
-  * If the matrix A is fat (size1>size2), mul(A,pinv(A)) is unity.
-  * If the matrix A is slender (size2<size1), mul(pinv(A),A) is unity.
+  * If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity.
+  * If the matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
   *
   */
   CASADI_SYMBOLIC_EXPORT MX pinv(const MX& A, linearSolverCreator lsolver,

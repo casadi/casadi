@@ -37,7 +37,7 @@ namespace casadi {
 
   OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const Function& f,
                                                                      const Function& g)
-      : IntegratorInternal(f,g) {
+      : IntegratorInternal(f, g) {
     addOption("number_of_finite_elements",     OT_INTEGER,  20,
               "Number of finite elements");
     addOption("interpolation_order",           OT_INTEGER,  3,
@@ -66,10 +66,10 @@ namespace casadi {
   }
 
   void OldCollocationIntegratorInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     IntegratorInternal::deepCopyMembers(already_copied);
-    startup_integrator_ = deepcopy(startup_integrator_,already_copied);
-    implicit_solver_ = deepcopy(implicit_solver_,already_copied);
+    startup_integrator_ = deepcopy(startup_integrator_, already_copied);
+    implicit_solver_ = deepcopy(implicit_solver_, already_copied);
   }
 
   OldCollocationIntegratorInternal::~OldCollocationIntegratorInternal() {
@@ -93,7 +93,7 @@ namespace casadi {
     int deg = getOption("interpolation_order");
 
     // All collocation time points
-    std::vector<double> tau_root = collocationPoints(deg,getOption("collocation_scheme"));
+    std::vector<double> tau_root = collocationPoints(deg, getOption("collocation_scheme"));
 
     // Size of the finite elements
     double h = (tf_-t0_)/nk;
@@ -102,10 +102,10 @@ namespace casadi {
     MX h_mx = h;
 
     // Coefficients of the collocation equation
-    vector<vector<MX> > C(deg+1,vector<MX>(deg+1));
+    vector<vector<MX> > C(deg+1, vector<MX>(deg+1));
 
     // Coefficients of the collocation equation as DMatrix
-    DMatrix C_num = DMatrix::zeros(deg+1,deg+1);
+    DMatrix C_num = DMatrix::zeros(deg+1, deg+1);
 
     // Coefficients of the continuity equation
     vector<MX> D(deg+1);
@@ -123,7 +123,7 @@ namespace casadi {
       Polynomial p = 1;
       for(int r=0; r<deg+1; ++r) {
         if(r!=j) {
-          p *= Polynomial(-tau_root[r],1)/(tau_root[j]-tau_root[r]);
+          p *= Polynomial(-tau_root[r], 1)/(tau_root[j]-tau_root[r]);
         }
       }
 
@@ -136,8 +136,8 @@ namespace casadi {
       // the coefficients of the continuity equation
       Polynomial dp = p.derivative();
       for(int r=0; r<deg+1; ++r) {
-        C_num(j,r) = dp(tau_root[r]);
-        C[j][r] = C_num(j,r);
+        C_num(j, r) = dp(tau_root[r]);
+        C[j][r] = C_num(j, r);
       }
 
       // Integrate polynomial to get the coefficients of the quadratures
@@ -145,11 +145,11 @@ namespace casadi {
       Q(j) = ip(1.0);
     }
 
-    C_num(std::vector<int>(1,0),ALL) = 0;
-    C_num(0,0)   = 1;
+    C_num(std::vector<int>(1, 0), ALL) = 0;
+    C_num(0, 0)   = 1;
 
-    casadi_assert_message(fabs(sumAll(Q)-1).at(0)<1e-9,"Check on quadrature coefficients");
-    casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9,"Check on collocation coefficients");
+    casadi_assert_message(fabs(sumAll(Q)-1).at(0)<1e-9, "Check on quadrature coefficients");
+    casadi_assert_message(fabs(sumAll(D_num)-1).at(0)<1e-9, "Check on collocation coefficients");
 
     // Initial state
     MX X0 = MX::sym("X0",x0().sparsity());
@@ -195,9 +195,9 @@ namespace casadi {
       // For all time points
       for(int j=0; j<nj; ++j) {
         // Get expressions for the differential state
-        X[k][j] = reshape(V(range(offset,offset+nx_)),x0().shape());
+        X[k][j] = reshape(V(range(offset, offset+nx_)), x0().shape());
         offset += nx_;
-        RX[k][j] = reshape(V(range(offset,offset+nrx_)),rx0().shape());
+        RX[k][j] = reshape(V(range(offset, offset+nrx_)), rx0().shape());
         offset += nrx_;
 
         // Get the local time
@@ -205,9 +205,9 @@ namespace casadi {
 
         // Get expressions for the algebraic variables
         if(j>0) {
-          Z[k][j-1] = reshape(V(range(offset,offset+nz_)),z0().shape());
+          Z[k][j-1] = reshape(V(range(offset, offset+nz_)), z0().shape());
           offset += nz_;
-          RZ[k][j-1] = reshape(V(range(offset,offset+nrz_)),rz0().shape());
+          RZ[k][j-1] = reshape(V(range(offset, offset+nrz_)), rz0().shape());
           offset += nrz_;
         }
       }
@@ -349,7 +349,7 @@ namespace casadi {
     ifcn_out[1+INTEGRATOR_QF] = QF;
     ifcn_out[1+INTEGRATOR_RXF] = RX[0][0];
     ifcn_out[1+INTEGRATOR_RQF] = RQF;
-    Function ifcn = MXFunction(ifcn_in,ifcn_out);
+    Function ifcn = MXFunction(ifcn_in, ifcn_out);
     std::stringstream ss_ifcn;
     ss_ifcn << "collocation_implicit_residual_" << getOption("name");
     ifcn.setOption("name",ss_ifcn.str());
@@ -364,7 +364,7 @@ namespace casadi {
     implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
 
     // Allocate a root-finding solver
-    implicit_solver_ = implicit_function_creator(ifcn,Function(),LinearSolver());
+    implicit_solver_ = implicit_function_creator(ifcn, Function(), LinearSolver());
     std::stringstream ss_implicit_solver;
     ss_implicit_solver << "collocation_implicitsolver_" << getOption("name");
     implicit_solver_.setOption("name",ss_implicit_solver.str());
@@ -384,7 +384,7 @@ namespace casadi {
       integratorCreator startup_integrator_creator = getOption("startup_integrator");
 
       // Allocate a root-finding solver
-      startup_integrator_ = startup_integrator_creator(f_,g_);
+      startup_integrator_ = startup_integrator_creator(f_, g_);
 
       // Pass options
       startup_integrator_.setOption("t0",coll_time_.front().front());

@@ -35,7 +35,7 @@ using namespace std;
 namespace casadi {
 
 
-double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::string &b) {
+double OptionsFunctionalityNode::wordDistance(const std::string &a, const std::string &b) {
   /// Levenshtein edit distance
   if (a == b) return 0;
   int na = a.size();
@@ -43,8 +43,8 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::st
   if (na == 0) return nb;
   if (nb == 0) return na;
 
-  vector<int> v0(nb+1,0);
-  vector<int> v1(nb+1,0);
+  vector<int> v0(nb+1, 0);
+  vector<int> v1(nb+1, 0);
 
   for (int i=0;i<nb+1;++i)
     v0[i] = i;
@@ -55,8 +55,8 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::st
   for (int i=0;i<na;i++) {
     v1[0] = i + 1;
     for (int j=0; j<nb; j++) {
-      s = std::tolower(a[i],loc);
-      t = std::tolower(b[j],loc);
+      s = std::tolower(a[i], loc);
+      t = std::tolower(b[j], loc);
       int cost = 0;
       if (s != t)
         cost = 1;
@@ -74,7 +74,7 @@ double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::st
 /// \cond INTERNAL
 /// A helper class to use stl::sort in OptionsFunctionalityNode::getBestMatches
 struct mysortclass {
-  bool operator () (std::pair<std::string,double> a,std::pair<std::string,double> b) {
+  bool operator () (std::pair<std::string, double> a, std::pair<std::string, double> b) {
       return (a.second<b.second);}
 } mysorter;
 /// \endcond
@@ -82,13 +82,13 @@ struct mysortclass {
 double OptionsFunctionalityNode::getBestMatches(const std::string & word,
                                                 const std::vector<std::string> &dictionary,
                                                 std::vector<std::string> &suggestions, int amount) {
-  // Make a list of (word,score) tuples
-  std::vector< std::pair<std::string,double> > candidates(dictionary.size());
+  // Make a list of (word, score) tuples
+  std::vector< std::pair<std::string, double> > candidates(dictionary.size());
 
   // Fill this list
   for (int i=0;i<dictionary.size();i++) {
     candidates[i].first  = dictionary[i];
-    candidates[i].second = wordDistance(word,dictionary[i]);
+    candidates[i].second = wordDistance(word, dictionary[i]);
   }
 
   // Sort it
@@ -118,7 +118,7 @@ double OptionsFunctionalityNode::getBestMatches(const std::string &name,
   }
 
   // Pass the work on to the more general method
-  return getBestMatches(name,dict,suggestions,amount);
+  return getBestMatches(name, dict, suggestions, amount);
 }
 
 
@@ -206,11 +206,11 @@ void OptionsFunctionalityNode::assert_exists(const std::string &name) const {
     stringstream ss;
     ss << "Unknown option: " << name << endl;
     std::vector<std::string> suggestions;
-    getBestMatches(name,suggestions,5);
+    getBestMatches(name, suggestions, 5);
     ss << endl;
     ss << "Did you mean one of the following?" << endl;
     for (int i=0;i<suggestions.size();++i)
-      printOption(suggestions[i],ss);
+      printOption(suggestions[i], ss);
     ss << "Use printOptions() to get a full list of options." << endl;
     casadi_error(ss.str());
   }
@@ -226,14 +226,14 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const {
     stringstream ss;
     if (allowed_options.find(name)!=allowed_options.end()) {
       ss << "Option: '" << name << "' has not been set." << endl;
-      printOption(name,ss);
+      printOption(name, ss);
     } else {
       ss << "Option: '" << name << "' does not exist." << endl << endl;
       std::vector<std::string> suggestions;
-      getBestMatches(name,suggestions,5);
+      getBestMatches(name, suggestions, 5);
       ss << "Did you mean one of the following?" << endl;
       for (int i=0;i<suggestions.size();++i)
-        printOption(suggestions[i],ss);
+        printOption(suggestions[i], ss);
       ss << "Use printOptions() to get a full list of options." << endl;
     }
     casadi_error(ss.str());
@@ -274,7 +274,7 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
     enum_values.push_back(val);
   }
 
-  addOption(name,type,def_val,desc,allowed_vals_vec,inherit, enum_values, enum_descr);
+  addOption(name, type, def_val, desc, allowed_vals_vec, inherit, enum_values, enum_descr);
 
 }
 
@@ -346,7 +346,7 @@ void OptionsFunctionalityNode::addOption(
 }
 
 void OptionsFunctionalityNode::printOption(const std::string &name, ostream &stream) const {
-   map<std::string,opt_type>::const_iterator allowed_option_it = allowed_options.find(name);
+   map<std::string, opt_type>::const_iterator allowed_option_it = allowed_options.find(name);
    if (allowed_option_it!=allowed_options.end()) {
 
       // First print out the datatype
@@ -363,14 +363,14 @@ void OptionsFunctionalityNode::printOption(const std::string &name, ostream &str
       stream << endl;
 
       // Print out the description on a new line.
-      map<std::string,std::string>::const_iterator description_it =description_.find(name);
+      map<std::string, std::string>::const_iterator description_it =description_.find(name);
       if (description_it!=description_.end()) {
         if (description_it->second != "n/a")
           stream << "     \"" << description_it->second << "\""<< std::endl;
       }
 
       // Print out the allowed values if applicable
-      map< std::string,std::vector<GenericType> >::const_iterator allowed_it =
+      map< std::string, std::vector<GenericType> >::const_iterator allowed_it =
           allowed_vals_.find(name);
       if (allowed_it!=allowed_vals_.end()) {
         const std::vector<GenericType> & allowed = allowed_it->second;
@@ -391,7 +391,7 @@ void OptionsFunctionalityNode::printOptions(ostream &stream) const {
   stream << "\"Option name\" [type] = value" << endl;
   for(map<string, opt_type>::const_iterator it=allowed_options.begin();
       it!=allowed_options.end(); ++it) {
-    printOption(it->first,stream);
+    printOption(it->first, stream);
   }
   stream << endl;
 }
@@ -430,11 +430,11 @@ OptionsFunctionalityNode::~OptionsFunctionalityNode() {
 }
 
 void OptionsFunctionality::setOption(const string &str, const GenericType& op) {
-  (*this)->setOption(str,op);
+  (*this)->setOption(str, op);
 }
 
 void OptionsFunctionality::setOption(const Dictionary& dict, bool skipUnknown) {
-  (*this)->setOption(dict,skipUnknown);
+  (*this)->setOption(dict, skipUnknown);
 }
 
 std::vector<std::string> OptionsFunctionality::getOptionNames() const {
@@ -481,7 +481,7 @@ bool OptionsFunctionality::checkNode() const {
 }
 
 void OptionsFunctionality::copyOptions(const OptionsFunctionality& obj, bool skipUnknown) {
-  (*this)->copyOptions(obj,skipUnknown);
+  (*this)->copyOptions(obj, skipUnknown);
 }
 
 const Dictionary& OptionsFunctionality::dictionary() const {
@@ -501,7 +501,7 @@ int OptionsFunctionality::getOptionEnumValue(const std::string &name) const {
 }
 
 void OptionsFunctionality::setOptionByEnumValue(const std::string &name, int v) {
-  return (*this)->setOptionByEnumValue(name,v);
+  return (*this)->setOptionByEnumValue(name, v);
 }
 
 const Dictionary& OptionsFunctionalityNode::dictionary() const {
@@ -511,13 +511,13 @@ const Dictionary& OptionsFunctionalityNode::dictionary() const {
 void OptionsFunctionalityNode::setOption(const Dictionary& dict, bool skipUnknown) {
   for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it) {
     if (!skipUnknown || hasOption(it->first)) {
-      setOption(it->first,it->second);
+      setOption(it->first, it->second);
     }
   }
 }
 
 void OptionsFunctionalityNode::copyOptions(const OptionsFunctionality& obj, bool skipUnknown) {
-  setOption(obj.dictionary(),skipUnknown);
+  setOption(obj.dictionary(), skipUnknown);
 }
 
 void OptionsFunctionalityNode::repr(ostream &stream) const {
@@ -569,35 +569,35 @@ std::vector<GenericType> OptionsFunctionalityNode::getOptionAllowed(const std::s
 
 int OptionsFunctionalityNode::getOptionAllowedIndex(const std::string &name) const {
   assert_exists(name);
-  casadi_assert_message(hasSetOption(name),"Option '" << name << "' has not been set.");
+  casadi_assert_message(hasSetOption(name), "Option '" << name << "' has not been set.");
   map<string, std::vector<GenericType> >::const_iterator it = allowed_vals_.find(name);
-  casadi_assert_message(it!=allowed_vals_.end(),"Option '" << name
+  casadi_assert_message(it!=allowed_vals_.end(), "Option '" << name
                         << "' has no list of allowed values.");
   const std::vector<GenericType> &vec = it->second;
-  std::vector<GenericType>::const_iterator it2 = std::find(vec.begin(),vec.end(),getOption(name));
+  std::vector<GenericType>::const_iterator it2 = std::find(vec.begin(), vec.end(), getOption(name));
   return it2-vec.begin();
 }
 
 void OptionsFunctionalityNode::setOptionByAllowedIndex(const std::string &name, int i) {
   assert_exists(name);
   map<string, std::vector<GenericType> >::const_iterator it = allowed_vals_.find(name);
-  casadi_assert_message(it!=allowed_vals_.end(),"Option '" << name
+  casadi_assert_message(it!=allowed_vals_.end(), "Option '" << name
                         << "' has no list of allowed values.");
   const std::vector<GenericType> &vec = it->second;
-  casadi_assert_message(i>=0 && i<= vec.size()-1,"setOptionAllowedIndex('" << name
+  casadi_assert_message(i>=0 && i<= vec.size()-1, "setOptionAllowedIndex('" << name
                         << "'," << i << "): index out of bounds. There are "
                         << vec.size() << " allowed values.");
-  setOption(name,vec[i]);
+  setOption(name, vec[i]);
 }
 
 int OptionsFunctionalityNode::getOptionEnumValue(const std::string &name) const {
   assert_exists(name);
   int i = getOptionAllowedIndex(name);
   map<string, std::vector<int> >::const_iterator it = enum_values_.find(name);
-  casadi_assert_message(it!=enum_values_.end(),"Option '" << name
+  casadi_assert_message(it!=enum_values_.end(), "Option '" << name
                         << "' has no list of enum values.");
   const std::vector<int> & enum_values = it->second;
-  casadi_assert_message(!enum_values.empty(),"Option '" << name
+  casadi_assert_message(!enum_values.empty(), "Option '" << name
                         << "' has an empty enum values list.");
   return enum_values.at(i);
 }
@@ -605,15 +605,15 @@ int OptionsFunctionalityNode::getOptionEnumValue(const std::string &name) const 
 void OptionsFunctionalityNode::setOptionByEnumValue(const std::string &name, int v) {
   assert_exists(name);
   map<string, std::vector<int> >::const_iterator it = enum_values_.find(name);
-  casadi_assert_message(it!=enum_values_.end(),"Option '" << name
+  casadi_assert_message(it!=enum_values_.end(), "Option '" << name
                         << "' has no list of enum values.");
   const std::vector<int> & enum_values = it->second;
-  casadi_assert_message(!enum_values.empty(),"Option '" << name
+  casadi_assert_message(!enum_values.empty(), "Option '" << name
                         << "' has an empty enum values list.");
-  std::vector<int>::const_iterator it2 = std::find(enum_values.begin(),enum_values.end(),v);
-  casadi_assert_message(it2!=enum_values.end(),"Option '"
+  std::vector<int>::const_iterator it2 = std::find(enum_values.begin(), enum_values.end(), v);
+  casadi_assert_message(it2!=enum_values.end(), "Option '"
                         << name << "', entry " << v << " was not found in enum value list.");
-  setOptionByAllowedIndex(name,it2-enum_values.begin());
+  setOptionByAllowedIndex(name, it2-enum_values.begin());
 }
 
 

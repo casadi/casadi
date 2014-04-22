@@ -185,25 +185,25 @@ namespace casadi {
   }
 
   void IntegratorInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     FunctionInternal::deepCopyMembers(already_copied);
-    f_ = deepcopy(f_,already_copied);
-    g_ = deepcopy(g_,already_copied);
-    linsol_f_ = deepcopy(linsol_f_,already_copied);
-    linsol_g_ = deepcopy(linsol_g_,already_copied);
+    f_ = deepcopy(f_, already_copied);
+    g_ = deepcopy(g_, already_copied);
+    linsol_f_ = deepcopy(linsol_f_, already_copied);
+    linsol_g_ = deepcopy(linsol_g_, already_copied);
   }
 
-  std::pair<Function,Function> IntegratorInternal::getAugmented(int nfwd, int nadj,
+  std::pair<Function, Function> IntegratorInternal::getAugmented(int nfwd, int nadj,
                                                                 AugOffset& offset) {
     log("IntegratorInternal::getAugmented","call");
 
     //    cout << "here" << endl;
 
     // Return object
-    std::pair<Function,Function> ret;
+    std::pair<Function, Function> ret;
 
     // Calculate offsets
-    offset = getAugOffset(nfwd,nadj);
+    offset = getAugOffset(nfwd, nadj);
 
     // Create augmented problem
     MX aug_t = MX::sym("aug_t",f_.input(DAE_T).sparsity());
@@ -215,17 +215,17 @@ namespace casadi {
     MX aug_rp = MX::sym("aug_rp",std::max(qf().size1(),rp().size1()),offset.rp.back());
 
     // Split up the augmented vectors
-    vector<MX> aug_x_split = horzsplit(aug_x,offset.x);
+    vector<MX> aug_x_split = horzsplit(aug_x, offset.x);
     vector<MX>::const_iterator aug_x_split_it = aug_x_split.begin();
-    vector<MX> aug_z_split = horzsplit(aug_z,offset.z);
+    vector<MX> aug_z_split = horzsplit(aug_z, offset.z);
     vector<MX>::const_iterator aug_z_split_it = aug_z_split.begin();
-    vector<MX> aug_p_split = horzsplit(aug_p,offset.p);
+    vector<MX> aug_p_split = horzsplit(aug_p, offset.p);
     vector<MX>::const_iterator aug_p_split_it = aug_p_split.begin();
-    vector<MX> aug_rx_split = horzsplit(aug_rx,offset.rx);
+    vector<MX> aug_rx_split = horzsplit(aug_rx, offset.rx);
     vector<MX>::const_iterator aug_rx_split_it = aug_rx_split.begin();
-    vector<MX> aug_rz_split = horzsplit(aug_rz,offset.rz);
+    vector<MX> aug_rz_split = horzsplit(aug_rz, offset.rz);
     vector<MX>::const_iterator aug_rz_split_it = aug_rz_split.begin();
-    vector<MX> aug_rp_split = horzsplit(aug_rp,offset.rp);
+    vector<MX> aug_rp_split = horzsplit(aug_rp, offset.rp);
     vector<MX>::const_iterator aug_rp_split_it = aug_rp_split.begin();
 
     // Temporary vector
@@ -238,11 +238,11 @@ namespace casadi {
     vector<MX> f_ode, f_alg, f_quad, g_ode, g_alg, g_quad;
 
     // Forward derivatives of f
-    Function d = f_.derivative(nfwd,0);
+    Function d = f_.derivative(nfwd, 0);
     vector<MX> f_arg;
     f_arg.reserve(d.getNumInputs());
     tmp.resize(DAE_NUM_IN);
-    fill(tmp.begin(),tmp.end(),MX());
+    fill(tmp.begin(), tmp.end(), MX());
 
     // Collect arguments for calling d
     for(int dir=-1; dir<nfwd; ++dir) {
@@ -250,7 +250,7 @@ namespace casadi {
       if( nx_>0) tmp[DAE_X] = *aug_x_split_it++;
       if( nz_>0) tmp[DAE_Z] = *aug_z_split_it++;
       if( np_>0) tmp[DAE_P] = *aug_p_split_it++;
-      f_arg.insert(f_arg.end(),tmp.begin(),tmp.end());
+      f_arg.insert(f_arg.end(), tmp.begin(), tmp.end());
     }
 
     // Call d
@@ -259,9 +259,9 @@ namespace casadi {
 
     // Collect right-hand-sides
     tmp.resize(DAE_NUM_OUT);
-    fill(tmp.begin(),tmp.end(),MX());
+    fill(tmp.begin(), tmp.end(), MX());
     for(int dir=-1; dir<nfwd; ++dir) {
-      copy(res_it,res_it+tmp.size(),tmp.begin());
+      copy(res_it, res_it+tmp.size(), tmp.begin());
       res_it += tmp.size();
       if( nx_>0) f_ode.push_back(tmp[DAE_ODE]);
       if( nz_>0) f_alg.push_back(tmp[DAE_ALG]);
@@ -275,10 +275,10 @@ namespace casadi {
     if(!g_.isNull()) {
 
       // Forward derivatives of g
-      d = g_.derivative(nfwd,0);
+      d = g_.derivative(nfwd, 0);
       g_arg.reserve(d.getNumInputs());
       tmp.resize(RDAE_NUM_IN);
-      fill(tmp.begin(),tmp.end(),MX());
+      fill(tmp.begin(), tmp.end(), MX());
 
       // Reset iterators
       aug_x_split_it = aug_x_split.begin();
@@ -294,7 +294,7 @@ namespace casadi {
         if(nrx_>0) tmp[RDAE_RX] = *aug_rx_split_it++;
         if(nrz_>0) tmp[RDAE_RZ] = *aug_rz_split_it++;
         if(nrp_>0) tmp[RDAE_RP] = *aug_rp_split_it++;
-        g_arg.insert(g_arg.end(),tmp.begin(),tmp.end());
+        g_arg.insert(g_arg.end(), tmp.begin(), tmp.end());
       }
 
       // Call d
@@ -303,9 +303,9 @@ namespace casadi {
 
       // Collect right-hand-sides
       tmp.resize(RDAE_NUM_OUT);
-      fill(tmp.begin(),tmp.end(),MX());
+      fill(tmp.begin(), tmp.end(), MX());
       for(int dir=-1; dir<nfwd; ++dir) {
-        copy(res_it,res_it+tmp.size(),tmp.begin());
+        copy(res_it, res_it+tmp.size(), tmp.begin());
         res_it += tmp.size();
         if(nrx_>0) g_ode.push_back(tmp[RDAE_ODE]);
         if(nrz_>0) g_alg.push_back(tmp[RDAE_ALG]);
@@ -319,18 +319,18 @@ namespace casadi {
     if(nadj>0) {
 
       // Adjoint derivatives of f
-      d = f_.derivative(0,nadj);
+      d = f_.derivative(0, nadj);
       f_arg.resize(DAE_NUM_IN);
       f_arg.reserve(d.getNumInputs());
 
       // Collect arguments for calling d
       tmp.resize(DAE_NUM_OUT);
-      fill(tmp.begin(),tmp.end(),MX());
+      fill(tmp.begin(), tmp.end(), MX());
       for(int dir=0; dir<nadj; ++dir) {
         if( nx_>0) tmp[DAE_ODE] = *aug_rx_split_it++;
         if( nz_>0) tmp[DAE_ALG] = *aug_rz_split_it++;
         if( nq_>0) tmp[DAE_QUAD] = *aug_rp_split_it++;
-        f_arg.insert(f_arg.end(),tmp.begin(),tmp.end());
+        f_arg.insert(f_arg.end(), tmp.begin(), tmp.end());
       }
 
       // Call der
@@ -345,7 +345,7 @@ namespace casadi {
       // Collect right-hand-sides
       tmp.resize(DAE_NUM_IN);
       for(int dir=0; dir<nadj; ++dir) {
-        copy(res_it,res_it+tmp.size(),tmp.begin());
+        copy(res_it, res_it+tmp.size(), tmp.begin());
         res_it += tmp.size();
         if( nx_>0) g_ode.push_back(tmp[DAE_X]);
         if( nz_>0) g_alg.push_back(tmp[DAE_Z]);
@@ -358,18 +358,18 @@ namespace casadi {
       if(!g_.isNull()) {
 
         // Adjoint derivatives of g
-        d = g_.derivative(0,nadj);
+        d = g_.derivative(0, nadj);
         g_arg.resize(RDAE_NUM_IN);
         g_arg.reserve(d.getNumInputs());
 
         // Collect arguments for calling der
         tmp.resize(RDAE_NUM_OUT);
-        fill(tmp.begin(),tmp.end(),MX());
+        fill(tmp.begin(), tmp.end(), MX());
         for(int dir=0; dir<nadj; ++dir) {
           if(nrx_>0) tmp[RDAE_ODE] = *aug_x_split_it++;
           if(nrz_>0) tmp[RDAE_ALG] = *aug_z_split_it++;
           if(nrq_>0) tmp[RDAE_QUAD] = *aug_p_split_it++;
-          g_arg.insert(g_arg.end(),tmp.begin(),tmp.end());
+          g_arg.insert(g_arg.end(), tmp.begin(), tmp.end());
         }
 
         // Call der
@@ -379,7 +379,7 @@ namespace casadi {
         // Collect right-hand-sides
         tmp.resize(RDAE_NUM_IN);
         for(int dir=0; dir<nadj; ++dir) {
-          copy(res_it,res_it+tmp.size(),tmp.begin());
+          copy(res_it, res_it+tmp.size(), tmp.begin());
           res_it += tmp.size();
           if( nx_>0) g_ode[g_ode_ind++] += tmp[RDAE_X];
           if( nz_>0) g_alg[g_alg_ind++] += tmp[RDAE_Z];
@@ -391,7 +391,7 @@ namespace casadi {
         casadi_assert(g_alg_ind == g_alg.size());
         casadi_assert(g_quad_ind == g_quad.size());
 
-        // Remove the dependency of rx,rz,rp in the forward integration (see Joel's thesis)
+        // Remove the dependency of rx, rz, rp in the forward integration (see Joel's thesis)
         if(nrx_>0) g_arg[RDAE_RX] = MX::zeros(g_arg[RDAE_RX].sparsity());
         if(nrz_>0) g_arg[RDAE_RZ] = MX::zeros(g_arg[RDAE_RZ].sparsity());
         if(nrp_>0) g_arg[RDAE_RP] = MX::zeros(g_arg[RDAE_RP].sparsity());
@@ -403,7 +403,7 @@ namespace casadi {
         // Collect right-hand-sides and add contribution to the forward integration
         tmp.resize(RDAE_NUM_IN);
         for(int dir=0; dir<nadj; ++dir) {
-          copy(res_it,res_it+tmp.size(),tmp.begin());
+          copy(res_it, res_it+tmp.size(), tmp.begin());
           res_it += tmp.size();
           if(nrx_>0) f_ode.push_back(tmp[RDAE_RX]);
           if(nrz_>0) f_alg.push_back(tmp[RDAE_RZ]);
@@ -433,7 +433,7 @@ namespace casadi {
       if(!f_ode.empty()) f_out[DAE_ODE] = dense(horzcat(f_ode));
       if(!f_alg.empty()) f_out[DAE_ALG] = dense(horzcat(f_alg));
       if(!f_quad.empty()) f_out[DAE_QUAD] = dense(horzcat(f_quad));
-      MXFunction f_mx(f_in,f_out);
+      MXFunction f_mx(f_in, f_out);
 
       // Expand to SXFuncion?
       if(expand) {
@@ -457,7 +457,7 @@ namespace casadi {
       if(!g_ode.empty()) g_out[RDAE_ODE] = dense(horzcat(g_ode));
       if(!g_alg.empty()) g_out[RDAE_ALG] = dense(horzcat(g_alg));
       if(!g_quad.empty()) g_out[RDAE_QUAD] = dense(horzcat(g_quad));
-      MXFunction g_mx(g_in,g_out);
+      MXFunction g_mx(g_in, g_out);
 
       // Expand to SXFuncion?
       if(expand) {
@@ -508,19 +508,19 @@ namespace casadi {
       f_.input(DAE_P).setBV(p());
       f_.input(DAE_Z).setZeroBV();
       f_.spEvaluate(true);
-      f_.output(DAE_ODE).getArrayBV(tmp_f1,nx_);
-      f_.output(DAE_ALG).getArrayBV(tmp_f1+nx_,nz_);
+      f_.output(DAE_ODE).getArrayBV(tmp_f1, nx_);
+      f_.output(DAE_ALG).getArrayBV(tmp_f1+nx_, nz_);
 
       // Propagate interdependencies
-      x0().getArrayBV(tmp_f2,nx_);
-      std::fill(tmp_f2+nx_,tmp_f2+nx_+nz_,0);
-      linsol_f_.spSolve(tmp_f2,tmp_f1,true);
-      xf().setArrayBV(tmp_f2,nx_);
-      zf().setArrayBV(tmp_f2+nx_,nz_);
+      x0().getArrayBV(tmp_f2, nx_);
+      std::fill(tmp_f2+nx_, tmp_f2+nx_+nz_, 0);
+      linsol_f_.spSolve(tmp_f2, tmp_f1, true);
+      xf().setArrayBV(tmp_f2, nx_);
+      zf().setArrayBV(tmp_f2+nx_, nz_);
 
       // Get influence on the quadratures
       if(nq_>0) {
-        f_.input(DAE_X).setArrayBV(tmp_f2,nx_);
+        f_.input(DAE_X).setArrayBV(tmp_f2, nx_);
         f_.input(DAE_Z).setBV(zf());
         f_.spEvaluate(true);
         f_.output(DAE_QUAD).getBV(qf());
@@ -538,15 +538,15 @@ namespace casadi {
         g_.input(RDAE_RP).setBV(rp());
         g_.input(RDAE_RZ).setZeroBV();
         g_.spEvaluate(true);
-        g_.output(RDAE_ODE).getArrayBV(tmp_g1,nrx_);
-        g_.output(RDAE_ALG).getArrayBV(tmp_g1+nrx_,nrz_);
+        g_.output(RDAE_ODE).getArrayBV(tmp_g1, nrx_);
+        g_.output(RDAE_ALG).getArrayBV(tmp_g1+nrx_, nrz_);
 
         // Propagate interdependencies
-        rx0().getArrayBV(tmp_g2,nrx_);
-        std::fill(tmp_g2+nrx_,tmp_g2+nrx_+nrz_,0);
-        linsol_g_.spSolve(tmp_g2,tmp_g1,true);
-        rxf().setArrayBV(tmp_g2,nrx_);
-        rzf().setArrayBV(tmp_g2+nrx_,nrz_);
+        rx0().getArrayBV(tmp_g2, nrx_);
+        std::fill(tmp_g2+nrx_, tmp_g2+nrx_+nrz_, 0);
+        linsol_g_.spSolve(tmp_g2, tmp_g1, true);
+        rxf().setArrayBV(tmp_g2, nrx_);
+        rzf().setArrayBV(tmp_g2+nrx_, nrz_);
 
         // Get influence on the backward quadratures
         if(nrq_>0) {
@@ -580,15 +580,15 @@ namespace casadi {
         }
 
         // Propagate interdependencies
-        rx0().getArrayBV(tmp_g2,nrx_);
-        rz0().getArrayBV(tmp_g2+nrx_,nrz_);
-        std::fill(tmp_g1,tmp_g1+nrx_+nrz_,0);
-        linsol_g_.spSolve(tmp_g1,tmp_g2,false);
+        rx0().getArrayBV(tmp_g2, nrx_);
+        rz0().getArrayBV(tmp_g2+nrx_, nrz_);
+        std::fill(tmp_g1, tmp_g1+nrx_+nrz_, 0);
+        linsol_g_.spSolve(tmp_g1, tmp_g2, false);
 
         // Propagate through the backward DAE
-        g_.output(RDAE_ODE).setArrayBV(tmp_g1,nrx_);
+        g_.output(RDAE_ODE).setArrayBV(tmp_g1, nrx_);
         g_.output(RDAE_ODE).borBV(rx0());
-        g_.output(RDAE_ALG).setArrayBV(tmp_g1+nrx_,nrz_);
+        g_.output(RDAE_ALG).setArrayBV(tmp_g1+nrx_, nrz_);
         g_.output(RDAE_ALG).borBV(rz0());
         g_.spEvaluate(false);
         x0().borBV(g_.input(RDAE_X));
@@ -612,15 +612,15 @@ namespace casadi {
       }
 
       // Propagate interdependencies
-      x0().getArrayBV(tmp_f2,nx_);
-      z0().getArrayBV(tmp_f2+nx_,nz_);
-      std::fill(tmp_f1,tmp_f1+nx_+nz_,0);
-      linsol_f_.spSolve(tmp_f1,tmp_f2,false);
+      x0().getArrayBV(tmp_f2, nx_);
+      z0().getArrayBV(tmp_f2+nx_, nz_);
+      std::fill(tmp_f1, tmp_f1+nx_+nz_, 0);
+      linsol_f_.spSolve(tmp_f1, tmp_f2, false);
 
       // Propagate through the DAE
-      f_.output(DAE_ODE).setArrayBV(tmp_f1,nx_);
+      f_.output(DAE_ODE).setArrayBV(tmp_f1, nx_);
       f_.output(DAE_ODE).borBV(x0());
-      f_.output(DAE_ALG).setArrayBV(tmp_f1+nx_,nz_);
+      f_.output(DAE_ALG).setArrayBV(tmp_f1+nx_, nz_);
       f_.output(DAE_ALG).borBV(z0());
       f_.spEvaluate(false);
       x0().borBV(f_.input(DAE_X));
@@ -636,14 +636,14 @@ namespace casadi {
   IntegratorInternal::AugOffset IntegratorInternal::getAugOffset(int nfwd, int nadj) {
     // Form return object
     AugOffset ret;
-    ret.x.resize(1,0);
-    ret.z.resize(1,0);
-    ret.q.resize(1,0);
-    ret.p.resize(1,0);
-    ret.rx.resize(1,0);
-    ret.rz.resize(1,0);
-    ret.rq.resize(1,0);
-    ret.rp.resize(1,0);
+    ret.x.resize(1, 0);
+    ret.z.resize(1, 0);
+    ret.q.resize(1, 0);
+    ret.p.resize(1, 0);
+    ret.rx.resize(1, 0);
+    ret.rz.resize(1, 0);
+    ret.rq.resize(1, 0);
+    ret.rp.resize(1, 0);
 
     // Count nondifferentiated and forward sensitivities
     for(int dir=-1; dir<nfwd; ++dir) {
@@ -688,14 +688,14 @@ namespace casadi {
 
     // Form the augmented DAE
     AugOffset offset;
-    std::pair<Function,Function> aug_dae = getAugmented(nfwd,nadj,offset);
+    std::pair<Function, Function> aug_dae = getAugmented(nfwd, nadj, offset);
 
     // Create integrator for augmented DAE
     Integrator integrator;
-    integrator.assignNode(create(aug_dae.first,aug_dae.second));
+    integrator.assignNode(create(aug_dae.first, aug_dae.second));
 
     // Set solver specific options
-    setDerivativeOptions(integrator,offset);
+    setDerivativeOptions(integrator, offset);
 
     // Pass down specific options if provided
     if (hasSetOption("augmented_options"))
@@ -725,46 +725,46 @@ namespace casadi {
       ss.clear();
       ss << "x0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_X0] = MX::sym(ss.str(),x0().sparsity());
+      dd[INTEGRATOR_X0] = MX::sym(ss.str(), x0().sparsity());
       x0_aug.appendColumns(dd[INTEGRATOR_X0]);
 
       // Parameter
       ss.clear();
       ss << "p";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_P] = MX::sym(ss.str(),p().sparsity());
+      dd[INTEGRATOR_P] = MX::sym(ss.str(), p().sparsity());
       p_aug.appendColumns(dd[INTEGRATOR_P]);
 
       // Initial guess for algebraic variable
       ss.clear();
       ss << "r0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_Z0] = MX::sym(ss.str(),z0().sparsity());
+      dd[INTEGRATOR_Z0] = MX::sym(ss.str(), z0().sparsity());
       z0_aug.appendColumns(dd[INTEGRATOR_Z0]);
 
       // Backward state
       ss.clear();
       ss << "rx0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RX0] = MX::sym(ss.str(),rx0().sparsity());
+      dd[INTEGRATOR_RX0] = MX::sym(ss.str(), rx0().sparsity());
       rx0_aug.appendColumns(dd[INTEGRATOR_RX0]);
 
       // Backward parameter
       ss.clear();
       ss << "rp";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RP] = MX::sym(ss.str(),rp().sparsity());
+      dd[INTEGRATOR_RP] = MX::sym(ss.str(), rp().sparsity());
       rp_aug.appendColumns(dd[INTEGRATOR_RP]);
 
       // Initial guess for backward algebraic variable
       ss.clear();
       ss << "rz0";
       if(dir>=0) ss << "_" << dir;
-      dd[INTEGRATOR_RZ0] = MX::sym(ss.str(),rz0().sparsity());
+      dd[INTEGRATOR_RZ0] = MX::sym(ss.str(), rz0().sparsity());
       rz0_aug.appendColumns(dd[INTEGRATOR_RZ0]);
 
       // Add to input vector
-      ret_in.insert(ret_in.end(),dd.begin(),dd.end());
+      ret_in.insert(ret_in.end(), dd.begin(), dd.end());
     }
 
     // Add adjoint seeds
@@ -774,41 +774,41 @@ namespace casadi {
       // Differential states become backward differential state
       ss.clear();
       ss << "xf" << "_" << dir;
-      dd[INTEGRATOR_XF] = MX::sym(ss.str(),xf().sparsity());
+      dd[INTEGRATOR_XF] = MX::sym(ss.str(), xf().sparsity());
       rx0_aug.appendColumns(dd[INTEGRATOR_XF]);
 
       // Quadratures become backward parameters
       ss.clear();
       ss << "qf" << "_" << dir;
-      dd[INTEGRATOR_QF] = MX::sym(ss.str(),qf().sparsity());
+      dd[INTEGRATOR_QF] = MX::sym(ss.str(), qf().sparsity());
       rp_aug.appendColumns(dd[INTEGRATOR_QF]);
 
       // Algebraic variables become backward algebraic variables
       ss.clear();
       ss << "zf" << "_" << dir;
-      dd[INTEGRATOR_ZF] = MX::sym(ss.str(),zf().sparsity());
+      dd[INTEGRATOR_ZF] = MX::sym(ss.str(), zf().sparsity());
       rz0_aug.appendColumns(dd[INTEGRATOR_ZF]);
 
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rxf" << "_" << dir;
-      dd[INTEGRATOR_RXF] = MX::sym(ss.str(),rxf().sparsity());
+      dd[INTEGRATOR_RXF] = MX::sym(ss.str(), rxf().sparsity());
       x0_aug.appendColumns(dd[INTEGRATOR_RXF]);
 
       // Backward quadratures becomes (forward) parameters
       ss.clear();
       ss << "rqf" << "_" << dir;
-      dd[INTEGRATOR_RQF] = MX::sym(ss.str(),rqf().sparsity());
+      dd[INTEGRATOR_RQF] = MX::sym(ss.str(), rqf().sparsity());
       p_aug.appendColumns(dd[INTEGRATOR_RQF]);
 
       // Backward differential states becomes forward differential states
       ss.clear();
       ss << "rzf" << "_" << dir;
-      dd[INTEGRATOR_RZF] = MX::sym(ss.str(),rzf().sparsity());
+      dd[INTEGRATOR_RZF] = MX::sym(ss.str(), rzf().sparsity());
       z0_aug.appendColumns(dd[INTEGRATOR_RZF]);
 
       // Add to input vector
-      ret_in.insert(ret_in.end(),dd.begin(),dd.end());
+      ret_in.insert(ret_in.end(), dd.begin(), dd.end());
     }
 
     // Call the integrator
@@ -822,12 +822,12 @@ namespace casadi {
     vector<MX> integrator_out = integrator.call(integrator_in);
 
     // Augmented results
-    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF],offset.x);
-    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF],offset.q);
-    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF],offset.z);
-    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF],offset.rx);
-    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF],offset.rq);
-    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF],offset.rz);
+    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset.x);
+    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset.q);
+    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset.z);
+    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset.rx);
+    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset.rq);
+    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset.rz);
     vector<MX>::const_iterator xf_aug_it = xf_aug.begin();
     vector<MX>::const_iterator qf_aug_it = qf_aug.begin();
     vector<MX>::const_iterator zf_aug_it = zf_aug.begin();
@@ -841,7 +841,7 @@ namespace casadi {
 
     // Collect the nondifferentiated results and forward sensitivities
     dd.resize(INTEGRATOR_NUM_OUT);
-    fill(dd.begin(),dd.end(),MX());
+    fill(dd.begin(), dd.end(), MX());
     for(int dir=-1; dir<nfwd; ++dir) {
       if( nx_>0) dd[INTEGRATOR_XF]  = *xf_aug_it++;
       if( nq_>0) dd[INTEGRATOR_QF]  = *qf_aug_it++;
@@ -849,12 +849,12 @@ namespace casadi {
       if(nrx_>0) dd[INTEGRATOR_RXF] = *rxf_aug_it++;
       if(nrq_>0) dd[INTEGRATOR_RQF] = *rqf_aug_it++;
       if(nrz_>0) dd[INTEGRATOR_RZF] = *rzf_aug_it++;
-      ret_out.insert(ret_out.end(),dd.begin(),dd.end());
+      ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
 
     // Collect the adjoint sensitivities
     dd.resize(INTEGRATOR_NUM_IN);
-    fill(dd.begin(),dd.end(),MX());
+    fill(dd.begin(), dd.end(), MX());
     for(int dir=0; dir<nadj; ++dir) {
       if( nx_>0) dd[INTEGRATOR_X0]  = *rxf_aug_it++;
       if( np_>0) dd[INTEGRATOR_P]   = *rqf_aug_it++;
@@ -862,21 +862,21 @@ namespace casadi {
       if(nrx_>0) dd[INTEGRATOR_RX0] = *xf_aug_it++;
       if(nrp_>0) dd[INTEGRATOR_RP]  = *qf_aug_it++;
       if(nrz_>0) dd[INTEGRATOR_RZ0] = *zf_aug_it++;
-      ret_out.insert(ret_out.end(),dd.begin(),dd.end());
+      ret_out.insert(ret_out.end(), dd.begin(), dd.end());
     }
     log("IntegratorInternal::getDerivative","end");
 
     // Create derivative function and return
-    return MXFunction(ret_in,ret_out);
+    return MXFunction(ret_in, ret_out);
   }
 
   Function IntegratorInternal::getJacobian(int iind, int oind, bool compact, bool symmetric) {
     vector<MX> arg = symbolicInput();
     vector<MX> res = shared_from_this<Function>().call(arg);
-    MXFunction f(arg,res);
+    MXFunction f(arg, res);
     f.setOption("ad_mode","forward");
     f.init();
-    return f.jacobian(iind,oind,compact,symmetric);
+    return f.jacobian(iind, oind, compact, symmetric);
   }
 
   void IntegratorInternal::reset() {
@@ -918,7 +918,7 @@ namespace casadi {
 
   Sparsity IntegratorInternal::spJacF() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity ret = f_.jacSparsity(DAE_X,DAE_ODE).T();
+    Sparsity ret = f_.jacSparsity(DAE_X, DAE_ODE).T();
 
     // Add diagonal to get interdependencies
     ret = ret.patternUnion(Sparsity::diag(nx_));
@@ -927,17 +927,17 @@ namespace casadi {
     if(nz_==0) return ret;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z,DAE_ODE).T();
-    Sparsity jac_alg_x = f_.jacSparsity(DAE_X,DAE_ALG).T();
-    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z,DAE_ALG).T();
-    ret = vertcat(ret,jac_ode_z);
-    ret.appendColumns(vertcat(jac_alg_x,jac_alg_z));
+    Sparsity jac_ode_z = f_.jacSparsity(DAE_Z, DAE_ODE).T();
+    Sparsity jac_alg_x = f_.jacSparsity(DAE_X, DAE_ALG).T();
+    Sparsity jac_alg_z = f_.jacSparsity(DAE_Z, DAE_ALG).T();
+    ret = vertcat(ret, jac_ode_z);
+    ret.appendColumns(vertcat(jac_alg_x, jac_alg_z));
     return ret;
   }
 
   Sparsity IntegratorInternal::spJacG() {
     // Start with the sparsity pattern of the ODE part
-    Sparsity ret = g_.jacSparsity(RDAE_RX,RDAE_ODE).T();
+    Sparsity ret = g_.jacSparsity(RDAE_RX, RDAE_ODE).T();
 
     // Add diagonal to get interdependencies
     ret = ret.patternUnion(Sparsity::diag(nrx_));
@@ -946,11 +946,11 @@ namespace casadi {
     if(nrz_==0) return ret;
 
     // Add contribution from algebraic variables and equations
-    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ,RDAE_ODE).T();
-    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX,RDAE_ALG).T();
-    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ,RDAE_ALG).T();
-    ret = vertcat(ret,jac_ode_z);
-    ret.appendColumns(vertcat(jac_alg_x,jac_alg_z));
+    Sparsity jac_ode_z = g_.jacSparsity(RDAE_RZ, RDAE_ODE).T();
+    Sparsity jac_alg_x = g_.jacSparsity(RDAE_RX, RDAE_ALG).T();
+    Sparsity jac_alg_z = g_.jacSparsity(RDAE_RZ, RDAE_ALG).T();
+    ret = vertcat(ret, jac_ode_z);
+    ret.appendColumns(vertcat(jac_alg_x, jac_alg_z));
     return ret;
   }
 

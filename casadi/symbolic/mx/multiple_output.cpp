@@ -36,7 +36,7 @@ namespace casadi {
 
   MX MultipleOutput::getOutput(int oind) const {
     MX this_ = shared_from_this<MX>();
-    return MX::create(new OutputNode(this_,oind));
+    return MX::create(new OutputNode(this_, oind));
   }
 
   OutputNode::OutputNode(const MX& parent, int oind) : oind_(oind) {

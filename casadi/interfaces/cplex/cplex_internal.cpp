@@ -140,13 +140,13 @@ namespace casadi {
     // Matrix A, count the number of elements per column
     const Sparsity& A_sp = input(QP_SOLVER_A).sparsity();
     matcnt_.resize(A_sp.size2());
-    transform(A_sp.colind().begin()+1,A_sp.colind().end(),A_sp.colind().begin(),matcnt_.begin(),
+    transform(A_sp.colind().begin()+1, A_sp.colind().end(), A_sp.colind().begin(), matcnt_.begin(),
               minus<int>());
 
     // Matrix H, count the number of elements per column
     const Sparsity& H_sp = input(QP_SOLVER_H).sparsity();
     qmatcnt_.resize(H_sp.size2());
-    transform(H_sp.colind().begin()+1,H_sp.colind().end(),H_sp.colind().begin(),qmatcnt_.begin(),
+    transform(H_sp.colind().begin()+1, H_sp.colind().end(), H_sp.colind().begin(), qmatcnt_.begin(),
               minus<int>());
 
     casadi_assert(lp_==0);

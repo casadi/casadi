@@ -52,7 +52,7 @@ namespace casadi {
     // Allocate inputs
     setNumInputs(LINSOL_NUM_IN);
     input(LINSOL_A) = DMatrix(sparsity);
-    input(LINSOL_B) = DMatrix::zeros(sparsity.size2(),nrhs);
+    input(LINSOL_B) = DMatrix::zeros(sparsity.size2(), nrhs);
 
     // Allocate outputs
     setNumOutputs(LINSOL_NUM_OUT);
@@ -111,10 +111,10 @@ namespace casadi {
     int nrhs = input(LINSOL_B).size2();
 
     // Copy input to output
-    copy(b.begin(),b.end(),x.begin());
+    copy(b.begin(), b.end(), x.begin());
 
     // Solve the factorized system in-place
-    solve(getPtr(x),nrhs,transpose);
+    solve(getPtr(x), nrhs, transpose);
   }
 
   void LinearSolverInternal::evaluateMXGen(const MXPtrV& input, MXPtrV& output,
@@ -132,14 +132,14 @@ namespace casadi {
       if(B.isZero()) {
         X = MX::sparse(B.shape());
       } else {
-        X = solve(A,B,tr);
+        X = solve(A, B, tr);
       }
     }
 
     // Forward sensitivities, collect the right hand sides
     std::vector<int> rhs_ind;
     std::vector<MX> rhs;
-    std::vector<int> col_offset(1,0);
+    std::vector<int> col_offset(1, 0);
     for(int d=0; d<nfwd; ++d) {
       const MX& B_hat = *fwdSeed[d][0];
       const MX& A_hat = *fwdSeed[d][1];
@@ -147,9 +147,9 @@ namespace casadi {
       // Get right hand side
       MX rhs_d;
       if(tr) {
-        rhs_d = B_hat - mul(A_hat.T(),X);
+        rhs_d = B_hat - mul(A_hat.T(), X);
       } else {
-        rhs_d = B_hat - mul(A_hat,X);
+        rhs_d = B_hat - mul(A_hat, X);
       }
 
       // Simplifiy if zero
@@ -164,7 +164,7 @@ namespace casadi {
 
     if(!rhs.empty()) {
       // Solve for all directions at once
-      rhs = horzsplit(solve(A,horzcat(rhs),tr),col_offset);
+      rhs = horzsplit(solve(A, horzcat(rhs), tr), col_offset);
 
       // Save result
       for(int i=0; i<rhs.size(); ++i) {
@@ -197,16 +197,16 @@ namespace casadi {
 
     if(!rhs.empty()) {
       // Solve for all directions at once
-      rhs = horzsplit(solve(A,horzcat(rhs),!tr),col_offset);
+      rhs = horzsplit(solve(A, horzcat(rhs), !tr), col_offset);
 
       for(int i=0; i<rhs.size(); ++i) {
         int d = rhs_ind[i];
 
         // Propagate to A
         if(!tr) {
-          adjSens[d][1]->addToSum(-mul(rhs[i],X.T(),A.sparsity()));
+          adjSens[d][1]->addToSum(-mul(rhs[i], X.T(), A.sparsity()));
         } else {
-          adjSens[d][1]->addToSum(-mul(X,rhs[i].T(),A.sparsity()));
+          adjSens[d][1]->addToSum(-mul(X, rhs[i].T(), A.sparsity()));
         }
 
         // Propagate to B
@@ -244,7 +244,7 @@ namespace casadi {
       if(fwd) {
 
         // Copy B_ptr to a temporary vector
-        copy(B_ptr,B_ptr+n,tmp_ptr);
+        copy(B_ptr, B_ptr+n, tmp_ptr);
 
         // Add A_hat contribution to tmp
         for(int cc=0; cc<n; ++cc) {
@@ -255,17 +255,17 @@ namespace casadi {
         }
 
         // Propagate to X_ptr
-        std::fill(X_ptr,X_ptr+n,0);
-        spSolve(X_ptr,tmp_ptr,transpose);
+        std::fill(X_ptr, X_ptr+n, 0);
+        spSolve(X_ptr, tmp_ptr, transpose);
 
       } else { // adjoint
 
         // Solve transposed
-        std::fill(tmp_ptr,tmp_ptr+n,0);
-        spSolve(tmp_ptr,B_ptr,!transpose);
+        std::fill(tmp_ptr, tmp_ptr+n, 0);
+        spSolve(tmp_ptr, B_ptr, !transpose);
 
         // Clear seeds
-        std::fill(B_ptr,B_ptr+n,0);
+        std::fill(B_ptr, B_ptr+n, 0);
 
         // Propagate to X_ptr
         for(int i=0; i<n; ++i) {
@@ -290,7 +290,7 @@ namespace casadi {
   void LinearSolverInternal::spSolve(DMatrix& X, const DMatrix& B, bool transpose) const {
     bvec_t* X_bvec = reinterpret_cast<bvec_t*>(X.ptr());
     const bvec_t* B_bvec = reinterpret_cast<const bvec_t*>(B.ptr());
-    spSolve(X_bvec,B_bvec,transpose);
+    spSolve(X_bvec, B_bvec, transpose);
   }
 
   void LinearSolverInternal::spSolve(bvec_t* X, const bvec_t* B, bool transpose) const {
@@ -361,14 +361,14 @@ namespace casadi {
   void LinearSolverInternal::evaluateDGen(const DMatrixPtrV& input, DMatrixPtrV& output, bool tr) {
 
     // Factorize the matrix
-    setInput(*input[1],LINSOL_A);
+    setInput(*input[1], LINSOL_A);
     prepare();
 
     // Solve for nondifferentiated output
     if(input[0]!=output[0]) {
-      copy(input[0]->begin(),input[0]->end(),output[0]->begin());
+      copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
-    solve(getPtr(output[0]->data()),output[0]->size2(),tr);
+    solve(getPtr(output[0]->data()), output[0]->size2(), tr);
   }
 
   void LinearSolverInternal::evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr) {

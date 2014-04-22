@@ -110,7 +110,7 @@ namespace casadi {
     virtual bool isBinaryOp() const { return false;}
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Print a representation */
     virtual void repr(std::ostream &stream) const;
@@ -147,7 +147,7 @@ namespace casadi {
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                                    std::vector<double>& rtmp, bool fwd)
-    { propagateSparsity(input,output,fwd);}
+    { propagateSparsity(input, output, fwd);}
 
     /** \brief  Get the name */
     virtual const std::string& getName() const;
@@ -210,7 +210,7 @@ namespace casadi {
     int size() const { return sparsity().size(); }
     int size1() const { return sparsity().size1(); }
     int size2() const { return sparsity().size2(); }
-    std::pair<int,int> shape() const { return sparsity().shape();}
+    std::pair<int, int> shape() const { return sparsity().shape();}
 
     /** \brief Is the node nonlinear */
     virtual bool isNonLinear() {return false;}
@@ -248,7 +248,7 @@ namespace casadi {
       if(x.shape()==sp.shape()) {
         return x;
       } else {
-        return MX(sp,x);
+        return MX(sp, x);
       }
     }
 

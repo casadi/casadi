@@ -26,8 +26,8 @@
 
 namespace casadi {
   std::vector<int> range(int start, int stop, int step, int len) {
-    start = std::min(start,len);
-    stop = std::min(stop,len);
+    start = std::min(start, len);
+    stop = std::min(stop, len);
     int nret = (stop-start)/step + ((stop-start)%step!=0);
     std::vector<int> ret(nret);
     int ind = start;
@@ -39,13 +39,13 @@ namespace casadi {
   }
 
   std::vector<int> range(int stop) {
-    return range(0,stop);
+    return range(0, stop);
   }
 
   std::vector<int> complement(const std::vector<int> &v, int size) {
-    casadi_assert_message(inBounds(v,size),
+    casadi_assert_message(inBounds(v, size),
                           "complement: out of bounds. Some elements in v fall out of [0,size[");
-    std::vector<int> lookup(size,0);
+    std::vector<int> lookup(size, 0);
     std::vector<int> ret;
 
     for (int i=0;i<v.size();i++) {
@@ -61,7 +61,7 @@ namespace casadi {
   }
 
   std::vector<int> lookupvector(const std::vector<int> &v, int size) {
-    casadi_assert_message(inBounds(v,size),
+    casadi_assert_message(inBounds(v, size),
                           "lookupvector: out of bounds. Some elements in v fall out of [0,size[");
     std::vector<int> lookup(size,-1);
 

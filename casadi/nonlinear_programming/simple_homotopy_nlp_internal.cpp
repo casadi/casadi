@@ -65,7 +65,7 @@ namespace casadi {
     split.push_back(0);
     split.push_back(np_);
     split.push_back(np_+1);
-    std::vector<MX> p_tau = vertsplit(P,split);
+    std::vector<MX> p_tau = vertsplit(P, split);
     MX x = MX::sym("x",hnlp_.input(HNL_X).size());
 
     std::vector<MX> nlp_in = nlpIn("x",x,"p",P);
@@ -91,14 +91,14 @@ namespace casadi {
   }
 
   void SimpleHomotopyNLPInternal::evaluate() {
-    nlpsolver_.setInput(input(NLP_SOLVER_X0),NLP_SOLVER_X0);
-    nlpsolver_.setInput(input(NLP_SOLVER_LAM_X0),NLP_SOLVER_LAM_X0);
-    nlpsolver_.setInput(input(NLP_SOLVER_LBX),NLP_SOLVER_LBX);
-    nlpsolver_.setInput(input(NLP_SOLVER_UBX),NLP_SOLVER_UBX);
-    nlpsolver_.setInput(input(NLP_SOLVER_LBG),NLP_SOLVER_LBG);
-    nlpsolver_.setInput(input(NLP_SOLVER_UBG),NLP_SOLVER_UBG);
-    nlpsolver_.setInput(input(NLP_SOLVER_LAM_G0),NLP_SOLVER_LAM_G0);
-    //nlpsolver_.setInput(input(NLP_SOLVER_LAM_P0),NLP_SOLVER_LAM_P0);
+    nlpsolver_.setInput(input(NLP_SOLVER_X0), NLP_SOLVER_X0);
+    nlpsolver_.setInput(input(NLP_SOLVER_LAM_X0), NLP_SOLVER_LAM_X0);
+    nlpsolver_.setInput(input(NLP_SOLVER_LBX), NLP_SOLVER_LBX);
+    nlpsolver_.setInput(input(NLP_SOLVER_UBX), NLP_SOLVER_UBX);
+    nlpsolver_.setInput(input(NLP_SOLVER_LBG), NLP_SOLVER_LBG);
+    nlpsolver_.setInput(input(NLP_SOLVER_UBG), NLP_SOLVER_UBG);
+    nlpsolver_.setInput(input(NLP_SOLVER_LAM_G0), NLP_SOLVER_LAM_G0);
+    //nlpsolver_.setInput(input(NLP_SOLVER_LAM_P0), NLP_SOLVER_LAM_P0);
 
     std::copy(input(NLP_SOLVER_P).begin(),
               input(NLP_SOLVER_P).end(),
@@ -108,17 +108,17 @@ namespace casadi {
       nlpsolver_.input(NLP_SOLVER_P)[np_] = i*1.0/(num_steps_-1);
       nlpsolver_.evaluate();
 
-      nlpsolver_.setInput(nlpsolver_.output(NLP_SOLVER_LAM_G),NLP_SOLVER_LAM_G0);
-      nlpsolver_.setInput(nlpsolver_.output(NLP_SOLVER_LAM_X),NLP_SOLVER_LAM_X0);
-     // nlpsolver_.setInput(nlpsolver_.output(NLP_SOLVER_LAM_P),NLP_SOLVER_LAM_P0);
+      nlpsolver_.setInput(nlpsolver_.output(NLP_SOLVER_LAM_G), NLP_SOLVER_LAM_G0);
+      nlpsolver_.setInput(nlpsolver_.output(NLP_SOLVER_LAM_X), NLP_SOLVER_LAM_X0);
+     // nlpsolver_.setInput(nlpsolver_.output(NLP_SOLVER_LAM_P), NLP_SOLVER_LAM_P0);
 
-      nlpsolver_.setInput(nlpsolver_.output(NLP_SOLVER_X),NLP_SOLVER_X0);
+      nlpsolver_.setInput(nlpsolver_.output(NLP_SOLVER_X), NLP_SOLVER_X0);
 
     }
 
-    setOutput(nlpsolver_.output(NLP_SOLVER_X),NLP_SOLVER_X);
-    setOutput(nlpsolver_.output(NLP_SOLVER_LAM_X),NLP_SOLVER_LAM_X);
-    setOutput(nlpsolver_.output(NLP_SOLVER_LAM_G),NLP_SOLVER_LAM_G);
+    setOutput(nlpsolver_.output(NLP_SOLVER_X), NLP_SOLVER_X);
+    setOutput(nlpsolver_.output(NLP_SOLVER_LAM_X), NLP_SOLVER_LAM_X);
+    setOutput(nlpsolver_.output(NLP_SOLVER_LAM_G), NLP_SOLVER_LAM_G);
 
 
     std::copy(nlpsolver_.output(NLP_SOLVER_P).begin(),

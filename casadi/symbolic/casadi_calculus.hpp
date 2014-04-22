@@ -260,14 +260,14 @@ namespace casadi {
   template<class T> T fmin(const T &x, const T &n) { return x.fmin(n);}
   template<class T> T fmin(const T &x,   double n) { return x.fmin(n);}
   template<class T> T fmin(double   x, const T &n) { return T(x).fmin(n);}
-  inline double fmin(double x, double y) throw() { return std::min(x,y);}
-  inline int fmin(int x, int y) throw() { return std::min(x,y);}
+  inline double fmin(double x, double y) throw() { return std::min(x, y);}
+  inline int fmin(int x, int y) throw() { return std::min(x, y);}
 
   template<class T> T fmax(const T &x, const T &n) { return x.fmax(n);}
   template<class T> T fmax(const T &x,   double n) { return x.fmax(n);}
   template<class T> T fmax(double   x, const T &n) { return T(x).fmax(n);}
-  inline double fmax(double x, double y) throw() { return std::max(x,y);}
-  inline int fmax(int x, int y) throw() { return std::max(x,y);}
+  inline double fmax(double x, double y) throw() { return std::max(x, y);}
+  inline int fmax(int x, int y) throw() { return std::max(x, y);}
 
   inline int isnan(double x) throw() { return x!=x;}
   inline int isinf(double x) throw() { return isnan(x-x);}
@@ -365,11 +365,11 @@ namespace casadi {
   struct BinaryOperation {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
-        UnaryOperation<I>::fcn(x,f);}
+        UnaryOperation<I>::fcn(x, f);}
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        UnaryOperation<I>::der(x,f,d); d[1]=0; }
+        UnaryOperation<I>::der(x, f, d); d[1]=0; }
   };
 
   template<int I>
@@ -377,7 +377,7 @@ namespace casadi {
     /// Function evaluation
     template<typename T> static inline T fcn(const T& x, const T& y) {
       T ret;
-      BinaryOperation<I>::fcn(x,y,ret);
+      BinaryOperation<I>::fcn(x, y, ret);
       return ret;
     }
   };
@@ -394,10 +394,10 @@ namespace casadi {
       T tmp;
 
       /// Evaluate the function
-      BinaryOperation<I>::fcn(x,y,tmp);
+      BinaryOperation<I>::fcn(x, y, tmp);
 
       /// Evaluate the partial derivatives
-      BinaryOperation<I>::der(x,y,tmp,d);
+      BinaryOperation<I>::der(x, y, tmp, d);
 
       /// Now save f
       f = tmp;
@@ -409,12 +409,12 @@ namespace casadi {
   struct BinaryOperationSS {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T& y, T& f, int n) {
-      BinaryOperation<I>::fcn(x,y,f);
+      BinaryOperation<I>::fcn(x, y, f);
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d, int n) {
-      BinaryOperation<I>::der(x,y,f,d);
+      BinaryOperation<I>::der(x, y, f, d);
     }
   };
 
@@ -425,14 +425,14 @@ namespace casadi {
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T* y, T* f, int n) {
       for(int i=0; i<n; ++i) {
-        BinaryOperation<I>::fcn(*x++,*y++,*f++);
+        BinaryOperation<I>::fcn(*x++,*y++, *f++);
       }
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T* x, const T* y, const T* f, T* d, int n) {
       for(int i=0; i<n; ++i, d+=2) {
-        BinaryOperation<I>::der(*x++,*y++,*f++,d);
+        BinaryOperation<I>::der(*x++,*y++, *f++, d);
       }
     }
   };
@@ -443,14 +443,14 @@ namespace casadi {
     /// Function evaluation
     template<typename T> static inline void fcn(const T* x, const T& y, T* f, int n) {
       for(int i=0; i<n; ++i) {
-        BinaryOperation<I>::fcn(*x++,y,*f++);
+        BinaryOperation<I>::fcn(*x++, y, *f++);
       }
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T* x, const T& y, const T* f, T* d, int n) {
       for(int i=0; i<n; ++i, d+=2) {
-        BinaryOperation<I>::der(*x++,y,*f++,d);
+        BinaryOperation<I>::der(*x++, y, *f++, d);
       }
     }
   };
@@ -461,14 +461,14 @@ namespace casadi {
     /// Function evaluation
     template<typename T> static inline void fcn(const T& x, const T* y, T* f, int n) {
       for(int i=0; i<n; ++i) {
-        BinaryOperation<I>::fcn(x,*y++,*f++);
+        BinaryOperation<I>::fcn(x,*y++, *f++);
       }
     }
 
     /// Partial derivatives - binary function
     template<typename T> static inline void der(const T& x, const T* y, const T* f, T* d, int n) {
       for(int i=0; i<n; ++i, d+=2) {
-        BinaryOperation<I>::der(x,*y++,*f++,d);
+        BinaryOperation<I>::der(x,*y++, *f++, d);
       }
     }
   };
@@ -660,19 +660,19 @@ namespace casadi {
   template<>
   struct BinaryOperation<OP_POW>{
   public:
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = pow(x,y);}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = pow(x, y);}
     // See issue #104 why d[0] is no longer y*f/x
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=y*pow(x,y-1); d[1]=log(x)*f;}
+        d[0]=y*pow(x, y-1); d[1]=log(x)*f;}
   };
 
   /// Power, defined only for y constant
   template<>
   struct BinaryOperation<OP_CONSTPOW>{
   public:
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = pow(x,y);}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = pow(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=y*pow(x,y-1); d[1]=0;}
+        d[0]=y*pow(x, y-1); d[1]=0;}
   };
 
   /// Square root
@@ -846,15 +846,15 @@ namespace casadi {
   /// Copysign
   template<>
   struct BinaryOperation<OP_COPYSIGN>{
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = copysign(x,y);}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = copysign(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        T e = 1; d[0]=copysign(e,y); d[1]=0;}
+        T e = 1; d[0]=copysign(e, y); d[1]=0;}
   };
 
   /// Minimum
   template<>
   struct BinaryOperation<OP_FMIN>{
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmin(x,y);}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmin(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=x<=y; d[1]=!d[0];}
   };
@@ -862,7 +862,7 @@ namespace casadi {
   /// Maximum
   template<>
   struct BinaryOperation<OP_FMAX>{
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmax(x,y);}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmax(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=x>=y; d[1]=!d[0];}
   };
@@ -929,7 +929,7 @@ namespace casadi {
   /// Identity operator with the side effect of printing
   template<>
   struct BinaryOperation<OP_PRINTME>{
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) {f = printme(x,y); }
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) {f = printme(x, y); }
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=1; d[1]=0;}
   };
@@ -938,7 +938,7 @@ namespace casadi {
   template<>
   struct BinaryOperation<OP_ATAN2>{
   public:
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = atan2(x,y);}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = atan2(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         T t = x*x+y*y; d[0]=y/t; d[1]=-x/t;}
   };
@@ -948,7 +948,7 @@ namespace casadi {
   struct BinaryOperation<OP_IF_ELSE_ZERO>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
-        f = if_else_zero(x,y);}
+        f = if_else_zero(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0]=0; d[1]=x;}
   };

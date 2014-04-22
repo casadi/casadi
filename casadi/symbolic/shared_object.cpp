@@ -165,15 +165,15 @@ void SharedObjectNode::print(std::ostream &stream) const {
 }
 
 void SharedObject::makeUnique(bool clone_members) {
-  std::map<SharedObjectNode*,SharedObject> already_copied;
-  makeUnique(already_copied,clone_members);
+  std::map<SharedObjectNode*, SharedObject> already_copied;
+  makeUnique(already_copied, clone_members);
 }
 
-void SharedObject::makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied,
+void SharedObject::makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
                               bool clone_members) {
   if(node && node->count>1) {
     // First find out if the expression has already been copied
-    std::map<SharedObjectNode*,SharedObject>::iterator it = already_copied.find(node);
+    std::map<SharedObjectNode*, SharedObject>::iterator it = already_copied.find(node);
 
     if(it==already_copied.end()) {
       // If the expression has not yet been copied
@@ -218,7 +218,7 @@ int SharedObjectNode::getCount() const {
   return count;
 }
 
-void SharedObjectNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied) {
+void SharedObjectNode::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
 }
 
 bool SharedObject::isInit() const {

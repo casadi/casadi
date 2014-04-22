@@ -41,12 +41,12 @@ namespace casadi {
 
   void Concat::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                          std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void Concat::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                           std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -55,7 +55,7 @@ namespace casadi {
     typename vector<T>::iterator res_it = output[0]->data().begin();
     for(int i=0; i<input.size(); ++i) {
       const vector<T>& arg_i = input[i]->data();
-      copy(arg_i.begin(),arg_i.end(),res_it);
+      copy(arg_i.begin(), arg_i.end(), res_it);
       res_it += arg_i.size();
     }
   }
@@ -116,19 +116,19 @@ namespace casadi {
       if(*j>=0 && (*j < begin || *j >= end)) {
 
         // Fallback to the base class
-        return MXNode::getGetNonzeros(sp,nz);
+        return MXNode::getGetNonzeros(sp, nz);
       }
     }
 
     // All nz refer to the same dependency, update the nonzero indices
     if(begin==0) {
-      return dep(i)->getGetNonzeros(sp,nz);
+      return dep(i)->getGetNonzeros(sp, nz);
     } else {
       vector<int> nz_new(nz);
       for(vector<int>::iterator j=nz_new.begin(); j!=nz_new.end(); ++j) {
         if(*j>=0) *j -= begin;
       }
-      return dep(i)->getGetNonzeros(sp,nz_new);
+      return dep(i)->getGetNonzeros(sp, nz_new);
     }
   }
 
@@ -173,7 +173,7 @@ namespace casadi {
     if(nadj==0) return;
 
     // Get offsets for each column
-    vector<int> col_offset(ndep()+1,0);
+    vector<int> col_offset(ndep()+1, 0);
     for(int i=0; i<ndep(); ++i) {
       int ncol = dep(i).sparsity().size2();
       col_offset[i+1] = col_offset[i] + ncol;
@@ -182,7 +182,7 @@ namespace casadi {
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d) {
       MX& aseed = *adjSeed[d][0];
-      vector<MX> s = horzsplit(aseed,col_offset);
+      vector<MX> s = horzsplit(aseed, col_offset);
       aseed = MX();
       for(int i=0; i<ndep(); ++i) {
         adjSens[d][i]->addToSum(s[i]);
@@ -231,7 +231,7 @@ namespace casadi {
     if(nadj==0) return;
 
     // Get offsets for each row
-    vector<int> row_offset(ndep()+1,0);
+    vector<int> row_offset(ndep()+1, 0);
     for(int i=0; i<ndep(); ++i) {
       int nrow = dep(i).sparsity().size1();
       row_offset[i+1] = row_offset[i] + nrow;
@@ -240,7 +240,7 @@ namespace casadi {
     // Adjoint sensitivities
     for(int d=0; d<nadj; ++d) {
       MX& aseed = *adjSeed[d][0];
-      vector<MX> s = vertsplit(aseed,row_offset);
+      vector<MX> s = vertsplit(aseed, row_offset);
       aseed = MX();
       for(int i=0; i<ndep(); ++i) {
         adjSens[d][i]->addToSum(s[i]);

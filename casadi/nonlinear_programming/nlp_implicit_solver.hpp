@@ -66,7 +66,7 @@ public:
   #endif
   static ImplicitFunction creator(const Function& f, const Function& jac,
                                   const LinearSolver& linsol)
-  { return NLPImplicitSolver(f,jac,linsol);}
+  { return NLPImplicitSolver(f, jac, linsol);}
   #ifdef SWIG
   %nocallback;
   #endif

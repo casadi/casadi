@@ -53,7 +53,7 @@ namespace casadi {
     virtual DpleInternal* clone() const=0;
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
     virtual DpleInternal* create(const std::vector< Sparsity > & A,

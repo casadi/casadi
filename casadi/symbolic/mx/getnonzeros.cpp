@@ -39,12 +39,12 @@ namespace casadi {
 
   void GetNonzerosVector::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                                     std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void GetNonzerosVector::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                                      std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -59,12 +59,12 @@ namespace casadi {
 
   void GetNonzerosSlice::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                                    std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void GetNonzerosSlice::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                                     std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -82,12 +82,12 @@ namespace casadi {
 
   void GetNonzerosSlice2::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                                     std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void GetNonzerosSlice2::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                                      std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -205,7 +205,7 @@ namespace casadi {
 
     // Get all input elements
     vector<int> el_input;
-    isp.getElements(el_input,false);
+    isp.getElements(el_input, false);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
     vector<int> r_colind, r_row, r_nz, r_ind;
@@ -220,12 +220,12 @@ namespace casadi {
 
       // Get the matching nonzeros
       r_ind.resize(el_input.size());
-      copy(el_input.begin(),el_input.end(),r_ind.begin());
+      copy(el_input.begin(), el_input.end(), r_ind.begin());
       arg.sparsity().getNZInplace(r_ind);
 
       // Sparsity pattern for the result
       r_colind.resize(osp.size2()+1); // Col count
-      fill(r_colind.begin(),r_colind.end(),0);
+      fill(r_colind.begin(), r_colind.end(), 0);
       r_row.clear();
 
       // Perform the assignments
@@ -262,8 +262,8 @@ namespace casadi {
       if(r_nz.size()==0) {
         res = MX::sparse(osp.shape());
       } else {
-        Sparsity f_sp(osp.size1(),osp.size2(),r_colind,r_row);
-        res = arg->getGetNonzeros(f_sp,r_nz);
+        Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
+        res = arg->getGetNonzeros(f_sp, r_nz);
       }
     }
 
@@ -278,7 +278,7 @@ namespace casadi {
       MX asens0 = asens; // Sensitivity before addition
 
       // Get the corresponding nz locations in the output sparsity pattern
-      aseed.sparsity().getElements(r_nz,false);
+      aseed.sparsity().getElements(r_nz, false);
       osp.getNZInplace(r_nz);
 
       // Filter out ignored entries and check if there is anything to add at all
@@ -298,7 +298,7 @@ namespace casadi {
 
       // Get the nz locations in the adjoint sensitivity corresponding to the inputs
       r_ind.resize(el_input.size());
-      copy(el_input.begin(),el_input.end(),r_ind.begin());
+      copy(el_input.begin(), el_input.end(), r_ind.begin());
       asens0.sparsity().getNZInplace(r_ind);
 
       // Enlarge the sparsity pattern of the sensitivity if not all additions fit
@@ -310,7 +310,7 @@ namespace casadi {
           asens0 = asens0->getSetSparse(sp);
 
           // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
-          copy(el_input.begin(),el_input.end(),r_ind.begin());
+          copy(el_input.begin(), el_input.end(), r_ind.begin());
           asens0.sparsity().getNZInplace(r_ind);
 
           break;
@@ -325,13 +325,13 @@ namespace casadi {
       }
 
       // Add to the element to the sensitivity
-      asens = aseed->getAddNonzeros(asens0,r_nz);
+      asens = aseed->getAddNonzeros(asens0, r_nz);
     }
   }
 
   Matrix<int> GetNonzeros::mapping() const {
     vector<int> nz = getAll();
-    return Matrix<int>(sparsity(),nz);
+    return Matrix<int>(sparsity(), nz);
   }
 
   bool GetNonzerosSlice::isIdentity() const {
@@ -353,7 +353,7 @@ namespace casadi {
                                             const std::vector<std::string>& res,
                                             CodeGenerator& gen) const {
     // Condegen the indices
-    int ind = gen.getConstant(nz_,true);
+    int ind = gen.getConstant(nz_, true);
 
     // Codegen the assignments
     stream << "  for(ii=s" << ind << ", rr=" << res.front() << ", ss=" << arg.front()
@@ -378,7 +378,7 @@ namespace casadi {
     for(vector<int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i) {
       if(*i>=0) *i = nz_all[*i];
     }
-    return dep()->getGetNonzeros(sp,nz_new);
+    return dep()->getGetNonzeros(sp, nz_new);
   }
 
   void GetNonzerosSlice::generateOperation(std::ostream &stream,
@@ -404,7 +404,7 @@ namespace casadi {
 
   bool GetNonzerosVector::isEqual(const MXNode* node, int depth) const {
     // Check dependencies
-    if(!sameOpAndDeps(node,depth)) return false;
+    if(!sameOpAndDeps(node, depth)) return false;
 
     // Check if same node
     const GetNonzerosVector* n = dynamic_cast<const GetNonzerosVector*>(node);
@@ -415,14 +415,14 @@ namespace casadi {
 
     // Check indices
     if(this->nz_.size()!=n->nz_.size()) return false;
-    if(!std::equal(this->nz_.begin(),this->nz_.end(),n->nz_.begin())) return false;
+    if(!std::equal(this->nz_.begin(), this->nz_.end(), n->nz_.begin())) return false;
 
     return true;
   }
 
   bool GetNonzerosSlice::isEqual(const MXNode* node, int depth) const {
     // Check dependencies
-    if(!sameOpAndDeps(node,depth)) return false;
+    if(!sameOpAndDeps(node, depth)) return false;
 
     // Check if same node
     const GetNonzerosSlice* n = dynamic_cast<const GetNonzerosSlice*>(node);
@@ -439,7 +439,7 @@ namespace casadi {
 
   bool GetNonzerosSlice2::isEqual(const MXNode* node, int depth) const {
     // Check dependencies
-    if(!sameOpAndDeps(node,depth)) return false;
+    if(!sameOpAndDeps(node, depth)) return false;
 
     // Check if same node
     const GetNonzerosSlice2* n = dynamic_cast<const GetNonzerosSlice2*>(node);

@@ -871,10 +871,10 @@ namespace casadi {
         int iPrint = getOption("_iprint");
         int Error = 0;
         // snsetr_(snopt_name.c_str(), &value, &iPrint, &iSumm, &Error,
-        //         getPtr(snopt_cw_),&clen,
-        //         getPtr(snopt_iw_),&ilen,
-        //         getPtr(snopt_rw_),&rlen,
-        //         bufferlen,clen*8);
+        //         getPtr(snopt_cw_), &clen,
+        //         getPtr(snopt_iw_), &ilen,
+        //         getPtr(snopt_rw_), &rlen,
+        //         bufferlen, clen*8);
         snopt_setr(snopt_name.c_str(), &bufferlen, &value, &iPrint, &iSumm, &Error,
                    getPtr(snopt_cw_), &clen,
                    getPtr(snopt_iw_), &ilen,

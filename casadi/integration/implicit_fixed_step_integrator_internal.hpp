@@ -38,7 +38,7 @@ namespace casadi {
     explicit ImplicitFixedStepIntegratorInternal(const Function& f, const Function& g);
 
     /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Clone
     virtual ImplicitFixedStepIntegratorInternal* clone() const = 0;

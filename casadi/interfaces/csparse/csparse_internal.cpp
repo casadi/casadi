@@ -29,7 +29,7 @@ using namespace std;
 namespace casadi {
 
   CSparseInternal::CSparseInternal(const Sparsity& sparsity, int nrhs)
-      : LinearSolverInternal(sparsity,nrhs) {
+      : LinearSolverInternal(sparsity, nrhs) {
     N_ = 0;
     S_ = 0;
   }
@@ -65,11 +65,11 @@ namespace casadi {
     called_once_ = false;
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog,this,"CSparse",
-                       ProfilingData_FunctionType_Other,2);
+      profileWriteName(CasadiOptions::profilingLog, this, "CSparse",
+                       ProfilingData_FunctionType_Other, 2);
 
-      profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"prepare",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"solve",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "prepare",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "solve",-1);
     }
   }
 
@@ -77,7 +77,7 @@ namespace casadi {
     double time_start=0;
     if(CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog,this);
+      profileWriteEntry(CasadiOptions::profilingLog, this);
     }
     if(!called_once_) {
       if(verbose()) {
@@ -98,8 +98,8 @@ namespace casadi {
 
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<linsys_nz.size(); ++k) {
-      casadi_assert_message(!isnan(linsys_nz[k]),"Nonzero " << k << " is not-a-number");
-      casadi_assert_message(!isinf(linsys_nz[k]),"Nonzero " << k << " is infinite");
+      casadi_assert_message(!isnan(linsys_nz[k]), "Nonzero " << k << " is not-a-number");
+      casadi_assert_message(!isinf(linsys_nz[k]), "Nonzero " << k << " is infinite");
     }
 
     if(verbose()) {
@@ -144,10 +144,10 @@ namespace casadi {
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog,this,0,
+      profileWriteTime(CasadiOptions::profilingLog, this, 0,
                        time_stop-time_start,
                        time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_start);
+      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
     }
   }
 
@@ -155,7 +155,7 @@ namespace casadi {
     double time_start=0;
     if(CasadiOptions::profiling&& CasadiOptions::profilingBinary) {
       time_start = getRealTime(); // Start timer
-      profileWriteEntry(CasadiOptions::profilingLog,this);
+      profileWriteEntry(CasadiOptions::profilingLog, this);
     }
 
 
@@ -182,16 +182,16 @@ namespace casadi {
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       double time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog,this,1,
+      profileWriteTime(CasadiOptions::profilingLog, this, 1,
                        time_stop-time_start,
                        time_stop-time_start);
-      profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_start);
+      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_start);
     }
   }
 
 
   CSparseInternal* CSparseInternal::clone() const {
-    return new CSparseInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size2());
+    return new CSparseInternal(input(LINSOL_A).sparsity(), input(LINSOL_B).size2());
   }
 
 } // namespace casadi

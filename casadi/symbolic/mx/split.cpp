@@ -43,12 +43,12 @@ namespace casadi {
 
   void Split::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                         std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void Split::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                          std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -101,10 +101,10 @@ namespace casadi {
     }
   }
 
-  Horzsplit::Horzsplit(const MX& x, const std::vector<int>& offset) : Split(x,offset) {
+  Horzsplit::Horzsplit(const MX& x, const std::vector<int>& offset) : Split(x, offset) {
 
     // Split up the sparsity pattern
-    output_sparsity_ = horzsplit(x.sparsity(),offset_);
+    output_sparsity_ = horzsplit(x.sparsity(), offset_);
 
     // Have offset_ refer to the nonzero offsets instead of column offsets
     offset_.resize(1);
@@ -146,7 +146,7 @@ namespace casadi {
       const MXPtrV& arg = d<0 ? input : fwdSeed[d];
       MXPtrV& res = d<0 ? output : fwdSens[d];
       MX& x = *arg[0];
-      vector<MX> y = horzsplit(x,col_offset);
+      vector<MX> y = horzsplit(x, col_offset);
       for(int i=0; i<nx; ++i) {
         if(res[i]!=0) {
           *res[i] = y[i];
@@ -172,10 +172,10 @@ namespace casadi {
     }
   }
 
-  Vertsplit::Vertsplit(const MX& x, const std::vector<int>& offset) : Split(x,offset) {
+  Vertsplit::Vertsplit(const MX& x, const std::vector<int>& offset) : Split(x, offset) {
 
     // Split up the sparsity pattern
-    output_sparsity_ = vertsplit(x.sparsity(),offset_);
+    output_sparsity_ = vertsplit(x.sparsity(), offset_);
 
     // Have offset_ refer to the nonzero offsets instead of column offsets
     offset_.resize(1);
@@ -217,7 +217,7 @@ namespace casadi {
       const MXPtrV& arg = d<0 ? input : fwdSeed[d];
       MXPtrV& res = d<0 ? output : fwdSens[d];
       MX& x = *arg[0];
-      vector<MX> y = vertsplit(x,row_offset);
+      vector<MX> y = vertsplit(x, row_offset);
       for(int i=0; i<nx; ++i) {
         if(res[i]!=0) {
           *res[i] = y[i];

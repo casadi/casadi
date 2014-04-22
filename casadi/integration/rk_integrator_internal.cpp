@@ -27,10 +27,10 @@ using namespace std;
 namespace casadi {
 
   RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) :
-      FixedStepIntegratorInternal(f,g) { }
+      FixedStepIntegratorInternal(f, g) { }
 
   void RKIntegratorInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     FixedStepIntegratorInternal::deepCopyMembers(already_copied);
   }
 
@@ -55,7 +55,7 @@ namespace casadi {
 
     // Intermediate variables (does not enter in F_, only in G_)
     MX v = MX::sym("v",x0.size1(),x0.size2()*3);
-    vector<MX> x = horzsplit(v,x0.size2());
+    vector<MX> x = horzsplit(v, x0.size2());
     casadi_assert(x.size()==3);
 
     // Definitions of x
@@ -112,7 +112,7 @@ namespace casadi {
       f_res[DAE_ODE] = xf;
       f_res[DAE_QUAD] = qf;
       f_res[DAE_ALG] = horzcat(x_def);
-      F_ = MXFunction(f_arg,f_res);
+      F_ = MXFunction(f_arg, f_res);
       F_.init();
     }
 
@@ -179,7 +179,7 @@ namespace casadi {
       g_res[RDAE_ODE] = rxf;
       g_res[RDAE_QUAD] = rqf;
       g_res[RDAE_ALG] = horzcat(rx_def);
-      G_ = MXFunction(g_arg,g_res);
+      G_ = MXFunction(g_arg, g_res);
       G_.init();
     }
   }

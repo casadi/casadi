@@ -111,13 +111,13 @@ namespace casadi {
     if (dim==1) t = true;
     if (dim==2) t = false;
 
-    MatType a1 = t ? a(0,ALL) : a(ALL,0);
-    MatType a2 = t ? a(1,ALL) : a(ALL,1);
-    MatType a3 = t ? a(2,ALL) : a(ALL,2);
+    MatType a1 = t ? a(0, ALL) : a(ALL, 0);
+    MatType a2 = t ? a(1, ALL) : a(ALL, 1);
+    MatType a3 = t ? a(2, ALL) : a(ALL, 2);
 
-    MatType b1 = t ? b(0,ALL) : b(ALL,0);
-    MatType b2 = t ? b(1,ALL) : b(ALL,1);
-    MatType b3 = t ? b(2,ALL) : b(ALL,2);
+    MatType b1 = t ? b(0, ALL) : b(ALL, 0);
+    MatType b2 = t ? b(1, ALL) : b(ALL, 1);
+    MatType b3 = t ? b(2, ALL) : b(ALL, 2);
 
     ret[0] = a2*b3-a3*b2;
     ret[1] = a3*b1-a1*b3;
@@ -174,21 +174,21 @@ namespace casadi {
 #ifdef SWIG
 
 // map the template name to the instantiated name
-#define GMTT_INST(MatType,function_name) \
+#define GMTT_INST(MatType, function_name) \
 %template(function_name) casadi::function_name< MatType >;
 
 // Define template instantiations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES(MatType) \
-GMTT_INST(MatType,cross) \
-GMTT_INST(MatType,tril2symm) \
-GMTT_INST(MatType,triu2symm) \
-GMTT_INST(MatType,triu) \
-GMTT_INST(MatType,tril) \
-GMTT_INST(MatType,isEqual)
+GMTT_INST(MatType, cross) \
+GMTT_INST(MatType, tril2symm) \
+GMTT_INST(MatType, triu2symm) \
+GMTT_INST(MatType, triu) \
+GMTT_INST(MatType, tril) \
+GMTT_INST(MatType, isEqual)
 
 // Define template instantiations
 #define GENERIC_MATRIX_TOOLS_TEMPLATES_REAL_ONLY(MatType) \
-GMTT_INST(MatType,linspace)
+GMTT_INST(MatType, linspace)
 
 #endif //SWIG
 

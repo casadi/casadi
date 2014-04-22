@@ -48,7 +48,7 @@ namespace casadi {
     virtual IntegratorInternal* clone() const=0;
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new integrator */
     virtual IntegratorInternal* create(const Function& f, const Function& g) const = 0;
@@ -91,7 +91,7 @@ namespace casadi {
 
     // Helper structure
     struct AugOffset {
-      std::vector<int> x,z,q,p,rx,rz,rq,rp;
+      std::vector<int> x, z, q, p, rx, rz, rq, rp;
     };
 
     /** \brief Set solver specific options to generated augmented integrators */
@@ -99,7 +99,7 @@ namespace casadi {
 
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
     * and \a nadj adjoint sensitivities */
-    virtual std::pair<Function,Function> getAugmented(int nfwd, int nadj, AugOffset& offset);
+    virtual std::pair<Function, Function> getAugmented(int nfwd, int nadj, AugOffset& offset);
 
     /// Get offsets in augmented problem
     AugOffset getAugOffset(int nfwd, int nadj);

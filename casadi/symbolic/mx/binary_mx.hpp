@@ -89,13 +89,13 @@ namespace casadi {
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const MXNode* node, int depth) const {
       if(op_==node->getOp()) {
-        if(dep(0).isEqual(node->dep(0),depth-1) && dep(1).isEqual(node->dep(1),depth-1)) {
+        if(dep(0).isEqual(node->dep(0), depth-1) && dep(1).isEqual(node->dep(1), depth-1)) {
           // If arguments are equal
           return true;
         } else {
           // If arguments are flipped
-          return operation_checker<CommChecker>(op_) && dep(1).isEqual(node->dep(0),depth-1) &&
-              dep(0).isEqual(node->dep(1),depth-1);
+          return operation_checker<CommChecker>(op_) && dep(1).isEqual(node->dep(0), depth-1) &&
+              dep(0).isEqual(node->dep(1), depth-1);
         }
       } else {
         return false;

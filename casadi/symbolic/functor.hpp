@@ -56,7 +56,7 @@ namespace casadi {
   * \code
   *
   *   @derivativegenerator
-  *   def c(f,nadj,nadir):
+  *   def c(f, nadj, nadir):
   *     print f
   *
   *   ff.setOption("derivative_generator",c)
@@ -81,10 +81,10 @@ namespace casadi {
   * \code
   *
   *   @pyevaluate
-  *   def c(f,nfdir,nadir):
+  *   def c(f, nfdir, nadir):
   *     print f
   *
-  *   f = CustomFunction(c,...)
+  *   f = CustomFunction(c, ...)
   * \endcode
   *
   */

@@ -49,12 +49,12 @@ namespace casadi {
     virtual NLPImplicitInternal* clone() const { return new NLPImplicitInternal(*this);}
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual NLPImplicitInternal* create(const Function& f, const Function& jac,
                                         const LinearSolver& linsol) const
-    { return new NLPImplicitInternal(f,jac,linsol);}
+    { return new NLPImplicitInternal(f, jac, linsol);}
 
     /** \brief  Initialize */
     virtual void init();

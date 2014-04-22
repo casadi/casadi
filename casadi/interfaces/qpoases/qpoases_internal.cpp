@@ -157,7 +157,7 @@ void QPOasesInternal::init() {
   if(ALLOW_QPROBLEMB && nc_==0) {
     qp_ = new qpOASES::QProblemB(n_);
   } else {
-    qp_ = new qpOASES::SQProblem(n_,nc_);
+    qp_ = new qpOASES::SQProblem(n_, nc_);
   }
   called_once_ = false;
 
@@ -220,14 +220,14 @@ void QPOasesInternal::evaluate() {
     h = getPtr(input(QP_SOLVER_H));
   } else {
     // First copy to dense array
-    input(QP_SOLVER_H).get(h_data_,DENSE);
+    input(QP_SOLVER_H).get(h_data_, DENSE);
     h = getPtr(h_data_);
   }
 
   // Copy A to a row-major dense vector
   const double* a=0;
   if(nc_>0) {
-    input(QP_SOLVER_A).get(a_data_,DENSETRANS);
+    input(QP_SOLVER_A).get(a_data_, DENSETRANS);
     a = getPtr(a_data_);
   }
 
@@ -246,18 +246,18 @@ void QPOasesInternal::evaluate() {
   int flag;
   if(!called_once_) {
     if(ALLOW_QPROBLEMB && nc_==0) {
-      flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h,g,lb,ub,nWSR,cputime_ptr);
+      flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
     } else {
-      flag = static_cast<qpOASES::SQProblem*>(qp_)->init(h,g,a,lb,ub,lbA,ubA,nWSR,cputime_ptr);
+      flag = static_cast<qpOASES::SQProblem*>(qp_)->init(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
     }
     called_once_ = true;
   } else {
     if(ALLOW_QPROBLEMB && nc_==0) {
       static_cast<qpOASES::QProblemB*>(qp_)->reset();
-      flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h,g,lb,ub,nWSR,cputime_ptr);
-      //flag = static_cast<qpOASES::QProblemB*>(qp_)->hotstart(g,lb,ub,nWSR,cputime_ptr);
+      flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
+      //flag = static_cast<qpOASES::QProblemB*>(qp_)->hotstart(g, lb, ub, nWSR, cputime_ptr);
     } else {
-      flag = static_cast<qpOASES::SQProblem*>(qp_)->hotstart(h,g,a,lb,ub,lbA,ubA,nWSR, cputime_ptr);
+      flag = static_cast<qpOASES::SQProblem*>(qp_)->hotstart(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
     }
   }
   if(flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {
@@ -274,8 +274,8 @@ void QPOasesInternal::evaluate() {
   qp_->getDualSolution(&dual_.front());
 
   // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-  transform(dual_.begin(),   dual_.begin()+n_,output(QP_SOLVER_LAM_X).begin(),negate<double>());
-  transform(dual_.begin()+n_,dual_.end(),     output(QP_SOLVER_LAM_A).begin(),negate<double>());
+  transform(dual_.begin(),   dual_.begin()+n_, output(QP_SOLVER_LAM_X).begin(), negate<double>());
+  transform(dual_.begin()+n_, dual_.end(),     output(QP_SOLVER_LAM_A).begin(), negate<double>());
 }
 
 std::string QPOasesInternal::getErrorMessage(int flag) {

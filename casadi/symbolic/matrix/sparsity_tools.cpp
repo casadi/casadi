@@ -31,11 +31,11 @@ using namespace std;
 namespace casadi {
 
   Sparsity reshape(const Sparsity& a, int nrow, int ncol) {
-    return a.reshape(nrow,ncol);
+    return a.reshape(nrow, ncol);
   }
 
   Sparsity vec(const Sparsity& a) {
-    return reshape(a,a.numel(),1);
+    return reshape(a, a.numel(), 1);
   }
 
   Sparsity mul(const Sparsity& a, const Sparsity &b) {
@@ -100,7 +100,7 @@ namespace casadi {
     int n = 0;
     int m = 0;
 
-    std::vector<int> colind(1,0);
+    std::vector<int> colind(1, 0);
     std::vector<int> row;
 
     int nz = 0;
@@ -118,7 +118,7 @@ namespace casadi {
       nz+= v[i].size();
     }
 
-    return Sparsity(m,n,colind,row);
+    return Sparsity(m, n, colind, row);
   }
 
   Sparsity blkdiag(const Sparsity &a, const Sparsity &b) {
@@ -167,10 +167,10 @@ namespace casadi {
       for(vector<int>::iterator it=colind.begin()+1; it!=colind.end(); ++it) *it -= colind[0];
       colind[0] = 0;
       row.resize(colind.back());
-      copy(row_x.begin()+colind_x[first_col],row_x.begin()+colind_x[last_col],row.begin());
+      copy(row_x.begin()+colind_x[first_col], row_x.begin()+colind_x[last_col], row.begin());
 
       // Append to the list
-      ret.push_back(Sparsity(nrow,ncol,colind,row));
+      ret.push_back(Sparsity(nrow, ncol, colind, row));
     }
 
     // Return (RVO)
@@ -178,7 +178,7 @@ namespace casadi {
   }
 
   std::vector<Sparsity> vertsplit(const Sparsity& sp, const std::vector<int>& offset) {
-    std::vector<Sparsity> ret = horzsplit(sp.T(),offset);
+    std::vector<Sparsity> ret = horzsplit(sp.T(), offset);
     for(std::vector<Sparsity>::iterator it=ret.begin(); it!=ret.end(); ++it) {
       *it = it->T();
     }

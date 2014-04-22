@@ -31,7 +31,7 @@ IdasIntegrator::IdasIntegrator() {
 }
 
 IdasIntegrator::IdasIntegrator(const Function& f, const Function& g) {
-  assignNode(new IdasInternal(f,g));
+  assignNode(new IdasInternal(f, g));
 }
 
 IdasInternal* IdasIntegrator::operator->() {

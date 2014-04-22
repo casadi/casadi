@@ -189,7 +189,7 @@ namespace casadi {
     vector<double>& AT = AT_.data();
     const vector<int>& AT_colind = AT_.colind();
     const vector<int>& AT_row = AT_.row();
-    std::copy(AT_colind.begin(),AT_colind.begin()+nc_,AT_tmp_.begin());
+    std::copy(AT_colind.begin(), AT_colind.begin()+nc_, AT_tmp_.begin());
     for(int cc=0; cc<n_; ++cc) {
       for(int el=A_colind[cc]; el<A_colind[cc+1]; ++el) {
         int rr=A_row[el];
@@ -199,7 +199,7 @@ namespace casadi {
     }
 
     // Loop over constraints
-    int nA=0, nC=0, /*mz=0,*/ nnzA=0, nnzC=0;
+    int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
     for(int j=0; j<nc_; ++j) {
       if(lba[j]==-numeric_limits<double>::infinity() && uba[j]==numeric_limits<double>::infinity()) {
         // Redundant constraint
@@ -264,17 +264,17 @@ namespace casadi {
       cout << "   subject to  A*x = b,  d <= C*x <= f, l <= x <= u" << endl;
       cout << "with" << endl;
       cout << "Q = " <<
-          tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(),irowQ_.begin()+nnzQ),
-                                     vector<int>(jcolQ_.begin(),jcolQ_.begin()+nnzQ),
-                                     vector<double>(dQ_.begin(),dQ_.begin()+nnzQ),nx,nx)) << endl;
+          tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
+                                     vector<int>(jcolQ_.begin(), jcolQ_.begin()+nnzQ),
+                                     vector<double>(dQ_.begin(), dQ_.begin()+nnzQ), nx, nx)) << endl;
       cout << "c = " << vector<double>(c_.begin(),c_.begin()+nx) << endl;
       cout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),irowA_.begin()+nnzA),
-                                        vector<int>(jcolA_.begin(),jcolA_.begin()+nnzA),
-                                        vector<double>(dA_.begin(),dA_.begin()+nnzA),nA,nx) << endl;
+                                        vector<int>(jcolA_.begin(), jcolA_.begin()+nnzA),
+                                        vector<double>(dA_.begin(), dA_.begin()+nnzA), nA, nx) << endl;
       cout << "b = " << vector<double>(bA_.begin(),bA_.begin()+nA) << endl;
       cout << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),irowC_.begin()+nnzC),
-                                        vector<int>(jcolC_.begin(),jcolC_.begin()+nnzC),
-                                        vector<double>(dC_.begin(),dC_.begin()+nnzC),nC,nx) << endl;
+                                        vector<int>(jcolC_.begin(), jcolC_.begin()+nnzC),
+                                        vector<double>(dC_.begin(), dC_.begin()+nnzC), nC, nx) << endl;
       cout << "d = " << printBounds(clow_,iclow_,nC,"-") << endl;
       cout << "f = " << printBounds(cupp_,icupp_,nC,"") << endl;
       cout << "l = " << printBounds(xlow_,ixlow_,nx,"-") << endl;
@@ -282,13 +282,13 @@ namespace casadi {
     }
 
     // Reset the solution
-    fill(x_.begin(),x_.end(),0);
-    fill(gamma_.begin(),gamma_.end(),0);
-    fill(phi_.begin(),phi_.end(),0);
-    fill(y_.begin(),y_.end(),0);
-    fill(z_.begin(),z_.end(),0);
-    fill(lambda_.begin(),lambda_.end(),0);
-    fill(pi_.begin(),pi_.end(),0);
+    fill(x_.begin(), x_.end(), 0);
+    fill(gamma_.begin(), gamma_.end(), 0);
+    fill(phi_.begin(), phi_.end(), 0);
+    fill(y_.begin(), y_.end(), 0);
+    fill(z_.begin(), z_.end(), 0);
+    fill(lambda_.begin(), lambda_.end(), 0);
+    fill(pi_.begin(), pi_.end(), 0);
 
     // Solve the QP
     double objectiveValue;

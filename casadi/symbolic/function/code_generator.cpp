@@ -44,14 +44,14 @@ namespace casadi {
     for(int i=0; i<integer_constants_.size(); ++i) {
       name.str(string());
       name << "s" << i;
-      printVector(s,name.str(),integer_constants_[i]);
+      printVector(s, name.str(), integer_constants_[i]);
     }
 
     // Print double constants
     for(int i=0; i<double_constants_.size(); ++i) {
       name.str(string());
       name << "c" << i;
-      printVector(s,name.str(),double_constants_[i]);
+      printVector(s, name.str(), double_constants_[i]);
     }
 
     s << dependencies_.str();
@@ -103,7 +103,7 @@ namespace casadi {
     s << "d " << name << "[] = {";
     for(int i=0; i<v.size(); ++i) {
       if(i!=0) s << ",";
-      printConstant(s,v[i]);
+      printConstant(s, v[i]);
     }
     s << "};" << endl;
   }
@@ -138,7 +138,7 @@ namespace casadi {
       std::vector<int> sp_compact = sp.compress();
 
       // Codegen vector
-      ind = getConstant(sp_compact,true);
+      ind = getConstant(sp_compact, true);
     }
 
     return ind;
@@ -159,7 +159,7 @@ namespace casadi {
       const int int_len = v.size()*(sizeof(double)/sizeof(size_t));
       const size_t* int_v = reinterpret_cast<const size_t*>(&v.front());
       for(size_t i=0; i<int_len; ++i) {
-        hash_combine(seed,int_v[i]);
+        hash_combine(seed, int_v[i]);
       }
     }
     return seed;
@@ -167,7 +167,7 @@ namespace casadi {
 
   size_t CodeGenerator::hash(const std::vector<int>& v) {
     size_t seed=0;
-    hash_combine(seed,v);
+    hash_combine(seed, v);
     return seed;
   }
 
@@ -176,17 +176,17 @@ namespace casadi {
     size_t h = hash(v);
 
     // Try to locate it in already added constants
-    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq =
+    pair<multimap<size_t, size_t>::iterator, multimap<size_t, size_t>::iterator> eq =
       added_double_constants_.equal_range(h);
-    for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i) {
-      if(equal(v,double_constants_[i->second])) return i->second;
+    for(multimap<size_t, size_t>::iterator i=eq.first; i!=eq.second; ++i) {
+      if(equal(v, double_constants_[i->second])) return i->second;
     }
 
     if(allow_adding) {
       // Add to constants
       int ind = double_constants_.size();
       double_constants_.push_back(v);
-      added_double_constants_.insert(pair<size_t,size_t>(h,ind));
+      added_double_constants_.insert(pair<size_t, size_t>(h, ind));
       return ind;
     } else {
       casadi_error("Constant not found");
@@ -199,17 +199,17 @@ namespace casadi {
     size_t h = hash(v);
 
     // Try to locate it in already added constants
-    pair<multimap<size_t,size_t>::iterator,multimap<size_t,size_t>::iterator> eq =
+    pair<multimap<size_t, size_t>::iterator, multimap<size_t, size_t>::iterator> eq =
       added_integer_constants_.equal_range(h);
-    for(multimap<size_t,size_t>::iterator i=eq.first; i!=eq.second; ++i) {
-      if(equal(v,integer_constants_[i->second])) return i->second;
+    for(multimap<size_t, size_t>::iterator i=eq.first; i!=eq.second; ++i) {
+      if(equal(v, integer_constants_[i->second])) return i->second;
     }
 
     if(allow_adding) {
       // Add to constants
       int ind = integer_constants_.size();
       integer_constants_.push_back(v);
-      added_integer_constants_.insert(pair<size_t,size_t>(h,ind));
+      added_integer_constants_.insert(pair<size_t, size_t>(h, ind));
       return ind;
     } else {
       casadi_error("Constant not found");

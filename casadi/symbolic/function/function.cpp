@@ -55,21 +55,21 @@ namespace casadi {
   vector<DMatrix> Function::call(const vector<DMatrix> &arg, bool always_inline, bool never_inline) {
     DMatrixVectorVector dummy;
     DMatrixVector res;
-    callDerivative(arg,res,dummy,dummy,dummy,dummy,always_inline,never_inline);
+    callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
     return res;
   }
 
   vector<SX> Function::call(const vector<SX> &arg, bool always_inline, bool never_inline) {
     SXVectorVector dummy;
     SXVector res;
-    callDerivative(arg,res,dummy,dummy,dummy,dummy,always_inline,never_inline);
+    callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
     return res;
   }
 
   vector<MX> Function::call(const vector<MX> &arg, bool always_inline, bool never_inline) {
     MXVectorVector dummy;
     MXVector res;
-    callDerivative(arg,res,dummy,dummy,dummy,dummy,always_inline,never_inline);
+    callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);
     return res;
   }
 
@@ -78,7 +78,7 @@ namespace casadi {
     assertInit();
 
     // Make sure not empty
-    casadi_assert_message(x.size()>1,"Function: callParallel(vector<vector<MX> >): "
+    casadi_assert_message(x.size()>1, "Function: callParallel(vector<vector<MX> >): "
                           "argument must be of length > 1. You supplied length "
                           << x.size() << ".");
 
@@ -95,7 +95,7 @@ namespace casadi {
     }
 
     // Create parallelizer object and initialize it
-    Parallelizer p(vector<Function>(x.size(),*this));
+    Parallelizer p(vector<Function>(x.size(), *this));
     p.setOption(paropt);
     p.init();
 
@@ -103,7 +103,7 @@ namespace casadi {
     vector<MX> p_in;
     p_in.reserve(x.size() * getNumInputs());
     for(int i=0; i<x.size(); ++i) {
-      p_in.insert(p_in.end(),x[i].begin(),x[i].end());
+      p_in.insert(p_in.end(), x[i].begin(), x[i].end());
       p_in.resize(p_in.size()+getNumInputs()-x[i].size());
     }
 
@@ -114,7 +114,7 @@ namespace casadi {
     // Collect the outputs
     vector<MX>::const_iterator it=p_out.begin();
     for(int i=0; i<x.size(); ++i) {
-      ret[i].insert(ret[i].end(),it,it+getNumOutputs());
+      ret[i].insert(ret[i].end(), it, it+getNumOutputs());
       it += getNumOutputs();
     }
     return ret;
@@ -147,26 +147,26 @@ namespace casadi {
 
   Function Function::jacobian(int iind, int oind, bool compact, bool symmetric) {
     assertInit();
-    return (*this)->jacobian(iind,oind,compact,symmetric);
+    return (*this)->jacobian(iind, oind, compact, symmetric);
   }
 
   void Function::setJacobian(const Function& jac, int iind, int oind, bool compact) {
-    (*this)->setJacobian(jac,iind,oind,compact);
+    (*this)->setJacobian(jac, iind, oind, compact);
   }
 
   Function Function::gradient(int iind, int oind) {
     assertInit();
-    return (*this)->gradient(iind,oind);
+    return (*this)->gradient(iind, oind);
   }
 
   Function Function::tangent(int iind, int oind) {
     assertInit();
-    return (*this)->tangent(iind,oind);
+    return (*this)->tangent(iind, oind);
   }
 
   Function Function::hessian(int iind, int oind) {
     assertInit();
-    return (*this)->hessian(iind,oind);
+    return (*this)->hessian(iind, oind);
   }
 
   Function Function::fullJacobian() {
@@ -199,11 +199,11 @@ namespace casadi {
   }
 
   Sparsity& Function::jacSparsity(int iind, int oind, bool compact, bool symmetric) {
-    return (*this)->jacSparsity(iind,oind,compact, symmetric);
+    return (*this)->jacSparsity(iind, oind, compact, symmetric);
   }
 
   void Function::setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact) {
-    (*this)->setJacSparsity(sp,iind,oind,compact);
+    (*this)->setJacSparsity(sp, iind, oind, compact);
   }
 
   std::vector<MX> Function::symbolicInput() const {
@@ -243,11 +243,11 @@ namespace casadi {
   }
 
   Function Function::derivative(int nfwd, int nadj) {
-    return (*this)->derivative(nfwd,nadj);
+    return (*this)->derivative(nfwd, nadj);
   }
 
   void Function::setDerivative(const Function& fcn, int nfwd, int nadj) {
-    (*this)->setDerivative(fcn,nfwd,nadj);
+    (*this)->setDerivative(fcn, nfwd, nadj);
   }
 
   void Function::generateCode(const string& filename) {
@@ -307,28 +307,28 @@ namespace casadi {
                           const DMatrixVectorVector& fseed, DMatrixVectorVector& fsens,
                           const DMatrixVectorVector& aseed, DMatrixVectorVector& asens,
                           bool always_inline, bool never_inline) {
-    (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
+    (*this)->call(arg, res, fseed, fsens, aseed, asens, always_inline, never_inline);
   }
 
   void Function::callDerivative(const SXVector& arg, SXVector& res,
                           const SXVectorVector& fseed, SXVectorVector& fsens,
                           const SXVectorVector& aseed, SXVectorVector& asens,
                           bool always_inline, bool never_inline) {
-    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: dimension "
+    casadi_assert_message(arg.size()==getNumInputs(), "Function::callDerivative: dimension "
                           "mismatch. You supplied " << arg.size()
                           << " arguments instead of expected " << getNumInputs() << ".");
-    (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
+    (*this)->call(arg, res, fseed, fsens, aseed, asens, always_inline, never_inline);
   }
 
   void Function::callDerivative(const MXVector& arg, MXVector& res,
                           const MXVectorVector& fseed, MXVectorVector& fsens,
                           const MXVectorVector& aseed, MXVectorVector& asens,
                           bool always_inline, bool never_inline) {
-    casadi_assert_message(arg.size()==getNumInputs(),"Function::callDerivative: "
+    casadi_assert_message(arg.size()==getNumInputs(), "Function::callDerivative: "
                           "dimension mismatch. You supplied "
                           << arg.size() << " arguments instead of expected "
                           << getNumInputs() << ".");
-    (*this)->call(arg,res,fseed,fsens,aseed,asens,always_inline,never_inline);
+    (*this)->call(arg, res, fseed, fsens, aseed, asens, always_inline, never_inline);
   }
 
   std::string Function::getSanitizedName() const {

@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
 
   double inf = 1.0e+20;
 
-  std::fill(bl.begin(),bl.begin()+n,0);
+  std::fill(bl.begin(), bl.begin()+n, 0);
 
-  std::fill(bu.begin(),bu.begin()+n,inf);
+  std::fill(bu.begin(), bu.begin()+n, inf);
 
 
   // http://apmonitor.com/wiki/uploads/Apps/hs118.apm
@@ -48,8 +48,8 @@ int main(int argc, char *argv[])
   bu[14] =  60.0;
 
   //
-  std::fill(bl.begin()+n,bl.begin()+n+m,0);
-  std::fill(bu.begin()+n,bu.begin()+n+m,inf);
+  std::fill(bl.begin()+n, bl.begin()+n+m, 0);
+  std::fill(bu.begin()+n, bu.begin()+n+m, inf);
 
   //iObj   = 18  means the linear objective is row 18 in valA(*).
   //The objective row is free.

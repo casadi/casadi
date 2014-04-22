@@ -38,18 +38,18 @@
     q(t0)  = 0
 
     Forward integration from t=t0 to t=tf
-    der(x) = function(x,z,p,t)                  Forward ODE
-    0 = fz(x,z,p,t)                  Forward algebraic equations
-    der(q) = fq(x,z,p,t)                  Forward quadratures
+    der(x) = function(x, z, p, t)                  Forward ODE
+    0 = fz(x, z, p, t)                  Forward algebraic equations
+    der(q) = fq(x, z, p, t)                  Forward quadratures
 
     Terminal conditions at t=tf
     rx(tf)  = rx0
     rq(tf)  = 0
 
     Backward integration from t=tf to t=t0
-    der(rx) = gx(rx,rz,rp,x,z,p,t)        Backward ODE
-    0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations
-    der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures
+    der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+    0 = gz(rx, rz, rp, x, z, p, t)        Backward algebraic equations
+    der(rq) = gq(rx, rz, rp, x, z, p, t)        Backward quadratures
 
     where we assume that both the forward and backwards integrations are index-1
     (i.e. dfz/dz, dgz/drz are invertible) and furthermore that
@@ -157,7 +157,7 @@ namespace casadi {
   class IntegratorInternal;
 
   // grep "addOption" integrator_internal.cpp |
-  //   perl -pe 's/addOption\((.*?),(.*?),(.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
+  //   perl -pe 's/addOption\((.*?),(.*?), (.*?)\);(.*\/\/ (.*))?/* \1 \2 \3 ...  \5\\n/'
 
   /** Integrator abstract base class
 
@@ -212,7 +212,7 @@ namespace casadi {
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
      *    and \a nadj adjoint sensitivities
      */
-    std::pair<Function,Function> getAugmented(int nfwd, int nadj);
+    std::pair<Function, Function> getAugmented(int nfwd, int nadj);
 
     /// Get the DAE
     Function getDAE();

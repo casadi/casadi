@@ -30,7 +30,7 @@ namespace casadi {
   }
 
   KinsolSolver::KinsolSolver(const Function& f, const Function& jac, const LinearSolver& linsol) {
-    assignNode(new KinsolInternal(f,jac,linsol));
+    assignNode(new KinsolInternal(f, jac, linsol));
   }
 
   KinsolInternal* KinsolSolver::operator->() {

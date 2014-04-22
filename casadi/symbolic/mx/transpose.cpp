@@ -36,22 +36,22 @@ namespace casadi {
 
   void Transpose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                             std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
  void DenseTranspose::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                                 std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void Transpose::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                              std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   void DenseTranspose::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                                   std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -67,7 +67,7 @@ namespace casadi {
     vector<T>& xT = output[0]->data();
 
     // Transpose
-    copy(xT_colind.begin(),xT_colind.end(),itmp.begin());
+    copy(xT_colind.begin(), xT_colind.end(), itmp.begin());
     for(int el=0; el<x_row.size(); ++el) {
       xT[itmp[x_row[el]]++] = x[el];
     }
@@ -102,7 +102,7 @@ namespace casadi {
     const vector<int>& xT_colind = output[0]->colind();
 
     // Offset for each col of the result
-    copy(xT_colind.begin(),xT_colind.end(),itmp.begin());
+    copy(xT_colind.begin(), xT_colind.end(), itmp.begin());
 
     // Loop over the nonzeros of the argument
     for(int el=0; el<x_row.size(); ++el) {

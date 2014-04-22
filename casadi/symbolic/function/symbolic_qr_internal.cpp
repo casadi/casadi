@@ -32,7 +32,7 @@ using namespace std;
 namespace casadi {
 
   SymbolicQRInternal::SymbolicQRInternal(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity,nrhs) {
+      LinearSolverInternal(sparsity, nrhs) {
     addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");
     addOption("compiler",          OT_STRING,    "gcc -fPIC -O2",
               "Compiler command to be used for compiling generated code");
@@ -42,11 +42,11 @@ namespace casadi {
   }
 
   void SymbolicQRInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     LinearSolverInternal::deepCopyMembers(already_copied);
-    fact_fcn_ = deepcopy(fact_fcn_,already_copied);
-    solv_fcn_N_ = deepcopy(solv_fcn_N_,already_copied);
-    solv_fcn_T_ = deepcopy(solv_fcn_T_,already_copied);
+    fact_fcn_ = deepcopy(fact_fcn_, already_copied);
+    solv_fcn_N_ = deepcopy(solv_fcn_N_, already_copied);
+    solv_fcn_T_ = deepcopy(solv_fcn_T_, already_copied);
   }
 
   void SymbolicQRInternal::init() {
@@ -81,18 +81,18 @@ namespace casadi {
       inv_rowperm[rowperm_[k]] = k;
 
     // Permute the linear system
-    SX Aperm = A(rowperm_,colperm_);
+    SX Aperm = A(rowperm_, colperm_);
 
     // Generate the QR factorization function
     vector<SX> QR(2);
-    qr(Aperm,QR[0],QR[1]);
-    SXFunction fact_fcn(A,QR);
+    qr(Aperm, QR[0], QR[1]);
+    SXFunction fact_fcn(A, QR);
 
     // Optionally generate c code and load as DLL
     if(codegen) {
       stringstream ss;
       ss << "symbolic_qr_fact_fcn_" << this;
-      fact_fcn_ = dynamicCompilation(fact_fcn,ss.str(),
+      fact_fcn_ = dynamicCompilation(fact_fcn, ss.str(),
                                      "Symbolic QR factorization function",compiler);
     } else {
       fact_fcn_ = fact_fcn;
@@ -111,26 +111,26 @@ namespace casadi {
     // We have Pb' * Q * R * Px * x = b <=> x = Px' * inv(R) * Q' * Pb * b
 
     // Permute the right hand sides
-    SX bperm = b(rowperm_,ALL);
+    SX bperm = b(rowperm_, ALL);
 
     // Solve the factorized system
-    SX xperm = casadi::solve(R,mul(Q.T(),bperm));
+    SX xperm = casadi::solve(R, mul(Q.T(), bperm));
 
     // Permute back the solution
-    SX x = xperm(inv_colperm,ALL);
+    SX x = xperm(inv_colperm, ALL);
 
     // Generate the QR solve function
     vector<SX> solv_in(3);
     solv_in[0] = Q;
     solv_in[1] = R;
     solv_in[2] = b;
-    SXFunction solv_fcn(solv_in,x);
+    SXFunction solv_fcn(solv_in, x);
 
     // Optionally generate c code and load as DLL
     if(codegen) {
       stringstream ss;
       ss << "symbolic_qr_solv_fcn_N_" << this;
-      solv_fcn_N_ = dynamicCompilation(solv_fcn,ss.str(),"QR_solv_N",compiler);
+      solv_fcn_N_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_N",compiler);
     } else {
       solv_fcn_N_ = solv_fcn;
     }
@@ -145,22 +145,22 @@ namespace casadi {
     // <=> x = Pb' * Q * inv(R') * Px * b
 
     // Permute the right hand side
-    bperm = b(colperm_,ALL);
+    bperm = b(colperm_, ALL);
 
     // Solve the factorized system
-    xperm = mul(Q,casadi::solve(R.T(),bperm));
+    xperm = mul(Q, casadi::solve(R.T(), bperm));
 
     // Permute back the solution
-    x = xperm(inv_rowperm,ALL);
+    x = xperm(inv_rowperm, ALL);
 
     // Mofify the QR solve function
-    solv_fcn = SXFunction(solv_in,x);
+    solv_fcn = SXFunction(solv_in, x);
 
     // Optionally generate c code and load as DLL
     if(codegen) {
       stringstream ss;
       ss << "symbolic_qr_solv_fcn_T_" << this;
-      solv_fcn_T_ = dynamicCompilation(solv_fcn,ss.str(),"QR_solv_T",compiler);
+      solv_fcn_T_ = dynamicCompilation(solv_fcn, ss.str(), "QR_solv_T",compiler);
     } else {
       solv_fcn_T_ = solv_fcn;
     }
@@ -178,8 +178,8 @@ namespace casadi {
     // Factorize
     fact_fcn_.setInput(input(LINSOL_A));
     fact_fcn_.evaluate();
-    fact_fcn_.getOutput(Q_,0);
-    fact_fcn_.getOutput(R_,1);
+    fact_fcn_.getOutput(Q_, 0);
+    fact_fcn_.getOutput(R_, 1);
     prepared_ = true;
   }
 
@@ -188,12 +188,12 @@ namespace casadi {
     Function& solv = transpose ? solv_fcn_T_ : solv_fcn_N_;
 
     // Pass QR factorization
-    solv.setInput(Q_,0);
-    solv.setInput(R_,1);
+    solv.setInput(Q_, 0);
+    solv.setInput(R_, 1);
 
     // Solve for all right hand sides
     for(int i=0; i<nrhs; ++i) {
-      solv.setInput(x,2);
+      solv.setInput(x, 2);
       solv.evaluate();
       solv.getOutput(x);
       x += solv.output().size();
@@ -220,7 +220,7 @@ namespace casadi {
     vector<SX> resv;
     v.resize(3);
     for(int i=0; i<nrhs; ++i) {
-      v[2] = r(Slice(),i);
+      v[2] = r(Slice(), i);
       resv.push_back(solv(v).at(0));
     }
 

@@ -30,7 +30,7 @@ namespace casadi {
   }
 
   CollocationIntegrator::CollocationIntegrator(const Function& f, const Function& g) {
-    assignNode(new CollocationIntegratorInternal(f,g));
+    assignNode(new CollocationIntegratorInternal(f, g));
   }
 
   CollocationIntegratorInternal* CollocationIntegrator::operator->() {

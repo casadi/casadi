@@ -78,14 +78,14 @@ namespace casadi {
         nlp_in.resize(NL_NUM_IN);
         vector<SX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_F] = F_sx.outputExpr(0);
-        return SXFunction(nlp_in,nlp_out);
+        return SXFunction(nlp_in, nlp_out);
       } else if(is_a<MXFunction>(F)) {
         MXFunction F_mx = shared_cast<MXFunction>(F);
         vector<MX> nlp_in = F_mx.inputExpr();
         nlp_in.resize(NL_NUM_IN);
         vector<MX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_F] = F_mx.outputExpr(0);
-        return MXFunction(nlp_in,nlp_out);
+        return MXFunction(nlp_in, nlp_out);
       } else {
         vector<MX> F_in = F.symbolicInput();
         vector<MX> nlp_in(NL_NUM_IN);
@@ -93,7 +93,7 @@ namespace casadi {
         if(F_in.size()>1) nlp_in[NL_P] = F_in.at(1);
         vector<MX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_F] = F.call(F_in).front();
-        return MXFunction(nlp_in,nlp_out);
+        return MXFunction(nlp_in, nlp_out);
       }
     } else if(F.isNull()) {
       // feasibility problem
@@ -103,7 +103,7 @@ namespace casadi {
         nlp_in.resize(NL_NUM_IN);
         vector<SX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_G] = G_sx.outputExpr(0);
-        return SXFunction(nlp_in,nlp_out);
+        return SXFunction(nlp_in, nlp_out);
       } else if(is_a<MXFunction>(G)) {
         MXFunction G_mx = shared_cast<MXFunction>(F);
         vector<MX> nlp_in = G_mx.inputExpr();
@@ -111,7 +111,7 @@ namespace casadi {
         vector<MX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_G] = G_mx.outputExpr(0);
         nlp_out.resize(NL_NUM_OUT);
-        return MXFunction(nlp_in,nlp_out);
+        return MXFunction(nlp_in, nlp_out);
       } else {
         vector<MX> G_in = G.symbolicInput();
         vector<MX> nlp_in(NL_NUM_IN);
@@ -119,7 +119,7 @@ namespace casadi {
         if(G_in.size()>1) nlp_in[NL_P] = G_in.at(1);
         vector<MX> nlp_out(NL_NUM_OUT);
         nlp_out[NL_G] = G.call(G_in).at(0);
-        return MXFunction(nlp_in,nlp_out);
+        return MXFunction(nlp_in, nlp_out);
       }
     } else {
       // Standard (constrained) NLP
@@ -138,9 +138,9 @@ namespace casadi {
 
         // Expression for f and g
         nlp_out[NL_G] = G_sx.outputExpr(0);
-        nlp_out[NL_F] = substitute(F_sx.outputExpr(),F_sx.inputExpr(),G_sx.inputExpr()).front();
+        nlp_out[NL_F] = substitute(F_sx.outputExpr(), F_sx.inputExpr(), G_sx.inputExpr()).front();
 
-        return SXFunction(nlp_in,nlp_out);
+        return SXFunction(nlp_in, nlp_out);
       } else { // MXFunction otherwise
         vector<MX> nlp_in(NL_NUM_IN), nlp_out(NL_NUM_OUT);
 
@@ -159,7 +159,7 @@ namespace casadi {
           }
           nlp_out[NL_G] = G_mx.outputExpr(0);
           if(!F_mx.isNull()) { // Both are MXFunction, make sure they use the same variables
-            nlp_out[NL_F] = substitute(F_mx.outputExpr(),F_mx.inputExpr(),G_mx.inputExpr()).front();
+            nlp_out[NL_F] = substitute(F_mx.outputExpr(), F_mx.inputExpr(), G_mx.inputExpr()).front();
           } else { // G_ but not F_ MXFunction
             nlp_out[NL_F] = F.call(G_mx.inputExpr()).front();
           }
@@ -181,7 +181,7 @@ namespace casadi {
             nlp_out[NL_F] = F.call(FG_in).front();
           }
         }
-        return MXFunction(nlp_in,nlp_out);
+        return MXFunction(nlp_in, nlp_out);
       } // SXFunction/MXFunction
     } // constrained/unconstrained
   }

@@ -73,7 +73,7 @@ namespace casadi {
     std::vector<Sparsity> output_sparsity_;
   };
 
-  /** \brief Horizontal split, x -> x0, x1,...
+  /** \brief Horizontal split, x -> x0, x1, ...
       \author Joel Andersson
       \date 2013
   */
@@ -104,7 +104,7 @@ namespace casadi {
     virtual MX getHorzcat(const std::vector<MX>& x) const;
   };
 
-  /** \brief Vertical split of vectors, x -> x0, x1,...
+  /** \brief Vertical split of vectors, x -> x0, x1, ...
       \author Joel Andersson
       \date 2014
   */

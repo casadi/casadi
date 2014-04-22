@@ -34,7 +34,7 @@ namespace casadi {
   StabilizedQPSolverInternal::StabilizedQPSolverInternal(const std::vector<Sparsity> &st)
       : st_(st) {
     // Get structure
-    casadi_assert_message(st_.size()==QP_STRUCT_NUM,"Problem structure mismatch");
+    casadi_assert_message(st_.size()==QP_STRUCT_NUM, "Problem structure mismatch");
     const Sparsity& A = st_[QP_STRUCT_A];
     const Sparsity& H = st_[QP_STRUCT_H];
 
@@ -55,8 +55,8 @@ namespace casadi {
       "We need H square & symmetric" << std::endl);
 
     // IO sparsities
-    Sparsity x_sparsity = Sparsity::dense(n_,1);
-    Sparsity a_sparsity = Sparsity::dense(nc_,1);
+    Sparsity x_sparsity = Sparsity::dense(n_, 1);
+    Sparsity a_sparsity = Sparsity::dense(nc_, 1);
 
     // Input arguments
     setNumInputs(STABILIZED_QP_SOLVER_NUM_IN);

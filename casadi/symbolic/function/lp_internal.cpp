@@ -32,7 +32,7 @@ namespace casadi {
 
 // Constructor
 LPSolverInternal::LPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
-  casadi_assert_message(st_.size()==LP_STRUCT_NUM,"Problem structure mismatch");
+  casadi_assert_message(st_.size()==LP_STRUCT_NUM, "Problem structure mismatch");
 
   const Sparsity& A = st_[LP_STRUCT_A];
 

@@ -35,7 +35,7 @@ namespace casadi {
                      const std::vector<int>& row) :
         nrow_(nrow), ncol_(ncol), colind_(colind), row_(row) { sanityCheck(false); }
 
-    /// Check if the dimensions and colind,row vectors are compatible
+    /// Check if the dimensions and colind, row vectors are compatible
     void sanityCheck(bool complete=false) const;
 
     /** \brief Get the diagonal of the matrix/create a diagonal matrix
@@ -86,7 +86,7 @@ namespace casadi {
     /// return 1 if col i is in R2 : see cs_rprune in CSparse
     static int rprune (int i, int j, double aij, void *other);
 
-    /** \brief drop entries for which fkeep(A(i,j)) is false; return nz if OK, else -1: :
+    /** \brief drop entries for which fkeep(A(i, j)) is false; return nz if OK, else -1: :
      * see cs_fkeep in CSparse
      */
     int drop(int (*fkeep) (int, int, double, void *), void *other);
@@ -96,8 +96,8 @@ namespace casadi {
                           std::vector<int>& rowblock, std::vector<int>& colblock,
                           std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock,
                           int seed) const {
-      return transpose()->dulmageMendelsohnUpper(colperm,rowperm,colblock,rowblock,
-                                                 coarse_colblock,coarse_rowblock,seed);
+      return transpose()->dulmageMendelsohnUpper(colperm, rowperm, colblock, rowblock,
+                                                 coarse_colblock, coarse_rowblock, seed);
     }
 
     /** \brief Compute the Dulmage-Mendelsohn decomposition
@@ -127,10 +127,10 @@ namespace casadi {
     /// Invert a permutation matrix: see cs_pinv in CSparse
     static std::vector<int> invertPermutation(const std::vector<int>& p);
 
-    /// C = A(p,q) where p and q are permutations of 0..m-1 and 0..n-1.: see cs_permute in CSparse
+    /// C = A(p, q) where p and q are permutations of 0..m-1 and 0..n-1.: see cs_permute in CSparse
     Sparsity permute(const std::vector<int>& pinv, const std::vector<int>& q, int values) const;
 
-    /// consider A(i,j), node j in ith col subtree and return lca(jprev,j): See cs_leaf in CSparse
+    /// consider A(i, j), node j in ith col subtree and return lca(jprev, j): See cs_leaf in CSparse
     static int leaf (int i, int j, const int *first, int *maxfirst,
                      int *prevleaf, int *ancestor, int *jleaf);
 
@@ -172,7 +172,7 @@ namespace casadi {
     /// C = A*B: See cs_multiply in CSparse
     Sparsity multiply(const Sparsity& B) const;
 
-    /** x = x + beta * A(:,j), where x is a dense vector and A(:,j) is sparse:
+    /** x = x + beta * A(:, j), where x is a dense vector and A(:, j) is sparse:
      * See cs_scatter in CSparse
      */
     int scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const;
@@ -202,7 +202,7 @@ namespace casadi {
     int sizeD() const;
 
     /// Shape
-    std::pair<int,int> shape() const;
+    std::pair<int, int> shape() const;
 
     /// Is scalar?
     bool isScalar(bool scalar_and_dense) const;
@@ -250,7 +250,7 @@ namespace casadi {
     ///@{
     /// Sparsity pattern for a matrix-matrix product (details in public class)
     Sparsity patternProduct(const Sparsity& x_trans,
-                            std::vector< std::vector< std::pair<int,int> > >& mapping) const;
+                            std::vector< std::vector< std::pair<int, int> > >& mapping) const;
     Sparsity patternProduct(const Sparsity& x_trans) const;
     ///@}
 

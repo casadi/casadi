@@ -51,13 +51,13 @@ const XMLNode& XMLNode::operator[](int i) const {
 }
 
 bool XMLNode::hasChild(const string& childname) const {
-  map<string,int>::const_iterator it = child_indices_.find(childname);
+  map<string, int>::const_iterator it = child_indices_.find(childname);
   return it!=child_indices_.end();
 }
 
 XMLNode& XMLNode::operator[](const string& childname) {
   // Find the child
-  map<string,int>::const_iterator it = child_indices_.find(childname);
+  map<string, int>::const_iterator it = child_indices_.find(childname);
 
   // check that the child was indeed found
   if(it == child_indices_.end()) {
@@ -89,7 +89,7 @@ void XMLNode::addNode(TiXmlNode* n) {
       for(TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
           pAttrib;
           pAttrib=pAttrib->Next()) {
-          setAttribute(pAttrib->Name(),pAttrib->Value());
+          setAttribute(pAttrib->Name(), pAttrib->Value());
       }
     }
   } else if(type == TiXmlNode::DOCUMENT) {
@@ -146,27 +146,27 @@ void XMLNode::setName(const string& name) {
 
 void XMLNode::dump(ostream &stream, int indent) const {
   // Print name
-  stream << string( indent,' ') << "Node: " << name_ << endl;
+  stream << string( indent, ' ') << "Node: " << name_ << endl;
 
   // Print comment
   if(!comment_.empty()) {
-    stream << string( indent,' ') << "----- comment starts ----- "  << endl;
+    stream << string( indent, ' ') << "----- comment starts ----- "  << endl;
     stream << comment_ << endl;
-    stream << string( indent,' ') << "----- comment ends ----- "  << endl;
+    stream << string( indent, ' ') << "----- comment ends ----- "  << endl;
   }
 
   // Print text
   if(!text_.empty())
-    stream << string( indent+2,' ') << "Text: " << text_ << endl;
+    stream << string( indent+2, ' ') << "Text: " << text_ << endl;
 
   // Print attributes
   for(map<string, string>::const_iterator it=attributes_.begin(); it != attributes_.end(); ++it)
-    stream << string( indent+2,' ') << "attribute " << it->first << " = " << it->second << endl;
+    stream << string( indent+2, ' ') << "attribute " << it->first << " = " << it->second << endl;
 
   // Print Children
   for(int i=0; i<size(); ++i) {
-    stream << string( indent,' ') << "Child " << i << ":" << endl;
-    (*this)[i].dump(stream,indent+2);
+    stream << string( indent, ' ') << "Child " << i << ":" << endl;
+    (*this)[i].dump(stream, indent+2);
   }
 }
 

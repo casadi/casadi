@@ -34,7 +34,7 @@ namespace casadi {
 
   NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac,
                                                  const LinearSolver& linsol)
-      : ImplicitFunctionInternal(f,jac,linsol) {
+      : ImplicitFunctionInternal(f, jac, linsol) {
     addOption("abstol",                      OT_REAL,1e-12,
               "Stopping criterion tolerance on max(|F|)");
     addOption("abstolStep",                  OT_REAL,1e-12,
@@ -61,7 +61,7 @@ namespace casadi {
 
     // Pass the inputs to J
     for(int i=0; i<getNumInputs(); ++i) {
-      if(i!=iin_) jac_.setInput(input(i),i);
+      if(i!=iin_) jac_.setInput(input(i), i);
     }
 
     // Aliases
@@ -96,9 +96,9 @@ namespace casadi {
       }
 
       // Use u to evaluate J
-      jac_.setInput(u,iin_);
+      jac_.setInput(u, iin_);
       for(int i=0; i<getNumInputs(); ++i)
-        if(i!=iin_) jac_.setInput(input(i),i);
+        if(i!=iin_) jac_.setInput(input(i), i);
 
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
@@ -119,7 +119,7 @@ namespace casadi {
       if (monitored("F")) std::cout << "  F = " << F << std::endl;
       if (monitored("normF"))
         std::cout << "  F (min, max, 1-norm, 2-norm) = "
-                  << (*std::min_element(F.data().begin(),F.data().end()))
+                  << (*std::min_element(F.data().begin(), F.data().end()))
                   << ", " << (*std::max_element(F.data().begin(),F.data().end()))
                   << ", " << sumAll(fabs(F)) << ", " << sqrt(sumAll(F*F)) << std::endl;
       if (monitored("J")) std::cout << "  J = " << J << std::endl;
@@ -136,7 +136,7 @@ namespace casadi {
       }
 
       // Prepare the linear solver with J
-      linsol_.setInput(J,LINSOL_A);
+      linsol_.setInput(J, LINSOL_A);
 
       if (CasadiOptions::profiling) {
         time_start = getRealTime(); // Start timer
@@ -156,7 +156,7 @@ namespace casadi {
         time_start = getRealTime(); // Start timer
       }
       // Solve against F
-      linsol_.solve(&F.front(),1,false);
+      linsol_.solve(&F.front(), 1, false);
       if (CasadiOptions::profiling && !CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
         CasadiOptions::profilingLog
@@ -188,7 +188,7 @@ namespace casadi {
 
       // Get auxiliary outputs
       for(int i=0; i<getNumOutputs(); ++i) {
-        if(i!=iout_) jac_.getOutput(output(i),1+i);
+        if(i!=iout_) jac_.getOutput(output(i), 1+i);
       }
     }
 

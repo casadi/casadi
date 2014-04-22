@@ -66,7 +66,7 @@ namespace casadi {
     virtual MX getGetNonzeros(const Sparsity& sp, const std::vector<int>& nz) const;
 
     /** \brief Check if two nodes are equivalent up to a given depth */
-    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node,depth);}
+    virtual bool isEqual(const MXNode* node, int depth) const { return sameOpAndDeps(node, depth);}
   };
 
 

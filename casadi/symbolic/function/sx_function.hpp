@@ -36,7 +36,7 @@ namespace casadi {
     int i0;
     union {
       double d;
-      struct { int i1,i2; };
+      struct { int i1, i2; };
     };
   };
 
@@ -116,39 +116,39 @@ namespace casadi {
      */
     SX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     SX jac(const std::string& iname, int oind=0, bool compact=false, bool symmetric=false)
-    { return jac(inputSchemeEntry(iname),oind,compact,symmetric); }
+    { return jac(inputSchemeEntry(iname), oind, compact, symmetric); }
     SX jac(int iind, const std::string& oname, bool compact=false, bool symmetric=false)
-    { return jac(iind,outputSchemeEntry(oname),compact,symmetric); }
+    { return jac(iind, outputSchemeEntry(oname), compact, symmetric); }
     SX jac(const std::string& iname, const std::string& oname,
            bool compact=false, bool symmetric=false)
-    { return jac(inputSchemeEntry(iname),outputSchemeEntry(oname),compact,symmetric); }
+    { return jac(inputSchemeEntry(iname), outputSchemeEntry(oname), compact, symmetric); }
     ///@}
 
     ///@{
     /// Gradient via source code transformation
     SX grad(int iind=0, int oind=0);
-    SX grad(const std::string& iname, int oind=0) { return grad(inputSchemeEntry(iname),oind); }
-    SX grad(int iind, const std::string& oname) { return grad(iind,outputSchemeEntry(oname)); }
+    SX grad(const std::string& iname, int oind=0) { return grad(inputSchemeEntry(iname), oind); }
+    SX grad(int iind, const std::string& oname) { return grad(iind, outputSchemeEntry(oname)); }
     SX grad(const std::string& iname, const std::string& oname)
-    { return grad(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    { return grad(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
     ///@}
 
     ///@{
     /// Tangent via source code transformation
     SX tang(int iind=0, int oind=0);
-    SX tang(const std::string& iname, int oind=0) { return tang(inputSchemeEntry(iname),oind); }
-    SX tang(int iind, const std::string& oname) { return tang(iind,outputSchemeEntry(oname)); }
+    SX tang(const std::string& iname, int oind=0) { return tang(inputSchemeEntry(iname), oind); }
+    SX tang(int iind, const std::string& oname) { return tang(iind, outputSchemeEntry(oname)); }
     SX tang(const std::string& iname, const std::string& oname)
-    { return tang(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    { return tang(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
     ///@}
 
     ///@{
     /// Hessian (forward over adjoint) via source code transformation
     SX hess(int iind=0, int oind=0);
-    SX hess(const std::string& iname, int oind=0) { return hess(inputSchemeEntry(iname),oind); }
-    SX hess(int iind, const std::string& oname) { return hess(iind,outputSchemeEntry(oname)); }
+    SX hess(const std::string& iname, int oind=0) { return hess(inputSchemeEntry(iname), oind); }
+    SX hess(int iind, const std::string& oname) { return hess(iind, outputSchemeEntry(oname)); }
     SX hess(const std::string& iname, const std::string& oname)
-    { return hess(inputSchemeEntry(iname),outputSchemeEntry(oname)); }
+    { return hess(inputSchemeEntry(iname), outputSchemeEntry(oname)); }
     ///@}
 
     /// Check if the node is pointing to the right type of object
@@ -187,9 +187,9 @@ namespace casadi {
     int getAtomicOperation(int k) const { return algorithm().at(k).op;}
 
     /** \brief Get the (integer) input arguments of an atomic operation */
-    std::pair<int,int> getAtomicInput(int k) const {
+    std::pair<int, int> getAtomicInput(int k) const {
       const ScalarAtomic& atomic = algorithm().at(k);
-      return std::pair<int,int>(atomic.i1,atomic.i2);}
+      return std::pair<int, int>(atomic.i1, atomic.i2);}
 
     /** \brief Get the floating point output argument of an atomic operation */
     double getAtomicInputReal(int k) const { return algorithm().at(k).d;}

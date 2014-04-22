@@ -29,7 +29,7 @@ DirectMultipleShooting::DirectMultipleShooting() {
 
 DirectMultipleShooting::DirectMultipleShooting(const Function& ffcn, const Function& mfcn,
                                                const Function& cfcn, const Function& rfcn) {
-  assignNode(new DirectMultipleShootingInternal(ffcn,mfcn,cfcn,rfcn));
+  assignNode(new DirectMultipleShootingInternal(ffcn, mfcn, cfcn, rfcn));
 }
 
 const DirectMultipleShootingInternal* DirectMultipleShooting::operator->() const {
@@ -46,12 +46,12 @@ void DirectMultipleShooting::getGuess(std::vector<double>& V_init) const {
 
 void DirectMultipleShooting::getVariableBounds(std::vector<double>& V_min,
                                                std::vector<double>& V_max) const {
-  (*this)->getVariableBounds(V_min,V_max);
+  (*this)->getVariableBounds(V_min, V_max);
 }
 
 void DirectMultipleShooting::getConstraintBounds(std::vector<double>& G_min,
                                                  std::vector<double>& G_max) const {
-  (*this)->getConstraintBounds(G_min,G_max);
+  (*this)->getConstraintBounds(G_min, G_max);
 }
 
 void DirectMultipleShooting::setOptimalSolution( const std::vector<double> &V_opt ) {

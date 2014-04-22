@@ -70,47 +70,47 @@ public:
   #endif // WITH_SIPOPT
 
   /// All IPOPT options
-  std::map<std::string,opt_type> ops_;
+  std::map<std::string, opt_type> ops_;
 
   // Ipopt callback functions
   bool eval_f(int n, const double* x, bool new_x, double& obj_value);
   bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f);
   bool eval_g(int n, const double* x, bool new_x, int m, double* g);
-  bool eval_jac_g(int n, const double* x, bool new_x,int m, int nele_jac, int* iRow, int *jCol,
+  bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac, int* iRow, int *jCol,
                   double* values);
   bool eval_h(const double* x, bool new_x, double obj_factor, const double* lambda,
-              bool new_lambda, int nele_hess, int* iRow,int* jCol, double* values);
+              bool new_lambda, int nele_hess, int* iRow, int* jCol, double* values);
   void finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g,
                          const double* lambda, double obj_value, int iter_count);
-  bool get_bounds_info(int n, double* x_l, double* x_u,int m, double* g_l, double* g_u);
-  bool get_starting_point(int n, bool init_x, double* x,bool init_z, double* z_L, double* z_U,
-                          int m, bool init_lambda,double* lambda);
-  void get_nlp_info(int& n, int& m, int& nnz_jac_g,int& nnz_h_lag);
+  bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l, double* g_u);
+  bool get_starting_point(int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U,
+                          int m, bool init_lambda, double* lambda);
+  void get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag);
   int get_number_of_nonlinear_variables();
   bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars);
   bool intermediate_callback(
     const double* x, const double* z_L, const double* z_U, const double* g,
     const double* lambda, double obj_value, int iter,
-    double inf_pr, double inf_du,double mu,double d_norm,
-    double regularization_size,double alpha_du,double alpha_pr,
+    double inf_pr, double inf_du, double mu, double d_norm,
+    double regularization_size, double alpha_du, double alpha_pr,
     int ls_trials, bool full_callback);
   bool get_var_con_metadata(int n,
-                            std::map<std::string,std::vector<std::string> >& var_string_md,
-                            std::map<std::string,std::vector<int> >& var_integer_md,
-                            std::map<std::string,std::vector<double> >& var_numeric_md,
+                            std::map<std::string, std::vector<std::string> >& var_string_md,
+                            std::map<std::string, std::vector<int> >& var_integer_md,
+                            std::map<std::string, std::vector<double> >& var_numeric_md,
                             int m,
-                            std::map<std::string,std::vector<std::string> >& con_string_md,
-                            std::map<std::string,std::vector<int> >& con_integer_md,
-                            std::map<std::string,std::vector<double> >& con_numeric_md);
+                            std::map<std::string, std::vector<std::string> >& con_string_md,
+                            std::map<std::string, std::vector<int> >& con_integer_md,
+                            std::map<std::string, std::vector<double> >& con_numeric_md);
 
   void finalize_metadata(int n,
-                          const std::map<std::string,std::vector<std::string> >& var_string_md,
-                          const std::map<std::string,std::vector<int> >& var_integer_md,
-                          const std::map<std::string,std::vector<double> >& var_numeric_md,
+                          const std::map<std::string, std::vector<std::string> >& var_string_md,
+                          const std::map<std::string, std::vector<int> >& var_integer_md,
+                          const std::map<std::string, std::vector<double> >& var_numeric_md,
                           int m,
-                          const std::map<std::string,std::vector<std::string> >& con_string_md,
-                          const std::map<std::string,std::vector<int> >& con_integer_md,
-                          const std::map<std::string,std::vector<double> >& con_numeric_md);
+                          const std::map<std::string, std::vector<std::string> >& con_string_md,
+                          const std::map<std::string, std::vector<int> >& con_integer_md,
+                          const std::map<std::string, std::vector<double> >& con_numeric_md);
 
   // Accumulated time since last reset:
   double t_eval_f_; // time spent in eval_f

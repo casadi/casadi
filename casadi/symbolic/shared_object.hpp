@@ -174,7 +174,7 @@ namespace casadi {
     /// \endcond SWIGINTERNAL
     /// \cond INTERNAL
 #ifndef SWIG
-    void makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied,
+    void makeUnique(std::map<SharedObjectNode*, SharedObject>& already_copied,
                     bool clone_members=true);
 #endif
     /// \endcond
@@ -217,7 +217,7 @@ namespace casadi {
     virtual SharedObjectNode* clone() const=0;
 
     /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Get the reference count
     int getCount() const;
@@ -323,17 +323,17 @@ namespace casadi {
 
   /// \cond INTERNAL
   template<class A>
-  A deepcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied) {
+  A deepcopy(const A& a, std::map<SharedObjectNode*, SharedObject>& already_copied) {
     A ret = a;
     ret.makeUnique(already_copied);
     return ret;
   }
 
   template<class A>
-  A getcopy(const A& a, std::map<SharedObjectNode*,SharedObject>& already_copied) {
+  A getcopy(const A& a, std::map<SharedObjectNode*, SharedObject>& already_copied) {
     A ret;
     if(!a.isNull()) {
-      std::map<SharedObjectNode*,SharedObject>::iterator it =
+      std::map<SharedObjectNode*, SharedObject>::iterator it =
           already_copied.find(const_cast<SharedObjectNode*>(a.get()));
       if(it!=already_copied.end()) {
         ret.assignNode(it->second.get());
@@ -344,7 +344,7 @@ namespace casadi {
 
   template<class A>
   std::vector<A> deepcopy(const std::vector<A>& a,
-                          std::map<SharedObjectNode*,SharedObject>& already_copied) {
+                          std::map<SharedObjectNode*, SharedObject>& already_copied) {
     std::vector<A> ret = a;
     for(typename std::vector<A>::iterator it=ret.begin(); it!=ret.end(); ++it) {
       it->makeUnique(already_copied);

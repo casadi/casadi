@@ -123,7 +123,7 @@ namespace casadi {
   public:
 
     /// Constructor
-    SetNonzerosSlice(const MX& y, const MX& x, const Slice& s) : SetNonzeros<Add>(y,x), s_(s) {}
+    SetNonzerosSlice(const MX& y, const MX& x, const Slice& s) : SetNonzeros<Add>(y, x), s_(s) {}
 
     /// Clone function
     virtual SetNonzerosSlice* clone() const { return new SetNonzerosSlice(*this);}
@@ -176,7 +176,7 @@ namespace casadi {
 
     /// Constructor
     SetNonzerosSlice2(const MX& y, const MX& x, const Slice& inner, const Slice& outer) :
-        SetNonzeros<Add>(y,x), inner_(inner), outer_(outer) {}
+        SetNonzeros<Add>(y, x), inner_(inner), outer_(outer) {}
 
     /// Clone function
     virtual SetNonzerosSlice2* clone() const { return new SetNonzerosSlice2(*this);}
@@ -185,7 +185,7 @@ namespace casadi {
     virtual ~SetNonzerosSlice2() {}
 
     /// Get all the nonzeros
-    virtual std::vector<int> getAll() const { return inner_.getAll(outer_,outer_.stop_);}
+    virtual std::vector<int> getAll() const { return inner_.getAll(outer_, outer_.stop_);}
 
     /// Propagate sparsity
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);

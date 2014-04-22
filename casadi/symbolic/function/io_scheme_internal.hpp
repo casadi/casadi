@@ -142,12 +142,12 @@ class CASADI_SYMBOLIC_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
 
     /// Clone
     virtual IOSchemeCustomInternal* clone() const
-    { return new IOSchemeCustomInternal(entries_,descriptions_); }
+    { return new IOSchemeCustomInternal(entries_, descriptions_); }
 
   private:
     std::vector<std::string> entries_;
     std::vector<std::string> descriptions_;
-    std::map<std::string,int> entrymap_;
+    std::map<std::string, int> entrymap_;
 };
 
 

@@ -50,11 +50,11 @@ class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode {
         double dep0_val = dep0.getValue();
         double dep1_val = dep1.getValue();
         double ret_val;
-        casadi_math<double>::fun(op,dep0_val,dep1_val,ret_val);
+        casadi_math<double>::fun(op, dep0_val, dep1_val, ret_val);
         return ret_val;
       } else {
         // Expression containing free variables
-        return SXElement::create(new BinarySX(op,dep0,dep1));
+        return SXElement::create(new BinarySX(op, dep0, dep1));
       }
     }
 
@@ -136,9 +136,9 @@ class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode {
       const BinarySX* n = dynamic_cast<const BinarySX*>(node);
       if(n==0) return false;
       if(n->op_ != op_) return false;
-      if(n->dep0_.isEqual(dep0_,depth-1) && n->dep1_.isEqual(dep1_,depth-1)) return true;
-      if(operation_checker<CommChecker>(op_) && n->dep1_.isEqual(dep0_,depth-1) &&
-         n->dep0_.isEqual(dep1_,depth-1)) return true;
+      if(n->dep0_.isEqual(dep0_, depth-1) && n->dep1_.isEqual(dep1_, depth-1)) return true;
+      if(operation_checker<CommChecker>(op_) && n->dep1_.isEqual(dep0_, depth-1) &&
+         n->dep0_.isEqual(dep1_, depth-1)) return true;
       return false;
     }
 
@@ -156,19 +156,19 @@ class CASADI_SYMBOLIC_EXPORT BinarySX : public SXNode {
     virtual void print(std::ostream &stream, long& remaining_calls) const {
 
       // Print the prefix
-      casadi_math<double>::printPre(op_,stream);
+      casadi_math<double>::printPre(op_, stream);
 
       // Print the first dependency
-      dep0_.print(stream,remaining_calls);
+      dep0_.print(stream, remaining_calls);
 
       //Print the infix
-      casadi_math<double>::printSep(op_,stream);
+      casadi_math<double>::printSep(op_, stream);
 
       // Print the second dependency
-      dep1_.print(stream,remaining_calls);
+      dep1_.print(stream, remaining_calls);
 
       // Print the suffix
-      casadi_math<double>::printPost(op_,stream);
+      casadi_math<double>::printPost(op_, stream);
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */

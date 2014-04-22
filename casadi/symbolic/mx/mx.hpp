@@ -96,7 +96,7 @@ namespace casadi {
     const MX at(int k) const;
 
     /// Access a non-zero element, with bounds checking
-    NonZeros<MX,int> at(int k);
+    NonZeros<MX, int> at(int k);
 
 #endif // SWIG
 
@@ -121,13 +121,13 @@ namespace casadi {
     }
 
     /// get a matrix element
-    const MX indexed_one_based(int rr, int cc) const { return (*this)(rr-1,cc-1);}
-    const MX indexed_zero_based(int rr, int cc) const { return (*this)(rr,cc);}
+    const MX indexed_one_based(int rr, int cc) const { return (*this)(rr-1, cc-1);}
+    const MX indexed_zero_based(int rr, int cc) const { return (*this)(rr, cc);}
     const MX indexed(const IndexList &rr, const IndexList &cc) const {
-      return (*this)(rr.getAll(size1()),cc.getAll(size2()));
+      return (*this)(rr.getAll(size1()), cc.getAll(size2()));
     }
     const MX indexed(const Slice &rr, const Slice &cc) const {
-      return (*this)(rr.getAll(size1()),cc.getAll(size2()));
+      return (*this)(rr.getAll(size1()), cc.getAll(size2()));
     }
     const MX indexed(const Matrix<int> &k) const {
       return (*this)(k);
@@ -135,16 +135,16 @@ namespace casadi {
     const MX indexed(const Sparsity &sp) const {
       return (*this)(sp);
     }
-    const MX indexed(const Slice &rr, const Matrix<int>& cc) const { return (*this)(rr,cc); }
+    const MX indexed(const Slice &rr, const Matrix<int>& cc) const { return (*this)(rr, cc); }
     const MX indexed(const Matrix<int>& rr, const IndexList& cc) const {
-      return (*this)(rr,cc.getAll(size2()));
+      return (*this)(rr, cc.getAll(size2()));
     }
-    const MX indexed(const Matrix<int>& rr, const Slice& cc) const { return (*this)(rr,cc); }
+    const MX indexed(const Matrix<int>& rr, const Slice& cc) const { return (*this)(rr, cc); }
     const MX indexed(const IndexList& rr, const Matrix<int>& cc) const {
-      return (*this)(rr.getAll(size1()),cc);
+      return (*this)(rr.getAll(size1()), cc);
     }
     const MX indexed(const Matrix<int>& rr, const Matrix<int>& cc) const {
-      return (*this)(rr,cc);
+      return (*this)(rr, cc);
     }
 
     // get a vector element
@@ -159,19 +159,19 @@ namespace casadi {
       return (*this)(rr);
     }
     const MX indexed(const IndexList &rr) const {
-      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got "
+      casadi_assert_message(isDense() && isVector(), "Matrix must be a dense vector, but got "
                             << dimString() << ".");
       return (*this)(rr.getAll(size1()));
     }
     const MX indexed(const Slice &rr) const {
-      casadi_assert_message(isDense() && isVector(),"Matrix must be a dense vector, but got "
+      casadi_assert_message(isDense() && isVector(), "Matrix must be a dense vector, but got "
                             << dimString() << ".");
       return (*this)(rr.getAll(size1()));
     }
 
     /// set a non-zero
-    void nz_indexed_one_based_assignment(int k, const MX &m) { at(k-1) = m(0,0);}
-    void nz_indexed_zero_based_assignment(int k, const MX &m) { at(k) = m(0,0);}
+    void nz_indexed_one_based_assignment(int k, const MX &m) { at(k-1) = m(0, 0);}
+    void nz_indexed_zero_based_assignment(int k, const MX &m) { at(k) = m(0, 0);}
     void nz_indexed_assignment(const IndexList &k, const MX &m) {
       (*this)[k.getAll(size())] = m;
     }
@@ -183,14 +183,14 @@ namespace casadi {
     }
 
     /// set a matrix element
-    void indexed_one_based_assignment(int rr, int cc, const MX &m) { (*this)(rr-1,cc-1) = m;}
-    void indexed_zero_based_assignment(int rr, int cc, const MX &m) { (*this)(rr,cc) = m;}
+    void indexed_one_based_assignment(int rr, int cc, const MX &m) { (*this)(rr-1, cc-1) = m;}
+    void indexed_zero_based_assignment(int rr, int cc, const MX &m) { (*this)(rr, cc) = m;}
     void indexed_assignment(const IndexList &rr, const IndexList &cc, const MX &m) {
-      setSub(m,rr.getAll(size1()),cc.getAll(size2()));
+      setSub(m, rr.getAll(size1()), cc.getAll(size2()));
     }
 
     void indexed_assignment(const Slice &rr, const Slice &cc, const MX &m) {
-      (*this)(rr.getAll(size1()),cc.getAll(size2())) = m;
+      (*this)(rr.getAll(size1()), cc.getAll(size2())) = m;
     }
 
     void indexed_zero_based_assignment(const Matrix<int>& k, const MX &m) {
@@ -200,19 +200,19 @@ namespace casadi {
       (*this)(sp) = m;
     }
     void indexed_assignment(const Matrix<int> &rr, const Slice& cc, const MX& m) {
-      (*this)(rr,cc.getAll(size2())) = m;
+      (*this)(rr, cc.getAll(size2())) = m;
     }
     void indexed_assignment( const Slice& rr, const Matrix<int>& cc, const MX& m) {
-      (*this)(rr.getAll(size1()),cc) = m;
+      (*this)(rr.getAll(size1()), cc) = m;
     }
     void indexed_assignment(const Matrix<int>& rr, const IndexList& cc, const MX& m) {
-      (*this)(rr,cc.getAll(size2())) = m;
+      (*this)(rr, cc.getAll(size2())) = m;
     }
     void indexed_assignment(const IndexList& rr, const Matrix<int>& cc, const MX& m) {
-      (*this)(rr.getAll(size1()),cc) = m;
+      (*this)(rr.getAll(size1()), cc) = m;
     }
     void indexed_assignment( const Matrix<int>& rr, const Matrix<int>& cc, const MX& m) {
-      (*this)(rr,cc) = m;
+      (*this)(rr, cc) = m;
     }
     ///@}
 
@@ -358,7 +358,7 @@ namespace casadi {
      *  a = x*x
      *  b = x*x
      *
-     *  a.isEqual(b,0)  will return false, but a.isEqual(b,1) will return true
+     *  a.isEqual(b, 0)  will return false, but a.isEqual(b, 1) will return true
      */
     bool isEqual(const MX& y, int depth=0) const;
 #ifndef SWIG
@@ -388,14 +388,14 @@ namespace casadi {
     /** \brief  create a matrix with all inf */
     static MX inf(const Sparsity& sp);
     static MX inf(int nrow=1, int ncol=1);
-    static MX inf(const std::pair<int,int>& rc);
+    static MX inf(const std::pair<int, int>& rc);
     ///@}
 
     ///@{
     /** \brief  create a matrix with all nan */
     static MX nan(const Sparsity& sp);
     static MX nan(int nrow=1, int ncol=1);
-    static MX nan(const std::pair<int,int>& rc);
+    static MX nan(const std::pair<int, int>& rc);
     ///@}
 
     ///@{
@@ -415,30 +415,30 @@ namespace casadi {
     const MX sub(int rr, const std::vector<int>& cc) const;
     const MX sub(const std::vector<int>& rr, const std::vector<int>& cc) const;
     const MX sub(const Sparsity& sp, int dummy=0) const;
-    const MX sub(const Matrix<int>& rr, int cc) const { return sub(rr,Slice(cc));}
+    const MX sub(const Matrix<int>& rr, int cc) const { return sub(rr, Slice(cc));}
     const MX sub(const Matrix<int>& rr, const std::vector<int>& cc) const;
     const MX sub(const std::vector<int>& rr, const Matrix<int>& cc) const;
-    const MX sub(int rr, const Slice& cc) const {return sub(rr,cc.getAll(size2()));}
-    const MX sub(const Slice& rr, int cc) const {return sub(rr.getAll(size1()),cc);}
+    const MX sub(int rr, const Slice& cc) const {return sub(rr, cc.getAll(size2()));}
+    const MX sub(const Slice& rr, int cc) const {return sub(rr.getAll(size1()), cc);}
     const MX sub(const Slice& rr, const Slice& cc) const
-    { return sub(rr.getAll(size1()),cc.getAll(size2())); }
+    { return sub(rr.getAll(size1()), cc.getAll(size2())); }
     const MX sub(const Matrix<int>& rr, const Slice& cc) const
-    { return sub(rr,cc.getAll(size2())); }
+    { return sub(rr, cc.getAll(size2())); }
     const MX sub(const Slice& rr, const Matrix<int>& cc) const
-    { return sub(rr.getAll(size1()),cc); }
+    { return sub(rr.getAll(size1()), cc); }
     const MX sub(const Matrix<int>& rr, const Matrix<int>& cc) const;
-    const MX sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr),cc);}
+    const MX sub(int rr, const Matrix<int>& cc) const { return sub(Slice(rr), cc);}
 
     void setSub(const MX& m, int rr, int cc);
     void setSub(const MX& m, const std::vector<int>& rr, int cc);
     void setSub(const MX& m, int rr, const std::vector<int>& cc);
     void setSub(const MX& m, const std::vector<int>& rr, const std::vector<int>& cc);
     void setSub(const MX& m, const std::vector<int>& rr, Slice cc)
-    { setSub(m,rr,cc.getAll(size2()));}
+    { setSub(m, rr, cc.getAll(size2()));}
     void setSub(const MX& m, const Matrix<int>& rr, const std::vector<int>& cc);
-    void setSub(const MX& m, const Matrix<int>& rr, int cc) { setSub(m,rr,std::vector<int>(1,cc)); }
+    void setSub(const MX& m, const Matrix<int>& rr, int cc) { setSub(m, rr, std::vector<int>(1, cc)); }
     void setSub(const MX& m, const std::vector<int>& rr, const Matrix<int>& cc);
-    void setSub(const MX& m, int rr, const Matrix<int>& cc) { setSub(m,std::vector<int>(1,rr),cc); }
+    void setSub(const MX& m, int rr, const Matrix<int>& cc) { setSub(m, std::vector<int>(1, rr), cc); }
     void setSub(const MX& m, const Slice& rr, const Slice& cc);
     void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc);
     void setSub(const MX& m, const Sparsity& sp, int dummy);
@@ -449,7 +449,7 @@ namespace casadi {
     MX getNZ(const Matrix<int>& k) const;
     void setNZ(int k, const MX& el);
     void setNZ(const std::vector<int>& k, const MX& el);
-    void setNZ(const Slice& k, const MX& m) { setNZ(k.getAll(size()),m);}
+    void setNZ(const Slice& k, const MX& m) { setNZ(k.getAll(size()), m);}
     void setNZ(const Matrix<int>& k, const MX& m);
     /// \endcond
 
@@ -520,7 +520,7 @@ namespace casadi {
     *
     *  If y does not evaluate to 1, a runtime error is raised
     */
-    MX attachAssert(const MX& y,const std::string &fail_message="") const;
+    MX attachAssert(const MX& y, const std::string &fail_message="") const;
 
     /** \brief Set sparse */
     MX setSparse(const Sparsity& sp, bool intersect=false) const;

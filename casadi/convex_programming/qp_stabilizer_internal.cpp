@@ -40,9 +40,9 @@ namespace casadi {
   }
 
   void QPStabilizerInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     StabilizedQPSolverInternal::deepCopyMembers(already_copied);
-    qp_solver_ = deepcopy(qp_solver_,already_copied);
+    qp_solver_ = deepcopy(qp_solver_, already_copied);
   }
 
   void QPStabilizerInternal::init() {
@@ -50,8 +50,8 @@ namespace casadi {
     StabilizedQPSolverInternal::init();
 
     // Form augmented QP
-    Sparsity H_sparsity_qp = blkdiag(st_[QP_STRUCT_H],Sparsity::diag(nc_));
-    Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A],Sparsity::diag(nc_));
+    Sparsity H_sparsity_qp = blkdiag(st_[QP_STRUCT_H], Sparsity::diag(nc_));
+    Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
     qp_solver_ = qp_solver_creator(qpStruct("h",H_sparsity_qp,"a",A_sparsity_qp));
 
@@ -75,19 +75,19 @@ namespace casadi {
     std::copy(input(STABILIZED_QP_SOLVER_H).begin(),
               input(STABILIZED_QP_SOLVER_H).end(),
               H_qp.begin());
-    std::fill(H_qp.begin()+input(STABILIZED_QP_SOLVER_H).size(),H_qp.end(),muR);
+    std::fill(H_qp.begin()+input(STABILIZED_QP_SOLVER_H).size(), H_qp.end(), muR);
 
     // Linear constraints
     if (nc_>0) {
       // Upper and lower bounds
-      qp_solver_.setInput(input(STABILIZED_QP_SOLVER_LBA),QP_SOLVER_LBA);
-      qp_solver_.setInput(input(STABILIZED_QP_SOLVER_UBA),QP_SOLVER_UBA);
+      qp_solver_.setInput(input(STABILIZED_QP_SOLVER_LBA), QP_SOLVER_LBA);
+      qp_solver_.setInput(input(STABILIZED_QP_SOLVER_UBA), QP_SOLVER_UBA);
 
       // Matrix term in the linear constraint
       DMatrix& A_qp = qp_solver_.input(QP_SOLVER_A);
       DMatrix& A = input(STABILIZED_QP_SOLVER_A);
-      std::copy(A.begin(),A.end(),A_qp.begin());
-      std::fill(A_qp.begin()+A.size(),A_qp.end(),-muR);
+      std::copy(A.begin(), A.end(), A_qp.begin());
+      std::fill(A_qp.begin()+A.size(), A_qp.end(), -muR);
 
       // Add constant to linear inequality
       for(int i=0; i<mu.size(); ++i) {
@@ -113,7 +113,7 @@ namespace casadi {
 
     // Gradient term in the objective
     DMatrix &g = input(STABILIZED_QP_SOLVER_G);
-    std::copy(g.begin(),g.end(),qp_solver_.input(QP_SOLVER_G).begin());
+    std::copy(g.begin(), g.end(), qp_solver_.input(QP_SOLVER_G).begin());
     for (int i=0;i<nc_;++i) {
       qp_solver_.input(QP_SOLVER_G).at(g.size()+i) = muR * mu[i];
     }

@@ -64,7 +64,7 @@ public:
   static ImplicitFunction creator(const Function& f,
                                   const Function& jac,
                                   const LinearSolver& linsol)
-  { return NewtonImplicitSolver(f,jac,linsol);}
+  { return NewtonImplicitSolver(f, jac, linsol);}
   #ifdef SWIG
   %nocallback;
   #endif

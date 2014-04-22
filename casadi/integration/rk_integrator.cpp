@@ -30,7 +30,7 @@ namespace casadi {
   }
 
   RKIntegrator::RKIntegrator(const Function& f, const Function& g) {
-    assignNode(new RKIntegratorInternal(f,g));
+    assignNode(new RKIntegratorInternal(f, g));
   }
 
   RKIntegratorInternal* RKIntegrator::operator->() {

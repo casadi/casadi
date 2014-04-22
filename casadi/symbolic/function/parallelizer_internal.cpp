@@ -60,11 +60,11 @@ namespace casadi {
 #endif // WITH_OPENMP
 
     // Check if a node is a copy of another
-    copy_of_.resize(funcs_.size(),-1);
-    map<void*,int> is_copy_of;
+    copy_of_.resize(funcs_.size(), -1);
+    map<void*, int> is_copy_of;
     for(int i=0; i<funcs_.size(); ++i) {
       // Check if the function has already been assigned an index
-      map<void*,int>::const_iterator it=is_copy_of.find(funcs_[i].get());
+      map<void*, int>::const_iterator it=is_copy_of.find(funcs_[i].get());
       if(it!=is_copy_of.end()) {
         copy_of_[i] = it->second;
       } else {
@@ -146,7 +146,7 @@ namespace casadi {
         stats_["task_cputime"] = task_cputime;
       }
       // Measure all times relative to the earliest start_time.
-      double start = *std::min_element(task_starttime.begin(),task_starttime.end());
+      double start = *std::min_element(task_starttime.begin(), task_starttime.end());
       for (int task=0; task<funcs_.size(); ++task) {
         task_starttime[task] =  task_starttime[task] - start;
         task_endtime[task] = task_endtime[task] - start;
@@ -201,7 +201,7 @@ namespace casadi {
       int oind_f = oind-outind_[task];
 
       // Get the local sparsity patterm
-      return funcs_.at(task).jacSparsity(iind_f,oind_f);
+      return funcs_.at(task).jacSparsity(iind_f, oind_f);
 
     } else {
       // All-zero jacobian
@@ -225,7 +225,7 @@ namespace casadi {
       int oind_f = oind-outind_[task];
 
       // Get the local jacobian
-      return funcs_.at(task).jacobian(iind_f,oind_f, compact, symmetric);
+      return funcs_.at(task).jacobian(iind_f, oind_f, compact, symmetric);
     } else {
       // All-zero jacobian
       return Function();
@@ -233,9 +233,9 @@ namespace casadi {
   }
 
   void ParallelizerInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     FunctionInternal::deepCopyMembers(already_copied);
-    funcs_ = deepcopy(funcs_,already_copied);
+    funcs_ = deepcopy(funcs_, already_copied);
   }
 
   void ParallelizerInternal::spInit(bool use_fwd) {
@@ -247,7 +247,7 @@ namespace casadi {
   void ParallelizerInternal::spEvaluate(bool use_fwd) {
     // This function can be parallelized. Move logic in "evaluate" to a template function.
     for(int task=0; task<funcs_.size(); ++task) {
-      spEvaluateTask(use_fwd,task);
+      spEvaluateTask(use_fwd, task);
     }
   }
 
@@ -261,7 +261,7 @@ namespace casadi {
         int nv = input(j).size();
         const bvec_t* p_v = get_bvec_t(input(j).data());
         bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
-        copy(p_v,p_v+nv,f_v);
+        copy(p_v, p_v+nv, f_v);
       }
 
       // Propagate
@@ -272,7 +272,7 @@ namespace casadi {
         int nv = output(j).size();
         bvec_t* p_v = get_bvec_t(output(j).data());
         const bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
-        copy(f_v,f_v+nv, p_v);
+        copy(f_v, f_v+nv, p_v);
       }
 
     } else {
@@ -282,7 +282,7 @@ namespace casadi {
         int nv = output(j).size();
         const bvec_t* p_v = get_bvec_t(output(j).data());
         bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
-        copy(p_v,p_v+nv,f_v);
+        copy(p_v, p_v+nv, f_v);
       }
 
       // Propagate
@@ -293,7 +293,7 @@ namespace casadi {
         int nv = input(j).size();
         bvec_t* p_v = get_bvec_t(input(j).data());
         const bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
-        copy(f_v,f_v+nv,p_v);
+        copy(f_v, f_v+nv, p_v);
       }
     }
   }
@@ -305,7 +305,7 @@ namespace casadi {
       if(copy_of_[i]>=0) {
         der_funcs[i] = der_funcs[copy_of_[i]];
       } else {
-        der_funcs[i] = funcs_[i].derivative(nfwd,nadj);
+        der_funcs[i] = funcs_[i].derivative(nfwd, nadj);
       }
     }
 
@@ -346,7 +346,7 @@ namespace casadi {
     }
 
     // Assemble the return function
-    return MXFunction(ret_arg,ret_res);
+    return MXFunction(ret_arg, ret_res);
   }
 
 

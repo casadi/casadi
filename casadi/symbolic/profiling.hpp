@@ -126,7 +126,7 @@ inline ProfilingData_Type ProfilingType<ProfilingData_IO>()
 
 
 template<typename T>
-void profileWrite(std::ofstream &f,const T& s) {
+void profileWrite(std::ofstream &f, const T& s) {
   ProfilingHeader hd;
   hd.type   = ProfilingType<T>();
   f.write(reinterpret_cast<const char*>(&hd), sizeof(hd));
@@ -134,7 +134,7 @@ void profileWrite(std::ofstream &f,const T& s) {
 }
 
 template<typename T>
-void profileWriteBare(std::ofstream &f,const T& s) {
+void profileWriteBare(std::ofstream &f, const T& s) {
   f.write(reinterpret_cast<const char*>(&s), sizeof(s));
 }
 
@@ -146,7 +146,7 @@ long ptrToLong(T *a) {
 }
 
 template<typename T>
-void profileWriteName(std::ofstream &f,T *a,const std::string &name,
+void profileWriteName(std::ofstream &f, T *a, const std::string &name,
                       ProfilingData_FunctionType type, int algorithm_size) {
   ProfilingData_NAME s;
   s.thisp=ptrToLong(a);
@@ -155,52 +155,52 @@ void profileWriteName(std::ofstream &f,T *a,const std::string &name,
   s.algorithm_size = algorithm_size;
   s.numin = a->getNumInputs();
   s.numout = a->getNumOutputs();
-  profileWrite(f,s);
+  profileWrite(f, s);
   f << name;
   for (int i=0;i<s.numin;++i) {
     ProfilingData_IO ss;
     ss.nrow = a->input(i).size1();
     ss.ncol = a->input(i).size2();
     ss.ndata = a->input(i).size();
-    profileWriteBare(f,ss);
+    profileWriteBare(f, ss);
   }
   for (int i=0;i<s.numout;++i) {
     ProfilingData_IO ss;
     ss.nrow = a->output(i).size1();
     ss.ncol = a->output(i).size2();
     ss.ndata = a->output(i).size();
-    profileWriteBare(f,ss);
+    profileWriteBare(f, ss);
   }
 }
 
 template<typename T>
-void profileWriteEntry(std::ofstream &f,T *a) {
+void profileWriteEntry(std::ofstream &f, T *a) {
   ProfilingData_ENTRY s;
   s.thisp=ptrToLong(a);
-  profileWrite(f,s);
+  profileWrite(f, s);
 }
 
 template<typename T>
-void profileWriteExit(std::ofstream &f,T *a,double total) {
+void profileWriteExit(std::ofstream &f, T *a, double total) {
   ProfilingData_EXIT s;
   s.thisp=ptrToLong(a);
   s.total=total;
-  profileWrite(f,s);
+  profileWrite(f, s);
 }
 
 template<typename T>
-void profileWriteTime(std::ofstream &f,T *a,int line_number,double local, double total) {
+void profileWriteTime(std::ofstream &f, T *a, int line_number, double local, double total) {
   ProfilingData_TIMELINE s;
   s.local = local;
   s.total = total;
   s.thisp = ptrToLong(a);
   s.line_number = line_number;
-  profileWrite(f,s);
+  profileWrite(f, s);
 }
 
 
 template<typename T, typename T2>
-void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::string &sourceline,
+void profileWriteSourceLine(std::ofstream &f, T *a, int line_number, const std::string &sourceline,
                             int opcode, T2 *dependency) {
   ProfilingData_SOURCE s;
   s.thisp = ptrToLong(a);
@@ -208,12 +208,12 @@ void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,const std::str
   s.length = sourceline.size();
   s.opcode = opcode;
   s.dependency = ptrToLong(dependency);
-  profileWrite(f,s);
+  profileWrite(f, s);
   f << sourceline;
 }
 
 template<typename T>
-void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,
+void profileWriteSourceLine(std::ofstream &f, T *a, int line_number,
                             const std::string &sourceline, int opcode) {
   ProfilingData_SOURCE s;
   s.thisp = ptrToLong(a);
@@ -221,7 +221,7 @@ void profileWriteSourceLine(std::ofstream &f,T *a,int line_number,
   s.length = sourceline.size();
   s.opcode = opcode;
   s.dependency = 0;
-  profileWrite(f,s);
+  profileWrite(f, s);
   f << sourceline;
 }
 

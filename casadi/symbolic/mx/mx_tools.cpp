@@ -87,7 +87,7 @@ namespace casadi {
     if(offset.size()==1) {
       return vector<MX>(0);
     } else if(offset.size()==2) {
-      return vector<MX>(1,x);
+      return vector<MX>(1, x);
     } else {
       return x->getHorzsplit(offset);
     }
@@ -95,9 +95,9 @@ namespace casadi {
 
   std::vector<MX> horzsplit(const MX& x, int incr) {
     casadi_assert(incr>=1);
-    vector<int> offset2 = range(0,x.size2(),incr);
+    vector<int> offset2 = range(0, x.size2(), incr);
     offset2.push_back(x.size2());
-    return horzsplit(x,offset2);
+    return horzsplit(x, offset2);
   }
 
   std::vector<MX> vertsplit(const MX& x, const std::vector<int>& offset) {
@@ -112,31 +112,31 @@ namespace casadi {
       if(offset.size()==1) {
         return vector<MX>();
       } else if(offset.size()==2) {
-        return vector<MX>(1,x);
+        return vector<MX>(1, x);
       } else {
         return x->getVertsplit(offset);
       }
     } else {
-      std::vector<MX> ret = horzsplit(x.T(),offset);
+      std::vector<MX> ret = horzsplit(x.T(), offset);
       MX (*transposeMX)(const MX& x) = transpose;
-      std::transform(ret.begin(),ret.end(),ret.begin(),transposeMX);
+      std::transform(ret.begin(), ret.end(), ret.begin(), transposeMX);
       return ret;
     }
   }
 
   std::vector<MX> vertsplit(const MX& x, int incr) {
     casadi_assert(incr>=1);
-    vector<int> offset1 = range(0,x.size1(),incr);
+    vector<int> offset1 = range(0, x.size1(), incr);
     offset1.push_back(x.size1());
-    return vertsplit(x,offset1);
+    return vertsplit(x, offset1);
   }
 
   std::vector< std::vector<MX> > blocksplit(const MX& x, const std::vector<int>& vert_offset,
                                             const std::vector<int>& horz_offset) {
-    std::vector<MX> rows = vertsplit(x,vert_offset);
+    std::vector<MX> rows = vertsplit(x, vert_offset);
     std::vector< std::vector<MX> > ret;
     for (int i=0;i<rows.size();++i) {
-      ret.push_back(horzsplit(rows[i],horz_offset));
+      ret.push_back(horzsplit(rows[i], horz_offset));
     }
     return ret;
   }
@@ -144,11 +144,11 @@ namespace casadi {
   std::vector< std::vector<MX > > blocksplit(const MX& x, int vert_incr, int horz_incr) {
     casadi_assert(horz_incr>=1);
     casadi_assert(vert_incr>=1);
-    vector<int> offset1 = range(0,x.size1(),vert_incr);
+    vector<int> offset1 = range(0, x.size1(), vert_incr);
     offset1.push_back(x.size1());
-    vector<int> offset2 = range(0,x.size2(),horz_incr);
+    vector<int> offset2 = range(0, x.size2(), horz_incr);
     offset2.push_back(x.size2());
-    return blocksplit(x,offset1,offset2);
+    return blocksplit(x, offset1, offset2);
   }
 
   MX horzcat(const MX& a, const MX& b) {
@@ -167,11 +167,11 @@ namespace casadi {
 
   MX veccat(const vector<MX>& comp) {
     MX (&f)(const MX&) = vec;
-    return vertcat(applymap(f,comp));
+    return vertcat(applymap(f, comp));
   }
 
   MX vecNZcat(const vector<MX>& comp) {
-    return vertcat(applymap(vecNZ,comp));
+    return vertcat(applymap(vecNZ, comp));
   }
 
   MX norm_2(const MX &x) {
@@ -191,7 +191,7 @@ namespace casadi {
   }
 
   MX mul(const MX &x, const MX &y, const Sparsity& sp_z) {
-    return x.mul(y,sp_z);
+    return x.mul(y, sp_z);
   }
 
   MX mul(const std::vector< MX > &args) {
@@ -223,15 +223,15 @@ namespace casadi {
     return x.T();
   }
 
-  MX reshape(const MX &x, std::pair<int,int> rc) {
-    return reshape(x,rc.first,rc.second);
+  MX reshape(const MX &x, std::pair<int, int> rc) {
+    return reshape(x, rc.first, rc.second);
   }
 
   MX reshape(const MX &x, int nrow, int ncol) {
     if(nrow==x.size1() && ncol==x.size2())
       return x;
     else
-      return reshape(x,x.sparsity().reshape(nrow,ncol));
+      return reshape(x, x.sparsity().reshape(nrow, ncol));
   }
 
   MX reshape(const MX &x, const Sparsity& sp) {
@@ -250,7 +250,7 @@ namespace casadi {
     if(x.isVector()) {
       return x;
     } else {
-      return reshape(x,x.numel(),1);
+      return reshape(x, x.numel(), 1);
     }
   }
 
@@ -258,21 +258,21 @@ namespace casadi {
     if(x.isDense()) {
       return vec(x);
     } else {
-      return x->getGetNonzeros(Sparsity::dense(x.size(),1),range(x.size()));
+      return x->getGetNonzeros(Sparsity::dense(x.size(), 1), range(x.size()));
     }
   }
 
   MX if_else(const MX &cond, const MX &if_true, const MX &if_false) {
-    return if_else_zero(cond,if_true) + if_else_zero(!cond,if_false);
+    return if_else_zero(cond, if_true) + if_else_zero(!cond, if_false);
   }
 
   MX unite(const MX& A, const MX& B) {
     // Join the sparsity patterns
     std::vector<unsigned char> mapping;
-    Sparsity sp = A.sparsity().patternUnion(B.sparsity(),mapping);
+    Sparsity sp = A.sparsity().patternUnion(B.sparsity(), mapping);
 
     // Split up the mapping
-    std::vector<int> nzA,nzB;
+    std::vector<int> nzA, nzB;
 
     // Copy sparsity
     for(int k=0; k<mapping.size(); ++k) {
@@ -287,8 +287,8 @@ namespace casadi {
 
     // Create mapping
     MX ret = MX::zeros(sp);
-    ret = A->getSetNonzeros(ret,nzA);
-    ret = B->getSetNonzeros(ret,nzB);
+    ret = A->getSetNonzeros(ret, nzA);
+    ret = B->getSetNonzeros(ret, nzB);
     return ret;
   }
 
@@ -296,7 +296,7 @@ namespace casadi {
     casadi_assert_message(A.size2() == A.size1(), "trace: must be square");
     MX res(0);
     for (int i=0; i < A.size2(); i ++) {
-      res+=A(i,i);
+      res+=A(i, i);
     }
     return res;
   }
@@ -317,10 +317,10 @@ namespace casadi {
      MX clip(const MX& A, const Sparsity& sp) {
      // Join the sparsity patterns
      std::vector<int> mapping;
-     Sparsity sp = A.sparsity().patternIntersection(sp,mapping);
+     Sparsity sp = A.sparsity().patternIntersection(sp, mapping);
 
      // Split up the mapping
-     std::vector<int> nzA,nzB;
+     std::vector<int> nzA, nzB;
 
      // Copy sparsity
      for(int k=0; k<mapping.size(); ++k) {
@@ -336,8 +336,8 @@ namespace casadi {
      // Create mapping
      MX ret;
      ret.assignNode(new Mapping(sp));
-     ret->assign(A,range(nzA.size()),nzA);
-     ret->assign(B,range(nzB.size()),nzB);
+     ret->assign(A, range(nzA.size()), nzA);
+     ret->assign(B, range(nzB.size()), nzB);
      return ret;
 
      }
@@ -357,7 +357,7 @@ namespace casadi {
     }
 
     // Collect the sizes of the depenencies
-    std::vector<int> index(deps.size()+1,0);
+    std::vector<int> index(deps.size()+1, 0);
     for (int k=0;k<deps.size();k++) {
       index[k+1] =  index[k] + deps[k].size();
     }
@@ -365,11 +365,11 @@ namespace casadi {
     // Create the parent
     MX P = MX::sym("P",index[deps.size()],1);
 
-    std::vector<MX> Ps = vertsplit(P,index);
+    std::vector<MX> Ps = vertsplit(P, index);
 
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      deps[k] = MX(deps[k].sparsity(),Ps[k]);
+      deps[k] = MX(deps[k].sparsity(), Ps[k]);
     }
 
     return P;
@@ -377,20 +377,20 @@ namespace casadi {
 
   MX createParent(const std::vector<Sparsity> &deps, std::vector<MX>& children) {
     // Collect the sizes of the depenencies
-    std::vector<int> index(deps.size()+1,0);
+    std::vector<int> index(deps.size()+1, 0);
     for (int k=0;k<deps.size();k++) {
       index[k+1] =  index[k] + deps[k].size();
     }
 
     // Create the parent
     MX P = MX::sym("P",index[deps.size()],1);
-    std::vector<MX> Ps = vertsplit(P,index);
+    std::vector<MX> Ps = vertsplit(P, index);
 
     children.resize(deps.size());
 
     // Make the arguments dependent on the parent
     for (int k=0;k<deps.size();k++) {
-      children[k] =  MX(deps[k],Ps[k]);
+      children[k] =  MX(deps[k], Ps[k]);
     }
 
     return P;
@@ -410,7 +410,7 @@ namespace casadi {
     Sparsity sp = x.sparsity().getDiag(mapping);
 
     // Create a reference to the nonzeros
-    return x->getGetNonzeros(sp,mapping);
+    return x->getGetNonzeros(sp, mapping);
   }
 
   MX blkdiag(const std::vector<MX> &A) {
@@ -421,12 +421,12 @@ namespace casadi {
       ncol += A[i].size2();
     }
 
-    MX ret = MX::sparse(nrow,ncol);
+    MX ret = MX::sparse(nrow, ncol);
     nrow = 0;
     ncol = 0;
 
     for (int i=0;i<A.size();++i) {
-      ret(range(nrow,nrow+A[i].size1()),range(ncol,ncol+A[i].size2())) = A[i];
+      ret(range(nrow, nrow+A[i].size1()), range(ncol, ncol+A[i].size2())) = A[i];
       nrow += A[i].size1();
       ncol += A[i].size2();
     }
@@ -442,17 +442,17 @@ namespace casadi {
   }
 
   int countNodes(const MX& A) {
-    MXFunction f(vector<MX>(),A);
+    MXFunction f(vector<MX>(), A);
     f.init();
     return f.countNodes();
   }
 
   MX sumCols(const MX &x) {
-    return mul(x,MX::ones(x.size2(),1));
+    return mul(x, MX::ones(x.size2(), 1));
   }
 
   MX sumRows(const MX &x) {
-    return mul(MX::ones(1,x.size1()),x);
+    return mul(MX::ones(1, x.size1()), x);
   }
 
   MX sumAll(const MX &x) {
@@ -461,8 +461,8 @@ namespace casadi {
 
 
   MX polyval(const MX& p, const MX& x) {
-    casadi_assert_message(p.isDense(),"polynomial coefficients vector must be a vector");
-    casadi_assert_message(p.isVector() && p.size()>0,"polynomial coefficients must be a vector");
+    casadi_assert_message(p.isDense(), "polynomial coefficients vector must be a vector");
+    casadi_assert_message(p.isVector() && p.size()>0, "polynomial coefficients must be a vector");
     MX ret = p[0];
     for(int i=1; i<p.size(); ++i) {
       ret = ret*x + p[i];
@@ -473,14 +473,14 @@ namespace casadi {
   std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args) {
     std::stringstream s;
     const MXNode* node = dynamic_cast<const MXNode*>(x.get());
-    node->printPart(s,0);
+    node->printPart(s, 0);
     if (x.isUnary()) {
       s << args[0];
-      node->printPart(s,1);
+      node->printPart(s, 1);
     } else {
       for (int i=0;i<args.size();++i) {
         s << args[i];
-        node->printPart(s,1+i);
+        node->printPart(s, 1+i);
       }
     }
 
@@ -490,7 +490,7 @@ namespace casadi {
   void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse) {
     // Empty vector
     vector<MX> ex;
-    substituteInPlace(v,vdef,ex,reverse);
+    substituteInPlace(v, vdef, ex, reverse);
   }
 
   void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef,
@@ -498,11 +498,11 @@ namespace casadi {
     casadi_assert_message(v.size()==vdef.size(),
                           "Mismatch in the number of expression to substitute.");
     for(int k=0; k<v.size(); ++k) {
-      casadi_assert_message(v[k].isSymbolic(),"Variable " << k << " is not symbolic");
+      casadi_assert_message(v[k].isSymbolic(), "Variable " << k << " is not symbolic");
       casadi_assert_message(v[k].sparsity() == vdef[k].sparsity(),
                             "Inconsistent sparsity for variable " << k << ".");
     }
-    casadi_assert_message(reverse==false,"Not implemented");
+    casadi_assert_message(reverse==false, "Not implemented");
 
     // quick return if nothing to replace
     if(v.empty()) return;
@@ -512,10 +512,10 @@ namespace casadi {
 
     // Function outputs
     std::vector<MX> f_out = vdef;
-    f_out.insert(f_out.end(),ex.begin(),ex.end());
+    f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    MXFunction f(f_in,f_out);
+    MXFunction f(f_in, f_out);
     f.init();
 
     // Get references to the internal data structures
@@ -554,14 +554,14 @@ namespace casadi {
             output_p[i] = el<0 ? 0 : &work.at(el);
           }
 
-          it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,dummy_p,dummy_p,false);
+          it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p, dummy_p, dummy_p, false);
         }
       }
     }
   }
 
   MX substitute(const MX &ex, const MX& v, const MX& vdef) {
-    return substitute(vector<MX>(1,ex),vector<MX>(1,v),vector<MX>(1,vdef)).front();
+    return substitute(vector<MX>(1, ex), vector<MX>(1, v), vector<MX>(1, vdef)).front();
   }
 
   std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
@@ -580,13 +580,13 @@ namespace casadi {
     if(all_equal) return ex;
 
     // Otherwise, evaluate symbolically
-    MXFunction F(v,ex);
+    MXFunction F(v, ex);
     F.init();
-    return F.call(vdef,true);
+    return F.call(vdef, true);
   }
 
   MX graph_substitute(const MX &ex, const std::vector<MX> &v, const std::vector<MX> &vdef) {
-    return graph_substitute(std::vector<MX>(1,ex),v,vdef).at(0);
+    return graph_substitute(std::vector<MX>(1, ex), v, vdef).at(0);
   }
 
   std::vector<MX> graph_substitute(const std::vector<MX> &ex, const std::vector<MX> &expr,
@@ -596,7 +596,7 @@ namespace casadi {
                           << expr.size() << " <-> " << exprs.size() << ".");
 
     // Sort the expression
-    MXFunction f(vector<MX>(),ex);
+    MXFunction f(vector<MX>(), ex);
     f.init();
 
     // Get references to the internal data structures
@@ -610,7 +610,7 @@ namespace casadi {
     stringstream ss;
 
     // Construct lookup table for expressions
-    std::map<const MXNode*,int> expr_lookup;
+    std::map<const MXNode*, int> expr_lookup;
     for (int i=0;i<expr.size();++i) {
       expr_lookup[expr[i].operator->()] = i;
     }
@@ -625,7 +625,7 @@ namespace casadi {
     MXPtrVV dummy_p;
 
     // expr_lookup iterator
-    std::map<const MXNode*,int>::const_iterator it_lookup;
+    std::map<const MXNode*, int>::const_iterator it_lookup;
 
     for(vector<MXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it) {
 
@@ -674,8 +674,8 @@ namespace casadi {
             int el = it->res[0];
             swork[el] = it->data;
           } else {
-            const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,
-                                                  dummy_p,dummy_p,dummy_p,dummy_p,false);
+            const_cast<MX&>(it->data)->evaluateMX(input_p, output_p,
+                                                  dummy_p, dummy_p, dummy_p, dummy_p, false);
           }
         }
       }
@@ -700,7 +700,7 @@ namespace casadi {
                      const std::string& v_prefix, const std::string& v_suffix) {
 
     // Sort the expression
-    MXFunction f(vector<MX>(),ex);
+    MXFunction f(vector<MX>(), ex);
     f.init();
 
     // Get references to the internal data structures
@@ -708,13 +708,13 @@ namespace casadi {
     vector<MX> work(f.getWorkSize());
 
     // Count how many times an expression has been used
-    vector<int> usecount(work.size(),0);
+    vector<int> usecount(work.size(), 0);
 
     // Remember the origin of every calculation
-    vector<pair<int,int> > origin(work.size(),make_pair(-1,-1));
+    vector<pair<int, int> > origin(work.size(), make_pair(-1, -1));
 
     // Which evaluations to replace
-    vector<pair<int,int> > replace;
+    vector<pair<int, int> > replace;
 
     // Evaluate the algorithm to identify which evaluations to replace
     int k=0;
@@ -748,7 +748,7 @@ namespace casadi {
           if(it->res[c]>=0) {
             work[it->res[c]] = it->data.getOutput(c);
             usecount[it->res[c]] = 0; // Not (yet) extracted
-            origin[it->res[c]] = make_pair(k,c);
+            origin[it->res[c]] = make_pair(k, c);
           }
         }
         break;
@@ -765,8 +765,8 @@ namespace casadi {
     if(replace.empty()) return;
 
     // Sort the elements to be replaced in the order of appearence in the algorithm
-    sort(replace.begin(),replace.end());
-    vector<pair<int,int> >::const_iterator replace_it=replace.begin();
+    sort(replace.begin(), replace.end());
+    vector<pair<int, int> >::const_iterator replace_it=replace.begin();
 
     // Name of intermediate variables
     stringstream v_name;
@@ -799,8 +799,8 @@ namespace casadi {
           }
 
           // Evaluate atomic operation
-          const_cast<MX&>(it->data)->evaluateMX(input_p,output_p,
-                                                dummy_p,dummy_p,dummy_p,dummy_p,false);
+          const_cast<MX&>(it->data)->evaluateMX(input_p, output_p,
+                                                dummy_p, dummy_p, dummy_p, dummy_p, false);
 
           // Possibly replace results with new variables
           for(int c=0; c<it->res.size(); ++c) {
@@ -828,9 +828,9 @@ namespace casadi {
 
   void printCompact(const MX& ex, std::ostream &stream) {
     // Extract shared subexpressions from ex
-    vector<MX> v,vdef;
-    vector<MX> ex_extracted(1,ex);
-    extractShared(ex_extracted,v,vdef,"@","");
+    vector<MX> v, vdef;
+    vector<MX> ex_extracted(1, ex);
+    extractShared(ex_extracted, v, vdef, "@","");
 
     // Print the expression without shared subexpressions
     ex_extracted.front().print(stream);
@@ -845,21 +845,21 @@ namespace casadi {
   }
 
   MX jacobian(const MX& ex, const MX &arg) {
-    MXFunction temp(arg,ex); // make a runtime
+    MXFunction temp(arg, ex); // make a runtime
     temp.setOption("name","helper_jacobian_MX");
     temp.init();
     return temp.jac();
   }
 
   MX gradient(const MX& ex, const MX &arg) {
-    MXFunction temp(arg,ex); // make a runtime
+    MXFunction temp(arg, ex); // make a runtime
     temp.setOption("name","helper_gradient_MX");
     temp.init();
     return temp.grad();
   }
 
   MX tangent(const MX& ex, const MX &arg) {
-    MXFunction temp(arg,ex); // make a runtime
+    MXFunction temp(arg, ex); // make a runtime
     temp.setOption("name","helper_tangent_MX");
     temp.init();
     return temp.tang();
@@ -867,7 +867,7 @@ namespace casadi {
 
   MX blockcat(const std::vector< std::vector<MX > > &v) {
     // Quick return if no block rows
-    if(v.empty()) return MX::sparse(0,0);
+    if(v.empty()) return MX::sparse(0, 0);
 
     // Make sure same number of block columns
     int ncols = v.front().size();
@@ -876,7 +876,7 @@ namespace casadi {
     }
 
     // Quick return if no block columns
-    if(v.front().empty()) return MX::sparse(0,0);
+    if(v.front().empty()) return MX::sparse(0, 0);
 
     // Horizontally concatenate all columns for each row, then vertically concatenate rows
     std::vector<MX> rows;
@@ -886,8 +886,8 @@ namespace casadi {
     return vertcat(rows);
   }
 
-  MX blockcat(const MX &A,const MX &B,const MX &C,const MX &D) {
-    return vertcat(horzcat(A,B),horzcat(C,D));
+  MX blockcat(const MX &A, const MX &B, const MX &C, const MX &D) {
+    return vertcat(horzcat(A, B), horzcat(C, D));
   }
 
   MX det(const MX& A) {
@@ -899,13 +899,13 @@ namespace casadi {
   }
 
   std::vector<MX> getSymbols(const MX& e) {
-    MXFunction f(std::vector<MX>(),e);
+    MXFunction f(std::vector<MX>(), e);
     f.init();
     return f.getFree();
   }
 
   std::vector<MX> getSymbols(const std::vector<MX>& e) {
-    MXFunction f(std::vector<MX>(),e);
+    MXFunction f(std::vector<MX>(), e);
     f.init();
     return f.getFree();
   }
@@ -914,7 +914,7 @@ namespace casadi {
     if(ex.size()==0) return false;
 
     // Construct a temporary algorithm
-    MXFunction temp(arg,ex);
+    MXFunction temp(arg, ex);
     temp.init();
     temp.spInit(true);
 
@@ -935,8 +935,8 @@ namespace casadi {
   }
 
   MX matrix_expand(const MX& e, const std::vector<MX> &boundary) {
-    std::vector<MX> e_v(1,e);
-    return matrix_expand(e_v,boundary).at(0);
+    std::vector<MX> e_v(1, e);
+    return matrix_expand(e_v, boundary).at(0);
   }
 
   std::vector<MX> matrix_expand(const std::vector<MX>& e, const std::vector<MX> &boundary) {
@@ -949,29 +949,29 @@ namespace casadi {
     }
 
     // Substitute symbols for boundary nodes
-    std::vector<MX> ret = graph_substitute(e,boundary,syms);
+    std::vector<MX> ret = graph_substitute(e, boundary, syms);
 
     // Obtain list of dependants
     std::vector<MX> v = getSymbols(ret);
 
     // Construct an MXFunction with it
-    MXFunction f(v,ret);
+    MXFunction f(v, ret);
     f.init();
 
     // Expand to SXFunction
     SXFunction s = f.expand();
     s.init();
 
-    return s.call(graph_substitute(v,syms,boundary),true);
+    return s.call(graph_substitute(v, syms, boundary), true);
   }
 
   MX kron(const MX& a, const MX& b) {
     const Sparsity &a_sp = a.sparsity();
     MX filler = MX::sparse(b.shape());
-    std::vector< std::vector< MX > > blocks(a.size1(),std::vector< MX >(a.size2(),filler));
+    std::vector< std::vector< MX > > blocks(a.size1(), std::vector< MX >(a.size2(), filler));
     for (int i=0;i<a.size1();++i) {
       for (int j=0;j<a.size2();++j) {
-        int k = a_sp.getNZ(i,j);
+        int k = a_sp.getNZ(i, j);
         if (k!=-1) {
           blocks[i][j] = a[k]*b;
         }
@@ -981,23 +981,23 @@ namespace casadi {
   }
 
   MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict) {
-    LinearSolver mysolver = lsolver(A.sparsity(),b.size2());
+    LinearSolver mysolver = lsolver(A.sparsity(), b.size2());
     mysolver.setOption(dict);
     mysolver.init();
-    return mysolver.solve(A,b,false);
+    return mysolver.solve(A, b, false);
   }
 
   MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict) {
     if (A.size1()>=A.size2()) {
-      return solve(mul(A.T(),A),A.T(),lsolver,dict);
+      return solve(mul(A.T(), A), A.T(), lsolver, dict);
     } else {
-      return solve(mul(A,A.T()),A,lsolver,dict).T();
+      return solve(mul(A, A.T()), A, lsolver, dict).T();
     }
   }
 
   MX nullspace(const MX& A) {
     SX n = SX::sym("A",A.sparsity());
-    SXFunction f(n,nullspace(n));
+    SXFunction f(n, nullspace(n));
     f.setOption("name","nullspace");
     f.init();
     return f(A).at(0);

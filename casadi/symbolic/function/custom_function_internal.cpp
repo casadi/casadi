@@ -38,11 +38,11 @@ CustomFunctionInternal::CustomFunctionInternal(
   setNumOutputs(outputscheme.size());
 
   for (int k=0;k<inputscheme.size();k++) {
-    input(k) = DMatrix(inputscheme[k],0);
+    input(k) = DMatrix(inputscheme[k], 0);
   }
 
   for (int k=0;k<outputscheme.size();k++) {
-    output(k) = DMatrix(outputscheme[k],0);
+    output(k) = DMatrix(outputscheme[k], 0);
   }
 
   // Make the ref object a non-refence counted pointer to this (as reference counting
@@ -58,7 +58,7 @@ CustomFunctionInternal::~CustomFunctionInternal() {
 
 void CustomFunctionInternal::evaluate() {
   casadi_assert_message(!evaluate_.isNull(), "CustomFunctionInternal::evaluate: pointer is null");
-  evaluate_(ref_,user_data_);
+  evaluate_(ref_, user_data_);
 }
 
 void CustomFunctionInternal::init() {

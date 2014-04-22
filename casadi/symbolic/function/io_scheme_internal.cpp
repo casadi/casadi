@@ -37,11 +37,11 @@ namespace casadi {
     }
 
     std::string IOSchemeBuiltinInternal::entry(int i) const {
-      return getSchemeEntryName(scheme_,i);
+      return getSchemeEntryName(scheme_, i);
     }
 
     std::string IOSchemeBuiltinInternal::entryEnum(int i) const {
-      return getSchemeEntryEnumName(scheme_,i);
+      return getSchemeEntryEnumName(scheme_, i);
     }
 
     std::string IOSchemeBuiltinInternal::describe(int i) const {
@@ -112,7 +112,7 @@ namespace casadi {
 
     int IOSchemeCustomInternal::index(const std::string &name) const {
       std::map<std::string, int>::const_iterator it = entrymap_.find(name);
-      casadi_assert_message(it!=entrymap_.end(),"customIO::index(): entry '" << name
+      casadi_assert_message(it!=entrymap_.end(), "customIO::index(): entry '" << name
                             << "' not available. Available entries are " << entryNames());
       return it->second;
     }

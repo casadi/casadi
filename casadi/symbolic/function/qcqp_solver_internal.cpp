@@ -33,7 +33,7 @@ namespace casadi {
 // Constructor
 QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
 
-  casadi_assert_message(st_.size()==QCQP_STRUCT_NUM,"Problem structure mismatch");
+  casadi_assert_message(st_.size()==QCQP_STRUCT_NUM, "Problem structure mismatch");
 
   const Sparsity& A = st_[QCQP_STRUCT_A];
   const Sparsity& P = st_[QCQP_STRUCT_P];
@@ -69,25 +69,25 @@ QCQPSolverInternal::QCQPSolverInternal(const std::vector<Sparsity> &st) : st_(st
   nq_ = P.size2() / n_;
 
   // Sparsity
-  Sparsity x_sparsity = Sparsity::dense(n_,1);
-  Sparsity bounds_sparsity = Sparsity::dense(nc_,1);
+  Sparsity x_sparsity = Sparsity::dense(n_, 1);
+  Sparsity bounds_sparsity = Sparsity::dense(nc_, 1);
 
   // Input arguments
   setNumInputs(QCQP_SOLVER_NUM_IN);
-  input(QCQP_SOLVER_X0) = DMatrix(x_sparsity,0);
+  input(QCQP_SOLVER_X0) = DMatrix(x_sparsity, 0);
   input(QCQP_SOLVER_H) = DMatrix(H);
   input(QCQP_SOLVER_G) = DMatrix(x_sparsity);
   input(QCQP_SOLVER_A) = DMatrix(A);
   input(QCQP_SOLVER_P) = DMatrix(P);
-  input(QCQP_SOLVER_Q) = DMatrix::zeros(nq_*n_,1);
-  input(QCQP_SOLVER_R) = DMatrix::zeros(nq_,1);
+  input(QCQP_SOLVER_Q) = DMatrix::zeros(nq_*n_, 1);
+  input(QCQP_SOLVER_R) = DMatrix::zeros(nq_, 1);
   input(QCQP_SOLVER_LBA) = DMatrix(bounds_sparsity, -std::numeric_limits<double>::infinity());
   input(QCQP_SOLVER_UBA) = DMatrix(bounds_sparsity,  std::numeric_limits<double>::infinity());
   input(QCQP_SOLVER_LBX) = DMatrix(x_sparsity,      -std::numeric_limits<double>::infinity());
   input(QCQP_SOLVER_UBX) = DMatrix(x_sparsity,       std::numeric_limits<double>::infinity());
 
   for (int i=0;i<nq_;++i) {
-    DMatrix Pi = input(QCQP_SOLVER_P)(ALL,Slice(i*n_,(i+1)*n_));
+    DMatrix Pi = input(QCQP_SOLVER_P)(ALL, Slice(i*n_, (i+1)*n_));
     casadi_assert_message(Pi.sparsity().isSymmetric(),
                           "We need Pi square & symmetric but got " << Pi.dimString()
                           << " for i = " << i << ".");

@@ -49,14 +49,14 @@ public:
   explicit CVodesInternal(const Function& f, const Function& g);
 
   /** \brief  Deep copy data members */
-  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+  virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
   /** \brief  Clone */
   virtual CVodesInternal* clone() const;
 
   /** \brief  Create a new integrator */
   virtual CVodesInternal* create(const Function& f, const Function& g) const
-  { return new CVodesInternal(f,g);}
+  { return new CVodesInternal(f, g);}
 
   /** \brief  Destructor */
   virtual ~CVodesInternal();
@@ -171,7 +171,7 @@ public:
   static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
                             void *user_data, N_Vector tmp);
   static int jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
-                             N_Vector xdotB, void *user_data ,N_Vector tmpB);
+                             N_Vector xdotB, void *user_data , N_Vector tmpB);
   static int djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,
                           N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB,
@@ -232,10 +232,10 @@ public:
   int ism_;
 
   // Calculate the error message map
-  static std::map<int,std::string> calc_flagmap();
+  static std::map<int, std::string> calc_flagmap();
 
     // Error message map
-  static std::map<int,std::string> flagmap;
+  static std::map<int, std::string> flagmap;
 
   // Throw error
   static void cvodes_error(const std::string& module, int flag);

@@ -85,7 +85,7 @@ namespace casadi {
     /// Nature of problem (always minimization)
     int objsen_;
 
-    /// Determines relation >,<,= in the linear constraints
+    /// Determines relation >,<, = in the linear constraints
     std::vector<char> sense_;
 
     /// Coefficients of matrix A (constraint Jacobian)

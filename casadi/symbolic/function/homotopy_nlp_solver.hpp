@@ -30,12 +30,12 @@
 
   Solves the following parametric nonlinear program (NLP):
   \verbatim
-  min          F(x,p,tau)
+  min          F(x, p, tau)
    x
 
   subject to
               LBX <=   x    <= UBX
-              LBG <= G(x,p) <= UBG
+              LBG <= G(x, p) <= UBG
                          p  == P
 
       nx: number of decision variables

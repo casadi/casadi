@@ -30,7 +30,7 @@ CVodesIntegrator::CVodesIntegrator() {
 }
 
 CVodesIntegrator::CVodesIntegrator(const Function& f, const Function& g) {
-  assignNode(new CVodesInternal(f,g));
+  assignNode(new CVodesInternal(f, g));
 }
 
 CVodesInternal* CVodesIntegrator::operator->() {

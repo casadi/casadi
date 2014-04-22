@@ -51,38 +51,38 @@ MXFunction::MXFunction(const MX& inputm, const MX& outputm) {
   inputv[0] = inputm;
   vector<MX> outputv(1);
   outputv[0] = outputm;
-  assignNode(new MXFunctionInternal(inputv,outputv));
+  assignNode(new MXFunctionInternal(inputv, outputv));
 }
 
 MXFunction::MXFunction(const MX& inputm, const std::vector<MX>& outputv) {
   vector<MX> inputv(1);
   inputv[0] = inputm;
-  assignNode(new MXFunctionInternal(inputv,outputv));
+  assignNode(new MXFunctionInternal(inputv, outputv));
 }
 
 MXFunction::MXFunction(const std::vector<MX>& inputv, const MX& outputm) {
   vector<MX> outputv(1);
   outputv[0] = outputm;
-  assignNode(new MXFunctionInternal(inputv,outputv));
+  assignNode(new MXFunctionInternal(inputv, outputv));
 }
 
 MXFunction::MXFunction(const std::vector<MX>& inputv, const std::vector<MX>& outputv) {
-  assignNode(new MXFunctionInternal(inputv,outputv));
+  assignNode(new MXFunctionInternal(inputv, outputv));
 }
 
 MXFunction::MXFunction(const std::vector<MX>& inputv, const IOSchemeVector< MX >& outputv) {
-  assignNode(new MXFunctionInternal(inputv,outputv));
+  assignNode(new MXFunctionInternal(inputv, outputv));
   setOutputScheme(outputv.scheme);
 }
 
 MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const std::vector<MX>& outputv) {
-  assignNode(new MXFunctionInternal(inputv,outputv));
+  assignNode(new MXFunctionInternal(inputv, outputv));
   setInputScheme(inputv.scheme);
 }
 
 
 MXFunction::MXFunction(const IOSchemeVector< MX >& inputv, const IOSchemeVector< MX >& outputv) {
-  assignNode(new MXFunctionInternal(inputv,outputv));
+  assignNode(new MXFunctionInternal(inputv, outputv));
   setInputScheme(inputv.scheme);
   setOutputScheme(outputv.scheme);
 }
@@ -121,15 +121,15 @@ int MXFunction::countNodes() const {
 }
 
 MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
-  return (*this)->jac(iind,oind,compact,symmetric);
+  return (*this)->jac(iind, oind, compact, symmetric);
 }
 
 MX MXFunction::grad(int iind, int oind) {
-  return (*this)->grad(iind,oind);
+  return (*this)->grad(iind, oind);
 }
 
 MX MXFunction::tang(int iind, int oind) {
-  return (*this)->tang(iind,oind);
+  return (*this)->tang(iind, oind);
 }
 
 SXFunction MXFunction::expand(const std::vector<SX>& inputv) {
@@ -145,7 +145,7 @@ int MXFunction::getWorkSize() const {
 }
 
 void MXFunction::generateLiftingFunctions(MXFunction& vdef_fcn, MXFunction& vinit_fcn) {
-  (*this)->generateLiftingFunctions(vdef_fcn,vinit_fcn);
+  (*this)->generateLiftingFunctions(vdef_fcn, vinit_fcn);
 }
 
 

@@ -38,30 +38,30 @@ namespace casadi {
 
       We can view this function as a being composed of a (\a nin, \a nout) grid of single-input,
       single-output primitive functions.\n
-      Each such primitive function \f$f_ {i,j} \forall i \in [0,nin-1], j \in [0,nout-1]\f$ can
-      map as \f$\mathbf {R}^{n,m}\to\mathbf{R}^{p,q}\f$,
-      in which n,m,p,q can take different values for every (i,j) pair.\n
+      Each such primitive function \f$f_ {i, j} \forall i \in [0, nin-1], j \in [0, nout-1]\f$ can
+      map as \f$\mathbf {R}^{n, m}\to\mathbf{R}^{p, q}\f$,
+      in which n, m, p, q can take different values for every (i, j) pair.\n
 
       When passing input, you specify which partition \f$i\f$ is active.
       You pass the numbers vectorized, as a vector of size \f$(n*m)\f$.\n
       When requesting output, you specify which partition \f$j\f$ is active.
       You get the numbers vectorized, as a vector of size \f$(p*q)\f$.\n
 
-      To calculate Jacobians, you need to have \f$(m=1,q=1)\f$.
+      To calculate Jacobians, you need to have \f$(m=1, q=1)\f$.
 
-      Write the Jacobian as \f$J_ {i,j} = \nabla f_{i,j} =
-      \frac {\partial f_{i,j}(\vec{x})}{\partial \vec{x}}\f$.
+      Write the Jacobian as \f$J_ {i, j} = \nabla f_{i, j} =
+      \frac {\partial f_{i, j}(\vec{x})}{\partial \vec{x}}\f$.
 
-      Using \f$\vec {v} \in \mathbf{R}^n\f$ as a forward seed:  <tt>setFwdSeed(v,i)</tt>\n
-      Retrieving \f$\vec {s}_f \in \mathbf{R}^p\f$ from:        <tt>getFwdSens(sf,j)</tt>\n
+      Using \f$\vec {v} \in \mathbf{R}^n\f$ as a forward seed:  <tt>setFwdSeed(v, i)</tt>\n
+      Retrieving \f$\vec {s}_f \in \mathbf{R}^p\f$ from:        <tt>getFwdSens(sf, j)</tt>\n
 
-      Using \f$\vec {w} \in \mathbf{R}^p\f$ as a forward seed:  <tt>setAdjSeed(w,j)</tt>\n
-      Retrieving \f$\vec {s}_a \in \mathbf{R}^n \f$ from:        <tt>getAdjSens(sa,i)</tt>\n
+      Using \f$\vec {w} \in \mathbf{R}^p\f$ as a forward seed:  <tt>setAdjSeed(w, j)</tt>\n
+      Retrieving \f$\vec {s}_a \in \mathbf{R}^n \f$ from:        <tt>getAdjSens(sa, i)</tt>\n
 
       We have the following relationships for function mapping from a row vector to a row vector:
 
-      \f$ \vec {s}_f = \nabla f_{i,j} . \vec{v}\f$ \n
-      \f$ \vec {s}_a = (\nabla f_{i,j})^T . \vec{w}\f$
+      \f$ \vec {s}_f = \nabla f_{i, j} . \vec{v}\f$ \n
+      \f$ \vec {s}_a = (\nabla f_{i, j})^T . \vec{w}\f$
 
       Some quantities in these formulas must be transposed: \n
       input  col: transpose \f$ \vec {v} \f$ and \f$\vec{s}_a\f$ \n
@@ -178,14 +178,14 @@ namespace casadi {
     Function jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     Function jacobian(const std::string& iind,  int oind=0, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(inputSchemeEntry(iind),oind,compact,symmetric);
+        return jacobian(inputSchemeEntry(iind), oind, compact, symmetric);
     }
     Function jacobian(int iind, const std::string& oind, bool compact=false, bool symmetric=false) {
-        return jacobian(iind,outputSchemeEntry(oind),compact,symmetric);
+        return jacobian(iind, outputSchemeEntry(oind), compact, symmetric);
     }
     Function jacobian(const std::string& iind, const std::string& oind, bool compact=false,
                       bool symmetric=false) {
-        return jacobian(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric);
+        return jacobian(inputSchemeEntry(iind), outputSchemeEntry(oind), compact, symmetric);
     }
     ///@}
 
@@ -204,13 +204,13 @@ namespace casadi {
      */
     Function gradient(int iind=0, int oind=0);
     Function gradient(const std::string& iind, int oind=0) {
-        return gradient(inputSchemeEntry(iind),oind);
+        return gradient(inputSchemeEntry(iind), oind);
     }
     Function gradient(int iind, const std::string& oind) {
-        return gradient(iind,outputSchemeEntry(oind));
+        return gradient(iind, outputSchemeEntry(oind));
     }
     Function gradient(const std::string& iind, const std::string& oind) {
-        return gradient(inputSchemeEntry(iind),outputSchemeEntry(oind));
+        return gradient(inputSchemeEntry(iind), outputSchemeEntry(oind));
     }
     ///@}
 
@@ -225,11 +225,11 @@ namespace casadi {
      */
     Function tangent(int iind=0, int oind=0);
     Function tangent(const std::string& iind, int oind=0)
-    { return tangent(inputSchemeEntry(iind),oind); }
+    { return tangent(inputSchemeEntry(iind), oind); }
     Function tangent(int iind, const std::string& oind)
-    { return tangent(iind,outputSchemeEntry(oind)); }
+    { return tangent(iind, outputSchemeEntry(oind)); }
     Function tangent(const std::string& iind, const std::string& oind)
-    { return tangent(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
+    { return tangent(inputSchemeEntry(iind), outputSchemeEntry(oind)); }
     ///@}
 
     ///@{
@@ -243,11 +243,11 @@ namespace casadi {
      */
     Function hessian(int iind=0, int oind=0);
     Function hessian(const std::string& iind, int oind=0)
-    { return hessian(inputSchemeEntry(iind),oind); }
+    { return hessian(inputSchemeEntry(iind), oind); }
     Function hessian(int iind, const std::string& oind)
-    { return hessian(iind,outputSchemeEntry(oind)); }
+    { return hessian(iind, outputSchemeEntry(oind)); }
     Function hessian(const std::string& iind, const std::string& oind)
-    { return hessian(inputSchemeEntry(iind),outputSchemeEntry(oind)); }
+    { return hessian(inputSchemeEntry(iind), outputSchemeEntry(oind)); }
     ///@}
 
     /** \brief Generate a Jacobian function of all the inputs elements with respect to all
@@ -287,9 +287,9 @@ namespace casadi {
     ///@{
     /// Functor shorthand for evaluation, two arguments (only C++)
     std::vector<DMatrix> operator()(const DMatrix& arg0, const DMatrix& arg1)
-    { return call(toVector(arg0,arg1));}
-    std::vector<SX> operator()(const SX& arg0, const SX& arg1) { return call(toVector(arg0,arg1));}
-    std::vector<MX> operator()(const MX& arg0, const MX& arg1) { return call(toVector(arg0,arg1));}
+    { return call(toVector(arg0, arg1));}
+    std::vector<SX> operator()(const SX& arg0, const SX& arg1) { return call(toVector(arg0, arg1));}
+    std::vector<MX> operator()(const MX& arg0, const MX& arg1) { return call(toVector(arg0, arg1));}
     ///@}
 #endif // SWIG
 
@@ -357,25 +357,25 @@ NOTE: Does _not_ take ownership, only weak references to the derivatives are kep
     Sparsity& jacSparsity(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
     Sparsity& jacSparsity(const std::string &iind, int oind=0, bool compact=false,
                           bool symmetric=false) {
-        return jacSparsity(inputSchemeEntry(iind),oind,compact,symmetric); }
+        return jacSparsity(inputSchemeEntry(iind), oind, compact, symmetric); }
     Sparsity& jacSparsity(int iind, const std::string &oind, bool compact=false,
                           bool symmetric=false) {
-        return jacSparsity(iind,outputSchemeEntry(oind),compact,symmetric); }
+        return jacSparsity(iind, outputSchemeEntry(oind), compact, symmetric); }
     Sparsity& jacSparsity(const std::string &iind, const std::string &oind,
                           bool compact=false, bool symmetric=false) {
-        return jacSparsity(inputSchemeEntry(iind),outputSchemeEntry(oind),compact,symmetric); }
+        return jacSparsity(inputSchemeEntry(iind), outputSchemeEntry(oind), compact, symmetric); }
     ///@}
 
     ///@{
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const Sparsity& sp, int iind, int oind, bool compact=false);
     void setJacSparsity(const Sparsity& sp, const std::string &iind, int oind, bool compact=false) {
-        setJacSparsity(sp,inputSchemeEntry(iind),oind,compact); }
+        setJacSparsity(sp, inputSchemeEntry(iind), oind, compact); }
     void setJacSparsity(const Sparsity& sp, int iind, const std::string &oind, bool compact=false) {
-        setJacSparsity(sp,iind,outputSchemeEntry(oind),compact); }
+        setJacSparsity(sp, iind, outputSchemeEntry(oind), compact); }
     void setJacSparsity(const Sparsity& sp, const std::string &iind, const std::string &oind,
                         bool compact=false) {
-        setJacSparsity(sp,inputSchemeEntry(iind),outputSchemeEntry(oind),compact); }
+        setJacSparsity(sp, inputSchemeEntry(iind), outputSchemeEntry(oind), compact); }
     ///@}
 
     /** \brief Export / Generate C code for the function */

@@ -49,7 +49,7 @@ namespace casadi {
 
     // Start with vectors of zero length
     this->s=this->x=this->z=this->q=this->ci=this->cd=this->pi=this->pd=this->p=this->y=
-        this->u=this->path=this->point = SX::zeros(0,1);
+        this->u=this->path=this->point = SX::zeros(0, 1);
   }
 
   void SymbolicOCP::parseFMI(const std::string& filename) {
@@ -178,7 +178,7 @@ namespace casadi {
           }
 
           // Add to list of variables
-          addVariable(qn,var);
+          addVariable(qn, var);
 
           // Sort expression
           switch(var.category) {
@@ -232,7 +232,7 @@ namespace casadi {
         // Get the variable and binding expression
         Variable& var = readVariable(beq[0]);
         SX bexpr = readExpr(beq[1][0]);
-        setBeq(var.v,bexpr.toScalar());
+        setBeq(var.v, bexpr.toScalar());
       }
     }
 
@@ -312,7 +312,7 @@ namespace casadi {
           // Allocate all the timed variables
           for(int k=0; k<tpnode[i].size(); ++k) {
             string qn = qualifiedName(tpnode[i][k]);
-            atTime(qn,value,true);
+            atTime(qn, value, true);
           }
         }
       }
@@ -389,7 +389,7 @@ namespace casadi {
             }
 
             // Add to list of variables and outputs
-            addVariable(ss.str(),v);
+            addVariable(ss.str(), v);
             this->point.append(v.v);
           }
         } else if(onode.checkName("opt:Constraints") || onode.checkName("opt:PathConstraints")) {
@@ -417,7 +417,7 @@ namespace casadi {
             }
 
             // Add to list of variables and outputs
-            addVariable(ss.str(),v);
+            addVariable(ss.str(), v);
             this->path.append(v.v);
           }
         } else {
@@ -504,11 +504,11 @@ namespace casadi {
       SX ex = readExpr(node[n-1]);
 
       // Evaluate ifs
-      for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i]),readExpr(node[i+1]),ex);
+      for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i]), readExpr(node[i+1]), ex);
 
       return ex;
     } else if(name.compare("Pow")==0) {
-      return pow(readExpr(node[0]),readExpr(node[1]));
+      return pow(readExpr(node[0]), readExpr(node[1]));
     } else if(name.compare("RealLiteral")==0) {
       double val;
       node.getText(val);
@@ -712,7 +712,7 @@ namespace casadi {
       if(tf==tf) qv.nominal = this->tf; // if not not-a-number
 
       // Add to the list of variables
-      addVariable(q_name.str(),qv);
+      addVariable(q_name.str(), qv);
 
       // Add to the quadrature states
       this->q.append(qv.v);
@@ -731,12 +731,12 @@ namespace casadi {
   void SymbolicOCP::eliminateQuadratureStates() {
     // Move all the quadratures to the list of differential states
     this->x.append(this->q);
-    this->q = SX::zeros(0,1);
+    this->q = SX::zeros(0, 1);
   }
 
   void SymbolicOCP::scaleVariables() {
     // Gather variables and expressions to replace
-    vector<SXElement> v_id,v_rep,ex_rep;
+    vector<SXElement> v_id, v_rep, ex_rep;
     for(VarMap::iterator it=varmap_.begin(); it!=varmap_.end(); ++it) {
       if(it->second.nominal!=1) {
         Variable& v=it->second;
@@ -770,7 +770,7 @@ namespace casadi {
     ex.push_back(this->lterm);
 
     // Substitute all at once (more efficient since they may have common subexpressions)
-    ex = substitute(ex,vector<SX>(1,v_id),vector<SX>(1,v_rep));
+    ex = substitute(ex, vector<SX>(1, v_id), vector<SX>(1, v_rep));
 
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
@@ -809,7 +809,7 @@ namespace casadi {
     ex.push_back(beq(this->pd));
 
     // Substitute all at once (since they may have common subexpressions)
-    ex = substitute(ex,vector<SX>(1,this->pi),vector<SX>(1,beq(this->pi)));
+    ex = substitute(ex, vector<SX>(1, this->pi), vector<SX>(1, beq(this->pi)));
 
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
@@ -830,13 +830,13 @@ namespace casadi {
     if(this->pd.isEmpty()) return;
 
     // Find out which dependent parameter depends on which binding equation
-    SXFunction f(this->pd,this->pd - beq(this->pd));
+    SXFunction f(this->pd, this->pd - beq(this->pd));
     f.init();
     Sparsity sp = f.jacSparsity();
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
+    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Permute variables
     this->pd = this->pd(colperm);
@@ -851,13 +851,13 @@ namespace casadi {
 
     // Sort the equations by causality
     SX pd_def = beq(this->pd);
-    substituteInPlace(this->pd,pd_def,false);
+    substituteInPlace(this->pd, pd_def, false);
 
     // Make sure that the dependent variables have been properly eliminated from the definitions
-    casadi_assert(!dependsOn(pd_def,this->pd));
+    casadi_assert(!dependsOn(pd_def, this->pd));
 
     // Save new binding equations
-    setBeq(this->pd,pd_def);
+    setBeq(this->pd, pd_def);
   }
 
   void SymbolicOCP::eliminateDependentParameters() {
@@ -879,7 +879,7 @@ namespace casadi {
     ex.push_back(this->lterm);
 
     // Substitute all at once (since they may have common subexpressions)
-    ex = substitute(ex,vector<SX>(1,this->pd),vector<SX>(1,beq(this->pd)));
+    ex = substitute(ex, vector<SX>(1, this->pd), vector<SX>(1, beq(this->pd)));
 
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
@@ -899,13 +899,13 @@ namespace casadi {
     if(this->y.isEmpty()) return;
 
     // Find out which dependent parameter depends on which binding equation
-    SXFunction f(this->y,this->y - beq(this->y));
+    SXFunction f(this->y, this->y - beq(this->y));
     f.init();
     Sparsity sp = f.jacSparsity();
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
+    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Permute variables
     this->y = this->y(colperm);
@@ -920,13 +920,13 @@ namespace casadi {
 
     // Sort the equations by causality
     SX y_def = beq(this->y);
-    substituteInPlace(this->y,y_def,false);
+    substituteInPlace(this->y, y_def, false);
 
     // Make sure that the outputs have been properly eliminated from the output definitions
-    casadi_assert(!dependsOn(y_def,this->y));
+    casadi_assert(!dependsOn(y_def, this->y));
 
     // Save new binding equations
-    setBeq(this->y,y_def);
+    setBeq(this->y, y_def);
   }
 
   void SymbolicOCP::eliminateOutputs() {
@@ -948,7 +948,7 @@ namespace casadi {
     ex.push_back(this->lterm);
 
     // Substitute all at once (since they may have common subexpressions)
-    ex = substitute(ex,vector<SX>(1,this->y),vector<SX>(1,beq(this->y)));
+    ex = substitute(ex, vector<SX>(1, this->y), vector<SX>(1, beq(this->y)));
 
     // Get the modified expressions
     vector<SX>::const_iterator it=ex.begin();
@@ -970,7 +970,7 @@ namespace casadi {
     double time1 = clock();
 
     // Variables
-    enum Variables {T,X,XDOT,Z,PI,PF,U,NUM_VAR};
+    enum Variables {T, X, XDOT, Z, PI, PF, U, NUM_VAR};
     vector<SX > v(NUM_VAR); // all variables
     v[T] = this->t;
     v[X] = this->x;
@@ -980,30 +980,30 @@ namespace casadi {
     v[PF] = this->p;
     v[U] = this->u;
 
-    // Create the jacobian of the implicit equations with respect to [x,z,p,u]
+    // Create the jacobian of the implicit equations with respect to [x, z, p, u]
     SX xz;
     xz.append(v[X]);
     xz.append(v[Z]);
     xz.append(v[PI]);
     xz.append(v[PF]);
     xz.append(v[U]);
-    SXFunction fcn = SXFunction(xz,ode(this->x));
-    SXFunction J(v,fcn.jac());
+    SXFunction fcn = SXFunction(xz, ode(this->x));
+    SXFunction J(v, fcn.jac());
 
     // Evaluate the Jacobian in the starting point
     J.init();
-    J.setInput(0.0,T);
-    J.setInput(start(this->x,true),X);
+    J.setInput(0.0, T);
+    J.setInput(start(this->x, true), X);
     J.input(XDOT).setAll(0.0);
-    J.setInput(start(this->z,true),Z);
-    J.setInput(start(this->pi,true),PI);
-    J.setInput(start(this->p,true),PF);
-    J.setInput(start(this->u,true),U);
+    J.setInput(start(this->z, true), Z);
+    J.setInput(start(this->pi, true), PI);
+    J.setInput(start(this->p, true), PF);
+    J.setInput(start(this->u, true), U);
     J.evaluate();
 
     // Get the maximum of every row
     Matrix<double> &J0 = J.output();
-    vector<double> scale(J0.size1(),0.0); // scaling factors
+    vector<double> scale(J0.size1(), 0.0); // scaling factors
     for(int cc=0; cc<J0.size2(); ++cc) {
       // Loop over non-zero entries of the column
       for(int el=J0.colind(cc); el<J0.colind(cc+1); ++el) {
@@ -1012,7 +1012,7 @@ namespace casadi {
 
         // The scaling factor is the maximum norm, ignoring not-a-number entries
         if(!isnan(J0.at(el))) {
-          scale[rr] = std::max(scale[rr],fabs(J0.at(el)));
+          scale[rr] = std::max(scale[rr], fabs(J0.at(el)));
         }
       }
     }
@@ -1026,7 +1026,7 @@ namespace casadi {
     }
 
     // Scale the equations
-    setOde(this->x,ode(this->x)/scale);
+    setOde(this->x, ode(this->x)/scale);
 
     double time2 = clock();
     double dt = (time2-time1)/CLOCKS_PER_SEC;
@@ -1038,13 +1038,13 @@ namespace casadi {
     if(this->x.isEmpty()) return;
 
     // Find out which differential equation depends on which differential state
-    SXFunction f(der(this->s),this->dae);
+    SXFunction f(der(this->s), this->dae);
     f.init();
     Sparsity sp = f.jacSparsity();
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
+    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Permute equations
     this->dae = this->dae(rowperm);
@@ -1058,13 +1058,13 @@ namespace casadi {
     if(this->z.isEmpty()) return;
 
     // Find out which algebraic equation depends on which algebraic state
-    SXFunction f(this->z,this->alg);
+    SXFunction f(this->z, this->alg);
     f.init();
     Sparsity sp = f.jacSparsity();
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
+    sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Permute equations
     this->alg = this->alg(rowperm);
@@ -1081,7 +1081,7 @@ namespace casadi {
     if(this->s.isEmpty()) return;
 
     // Write the ODE as a function of the state derivatives
-    SXFunction f(der(this->s),this->dae);
+    SXFunction f(der(this->s), this->dae);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which
@@ -1090,8 +1090,8 @@ namespace casadi {
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,
-                                  coarse_rowblock,coarse_colblock);
+    int nb = sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+                                  coarse_rowblock, coarse_colblock);
 
     // Permute equations
     this->dae = this->dae(rowperm);
@@ -1100,7 +1100,7 @@ namespace casadi {
     this->s = this->s(colperm);
 
     // Now write the sorted ODE as a function of the state derivatives
-    f = SXFunction(der(this->s),this->dae);
+    f = SXFunction(der(this->s), this->dae);
     f.init();
 
     // Get the Jacobian
@@ -1116,22 +1116,22 @@ namespace casadi {
       int bs = rowblock[b+1] - rowblock[b];
 
       // Get variables in the block
-      SX xb = this->s(Slice(colblock[b],colblock[b+1]));
+      SX xb = this->s(Slice(colblock[b], colblock[b+1]));
 
       // Get equations in the block
-      SX fb = this->dae(Slice(rowblock[b],rowblock[b+1]));
+      SX fb = this->dae(Slice(rowblock[b], rowblock[b+1]));
 
       // Get local Jacobian
-      SX Jb = J(Slice(rowblock[b],rowblock[b+1]),Slice(colblock[b],colblock[b+1]));
+      SX Jb = J(Slice(rowblock[b], rowblock[b+1]), Slice(colblock[b], colblock[b+1]));
 
       // If Jb depends on xb, then the state derivative does not enter linearly
       // in the ODE and we cannot solve for the state derivative
-      casadi_assert_message(!dependsOn(Jb,der(xb)),
+      casadi_assert_message(!dependsOn(Jb, der(xb)),
                             "Cannot find an explicit expression for variable(s) " << xb);
 
       // Divide fb into a part which depends on vb and a part which doesn't according to
       // "fb == mul(Jb,vb) + fb_res"
-      SX fb_res = substitute(fb,der(xb),SX::zeros(xb.sparsity()));
+      SX fb_res = substitute(fb, der(xb), SX::zeros(xb.sparsity()));
       SX fb_exp;
 
       // Solve for vb
@@ -1148,12 +1148,12 @@ namespace casadi {
     }
 
     // Eliminate inter-dependencies
-    substituteInPlace(der(this->s),new_ode,false);
+    substituteInPlace(der(this->s), new_ode, false);
 
     // Add to explicit differential states and ODE
-    setOde(this->s,new_ode);
+    setOde(this->s, new_ode);
     this->x.append(this->s);
-    this->dae = this->s = SX::zeros(0,1);
+    this->dae = this->s = SX::zeros(0, 1);
   }
 
   void SymbolicOCP::eliminateAlgebraic() {
@@ -1161,7 +1161,7 @@ namespace casadi {
     if(this->z.isEmpty()) return;
 
     // Write the algebraic equations as a function of the algebraic states
-    SXFunction f(this->z,alg);
+    SXFunction f(this->z, alg);
     f.init();
 
     // Get the sparsity of the Jacobian which can be used to determine which
@@ -1170,8 +1170,8 @@ namespace casadi {
 
     // BLT transformation
     vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
-    int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,
-                                  coarse_rowblock,coarse_colblock);
+    int nb = sp.dulmageMendelsohn(rowperm, colperm, rowblock, colblock,
+                                  coarse_rowblock, coarse_colblock);
 
     // Permute equations
     this->alg = this->alg(rowperm);
@@ -1180,7 +1180,7 @@ namespace casadi {
     this->z = this->z(colperm);
 
     // Rewrite the sorted algebraic equations as a function of the algebraic states
-    f = SXFunction(this->z,this->alg);
+    f = SXFunction(this->z, this->alg);
     f.init();
 
     // Get the Jacobian
@@ -1199,16 +1199,16 @@ namespace casadi {
       int bs = rowblock[b+1] - rowblock[b];
 
       // Get local variables
-      SX zb = this->z(Slice(colblock[b],colblock[b+1]));
+      SX zb = this->z(Slice(colblock[b], colblock[b+1]));
 
       // Get local equations
-      SX fb = this->alg(Slice(rowblock[b],rowblock[b+1]));
+      SX fb = this->alg(Slice(rowblock[b], rowblock[b+1]));
 
       // Get local Jacobian
-      SX Jb = J(Slice(rowblock[b],rowblock[b+1]),Slice(colblock[b],colblock[b+1]));
+      SX Jb = J(Slice(rowblock[b], rowblock[b+1]), Slice(colblock[b], colblock[b+1]));
 
       // If Jb depends on zb, then we cannot (currently) solve for it explicitly
-      if(dependsOn(Jb,zb)) {
+      if(dependsOn(Jb, zb)) {
 
         // Add the equations to the new list of algebraic equations
         f_imp.append(fb);
@@ -1220,7 +1220,7 @@ namespace casadi {
 
         // Divide fb into a part which depends on vb and a part which doesn't
         // according to "fb == mul(Jb,vb) + fb_res"
-        SX fb_res = substitute(fb,zb,SX::zeros(zb.sparsity()));
+        SX fb_res = substitute(fb, zb, SX::zeros(zb.sparsity()));
 
         // Solve for vb
         SX fb_exp;
@@ -1239,12 +1239,12 @@ namespace casadi {
     }
 
     // Eliminate inter-dependencies in fb_exp
-    substituteInPlace(z_exp,f_exp,false);
+    substituteInPlace(z_exp, f_exp, false);
 
     // Add to the beginning of the dependent variables
     // (since the other dependent variable might depend on them)
-    this->y = vertcat(z_exp,this->y);
-    setBeq(z_exp,f_exp);
+    this->y = vertcat(z_exp, this->y);
+    setBeq(z_exp, f_exp);
 
     // Save new algebraic equations
     this->z = z_imp;
@@ -1262,7 +1262,7 @@ namespace casadi {
     eliminateAlgebraic();
 
     // Error if still algebraic variables
-    casadi_assert_message(this->z.isEmpty(),"Failed to eliminate algebraic variables");
+    casadi_assert_message(this->z.isEmpty(), "Failed to eliminate algebraic variables");
   }
 
   const Variable& SymbolicOCP::variable(const std::string& name) const {
@@ -1403,7 +1403,7 @@ namespace casadi {
     datfile << endl;
 
     // Parameter properties
-    SX p = vertcat(this->pi,this->p);
+    SX p = vertcat(this->pi, this->p);
     if(!p.isEmpty()) {
       datfile << "*  global model parameter start values, scale factors, and bounds" << endl;
       datfile << "p" << endl;
@@ -1613,7 +1613,7 @@ namespace casadi {
   }
 
   SX SymbolicOCP::beq(const SX& var) const {
-    return attribute(&SymbolicOCP::beq,var);
+    return attribute(&SymbolicOCP::beq, var);
   }
 
   void SymbolicOCP::setBeq(const std::string& name, const SX& val) {
@@ -1621,7 +1621,7 @@ namespace casadi {
   }
 
   void SymbolicOCP::setBeq(const SX& var, const SX& val) {
-    setAttribute(&SymbolicOCP::setBeq,var,val);
+    setAttribute(&SymbolicOCP::setBeq, var, val);
   }
 
   SX SymbolicOCP::ode(const std::string& name) const {
@@ -1645,16 +1645,16 @@ namespace casadi {
     casadi_assert(var.isVector() && var.isSymbolic());
     casadi_assert(var.sparsity()==val.sparsity());
     for(int i=0; i<var.size(); ++i) {
-      setOde(var.at(i).getName(),val.at(i));
+      setOde(var.at(i).getName(), val.at(i));
     }
   }
 
   SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate) const {
-    return variable(name).atTime(t,allocate);
+    return variable(name).atTime(t, allocate);
   }
 
   SX SymbolicOCP::atTime(const std::string& name, double t, bool allocate) {
-    return variable(name).atTime(t,allocate);
+    return variable(name).atTime(t, allocate);
   }
 
   void SymbolicOCP::separateAlgebraic() {
@@ -1664,7 +1664,7 @@ namespace casadi {
     // We investigate the interdependencies in sdot -> dae
     vector<SX> f_in;
     f_in.push_back(der(this->s));
-    SXFunction f(f_in,this->dae);
+    SXFunction f(f_in, this->dae);
     f.init();
 
     // Number of s
@@ -1679,10 +1679,10 @@ namespace casadi {
     f.spInit(true);
 
     // Seed all inputs
-    std::fill(f_sdot,f_sdot+ns,bvec_t(1));
+    std::fill(f_sdot, f_sdot+ns, bvec_t(1));
 
     // Propagate to f_dae
-    std::fill(f_dae,f_dae+ns,bvec_t(0));
+    std::fill(f_dae, f_dae+ns, bvec_t(0));
     f.spEvaluate(true);
 
     // Get the new differential and algebraic equations
@@ -1700,14 +1700,14 @@ namespace casadi {
     f.spInit(false);
 
     // Seed all outputs
-    std::fill(f_dae,f_dae+ns,bvec_t(1));
+    std::fill(f_dae, f_dae+ns, bvec_t(1));
 
     // Propagate to f_sdot
-    std::fill(f_sdot,f_sdot+ns,bvec_t(0));
+    std::fill(f_sdot, f_sdot+ns, bvec_t(0));
     f.spEvaluate(false);
 
     // Get the new algebraic variables and new states
-    SX new_s,new_z;
+    SX new_s, new_z;
     for(int i=0; i<ns; ++i) {
       if(f_sdot[i]==bvec_t(1)) {
         new_s.append(this->s[i]);
@@ -1771,9 +1771,9 @@ namespace casadi {
   void SymbolicOCP::setNominal(const SX& var, const std::vector<double>& val) {
     casadi_assert_message(var.isVector() && var.isSymbolic(),
                           "SymbolicOCP::nominal: Argument must be a symbolic vector");
-    casadi_assert_message(var.size()==var.size(),"SymbolicOCP::nominal: Dimension mismatch");
+    casadi_assert_message(var.size()==var.size(), "SymbolicOCP::nominal: Dimension mismatch");
     for(int i=0; i<val.size(); ++i) {
-      setNominal(var.at(i).getName(),val.at(i));
+      setNominal(var.at(i).getName(), val.at(i));
     }
   }
 
@@ -1782,7 +1782,7 @@ namespace casadi {
                           "SymbolicOCP::attribute: Argument must be a symbolic vector");
     std::vector<double> ret(var.size());
     for(int i=0; i<ret.size(); ++i) {
-      ret[i] = (this->*f)(var.at(i).getName(),normalized);
+      ret[i] = (this->*f)(var.at(i).getName(), normalized);
     }
     return ret;
   }
@@ -1801,9 +1801,9 @@ namespace casadi {
                                  bool normalized) {
     casadi_assert_message(var.isVector() && var.isSymbolic(),
                           "SymbolicOCP::setAttribute: Argument must be a symbolic vector");
-    casadi_assert_message(var.size()==val.size(),"SymbolicOCP::setAttribute: Dimension mismatch");
+    casadi_assert_message(var.size()==val.size(), "SymbolicOCP::setAttribute: Dimension mismatch");
     for(int i=0; i<val.size(); ++i) {
-      (this->*f)(var.at(i).getName(),val.at(i),normalized);
+      (this->*f)(var.at(i).getName(), val.at(i), normalized);
     }
   }
 
@@ -1813,7 +1813,7 @@ namespace casadi {
     casadi_assert_message(var.sparsity()==val.sparsity(),
                           "SymbolicOCP::setAttribute: Sparsity mismatch");
     for(int i=0; i<val.size(); ++i) {
-      (this->*f)(var.at(i).getName(),val.at(i));
+      (this->*f)(var.at(i).getName(), val.at(i));
     }
   }
 
@@ -1822,7 +1822,7 @@ namespace casadi {
   }
 
   SX SymbolicOCP::min(const SX& var) const {
-    return attribute(&SymbolicOCP::min,var);
+    return attribute(&SymbolicOCP::min, var);
   }
 
   void SymbolicOCP::setMin(const std::string& name, const SX& val) {
@@ -1830,7 +1830,7 @@ namespace casadi {
   }
 
   void SymbolicOCP::setMin(const SX& var, const SX& val) {
-    setAttribute(&SymbolicOCP::setMin,var,val);
+    setAttribute(&SymbolicOCP::setMin, var, val);
   }
 
   SX SymbolicOCP::max(const std::string& name) const {
@@ -1838,7 +1838,7 @@ namespace casadi {
   }
 
   SX SymbolicOCP::max(const SX& var) const {
-    return attribute(&SymbolicOCP::max,var);
+    return attribute(&SymbolicOCP::max, var);
   }
 
   void SymbolicOCP::setMax(const std::string& name, const SX& val) {
@@ -1846,7 +1846,7 @@ namespace casadi {
   }
 
   void SymbolicOCP::setMax(const SX& var, const SX& val) {
-    setAttribute(&SymbolicOCP::setMax,var,val);
+    setAttribute(&SymbolicOCP::setMax, var, val);
   }
 
   SX SymbolicOCP::initialGuess(const std::string& name) const {
@@ -1854,7 +1854,7 @@ namespace casadi {
   }
 
   SX SymbolicOCP::initialGuess(const SX& var) const {
-    return attribute(&SymbolicOCP::initialGuess,var);
+    return attribute(&SymbolicOCP::initialGuess, var);
   }
 
   void SymbolicOCP::setInitialGuess(const std::string& name, const SX& val) {
@@ -1862,7 +1862,7 @@ namespace casadi {
   }
 
   void SymbolicOCP::setInitialGuess(const SX& var, const SX& val) {
-    setAttribute(&SymbolicOCP::setInitialGuess,var,val);
+    setAttribute(&SymbolicOCP::setInitialGuess, var, val);
   }
 
   double SymbolicOCP::start(const std::string& name, bool normalized) const {
@@ -1871,7 +1871,7 @@ namespace casadi {
   }
 
   std::vector<double> SymbolicOCP::start(const SX& var, bool normalized) const {
-    return attribute(&SymbolicOCP::start,var,normalized);
+    return attribute(&SymbolicOCP::start, var, normalized);
   }
 
   void SymbolicOCP::setStart(const std::string& name, double val, bool normalized) {
@@ -1880,7 +1880,7 @@ namespace casadi {
   }
 
   void SymbolicOCP::setStart(const SX& var, const std::vector<double>& val, bool normalized) {
-    setAttribute(&SymbolicOCP::setStart,var,val,normalized);
+    setAttribute(&SymbolicOCP::setStart, var, val, normalized);
   }
 
   double SymbolicOCP::derivativeStart(const std::string& name, bool normalized) const {
@@ -1889,7 +1889,7 @@ namespace casadi {
   }
 
   std::vector<double> SymbolicOCP::derivativeStart(const SX& var, bool normalized) const {
-    return attribute(&SymbolicOCP::derivativeStart,var,normalized);
+    return attribute(&SymbolicOCP::derivativeStart, var, normalized);
   }
 
   void SymbolicOCP::setDerivativeStart(const std::string& name, double val, bool normalized) {
@@ -1899,7 +1899,7 @@ namespace casadi {
 
   void SymbolicOCP::setDerivativeStart(const SX& var, const std::vector<double>& val,
                                        bool normalized) {
-    setAttribute(&SymbolicOCP::setDerivativeStart,var,val,normalized);
+    setAttribute(&SymbolicOCP::setDerivativeStart, var, val, normalized);
   }
 
 } // namespace casadi

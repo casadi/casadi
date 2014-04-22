@@ -68,7 +68,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const Function& f, const Function& g) { return CVodesIntegrator(f,g);}
+  static Integrator creator(const Function& f, const Function& g) { return CVodesIntegrator(f, g);}
   #ifdef SWIG
   %nocallback;
   #endif

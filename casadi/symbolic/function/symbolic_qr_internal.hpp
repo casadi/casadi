@@ -42,7 +42,7 @@ namespace casadi {
     virtual SymbolicQRInternal* clone() const { return new SymbolicQRInternal(*this);}
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     // Initialize
     virtual void init();

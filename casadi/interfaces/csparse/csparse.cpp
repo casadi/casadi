@@ -29,7 +29,7 @@ namespace casadi {
   }
 
   CSparse::CSparse(const Sparsity& sp, int nrhs) {
-    assignNode(new CSparseInternal(sp,nrhs));
+    assignNode(new CSparseInternal(sp, nrhs));
   }
 
   CSparseInternal* CSparse::operator->() {

@@ -41,54 +41,54 @@ SXFunction::SXFunction() {
 }
 
 SXFunction::SXFunction(const SX& arg, const SX& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(1,arg),
-                                    vector<SX>(1,res)));
+  assignNode(new SXFunctionInternal(vector<SX>(1, arg),
+                                    vector<SX>(1, res)));
 }
 
 SXFunction::SXFunction(const vector< vector<SXElement> >& arg,
                        const vector< vector<SXElement> >& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(arg.begin(),arg.end()),
-                                    vector<SX>(res.begin(),res.end())));
+  assignNode(new SXFunctionInternal(vector<SX>(arg.begin(), arg.end()),
+                                    vector<SX>(res.begin(), res.end())));
 }
 
 SXFunction::SXFunction(const vector< SX>& arg, const vector<SX>& res) {
-  assignNode(new SXFunctionInternal(arg,res));
+  assignNode(new SXFunctionInternal(arg, res));
 }
 
 SXFunction::SXFunction(const vector< SX>& arg, const IOSchemeVector< SX >& res) {
-  assignNode(new SXFunctionInternal(arg,res));
+  assignNode(new SXFunctionInternal(arg, res));
   setOutputScheme(res.scheme);
 }
 
 SXFunction::SXFunction(const IOSchemeVector< SX >& arg, const vector< SX>& res) {
-  assignNode(new SXFunctionInternal(arg,res));
+  assignNode(new SXFunctionInternal(arg, res));
   setInputScheme(arg.scheme);
 }
 
 SXFunction::SXFunction(const IOSchemeVector< SX >& arg, const IOSchemeVector< SX >& res) {
-  assignNode(new SXFunctionInternal(arg,res));
+  assignNode(new SXFunctionInternal(arg, res));
   setInputScheme(arg.scheme);
   setOutputScheme(res.scheme);
 }
 
 SXFunction::SXFunction(const vector< vector<SXElement> >& arg, const SX& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(arg.begin(),arg.end()),
-                                    vector<SX>(1,res)));
+  assignNode(new SXFunctionInternal(vector<SX>(arg.begin(), arg.end()),
+                                    vector<SX>(1, res)));
 }
 
 SXFunction::SXFunction(const vector< SX>& arg, const SX& res) {
   assignNode(new SXFunctionInternal(arg,
-                                    vector<SX>(1,res)));
+                                    vector<SX>(1, res)));
 }
 
 SXFunction::SXFunction(const SX& arg, const std::vector< std::vector<SXElement> >& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(1,arg),
-                                    vector<SX>(res.begin(),res.end())));
+  assignNode(new SXFunctionInternal(vector<SX>(1, arg),
+                                    vector<SX>(res.begin(), res.end())));
 
 }
 
 SXFunction::SXFunction(const SX& arg, const std::vector< SX>& res) {
-  assignNode(new SXFunctionInternal(vector<SX>(1,arg),
+  assignNode(new SXFunctionInternal(vector<SX>(1, arg),
                                     res));
 }
 
@@ -106,19 +106,19 @@ bool SXFunction::checkNode() const {
 }
 
 SX SXFunction::jac(int iind, int oind, bool compact, bool symmetric) {
-  return (*this)->jac(iind,oind,compact,symmetric);
+  return (*this)->jac(iind, oind, compact, symmetric);
 }
 
 SX SXFunction::grad(int iind, int oind) {
-  return (*this)->grad(iind,oind);
+  return (*this)->grad(iind, oind);
 }
 
 SX SXFunction::tang(int iind, int oind) {
-  return (*this)->tang(iind,oind);
+  return (*this)->tang(iind, oind);
 }
 
 SX SXFunction::hess(int iind, int oind) {
-  return (*this)->hess(iind,oind);
+  return (*this)->hess(iind, oind);
 }
 
 const SX& SXFunction::inputExpr(int ind) const {

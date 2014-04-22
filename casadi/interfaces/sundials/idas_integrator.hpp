@@ -77,7 +77,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const Function& f, const Function& g) { return IdasIntegrator(f,g);}
+  static Integrator creator(const Function& f, const Function& g) { return IdasIntegrator(f, g);}
   #ifdef SWIG
   %nocallback;
   #endif

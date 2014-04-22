@@ -88,7 +88,7 @@ namespace casadi {
     virtual Sparsity getJacSparsity(int iind, int oind, bool symmetric);
 
     /// Deep copy data members
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Functions
     std::vector<Function> funcs_;
@@ -103,7 +103,7 @@ namespace casadi {
     std::vector<int> copy_of_;
 
     /// Parallelization modes
-    enum Mode {SERIAL,OPENMP,MPI};
+    enum Mode {SERIAL, OPENMP, MPI};
 
     /// Mode
     Mode mode_;

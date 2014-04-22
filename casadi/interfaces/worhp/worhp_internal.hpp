@@ -83,8 +83,8 @@ namespace casadi {
     Params    worhp_p_;
     Control   worhp_c_;
 
-    std::map<int,std::string> status_;
-    std::map<std::string,opt_type> ops_;
+    std::map<int, std::string> status_;
+    std::map<std::string, opt_type> ops_;
 
     // Worhp callback functions
     bool eval_f(const double* x, double scale, double& obj_value);
@@ -116,10 +116,10 @@ namespace casadi {
     void passOptions();
 
     // Calculate the status message map
-    static std::map<int,std::string> calc_flagmap();
+    static std::map<int, std::string> calc_flagmap();
 
     // Error status map
-    static std::map<int,std::string> flagmap;
+    static std::map<int, std::string> flagmap;
 
   };
 

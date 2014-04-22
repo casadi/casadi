@@ -47,9 +47,9 @@ namespace casadi {
 
   void UnaryMX::printPart(std::ostream &stream, int part) const {
     if(part==0) {
-      casadi_math<double>::printPre(op_,stream);
+      casadi_math<double>::printPre(op_, stream);
     } else {
-      casadi_math<double>::printPost(op_,stream);
+      casadi_math<double>::printPost(op_, stream);
     }
   }
 
@@ -60,7 +60,7 @@ namespace casadi {
     const vector<double> &inputd = input[0]->data();
 
     for(int i=0; i<size(); ++i) {
-      casadi_math<double>::fun(op_,inputd[i],nan,outputd[i]);
+      casadi_math<double>::fun(op_, inputd[i], nan, outputd[i]);
     }
   }
 
@@ -71,7 +71,7 @@ namespace casadi {
     vector<SXElement> &od = output[0]->data();
 
     for(int el=0; el<size(); ++el) {
-      casadi_math<SXElement>::fun(op_,xd[el],0,od[el]);
+      casadi_math<SXElement>::fun(op_, xd[el], 0, od[el]);
     }
   }
 
@@ -83,7 +83,7 @@ namespace casadi {
     if(output_given) {
       f = *output[0];
     } else {
-      casadi_math<MX>::fun(op_,*input[0],dummy,f);
+      casadi_math<MX>::fun(op_, *input[0], dummy, f);
     }
 
     // Number of forward directions
@@ -92,7 +92,7 @@ namespace casadi {
     if(nfwd>0 || nadj>0) {
       // Get partial derivatives
       MX pd[2];
-      casadi_math<MX>::der(op_,*input[0],dummy,f,pd);
+      casadi_math<MX>::der(op_, *input[0], dummy, f, pd);
 
       // Propagate forward seeds
       for(int d=0; d<nfwd; ++d) {
@@ -120,7 +120,7 @@ namespace casadi {
     bvec_t *inputd = get_bvec_t(input[0]->data());
     bvec_t *outputd = get_bvec_t(output[0]->data());
     if(fwd) {
-      copy(inputd,inputd+size(),outputd);
+      copy(inputd, inputd+size(), outputd);
     } else {
       int nz = input[0]->data().size();
       for(int el=0; el<nz; ++el) {
@@ -135,9 +135,9 @@ namespace casadi {
                                   const std::vector<std::string>& res, CodeGenerator& gen) const {
     stream << "  for(i=0; i<" << sparsity().size() << "; ++i) ";
     stream << res.at(0) << "[i]=";
-    casadi_math<double>::printPre(op_,stream);
+    casadi_math<double>::printPre(op_, stream);
     stream << arg.at(0) << "[i]";
-    casadi_math<double>::printPost(op_,stream);
+    casadi_math<double>::printPost(op_, stream);
     stream << ";" << endl;
   }
 
@@ -184,25 +184,25 @@ namespace casadi {
   MX UnaryMX::getBinary(int op, const MX& y, bool scX, bool scY) const {
     switch(op_) {
     case OP_NEG:
-      if(op==OP_ADD) return y->getBinary(OP_SUB,dep(),scY,scX);
-      else if(op==OP_MUL) return -dep()->getBinary(OP_MUL,y,scX,scY);
-      else if(op==OP_DIV) return -dep()->getBinary(OP_DIV,y,scX,scY);
+      if(op==OP_ADD) return y->getBinary(OP_SUB, dep(), scY, scX);
+      else if(op==OP_MUL) return -dep()->getBinary(OP_MUL, y, scX, scY);
+      else if(op==OP_DIV) return -dep()->getBinary(OP_DIV, y, scX, scY);
       break;
     case OP_TWICE:
-      if(op==OP_SUB && y.isEqual(dep(),maxDepth())) return dep();
+      if(op==OP_SUB && y.isEqual(dep(), maxDepth())) return dep();
       break;
     case OP_SQ:
       if(op==OP_ADD && y.getOp()==OP_SQ) /*sum of squares:*/
         if((dep().getOp()==OP_SIN && y->dep().getOp()==OP_COS) ||
            (dep().getOp()==OP_COS && y->dep()->getOp()==OP_SIN)) /* sin^2(x)+sin^2(y) */
-          if(dep()->dep().isEqual(y->dep()->dep(),maxDepth())) /*sin^2(x) + cos^2(x) */
+          if(dep()->dep().isEqual(y->dep()->dep(), maxDepth())) /*sin^2(x) + cos^2(x) */
             return MX::ones(y.sparsity());
       break;
     default: break; // no rule
     }
 
     // Fallback to default implementation
-    return MXNode::getBinary(op,y,scX,scY);
+    return MXNode::getBinary(op, y, scX, scY);
   }
 
 } // namespace casadi

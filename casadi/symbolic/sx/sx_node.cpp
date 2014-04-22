@@ -114,7 +114,7 @@ namespace casadi {
 
   void SXNode::print(std::ostream &stream) const {
     long remaining_calls = max_num_calls_in_print_;
-    print(stream,remaining_calls);
+    print(stream, remaining_calls);
   }
 
   bool SXNode::marked() const {

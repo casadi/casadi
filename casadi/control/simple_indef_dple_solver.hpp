@@ -71,7 +71,7 @@ namespace casadi {
     #endif
     static DpleSolver creator(const std::vector< Sparsity > & A,
                               const std::vector< Sparsity > &V) {
-        return SimpleIndefDpleSolver(A,V);}
+        return SimpleIndefDpleSolver(A, V);}
     #ifdef SWIG
     %nocallback;
     #endif

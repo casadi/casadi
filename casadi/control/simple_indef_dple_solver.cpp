@@ -33,7 +33,7 @@ namespace casadi {
 
   SimpleIndefDpleSolver::SimpleIndefDpleSolver(const std::vector< Sparsity > & A,
                                                const std::vector< Sparsity > &V) {
-    assignNode(new SimpleIndefDpleInternal(A,V));
+    assignNode(new SimpleIndefDpleInternal(A, V));
   }
 
   SimpleIndefDpleInternal* SimpleIndefDpleSolver::operator->() {

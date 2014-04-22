@@ -38,10 +38,10 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   // Load the dll
 #ifdef _WIN32
   handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
-  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: "
+  casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
                         << bin_name_ << ". error code (WIN32): "<< GetLastError());
 
-  initPtr init = (initPtr)GetProcAddress(handle_,TEXT("init"));
+  initPtr init = (initPtr)GetProcAddress(handle_, TEXT("init"));
   if(init==0) throw CasadiException("ExternalFunctionInternal: no \"init\" found");
   getSparsityPtr getSparsity = (getSparsityPtr)GetProcAddress(handle_, TEXT("getSparsity"));
   if(getSparsity==0) throw CasadiException("ExternalFunctionInternal: no \"getSparsity\" found");
@@ -50,7 +50,7 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
 
 #else // _WIN32
   handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
-  casadi_assert_message(handle_!=0,"ExternalFunctionInternal: Cannot open function: "
+  casadi_assert_message(handle_!=0, "ExternalFunctionInternal: Cannot open function: "
                         << bin_name_ << ". error code: "<< dlerror());
 
   // reset error
@@ -78,26 +78,26 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   for(int i=0; i<n_in+n_out; ++i) {
     // Get sparsity from file
     int nrow, ncol, *colind, *row;
-    flag = getSparsity(i,&nrow,&ncol,&colind,&row);
+    flag = getSparsity(i,&nrow,&ncol,&colind, &row);
     if(flag) throw CasadiException("ExternalFunctionInternal: \"getSparsity\" failed");
 
     // Col offsets
-    vector<int> colindv(colind,colind+ncol+1);
+    vector<int> colindv(colind, colind+ncol+1);
 
     // Number of nonzeros
     int nnz = colindv.back();
 
     // Rows
-    vector<int> rowv(row,row+nnz);
+    vector<int> rowv(row, row+nnz);
 
     // Sparsity
-    Sparsity sp = Sparsity(nrow,ncol,colindv,rowv);
+    Sparsity sp = Sparsity(nrow, ncol, colindv, rowv);
 
     // Save to inputs/outputs
     if(i<n_in) {
-      input(i) = Matrix<double>(sp,0);
+      input(i) = Matrix<double>(sp, 0);
     } else {
-      output(i-n_in) = Matrix<double>(sp,0);
+      output(i-n_in) = Matrix<double>(sp, 0);
     }
   }
 
@@ -124,7 +124,7 @@ ExternalFunctionInternal::~ExternalFunctionInternal() {
 
 void ExternalFunctionInternal::evaluate() {
 #ifdef WITH_DL
-  int flag = evaluate_(getPtr(input_array_),getPtr(output_array_));
+  int flag = evaluate_(getPtr(input_array_), getPtr(output_array_));
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");
 #endif // WITH_DL
 }

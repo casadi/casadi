@@ -228,7 +228,7 @@ namespace casadi {
       jacF = getOption("jac_f");
     } else {
       log("Generating objective jacobian");
-      jacF = nlp_.jacobian(NL_X,NL_F);
+      jacF = nlp_.jacobian(NL_X, NL_F);
       log("Jacobian function generated");
     }
     jacF.setOption("name","jac_f");
@@ -251,7 +251,7 @@ namespace casadi {
       gradF = getOption("grad_f");
     } else {
       log("Generating objective gradient");
-      gradF = nlp_.gradient(NL_X,NL_F);
+      gradF = nlp_.gradient(NL_X, NL_F);
       log("Gradient function generated");
     }
     gradF.setOption("name","grad_f");
@@ -285,7 +285,7 @@ namespace casadi {
       jacG = getOption("jac_g");
     } else {
       log("Generating constraint Jacobian");
-      jacG = nlp_.jacobian(NL_X,NL_G);
+      jacG = nlp_.jacobian(NL_X, NL_G);
       log("Jacobian function generated");
     }
     jacG.setOption("name","jac_g");
@@ -315,7 +315,7 @@ namespace casadi {
       gradLag = getOption("grad_lag");
     } else {
       log("Generating/retrieving Lagrangian gradient function");
-      gradLag = nlp_.derivative(0,1);
+      gradLag = nlp_.derivative(0, 1);
       log("Gradient function generated");
     }
     gradLag.setOption("name","grad_lag");
@@ -338,7 +338,7 @@ namespace casadi {
     } else {
       Function& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian");
-      hessLag = gradLag.jacobian(NL_X,NL_NUM_OUT+NL_X,false,true);
+      hessLag = gradLag.jacobian(NL_X, NL_NUM_OUT+NL_X, false, true);
       log("Hessian function generated");
     }
     hessLag.setOption("name","hess_lag");
@@ -370,7 +370,7 @@ namespace casadi {
     } else {
       Function& gradLag = this->gradLag();
       log("Generating Hessian of the Lagrangian sparsity pattern");
-      spHessLag = gradLag.jacSparsity(NL_X,NL_NUM_OUT+NL_X,false,true);
+      spHessLag = gradLag.jacSparsity(NL_X, NL_NUM_OUT+NL_X, false, true);
       log("Hessian sparsity pattern generated");
     }
     return spHessLag;

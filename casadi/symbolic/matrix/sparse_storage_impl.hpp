@@ -30,7 +30,7 @@ namespace casadi {
 
   template<typename DataType>
   const DataType& SparseStorage<DataType>::elem(int rr, int cc) const {
-    int ind = sparsity().getNZ(rr,cc);
+    int ind = sparsity().getNZ(rr, cc);
     if(ind==-1)
       return casadi_limits<DataType>::zero;
     else
@@ -40,14 +40,14 @@ namespace casadi {
   template<typename DataType>
   DataType& SparseStorage<DataType>::elem(int rr, int cc) {
     int oldsize = sparsity().size();
-    int ind = sparsityRef().getNZ(rr,cc);
+    int ind = sparsityRef().getNZ(rr, cc);
     if(oldsize != sparsity().size())
-      data().insert(begin()+ind,DataType(0));
+      data().insert(begin()+ind, DataType(0));
     return at(ind);
   }
 
   template<typename DataType>
-  SparseStorage<DataType>::SparseStorage() : sparsity_(Sparsity::sparse(0,0)) {
+  SparseStorage<DataType>::SparseStorage() : sparsity_(Sparsity::sparse(0, 0)) {
   }
 
   template<typename DataType>
@@ -56,11 +56,11 @@ namespace casadi {
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage(const std::vector<DataType>& x) :
-    sparsity_(Sparsity::dense(x.size(),1)), data_(x) {}
+    sparsity_(Sparsity::dense(x.size(), 1)), data_(x) {}
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage(const std::vector<DataType>& x, int nrow, int ncol)
-      : sparsity_(Sparsity::dense(nrow,ncol)), data_(x) {
+      : sparsity_(Sparsity::dense(nrow, ncol)), data_(x) {
     casadi_assert_message(x.size() == nrow*ncol,
                           "Dimension mismatch." << std::endl
                           << "You supplied a vector of length " << x.size()
@@ -96,23 +96,23 @@ namespace casadi {
 
   template<typename DataType>
   void SparseStorage<DataType>::reserve(int nnz) {
-    reserve(nnz,sparsity_.size2());
+    reserve(nnz, sparsity_.size2());
   }
 
   template<typename DataType>
   void SparseStorage<DataType>::reserve(int nnz, int ncol) {
     data().reserve(nnz);
-    sparsity_.reserve(nnz,ncol);
+    sparsity_.reserve(nnz, ncol);
   }
 
   template<typename DataType>
   void SparseStorage<DataType>::resize(int nrow, int ncol) {
-    sparsity_.resize(nrow,ncol);
+    sparsity_.resize(nrow, ncol);
   }
 
   template<typename DataType>
   void SparseStorage<DataType>::clear() {
-    sparsity_ = Sparsity::sparse(0,0);
+    sparsity_ = Sparsity::sparse(0, 0);
     data().clear();
   }
 
@@ -134,7 +134,7 @@ namespace casadi {
     }
 
     // Form matrix
-    sparsity_ = Sparsity::dense(nrow,ncol);
+    sparsity_ = Sparsity::dense(nrow, ncol);
     data().resize(nrow*ncol);
     typename std::vector<DataType>::iterator it=begin();
     for(int cc=0; cc<ncol; ++cc) {
@@ -146,7 +146,7 @@ namespace casadi {
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const DataType& val) :
-    sparsity_(sparsity), data_(sparsity.size(),val) {}
+    sparsity_(sparsity), data_(sparsity.size(), val) {}
 
   template<typename DataType>
   SparseStorage<DataType>::SparseStorage(const Sparsity& sparsity, const std::vector<DataType>& d)

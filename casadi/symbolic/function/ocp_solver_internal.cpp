@@ -90,10 +90,10 @@ void OCPSolverInternal::init() {
 
   // Specify the inputs
   setNumInputs(OCP_NUM_IN);
-  input(OCP_LBX) = input(OCP_UBX) = input(OCP_X_INIT) = Matrix<double>::zeros(nx_,nk_+1);
-  input(OCP_LBU) = input(OCP_UBU) = input(OCP_U_INIT) = Matrix<double>::zeros(nu_,nk_);
+  input(OCP_LBX) = input(OCP_UBX) = input(OCP_X_INIT) = Matrix<double>::zeros(nx_, nk_+1);
+  input(OCP_LBU) = input(OCP_UBU) = input(OCP_U_INIT) = Matrix<double>::zeros(nu_, nk_);
   input(OCP_LBP) = input(OCP_UBP) = input(OCP_P_INIT) = Matrix<double>::zeros(np_);
-  input(OCP_LBH) = input(OCP_UBH) = Matrix<double>::zeros(nh_,nk_+1);
+  input(OCP_LBH) = input(OCP_UBH) = Matrix<double>::zeros(nh_, nk_+1);
   input(OCP_LBG) = input(OCP_UBG) = Matrix<double>::zeros(ng_);
 
   // Specify the outputs

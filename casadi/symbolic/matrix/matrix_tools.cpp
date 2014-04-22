@@ -30,11 +30,11 @@ namespace casadi {
 
   Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b,
                        linearSolverCreator lsolver, const Dictionary& dict) {
-    LinearSolver mysolver = lsolver(A.sparsity(),b.size2());
+    LinearSolver mysolver = lsolver(A.sparsity(), b.size2());
     mysolver.setOption(dict);
     mysolver.init();
-    mysolver.setInput(A,LINSOL_A);
-    mysolver.setInput(b,LINSOL_B);
+    mysolver.setInput(A, LINSOL_A);
+    mysolver.setInput(b, LINSOL_B);
     mysolver.prepare();
     mysolver.solve(false);
 
@@ -45,9 +45,9 @@ namespace casadi {
   Matrix<double> pinv(const Matrix<double>& A, linearSolverCreator lsolver,
                       const Dictionary& dict) {
     if (A.size1()>=A.size2()) {
-      return solve(mul(A.T(),A),A.T(),lsolver,dict);
+      return solve(mul(A.T(), A), A.T(), lsolver, dict);
     } else {
-      return solve(mul(A,A.T()),A,lsolver,dict).T();
+      return solve(mul(A, A.T()), A, lsolver, dict).T();
     }
   }
 

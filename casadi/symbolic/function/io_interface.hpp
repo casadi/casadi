@@ -169,7 +169,7 @@ namespace casadi {
      * SCHEME_NLPINput
      */
     int inputSchemeEntry(const std::string &name) const
-    { return schemeEntry(static_cast<const Derived*>(this)->inputScheme(),name,true);}
+    { return schemeEntry(static_cast<const Derived*>(this)->inputScheme(), name, true);}
 
     /** \brief Find the index for a string describing a particular entry of an output scheme
      *
@@ -177,14 +177,14 @@ namespace casadi {
      * SCHEME_NLPINput
      */
     int outputSchemeEntry(const std::string &name) const
-    { return schemeEntry(static_cast<const Derived*>(this)->outputScheme(),name,false);}
+    { return schemeEntry(static_cast<const Derived*>(this)->outputScheme(), name, false);}
 
     /** \brief Find the index for a string describing a particular entry of a scheme
      *
      * example:  schemeEntry("x_opt")  -> returns  NLP_SOLVER_X if FunctionInternal adheres to
      * SCHEME_NLPINput
      */
-    int schemeEntry(const casadi::IOScheme &scheme,const std::string &name,bool input) const {
+    int schemeEntry(const casadi::IOScheme &scheme, const std::string &name, bool input) const {
       if (scheme.isNull()) casadi_error("Unable to look up '" <<  name<< "' in "
                                         << (input? "input": "output") << "scheme, as the "
                                         <<  (input? "input": "output")
@@ -341,9 +341,9 @@ namespace casadi {
     void setOutput(T val, int oind=0)                                           \
     { static_cast<const Derived*>(this)->assertInit(); output(oind).set(val); } \
     void setInput(T val, const std::string &iname)                              \
-    { setInput(val,inputSchemeEntry(iname));  }                                 \
+    { setInput(val, inputSchemeEntry(iname));  }                                 \
     void setOutput(T val, const std::string &oname)                             \
-    { setOutput(val,outputSchemeEntry(oname)); }                                \
+    { setOutput(val, outputSchemeEntry(oname)); }                                \
 
 #ifndef DOXYGENPROC
     SETTERS(double) // NOLINT(readability/casting) - false positive
@@ -362,9 +362,9 @@ namespace casadi {
     void getOutput(T val, int oind=0) const                                    \
     { static_cast<const Derived*>(this)->assertInit(); output(oind).get(val);} \
     void getInput(T val, const std::string &iname) const                       \
-    { getInput(val,inputSchemeEntry(iname)); }                                 \
+    { getInput(val, inputSchemeEntry(iname)); }                                 \
     void getOutput(T val, const std::string &oname) const                      \
-    { getOutput(val,outputSchemeEntry(oname)); }                               \
+    { getOutput(val, outputSchemeEntry(oname)); }                               \
 
 #ifndef DOXYGENPROC
 #ifndef SWIG

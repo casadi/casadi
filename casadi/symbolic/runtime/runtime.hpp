@@ -49,7 +49,7 @@ namespace casadi {
   template<typename real_t>
   void casadi_axpy(int n, real_t alpha, const real_t* x, int inc_x, real_t* y, int inc_y);
 
-  /// DOT: inner_prod(x,y) -> return
+  /// DOT: inner_prod(x, y) -> return
   template<typename real_t>
   real_t casadi_dot(int n, const real_t* x, int inc_x, const real_t* y, int inc_y);
 
@@ -85,7 +85,7 @@ namespace casadi {
 // Note: due to restrictions of cmake IO processing, make sure that
 //      1)   semicolons (;) are never immediately preceded by whitespace
 //      2)   line continuation slashes (\) are always immediately preceded by whitespace
-#define CASADI_GEMM_NT(M,N,K,A,LDA,B,LDB,C,LDC) \
+#define CASADI_GEMM_NT(M, N, K, A, LDA, B, LDB, C, LDC) \
   for(i=0, rr=C; i<M; ++i) \
     for(j=0; j<N; ++j, ++rr) \
       for(k=0, ss=A+i*LDA, tt=B+j*LDB; k<K; ++k) \
@@ -130,7 +130,7 @@ namespace casadi {
     const int* row_y = sp_y + 2 + ncol_y+1;
     /* int nnz_y = colind_y[ncol_y];*/
     if(sp_x==sp_y) {
-      casadi_copy(nnz_x,x,1,y,1);
+      casadi_copy(nnz_x, x, 1, y, 1);
     } else {
       int i;
       for(i=0; i<ncol_x; ++i) {

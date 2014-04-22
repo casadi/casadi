@@ -121,13 +121,13 @@ namespace casadi {
     std::stringstream finalization_;
 
     // Set of already included header files
-    typedef std::map<const void*,int> PointerMap;
+    typedef std::map<const void*, int> PointerMap;
     std::set<std::string> added_includes_;
     std::set<Auxiliary> added_auxiliaries_;
     PointerMap added_sparsities_;
     PointerMap added_dependencies_;
-    std::multimap<size_t,size_t> added_double_constants_;
-    std::multimap<size_t,size_t> added_integer_constants_;
+    std::multimap<size_t, size_t> added_double_constants_;
+    std::multimap<size_t, size_t> added_integer_constants_;
 
     // Constants
     std::vector<std::vector<double> > double_constants_;

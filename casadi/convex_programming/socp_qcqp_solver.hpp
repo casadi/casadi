@@ -50,7 +50,7 @@ class SOCPQCQPInternal;
    *    x
    *
    *   min  t
-   *    x,t  f(x) <= t
+   *    x, t  f(x) <= t
    * \endverbatim
    *
    *  This implementation makes use of the following identity:

@@ -29,7 +29,7 @@ DirectSingleShooting::DirectSingleShooting() {
 
 DirectSingleShooting::DirectSingleShooting(const Function& ffcn, const Function& mfcn,
                                            const Function& cfcn, const Function& rfcn) {
-  assignNode(new DirectSingleShootingInternal(ffcn,mfcn,cfcn,rfcn));
+  assignNode(new DirectSingleShootingInternal(ffcn, mfcn, cfcn, rfcn));
 }
 
 const DirectSingleShootingInternal* DirectSingleShooting::operator->() const {
@@ -46,12 +46,12 @@ void DirectSingleShooting::getGuess(std::vector<double>& V_init) const {
 
 void DirectSingleShooting::getVariableBounds(std::vector<double>& V_min,
                                              std::vector<double>& V_max) const {
-  (*this)->getVariableBounds(V_min,V_max);
+  (*this)->getVariableBounds(V_min, V_max);
 }
 
 void DirectSingleShooting::getConstraintBounds(std::vector<double>& G_min,
                                                std::vector<double>& G_max) const {
-  (*this)->getConstraintBounds(G_min,G_max);
+  (*this)->getConstraintBounds(G_min, G_max);
 }
 
 void DirectSingleShooting::setOptimalSolution( const std::vector<double> &V_opt ) {

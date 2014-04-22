@@ -80,7 +80,7 @@ namespace casadi {
     virtual int getFunctionOutput() const { return -1;}
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const;

@@ -28,7 +28,7 @@ using namespace std;
 namespace casadi {
 
   SymbolicMX::SymbolicMX(const std::string& name, int nrow, int ncol) : name_(name) {
-    setSparsity(Sparsity::dense(nrow,ncol));
+    setSparsity(Sparsity::dense(nrow, ncol));
   }
 
   SymbolicMX::SymbolicMX(const std::string& name, const Sparsity & sp) : name_(name) {
@@ -62,7 +62,7 @@ namespace casadi {
 
   void SymbolicMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
     bvec_t *outputd = get_bvec_t(output[0]->data());
-    fill_n(outputd,output[0]->size(),0);
+    fill_n(outputd, output[0]->size(), 0);
   }
 
 

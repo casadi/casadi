@@ -27,7 +27,7 @@
 using namespace std;
 namespace casadi {
 
-  Polynomial::Polynomial(real_t scalar) : p_(1,scalar) {
+  Polynomial::Polynomial(real_t scalar) : p_(1, scalar) {
   }
 
   Polynomial::Polynomial(real_t p0, real_t p1) {
@@ -78,7 +78,7 @@ namespace casadi {
   }
 
   Polynomial Polynomial::operator*(const Polynomial& a) const {
-    vector<real_t> p_ret(p_.size() + a.p_.size() - 1,0);
+    vector<real_t> p_ret(p_.size() + a.p_.size() - 1, 0);
     for(int d=0; d<p_.size(); ++d) {
       for(int d_a=0; d_a<a.p_.size(); ++d_a) {
         p_ret[d+d_a] += p_[d] * a.p_[d_a];
@@ -110,8 +110,8 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator+=(const Polynomial& b) {
-    p_.resize(max(p_.size(),b.p_.size()),0);
-    transform(b.p_.begin(),b.p_.end(),p_.begin(),p_.begin(),std::plus<real_t>());
+    p_.resize(max(p_.size(), b.p_.size()), 0);
+    transform(b.p_.begin(), b.p_.end(), p_.begin(), p_.begin(), std::plus<real_t>());
     trim();
     return *this;
   }
@@ -122,8 +122,8 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator-=(const Polynomial& b) {
-    p_.resize(max(p_.size(),b.p_.size()),0);
-    transform(p_.begin(),p_.begin()+b.p_.size(),b.p_.begin(),p_.begin(),std::minus<real_t>());
+    p_.resize(max(p_.size(), b.p_.size()), 0);
+    transform(p_.begin(), p_.begin()+b.p_.size(), b.p_.begin(), p_.begin(), std::minus<real_t>());
     trim();
     return *this;
   }

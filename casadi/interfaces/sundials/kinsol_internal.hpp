@@ -40,7 +40,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  typedef std::pair< std::string,std::string> Message;
+  typedef std::pair< std::string, std::string> Message;
 
   class CASADI_SUNDIALS_INTERFACE_EXPORT KinsolInternal : public ImplicitFunctionInternal {
     friend class KinsolSolver;
@@ -57,7 +57,7 @@ namespace casadi {
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
                                              const LinearSolver& linsol) const
-    { return new KinsolInternal(f,jac,linsol);}
+    { return new KinsolInternal(f, jac, linsol);}
 
     /** \brief  Initialize stage */
     virtual void init();
@@ -127,7 +127,7 @@ namespace casadi {
     static std::map<int, Message > calc_flagmap();
 
     // Error message map
-    static std::map<int,Message> flagmap;
+    static std::map<int, Message> flagmap;
 
 
     // Raise an error specific to KinSol

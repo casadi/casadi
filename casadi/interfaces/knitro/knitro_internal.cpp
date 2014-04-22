@@ -221,11 +221,11 @@ namespace casadi {
     }
 
     // Type of constraints
-    vector<int> cType(ng_,KTR_CONTYPE_GENERAL);
+    vector<int> cType(ng_, KTR_CONTYPE_GENERAL);
     if(hasSetOption("contype")) {
       vector<int> contype = getOption("contype");
       casadi_assert(contype.size()==cType.size());
-      copy(contype.begin(),contype.end(),cType.begin());
+      copy(contype.begin(), contype.end(), cType.begin());
     }
 
     // "Correct" upper and lower bounds
@@ -306,10 +306,10 @@ namespace casadi {
 
       // Direct to the correct function
       switch(evalRequestCode) {
-      case KTR_RC_EVALFC: this_->evalfc(x,*obj,c); break;
-      case KTR_RC_EVALGA: this_->evalga(x,objGrad,jac); break;
-      case KTR_RC_EVALH:  this_->evalh(x,lambda,hessian); break;
-      default: casadi_assert_message(0,"KnitroInternal::callback: unknown method");
+      case KTR_RC_EVALFC: this_->evalfc(x, *obj, c); break;
+      case KTR_RC_EVALGA: this_->evalga(x, objGrad, jac); break;
+      case KTR_RC_EVALH:  this_->evalh(x, lambda, hessian); break;
+      default: casadi_assert_message(0, "KnitroInternal::callback: unknown method");
       }
 
       return 0;
@@ -321,15 +321,15 @@ namespace casadi {
 
   void KnitroInternal::evalfc(const double* x, double& obj, double *c) {
     // Pass the argument to the function
-    nlp_.setInput(x,NL_X);
-    nlp_.setInput(input(NLP_SOLVER_P),NL_P);
+    nlp_.setInput(x, NL_X);
+    nlp_.setInput(input(NLP_SOLVER_P), NL_P);
 
     // Evaluate the function
     nlp_.evaluate();
 
     // Get the result
     nlp_.output(NL_F).get(obj);
-    nlp_.output(NL_G).get(c,DENSE);
+    nlp_.output(NL_G).get(c, DENSE);
 
     // Printing
     if(monitored("eval_f")) {
@@ -344,14 +344,14 @@ namespace casadi {
 
   void KnitroInternal::evalga(const double* x, double* objGrad, double* jac) {
     // Pass the argument to the function
-    gradF_.setInput(x,NL_X);
-    gradF_.setInput(input(NLP_SOLVER_P),NL_P);
+    gradF_.setInput(x, NL_X);
+    gradF_.setInput(input(NLP_SOLVER_P), NL_P);
 
     // Evaluate the function using adjoint mode AD
     gradF_.evaluate();
 
     // Get the result
-    gradF_.output().get(objGrad,DENSE);
+    gradF_.output().get(objGrad, DENSE);
 
     // Printing
     if(monitored("eval_grad_f")) {
@@ -360,8 +360,8 @@ namespace casadi {
     }
 
     // Pass the argument to the Jacobian function
-    jacG_.setInput(x,NL_X);
-    jacG_.setInput(input(NLP_SOLVER_P),NL_P);
+    jacG_.setInput(x, NL_X);
+    jacG_.setInput(input(NLP_SOLVER_P), NL_P);
 
     // Evaluate the Jacobian function
     jacG_.evaluate();
@@ -378,16 +378,16 @@ namespace casadi {
 
   void KnitroInternal::evalh(const double* x, const double* lambda, double* hessian) {
     // Pass the argument to the function
-    hessLag_.setInput(x,NL_X);
-    hessLag_.setInput(input(NLP_SOLVER_P),NL_P);
-    hessLag_.setInput(1.0,NL_NUM_IN+NL_F);
-    hessLag_.setInput(lambda,NL_NUM_IN+NL_G);
+    hessLag_.setInput(x, NL_X);
+    hessLag_.setInput(input(NLP_SOLVER_P), NL_P);
+    hessLag_.setInput(1.0, NL_NUM_IN+NL_F);
+    hessLag_.setInput(lambda, NL_NUM_IN+NL_G);
 
     // Evaluate
     hessLag_.evaluate();
 
     // Get results
-    hessLag_.output().get(hessian,SPARSESYM);
+    hessLag_.output().get(hessian, SPARSESYM);
 
     // Printing
     if(monitored("eval_h")) {

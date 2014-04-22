@@ -43,7 +43,7 @@ namespace casadi {
 
   PsdIndefDpleInternal::PsdIndefDpleInternal(const std::vector< Sparsity > & A,
                                              const std::vector< Sparsity > &V, int nfwd, int nadj)
-      : DpleInternal(A,V, nfwd, nadj) {
+      : DpleInternal(A, V, nfwd, nadj) {
 
     // set default options
     setOption("name","unnamed_psd_indef_dple_solver"); // name of the function
@@ -81,8 +81,8 @@ namespace casadi {
 
     Xbar_.resize(n_*n_*K_);
 
-    nnKa_.resize(K_,DMatrix::zeros(n_,n_));
-    nnKb_.resize(K_,DMatrix::zeros(n_,n_));
+    nnKa_.resize(K_, DMatrix::zeros(n_, n_));
+    nnKb_.resize(K_, DMatrix::zeros(n_, n_));
 
     eig_real_.resize(n_);
     eig_imag_.resize(n_);
@@ -92,7 +92,7 @@ namespace casadi {
 
     FF_.resize(2*2*K_);
 
-    dwork_.resize(std::max(n_+K_-2,4*n_)+(n_-1)*K_+2*n_);
+    dwork_.resize(std::max(n_+K_-2, 4*n_)+(n_-1)*K_+2*n_);
 
     // There can be at most n partitions
     partition_.reserve(n_);
@@ -109,13 +109,13 @@ namespace casadi {
       // I+X
       dpse_solvers_.resize(3);
       for (int i=0;i<3;++i) {
-        int np = std::pow(2,i);
+        int np = std::pow(2, i);
 
         Sparsity sp;
         if (K_==1) {
-          sp = Sparsity::dense(np,np);
+          sp = Sparsity::dense(np, np);
         } else {
-          std::vector<int> row_ind = range(0,np*(np+1)*K_+np+1,np+1);
+          std::vector<int> row_ind = range(0, np*(np+1)*K_+np+1, np+1);
           std::vector<int> col(np*(np+1)*K_);
 
           int k = 0;
@@ -136,15 +136,15 @@ namespace casadi {
 
           }
 
-          sp = Sparsity(np*K_,np*K_,row_ind,col);
+          sp = Sparsity(np*K_, np*K_, row_ind, col);
         }
-        LinearSolver solver = linear_solver_creator(sp,1);
+        LinearSolver solver = linear_solver_creator(sp, 1);
         solver.init();
 
-        dpse_solvers_[i].resize(n_*(n_+1)/2,solver);
+        dpse_solvers_[i].resize(n_*(n_+1)/2, solver);
         for (int k=0;k<n_*(n_+1)/2;++k) {
           dpse_solvers_[i][k].makeUnique();
-          dpse_solvers_[i][k].setInput(1,LINSOL_A);
+          dpse_solvers_[i][k].setInput(1, LINSOL_A);
         }
 
       }
@@ -154,13 +154,13 @@ namespace casadi {
     }
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
-      profileWriteName(CasadiOptions::profilingLog,this,"PsdIndefSolver",
-                       ProfilingData_FunctionType_Other,4);
+      profileWriteName(CasadiOptions::profilingLog, this, "PsdIndefSolver",
+                       ProfilingData_FunctionType_Other, 4);
 
-      profileWriteSourceLine(CasadiOptions::profilingLog,this,0,"periodic schur form",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog,this,1,"nominal",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog,this,2,"forward",-1);
-      profileWriteSourceLine(CasadiOptions::profilingLog,this,3,"adjoint",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 0, "periodic schur form",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 1, "nominal",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 2, "forward",-1);
+      profileWriteSourceLine(CasadiOptions::profilingLog, this, 3, "adjoint",-1);
     }
 
   }
@@ -218,7 +218,7 @@ namespace casadi {
     double time_stop=0;
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_zero = getRealTime();
-      profileWriteEntry(CasadiOptions::profilingLog,this);
+      profileWriteEntry(CasadiOptions::profilingLog, this);
     }
 
     if(CasadiOptions::profiling) {
@@ -233,11 +233,11 @@ namespace casadi {
         }
       }
     }
-    slicot_periodic_schur(n_,K_,X_,T_,Z_,dwork_,eig_real_,eig_imag_);
+    slicot_periodic_schur(n_, K_, X_, T_, Z_, dwork_, eig_real_, eig_imag_);
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog,this,0,time_stop-time_start,time_stop-time_zero);
+      profileWriteTime(CasadiOptions::profilingLog, this, 0, time_stop-time_start, time_stop-time_zero);
     }
 
     if(CasadiOptions::profiling) {
@@ -258,7 +258,7 @@ namespace casadi {
     }
 
     // Find a block partition of the T hessenberg form
-    partition_.resize(1,0);
+    partition_.resize(1, 0);
     int i = 0;
     int j = 0;
     while(j<n_) {
@@ -270,16 +270,16 @@ namespace casadi {
     }
 
     // ********** START ***************
-    // V = blocks([mul([sZ[k].T,Vs[k],sZ[k]]) for k in range(p)])
+    // V = blocks([mul([sZ[k].T, Vs[k], sZ[k]]) for k in range(p)])
 
     for(int k=0;k<K_;++k) {
       nnKa_[k].set(0.0);
       nnKb_[k].set(0.0);
       // nnKa[k] <- V[k]*Z[k+1]
-      dense_mul_nt(n_,n_,n_,&input(DPLE_V).data()[k*n_*n_],&Z_[((k+1) % K_)*n_*n_],
+      dense_mul_nt(n_, n_, n_,&input(DPLE_V).data()[k*n_*n_], &Z_[((k+1) % K_)*n_*n_],
                    &nnKa_[k].data()[0]);
       // nnKb[k] <- Z[k+1]'*V[k]*Z[k+1]
-      dense_mul_nn(n_,n_,n_,&Z_[((k+1) % K_)*n_*n_],&nnKa_[k].data()[0],&nnKb_[k].data()[0]);
+      dense_mul_nn(n_, n_, n_,&Z_[((k+1) % K_)*n_*n_],&nnKa_[k].data()[0], &nnKb_[k].data()[0]);
     }
 
     // ********** STOP ****************
@@ -288,11 +288,11 @@ namespace casadi {
     // Outer main loop
     for (int l=0;l<partition_.size()-1;++l) {
       // F serves an an accumulator for intermediate summation results
-      std::fill(F_.begin(),F_.end(),0);
+      std::fill(F_.begin(), F_.end(), 0);
 
       // ********** START ***************
       //for i in range(l):
-      //  F[i] = [sum(mul(X[i][j][k],A[l][j][k].T) for j in range(l)) for k in range(p) ]
+      //  F[i] = [sum(mul(X[i][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
 
       for (int i=0;i<l;++i) {
         int na1 = partition_[i+1]-partition_[i];
@@ -303,7 +303,7 @@ namespace casadi {
             for (int ii=0;ii<na1;++ii) {
               for (int jj=0;jj<nb2;++jj) {
                 for (int kk=0;kk<na2;++kk) {
-                  F_[k*4*n_+4*i+2*ii+jj] += X_[partindex(i,j,k,ii,kk)]*T_[partindex(l,j,k,jj,kk)];
+                  F_[k*4*n_+4*i+2*ii+jj] += X_[partindex(i, j, k, ii, kk)]*T_[partindex(l, j, k, jj, kk)];
                 }
               }
             }
@@ -316,12 +316,12 @@ namespace casadi {
       for (int r=0;r<l+1;++r) {
 
         // ********** START ***************
-        // F[r] = [sum(mul(X[r][j][k],A[l][j][k].T) for j in range(l)) for k in range(p) ]
+        // F[r] = [sum(mul(X[r][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
         int na1 = partition_[r+1]-partition_[r];
         int nb2 = partition_[l+1]-partition_[l];
 
         for (int k=0;k<K_;++k) {
-          std::fill(F_.begin()+k*4*n_+4*r,F_.begin()+k*4*n_+4*r+4,0);
+          std::fill(F_.begin()+k*4*n_+4*r, F_.begin()+k*4*n_+4*r+4, 0);
         }
 
         for (int j=0;j<l;++j) {
@@ -330,7 +330,7 @@ namespace casadi {
             for (int ii=0;ii<na1;++ii) {
               for (int jj=0;jj<nb2;++jj) {
                 for (int kk=0;kk<na2;++kk) {
-                  F_[k*4*n_+4*r+2*ii+jj] += X_[partindex(r,j,k,ii,kk)]*T_[partindex(l,j,k,jj,kk)];
+                  F_[k*4*n_+4*r+2*ii+jj] += X_[partindex(r, j, k, ii, kk)]*T_[partindex(l, j, k, jj, kk)];
                 }
               }
             }
@@ -339,9 +339,9 @@ namespace casadi {
         // ********** STOP ***************
 
         // ********** START ***************
-        // FF =   [sum(mul(A[r][i][k],X[i][l][k]) for i in range(r)) for k in range(p)]
+        // FF =   [sum(mul(A[r][i][k], X[i][l][k]) for i in range(r)) for k in range(p)]
         // Each entry of FF is na1-by-na2
-        std::fill(FF_.begin(),FF_.end(),0);
+        std::fill(FF_.begin(), FF_.end(), 0);
         {
           int na1 = partition_[r+1]-partition_[r];
           for (int i=0;i<r;++i) {
@@ -351,7 +351,7 @@ namespace casadi {
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    FF_[k*4+2*ii+jj] += T_[partindex(r,i,k,ii,kk)]*X_[partindex(i,l,k,kk,jj)];
+                    FF_[k*4+2*ii+jj] += T_[partindex(r, i, k, ii, kk)]*X_[partindex(i, l, k, kk, jj)];
                   }
                 }
               }
@@ -377,7 +377,7 @@ namespace casadi {
         }
 
         // ********** START ***************
-        // M+= [sum(mul(A[r][i][k],F[i][k])  for i in range(r+1)) for k in rang(p)]
+        // M+= [sum(mul(A[r][i][k], F[i][k])  for i in range(r+1)) for k in rang(p)]
         {
           int na1 = partition_[r+1]-partition_[r];
           int nb2 = partition_[l+1]-partition_[l];
@@ -388,7 +388,7 @@ namespace casadi {
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    M[np*((k+1)%K_)+ii*n2+jj] += T_[partindex(r,i,k,ii,kk)]*F_[k*4*n_+4*i+2*kk+jj];
+                    M[np*((k+1)%K_)+ii*n2+jj] += T_[partindex(r, i, k, ii, kk)]*F_[k*4*n_+4*i+2*kk+jj];
                   }
                 }
               }
@@ -398,7 +398,7 @@ namespace casadi {
         // ********** STOP ***************
 
         // ********** START ***************
-        // M+= [mul(FF[k],A[l][l][k].T) for k in rang(p)]
+        // M+= [mul(FF[k], A[l][l][k].T) for k in rang(p)]
         {
           int na1 = partition_[r+1]-partition_[r];
           int na2 = partition_[l+1]-partition_[l];
@@ -407,7 +407,7 @@ namespace casadi {
             for (int ii=0;ii<na1;++ii) {
               for (int jj=0;jj<nb2;++jj) {
                 for (int kk=0;kk<na2;++kk) {
-                  M[np*((k+1)%K_)+ii*n2+jj] += FF_[k*4+2*ii+kk]*T_[partindex(l,l,k,jj,kk)];
+                  M[np*((k+1)%K_)+ii*n2+jj] += FF_[k*4+2*ii+kk]*T_[partindex(l, l, k, jj, kk)];
                 }
               }
             }
@@ -416,14 +416,14 @@ namespace casadi {
         // ********** STOP ***************
 
         // ********** START ***************
-        // Populate the appropriate solver with kron(Arr,All)
+        // Populate the appropriate solver with kron(Arr, All)
         std::vector<double> &A = solver.input(LINSOL_A).data();
 
         // Special case if K==1
         if (K_==1) {
           for (int ll=0;ll<np;++ll) {
             for (int m=0;m<np;++m) {
-              A[ll*np+m] = -T_[partindex(r,r,0,ll/n2,m/n2)]*T_[partindex(l,l,0,ll%n2,m%n2)];
+              A[ll*np+m] = -T_[partindex(r, r, 0, ll/n2, m/n2)]*T_[partindex(l, l, 0, ll%n2, m%n2)];
               if (ll==m) {
                 A[ll*np+m]+= 1;
               }
@@ -436,9 +436,9 @@ namespace casadi {
             for (int ll=0;ll<np;++ll) {
               for (int m=0;m<np;++m) {
                 A[np*(np+1)*((k+1)%K_)+ll*(np+1)+m] =
-                    -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
+                    -T_[partindex(r, r, k, ll/n2, m/n2)]*T_[partindex(l, l, k, ll%n2, m%n2)];
                 //A[np*(np+1)*k+m*(np+1)+ll+1] =
-                //  -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
+                //  -T_[partindex(r, r, k, ll/n2, m/n2)]*T_[partindex(l, l, k, ll%n2, m%n2)];
               }
             }
           }
@@ -446,9 +446,9 @@ namespace casadi {
           for (int ll=0;ll<np;++ll) {
             for (int m=0;m<np;++m) {
               A[np*(np+1)*((k+1)%K_)+ll*(np+1)+m+1] =
-                -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
+                -T_[partindex(r, r, k, ll/n2, m/n2)]*T_[partindex(l, l, k, ll%n2, m%n2)];
               //A[np*(np+1)*(K_-1)+m*(np+1)+ll] =
-              //  -T_[partindex(r,r,k,ll/n2,m/n2)]*T_[partindex(l,l,k,ll%n2,m%n2)];
+              //  -T_[partindex(r, r, k, ll/n2, m/n2)]*T_[partindex(l, l, k, ll%n2, m%n2)];
             }
           }
         }
@@ -464,7 +464,7 @@ namespace casadi {
         for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
           for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
             for (int k=0;k<K_;++k) {
-              X_[partindex(r,l,k,ii,jj)] = sol[n1*n2*k+n2*ii+jj];
+              X_[partindex(r, l, k, ii, jj)] = sol[n1*n2*k+n2*ii+jj];
             }
           }
         }
@@ -473,7 +473,7 @@ namespace casadi {
           for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
             for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
               for (int k=0;k<K_;++k) {
-                X_[partindex(l,r,k,jj,ii)] = sol[n1*n2*k+n2*ii+jj];
+                X_[partindex(l, r, k, jj, ii)] = sol[n1*n2*k+n2*ii+jj];
               }
             }
           }
@@ -489,14 +489,14 @@ namespace casadi {
       nnKa_[k].set(0.0);
 
       // nnKa[k] <- V[k]*Z[k]'
-      dense_mul_nn(n_,n_,n_,&X_[k*n_*n_],&Z_[k*n_*n_],&nnKa_[k].data()[0]);
+      dense_mul_nn(n_, n_, n_,&X_[k*n_*n_],&Z_[k*n_*n_], &nnKa_[k].data()[0]);
       // output <- Z[k]*V[k]*Z[k]'
-      dense_mul_tn(n_,n_,n_,&Z_[k*n_*n_],&nnKa_[k].data()[0],&output(DPLE_P).data()[k*n_*n_]);
+      dense_mul_tn(n_, n_, n_,&Z_[k*n_*n_],&nnKa_[k].data()[0], &output(DPLE_P).data()[k*n_*n_]);
     }
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_stop = getRealTime(); // Stop timer
-      profileWriteTime(CasadiOptions::profilingLog,this,1,time_stop-time_start,time_stop-time_zero);
+      profileWriteTime(CasadiOptions::profilingLog, this, 1, time_stop-time_start, time_stop-time_zero);
     }
 
     for (int d=0;d<nfwd_;++d) {
@@ -505,10 +505,10 @@ namespace casadi {
         time_start = getRealTime(); // Start timer
       }
 
-      // dV2 = [dV+mul([a_dot,x,a.T])+mul([a,x,a_dot.T]) for vp,a,a_dot,x in zip(Vp,As,Ap,X) ]
+      // dV2 = [dV+mul([a_dot, x, a.T])+mul([a, x, a_dot.T]) for vp, a, a_dot, x in zip(Vp, As, Ap, X) ]
       for(int k=0;k<K_;++k) {
-        std::fill(nnKb_[k].begin(),nnKb_[k].end(),0);
-        std::fill(nnKa_[k].begin(),nnKa_[k].end(),0);
+        std::fill(nnKb_[k].begin(), nnKb_[k].end(), 0);
+        std::fill(nnKa_[k].begin(), nnKa_[k].end(), 0);
 
         // nnKb <- dV
         std::copy(&input(DPLE_NUM_IN*(d+1)+DPLE_V).data()[n_*n_*k],
@@ -524,49 +524,49 @@ namespace casadi {
         }
 
         // nnKa <- x*a'
-        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],&input(DPLE_A).data()[n_*n_*k],
+        dense_mul_nn(n_, n_, n_,&output(DPLE_P).data()[n_*n_*k], &input(DPLE_A).data()[n_*n_*k],
                      &nnKa_[k].data()[0]);
 
         // nnKb += da*nnKa
-        dense_mul_tn(n_,n_,n_,&input(DPLE_NUM_IN*(d+1)+DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0],
+        dense_mul_tn(n_, n_, n_,&input(DPLE_NUM_IN*(d+1)+DPLE_A).data()[n_*n_*k], &nnKa_[k].data()[0],
                      &nnKb_[k].data()[0]);
 
-        std::fill(nnKa_[k].begin(),nnKa_[k].end(),0);
+        std::fill(nnKa_[k].begin(), nnKa_[k].end(), 0);
 
         // nnKa <- x*da'
-        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],
-                     &input(DPLE_NUM_IN*(d+1)+DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0]);
+        dense_mul_nn(n_, n_, n_, &output(DPLE_P).data()[n_*n_*k],
+                     &input(DPLE_NUM_IN*(d+1)+DPLE_A).data()[n_*n_*k], &nnKa_[k].data()[0]);
 
         // nnKb += a*nnKa
-        dense_mul_tn(n_,n_,n_,&input(DPLE_A).data()[n_*n_*k],&nnKa_[k].data()[0],
+        dense_mul_tn(n_, n_, n_,&input(DPLE_A).data()[n_*n_*k], &nnKa_[k].data()[0],
                      &nnKb_[k].data()[0]);
       }
 
       // ********** START ***************
-      // V = blocks([mul([sZ[k].T,dV2[k],sZ[k]]) for k in range(p)])
+      // V = blocks([mul([sZ[k].T, dV2[k], sZ[k]]) for k in range(p)])
 
       for(int k=0;k<K_;++k) {
         nnKa_[k].set(0.0);
         // nnKa[k] <- dV2[k]*Z[k+1]
-        dense_mul_nt(n_,n_,n_,&nnKb_[k].data()[0],&Z_[((k+1) % K_)*n_*n_],&nnKa_[k].data()[0]);
+        dense_mul_nt(n_, n_, n_,&nnKb_[k].data()[0],&Z_[((k+1) % K_)*n_*n_], &nnKa_[k].data()[0]);
         nnKb_[k].set(0.0);
         // nnKb[k] <- Z[k+1]'*dV2[k]*Z[k+1]
-        dense_mul_nn(n_,n_,n_,&Z_[((k+1) % K_)*n_*n_],&nnKa_[k].data()[0],&nnKb_[k].data()[0]);
+        dense_mul_nn(n_, n_, n_,&Z_[((k+1) % K_)*n_*n_],&nnKa_[k].data()[0], &nnKb_[k].data()[0]);
       }
 
       // ********** STOP ****************
 
-      std::fill(dX_.begin(),dX_.end(),0);
+      std::fill(dX_.begin(), dX_.end(), 0);
 
       // Main loops to loop over blocks of the block-upper triangular A
       // Outer main loop
       for (int l=0;l<partition_.size()-1;++l) {
         // F serves an an accumulator for intermediate summation results
-        std::fill(F_.begin(),F_.end(),0);
+        std::fill(F_.begin(), F_.end(), 0);
 
         // ********** START ***************
         //for i in range(l):
-        //  F[i] = [sum(mul(dX[i][j][k],A[l][j][k].T) for j in range(l)) for k in range(p) ]
+        //  F[i] = [sum(mul(dX[i][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
 
         for (int i=0;i<l;++i) {
           int na1 = partition_[i+1]-partition_[i];
@@ -578,7 +578,7 @@ namespace casadi {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
                     F_[k*4*n_+4*i+2*ii+jj] +=
-                        dX_[partindex(i,j,k,ii,kk)]*T_[partindex(l,j,k,jj,kk)];
+                        dX_[partindex(i, j, k, ii, kk)]*T_[partindex(l, j, k, jj, kk)];
                   }
                 }
               }
@@ -591,12 +591,12 @@ namespace casadi {
         for (int r=0;r<l+1;++r) {
 
           // ********** START ***************
-          // F[r] = [sum(mul(dX[r][j][k],A[l][j][k].T) for j in range(l)) for k in range(p) ]
+          // F[r] = [sum(mul(dX[r][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
           int na1 = partition_[r+1]-partition_[r];
           int nb2 = partition_[l+1]-partition_[l];
 
           for (int k=0;k<K_;++k) {
-            std::fill(F_.begin()+k*4*n_+4*r,F_.begin()+k*4*n_+4*r+4,0);
+            std::fill(F_.begin()+k*4*n_+4*r, F_.begin()+k*4*n_+4*r+4, 0);
           }
 
           for (int j=0;j<l;++j) {
@@ -606,7 +606,7 @@ namespace casadi {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
                     F_[k*4*n_+4*r+2*ii+jj] +=
-                        dX_[partindex(r,j,k,ii,kk)]*T_[partindex(l,j,k,jj,kk)];
+                        dX_[partindex(r, j, k, ii, kk)]*T_[partindex(l, j, k, jj, kk)];
                   }
                 }
               }
@@ -616,9 +616,9 @@ namespace casadi {
 
 
           // ********** START ***************
-          // FF =   [sum(mul(A[r][i][k],dX[i][l][k]) for i in range(r)) for k in range(p)]
+          // FF =   [sum(mul(A[r][i][k], dX[i][l][k]) for i in range(r)) for k in range(p)]
           // Each entry of FF is na1-by-na2
-          std::fill(FF_.begin(),FF_.end(),0);
+          std::fill(FF_.begin(), FF_.end(), 0);
           {
             int na1 = partition_[r+1]-partition_[r];
             for (int i=0;i<r;++i) {
@@ -628,7 +628,7 @@ namespace casadi {
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
-                      FF_[k*4+2*ii+jj] += T_[partindex(r,i,k,ii,kk)]*dX_[partindex(i,l,k,kk,jj)];
+                      FF_[k*4+2*ii+jj] += T_[partindex(r, i, k, ii, kk)]*dX_[partindex(i, l, k, kk, jj)];
                     }
                   }
                 }
@@ -654,7 +654,7 @@ namespace casadi {
           }
 
           // ********** START ***************
-          // M+= [sum(mul(A[r][i][k],F[i][k])  for i in range(r+1)) for k in rang(p)]
+          // M+= [sum(mul(A[r][i][k], F[i][k])  for i in range(r+1)) for k in rang(p)]
           {
             int na1 = partition_[r+1]-partition_[r];
             int nb2 = partition_[l+1]-partition_[l];
@@ -666,7 +666,7 @@ namespace casadi {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
                       M[np*((k+1)%K_)+ii*n2+jj] +=
-                          T_[partindex(r,i,k,ii,kk)]*F_[k*4*n_+4*i+2*kk+jj];
+                          T_[partindex(r, i, k, ii, kk)]*F_[k*4*n_+4*i+2*kk+jj];
                     }
                   }
                 }
@@ -676,7 +676,7 @@ namespace casadi {
           // ********** STOP ***************
 
           // ********** START ***************
-          // M+= [mul(FF[k],A[l][l][k].T) for k in rang(p)]
+          // M+= [mul(FF[k], A[l][l][k].T) for k in rang(p)]
           {
             int na1 = partition_[r+1]-partition_[r];
             int na2 = partition_[l+1]-partition_[l];
@@ -685,7 +685,7 @@ namespace casadi {
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    M[np*((k+1)%K_)+ii*n2+jj] += FF_[k*4+2*ii+kk]*T_[partindex(l,l,k,jj,kk)];
+                    M[np*((k+1)%K_)+ii*n2+jj] += FF_[k*4+2*ii+kk]*T_[partindex(l, l, k, jj, kk)];
                   }
                 }
               }
@@ -703,7 +703,7 @@ namespace casadi {
           for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
             for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
               for (int k=0;k<K_;++k) {
-                dX_[partindex(r,l,k,ii,jj)] = sol[n1*n2*k+n2*ii+jj];
+                dX_[partindex(r, l, k, ii, jj)] = sol[n1*n2*k+n2*ii+jj];
               }
             }
           }
@@ -711,7 +711,7 @@ namespace casadi {
           for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
             for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
               for (int k=0;k<K_;++k) {
-                dX_[partindex(l,r,k,jj,ii)] = sol[n1*n2*k+n2*ii+jj];
+                dX_[partindex(l, r, k, jj, ii)] = sol[n1*n2*k+n2*ii+jj];
               }
             }
           }
@@ -725,16 +725,16 @@ namespace casadi {
           nnKa_[k].set(0.0);
 
           // nnKa[k] <- V[k]*Z[k]'
-          dense_mul_nn(n_,n_,n_,&dX_[k*n_*n_],&Z_[k*n_*n_],&nnKa_[k].data()[0]);
+          dense_mul_nn(n_, n_, n_,&dX_[k*n_*n_],&Z_[k*n_*n_], &nnKa_[k].data()[0]);
           // output <- Z[k]*V[k]*Z[k]'
-          dense_mul_tn(n_,n_,n_,&Z_[k*n_*n_],&nnKa_[k].data()[0],
+          dense_mul_tn(n_, n_, n_,&Z_[k*n_*n_], &nnKa_[k].data()[0],
                        &output(DPLE_NUM_OUT*(d+1)+DPLE_P).data()[k*n_*n_]);
         }
       }
 
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        profileWriteTime(CasadiOptions::profilingLog,this,2,time_stop-time_start,
+        profileWriteTime(CasadiOptions::profilingLog, this, 2, time_stop-time_start,
                          time_stop-time_zero);
       }
 
@@ -752,12 +752,12 @@ namespace casadi {
 
       DMatrix &P_bar = input(DPLE_NUM_IN*(nfwd_+1)+DPLE_NUM_OUT*d+DPLE_P);
       std::vector<double> &Vbar = output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*d+DPLE_V).data();
-      std::fill(Vbar.begin(),Vbar.end(),0);
+      std::fill(Vbar.begin(), Vbar.end(), 0);
 
       std::vector<double> &Abar = output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*d+DPLE_A).data();
-      std::fill(Abar.begin(),Abar.end(),0);
+      std::fill(Abar.begin(), Abar.end(), 0);
 
-      std::fill(Xbar_.begin(),Xbar_.end(),0);
+      std::fill(Xbar_.begin(), Xbar_.end(), 0);
 
 
       // X_bar = [mul([Z[k].T, X_bar[k] , Z[k]]) for k in range(p)]
@@ -765,9 +765,9 @@ namespace casadi {
         nnKa_[k].set(0.0);
 
         // nnKa[k] <- nnKb*Z[k]
-        dense_mul_nt(n_,n_,n_,&P_bar.data()[n_*n_*k],&Z_[k*n_*n_],&nnKa_[k].data()[0]);
+        dense_mul_nt(n_, n_, n_,&P_bar.data()[n_*n_*k],&Z_[k*n_*n_], &nnKa_[k].data()[0]);
         // Xbar <- Z[k]*V[k]*Z[k]'
-        dense_mul_nn(n_,n_,n_,&Z_[k*n_*n_],&nnKa_[k].data()[0],&Xbar_[k*n_*n_]);
+        dense_mul_nn(n_, n_, n_,&Z_[k*n_*n_],&nnKa_[k].data()[0], &Xbar_[k*n_*n_]);
       }
 
 
@@ -778,7 +778,7 @@ namespace casadi {
       for (int l=partition_.size()-2;l>=0;--l) {
 
         for (int k=0;k<K_;++k) {
-          std::fill(F_.begin(),F_.end(),0);
+          std::fill(F_.begin(), F_.end(), 0);
         }
 
         // Inner main loop
@@ -797,7 +797,7 @@ namespace casadi {
           for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
             for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
               for (int k=0;k<K_;++k) {
-                B[n1*n2*k+n2*ii+jj] = Xbar_[partindex(r,l,k,ii,jj)];
+                B[n1*n2*k+n2*ii+jj] = Xbar_[partindex(r, l, k, ii, jj)];
               }
             }
           }
@@ -805,7 +805,7 @@ namespace casadi {
             for (int ii=0;ii<partition_[r+1]-partition_[r];++ii) {
               for (int jj=0;jj<partition_[l+1]-partition_[l];++jj) {
                 for (int k=0;k<K_;++k) {
-                  B[n1*n2*k+n2*ii+jj]+=Xbar_[partindex(l,r,k,jj,ii)];
+                  B[n1*n2*k+n2*ii+jj]+=Xbar_[partindex(l, r, k, jj, ii)];
                 }
               }
             }
@@ -821,15 +821,15 @@ namespace casadi {
           for (int k=0;k<K_;++k) {
             for (int ll=0;ll<n1;++ll) {
               for (int m=0;m<n2;++m) {
-                 Vbar[partindex(r,l,k,ll,m)]+= Mbar[np*((k+1)%K_)+ll*n2+m];
+                 Vbar[partindex(r, l, k, ll, m)]+= Mbar[np*((k+1)%K_)+ll*n2+m];
               }
             }
           }
 
           // ********** START ***************
           //     for k in range(p):
-          //       FF_bar[k] += mul(M_bar[k],A[l][l][k])
-          std::fill(FF_.begin(),FF_.end(),0);
+          //       FF_bar[k] += mul(M_bar[k], A[l][l][k])
+          std::fill(FF_.begin(), FF_.end(), 0);
           {
             int na1 = partition_[r+1]-partition_[r];
             int na2 = partition_[l+1]-partition_[l];
@@ -838,7 +838,7 @@ namespace casadi {
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    FF_[k*4+2*ii+kk] += Mbar[np*((k+1)%K_)+ii*n2+jj]*T_[partindex(l,l,k,jj,kk)];
+                    FF_[k*4+2*ii+kk] += Mbar[np*((k+1)%K_)+ii*n2+jj]*T_[partindex(l, l, k, jj, kk)];
                   }
                 }
               }
@@ -850,7 +850,7 @@ namespace casadi {
 
           // for k in range(p):
           //  for i in range(r):
-          //    X_bar[i][l][k] +=mul(A[r][i][k].T,FF_bar[k])
+          //    X_bar[i][l][k] +=mul(A[r][i][k].T, FF_bar[k])
           // ********** START ***************
           {
             int na1 = partition_[r+1]-partition_[r];
@@ -861,7 +861,7 @@ namespace casadi {
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
-                      Xbar_[partindex(i,l,k,kk,jj)] += T_[partindex(r,i,k,ii,kk)]*FF_[k*4+2*ii+jj];
+                      Xbar_[partindex(i, l, k, kk, jj)] += T_[partindex(r, i, k, ii, kk)]*FF_[k*4+2*ii+jj];
                     }
                   }
                 }
@@ -872,7 +872,7 @@ namespace casadi {
 
           //for k in range(p):
           //  for i in range(r+1):
-          //    F_bar[i][k]+= mul(A[r][i][k].T,M_bar[k])
+          //    F_bar[i][k]+= mul(A[r][i][k].T, M_bar[k])
           // ********** START ***************
           {
             int na1 = partition_[r+1]-partition_[r];
@@ -885,7 +885,7 @@ namespace casadi {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
                       F_[k*4*n_+4*i+2*kk+jj] +=
-                          T_[partindex(r,i,k,ii,kk)]*Mbar[np*((k+1)%K_)+ii*n2+jj];
+                          T_[partindex(r, i, k, ii, kk)]*Mbar[np*((k+1)%K_)+ii*n2+jj];
                     }
                   }
                 }
@@ -897,7 +897,7 @@ namespace casadi {
           // if r>=l:
           //   for k in range(p):
           //     for j in range(l):
-          //       X_bar[r][j][k] +=mul(F_bar[r][k],A[l][j][k])
+          //       X_bar[r][j][k] +=mul(F_bar[r][k], A[l][j][k])
           // ********** START ***************
           if (r>=l) {
             int na1 = partition_[r+1]-partition_[r];
@@ -909,8 +909,8 @@ namespace casadi {
                 for (int ii=0;ii<na1;++ii) {
                   for (int jj=0;jj<nb2;++jj) {
                     for (int kk=0;kk<na2;++kk) {
-                      Xbar_[partindex(r,j,k,ii,kk)] +=
-                          F_[k*4*n_+4*r+2*ii+jj]*T_[partindex(l,j,k,jj,kk)];
+                      Xbar_[partindex(r, j, k, ii, kk)] +=
+                          F_[k*4*n_+4*r+2*ii+jj]*T_[partindex(l, j, k, jj, kk)];
                     }
                   }
                 }
@@ -924,10 +924,10 @@ namespace casadi {
         //for i in range(l):
         // for k in range(p):
         //   for j in range(l):
-        //     X_bar[i][j][k]+=mul(F_bar[i][k],A[l][j][k])
+        //     X_bar[i][j][k]+=mul(F_bar[i][k], A[l][j][k])
         // ********** START ***************
         //for i in range(l):
-        //  F[i] = [sum(mul(X[i][j][k],A[l][j][k].T) for j in range(l)) for k in range(p) ]
+        //  F[i] = [sum(mul(X[i][j][k], A[l][j][k].T) for j in range(l)) for k in range(p) ]
 
         for (int i=0;i<l;++i) {
           int na1 = partition_[i+1]-partition_[i];
@@ -938,8 +938,8 @@ namespace casadi {
               for (int ii=0;ii<na1;++ii) {
                 for (int jj=0;jj<nb2;++jj) {
                   for (int kk=0;kk<na2;++kk) {
-                    Xbar_[partindex(i,j,k,ii,kk)] +=
-                        F_[k*4*n_+4*i+2*ii+jj]*T_[partindex(l,j,k,jj,kk)];
+                    Xbar_[partindex(i, j, k, ii, kk)] +=
+                        F_[k*4*n_+4*i+2*ii+jj]*T_[partindex(l, j, k, jj, kk)];
                   }
                 }
               }
@@ -954,9 +954,9 @@ namespace casadi {
       // V_bar = [mul([sZ[k], V_bar[k] , sZ[k].T]) for k in range(p)]
       for(int k=0;k<K_;++k) {
         nnKa_[k].set(0.0);
-        dense_mul_nn(n_,n_,n_,&Vbar[n_*n_*k],&Z_[((k+1)%K_)*n_*n_],&nnKa_[k].data()[0]);
-        std::fill(&Vbar[n_*n_*k],&Vbar[n_*n_*(k+1)],0);
-        dense_mul_tn(n_,n_,n_,&Z_[((k+1)%K_)*n_*n_],&nnKa_[k].data()[0],&Vbar[n_*n_*k]);
+        dense_mul_nn(n_, n_, n_,&Vbar[n_*n_*k],&Z_[((k+1)%K_)*n_*n_], &nnKa_[k].data()[0]);
+        std::fill(&Vbar[n_*n_*k],&Vbar[n_*n_*(k+1)], 0);
+        dense_mul_tn(n_, n_, n_,&Z_[((k+1)%K_)*n_*n_],&nnKa_[k].data()[0], &Vbar[n_*n_*k]);
       }
 
       // Force symmetry
@@ -970,21 +970,21 @@ namespace casadi {
         }
       }
 
-      // A_bar = [mul([vb+vb.T,a,x]) for vb,x,a in zip(V_bar,X,As)]
+      // A_bar = [mul([vb+vb.T, a, x]) for vb, x, a in zip(V_bar, X, As)]
       for(int k=0;k<K_;++k) {
-        std::fill(nnKa_[k].begin(),nnKa_[k].end(),0);
-        dense_mul_nn(n_,n_,n_,&output(DPLE_P).data()[n_*n_*k],&input(DPLE_A).data()[n_*n_*k],
+        std::fill(nnKa_[k].begin(), nnKa_[k].end(), 0);
+        dense_mul_nn(n_, n_, n_,&output(DPLE_P).data()[n_*n_*k], &input(DPLE_A).data()[n_*n_*k],
                      &nnKa_[k].data()[0]);
 
-        dense_mul_nt(n_,n_,n_,&nnKa_[k].data()[0],&Vbar[n_*n_*k],&Abar[n_*n_*k]);
-        dense_mul_nn(n_,n_,n_,&nnKa_[k].data()[0],&Vbar[n_*n_*k],&Abar[n_*n_*k]);
+        dense_mul_nt(n_, n_, n_,&nnKa_[k].data()[0],&Vbar[n_*n_*k], &Abar[n_*n_*k]);
+        dense_mul_nn(n_, n_, n_,&nnKa_[k].data()[0],&Vbar[n_*n_*k], &Abar[n_*n_*k]);
       }
 
-      std::fill(P_bar.data().begin(),P_bar.data().end(),0);
+      std::fill(P_bar.data().begin(), P_bar.data().end(), 0);
 
      if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
         time_stop = getRealTime(); // Stop timer
-        profileWriteTime(CasadiOptions::profilingLog,this,3,time_stop-time_start,
+        profileWriteTime(CasadiOptions::profilingLog, this, 3, time_stop-time_start,
                          time_stop-time_zero);
      }
 
@@ -994,7 +994,7 @@ namespace casadi {
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_stop = getRealTime();
-      profileWriteExit(CasadiOptions::profilingLog,this,time_stop-time_zero);
+      profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_zero);
     }
 
   }
@@ -1002,7 +1002,7 @@ namespace casadi {
   Function PsdIndefDpleInternal::getDerivative(int nfwd, int nadj) {
     casadi_assert(nfwd_==0 && nadj_==0);
 
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(A_,V_, nfwd, nadj);
+    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(A_, V_, nfwd, nadj);
     node->setOption(dictionary());
 
     PsdIndefDpleSolver ret;
@@ -1013,14 +1013,14 @@ namespace casadi {
   }
 
   void PsdIndefDpleInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied)
+      std::map<SharedObjectNode*, SharedObject>& already_copied)
   {
     DpleInternal::deepCopyMembers(already_copied);
   }
 
   PsdIndefDpleInternal* PsdIndefDpleInternal::clone() const {
     // Return a deep copy
-    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(A_,V_, nfwd_, nadj_);
+    PsdIndefDpleInternal* node = new PsdIndefDpleInternal(A_, V_, nfwd_, nadj_);
     node->setOption(dictionary());
     return node;
   }

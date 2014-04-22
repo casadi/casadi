@@ -74,21 +74,21 @@ void SOCPQCQPInternal::evaluate() {
   for (int i=0;i<nq_+1;++i) {
     cholesky_[i].prepare();
     DMatrix G = cholesky_[i].getFactorization(true);
-    std::copy(G.begin(),G.end(),socpsolver_.input(SOCP_SOLVER_G).begin()+socp_g_offset);
+    std::copy(G.begin(), G.end(), socpsolver_.input(SOCP_SOLVER_G).begin()+socp_g_offset);
     socp_g_offset += G.size()+1;
   }
 
   // Transform QCQP_SOLVER_Q to SOCP_SOLVER_H (needs SOCP_SOLVER_G)
   //   2h'G = Q   -> 2G'h = Q  ->  solve for h
   double *x = &socpsolver_.input(SOCP_SOLVER_H).data().front();
-  std::copy(input(QCQP_SOLVER_G).begin(),input(QCQP_SOLVER_G).begin()+n_,x);
-  cholesky_[0].solveL(x,1,true);
+  std::copy(input(QCQP_SOLVER_G).begin(), input(QCQP_SOLVER_G).begin()+n_, x);
+  cholesky_[0].solveL(x, 1, true);
   int x_offset = n_+1;
   for (int i=0;i<nq_;++i) {
     std::copy(input(QCQP_SOLVER_Q).begin()+i*(n_+1),
               input(QCQP_SOLVER_Q).begin()+(i+1)*(n_+1)-1,
               x+x_offset);
-    cholesky_[i+1].solveL(x+x_offset,1,true);
+    cholesky_[i+1].solveL(x+x_offset, 1, true);
     x_offset += n_+1;
   }
 
@@ -163,7 +163,7 @@ void SOCPQCQPInternal::init() {
   cholesky_.push_back(CSparseCholesky(st_[QCQP_STRUCT_H]));
   for (int i=0;i<nq_;++i) {
     cholesky_.push_back(
-      CSparseCholesky(DMatrix(st_[QCQP_STRUCT_P])(range(i*n_,(i+1)*n_),ALL).sparsity()));
+      CSparseCholesky(DMatrix(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity()));
   }
 
   for (int i=0;i<nq_+1;++i) {
@@ -172,7 +172,7 @@ void SOCPQCQPInternal::init() {
 
     // Harvest Cholsesky sparsity patterns
     // Note that we add extra scalar to make room for the epigraph-reformulation variable
-    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(false),Sparsity::dense(1,1)));
+    socp_g.push_back(blkdiag(cholesky_[i].getFactorizationSparsity(false), Sparsity::dense(1, 1)));
   }
 
   // Create an socpsolver instance

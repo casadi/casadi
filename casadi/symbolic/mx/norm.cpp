@@ -42,12 +42,12 @@ namespace casadi {
 
   void NormF::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
                         std::vector<int>& itmp, std::vector<double>& rtmp) {
-    evaluateGen<double,DMatrixPtrV,DMatrixPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   void NormF::evaluateSX(const SXPtrV& input, SXPtrV& output, std::vector<int>& itmp,
                          std::vector<SXElement>& rtmp) {
-    evaluateGen<SXElement,SXPtrV,SXPtrVV>(input,output,itmp,rtmp);
+    evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<typename T, typename MatV, typename MatVV>
@@ -59,7 +59,7 @@ namespace casadi {
     const int n = arg.size();
 
     // Perform the inner product
-    res = sqrt(casadi_dot(n,getPtr(arg),1,getPtr(arg),1));
+    res = sqrt(casadi_dot(n, getPtr(arg), 1, getPtr(arg), 1));
   }
 
   void NormF::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
@@ -86,8 +86,8 @@ namespace casadi {
   void NormF::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                 const std::vector<std::string>& res, CodeGenerator& gen) const {
     stream << "  *" << res.front() << " = sqrt(" << gen.casadi_dot(dep().size(),
-                                                                   arg.front(),1,
-                                                                   arg.front(),1) << ");" << endl;
+                                                                   arg.front(), 1,
+                                                                   arg.front(), 1) << ");" << endl;
   }
 
   void Norm2::printPart(std::ostream &stream, int part) const {

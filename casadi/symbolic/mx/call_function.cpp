@@ -34,7 +34,7 @@ namespace casadi {
 
     // Number inputs and outputs
     int num_in = fcn.getNumInputs();
-    casadi_assert_message(arg.size()<=num_in,"Argument list length (" << arg.size()
+    casadi_assert_message(arg.size()<=num_in, "Argument list length (" << arg.size()
                           << ") exceeds number of inputs (" << num_in << ")");
 
     // Add arguments if needed
@@ -54,12 +54,12 @@ namespace casadi {
   }
 
   void CallFunction::printPart(std::ostream &stream, int part) const {
-    fcn_->printPart(this,stream,part);
+    fcn_->printPart(this, stream, part);
   }
 
   void CallFunction::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp,
                                std::vector<double>& rtmp) {
-    fcn_->evaluateD(this,arg,res,itmp,rtmp);
+    fcn_->evaluateD(this, arg, res, itmp, rtmp);
   }
 
   int CallFunction::getNumOutputs() const {
@@ -76,13 +76,13 @@ namespace casadi {
 
   void CallFunction::evaluateSX(const SXPtrV& arg, SXPtrV& res, std::vector<int>& itmp,
                                 std::vector<SXElement>& rtmp) {
-    fcn_->evaluateSX(this,arg,res,itmp,rtmp);
+    fcn_->evaluateSX(this, arg, res, itmp, rtmp);
   }
 
   void CallFunction::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                                 MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                                 bool output_given) {
-    fcn_->evaluateMX(this,input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given);
+    fcn_->evaluateMX(this, input, output, fwdSeed, fwdSens, adjSeed, adjSens, output_given);
   }
 
   void CallFunction::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
@@ -92,17 +92,17 @@ namespace casadi {
 
   void CallFunction::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, std::vector<int>& itmp,
                                        std::vector<double>& rtmp, bool use_fwd) {
-    fcn_->propagateSparsity(this,arg,res,itmp,rtmp,use_fwd);
+    fcn_->propagateSparsity(this, arg, res, itmp, rtmp, use_fwd);
   }
 
   void CallFunction::generateOperation(std::ostream &stream, const std::vector<std::string>& arg,
                                        const std::vector<std::string>& res,
                                        CodeGenerator& gen) const {
-    fcn_->generateOperation(this,stream,arg,res,gen);
+    fcn_->generateOperation(this, stream, arg, res, gen);
   }
 
   void CallFunction::nTmp(size_t& ni, size_t& nr) {
-    fcn_->nTmp(this,ni,nr);
+    fcn_->nTmp(this, ni, nr);
   }
 
 } // namespace casadi

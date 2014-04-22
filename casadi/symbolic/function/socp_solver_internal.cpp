@@ -74,11 +74,11 @@ void SOCPSolverInternal::init() {
 
   // Input arguments
   setNumInputs(SOCP_SOLVER_NUM_IN);
-  input(SOCP_SOLVER_G) = DMatrix(G,0);
-  input(SOCP_SOLVER_H) = DMatrix::zeros(N_,1);
-  input(SOCP_SOLVER_E) = DMatrix::zeros(n_*m_,1);
-  input(SOCP_SOLVER_F) = DMatrix::zeros(m_,1);
-  input(SOCP_SOLVER_A) = DMatrix(A,0);
+  input(SOCP_SOLVER_G) = DMatrix(G, 0);
+  input(SOCP_SOLVER_H) = DMatrix::zeros(N_, 1);
+  input(SOCP_SOLVER_E) = DMatrix::zeros(n_*m_, 1);
+  input(SOCP_SOLVER_F) = DMatrix::zeros(m_, 1);
+  input(SOCP_SOLVER_A) = DMatrix(A, 0);
   input(SOCP_SOLVER_C) = DMatrix::zeros(n_);
   input(SOCP_SOLVER_LBX) = -DMatrix::inf(n_);
   input(SOCP_SOLVER_UBX) = DMatrix::inf(n_);
@@ -87,10 +87,10 @@ void SOCPSolverInternal::init() {
 
   // Output arguments
   setNumOutputs(SOCP_SOLVER_NUM_OUT);
-  output(SOCP_SOLVER_X) = DMatrix::zeros(n_,1);
+  output(SOCP_SOLVER_X) = DMatrix::zeros(n_, 1);
   output(SOCP_SOLVER_COST) = 0.0;
-  output(SOCP_SOLVER_LAM_X) = DMatrix::zeros(n_,1);
-  output(SOCP_SOLVER_LAM_A) = DMatrix::zeros(nc_,1);
+  output(SOCP_SOLVER_LAM_X) = DMatrix::zeros(n_, 1);
+  output(SOCP_SOLVER_LAM_A) = DMatrix::zeros(nc_, 1);
 
 }
 

@@ -41,7 +41,7 @@ namespace casadi {
    * <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
    *
    * LapackQRDense is an casadi::Function mapping from 2 inputs
-   * [ A (matrix),b (vector)] to one output [x (vector)].
+   * [ A (matrix), b (vector)] to one output [x (vector)].
    *
    * The usual procedure to use LapackQRDense is: \n
    *  -# init()

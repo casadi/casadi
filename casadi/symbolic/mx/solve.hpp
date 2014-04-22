@@ -86,7 +86,7 @@ namespace casadi {
     virtual Function& getFunction() { return linear_solver_;}
 
     /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Get number of temporary variables needed
     virtual void nTmp(size_t& ni, size_t& nr) { ni=0; nr=sparsity().size1();}

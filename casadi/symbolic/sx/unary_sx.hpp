@@ -48,11 +48,11 @@ class CASADI_SYMBOLIC_EXPORT UnarySX : public SXNode {
         // Evaluate constant
         double dep_val = dep.getValue();
         double ret_val;
-        casadi_math<double>::fun(op,dep_val,dep_val,ret_val);
+        casadi_math<double>::fun(op, dep_val, dep_val, ret_val);
         return ret_val;
       } else {
         // Expression containing free variables
-        return SXElement::create(new UnarySX(op,dep));
+        return SXElement::create(new UnarySX(op, dep));
       }
     }
 
@@ -66,7 +66,7 @@ class CASADI_SYMBOLIC_EXPORT UnarySX : public SXNode {
     /** \brief Check if two nodes are equivalent up to a given depth */
     virtual bool isEqual(const SXNode* node, int depth) const {
       const UnarySX* n = dynamic_cast<const UnarySX*>(node);
-      return n && n->op_ == op_ &&  n->dep_.isEqual(dep_,depth-1);
+      return n && n->op_ == op_ &&  n->dep_.isEqual(dep_, depth-1);
     }
 
     /** \brief  Number of dependencies */
@@ -83,13 +83,13 @@ class CASADI_SYMBOLIC_EXPORT UnarySX : public SXNode {
     virtual void print(std::ostream &stream, long& remaining_calls) const {
 
       // Print the prefix
-      casadi_math<double>::printPre(op_,stream);
+      casadi_math<double>::printPre(op_, stream);
 
       // Print the dependency
-      dep_.print(stream,remaining_calls);
+      dep_.print(stream, remaining_calls);
 
       // Print the suffix
-      casadi_math<double>::printPost(op_,stream);
+      casadi_math<double>::printPost(op_, stream);
     }
 
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */

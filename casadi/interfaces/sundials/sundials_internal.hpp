@@ -49,7 +49,7 @@ public:
   virtual void reset() = 0;
 
   /** \brief  Deep copy data members */
-  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+  virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
   /** \brief  Set stop time for the integration */
   virtual void setStopTime(double tf) = 0;
@@ -75,7 +75,7 @@ public:
   enum LinearSolverType {SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
 
   /// Supported iterative solvers in Sundials
-  enum IterativeSolverType {SD_GMRES,SD_BCGSTAB,SD_TFQMR};
+  enum IterativeSolverType {SD_GMRES, SD_BCGSTAB, SD_TFQMR};
 
   /// Linear solver data (dense)
   struct LinSolDataDense {};

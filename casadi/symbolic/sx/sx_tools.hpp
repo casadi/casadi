@@ -261,8 +261,8 @@ namespace casadi {
   ///@}
 
   /** \brief Calculate the Jacobian and multiply by a vector from the left
-      This is equivalent to <tt>mul(jacobian(ex,arg),v)</tt> or
-      <tt>mul(jacobian(ex,arg).T,v)</tt> for
+      This is equivalent to <tt>mul(jacobian(ex, arg), v)</tt> or
+      <tt>mul(jacobian(ex, arg).T, v)</tt> for
       transpose_jacobian set to false and true respectively. If contrast to these
       expressions, it will use directional derivatives which is typically (but
       not necessarily) more efficient if the complete Jacobian is not needed and v has few rows.
@@ -280,12 +280,12 @@ namespace casadi {
    *
    * Example usage:
    * \code
-   * taylor(sin(x),x)
+   * taylor(sin(x), x)
    * \endcode
    * \verbatim >>   x \endverbatim
    */
-  CASADI_SYMBOLIC_EXPORT SX taylor(const SX& ex,const SX& x,
-                                   const SX& a=casadi_limits<SXElement>::zero,int order=1);
+  CASADI_SYMBOLIC_EXPORT SX taylor(const SX& ex, const SX& x,
+                                   const SX& a=casadi_limits<SXElement>::zero, int order=1);
 
   /**
    * \brief multivariate Taylor series expansion
@@ -294,7 +294,7 @@ namespace casadi {
    * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
    *
    */
-  CASADI_SYMBOLIC_EXPORT SX mtaylor(const SX& ex,const SX& x, const SX& a,int order=1);
+  CASADI_SYMBOLIC_EXPORT SX mtaylor(const SX& ex, const SX& x, const SX& a, int order=1);
   /**
    * \brief multivariate Taylor series expansion
    *
@@ -302,26 +302,26 @@ namespace casadi {
    * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
    *
    * The argument order_contributions can denote how match each variable contributes
-   * to the aggregated order. If x=[x,y] and order_contributions=[1,2], then the
+   * to the aggregated order. If x=[x, y] and order_contributions=[1, 2], then the
    * aggregated order of \f$x^n y^m\f$ equals \f$1n+2m\f$.
    *
    * Example usage
    *
    * \code
-   * taylor(sin(x+y),[x,y],[a,b],1)
+   * taylor(sin(x+y),[x, y],[a, b], 1)
    * \endcode
    * \f$ \sin(b+a)+\cos(b+a)(x-a)+\cos(b+a)(y-b) \f$
    * \code
-   * taylor(sin(x+y),[x,y],[0,0],4)
+   * taylor(sin(x+y),[x, y],[0, 0], 4)
    * \endcode
    * \f$  y+x-(x^3+3y x^2+3 y^2 x+y^3)/6  \f$
    * \code
-   * taylor(sin(x+y),[x,y],[0,0],4,[1,2])
+   * taylor(sin(x+y),[x, y],[0, 0], 4,[1, 2])
    * \endcode
    * \f$  (-3 x^2 y-x^3)/6+y+x \f$
    *
    */
-  CASADI_SYMBOLIC_EXPORT SX mtaylor(const SX& ex,const SX& x, const SX& a,int order,
+  CASADI_SYMBOLIC_EXPORT SX mtaylor(const SX& ex, const SX& x, const SX& a, int order,
                                     const std::vector<int>&order_contributions);
 
   /** \brief Count number of nodes */

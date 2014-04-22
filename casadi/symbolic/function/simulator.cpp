@@ -31,7 +31,7 @@ namespace casadi {
 
   Simulator::Simulator(const Integrator& integrator, const Function& output_fcn,
                        const vector<double>& grid) {
-    assignNode(new SimulatorInternal(integrator,output_fcn,grid));
+    assignNode(new SimulatorInternal(integrator, output_fcn, grid));
   }
 
   Simulator::Simulator(const Integrator& integrator, const Function& output_fcn,
@@ -42,11 +42,11 @@ namespace casadi {
     casadi_assert_message(grid.isDense(),
                           "Simulator::Simulator: grid must be dense, but got "
                           << grid.dimString());
-    assignNode(new SimulatorInternal(integrator,output_fcn,grid.data()));
+    assignNode(new SimulatorInternal(integrator, output_fcn, grid.data()));
   }
 
   Simulator::Simulator(const Integrator& integrator, const vector<double>& grid) {
-    assignNode(new SimulatorInternal(integrator,Function(),grid));
+    assignNode(new SimulatorInternal(integrator, Function(), grid));
   }
 
   Simulator::Simulator(const Integrator& integrator, const Matrix<double>& grid) {
@@ -56,7 +56,7 @@ namespace casadi {
     casadi_assert_message(grid.isDense(),
                           "Simulator::Simulator: grid must be dense, but got "
                           << grid.dimString());
-    assignNode(new SimulatorInternal(integrator,Function(),grid.data()));
+    assignNode(new SimulatorInternal(integrator, Function(), grid.data()));
   }
 
 

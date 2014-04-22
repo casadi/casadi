@@ -33,15 +33,15 @@ namespace casadi {
 
   FixedStepIntegratorInternal::FixedStepIntegratorInternal(const Function& f,
                                                            const Function& g)
-      : IntegratorInternal(f,g) {
+      : IntegratorInternal(f, g) {
     addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   }
 
   void FixedStepIntegratorInternal::deepCopyMembers(
-      std::map<SharedObjectNode*,SharedObject>& already_copied) {
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     IntegratorInternal::deepCopyMembers(already_copied);
-    F_ = deepcopy(F_,already_copied);
-    G_ = deepcopy(G_,already_copied);
+    F_ = deepcopy(F_, already_copied);
+    G_ = deepcopy(G_, already_copied);
   }
 
   FixedStepIntegratorInternal::~FixedStepIntegratorInternal() {
@@ -67,15 +67,15 @@ namespace casadi {
 
     // Allocate tape if backward states are present
     if(nrx_>0) {
-      x_tape_.resize(nk_+1,vector<double>(nx_));
-      Z_tape_.resize(nk_,vector<double>(nZ_));
+      x_tape_.resize(nk_+1, vector<double>(nx_));
+      Z_tape_.resize(nk_, vector<double>(nZ_));
     }
   }
 
   void FixedStepIntegratorInternal::integrate(double t_out) {
     // Get discrete time sought
     int k_out = std::ceil((t_out-t0_)/h_);
-    k_out = std::min(k_out,nk_); //  make sure that rounding errors does not result in k_out>nk_
+    k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
     casadi_assert(k_out>=0);
 
     // Explicit discrete time dynamics
@@ -112,7 +112,7 @@ namespace casadi {
   void FixedStepIntegratorInternal::integrateB(double t_out) {
     // Get discrete time sought
     int k_out = std::floor((t_out-t0_)/h_);
-    k_out = std::max(k_out,0); //  make sure that rounding errors does not result in k_out>nk_
+    k_out = std::max(k_out, 0); //  make sure that rounding errors does not result in k_out>nk_
     casadi_assert(k_out<=nk_);
 
     // Explicit discrete time dynamics

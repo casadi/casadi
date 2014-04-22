@@ -29,7 +29,7 @@ using namespace std;
 namespace casadi {
 
   CSparseCholeskyInternal::CSparseCholeskyInternal(const Sparsity& sparsity, int nrhs) :
-      LinearSolverInternal(sparsity,nrhs) {
+      LinearSolverInternal(sparsity, nrhs) {
     L_ = 0;
     S_ = 0;
 
@@ -81,7 +81,7 @@ namespace casadi {
     int n = AT_.n;
     int nzmax = S_->cp[n];
     std::vector< int > row(n+1);
-    std::copy(S_->cp,S_->cp+n+1,row.begin());
+    std::copy(S_->cp, S_->cp+n+1, row.begin());
     std::vector< int > colind(nzmax);
     int *Li = &colind.front();
     int *Lp = &row.front();
@@ -91,12 +91,12 @@ namespace casadi {
     int *c = & temp.front();
     int *s = c+n;
     for (int k = 0 ; k < n ; k++) c[k] = S_->cp[k] ;
-    for (int k = 0 ; k < n ; k++) {       /* compute L(k,:) for L*L' = C */
+    for (int k = 0 ; k < n ; k++) {       /* compute L(k, :) for L*L' = C */
       int top = cs_ereach (C, k, S_->parent, s, c) ;
-      for ( ; top < n ; top++) {  /* solve L(0:k-1,0:k-1) * x = C(:,k) */
-          int i = s[top] ;               /* s[top..n-1] is pattern of L(k,:) */
+      for ( ; top < n ; top++) {  /* solve L(0:k-1, 0:k-1) * x = C(:, k) */
+          int i = s[top] ;               /* s[top..n-1] is pattern of L(k, :) */
           int p = c[i]++ ;
-          Li[p] = k ;                /* store L(k,i) in row i */
+          Li[p] = k ;                /* store L(k, i) in row i */
       }
       int p = c[k]++ ;
       Li[p] = k ;
@@ -115,12 +115,12 @@ namespace casadi {
     int m = L->m; // number of cols
     int n = L->n; // number of rows
     std::vector< int > colind(m+1);
-    std::copy(L->p,L->p+m+1,colind.begin());
+    std::copy(L->p, L->p+m+1, colind.begin());
     std::vector< int > row(nz);
-    std::copy(L->i,L->i+nz,row.begin());
+    std::copy(L->i, L->i+nz, row.begin());
     std::vector< double > data(nz);
-    std::copy(L->x,L->x+nz,data.begin());
-    DMatrix ret(Sparsity(n, m, colind, row),data);
+    std::copy(L->x, L->x+nz, data.begin());
+    DMatrix ret(Sparsity(n, m, colind, row), data);
 
     return transpose? ret.T() : ret;
   }
@@ -134,8 +134,8 @@ namespace casadi {
 
     // Make sure that all entries of the linear system are valid
     for(int k=0; k<linsys_nz.size(); ++k) {
-      casadi_assert_message(!isnan(linsys_nz[k]),"Nonzero " << k << " is not-a-number");
-      casadi_assert_message(!isinf(linsys_nz[k]),"Nonzero " << k << " is infinite");
+      casadi_assert_message(!isnan(linsys_nz[k]), "Nonzero " << k << " is not-a-number");
+      casadi_assert_message(!isinf(linsys_nz[k]), "Nonzero " << k << " is infinite");
     }
 
     if(verbose()) {
@@ -214,7 +214,7 @@ namespace casadi {
   }
 
   CSparseCholeskyInternal* CSparseCholeskyInternal::clone() const {
-    return new CSparseCholeskyInternal(input(LINSOL_A).sparsity(),input(LINSOL_B).size2());
+    return new CSparseCholeskyInternal(input(LINSOL_A).sparsity(), input(LINSOL_B).size2());
   }
 
 } // namespace casadi

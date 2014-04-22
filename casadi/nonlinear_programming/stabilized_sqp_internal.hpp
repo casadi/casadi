@@ -82,14 +82,14 @@ public:
   double nu_;
   double muR_;
   double muLS;
-  double Merit_,Merit_cand_, Merit_mu_,Merit_mu_cand_;
+  double Merit_, Merit_cand_, Merit_mu_, Merit_mu_cand_;
 
   // Optimality measure and adjustment parameters
   double tau_;
   double phiWeight_;
   double yMax_;
   double phiComb_;
-  double phiMaxO_, phiMaxV_, phiV_,phiO_;
+  double phiMaxO_, phiMaxV_, phiV_, phiO_;
 
   // Trust Region parameters
   double TRDelta_, TReta1_, TReta2_, gamma1_, gamma2_, gamma3_;
@@ -197,7 +197,7 @@ public:
                              const std::vector<double>& g,
                              const std::vector<double>& lbg, const std::vector<double>& ubg);
 
-  /// Calculates <tt>inner_prod(x,mul(A,x))</tt>
+  /// Calculates <tt>inner_prod(x, mul(A, x))</tt>
   static double quad_form(const std::vector<double>& x, const DMatrix& A);
 
   /// Calculate the merit function gradient

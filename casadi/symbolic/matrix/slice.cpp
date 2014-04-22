@@ -59,18 +59,18 @@ namespace casadi {
                           << ") out of bounds with start<0.");
     if ((stop>=start && step_<0) || (stop<=start && step_>0)) return std::vector<int>();
 
-    return range(start,stop,step_,len);
+    return range(start, stop, step_, len);
   }
 
   IndexList::IndexList() : type(NILL) {}
   IndexList::IndexList(int i_) : i(i_), type(INT) {}
-  IndexList::IndexList(const std::vector<int> &i_) : iv(i_) ,type(IVECTOR) {}
+  IndexList::IndexList(const std::vector<int> &i_) : iv(i_) , type(IVECTOR) {}
   IndexList::IndexList(const Slice &s) : slice(s), type(SLICE) {}
 
   std::vector<int> IndexList::getAll(int len) const {
     if (type == INT)  {
-      if (i<0) return std::vector<int>(1,i+len);
-      return std::vector<int>(1,i);
+      if (i<0) return std::vector<int>(1, i+len);
+      return std::vector<int>(1, i);
     } else if (type == IVECTOR) {
       return iv;
     } else {
@@ -94,7 +94,7 @@ namespace casadi {
   }
 
   Slice::Slice(const std::vector<int>& v) {
-    casadi_assert_message(isSlice(v),"Cannot be represented as a Slice");
+    casadi_assert_message(isSlice(v), "Cannot be represented as a Slice");
     if(v.size()==0) {
       start_=stop_=0;
       step_ = 1;
@@ -188,7 +188,7 @@ namespace casadi {
   }
 
   Slice::Slice(const std::vector<int>& v, Slice& outer) {
-    casadi_assert_message(isSlice2(v),"Cannot be represented as a nested Slice");
+    casadi_assert_message(isSlice2(v), "Cannot be represented as a nested Slice");
 
     // If simple slice
     if(isSlice(v)) {

@@ -31,7 +31,7 @@ namespace casadi {
 
   NLPImplicitSolver::NLPImplicitSolver(const Function& f, const Function& jac,
                                        const LinearSolver& linsol) {
-    assignNode(new NLPImplicitInternal(f,jac,linsol));
+    assignNode(new NLPImplicitInternal(f, jac, linsol));
   }
 
   NLPImplicitInternal* NLPImplicitSolver::operator->() {

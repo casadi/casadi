@@ -72,7 +72,7 @@ namespace casadi {
   \date 2010
 */
 class CASADI_SYMBOLIC_EXPORT SXFunctionInternal :
-        public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SXElement>,SXNode>{
+        public XFunctionInternal<SXFunction, SXFunctionInternal, Matrix<SXElement>, SXNode>{
   friend class SXFunction;
 
   protected:
