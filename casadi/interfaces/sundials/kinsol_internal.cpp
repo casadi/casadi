@@ -173,7 +173,7 @@ namespace casadi{
                      getOption("lower_bandwidth").toInt());
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
 
-      if(exact_Jacobian){
+      if(exact_jacobian){
         flag = KINDlsSetBandJacFn(mem_, bjac_wrapper);
         casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
       }
