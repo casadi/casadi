@@ -56,7 +56,8 @@ StabilizedSQICInternal::~StabilizedSQICInternal() {
 void StabilizedSQICInternal::evaluate() {
   if (inputs_check_) checkInputs();
 
-  std::copy(input(STABILIZED_QP_SOLVER_X0).begin(), input(STABILIZED_QP_SOLVER_X0).end(), x_.begin());
+  std::copy(input(STABILIZED_QP_SOLVER_X0).begin(),
+            input(STABILIZED_QP_SOLVER_X0).end(), x_.begin());
   std::fill(x_.begin()+n_, x_.end(), 0);
 
   std::transform(input(STABILIZED_QP_SOLVER_LAM_X0).begin(),
