@@ -115,7 +115,7 @@ if (dwork==0) {
      f_int ldwork_ = ldwork;
      f_int ret_ = 0;
      mb03wd_(&job, &compz, &n_, &p_, &ilo_, &ihi_, &iloz_, &ihiz_, h, &ldh1_, &ldh2_,
-             z, &ldz1_, &ldz2_, wr, wi, dwork,&ldwork_, &ret_);
+             z, &ldz1_, &ldz2_, wr, wi, dwork, &ldwork_, &ret_);
 
      if (ret_<0) {
        casadi_error("mb03wd wrong arguments:" << ret_);
