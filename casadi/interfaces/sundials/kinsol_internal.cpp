@@ -158,7 +158,7 @@ namespace casadi {
 
     // attach a linear solver
     if (getOption("linear_solver_type")=="dense") {
-      // Dense jacobian
+      // Dense Jacobian
       flag = KINDense(mem_, n_);
       casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
 
@@ -168,7 +168,7 @@ namespace casadi {
       }
 
     } else if (getOption("linear_solver_type")=="banded") {
-      // Banded jacobian
+      // Banded Jacobian
       flag = KINBand(mem_, n_, getOption("upper_bandwidth").toInt(),
                      getOption("lower_bandwidth").toInt());
       casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
@@ -197,7 +197,7 @@ namespace casadi {
         throw CasadiException("KINSOL: Unknown sparse solver");
       }
 
-      // Attach functions for jacobian information
+      // Attach functions for Jacobian information
       if (exact_jacobian) {
         // Form the Jacobian-times-vector function
         f_fwd_ = f_.derivative(1, 0);
@@ -211,7 +211,7 @@ namespace casadi {
         // Make sure that a Jacobian has been provided
         casadi_assert_message(!jac_.isNull(), "No Jacobian has been provided");
 
-        // Make sure that a linear solver has been providided
+        // Make sure that a linear solver has been provided
         casadi_assert_message(!linsol_.isNull(), "No linear solver has been provided.");
 
         // Pass to IDA
@@ -223,7 +223,7 @@ namespace casadi {
       // Make sure that a Jacobian has been provided
       casadi_assert(!jac_.isNull());
 
-      // Make sure that a linear solver has been providided
+      // Make sure that a linear solver has been provided
       casadi_assert(!linsol_.isNull());
 
       // Set fields in the IDA memory
@@ -268,7 +268,7 @@ namespace casadi {
     // Get the solution
     setOutput(NV_DATA_S(u_), iout_);
 
-    // Evaluate auxilary outputs
+    // Evaluate auxiliary outputs
     if (getNumOutputs()>0) {
       f_.setInput(output(iout_), iin_);
       for (int i=0; i<getNumInputs(); ++i)
@@ -366,7 +366,7 @@ namespace casadi {
     // Get time
     time1_ = clock();
 
-    // Pass inputs to the jacobian function
+    // Pass inputs to the Jacobian function
     jac_.setInput(NV_DATA_S(u), iin_);
     for (int i=0; i<getNumInputs(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
@@ -424,7 +424,7 @@ namespace casadi {
     // Get time
     time1_ = clock();
 
-    // Pass inputs to the jacobian function
+    // Pass inputs to the Jacobian function
     jac_.setInput(NV_DATA_S(u), iin_);
     for (int i=0; i<getNumInputs(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
@@ -516,7 +516,7 @@ namespace casadi {
     for (int i=0; i<getNumInputs(); ++i)
       if (i!=iin_) jac_.setInput(input(i), i);
 
-    // Evaluate jacobian
+    // Evaluate Jacobian
     jac_.evaluate();
 
     // Get a reference to the nonzeros of Jacobian

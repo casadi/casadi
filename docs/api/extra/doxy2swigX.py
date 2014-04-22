@@ -63,6 +63,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
     del kwargs["internal"]
     self.deprecated = kwargs["deprecated"]
     del kwargs["deprecated"]
+    self.merge = kwargs["merge"]
+    del kwargs["merge"]
     Doxy2SWIG.__init__(self,*args, **kwargs)
     self.docstringmap = {}
     self.active_docstring = None
@@ -137,10 +139,14 @@ class Doxy2SWIG_X(Doxy2SWIG):
         o = my_open_write(fname)
         if self.multi:
             for p in self.pieces:
-              o.write(p.encode("ascii","ignore"))
+              pp = p.encode("ascii","ignore")
+              pp = re.sub("[A-Z_]*_EXPORT ","",pp)
+              o.write(pp)
         else:
             for p in self.clean_pieces(self.pieces):
-              o.write(p.encode("ascii","ignore"))
+              pp = p.encode("ascii","ignore")
+              pp = re.sub("[A-Z_]*_EXPORT ","",pp)
+              o.write(pp)
         o.close()
         
   def do_doxygenindex(self, node):
@@ -154,7 +160,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
               fname = os.path.join(self.my_dir,  fname)
           if not self.quiet:
               print "parsing file: %s"%fname
-          p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated)
+          p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated,merge=self.merge)
           p.generate()
           self.pieces.extend(self.clean_pieces(p.pieces))
             
@@ -355,17 +361,21 @@ class Doxy2SWIG_X(Doxy2SWIG):
           else:
              grouped_dict[total] = ([origin],pieces)
              grouped_list.append(grouped_dict[total])
-        if len(grouped_list)==1:
-          self.add_text_original(["%feature(\"docstring\") ", k, " \"\n"]+grouped_list[0][1]+["\";\n","\n"])
-        else:
-          self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
-          for (origin,pieces) in grouped_list:
-            if len(u"".join(pieces).rstrip())>0:
-              self.add_text_original(["\n"]+["\n>  " + o + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
-          self.add_text_original(["\";\n","\n"])
-      
-def convert(input, output,  include_function_definition=True, quiet=False,internal=None,deprecated=None):
-    p = Doxy2SWIG_X(input, include_function_definition, quiet,internal=internal,deprecated=deprecated)
+          if not self.merge:
+            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n"]+pieces+["\";\n","\n"])
+            
+        if self.merge:
+          if len(grouped_list)==1:
+            self.add_text_original(["%feature(\"docstring\") ", k, " \"\n"]+grouped_list[0][1]+["\";\n","\n"])
+          else:
+            self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
+            for (origin,pieces) in grouped_list:
+              if len(u"".join(pieces).rstrip())>0:
+                self.add_text_original(["\n"]+["\n>  " + o + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
+            self.add_text_original(["\";\n","\n"])
+            
+def convert(input, output,  include_function_definition=True, quiet=False,internal=None,deprecated=None,merge=False):
+    p = Doxy2SWIG_X(input, include_function_definition, quiet,internal=internal,deprecated=deprecated,merge=merge)
     p.generate()
     p.write(output)
 
@@ -382,6 +392,12 @@ def main():
                       default=False,
                       dest='quiet',
                       help='be quiet and minimize output')
+                      
+    parser.add_option("-m", '--merge',
+                      action='store_true',
+                      default=False,
+                      dest='merge',
+                      help='merge overloaded names')
     
     options, args = parser.parse_args()
     if len(args) != 4:
@@ -389,7 +405,7 @@ def main():
     
     internal = dict()
     deprecated = dict()
-    convert(args[0], args[1], False, options.quiet,internal=internal,deprecated=deprecated)
+    convert(args[0], args[1], False, options.quiet,internal=internal,deprecated=deprecated,merge=options.merge)
     file(args[2],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, internal.values()))))
     file(args[3],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, deprecated.values()))))
 

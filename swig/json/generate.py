@@ -272,10 +272,10 @@ for k,v in classes.items():
     for (name,pars,rettype,mkind,docs) in getAllMethods(k): # v["methods"]:
       methods.append({"methodName": name, "methodReturn": rettype, "methodParams": pars, "methodKind": mkind,"methodDocs":"","methodDocslink":""})
 
-  treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": "","classDocslink":""})
+  treedata["treeClasses"].append({"classType": k, "classMethods": methods, "classDocs": v['docs'],"classDocslink":""})
 
 for (name,pars,rettype,docs) in functions:
-  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":"","funDocslink":""})
+  treedata["treeFunctions"].append({"funName": name, "funReturn": rettype, "funParams": pars, "funDocs":docs,"funDocslink":""})
 
 for k,v in enums.items():
   treedata["treeEnums"][k] = {

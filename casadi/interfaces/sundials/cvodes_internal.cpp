@@ -1764,7 +1764,7 @@ namespace casadi {
       if (jac_.isNull())
           throw CasadiException("CVodesInternal::init(): No Jacobian has been provided.");
 
-      // Make sure that a linear solver has been providided
+      // Make sure that a linear solver has been provided
       if (linsol_.isNull())
           throw CasadiException("CVodesInternal::init(): "
                                 "No user defined linear solver has been provided.");
@@ -1781,7 +1781,7 @@ namespace casadi {
         throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): "
                               "No Jacobian has been provided.");
 
-    // Make sure that a linear solver has been providided
+    // Make sure that a linear solver has been provided
     if (linsol_.isNull())
         throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): "
                               "No user defined linear solver has been provided.");
@@ -1852,7 +1852,7 @@ namespace casadi {
       if (jacB_.isNull())
           throw CasadiException("CVodesInternal::init(): No backwards Jacobian has been provided.");
 
-      // Make sure that a linear solver has been providided
+      // Make sure that a linear solver has been provided
       if (linsolB_.isNull())
           throw CasadiException("CVodesInternal::init(): "
                                 "No user defined backwards  linear solver has been provided.");
@@ -1870,7 +1870,7 @@ namespace casadi {
         throw CasadiException("CVodesInternal::initUserDefinedLinearSolverB(): "
                               "No backwards Jacobian has been provided.");
 
-    // Make sure that a linear solver has been providided
+    // Make sure that a linear solver has been provided
     if (linsolB_.isNull())
         throw CasadiException("CVodesInternal::initUserDefinedLinearSolverB(): "
                               "No user defined backward linear solver has been provided.");

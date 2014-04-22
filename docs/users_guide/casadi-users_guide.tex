@@ -51,12 +51,12 @@
 }
 
 \newcommand{\pytexStart}[1]{
-  \addtocounter{pytexcount}{1}%   pytexcoun++
-  \setcounter{pytexsubcount}{0}%  reset pytexsubcount
+  \addtocounter{pytexcount}{1}%   'pytexcount'++
+  \setcounter{pytexsubcount}{0}%  reset 'pytexsubcount'
 }
 
 \renewenvironment{pytex}
-{\addtocounter{pytexsubcount}{1}%                                             pytexsubcount++
+{\addtocounter{pytexsubcount}{1}%                                             'pytexsubcount'++
   %                                                                            each line is added to accumulator
 \begin{rawhtml}
 <div style="color: black; background-color: \#b9c8db;  border-style: dotted; border-width: 1px; padding:2px;padding-left:1em" >
@@ -73,7 +73,7 @@
 \end{rawhtml}
 }
 \renewenvironment{pytexoutput}
-{\addtocounter{pytexsubcount}{1}%                                             pytexsubcount++
+{\addtocounter{pytexsubcount}{1}%                                             'pytexsubcount'++
   %                                                                            each line is added to accumulator
 \begin{rawhtml}
 <div style="display:none">
@@ -101,14 +101,14 @@
 }
 \end{htmlonly}
 
-%begin{latexonly}
+%\begin{latexonly}
 \newcommand{\codebegin}{
 
 }
 \newcommand{\codeend}{
 
 }
-%end{latexonly}
+%\end{latexonly}
 
 \author{Joel Andersson \and Joris Gillis \and Moritz Diehl}
 \title{User Documentation for \CasADi v\currentversion}
@@ -124,7 +124,7 @@
 \clearpage
 
 \chapter{Introduction}
-This document aims to give an introduction to \CasADi, an open-source software framework for numerical optimization in general and optimal control (i.e. optimization involving differential equations) in particular. \CasADi was developed by Joel Andersson and Joris Gillis while PhD students at the Optimization in Engineering Center (OPTEC) of the K.U. Leuven under supervision of Moritz Diehl.
+This document aims to give an introduction to \CasADi, an open-source software framework for numerical optimization in general and optimal control (i.e. optimization involving differential equations) in particular. \CasADi was developed by Joel Andersson and Joris Gillis while PhD students at the Optimization in Engineering Center (OPTEC) of the KU Leuven under supervision of Moritz Diehl.
 
 After reading this document, the reader should be able to formulate and manipulate expressions in \CasADi's symbolic framework, generate derivative information efficiently using \emph{algorithmic differentiation}, to set up, solve and perform forward and adjoint sensitivity analysis for systems of ordinary differential equations (ODE) or differential-algebraic equations (DAE) as well as to formulate and solve nonlinear programs (NLP) problems and optimal control problems (OCP).
 
@@ -140,7 +140,7 @@ Secondly, \CasADi is \emph{not} a computer algebra system. While the symbolic co
 Finally, \CasADi is not an ``optimal control problem solver'', that allows the user to enter an OCP and gives the solution back. Instead, it tries to provide the user with a set of ``building blocks'' that can be used to implement general-purpose or specific-purpose OCP solvers efficiently with a modest programming effort.
 
 \section{Help and support} \label{sec:support}
-If you find simple bugs or lack some feature that you think would be relatively easy for us to add, the simplest thing is simply to write to the forum, located at \htmladdnormallink{forum.casadi.org}{http://focum.casadi.org/}. We read the forum post regularly and try to respond as soon as possible. The only thing we expect for this kind of support is that you cite us, cf. Section~\ref{sec:citing}, whenever you use \CasADi in scientific work.
+If you find simple bugs or lack some feature that you think would be relatively easy for us to add, the simplest thing is simply to write to the forum, located at \htmladdnormallink{forum.casadi.org}{http://forum.casadi.org/}. We read the forum post regularly and try to respond as soon as possible. The only thing we expect for this kind of support is that you cite us, cf. Section~\ref{sec:citing}, whenever you use \CasADi in scientific work.
 
 If you want more help, we are always open for academic or industrial cooperation. An academic cooperation usually take the form of a co-authorship of a journal paper, and an industrial cooperation involves a negotiated consulting contract. Please contact the us directly if you are interested in this.
 
@@ -162,7 +162,7 @@ If you use \CasADi in published scientific work, please cite the following:
 \end{verbatim}
 
 \section{Reading this document}
-The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software. Our explaination is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of either Python or C++, theory of differential equations and optimization theory. 
+The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software. Our explanation is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of either Python or C++, theory of differential equations and optimization theory. 
 
 We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, even if the intention is to use another language later. We try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
 
@@ -223,7 +223,7 @@ The following list summarizes the most commonly used ways of constructing new \t
   \item[\texttt{SX.eye(\emph{n})}]: Create a \emph{n}-by-\emph{n} diagonal matrix with ones on the diagonal and structural zeros elsewhere.
   \item[\texttt{SX}(\emph{scalar})]: Create a scalar (1-by-1 matrix) with value \emph{scalar}. This method can be used explicitly, e.g. \verb|SX(9)|, or implicitly, e.g. \verb|9 * SX.ones(2,2)|.
   \item[\texttt{SX}(\emph{list})]: Create a column vector (n-by-1 matrix) with the elements in the list, e.g. \verb|SX([1,2,3])|
-  \item[\texttt{SX}(\emph{list of lists})]: Create a dense matrix with the elemets in the lists, e.g. \verb|SX([[1,2],[3,4]])|.
+  \item[\texttt{SX}(\emph{list of lists})]: Create a dense matrix with the elements in the lists, e.g. \verb|SX([[1,2],[3,4]])|.
 \end{description}
 
 
@@ -293,7 +293,7 @@ print "f = ", f
 print "f.shape = ", f.shape
 \end{pytex}
 
-As you can see, the output of this operaton is a 2-by-2 matrix. Note how the multiplication and the addition were performed elementwise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
+As you can see, the output of this operation is a 2-by-2 matrix. Note how the multiplication and the addition were performed elementwise and new expressions (of type \texttt{SX}) were created for each entry of the result matrix.
 
 We shall now introduce a second, more general \emph{matrix expression} type \texttt{MX}. The \texttt{MX} type allows, like \texttt{SX}, to build up expressions consisting of a sequence of elementary operations. But unlike \texttt{SX}, these elementary operations are not restricted to be scalar unary or binary operations ($\mathbb{R} \rightarrow \mathbb{R}$ or $\mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R}$. Instead the elementary operations that are used to form \texttt{MX} expressions are allowed to be general \emph{multiple sparse-matrix valued} input, \emph{multiple sparse-matrix valued} output functions: $\mathbb{R}^{n_1 \times m_1} \times \ldots \times \mathbb{R}^{n_N \times m_N} \rightarrow \mathbb{R}^{p_1 \times q_1} \times \ldots \times \mathbb{R}^{p_M \times q_M}$. %In particular, we allow \emph{calls} to functions of type \texttt{Function} (including calls to ODE integrators and \texttt{SXFunction} instances).
 
@@ -340,7 +340,7 @@ Element access and assignment, of the type you have just seen, are examples of o
 %% \includegraphics[width=0.8\textwidth]{mxdraw}
 %% \end{center}
 
-%% Using this feature, which is still under development, requires that you have installed the Python package \emph{pydot}. We actively work on getting the expressions more easier to grasp.
+%% Using this feature, which is still under development, requires that you have installed the Python package \emph{pydot}. We actively work on getting the expressions easier to grasp.
 
 
 
@@ -426,7 +426,7 @@ print SX.sym("x",Sparsity.tril(3))
 %%   \item[\texttt{SX.eye(\emph{n})}]: Create a \emph{n}-by-\emph{n} diagonal matrix with ones on the diagonal and structural zeros elsewhere.
 %%   \item[\texttt{SX}(\emph{scalar})]: Create a scalar (1-by-1 matrix) with value \emph{scalar}. This method can be used explicitly, e.g. \verb|SX(9)|, or implicitly, e.g. \verb|9 * SX.ones(2,2)|.
 %%   \item[\texttt{SX}(\emph{list})]: Create a column vector (n-by-1 matrix) with the elements in the list, e.g. \verb|SX([1,2,3])|
-%%   \item[\texttt{SX}(\emph{list of lists})]: Create a dense matrix with the elemets in the lists, e.g. \verb|SX([[1,2],[3,4]])|.
+%%   \item[\texttt{SX}(\emph{list of lists})]: Create a dense matrix with the elements in the lists, e.g. \verb|SX([[1,2],[3,4]])|.
 %% \end{description}
 
 \section{Getting and setting elements in matrices} \label{sec:getset}
@@ -476,7 +476,7 @@ M[0,:][0,0] = 1
 print M
 \end{pytex}
 
-%\subsection{Flavours of slices}
+%\subsection{Flavors of slices}
 
 \paragraph{Single element access} is getting or setting by providing a (\emph{row},\emph{column}) pair:
 \begin{pytex}
@@ -529,7 +529,7 @@ print M.nz[[6,1,3]]
 
 %% \paragraph{Simple \emph{IMatrix} access} does repeated scalar access with a custom result shape. The user specifies \texttt{IMatrix}'es as item(s) in the rectangular brackets.  The result takes over the shape/sparsity of the supplied \texttt{IMatrix}.
 
-%% In the \emph{nonzero access} style, each number of the \texttt{IMatrix} supplied is used as non-zero index into the left hand side matrix. In the \emph{full access} style, both \texttt{IMatrix}'es must have the same sparsity. Common non-zeros of the Imatrix'es form (row,col) pairs to access the left hand side.
+%% In the \emph{nonzero access} style, each number of the \texttt{IMatrix} supplied is used as non-zero index into the left hand side matrix. In the \emph{full access} style, both \texttt{IMatrix}'es must have the same sparsity. Common non-zeros of the \texttt{IMatrix}'es form (row,col) pairs to access the left hand side.
 
 %% \begin{pytex}
 %% M = DMatrix([[3,7,8,9],[4,5,6,1]])
@@ -551,7 +551,7 @@ print M.nz[[6,1,3]]
 %% print M[i,j]    # diag([3,7,6,1])
 %% \end{pytex}
 
-%% \paragraph{Mixed \texttt{IMatrix} access} deals with \emph{nonzero access} in a row or column wise fashion. Given a slice in the rows place and an \texttt{IMatrix} in the columns place, this flavour lets act \emph{simple \texttt{IMatrix} access} on each row individually. The results of all these \emph{simple \texttt{IMatrix} access} are concatenated vertically.
+%% \paragraph{Mixed \texttt{IMatrix} access} deals with \emph{nonzero access} in a row or column wise fashion. Given a slice in the rows place and an \texttt{IMatrix} in the columns place, this flavor lets act \emph{simple \texttt{IMatrix} access} on each row individually. The results of all these \emph{simple \texttt{IMatrix} access} are concatenated vertically.
 
 %% A similar definition holds for an IMatrix in the columns place, and a slice in the rows place of the double element rectangular bracket.
 
@@ -569,7 +569,7 @@ print M.nz[[6,1,3]]
 %% print M[i,:2]   # [[3,  4,  7,  5 ],[4,  3,  5,  7 ]]
 %% \end{pytex}
 
-%% \paragraph{Sparsity access} involves slicing with a sparsity pattern o fthe same shape as the left hand side. For each non-zero in the slice item, the element of the left hand side with the same (row, col) pair is selected.
+%% \paragraph{Sparsity access} involves slicing with a sparsity pattern of the same shape as the left hand side. For each non-zero in the slice item, the element of the left hand side with the same (row, col) pair is selected.
 %% \begin{pytex}
 %% M = DMatrix([[3,7,8],[4,5,6],[1,2,9]])
 %% print M[Sparsity.diag(3)]   # diag([3,5,9])
@@ -661,15 +661,15 @@ Some commonly used properties for a matrix \emph{A} are:
   \item[\emph{A}.size()] The number of structurally nonzero elements, equal to \emph{A}.numel() if \emph{dense}.
   \item[\emph{A}.sparsity()] Retrieve a reference to the sparsity pattern
   \item[\emph{A}.isDense()] Is a matrix dense, i.e. having no structural zeros
-  \item[\emph{A}.isScalar()] Is the matrix a scalar, i.e. having dimentions 1-by-1?
-  \item[\emph{A}.isVector()] Is the matrix a vector, i.e. having dimentions $n$-by-1?
+  \item[\emph{A}.isScalar()] Is the matrix a scalar, i.e. having dimensions 1-by-1?
+  \item[\emph{A}.isVector()] Is the matrix a vector, i.e. having dimensions $n$-by-1?
   \item[\emph{A}.isSquare()] Is the matrix square?
   \item[\emph{A}.isTriu()] Is the matrix upper triangular?
   \item[\emph{A}.isConstant()] Are the matrix entries all constant?
   \item[\emph{A}.isInteger()] Are the matrix entries all integer-valued?
 \end{description}
 
-The last queries are examples of queries for which \emph{false negative} returns are allowed. A matrix for which \emph{A}.isConstant() is \emph{true} is guarenteed to be constant, but is \emph{not} guarenteed to be non-constant if \emph{A}.isConstant() is \emph{false}. We recommend you to check the API documentation for a particular function before using it for the first time.
+The last queries are examples of queries for which \emph{false negative} returns are allowed. A matrix for which \emph{A}.isConstant() is \emph{true} is guaranteed to be constant, but is \emph{not} guaranteed to be non-constant if \emph{A}.isConstant() is \emph{false}. We recommend you to check the API documentation for a particular function before using it for the first time.
 
 \section{Linear algebra}
 \CasADi supports a limited number of linear algebra operations, e.g. for solution of linear systems of equations:
@@ -689,7 +689,7 @@ print jacobian(mul(A,x),x)
 
 %% \section{Sparsity tools}
 
-%% Sparsities are easily visualised with the \texttt{spy} command:
+%% Sparsities are easily visualized with the \texttt{spy} command:
 
 %% \begin{pytex}
 %% Sparsity.diag(3).spy()
@@ -700,7 +700,7 @@ print jacobian(mul(A,x),x)
 
 %% \begin{itemize}
 %%  \item Start from an empty matrix and add elements by using indexing/slicing in a setting mode.
-%%  \item Use sparsity contructors
+%%  \item Use sparsity constructors
 %%  \item Convert from scipy sparse matrices
 %% \end{itemize}
 
@@ -883,24 +883,24 @@ Assume a function $\mathbf{R}^N \rightarrow \mathbf{R}^M$:
 \begin{equation}
  y_{\text{fsens}} = \frac{\partial f}{\partial x} \, x_{\text{fseed}}
 \end{equation}
-We will refer to the mulitplying vector as the \emph{seed} vector and the result as the \emph{sensitivity} vector.
+We will refer to the multiplying vector as the \emph{seed} vector and the result as the \emph{sensitivity} vector.
 
-Similarily, \emph{reverse mode} (or \emph{adjoint mode}) directional derivatives can be used to calculate Jacobian-transposed-times-vector products:
+Similarly, \emph{reverse mode} (or \emph{adjoint mode}) directional derivatives can be used to calculate Jacobian-transposed-times-vector products:
 \begin{equation}
  x_{\text{asens}} = \left(\frac{\partial f}{\partial x}\right)^{\text{T}} \, y_{\text{aseed}}
 \end{equation}
 
-Both forward and adjoint directional derivatives are calculated at a cost proportinal to evaluating $f(x)$, \emph{regardless of the dimension of $x$}.
+Both forward and adjoint directional derivatives are calculated at a cost proportional to evaluating $f(x)$, \emph{regardless of the dimension of $x$}.
 
 CasADi is also able to generate complete, \emph{sparse} Jacobians efficiently. Internally, the algorithm it will use for this depends on the particular \texttt{Function} class but in most cases consists of the following steps:
 \begin{itemize}
  \item Automatically detect the sparsity pattern of the Jacobian
- \item Use graph coloring techniques to find a small number of forward and/or directional derivatives needed to construct the complete Jacobian
+ \item Use graph coloring techniques to find a few forward and/or directional derivatives needed to construct the complete Jacobian
  \item Calculate the directional derivatives numerically or symbolically
  \item Assemble the complete Jacobian
 \end{itemize}
 
-Hessians are calculated by first calcuating the gradient and then performing the same steps as above to calculate the Jacobian of the gradient in the same way as above, while exploiting symmetry.
+Hessians are calculated by first calculating the gradient and then performing the same steps as above to calculate the Jacobian of the gradient in the same way as above, while exploiting symmetry.
 
 \section{Generating Jacobian and Hessian function objects}
 You can generate a new function for calculating the Jacobian by calling the \texttt{Function::jacobian} member function:
@@ -910,7 +910,7 @@ You can generate a new function for calculating the Jacobian by calling the \tex
 \end{verbatim}
 This will generate a function with the same input scheme as the function \texttt{f} but with the (sparse) Jacobian as well as all the original function outputs as outputs.
 
-Similarily, the gradient of a scalar output can be called by calling the \texttt{Function::gradient} member function:
+Similarly, the gradient of a scalar output can be called by calling the \texttt{Function::gradient} member function:
 \begin{verbatim}
  G = f.gradient(iind,oind) # function corresponding to the gradient
                           # of the oind-th output w.r.t. the iind-th input
@@ -937,7 +937,7 @@ This might speed up the calculations significantly, but might also cause extra m
 %% Directional derivatives can also be calculated symbolically, i.e. you can generate new expressions corresponding to directional derivatives for further manipulation. This is only possible for the \texttt{SXFunction} and \texttt{MXFunction} classes.
 %% This is achieved by passing additional arguments to the \texttt{Function::eval} member function.
 
-%% Similarily, expressions corresponding to complete Jacobians and Hessians can be obtained by calling the \texttt{SXFunction::jac} and \texttt{MXFunction::jac} functions.
+%% Similarly, expressions corresponding to complete Jacobians and Hessians can be obtained by calling the \texttt{SXFunction::jac} and \texttt{MXFunction::jac} functions.
 
 %% We refer to the API documentation for details.
 
@@ -952,7 +952,7 @@ The integrators interfaced with \CasADi assumes a DAE residual function of semi-
 \end{align}
 \end{subequations}
 
-For solvers of \emph{ordinary} differential equations, the second equation and the algbraic variables $z$ must be absent.
+For solvers of \emph{ordinary} differential equations, the second equation and the algebraic variables $z$ must be absent.
 
 %% \newcommand{\backward}[1]{#1^*}
 %% \begin{equation}
@@ -994,7 +994,7 @@ dae = SXFunction(daeIn(x=x,z=z),daeOut(ode=f,alg=g))
 print dae
 \end{pytex}
 
-%This particular problem is actually troublesome. During integration, the rootfinding problem $C(z) = 0$ will be solved, and the initial guess is $z=0$. Since $\frac{dC}{dz}(z=0)=0$, the rootfinding will fail. You cannot force a different inital guess directly, but you can transform the $z$ variable:
+%This particular problem is actually troublesome. During integration, the rootfinding problem $C(z) = 0$ will be solved, and the initial guess is $z=0$. Since $\frac{dC}{dz}(z=0)=0$, the rootfinding will fail. You cannot force a different initial guess directly, but you can transform the $z$ variable:
 %$z \rightarrow z + 1$ -- $C=z^2+2z-1$, which will work fine.
 
 An integrator in \CasADi is a function that take the state at the initial time, a set of parameters, the state vector at the initial time and a guess for the algebraic variables (only for DAEs) and returns the state vector and algebraic variables at the final time. The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
@@ -1003,7 +1003,7 @@ An integrator in \CasADi is a function that take the state at the initial time, 
 \end{verbatim}
 
 \section{Sundials integrators}
-The Sundials suite contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These two integrators supports forward and adjoint sensitivities and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivitiy equations. This means that the only information that the user needs to provide is the DAE residual function:
+The Sundials suite contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These two integrators supports forward and adjoint sensitivities and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations. This means that the only information that the user needs to provide is the DAE residual function:
 \begin{verbatim}
  integrator = CVodesIntegrator(f)   or  integrator = IdasIntegrator(f)
 \end{verbatim}
@@ -1218,7 +1218,7 @@ Assuming that the Modelica/Optimica model \texttt{ModelicaClass.ModelicaModel} i
     {'generate_xml_equations':True, 'generate_fmi_me_xml':False})
 \end{verbatim}
 
-This will generate a \texttt{jmu}-file, which is essentially a zipfile containing, among other things, the file \texttt{modelDescription.xml}. This XML-file contains a symbolic representation of the optimal control problem and can be inspected in a standard XML editor.
+This will generate a \texttt{jmu}-file, which is essentially a zip file containing, among other things, the file \texttt{modelDescription.xml}. This XML-file contains a symbolic representation of the optimal control problem and can be inspected in a standard XML editor.
 \begin{verbatim}
   from zipfile import ZipFile
   sfile = ZipFile(jmu_name','r')

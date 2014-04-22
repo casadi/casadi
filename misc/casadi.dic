@@ -2,14 +2,22 @@ CasADi
 Matlab
 Matlab's
 Python
+Spyder
+scipy
 Numpy
 Sourceforge
 Fortran
+Netlib
+Modelica
+modelica
+Optimica
+Github
 perl
 matlab
 Andersson
 Moritz
 Diehl
+Diehl's
 Joris
 Gillis
 Slava
@@ -20,6 +28,8 @@ Greg
 Horn
 Nadeau
 K.U.Leuven
+KU
+Leuven
 Jacobian
 inf
 -inf
@@ -32,6 +42,7 @@ Schur
 Cholesky
 Runge-Kutta
 Radau
+radau
 Legendre
 Maratos
 Gershgorin
@@ -54,6 +65,7 @@ Hessenberg-triangular
 Wachter
 Biegler
 Krylov
+Betts
 indices
 
 'radau'
@@ -197,6 +209,7 @@ signalled
 
 
 init
+initializer
 str
 parallelizer
 
@@ -219,4 +232,20 @@ xml
 w.r.t.
 kinsol
 idas
-
+bugfix
+recoverably
+pre-built
+rootfinding
+reimplement
+functionalities
+discretized
+discretization
+resizings
+reshapings
+docstrings
+nonlinearity
+splitted
+'es
+'s
+foo'es
+foo's
