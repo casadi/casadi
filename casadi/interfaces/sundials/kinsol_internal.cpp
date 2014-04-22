@@ -35,7 +35,8 @@ namespace casadi {
     addOption("max_iter",                 OT_INTEGER, 0,
               "Maximum number of Newton iterations. Putting 0 sets the default value of KinSol.");
     addOption("abstol",                   OT_REAL, 1e-6, "Stopping criterion tolerance");
-    addOption("linear_solver_type",       OT_STRING, "dense", "dense|banded|iterative|user_defined");
+    addOption("linear_solver_type",       OT_STRING, "dense",
+              "dense|banded|iterative|user_defined");
     addOption("upper_bandwidth",          OT_INTEGER);
     addOption("lower_bandwidth",          OT_INTEGER);
     addOption("max_krylov",               OT_INTEGER, 0);

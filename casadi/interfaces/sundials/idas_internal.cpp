@@ -990,7 +990,8 @@ namespace casadi {
       if (nrq_>0) {
         N_VConst(0.0, rq_);
         flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_), rq_);
-        // flag = IDAQuadReInitB(mem_, whichB_[dir], rq_[dir]); // BUG in Sundials - do not use this!
+        // flag = IDAQuadReInitB(mem_, whichB_[dir], rq_[dir]); // BUG in Sundials
+        //                                                      // do not use this!
       }
       if (flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB", flag);
     } else {
@@ -1279,7 +1280,8 @@ namespace casadi {
                                  N_Vector xzdotA, N_Vector rrA, void *user_data) {
     try {
       IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
-      this_->resB(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(xzA), NV_DATA_S(xzdotA), NV_DATA_S(rrA));
+      this_->resB(t, NV_DATA_S(xz), NV_DATA_S(xzdot), NV_DATA_S(xzA),
+                  NV_DATA_S(xzdotA), NV_DATA_S(rrA));
       return 0;
     } catch(exception& e) {
       cerr << "resB failed: " << e.what() << endl;

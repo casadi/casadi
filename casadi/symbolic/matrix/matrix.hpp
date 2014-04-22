@@ -411,7 +411,8 @@ namespace casadi {
     /// get a matrix element
     const Matrix<DataType> indexed_one_based(int rr, int cc) const { return (*this)(rr-1, cc-1);}
     const Matrix<DataType> indexed_zero_based(int rr, int cc) const { return (*this)(rr, cc);}
-    const Matrix<DataType> indexed(const Slice &rr, const Slice &cc) const { return (*this)(rr, cc); }
+    const Matrix<DataType> indexed(const Slice &rr, const Slice &cc) const
+    { return (*this)(rr, cc); }
     const Matrix<DataType> indexed(const IndexList &rr, const IndexList &cc) const {
       return (*this)(rr.getAll(size1()), cc.getAll(size2()));
     }

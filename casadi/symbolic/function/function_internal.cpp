@@ -78,7 +78,8 @@ namespace casadi {
   FunctionInternal::~FunctionInternal() {
   }
 
-  void FunctionInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
+  void FunctionInternal::deepCopyMembers(
+      std::map<SharedObjectNode*, SharedObject>& already_copied) {
     OptionsFunctionalityNode::deepCopyMembers(already_copied);
     for (vector<vector<WeakRef> >::iterator i=derivative_fcn_.begin();
         i!=derivative_fcn_.end(); ++i) {
@@ -1096,7 +1097,8 @@ namespace casadi {
     casadi_assert_message(isInit(), "Function not initialized.");
 
     // Get an owning reference to the block
-    Sparsity jsp = compact ? jac_sparsity_compact_.elem(oind, iind) : jac_sparsity_.elem(oind, iind);
+    Sparsity jsp = compact ? jac_sparsity_compact_.elem(oind, iind)
+        : jac_sparsity_.elem(oind, iind);
 
     // Generate, if null
     if (jsp.isNull()) {
@@ -2571,7 +2573,9 @@ namespace casadi {
       for (int oind = 0; oind < res.size(); ++oind) {
         if (res[oind] != 0) {
           res[oind]->sparsity().set(
-            get_bvec_t(res[oind]->data()), get_bvec_t(output(oind).data()), output(oind).sparsity());
+            get_bvec_t(res[oind]->data()),
+            get_bvec_t(output(oind).data()),
+            output(oind).sparsity());
         }
       }
     } else {
@@ -2748,8 +2752,10 @@ namespace casadi {
                                            const Matrix<double> &lb, const Matrix<double> &ub,
                                            const std::string &name, double tol) {
 
-    casadi_assert_message(v.sparsity()==lb.sparsity(), "reportConstraints:: sparsities must match");
-    casadi_assert_message(ub.sparsity()==lb.sparsity(), "reportConstraints:: sparsities must match");
+    casadi_assert_message(v.sparsity()==lb.sparsity(),
+                          "reportConstraints:: sparsities must match");
+    casadi_assert_message(ub.sparsity()==lb.sparsity(),
+                          "reportConstraints:: sparsities must match");
 
     // Backup the formatting
     ios::fmtflags fmtflags_backup = stream.flags();

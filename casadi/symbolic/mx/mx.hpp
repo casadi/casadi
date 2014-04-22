@@ -435,9 +435,11 @@ namespace casadi {
     void setSub(const MX& m, const std::vector<int>& rr, Slice cc)
     { setSub(m, rr, cc.getAll(size2()));}
     void setSub(const MX& m, const Matrix<int>& rr, const std::vector<int>& cc);
-    void setSub(const MX& m, const Matrix<int>& rr, int cc) { setSub(m, rr, std::vector<int>(1, cc)); }
+    void setSub(const MX& m, const Matrix<int>& rr, int cc)
+    { setSub(m, rr, std::vector<int>(1, cc)); }
     void setSub(const MX& m, const std::vector<int>& rr, const Matrix<int>& cc);
-    void setSub(const MX& m, int rr, const Matrix<int>& cc) { setSub(m, std::vector<int>(1, rr), cc); }
+    void setSub(const MX& m, int rr, const Matrix<int>& cc)
+    { setSub(m, std::vector<int>(1, rr), cc); }
     void setSub(const MX& m, const Slice& rr, const Slice& cc);
     void setSub(const MX& m, const Matrix<int>& rr, const Matrix<int>& cc);
     void setSub(const MX& m, const Sparsity& sp, int dummy);

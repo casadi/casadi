@@ -506,7 +506,8 @@ namespace casadi {
     }
 
     // Now mark each input's place in the algorithm
-    for (vector<pair<int, SXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
+    for (vector<pair<int, SXNode*> >::const_iterator it=symb_loc.begin();
+         it!=symb_loc.end(); ++it) {
       it->second->temp = it->first+1;
     }
 
@@ -533,7 +534,8 @@ namespace casadi {
 
     // Locate free variables
     free_vars_.clear();
-    for (vector<pair<int, SXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
+    for (vector<pair<int, SXNode*> >::const_iterator it=symb_loc.begin();
+         it!=symb_loc.end(); ++it) {
       if (it->second->temp!=0) {
         // Save to list of free parameters
         free_vars_.push_back(SXElement::create(it->second));
@@ -607,7 +609,8 @@ namespace casadi {
           }
         }
         stream << std::endl;
-        profileWriteSourceLine(CasadiOptions::profilingLog, this, alg_counter++, stream.str(), it->op);
+        profileWriteSourceLine(CasadiOptions::profilingLog, this,
+                               alg_counter++, stream.str(), it->op);
       }
     }
 

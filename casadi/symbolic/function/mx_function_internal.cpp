@@ -326,7 +326,8 @@ namespace casadi {
     }
 
     // Now mark each input's place in the algorithm
-    for (vector<pair<int, MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
+    for (vector<pair<int, MXNode*> >::const_iterator it=symb_loc.begin();
+         it!=symb_loc.end(); ++it) {
       it->second->temp = it->first+1;
     }
 
@@ -347,7 +348,8 @@ namespace casadi {
 
     // Locate free variables
     free_vars_.clear();
-    for (vector<pair<int, MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it) {
+    for (vector<pair<int, MXNode*> >::const_iterator it=symb_loc.begin();
+         it!=symb_loc.end(); ++it) {
       int i = it->second->temp-1;
       if (i>=0) {
         // Save to list of free parameters
@@ -362,7 +364,8 @@ namespace casadi {
       profileWriteName(CasadiOptions::profilingLog, this, getOption("name"),
                        ProfilingData_FunctionType_MXFunction, algorithm_.size());
       int alg_counter = 0;
-      for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
+      for (vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end();
+           ++it, ++alg_counter) {
         std::stringstream ss;
         print(ss, *it);
         profileWriteSourceLine(CasadiOptions::profilingLog, this, alg_counter, ss.str(), it->op,
@@ -619,7 +622,8 @@ namespace casadi {
     }
   }
 
-  Function MXFunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric) {
+  Function MXFunctionInternal::getNumericJacobian(int iind, int oind,
+                                                  bool compact, bool symmetric) {
     // Create expressions for the Jacobian
     vector<MX> ret_out;
     ret_out.reserve(1+outputv_.size());
@@ -869,7 +873,8 @@ namespace casadi {
             // the sparsity might be changed e.g. in OP_SETSPARSE
             purgeSeeds(fseed_p, fsens_p, fseed_purged, fsens_purged, true);
             if (fsens_purged.size()==0 && fsens_purged.size()==0) {
-              it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p, dummy_p, dummy_p, output_given);
+              it->data->evaluateMX(input_p, output_p, dummy_p, dummy_p,
+                                   dummy_p, dummy_p, output_given);
             } else {
               if (CasadiOptions::purgeSeeds) {
                 // Call the evaluation function
@@ -877,12 +882,14 @@ namespace casadi {
                                      dummy_p, dummy_p, output_given);
               } else {
                 // Do nothing special
-                it->data->evaluateMX(input_p, output_p, fseed_p, fsens_p, dummy_p, dummy_p, output_given);
+                it->data->evaluateMX(input_p, output_p, fseed_p, fsens_p,
+                                     dummy_p, dummy_p, output_given);
               }
             }
           } else {
             // Call the evaluation function
-            it->data->evaluateMX(input_p, output_p, fseed_p, fsens_p, dummy_p, dummy_p, output_given);
+            it->data->evaluateMX(input_p, output_p, fseed_p, fsens_p,
+                                 dummy_p, dummy_p, output_given);
           }
         }
 

@@ -852,7 +852,8 @@ namespace casadi {
   }
 
   int CVodesInternal::rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot,
-                                    N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2) {
+                                    N_Vector *qdotF, void *user_data,
+                                    N_Vector tmp1, N_Vector tmp2) {
     try {
       //    casadi_assert(user_data);
       CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
@@ -1037,7 +1038,8 @@ namespace casadi {
   }
 
   int CVodesInternal::jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x,
-                                      N_Vector xB, N_Vector xdotB, void *user_data , N_Vector tmpB) {
+                                      N_Vector xB, N_Vector xdotB, void *user_data ,
+                                      N_Vector tmpB) {
     try {
       casadi_assert(user_data);
       CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);

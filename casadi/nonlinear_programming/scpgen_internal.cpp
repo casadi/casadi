@@ -463,7 +463,8 @@ namespace casadi {
         mfcn_fwdSeed[0][it->mod_lam] = it->d_lam;
       }
     }
-    mfcn.callDerivative(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens, mfcn_adjSeed, mfcn_adjSens, true);
+    mfcn.callDerivative(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens,
+                        mfcn_adjSeed, mfcn_adjSens, true);
 
     // Vector(s) b in Lifted Newton
     MX b_gf = mfcn_fwdSens[0][mod_gl_];
@@ -515,7 +516,8 @@ namespace casadi {
       }
     }
 
-    mfcn.callDerivative(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens, mfcn_adjSeed, mfcn_adjSens, true);
+    mfcn.callDerivative(mfcn_in, mfcn_out, mfcn_fwdSeed, mfcn_fwdSens,
+                        mfcn_adjSeed, mfcn_adjSens, true);
 
     // Step expansion function inputs
     n = mfcn_in.size();

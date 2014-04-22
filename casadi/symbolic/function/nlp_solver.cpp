@@ -159,7 +159,8 @@ namespace casadi {
           }
           nlp_out[NL_G] = G_mx.outputExpr(0);
           if (!F_mx.isNull()) { // Both are MXFunction, make sure they use the same variables
-            nlp_out[NL_F] = substitute(F_mx.outputExpr(), F_mx.inputExpr(), G_mx.inputExpr()).front();
+            nlp_out[NL_F] = substitute(F_mx.outputExpr(), F_mx.inputExpr(),
+                                       G_mx.inputExpr()).front();
           } else { // G_ but not F_ MXFunction
             nlp_out[NL_F] = F.call(G_mx.inputExpr()).front();
           }

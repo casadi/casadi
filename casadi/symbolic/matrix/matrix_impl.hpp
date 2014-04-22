@@ -1860,7 +1860,8 @@ namespace casadi {
     // Perform the operations elementwise
     if (x_sp==y_sp) {
       // Matching sparsities
-      casadi_math<DataType>::fun(op, getPtr(x.data()), getPtr(y.data()), getPtr(r.data()), r_sp.size());
+      casadi_math<DataType>::fun(op, getPtr(x.data()), getPtr(y.data()),
+                                 getPtr(r.data()), r_sp.size());
     } else if (y_sp==r_sp) {
       // Project first argument
       Matrix<DataType> x_mod = x(r_sp);

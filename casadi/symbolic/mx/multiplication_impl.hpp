@@ -64,20 +64,20 @@ namespace casadi {
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX, TrY>::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output,
-                                          std::vector<int>& itmp, std::vector<double>& rtmp) {
+                                           std::vector<int>& itmp, std::vector<double>& rtmp) {
     evaluateGen<double, DMatrixPtrV, DMatrixPtrVV>(input, output, itmp, rtmp);
   }
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX, TrY>::evaluateSX(const SXPtrV& input, SXPtrV& output,
-                                           std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
+                                            std::vector<int>& itmp, std::vector<SXElement>& rtmp) {
     evaluateGen<SXElement, SXPtrV, SXPtrVV>(input, output, itmp, rtmp);
   }
 
   template<bool TrX, bool TrY>
   template<typename T, typename MatV, typename MatVV>
-  void Multiplication<TrX, TrY>::evaluateGen(const MatV& input, MatV& output, std::vector<int>& itmp,
-                                            std::vector<T>& rtmp) {
+  void Multiplication<TrX, TrY>::evaluateGen(const MatV& input, MatV& output,
+                                             std::vector<int>& itmp, std::vector<T>& rtmp) {
     if (input[0]!=output[0]) {
       copy(input[0]->begin(), input[0]->end(), output[0]->begin());
     }
@@ -86,9 +86,9 @@ namespace casadi {
 
   template<bool TrX, bool TrY>
   void Multiplication<TrX, TrY>::evaluateMX(const MXPtrV& input, MXPtrV& output,
-                                           const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
-                                           const MXPtrVV& adjSeed, MXPtrVV& adjSens,
-                                           bool output_given) {
+                                            const MXPtrVV& fwdSeed, MXPtrVV& fwdSens,
+                                            const MXPtrVV& adjSeed, MXPtrVV& adjSens,
+                                            bool output_given) {
     if (!output_given)
       *output[0] = *input[0] + mul(tr<TrX>(*input[1]), tr<TrY>(*input[2]), (*input[0]).sparsity());
 

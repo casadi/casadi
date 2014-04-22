@@ -376,7 +376,8 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosVector<Add>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void SetNonzerosVector<Add>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                                 bool fwd) {
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd0 = get_bvec_t(input[0]->data());
@@ -450,7 +451,8 @@ namespace casadi {
   }
 
   template<bool Add>
-  void SetNonzerosSlice2<Add>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd) {
+  void SetNonzerosSlice2<Add>::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output,
+                                                 bool fwd) {
     // Get references to the assignment operations and data
     bvec_t *outputd = get_bvec_t(output[0]->data());
     bvec_t *inputd0 = get_bvec_t(input[0]->data());

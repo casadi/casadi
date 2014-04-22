@@ -632,7 +632,8 @@ namespace casadi {
                           << order_contributions.size() << ")");
 
     return reshape(
-             mtaylor_recursive(vec(ex), x, a, order, order_contributions), ex.size2(), ex.size1()).T();
+             mtaylor_recursive(vec(ex), x, a, order, order_contributions),
+             ex.size2(), ex.size1()).T();
   }
 
   int countNodes(const SX& A) {

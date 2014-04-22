@@ -52,7 +52,8 @@ namespace casadi {
     return static_cast<FunctionInternal*>(OptionsFunctionality::operator->());
   }
 
-  vector<DMatrix> Function::call(const vector<DMatrix> &arg, bool always_inline, bool never_inline) {
+  vector<DMatrix> Function::call(const vector<DMatrix> &arg,
+                                 bool always_inline, bool never_inline) {
     DMatrixVectorVector dummy;
     DMatrixVector res;
     callDerivative(arg, res, dummy, dummy, dummy, dummy, always_inline, never_inline);

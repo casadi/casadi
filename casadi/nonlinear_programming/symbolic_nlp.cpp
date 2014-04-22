@@ -551,7 +551,8 @@ SXElement SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<
             case 54:
             {
               SXElement r = 0;
-              for (vector<SXElement>::const_iterator it=args.begin(); it!=args.end(); ++it) r += *it;
+              for (vector<SXElement>::const_iterator it=args.begin();
+                   it!=args.end(); ++it) r += *it;
               return r;
             }
 

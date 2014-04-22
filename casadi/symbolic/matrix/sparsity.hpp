@@ -111,7 +111,8 @@ namespace casadi {
 
     /** \brief Create a scalar sparsity pattern **/
     ///@{
-    static Sparsity scalar(bool dense_scalar=true) { return dense_scalar ? dense(1, 1) : sparse(1, 1);}
+    static Sparsity scalar(bool dense_scalar=true)
+    { return dense_scalar ? dense(1, 1) : sparse(1, 1); }
     ///@}
 
     /** \brief Create a dense rectangular sparsity pattern **/

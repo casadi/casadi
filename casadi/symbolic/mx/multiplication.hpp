@@ -99,7 +99,8 @@ namespace casadi {
   public:
 
     /** \brief  Constructor */
-    DenseMultiplication(const MX& z, const MX& x, const MX& y) : Multiplication<TrX, TrY>(z, x, y) {}
+    DenseMultiplication(const MX& z, const MX& x, const MX& y)
+        : Multiplication<TrX, TrY>(z, x, y) {}
 
     /** \brief  Destructor */
     virtual ~DenseMultiplication() {}

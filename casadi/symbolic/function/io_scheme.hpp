@@ -210,7 +210,8 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject {
   #endif // SWIG
 
   template<class M>
-    std::vector<M> operator()(const std::vector<M> arg_m, const std::vector<std::string> & arg_s) {
+    std::vector<M> operator()(const std::vector<M> arg_m,
+                              const std::vector<std::string> & arg_s) {
     casadi_assert(arg_m.size()==size());
     std::vector<M> ret;
     for (int i=0;i<arg_s.size();++i) {
@@ -222,7 +223,8 @@ class CASADI_SYMBOLIC_EXPORT IOScheme : public SharedObject {
   }
 
   template<class M>
-    IOSchemeVector<M> operator()(const std::vector<std::string> arg_s, const std::vector<M> & arg_m) {
+    IOSchemeVector<M> operator()(const std::vector<std::string> arg_s,
+                                 const std::vector<M> & arg_m) {
     casadi_assert(arg_s.size()==arg_m.size());
     std::vector<M> v(size());
     for (int i=0;i<arg_s.size();++i) {

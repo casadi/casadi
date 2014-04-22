@@ -34,7 +34,8 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace casadi {
 
-SundialsInternal::SundialsInternal(const Function& f, const Function& g) : IntegratorInternal(f, g) {
+SundialsInternal::SundialsInternal(const Function& f, const Function& g)
+    : IntegratorInternal(f, g) {
   addOption("max_num_steps",               OT_INTEGER,          10000,
             "Maximum number of integrator steps");
   addOption("reltol",                      OT_REAL,             1e-6,

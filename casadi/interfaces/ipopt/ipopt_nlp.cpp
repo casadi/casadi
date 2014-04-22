@@ -207,7 +207,8 @@ Index IpoptUserClass::get_number_of_nonlinear_variables() {
   return solver->get_number_of_nonlinear_variables();
 }
 
-bool IpoptUserClass::get_list_of_nonlinear_variables(Index num_nonlin_vars, Index* pos_nonlin_vars) {
+bool IpoptUserClass::get_list_of_nonlinear_variables(Index num_nonlin_vars,
+                                                     Index* pos_nonlin_vars) {
   return solver->get_list_of_nonlinear_variables(num_nonlin_vars, pos_nonlin_vars);
 }
 

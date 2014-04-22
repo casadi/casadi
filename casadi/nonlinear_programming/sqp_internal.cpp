@@ -103,9 +103,11 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : Sparsity::dense(nx_, nx_);
+    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity()
+        : Sparsity::dense(nx_, nx_);
     H_sparsity = H_sparsity + Sparsity::diag(nx_);
-    Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_) : jacG().output().sparsity();
+    Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_)
+        : jacG().output().sparsity();
 
     QPSolverCreator qp_solver_creator = getOption("qp_solver");
     qp_solver_ = qp_solver_creator(qpStruct("h", H_sparsity, "a", A_sparsity));
@@ -479,7 +481,8 @@ namespace casadi {
         copy(gf_.begin(), gf_.end(), gLag_old_.begin());
         if (ng_>0) DMatrix::mul_no_alloc_tn(Jk_, mu_, gLag_old_);
         // gLag_old += mu_x_;
-        transform(gLag_old_.begin(), gLag_old_.end(), mu_x_.begin(), gLag_old_.begin(), plus<double>());
+        transform(gLag_old_.begin(), gLag_old_.end(), mu_x_.begin(), gLag_old_.begin(),
+                  plus<double>());
       }
 
       // Evaluate the constraint Jacobian
@@ -505,7 +508,7 @@ namespace casadi {
           const vector<int>& colind = Bk_.colind();      // Access sparsity (column offset)
           const vector<int>& row = Bk_.row();            // Access sparsity (row)
           vector<double>& data = Bk_.data();             // Access nonzero elements
-          for (int cc=0; cc<colind.size()-1; ++cc) {          // Loop over the columns of the Hessian
+          for (int cc=0; cc<colind.size()-1; ++cc) {     // Loop over the columns of the Hessian
             for (int el=colind[cc]; el<colind[cc+1]; ++el) {
               // Loop over the nonzero elements of the column
               if (cc!=row[el]) data[el] = 0;               // Remove if off-diagonal entries

@@ -719,7 +719,8 @@ namespace casadi {
   struct UnaryOperation<OP_TAN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = tan(x);}
-    template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 1/sq(cos(x));}
+    template<typename T> static inline void der(const T& x, const T& f, T* d)
+    { d[0] = 1/sq(cos(x));}
   };
 
   /// Arcus sine
@@ -735,7 +736,8 @@ namespace casadi {
   struct UnaryOperation<OP_ACOS>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = acos(x);}
-    template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0]=-1/sqrt(1-x*x);}
+    template<typename T> static inline void der(const T& x, const T& f, T* d)
+    { d[0]=-1/sqrt(1-x*x);}
   };
 
   /// Arcus tangent

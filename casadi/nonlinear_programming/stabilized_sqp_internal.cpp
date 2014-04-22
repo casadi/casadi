@@ -151,12 +151,15 @@ namespace casadi {
     }
 
     // Allocate a QP solver
-    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity() : Sparsity::dense(nx_, nx_);
+    Sparsity H_sparsity = exact_hessian_ ? hessLag().output().sparsity()
+        : Sparsity::dense(nx_, nx_);
     H_sparsity = H_sparsity + Sparsity::diag(nx_);
-    Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_) : jacG().output().sparsity();
+    Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_)
+        : jacG().output().sparsity();
 
     StabilizedQPSolverCreator stabilized_qp_solver_creator = getOption("stabilized_qp_solver");
-    stabilized_qp_solver_ = stabilized_qp_solver_creator(qpStruct("h", H_sparsity, "a", A_sparsity));
+    stabilized_qp_solver_ =
+        stabilized_qp_solver_creator(qpStruct("h", H_sparsity, "a", A_sparsity));
 
     // Set options if provided
     if (hasSetOption("stabilized_qp_solver_options")) {
@@ -536,7 +539,8 @@ namespace casadi {
         transform(xtmp_.begin(), xtmp_.end(), gk_.begin(), xtmp_.begin(), plus<double>());
         muhat = inner_prod(xtmp_, dx_)-inner_prod(mu_e_, ds_)+.5*gain;
         muhat = inner_prod(gsk_, gsk_)/abs(muhat);
-        transform(qp_DUAL_A_.begin(), qp_DUAL_A_.end(), mu_e_.begin(), pi2_.begin(), minus<double>());
+        transform(qp_DUAL_A_.begin(), qp_DUAL_A_.end(), mu_e_.begin(), pi2_.begin(),
+                  minus<double>());
         muhat = std::min(muhat, norm_2(gsk_)/(2*norm_2(pi2_)));
         if (muR_>muhat)
         muR_ = muhat;
@@ -596,7 +600,8 @@ namespace casadi {
       transform(mu_cand_.begin(), mu_cand_.end(), mu_e_.begin(), dualpen_.begin(), minus<double>());
       for (int i=0;i<ng_;++i)
         dualpen_[i] = -dualpen_[i]*(1/sigma_);
-      transform(gsk_cand_.begin(), gsk_cand_.end(), dualpen_.begin(), dualpen_.begin(), plus<double>());
+      transform(gsk_cand_.begin(), gsk_cand_.end(), dualpen_.begin(), dualpen_.begin(),
+                plus<double>());
       Merit_cand_ = fk_cand_+inner_prod(mu_e_, gsk_cand_)+.5*sigma_*(normcs_cand_*normcs_cand_+nu_*std::pow(norm_2(dualpen_), 2));   // NOLINT(whitespace/line_length)
 
       transform(mu_.begin(), mu_.end(), mu_e_.begin(), dualpen_.begin(), minus<double>());
@@ -608,7 +613,8 @@ namespace casadi {
       transform(mu_cand_.begin(), mu_cand_.end(), mu_e_.begin(), dualpen_.begin(), minus<double>());
       for (int i=0;i<ng_;++i)
              dualpen_[i] = -dualpen_[i]*(muR_);
-      transform(gsk_cand_.begin(), gsk_cand_.end(), dualpen_.begin(), dualpen_.begin(), plus<double>());
+      transform(gsk_cand_.begin(), gsk_cand_.end(), dualpen_.begin(), dualpen_.begin(),
+                plus<double>());
       Merit_mu_cand_ = fk_cand_+inner_prod(mu_e_, gsk_cand_)+.5*(1/muR_)*(normcs_cand_*normcs_cand_+nu_*std::pow(norm_2(dualpen_), 2));   // NOLINT(whitespace/line_length)
 
 
@@ -687,14 +693,16 @@ namespace casadi {
           normc_cand_ = norm_2(gk_cand_);
           normcs_cand_ = norm_2(gsk_cand_);
 
-          transform(mu_cand_.begin(), mu_cand_.end(), mu_e_.begin(), dualpen_.begin(), minus<double>());
+          transform(mu_cand_.begin(), mu_cand_.end(), mu_e_.begin(), dualpen_.begin(),
+                    minus<double>());
           for (int i=0;i<ng_;++i)
                  dualpen_[i] = -dualpen_[i]*(1/sigma_);
           transform(gsk_cand_.begin(), gsk_cand_.end(), dualpen_.begin(),
                     dualpen_.begin(), plus<double>());
           Merit_cand_ = fk_cand_+inner_prod(mu_e_, gsk_cand_)+.5*sigma_*(normcs_cand_*normcs_cand_+nu_*std::pow(norm_2(dualpen_), 2));  // NOLINT(whitespace/line_length)
 
-          transform(mu_cand_.begin(), mu_cand_.end(), mu_e_.begin(), dualpen_.begin(), minus<double>());
+          transform(mu_cand_.begin(), mu_cand_.end(), mu_e_.begin(), dualpen_.begin(),
+                    minus<double>());
           for (int i=0;i<ng_;++i)
                  dualpen_[i] = -dualpen_[i]*(muR_);
           transform(gsk_cand_.begin(), gsk_cand_.end(), dualpen_.begin(), dualpen_.begin(),
@@ -719,7 +727,8 @@ namespace casadi {
         copy(gf_.begin(), gf_.end(), gLag_old_.begin());
         if (ng_>0) DMatrix::mul_no_alloc_tn(Jk_, mu_, gLag_old_);
         // gLag_old += mu_x_;
-        transform(gLag_old_.begin(), gLag_old_.end(), mu_x_.begin(), gLag_old_.begin(), plus<double>());
+        transform(gLag_old_.begin(), gLag_old_.end(), mu_x_.begin(), gLag_old_.begin(),
+                  plus<double>());
       }
       // Candidate accepted, update the primal variable
       copy(x_.begin(), x_.end(), x_old_.begin());

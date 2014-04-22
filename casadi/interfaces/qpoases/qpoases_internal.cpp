@@ -248,7 +248,8 @@ void QPOasesInternal::evaluate() {
     if (ALLOW_QPROBLEMB && nc_==0) {
       flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
     } else {
-      flag = static_cast<qpOASES::SQProblem*>(qp_)->init(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+      flag = static_cast<qpOASES::SQProblem*>(qp_)->init(h, g, a, lb, ub, lbA, ubA,
+                                                         nWSR, cputime_ptr);
     }
     called_once_ = true;
   } else {
@@ -257,7 +258,8 @@ void QPOasesInternal::evaluate() {
       flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h, g, lb, ub, nWSR, cputime_ptr);
       //flag = static_cast<qpOASES::QProblemB*>(qp_)->hotstart(g, lb, ub, nWSR, cputime_ptr);
     } else {
-      flag = static_cast<qpOASES::SQProblem*>(qp_)->hotstart(h, g, a, lb, ub, lbA, ubA, nWSR, cputime_ptr);
+      flag = static_cast<qpOASES::SQProblem*>(qp_)->hotstart(h, g, a, lb, ub, lbA, ubA,
+                                                             nWSR, cputime_ptr);
     }
   }
   if (flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED) {

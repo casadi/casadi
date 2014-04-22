@@ -81,7 +81,8 @@ namespace casadi {
 
     // Start a sensitivity application (temporarily)
 #ifdef WITH_SIPOPT
-    Ipopt::SensApplication temp_sens_app(temp_app.Jnlst(), temp_app.Options(), temp_app.RegOptions());
+    Ipopt::SensApplication temp_sens_app(temp_app.Jnlst(), temp_app.Options(),
+                                         temp_app.RegOptions());
 
     // Register sIPOPT options
     Ipopt::RegisterOptions_sIPOPT(temp_app.RegOptions());
