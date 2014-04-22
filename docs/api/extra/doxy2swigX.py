@@ -362,7 +362,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
              grouped_dict[total] = ([origin],pieces)
              grouped_list.append(grouped_dict[total])
           if not self.merge:
-            self.add_text_original(["%feature(\"docstring\") ", swigname, " \"\n"]+pieces+["\";\n","\n"])
+            self.add_text_original(["%feature(\"docstring\") ", swigname if len(swigname)>0 else k, " \"\n"]+pieces+["\";\n","\n"])
             
         if self.merge:
           if len(grouped_list)==1:
