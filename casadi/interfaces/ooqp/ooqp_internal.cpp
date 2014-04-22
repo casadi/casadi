@@ -40,9 +40,10 @@ using namespace std;
 namespace casadi {
 
   OOQPInternal::OOQPInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st) {
-    addOption("print_level", OT_INTEGER,0, "Print level. OOQP listens to print_level 0, 10 and 100");
-    addOption("mutol", OT_REAL,1e-8, "tolerance as provided with setMuTol to OOQP");
-    addOption("artol", OT_REAL,1e-8, "tolerance as provided with setArTol to OOQP");
+    addOption("print_level", OT_INTEGER, 0,
+              "Print level. OOQP listens to print_level 0, 10 and 100");
+    addOption("mutol", OT_REAL, 1e-8, "tolerance as provided with setMuTol to OOQP");
+    addOption("artol", OT_REAL, 1e-8, "tolerance as provided with setArTol to OOQP");
   }
 
   OOQPInternal::~OOQPInternal() {
@@ -201,7 +202,8 @@ namespace casadi {
     // Loop over constraints
     int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
     for (int j=0; j<nc_; ++j) {
-      if (lba[j]==-numeric_limits<double>::infinity() && uba[j]==numeric_limits<double>::infinity()) {
+      if (lba[j] == -numeric_limits<double>::infinity() &&
+          uba[j] ==  numeric_limits<double>::infinity()) {
         // Redundant constraint
         c_index_[j] = 0;
       } else if (lba[j]==uba[j]) {
@@ -266,15 +268,24 @@ namespace casadi {
       cout << "Q = " <<
           tril2symm(DMatrix::triplet(vector<int>(irowQ_.begin(), irowQ_.begin()+nnzQ),
                                      vector<int>(jcolQ_.begin(), jcolQ_.begin()+nnzQ),
-                                     vector<double>(dQ_.begin(), dQ_.begin()+nnzQ), nx, nx)) << endl;
+                                     vector<double>(dQ_.begin(), dQ_.begin()+nnzQ),
+                                     nx, nx)) << endl;
       cout << "c = " << vector<double>(c_.begin(), c_.begin()+nx) << endl;
-      cout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(), irowA_.begin()+nnzA),
-                                        vector<int>(jcolA_.begin(), jcolA_.begin()+nnzA),
-                                        vector<double>(dA_.begin(), dA_.begin()+nnzA), nA, nx) << endl;
+      cout << "A = " << DMatrix::triplet(vector<int>(irowA_.begin(),
+                                                     irowA_.begin()+nnzA),
+                                        vector<int>(jcolA_.begin(),
+                                                    jcolA_.begin()+nnzA),
+                                        vector<double>(dA_.begin(),
+                                                       dA_.begin()+nnzA),
+                                         nA, nx) << endl;
       cout << "b = " << vector<double>(bA_.begin(), bA_.begin()+nA) << endl;
-      cout << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(), irowC_.begin()+nnzC),
-                                        vector<int>(jcolC_.begin(), jcolC_.begin()+nnzC),
-                                        vector<double>(dC_.begin(), dC_.begin()+nnzC), nC, nx) << endl;
+      cout << "C = " << DMatrix::triplet(vector<int>(irowC_.begin(),
+                                                     irowC_.begin()+nnzC),
+                                        vector<int>(jcolC_.begin(),
+                                                    jcolC_.begin()+nnzC),
+                                        vector<double>(dC_.begin(),
+                                                       dC_.begin()+nnzC),
+                                         nC, nx) << endl;
       cout << "d = " << printBounds(clow_, iclow_, nC, "-") << endl;
       cout << "f = " << printBounds(cupp_, icupp_, nC, "") << endl;
       cout << "l = " << printBounds(xlow_, ixlow_, nx, "-") << endl;
@@ -326,12 +337,12 @@ namespace casadi {
       if (ierr == 0) {
         QpGenContext ctx;
 
-        QpGenHbGondzioSetup( getPtr(c_), nx, getPtr(krowQ), getPtr(jcolQ_), getPtr(dQ_),
+        QpGenHbGondzioSetup(getPtr(c_), nx, getPtr(krowQ), getPtr(jcolQ_), getPtr(dQ_),
         getPtr(xlow_), getPtr(ixlow_), getPtr(xupp_), getPtr(ixupp_),
         getPtr(krowA), nA, getPtr(jcolA_), getPtr(dA_), getPtr(bA_),
         getPtr(krowC), nC, getPtr(jcolC_), getPtr(dC_),
         getPtr(clow_), getPtr(iclow_), getPtr(cupp_), getPtr(icupp_), &ctx,
-        &ierr );
+        &ierr);
         if (ierr == 0) {
           Solver* solver = static_cast<Solver *>(ctx.solver);
           gOoqpPrintLevel = print_level_;
@@ -339,11 +350,9 @@ namespace casadi {
           solver->setMuTol(mutol_);
           solver->setMuTol(mutol_);
 
-          QpGenFinish( &ctx, getPtr(x_), getPtr(gamma_), getPtr(phi_),
-              getPtr(y_),
-              getPtr(z_), getPtr(lambda_), getPtr(pi_),
-              &objectiveValue,
-                       &ierr );
+          QpGenFinish(&ctx, getPtr(x_), getPtr(gamma_), getPtr(phi_),
+              getPtr(y_), getPtr(z_), getPtr(lambda_), getPtr(pi_),
+              &objectiveValue, &ierr);
         }
 
         QpGenCleanup(&ctx);
