@@ -35,61 +35,61 @@ namespace casadi{
   */
   class CASADI_SYMBOLIC_EXPORT LinearSolverInternal : public FunctionInternal{
   public:
-    // Constructor
+    /// Constructor
     LinearSolverInternal(const Sparsity& sparsity, int nrhs);
 
-    // Destructor
+    /// Destructor
     virtual ~LinearSolverInternal();
 
-    // Clone
+    /// Clone
     virtual LinearSolverInternal* clone() const{ return new LinearSolverInternal(*this);}
 
-    // Initialize
+    /// Initialize
     virtual void init();
 
-    // Solve the system of equations
+    /// Solve the system of equations
     virtual void evaluate();
 
-    // Prepare the factorization
+    /// Prepare the factorization
     virtual void prepare(){}
 
-    // Solve the system of equations, using internal vector
+    /// Solve the system of equations, using internal vector
     virtual void solve(bool transpose);
 
-    // Solve the system of equations
+    /// Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
 
     /// Create a solve node
     MX solve(const MX& A, const MX& B, bool transpose);
 
-    // Evaluate numerically, possibly transposed
+    /// Evaluate numerically, possibly transposed
     virtual void evaluateDGen(const DMatrixPtrV& input, DMatrixPtrV& output, bool tr);
 
-    // Evaluate MX, possibly transposed
+    /// Evaluate MX, possibly transposed
     virtual void evaluateSXGen(const SXPtrV& input, SXPtrV& output, bool tr);
 
-    // Evaluate MX, possibly transposed
+    /// Evaluate MX, possibly transposed
     virtual void evaluateMXGen(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed,
                                MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens,
                                bool output_given, bool tr);
 
-    // Propagate sparsity, possibly transposed
+    /// Propagate sparsity, possibly transposed
     void propagateSparsityGen(DMatrixPtrV& input, DMatrixPtrV& output, std::vector<int>& itmp,
                               std::vector<double>& rtmp, bool fwd, bool transpose);
 
     ///@{
-    // Propagate sparsity through a linear solve
+    /// Propagate sparsity through a linear solve
     void spSolve(bvec_t* X, const bvec_t* B, bool transpose) const;
     void spSolve(DMatrix& X, const DMatrix& B, bool transpose) const;
     ///@}
 
-    // Dulmage-Mendelsohn decomposition
+    /// Dulmage-Mendelsohn decomposition
     std::vector<int> rowperm_, colperm_, rowblock_, colblock_;
 
-    // Is prepared
+    /// Is prepared
     bool prepared_;
 
-    // Get sparsity pattern
+    /// Get sparsity pattern
     int nrow() const{ return input(LINSOL_A).size1();}
     int ncol() const{ return input(LINSOL_A).size2();}
     int nnz() const{ return input(LINSOL_A).size();}

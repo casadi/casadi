@@ -256,8 +256,11 @@ namespace casadi{
         \see size()  */
     int numel() const;
 
-    /// Check if the sparsity is empty, i.e. if one of the dimensions is zero
-    // (or optionally both dimensions)
+    /** \brief Check if the sparsity is empty
+    *
+    * A sparsity is considered empty if one of the dimensions is zero
+    * (or optionally both dimensions)
+    */
     bool isEmpty(bool both=false) const;
 
     /** \brief Get the number of (structural) non-zeros
@@ -366,8 +369,11 @@ namespace casadi{
     Sparsity T() const{ return transpose();}
 #endif
 
-    /// Transpose the matrix and get the reordering of the non-zero entries,
-    // i.e. the non-zeros of the original matrix for each non-zero of the new matrix
+    /** \brief Transpose the matrix and get the reordering of the non-zero entries
+    * 
+    *  \param[out] mapping the non-zeros of the original matrix
+    *              for each non-zero of the new matrix
+    */
     Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
 
     /// Check if the sparsity is the transpose of another
@@ -495,12 +501,17 @@ namespace casadi{
     /// Get lower triangular part
     Sparsity getTril(bool includeDiagonal=true) const;
 
-    /// Do the rows appear sequentially on each column
-    // (if strictly==true, then do not allow multiple entries)
+    /** \brief Do the rows appear sequentially on each column
+    *
+    * \param[in] strictly if true, then do not allow multiple entries
+    */
     bool rowsSequential(bool strictly=true) const;
 
-    /// Remove duplicate entries: The same indices will be removed from the mapping vector,
-    // which must have the same length as the number of nonzeros
+    /** \brief Remove duplicate entries
+    *
+    * The same indices will be removed from the \a mapping vector,
+    * which must have the same length as the number of nonzeros
+    */
     void removeDuplicates(std::vector<int>& mapping);
 
 /// \cond INTERNAL

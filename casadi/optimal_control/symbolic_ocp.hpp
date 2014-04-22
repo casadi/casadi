@@ -310,12 +310,18 @@ namespace casadi{
     /// Set an binding expression by non-differentiated expression
     void setBeq(const SX& var, const SX& val);
 
-    /// Get a derivative binding equation (i.e. ordinary differential equation, ODE) by name.
-    // Returns variable expression if unknown.
+    /** \brief Get a derivative binding equation (i.e. ordinary differential equation, ODE) 
+     * by name.
+     * 
+     * Returns variable expression if unknown.
+     */
     SX ode(const std::string& name) const;
 
-    /// Get a derivative binding expression (i.e. ordinary differential equation, ODE)
-    // by non-differentiated expression. Returns derivative expression if unknown.
+    /** \brief Get a derivative binding expression (i.e. ordinary differential equation, ODE)
+     * by non-differentiated expression.
+     *
+     * Returns derivative expression if unknown.
+     */
     SX ode(const SX& var) const;
 
     /// Set a derivative binding equation by name

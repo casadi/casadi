@@ -388,8 +388,9 @@ namespace casadi{
     /// Perform the operation
     template<typename T> static inline void derf(const T& x, const T& y, T& f, T* d){
 
-      /// First save to temp since f might have the same address as x or y,
-      // in which case it will be incorrect in the second call
+      /** First save to temp since f might have the same address as x or y,
+      * in which case it will be incorrect in the second call
+      */
       T tmp;
 
       /// Evaluate the function

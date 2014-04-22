@@ -38,8 +38,10 @@ namespace casadi{
     /// Check if the dimensions and colind,row vectors are compatible
     void sanityCheck(bool complete=false) const;
 
-    /// Get the diagonal of the matrix/create a diagonal matrix
-    // (mapping will contain the nonzero mapping)
+    /** \brief Get the diagonal of the matrix/create a diagonal matrix
+     *
+     * \param[out mapping will contain the nonzero mapping
+     */
     Sparsity getDiag(std::vector<int>& mapping) const;
 
     /// Calculate the elimination tree: See cs_etree in CSparse
@@ -55,8 +57,10 @@ namespace casadi{
     /// Transpose the matrix
     Sparsity transpose() const;
 
-    /// Transpose the matrix and get the reordering of the non-zero entries,
-    // i.e. the non-zeros of the original matrix for each non-zero of the new matrix
+    /** \brief Transpose the matrix and get the reordering of the non-zero entries,
+     *
+     * \param[out] mapping the non-zeros of the original matrix for each non-zero of the new matrix
+     */
     Sparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
 
     /// Check if the sparsity is the transpose of another
@@ -82,8 +86,9 @@ namespace casadi{
     /// return 1 if col i is in R2 : see cs_rprune in CSparse
     static int rprune (int i, int j, double aij, void *other);
 
-    /// drop entries for which fkeep(A(i,j)) is false; return nz if OK, else -1: :
-    // see cs_fkeep in CSparse
+    /** \brief drop entries for which fkeep(A(i,j)) is false; return nz if OK, else -1: :
+     * see cs_fkeep in CSparse
+     */
     int drop(int (*fkeep) (int, int, double, void *), void *other);
 
     /// Compute the Dulmage-Mendelsohn decomposition : see cs_dmperm in CSparse
@@ -95,8 +100,10 @@ namespace casadi{
                                                  coarse_colblock,coarse_rowblock,seed);
     }
 
-    /// Compute the Dulmage-Mendelsohn decomposition
-    // -- upper triangular TODO: refactor and merge with the above
+    /** \brief Compute the Dulmage-Mendelsohn decomposition
+     *
+     * -- upper triangular TODO: refactor and merge with the above
+     */
     int dulmageMendelsohnUpper(std::vector<int>& rowperm, std::vector<int>& colperm,
                                std::vector<int>& rowblock, std::vector<int>& colblock,
                                std::vector<int>& coarse_rowblock,
@@ -110,9 +117,11 @@ namespace casadi{
     void augmentingPath(int k, std::vector<int>& jmatch,
                         int *cheap, std::vector<int>& w, int *js, int *is, int *ps) const;
 
-    /// return a random permutation vector, the identity perm, or p = n-1:-1:0.
-    // seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.
-    // otherwise p = random permutation. See cs_randperm in CSparse
+    /** 
+     * return a random permutation vector, the identity perm, or p = n-1:-1:0.
+     * seed = -1 means p = n-1:-1:0.  seed = 0 means p = identity.
+     * otherwise p = random permutation. See cs_randperm in CSparse
+     */
     static std::vector<int> randomPermutation(int n, int seed);
 
     /// Invert a permutation matrix: see cs_pinv in CSparse
@@ -125,8 +134,9 @@ namespace casadi{
     static int leaf (int i, int j, const int *first, int *maxfirst,
                      int *prevleaf, int *ancestor, int *jleaf);
 
-    /// compute nnz(V) = S->lnz, S->pinv, S->leftmost, S->m2 from A and S->parent:
-    // See cs_vcount in CSparse
+    /** compute nnz(V) = S->lnz, S->pinv, S->leftmost, S->m2 from A and S->parent:
+     * See cs_vcount in CSparse
+     */
     int vcount(std::vector<int>& pinv, std::vector<int>& parent, std::vector<int>& leftmost,
                int& S_m2, double& S_lnz) const;
 
@@ -143,8 +153,9 @@ namespace casadi{
     /// Row counts: See cs_counts in CSparse
     std::vector<int> counts(const int *parent, const int *post, int ata) const;
 
-    /// Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise.
-    // order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
+    /** Approximate minimal degree, p = amd(A+A') if symmetric is true, or amd(A'A) otherwise.
+     * order 0:natural, 1:Chol, 2:LU, 3:QR. See cs_amd in CSparse
+     */
     std::vector<int> approximateMinimumDegree(int order) const;
 
     /// symbolic ordering and analysis for QR or LU: See cs_sqr in CSparse
@@ -161,8 +172,9 @@ namespace casadi{
     /// C = A*B: See cs_multiply in CSparse
     Sparsity multiply(const Sparsity& B) const;
 
-    /// x = x + beta * A(:,j), where x is a dense vector and A(:,j) is sparse:
-    // See cs_scatter in CSparse
+    /** x = x + beta * A(:,j), where x is a dense vector and A(:,j) is sparse:
+     * See cs_scatter in CSparse
+     */
     int scatter(int j, std::vector<int>& w, int mark, Sparsity& C, int nz) const;
 
     /// Get the column for each nonzero
@@ -195,8 +207,11 @@ namespace casadi{
     /// Is scalar?
     bool isScalar(bool scalar_and_dense) const;
 
-    /// Check if the sparsity is empty, i.e. if one of the dimensions is zero
-    // (or optionally both dimensions)
+    /** \brief Check if the sparsity is empty
+     *
+     * A sparsity is considered empty if one of the dimensions is zero
+     * (or optionally both dimensions)
+     */
     bool isEmpty(bool both=false) const;
 
     /// Is dense?
@@ -303,8 +318,11 @@ namespace casadi{
     /// Does the rows appear sequentially on each col
     bool rowsSequential(bool strictly) const;
 
-    /// Remove duplicate entries: The same indices will be removed from the mapping vector,
-    // which must have the same length as the number of nonzeros
+    /** \brief Remove duplicate entries
+     *
+     * The same indices will be removed from the mapping vector,
+     * which must have the same length as the number of nonzeros
+     */
     void removeDuplicates(std::vector<int>& mapping);
 
     /// Get element index for each nonzero
@@ -334,16 +352,25 @@ namespace casadi{
     /// vector of length nnz containing the rows for all the indices of the non-zero elements
     std::vector<int> row_;
 
-    /// Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-    // (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+    /** \brief Perform a unidirectional coloring
+     *
+     * A greedy distance-2 coloring algorithm
+     * (Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+     */
     Sparsity unidirectionalColoring(const Sparsity& AT, int cutoff) const;
 
-    /// Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring algorithm
-    // (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+    /** \brief Perform a star coloring of a symmetric matrix
+     *
+     * A greedy distance-2 coloring algorithm
+     * (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN)
+     */
     Sparsity starColoring(int ordering, int cutoff) const;
 
-    /// Perform a star coloring of a symmetric matrix: An improved distance-2 coloring algorithm
-    // (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+    /** \brief Perform a star coloring of a symmetric matrix
+     * 
+     * An improved distance-2 coloring algorithm
+     * (Algorithm 4.1 in A. H. GEBREMEDHIN, A. TARAFDAR, F. MANNE, A. POTHEN)
+     */
     Sparsity starColoring2(int ordering, int cutoff) const;
 
     /// Order the columns by decreasing degree

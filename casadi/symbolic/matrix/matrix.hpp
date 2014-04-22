@@ -598,8 +598,9 @@ namespace casadi{
     static void mul_no_alloc_nn(const Matrix<DataType>& x, const std::vector<DataType> &y,
                                 std::vector<DataType>& z);
 
-    /// Propagate sparsity using 0-1 logic through a matrix product,
-    // no memory allocation: z = mul(trans(x),y)
+    /** \brief Propagate sparsity using 0-1 logic through a matrix product,
+     * no memory allocation: <tt>z = mul(trans(x),y)</tt>
+     */
     template<bool Fwd>
     static void mul_sparsity(Matrix<DataType> &x_trans, Matrix<DataType> &y, Matrix<DataType>& z);
 

@@ -40,8 +40,9 @@ namespace casadi{
   public:
 
     /// \cond UNSAFE
-    /// \brief [UNSAFE] Obtain reference to inputs
-    // \seealso getInput, setInput
+    /** \brief [UNSAFE] Obtain reference to inputs
+     * \seealso getInput, setInput
+     */
     ///@{
     /// Access input argument
     inline const Matrix<double>& input(int iind=0) const{ return inputS<true>(iind);}
@@ -54,8 +55,9 @@ namespace casadi{
     inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
     ///@}
 
-    /// \brief [UNSAFE] Obtain reference to outputs
-    // \seealso getOutput, getOutput
+    /** \brief [UNSAFE] Obtain reference to outputs
+     * \seealso getOutput, getOutput
+     */
     ///@{
     /// Access output argument
     inline const Matrix<double>& output(int oind=0) const{ return outputS<true>(oind);}

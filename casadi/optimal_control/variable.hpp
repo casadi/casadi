@@ -87,8 +87,9 @@ namespace casadi{
     /// Binding equation. Equal to "v" if unknown
     SXElement beq;
 
-    /// Derivative binding equation, i.e. ordinary differential equation (ODE).
-    // Equal do "d" if unknown
+    /** \brief Derivative binding equation, i.e. ordinary differential equation (ODE).
+     * Equal do "d" if unknown
+     */
     SXElement ode;
 
     /// Nominal value

@@ -102,8 +102,10 @@ namespace casadi{
     /// Assign the node to a node class pointer (or null)
     void assignNode(SharedObjectNode* node);
 
-    /// Assign the node to a node class pointer without reference counting: improper
-    // use will cause memory leaks!
+    /** \brief Assign the node to a node class pointer without reference counting
+     *
+     * improper use will cause memory leaks!
+     */
     void assignNodeNoCount(SharedObjectNode* node);
 
     /// Get a const pointer to the node
@@ -163,8 +165,11 @@ namespace casadi{
 
     ///@{
     /// \cond SWIGINTERNAL
-    /// If there are other references to the object, then make a deep copy of it
-    // and point to this new object
+    /** \brief Make unique
+     *
+     * If there are other references to the object, then make a deep copy of it
+     *  and point to this new object
+     */
     void makeUnique(bool clone_members=true);
     /// \endcond SWIGINTERNAL
     /// \cond INTERNAL
@@ -268,8 +273,9 @@ namespace casadi{
   /// \endcond
 
   /// \cond INTERNAL
-  /// Typecast a shared object to a base class to a shared object to a derived class,
-  // cf. dynamic_cast
+  /** \brief Typecast a shared object to a base class to a shared object to a derived class,
+   * cf. dynamic_cast
+   */
   template<class B>
   B shared_cast(SharedObject& A){
 
@@ -289,8 +295,9 @@ namespace casadi{
     return ret;
   }
 
-  /// Typecast a shared object to a base class to a shared object to a derived class,
-  // cf. dynamic_cast (const)
+  /** \brief Typecast a shared object to a base class to a shared object to a derived class,
+   * cf. dynamic_cast (const)
+   */
   template<class B>
   const B shared_cast(const SharedObject& A){
     SharedObject A_copy = A;
@@ -348,7 +355,7 @@ namespace casadi{
   ///@}
 
   /// \cond INTERNAL
-  // Template function implementations
+  /// Template function implementations
   template<class B>
   B SharedObjectNode::shared_from_this(){
     B ret;

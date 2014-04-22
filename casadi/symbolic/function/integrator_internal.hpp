@@ -97,17 +97,17 @@ namespace casadi{
     /** \brief Set solver specific options to generated augmented integrators */
     virtual void setDerivativeOptions(Integrator& integrator, const AugOffset& offset);
 
-    /// Generate a augmented DAE system with \a nfwd forward sensitivities
-    // and \a nadj adjoint sensitivities
+    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
+    * and \a nadj adjoint sensitivities */
     virtual std::pair<Function,Function> getAugmented(int nfwd, int nadj, AugOffset& offset);
 
-    // Get offsets in augmented problem
+    /// Get offsets in augmented problem
     AugOffset getAugOffset(int nfwd, int nadj);
 
-    // Create sparsity pattern of the extended Jacobian (forward problem)
+    /// Create sparsity pattern of the extended Jacobian (forward problem)
     Sparsity spJacF();
 
-    // Create sparsity pattern of the extended Jacobian (backward problem)
+    /// Create sparsity pattern of the extended Jacobian (backward problem)
     Sparsity spJacG();
 
     ///@{

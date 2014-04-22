@@ -461,7 +461,7 @@ namespace casadi{
     void appendColumns(const MX& y);
 
     /// \cond SWIGINTERNAL
-    // all binary operations
+    /// all binary operations
     MX __add__(const MX& y) const;
     MX __sub__(const MX& y) const;
     MX __mul__(const MX& y) const;

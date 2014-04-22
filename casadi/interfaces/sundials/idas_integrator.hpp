@@ -50,10 +50,6 @@ public:
   /// Default constructor
   IdasIntegrator();
 
-  /// Create an integrator for a fully implicit DAE with quadrature states
-  // (nz is the number of states not to be included in the state vector)
-
-
   /** \brief  Create an integrator for a fully implicit DAE with quadrature states
   * (\a nz is the number of states not to be included in the state vector)
   *   \param f dynamical system

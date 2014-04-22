@@ -101,12 +101,12 @@ namespace casadi{
     static SXElement create(SXNode* node);
     /// \endcond
 
-    // Assignment
+    /// Assignment
     SXElement& operator=(const SXElement& scalar);
     SXElement& operator=(double scalar); // needed since otherwise both a = SXElement(double)
                                          // and a = Matrix(double) would be ok
 
-    // Convert to a 1-by-1 Matrix
+    /// Convert to a 1-by-1 Matrix
     operator Matrix<SXElement>() const;
 
     /** \brief  print to stream */
@@ -216,7 +216,7 @@ namespace casadi{
     SXElement __mpower__(const SXElement& b) const {return (*this).__pow__(b);}
     SXElement trans() const{ return *this;}
 
-    /// The following functions serves two purposes:
+    // The following functions serves two purposes:
     // Numpy compatibility and to allow unambiguous access
     SXElement mul(const SXElement& y) const{ return __mul__(y);}
     SXElement exp() const;
@@ -261,16 +261,16 @@ namespace casadi{
     Matrix<SXElement> arctan2(const Matrix<SXElement>& b) const;
 
     /// \cond INTERNAL
-    // Get the temporary variable
+    /// Get the temporary variable
     int getTemp() const;
 
-    // Set the temporary variable
+    /// Set the temporary variable
     void setTemp(int t);
 
-    // Check if marked (i.e. temporary is negative)
+    /// Check if marked (i.e. temporary is negative)
     bool marked() const;
 
-    // Mark by flipping the sign of the temporary and decreasing by one
+    /// Mark by flipping the sign of the temporary and decreasing by one
     void mark();
 
     /** \brief Assign to another expression, if a duplicate. 
@@ -287,11 +287,11 @@ namespace casadi{
 
 #ifndef SWIG
   private:
-    // Pointer to node (SXElement is only a reference class)
+    /// Pointer to node (SXElement is only a reference class)
     SXNode* node;
 
     /** \brief inline if-test */
-    // replaces the ternary conditional operator "?:", which cannot be overloaded
+    /// replaces the ternary conditional operator "?:", which cannot be overloaded
     friend SXElement if_else(const SXElement& cond, const SXElement& if_true,
                              const SXElement& if_false);
 #endif // SWIG
