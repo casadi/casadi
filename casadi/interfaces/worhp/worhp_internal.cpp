@@ -883,7 +883,7 @@ namespace casadi {
   void WorhpInternal::setOptionsFromFile(const std::string & file) {
     int status;
     char *cpy = new char[file.size()+1] ;
-    strcpy(cpy, file.c_str());  // NOLINT(runtime/printf)
+    strcpy(cpy, file.c_str());
     worhp_p_.initialised = true;
     ReadParamsNoInit(&status, cpy, &worhp_p_);
     delete cpy;
