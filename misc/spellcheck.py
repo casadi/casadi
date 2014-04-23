@@ -61,6 +61,8 @@ def checkfile(f,lock):
       continue
     #if "//" in t[3:-3]:
     #  continue
+    
+    t = re.sub(r'\bNOLINT\(.*?\)','',t)
 
     t = re.sub(r'\s[^\s]+(-by-)[^\s\)]+(\s)','\\2',t)
     
