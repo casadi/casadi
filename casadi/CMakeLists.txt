@@ -80,7 +80,6 @@ foreach(name ${CASADI_MODULES})
   endfunction()
   
   obtain_interface_link_libraries(${name} OUTPUT)
-  message("${name} : ${OUTPUT}")
   set(PC_REQUIRES)
   set(PC_LIBRARIES)
   
@@ -100,7 +99,12 @@ foreach(name ${CASADI_MODULES})
 
   set(PC_LIBRARIES_LIST "-l${name}")
   foreach(LIB ${PC_LIBRARIES})
-    set(PC_LIBRARIES_LIST "${PC_LIBRARIES_LIST} -l${LIB}")
+    string(REGEX MATCH "[\\/](lib)?([a-zA-Z0-9_]+)\\.[a-zA-Z0-9_]+$" LIBMATCH ${LIB})
+    if(LIBMATCH)
+      set(PC_LIBRARIES_LIST "${PC_LIBRARIES_LIST} -l${CMAKE_MATCH_2}")
+    else()
+      set(PC_LIBRARIES_LIST "${PC_LIBRARIES_LIST} -l${LIB}")
+    endif()
   endforeach()
   get_target_property(PC_LINK_LIBRARIES ${name} "LINK_LIBRARIES")
   configure_file(
