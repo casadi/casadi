@@ -769,13 +769,11 @@ namespace casadi {
 
     // return reverse permutation
     if (seed==-1) return p;
-
-    // get new random number seed
-    srand(seed);
+    unsigned int seedu = seed;
 
     for (int k=0; k<n; ++k) {
       // j = rand int in range k to n-1
-      int j = k + (rand() % (n-k));
+      int j = k + (rand_r(&seedu) % (n-k));
 
       // swap p[k] and p[j]
       int t = p[j];

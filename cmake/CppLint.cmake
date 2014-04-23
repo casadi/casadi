@@ -43,7 +43,6 @@ set(STYLE_FILTER ${STYLE_FILTER}-runtime/int,)
 set(STYLE_FILTER ${STYLE_FILTER}-runtime/explicit,)
 
 # THESE SHOW LEGITAMITE WARNINGS WHICH SHOUL BE FIXED:
-set(STYLE_FILTER ${STYLE_FILTER}-runtime/threadsafe_fn,)
 set(STYLE_FILTER ${STYLE_FILTER}-runtime/printf,)
 
 # Add a target that runs cpplint.py
