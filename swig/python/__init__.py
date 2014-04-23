@@ -21,6 +21,7 @@
 # 
 # -*- coding: utf-8 -*-
 
+import warnings
 
 # workaround for issue #1012
 # Since ipopt uses "dlopen" internally, we have to make sure that all the
@@ -40,6 +41,9 @@ if hasattr(sys,"getdlopenflags"):
 
 from casadi import *    # import everything
 import casadi as casadi # import everything
+
+if 'casadi_symbolic' in failed_interfaces:
+  raise Exception("Error while loading casadi: %s" % str(failed_interfaces["casadi_symbolic"]))
 
 if hasattr(sys,"getdlopenflags"):
   sys.setdlopenflags( flags0 ) # set the old flags back
