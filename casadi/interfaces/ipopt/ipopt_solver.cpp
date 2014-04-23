@@ -49,4 +49,8 @@ namespace casadi {
     return (*this)->getReducedHessian();
   }
 
+  void IpoptSolver::setDefaultLinearSolver(const std::string& solver) {
+    IpoptInternal::setDefaultLinearSolver(solver);
+  }
+
 } // namespace casadi

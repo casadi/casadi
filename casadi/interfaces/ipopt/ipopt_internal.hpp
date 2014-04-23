@@ -137,6 +137,10 @@ public:
   DMatrix red_hess_;
   #endif // WITH_SIPOPT
 
+  static void setDefaultLinearSolver(const std::string& solver);
+
+  static std::string default_linear_solver_;
+
 };
 
 } // namespace casadi

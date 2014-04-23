@@ -128,6 +128,10 @@ namespace casadi {
       // Save to map containing IPOPT specific options
       ops_[opt_name] = casadi_type;
     }
+
+    if (default_linear_solver_.size()!=0) {
+      setOption("linear_solver", default_linear_solver_);
+    }
   }
 
   void IpoptInternal::freeIpopt() {
@@ -1022,5 +1026,11 @@ namespace casadi {
 #endif // WITH_CASADI_PATCH
 
   }
+
+  void IpoptInternal::setDefaultLinearSolver(const std::string& solver) {
+    IpoptInternal::default_linear_solver_ = solver;
+  }
+
+  std::string IpoptInternal::default_linear_solver_ = "";
 
 } // namespace casadi
