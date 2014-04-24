@@ -249,12 +249,12 @@ add_custom_target(${my_module}_json
 add_dependencies(${my_module}_json ${my_module}_xml DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml)
 endforeach()
 
-foreach(my_module ${CASADI_MODULES})
-install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.json
-  DESTINATION share/casadi
-  COMPONENT componentjson
-)
-endforeach()
+#foreach(my_module ${CASADI_MODULES})
+#install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.json
+#  DESTINATION share/casadi
+#  COMPONENT componentjson
+#)
+#endforeach()
 
 
 #set(CPACK_MONOLITHIC_INSTALL FALSE)
