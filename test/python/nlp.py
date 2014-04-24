@@ -1114,6 +1114,8 @@ class NLPtests(casadiTestCase):
       solver.setInput(UBX,"ubx")
       solver.setInput(LBA,"lbg")
       solver.setInput(UBA,"ubg")
+      if 'SQIC' in str(solver_options):
+        continue
       if 'Worhp' in str(Solver):
         with self.assertRaises(Exception):
           solver.solve()
