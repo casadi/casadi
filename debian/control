@@ -50,6 +50,16 @@ Description: ipopt interface for casadi
  CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
  Here is my description haha.
 
+Package: libcasadi-control2.0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libcasadi-core2.0 (= ${binary:Version})
+Description: controls library for casadi
+ CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
+ Here is my description haha.
+
 
 Package: libcasadi-dev
 Section: libdevel
@@ -81,6 +91,17 @@ Depends: ${misc:Depends},
          libcasadi-ipopt-interface2.0 (= ${binary:Version}),
          libcasadi-core-dev (= ${binary:Version})
 Description: development files for CasADi ipopt interface
+ CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
+ .
+ Here is my description haha.
+
+Package: libcasadi-control-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         libcasadi-control2.0 (= ${binary:Version}),
+         libcasadi-core-dev (= ${binary:Version})
+Description: development files for CasADi control
  CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
  .
  Here is my description haha.
