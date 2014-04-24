@@ -346,6 +346,7 @@ macro(SWIG_ADD_MODULE_XML name)
 
   add_library(${SWIG_MODULE_${name}_REAL_NAME}
     MODULE
+    EXCLUDE_FROM_ALL
     ${swig_generated_sources}
     ${swig_other_sources})
   set_target_properties(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES LINKER_LANGUAGE C)
