@@ -616,10 +616,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "casadi/core/function/parallelizer.hpp"
 #include "casadi/core/function/external_function.hpp"
 
-
-#include "casadi/optimal_control/direct_multiple_shooting.hpp"
-#include "casadi/optimal_control/symbolic_ocp.hpp"
-
 #include "casadi/core/function/io_interface.hpp"
 #include "casadi/core/function/function.hpp"
 #include "casadi/core/function/sx_function.hpp"
@@ -645,32 +641,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "casadi/core/function/custom_function.hpp"
 #include "casadi/core/function/nullspace.hpp"
 #include "casadi/core/functor.hpp"
-
-#include "casadi/nonlinear_programming/symbolic_nlp.hpp"
-#include "casadi/nonlinear_programming/sqp_method.hpp"
-#include "casadi/nonlinear_programming/stabilized_sqp_method.hpp"
-#include "casadi/nonlinear_programming/scpgen.hpp"
-#include "casadi/nonlinear_programming/nlp_qp_solver.hpp"
-#include "casadi/nonlinear_programming/nlp_implicit_solver.hpp"
-#include "casadi/nonlinear_programming/newton_implicit_solver.hpp"
-#include "casadi/nonlinear_programming/simple_homotopy_nlp_solver.hpp"
-
-#include "casadi/integration/fixed_step_integrator.hpp"
-#include "casadi/integration/implicit_fixed_step_integrator.hpp"
-#include "casadi/integration/rk_integrator.hpp"
-#include "casadi/integration/collocation_integrator.hpp"
-#include "casadi/integration/old_collocation_integrator.hpp"
-#include "casadi/integration/integration_tools.hpp"
-
-
-#include "casadi/optimal_control/variable.hpp"
-#include "casadi/optimal_control/symbolic_ocp.hpp"
-#include "casadi/optimal_control/direct_single_shooting.hpp"
-#include "casadi/optimal_control/direct_multiple_shooting.hpp"
-#include "casadi/optimal_control/direct_collocation.hpp"
-
-#include "casadi/control/dple_solver.hpp"
-#include "casadi/control/simple_indef_dple_solver.hpp"
 
 using namespace casadi;
 
