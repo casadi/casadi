@@ -222,7 +222,8 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
 foreach(my_module ${CASADI_MODULES})
   install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py
     DESTINATION casadi
-    COMPONENT install_python)
+    COMPONENT install_python
+  )
 endforeach()
 
 #creation of a custom installation command
