@@ -25,6 +25,7 @@
 #include "ipopt_nlp.hpp"
 #include "casadi/core/std_vector_tools.hpp"
 #include <ctime>
+#include <stdlib.h>
 
 using namespace std;
 #include <IpIpoptApplication.hpp>
@@ -129,8 +130,9 @@ namespace casadi {
       ops_[opt_name] = casadi_type;
     }
 
-    if (default_linear_solver_.size()!=0) {
-      setOption("linear_solver", default_linear_solver_);
+    char * default_solver = getenv("IPOPT_DEFAULT_LINEAR_SOLVER");
+    if (default_solver) {
+      setOption("linear_solver", default_solver);
     }
   }
 
@@ -1026,11 +1028,5 @@ namespace casadi {
 #endif // WITH_CASADI_PATCH
 
   }
-
-  void IpoptInternal::setDefaultLinearSolver(const std::string& solver) {
-    IpoptInternal::default_linear_solver_ = solver;
-  }
-
-  std::string IpoptInternal::default_linear_solver_ = "";
 
 } // namespace casadi

@@ -49,11 +49,6 @@ if hasattr(sys,"getdlopenflags"):
   sys.setdlopenflags( flags0 ) # set the old flags back
   
 import os
-
-if 'casadi_ipopt_interface' in loaded_modules and "IPOPT_DEFAULT_LINEAR_SOLVER" in os.environ:
-  IpoptSolver.setDefaultLinearSolver(os.environ["IPOPT_DEFAULT_LINEAR_SOLVER"])
-  
-
 import types
   
 def wrapper(f, warning,error=False):
