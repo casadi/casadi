@@ -21,7 +21,7 @@
  */
 
 #include "lapack_qr_dense.hpp"
-#include "../../symbolic/std_vector_tools.hpp"
+#include "../../core/std_vector_tools.hpp"
 
 using namespace std;
 namespace casadi {

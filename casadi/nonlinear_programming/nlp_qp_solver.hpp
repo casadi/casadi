@@ -23,7 +23,7 @@
 #ifndef NLP_QP_SOLVER_HPP
 #define NLP_QP_SOLVER_HPP
 
-#include "casadi/symbolic/function/qp_solver.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 

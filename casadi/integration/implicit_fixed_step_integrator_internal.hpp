@@ -25,7 +25,7 @@
 
 #include "implicit_fixed_step_integrator.hpp"
 #include "fixed_step_integrator_internal.hpp"
-#include "casadi/symbolic/function/implicit_function.hpp"
+#include "casadi/core/function/implicit_function.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

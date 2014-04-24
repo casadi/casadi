@@ -185,7 +185,7 @@ int usage_c_unknown_signature(){
 
 
 // C++ (and CasADi) from here on
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 using namespace casadi;
 using namespace std;
 

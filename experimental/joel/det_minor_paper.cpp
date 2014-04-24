@@ -20,12 +20,12 @@
  *
  */
 
-#include "symbolic/std_vector_tools.hpp"
-#include "symbolic/function/sx_function.hpp"
-#include "symbolic/function/mx_function.hpp"
-#include "symbolic/function/external_function.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/mx/mx_tools.hpp"
+#include "core/std_vector_tools.hpp"
+#include "core/function/sx_function.hpp"
+#include "core/function/mx_function.hpp"
+#include "core/function/external_function.hpp"
+#include "core/sx/sx_tools.hpp"
+#include "core/mx/mx_tools.hpp"
 #include <ctime>
 #include <stdlib.h>
 

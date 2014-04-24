@@ -21,8 +21,8 @@
  */
 
 #include "csparse_internal.hpp"
-#include "symbolic/matrix/crs_sparsity_internal.hpp"
-#include "symbolic/std_vector_tools.hpp"
+#include "core/matrix/crs_sparsity_internal.hpp"
+#include "core/std_vector_tools.hpp"
 
 using namespace std;
 namespace casadi{

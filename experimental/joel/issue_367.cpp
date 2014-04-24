@@ -1,4 +1,4 @@
-#include "symbolic/sx/sx.hpp"
+#include "core/sx/sx.hpp"
 casadi::SX a;
 int main(){
   return 0;

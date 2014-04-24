@@ -23,7 +23,7 @@
 #ifndef CSPARSE_CHOLESKY_HPP
 #define CSPARSE_CHOLESKY_HPP
 
-#include "casadi/symbolic/function/linear_solver.hpp"
+#include "casadi/core/function/linear_solver.hpp"
 #include <casadi/interfaces/csparse/casadi_csparse_interface_export.h>
 
 namespace casadi {

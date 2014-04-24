@@ -21,9 +21,9 @@
  */
 
 #include <iostream>
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/symbolic/function/external_function.hpp>
+#include <casadi/core/function/external_function.hpp>
 
 using namespace casadi;
 using namespace std;

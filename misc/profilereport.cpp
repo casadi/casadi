@@ -4,9 +4,9 @@
 #include <map>
 #include <fstream>
 
-#include "casadi/symbolic/profiling.hpp"
-#include "casadi/symbolic/casadi_math.hpp"
-#include "casadi/symbolic/casadi_calculus.hpp"
+#include "casadi/core/profiling.hpp"
+#include "casadi/core/casadi_math.hpp"
+#include "casadi/core/casadi_calculus.hpp"
 
 /**float(m.group(1))*1e-6, float(m.group(2))*1e-3, m.group(3), int(m.group(4)), m.group(5) , m.group(6)
 linereg = re.compile("^([\d\.]+) ns \| ([\d\.]+) ms \| (0x[\w\d]+:[\w_]+):(\d+)\|(0x[\w\d]+:[\w_]+)?\|(.*)$")

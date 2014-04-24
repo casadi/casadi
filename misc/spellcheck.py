@@ -138,7 +138,7 @@ if __name__ == "__main__":
   dir = sys.argv[1]
   files = sys.argv[2:]
 
-  if 'symbolic' in dir:
+  if 'core' in dir:
     sys.exit(0)
 
   success = True

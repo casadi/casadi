@@ -1,5 +1,5 @@
-#include "casadi/symbolic/function/custom_function.hpp"
-#include "casadi/symbolic/functor.hpp"
+#include "casadi/core/function/custom_function.hpp"
+#include "casadi/core/functor.hpp"
 
 using namespace casadi;
 

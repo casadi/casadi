@@ -1,4 +1,4 @@
-#include "symbolic/casadi.hpp"
+#include "core/casadi.hpp"
 #include "integration/irk_integrator.hpp"
 #include "interfaces/sundials/kinsol_solver.hpp"
 

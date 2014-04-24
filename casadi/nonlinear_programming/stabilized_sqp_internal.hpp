@@ -24,8 +24,8 @@
 #define STABILIZED_SQP_INTERNAL_HPP
 
 #include "stabilized_sqp_method.hpp"
-#include "casadi/symbolic/function/nlp_solver_internal.hpp"
-#include "casadi/symbolic/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/stabilized_qp_solver.hpp"
 #include <deque>
 
 /// \cond INTERNAL

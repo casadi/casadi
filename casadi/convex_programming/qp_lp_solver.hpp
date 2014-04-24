@@ -23,7 +23,7 @@
 #ifndef QP_LP_SOLVER_HPP
 #define QP_LP_SOLVER_HPP
 
-#include "casadi/symbolic/function/lp_solver.hpp"
+#include "casadi/core/function/lp_solver.hpp"
 
 #include <casadi/convex_programming/casadi_convex_programming_export.h>
 

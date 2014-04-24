@@ -20,7 +20,7 @@
  *
  */
 
-#include <symbolic/casadi.hpp>
+#include <core/casadi.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <nonlinear_programming/nlp_qp_solver.hpp>

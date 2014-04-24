@@ -19,7 +19,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 *
 */
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 #include <casadi/interfaces/sqic/sqic_solver.hpp>
 #include <casadi/interfaces/sqic/stabilized_sqic_solver.hpp>
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>

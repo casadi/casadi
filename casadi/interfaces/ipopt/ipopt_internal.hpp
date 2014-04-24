@@ -24,7 +24,7 @@
 #define IPOPT_INTERNAL_HPP
 
 #include "ipopt_solver.hpp"
-#include "casadi/symbolic/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

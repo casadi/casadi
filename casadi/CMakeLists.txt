@@ -21,8 +21,8 @@ macro(casadi_library name)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h
   DESTINATION include/${RELPATH})
   
-  if(NOT "${name}" STREQUAL "casadi_symbolic")
-    target_link_libraries(${name} casadi_symbolic)
+  if(NOT "${name}" STREQUAL "casadi_core")
+    target_link_libraries(${name} casadi_core)
   endif()
   set(CASADI_MODULES ${CASADI_MODULES} ${name} PARENT_SCOPE)
   install(TARGETS ${name}
@@ -35,7 +35,7 @@ macro(casadi_library name)
   set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
 endmacro()
 
-add_subdirectory(symbolic)  # needed by all except external_packages
+add_subdirectory(core)  # needed by all except external_packages
 add_subdirectory(interfaces)             # needs external_packages
 add_subdirectory(nonlinear_programming)  # needs interfaces
 add_subdirectory(convex_programming)     # needs interfaces

@@ -23,7 +23,7 @@
 #ifndef DPLE_SOLVER_HPP
 #define DPLE_SOLVER_HPP
 
-#include "../symbolic/function/function.hpp"
+#include "../core/function/function.hpp"
 
 #include <casadi/control/casadi_control_export.h>
 

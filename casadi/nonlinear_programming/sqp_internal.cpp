@@ -21,12 +21,12 @@
  */
 
 #include "sqp_internal.hpp"
-#include "casadi/symbolic/std_vector_tools.hpp"
-#include "casadi/symbolic/matrix/sparsity_tools.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/function/sx_function.hpp"
-#include "casadi/symbolic/sx/sx_tools.hpp"
-#include "casadi/symbolic/casadi_calculus.hpp"
+#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/matrix/sparsity_tools.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/function/sx_function.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/casadi_calculus.hpp"
 #include <ctime>
 #include <iomanip>
 #include <fstream>

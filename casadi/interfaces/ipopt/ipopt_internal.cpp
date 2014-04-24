@@ -23,7 +23,7 @@
 
 #include "ipopt_internal.hpp"
 #include "ipopt_nlp.hpp"
-#include "casadi/symbolic/std_vector_tools.hpp"
+#include "casadi/core/std_vector_tools.hpp"
 #include <ctime>
 
 using namespace std;

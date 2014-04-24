@@ -23,15 +23,15 @@
 #include "psd_indef_dple_internal.hpp"
 #include "slicot_tools.hpp"
 #include <cassert>
-#include "../../symbolic/std_vector_tools.hpp"
-#include "../../symbolic/matrix/matrix_tools.hpp"
-#include "../../symbolic/mx/mx_tools.hpp"
-#include "../../symbolic/sx/sx_tools.hpp"
-#include "../../symbolic/function/mx_function.hpp"
-#include "../../symbolic/function/sx_function.hpp"
+#include "../../core/std_vector_tools.hpp"
+#include "../../core/matrix/matrix_tools.hpp"
+#include "../../core/mx/mx_tools.hpp"
+#include "../../core/sx/sx_tools.hpp"
+#include "../../core/function/mx_function.hpp"
+#include "../../core/function/sx_function.hpp"
 
-#include "../../symbolic/profiling.hpp"
-#include "../../symbolic/casadi_options.hpp"
+#include "../../core/profiling.hpp"
+#include "../../core/casadi_options.hpp"
 
 #include <numeric>
 

@@ -22,8 +22,8 @@
 
 #include "nlp_implicit_internal.hpp"
 
-#include "casadi/symbolic/mx/mx_tools.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
+#include "casadi/core/function/mx_function.hpp"
 
 using namespace std;
 namespace casadi {

@@ -22,8 +22,8 @@
 
 #include "nlp_qp_internal.hpp"
 
-#include "casadi/symbolic/sx/sx_tools.hpp"
-#include "casadi/symbolic/fx/sx_function.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/fx/sx_function.hpp"
 
 using namespace std;
 namespace casadi {

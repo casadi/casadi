@@ -42,8 +42,8 @@ if hasattr(sys,"getdlopenflags"):
 from casadi import *    # import everything
 import casadi as casadi # import everything
 
-if 'casadi_symbolic' in failed_modules:
-  raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_symbolic"]))
+if 'casadi_core' in failed_modules:
+  raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
 
 if hasattr(sys,"getdlopenflags"):
   sys.setdlopenflags( flags0 ) # set the old flags back

@@ -23,7 +23,7 @@
 #ifndef STABILIZED_SQIC_SOLVER_HPP
 #define STABILIZED_SQIC_SOLVER_HPP
 
-#include "casadi/symbolic/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/stabilized_qp_solver.hpp"
 #include <casadi/interfaces/sqic/casadi_sqic_interface_export.h>
 
 namespace casadi {

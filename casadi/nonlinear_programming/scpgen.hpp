@@ -23,7 +23,7 @@
 #ifndef SCPGEN_HPP
 #define SCPGEN_HPP
 
-#include "casadi/symbolic/function/nlp_solver.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 

@@ -24,7 +24,7 @@
 #define SUNDIALS_INTERNAL_HPP
 
 #include "sundials_integrator.hpp"
-#include "casadi/symbolic/function/integrator_internal.hpp"
+#include "casadi/core/function/integrator_internal.hpp"
 
 #include <nvector/nvector_serial.h>
 #include <sundials/sundials_dense.h>

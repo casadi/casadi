@@ -23,8 +23,8 @@
 #ifndef DIRECT_COLLOCATION_HPP
 #define DIRECT_COLLOCATION_HPP
 
-#include "casadi/symbolic/function/ocp_solver.hpp"
-#include "casadi/symbolic/function/nlp_solver.hpp"
+#include "casadi/core/function/ocp_solver.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/integration/integration_tools.hpp"
 
 #include <casadi/optimal_control/casadi_optimal_control_export.h>

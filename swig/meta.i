@@ -22,21 +22,21 @@
 
 %{
 #include <sstream>
-#include "casadi/symbolic/std_vector_tools.hpp"
-#include "casadi/symbolic/printable_object.hpp"
-#include "casadi/symbolic/shared_object.hpp"
-#include "casadi/symbolic/generic_type.hpp"
-#include "casadi/symbolic/casadi_types.hpp"
-#include "casadi/symbolic/options_functionality.hpp"
-#include "casadi/symbolic/matrix/sparsity.hpp"
-#include "casadi/symbolic/matrix/slice.hpp"
-#include "casadi/symbolic/matrix/matrix.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/sx/sx_element.hpp"
-#include "casadi/symbolic/sx/sx_tools.hpp"
-#include "casadi/symbolic/mx/mx.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
-#include "casadi/symbolic/function/function.hpp"
+#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/printable_object.hpp"
+#include "casadi/core/shared_object.hpp"
+#include "casadi/core/generic_type.hpp"
+#include "casadi/core/casadi_types.hpp"
+#include "casadi/core/options_functionality.hpp"
+#include "casadi/core/matrix/sparsity.hpp"
+#include "casadi/core/matrix/slice.hpp"
+#include "casadi/core/matrix/matrix.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/sx/sx_element.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/mx/mx.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
+#include "casadi/core/function/function.hpp"
 %}
 
 %define %my_genericmatrix_const_typemap(Precedence,Type...) 

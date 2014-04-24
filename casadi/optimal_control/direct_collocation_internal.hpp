@@ -24,10 +24,10 @@
 #define DIRECT_COLLOCATION_INTERNAL_HPP
 
 #include "direct_collocation.hpp"
-#include "casadi/symbolic/function/ocp_solver_internal.hpp"
-#include "casadi/symbolic/function/parallelizer.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
-#include "casadi/symbolic/function/sx_function.hpp"
+#include "casadi/core/function/ocp_solver_internal.hpp"
+#include "casadi/core/function/parallelizer.hpp"
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/sx_function.hpp"
 #include "casadi/integration/integration_tools.hpp"
 
 /// \cond INTERNAL

@@ -25,6 +25,8 @@ endif()
 casadi_library(casadi_ipopt_interface ${IPOPT_INTERFACE_SRCS})
 target_link_libraries(casadi_ipopt_interface ${IPOPT_LIBRARIES})
 
+set_property(TARGET casadi_ipopt_interface PROPERTY PKG_CONFIG_REQUIRES ipopt)
+
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/ipopt
   FILES_MATCHING PATTERN "*.hpp"

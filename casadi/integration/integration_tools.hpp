@@ -25,9 +25,9 @@
 
 #include <vector>
 #include <algorithm>
-#include "casadi/symbolic/casadi_exception.hpp"
-#include "casadi/symbolic/options_functionality.hpp"
-#include "casadi/symbolic/mx/mx.hpp"
+#include "casadi/core/casadi_exception.hpp"
+#include "casadi/core/options_functionality.hpp"
+#include "casadi/core/mx/mx.hpp"
 
 #include <casadi/integration/casadi_integration_export.h>
 

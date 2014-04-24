@@ -23,7 +23,7 @@
 #ifndef SOCP_QCQP_SOLVER_HPP
 #define SOCP_QCQP_SOLVER_HPP
 
-#include "casadi/symbolic/function/qcqp_solver.hpp"
+#include "casadi/core/function/qcqp_solver.hpp"
 
 #include <casadi/convex_programming/casadi_convex_programming_export.h>
 

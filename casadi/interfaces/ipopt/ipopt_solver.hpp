@@ -23,7 +23,7 @@
 #ifndef IPOPT_SOLVER_HPP
 #define IPOPT_SOLVER_HPP
 
-#include "casadi/symbolic/function/nlp_solver.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 #include <casadi/interfaces/ipopt/casadi_ipopt_interface_export.h>
 
 namespace casadi {

@@ -19,7 +19,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 *
 */
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 #include <casadi/interfaces/worhp/worhp_solver.hpp>
 #include <casadi/nonlinear_programming/symbolic_nlp.hpp>
  

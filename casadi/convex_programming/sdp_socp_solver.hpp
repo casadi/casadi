@@ -23,7 +23,7 @@
 #ifndef SDP_SOCP_SOLVER_HPP
 #define SDP_SOCP_SOLVER_HPP
 
-#include "casadi/symbolic/function/socp_solver.hpp"
+#include "casadi/core/function/socp_solver.hpp"
 
 #include <casadi/convex_programming/casadi_convex_programming_export.h>
 

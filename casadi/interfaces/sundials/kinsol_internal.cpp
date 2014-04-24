@@ -21,10 +21,10 @@
  */
 
 #include "kinsol_internal.hpp"
-#include "casadi/symbolic/function/sx_function_internal.hpp"
-#include "casadi/symbolic/std_vector_tools.hpp"
-#include "casadi/symbolic/sx/sx_tools.hpp"
-#include "casadi/symbolic/function/linear_solver_internal.hpp"
+#include "casadi/core/function/sx_function_internal.hpp"
+#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/function/linear_solver_internal.hpp"
 
 using namespace std;
 namespace casadi {

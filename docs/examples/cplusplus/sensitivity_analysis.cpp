@@ -20,7 +20,7 @@
  *
  */
 
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 #include <casadi/integration/rk_integrator.hpp>
 #include <casadi/integration/collocation_integrator.hpp>
 #include <casadi/integration/old_collocation_integrator.hpp>

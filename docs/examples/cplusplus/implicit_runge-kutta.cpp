@@ -25,7 +25,7 @@
    @author: Joel Andersson, K.U. Leuven 2013
 */
 
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 #include <casadi/integration/integration_tools.hpp>
 #include <casadi/nonlinear_programming/newton_implicit_solver.hpp>
 #include <casadi/interfaces/csparse/csparse.hpp>

@@ -20,7 +20,7 @@
  *
  */
 
-#include "casadi/symbolic/casadi_exception.hpp"
+#include "casadi/core/casadi_exception.hpp"
 #include "variable.hpp"
 
 using namespace std;

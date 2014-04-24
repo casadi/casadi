@@ -23,8 +23,8 @@
 #ifndef SDP_SDQP_INTERNAL_HPP
 #define SDP_SDQP_INTERNAL_HPP
 
-#include "casadi/symbolic/function/sdqp_solver_internal.hpp"
-#include "casadi/symbolic/function/sdp_solver.hpp"
+#include "casadi/core/function/sdqp_solver_internal.hpp"
+#include "casadi/core/function/sdp_solver.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 
 #include "sdp_sdqp_solver.hpp"

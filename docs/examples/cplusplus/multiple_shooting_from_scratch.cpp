@@ -38,7 +38,7 @@
 */
 
 // CasADi core
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 
 // Interfaces
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>

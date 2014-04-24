@@ -21,12 +21,12 @@
  */
 
 #include "gsl_internal.hpp"
-#include "symbolic/function/sx_function_internal.hpp"
-#include "symbolic/std_vector_tools.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/function/linear_solver_internal.hpp"
-#include "symbolic/function/mx_function.hpp"
-#include "symbolic/function/jacobian.hpp"
+#include "core/function/sx_function_internal.hpp"
+#include "core/std_vector_tools.hpp"
+#include "core/sx/sx_tools.hpp"
+#include "core/function/linear_solver_internal.hpp"
+#include "core/function/mx_function.hpp"
+#include "core/function/jacobian.hpp"
 
 using namespace std;
 namespace casadi {

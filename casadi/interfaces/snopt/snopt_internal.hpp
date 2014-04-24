@@ -23,7 +23,7 @@
 #ifndef SNOPT_INTERNAL_HPP
 #define SNOPT_INTERNAL_HPP
 
-#include "casadi/symbolic/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlp_solver_internal.hpp"
 #include "snopt_solver.hpp"
 
 /// \cond INTERNAL

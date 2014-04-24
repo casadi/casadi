@@ -21,16 +21,16 @@
  */
 
 %{
-#include "casadi/symbolic/matrix/sparsity.hpp"
-#include "casadi/symbolic/matrix/matrix.hpp"
+#include "casadi/core/matrix/sparsity.hpp"
+#include "casadi/core/matrix/matrix.hpp"
 #include <sstream>
-#include "casadi/symbolic/casadi_exception.hpp"
+#include "casadi/core/casadi_exception.hpp"
 
 // to allow for typechecking
-#include "casadi/symbolic/sx/sx_element.hpp"
+#include "casadi/core/sx/sx_element.hpp"
 
 // to typecheck for MX
-#include "casadi/symbolic/mx/mx.hpp"
+#include "casadi/core/mx/mx.hpp"
 %}
 
 #ifndef SWIGXML
@@ -258,8 +258,8 @@ void PyDECREFParent(PyObject* self) {
 %extend Type {
 %pythoncode%{
     def __del__(self):
-      if not(_casadi_symbolic is None):
-         _casadi_symbolic.PyDECREFParent(self)
+      if not(_casadi_core is None):
+         _casadi_core.PyDECREFParent(self)
 
 %}
 
@@ -277,8 +277,8 @@ void PyDECREFParent(PyObject* self) {
 %extend Type {
 %pythoncode%{
     def __del__(self):
-      if not(_casadi_symbolic is None):
-         _casadi_symbolic.PyDECREFParent(self)
+      if not(_casadi_core is None):
+         _casadi_core.PyDECREFParent(self)
 
 %}
 

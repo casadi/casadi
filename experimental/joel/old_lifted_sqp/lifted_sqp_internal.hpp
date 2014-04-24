@@ -24,8 +24,8 @@
 #define LIFTED_SQP_INTERNAL_HPP
 
 #include "lifted_sqp.hpp"
-#include "symbolic/function/nlp_solver_internal.hpp"
-#include "symbolic/function/qp_solver.hpp"
+#include "core/function/nlp_solver_internal.hpp"
+#include "core/function/qp_solver.hpp"
 
 namespace casadi{
     

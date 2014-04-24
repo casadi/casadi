@@ -372,7 +372,7 @@ if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
   set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/docs/api)
   set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/docs/api)
-  set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/symbolic)
+  set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
   include(UseDoxygen OPTIONAL)
   add_subdirectory(docs/tutorials EXCLUDE_FROM_ALL)
   add_custom_target(tutor)
@@ -388,8 +388,8 @@ string(REPLACE "\n" "\\n" feature_list "${feature_list}")
 
 # Pass meta information
 configure_file(
-  ${CMAKE_SOURCE_DIR}/casadi/symbolic/casadi_meta.cpp.cmake
-  ${CMAKE_SOURCE_DIR}/casadi/symbolic/casadi_meta.cpp
+  ${CMAKE_SOURCE_DIR}/casadi/core/casadi_meta.cpp.cmake
+  ${CMAKE_SOURCE_DIR}/casadi/core/casadi_meta.cpp
   ESCAPE_QUOTES
 )
 

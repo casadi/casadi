@@ -21,14 +21,14 @@
  */
 
 #include "sqic_internal.hpp"
-#include "casadi/symbolic/function/qp_solver.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 
-#include "casadi/symbolic/matrix/sparsity_tools.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
+#include "casadi/core/matrix/sparsity_tools.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
+#include "casadi/core/function/mx_function.hpp"
 
-#include "casadi/symbolic/std_vector_tools.hpp"
+#include "casadi/core/std_vector_tools.hpp"
 
 #include "wsqic.hpp"
 #include "casadi/interfaces/sqic/resource_sqic.hpp"

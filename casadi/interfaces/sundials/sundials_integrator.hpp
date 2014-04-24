@@ -23,7 +23,7 @@
 #ifndef SUNDIALS_INTEGRATOR_HPP
 #define SUNDIALS_INTEGRATOR_HPP
 
-#include "casadi/symbolic/function/integrator.hpp"
+#include "casadi/core/function/integrator.hpp"
 
 #include <casadi/interfaces/sundials/casadi_sundials_interface_export.h>
 

@@ -24,11 +24,11 @@
 #define DIRECT_SINGLE_SHOOTING_INTERNAL_HPP
 
 #include "direct_single_shooting.hpp"
-#include "casadi/symbolic/function/ocp_solver_internal.hpp"
+#include "casadi/core/function/ocp_solver_internal.hpp"
 
-#include "casadi/symbolic/function/parallelizer.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
-#include "casadi/symbolic/function/sx_function.hpp"
+#include "casadi/core/function/parallelizer.hpp"
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/sx_function.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

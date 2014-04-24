@@ -23,7 +23,7 @@
 #define CPLEX_INTERNAL_HPP
 
 #include "ilcplex/cplex.h"
-#include "casadi/symbolic/function/qp_solver_internal.hpp"
+#include "casadi/core/function/qp_solver_internal.hpp"
 #include "cplex_solver.hpp"
 
 #include <string>

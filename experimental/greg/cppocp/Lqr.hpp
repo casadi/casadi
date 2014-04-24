@@ -10,8 +10,8 @@
 #include <map>
 #include <fstream>
 
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/function/sx_function.hpp>
+#include <core/sx/sx_tools.hpp>
+#include <core/function/sx_function.hpp>
 
 // #define EVAL_DYNAMICS_FUNCTION
 // #define EVAL_Q_FUNCTION

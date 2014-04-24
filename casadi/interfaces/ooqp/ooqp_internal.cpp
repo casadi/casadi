@@ -21,11 +21,11 @@
  */
 
 #include "ooqp_internal.hpp"
-#include "casadi/symbolic/function/qp_solver.hpp"
-#include "casadi/symbolic/matrix/sparsity_tools.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/matrix/generic_matrix_tools.hpp"
-#include "casadi/symbolic/std_vector_tools.hpp"
+#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/matrix/sparsity_tools.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/matrix/generic_matrix_tools.hpp"
+#include "casadi/core/std_vector_tools.hpp"
 
 // OOQP headers
 #include <cQpGenSparse.h>

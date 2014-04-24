@@ -20,8 +20,8 @@
  *
  */
 #include "cplex_internal.hpp"
-#include "casadi/symbolic/std_vector_tools.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
+#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>

@@ -23,7 +23,7 @@
 #ifndef OLD_COLLOCATION_INTEGRATOR_HPP
 #define OLD_COLLOCATION_INTEGRATOR_HPP
 
-#include "casadi/symbolic/function/integrator.hpp"
+#include "casadi/core/function/integrator.hpp"
 #include <casadi/integration/casadi_integration_export.h>
 
 namespace casadi {

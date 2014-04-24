@@ -23,8 +23,8 @@
 #ifndef QP_STABILIZER_INTERNAL_HPP
 #define QP_STABILIZER_INTERNAL_HPP
 
-#include "casadi/symbolic/function/stabilized_qp_solver_internal.hpp"
-#include "casadi/symbolic/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/stabilized_qp_solver_internal.hpp"
+#include "casadi/core/function/stabilized_qp_solver.hpp"
 
 #include "qp_stabilizer.hpp"
 

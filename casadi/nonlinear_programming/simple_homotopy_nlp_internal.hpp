@@ -24,8 +24,8 @@
 #define SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP
 
 #include "simple_homotopy_nlp_solver.hpp"
-#include "casadi/symbolic/function/homotopy_nlp_internal.hpp"
-#include "casadi/symbolic/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/homotopy_nlp_internal.hpp"
+#include "casadi/core/function/stabilized_qp_solver.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

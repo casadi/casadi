@@ -66,7 +66,7 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_lib")
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DCASADI_MODULE")
 
-set(CASADI_SWIG_MAIN_MODULE casadi_symbolic)
+set(CASADI_SWIG_MAIN_MODULE casadi_core)
 
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")

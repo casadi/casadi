@@ -10,8 +10,8 @@
 #include <map>
 #include <fstream>
 
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/function/sx_function.hpp>
+#include <core/sx/sx_tools.hpp>
+#include <core/function/sx_function.hpp>
 
 #define IDX_BACKWARD_SWEEP_INPUTS_U_K    0
 #define IDX_BACKWARD_SWEEP_INPUTS_Q_0_K  1

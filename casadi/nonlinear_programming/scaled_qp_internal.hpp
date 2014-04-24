@@ -23,7 +23,7 @@
 #ifndef NLP_QP_SOLVER_HPP
 #define NLP_QP_SOLVER_HPP
 
-#include "casadi/symbolic/fx/qp_solver.hpp"
+#include "casadi/core/fx/qp_solver.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

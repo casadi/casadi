@@ -1,4 +1,4 @@
-#include <symbolic/casadi.hpp>
+#include <core/casadi.hpp>
 
 using namespace casadi;
 using namespace std;

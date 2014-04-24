@@ -23,8 +23,8 @@
 #ifndef DIRECT_SINGLE_SHOOTING_HPP
 #define DIRECT_SINGLE_SHOOTING_HPP
 
-#include "casadi/symbolic/function/ocp_solver.hpp"
-#include "casadi/symbolic/function/nlp_solver.hpp"
+#include "casadi/core/function/ocp_solver.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 

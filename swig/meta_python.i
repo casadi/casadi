@@ -63,8 +63,8 @@ PyObject * getCasadiObject(const std::string &s) {
   return ret;
 }
 
-#include "casadi/symbolic/functor_internal.hpp"
-#include "casadi/symbolic/function/custom_function.hpp"
+#include "casadi/core/functor_internal.hpp"
+#include "casadi/core/function/custom_function.hpp"
 
 namespace casadi {
   //using namespace casadi;

@@ -29,11 +29,11 @@
 #include <vector>
 #include <iomanip>
 
-#include "casadi/symbolic/std_vector_tools.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
-#include "casadi/symbolic/matrix/sparsity_tools.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
+#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
+#include "casadi/core/matrix/sparsity_tools.hpp"
+#include "casadi/core/function/mx_function.hpp"
 
 #include "snopt_internal.hpp"
 #include "wsnopt.hpp"

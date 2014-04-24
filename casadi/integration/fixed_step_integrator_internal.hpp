@@ -24,8 +24,8 @@
 #define FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
 #include "fixed_step_integrator.hpp"
-#include "casadi/symbolic/function/integrator_internal.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
+#include "casadi/core/function/integrator_internal.hpp"
+#include "casadi/core/function/mx_function.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

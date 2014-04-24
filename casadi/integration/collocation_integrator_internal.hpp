@@ -25,8 +25,8 @@
 
 #include "collocation_integrator.hpp"
 #include "implicit_fixed_step_integrator_internal.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
-#include "casadi/symbolic/function/implicit_function.hpp"
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/implicit_function.hpp"
 #include "integration_tools.hpp"
 
 /// \cond INTERNAL

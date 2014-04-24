@@ -22,12 +22,12 @@
 
 #include "newton_implicit_internal.hpp"
 
-#include "casadi/symbolic/mx/mx_tools.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/function/mx_function.hpp"
 
-#include "casadi/symbolic/profiling.hpp"
-#include "casadi/symbolic/casadi_options.hpp"
+#include "casadi/core/profiling.hpp"
+#include "casadi/core/casadi_options.hpp"
 
 using namespace std;
 namespace casadi {

@@ -23,7 +23,7 @@
 #ifndef SYMBOLIC_NLP_HPP
 #define SYMBOLIC_NLP_HPP
 
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 

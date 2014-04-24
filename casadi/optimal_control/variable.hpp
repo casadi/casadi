@@ -24,8 +24,8 @@
 #define VARIABLE_HPP
 
 #include <iostream>
-#include "casadi/symbolic/function/sx_function.hpp"
-#include "casadi/symbolic/mx/mx.hpp"
+#include "casadi/core/function/sx_function.hpp"
+#include "casadi/core/mx/mx.hpp"
 
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 

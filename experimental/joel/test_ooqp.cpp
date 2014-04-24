@@ -20,7 +20,7 @@
  *
  */
 
-#include "symbolic/casadi.hpp"
+#include "core/casadi.hpp"
 #include "interfaces/ooqp/ooqp_solver.hpp"
 #include <ctime>
 

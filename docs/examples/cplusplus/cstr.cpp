@@ -20,7 +20,7 @@
  *
  */
 
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/interfaces/sundials/idas_integrator.hpp>

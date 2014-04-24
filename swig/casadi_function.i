@@ -23,5 +23,5 @@
 // Function
 %include "function.i"
 
-%include "casadi/symbolic/function/qp_solver.hpp"
+%include "casadi/core/function/qp_solver.hpp"
 

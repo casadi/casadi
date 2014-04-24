@@ -24,7 +24,7 @@
 
 %include "common.i"
 
-%import "casadi_symbolic.i"
+%import "casadi_core.i"
 
 %{
   #include "casadi/interfaces/liftopt/liftopt_solver.hpp"

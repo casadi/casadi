@@ -25,7 +25,7 @@
 
 #include "knitro_solver.hpp"
 #include <knitro.h>
-#include "casadi/symbolic/function/nlp_solver_internal.hpp"
+#include "casadi/core/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

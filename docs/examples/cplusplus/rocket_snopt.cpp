@@ -23,9 +23,9 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
-#include <casadi/symbolic/casadi.hpp>
+#include <casadi/core/casadi.hpp>
 #include <casadi/interfaces/snopt/snopt_solver.hpp>
-#include <casadi/symbolic/std_vector_tools.hpp>
+#include <casadi/core/std_vector_tools.hpp>
 
 using namespace casadi;
 using namespace std;

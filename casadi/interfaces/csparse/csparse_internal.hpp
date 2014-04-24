@@ -30,7 +30,7 @@ extern "C" {
 }
 
 #include "csparse.hpp"
-#include "casadi/symbolic/function/linear_solver_internal.hpp"
+#include "casadi/core/function/linear_solver_internal.hpp"
 
 namespace casadi {
 

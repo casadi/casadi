@@ -22,10 +22,10 @@
 
 #include "sdp_socp_internal.hpp"
 
-#include "casadi/symbolic/sx/sx_tools.hpp"
-#include "casadi/symbolic/function/sx_function.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/function/sx_function.hpp"
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
 
 using namespace std;
 namespace casadi {

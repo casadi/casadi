@@ -23,7 +23,7 @@
 #ifndef QP_STABILIZER_HPP
 #define QP_STABILIZER_HPP
 
-#include "casadi/symbolic/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/stabilized_qp_solver.hpp"
 
 #include <casadi/convex_programming/casadi_convex_programming_export.h>
 

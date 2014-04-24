@@ -24,7 +24,7 @@
 #define KINSOL_INTERNAL_HPP
 
 #include "kinsol_solver.hpp"
-#include "casadi/symbolic/function/implicit_function_internal.hpp"
+#include "casadi/core/function/implicit_function_internal.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
 #include <sundials/sundials_types.h>  /* definition of type double */

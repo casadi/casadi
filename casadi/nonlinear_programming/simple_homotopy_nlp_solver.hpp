@@ -23,7 +23,7 @@
 #ifndef SIMPLE_HOMOTOPY_NLP_SOLVER_HPP
 #define SIMPLE_HOMOTOPY_NLP_SOLVER_HPP
 
-#include "casadi/symbolic/function/homotopy_nlp_solver.hpp"
+#include "casadi/core/function/homotopy_nlp_solver.hpp"
 
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 

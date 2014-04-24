@@ -21,30 +21,30 @@
  */
 
 %{
-#include "casadi/symbolic/function/io_interface.hpp"
-#include "casadi/symbolic/function/function.hpp"
-#include "casadi/symbolic/function/sx_function.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
-#include "casadi/symbolic/function/linear_solver.hpp"
-#include "casadi/symbolic/function/symbolic_qr.hpp"
-#include "casadi/symbolic/function/implicit_function.hpp"
-#include "casadi/symbolic/function/integrator.hpp"
-#include "casadi/symbolic/function/simulator.hpp"
-#include "casadi/symbolic/function/control_simulator.hpp"
-#include "casadi/symbolic/function/nlp_solver.hpp"
-#include "casadi/symbolic/function/homotopy_nlp_solver.hpp"
-#include "casadi/symbolic/function/qp_solver.hpp"
-#include "casadi/symbolic/function/stabilized_qp_solver.hpp"
-#include "casadi/symbolic/function/lp_solver.hpp"
-#include "casadi/symbolic/function/ocp_solver.hpp"
-#include "casadi/symbolic/function/sdp_solver.hpp"
-#include "casadi/symbolic/function/socp_solver.hpp"
-#include "casadi/symbolic/function/qcqp_solver.hpp"
-#include "casadi/symbolic/function/sdqp_solver.hpp"
-#include "casadi/symbolic/function/external_function.hpp"
-#include "casadi/symbolic/function/parallelizer.hpp"
-#include "casadi/symbolic/function/custom_function.hpp"
-#include "casadi/symbolic/function/nullspace.hpp"
+#include "casadi/core/function/io_interface.hpp"
+#include "casadi/core/function/function.hpp"
+#include "casadi/core/function/sx_function.hpp"
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/linear_solver.hpp"
+#include "casadi/core/function/symbolic_qr.hpp"
+#include "casadi/core/function/implicit_function.hpp"
+#include "casadi/core/function/integrator.hpp"
+#include "casadi/core/function/simulator.hpp"
+#include "casadi/core/function/control_simulator.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
+#include "casadi/core/function/homotopy_nlp_solver.hpp"
+#include "casadi/core/function/qp_solver.hpp"
+#include "casadi/core/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/lp_solver.hpp"
+#include "casadi/core/function/ocp_solver.hpp"
+#include "casadi/core/function/sdp_solver.hpp"
+#include "casadi/core/function/socp_solver.hpp"
+#include "casadi/core/function/qcqp_solver.hpp"
+#include "casadi/core/function/sdqp_solver.hpp"
+#include "casadi/core/function/external_function.hpp"
+#include "casadi/core/function/parallelizer.hpp"
+#include "casadi/core/function/custom_function.hpp"
+#include "casadi/core/function/nullspace.hpp"
 %}
 
 #ifdef SWIGOCTAVE
@@ -140,11 +140,11 @@ def PyFunction(obj,inputs,outputs):
 %}
 #endif
 
-%include "casadi/symbolic/function/io_interface.hpp"
+%include "casadi/core/function/io_interface.hpp"
 %template(IOInterfaceFunction) casadi::IOInterface<casadi::Function>;
 
 %rename(__call__original__) casadi::IOScheme::operator();
-%include "casadi/symbolic/function/io_scheme.hpp"
+%include "casadi/core/function/io_scheme.hpp"
 #ifdef SWIGPYTHON
 %extend casadi::IOScheme {
 %template(__call__original__) operator()< casadi::Sparsity >;
@@ -162,7 +162,7 @@ def PyFunction(obj,inputs,outputs):
 }
 #endif
 
-%include "casadi/symbolic/function/io_scheme_vector.hpp"
+%include "casadi/core/function/io_scheme_vector.hpp"
 %template(IOSchemeVectorMX) casadi::IOSchemeVector< casadi::MX >;
 %template(IOSchemeVectorSX) casadi::IOSchemeVector< casadi::Matrix<casadi::SXElement> >;
 %template(IOSchemeVectorSparsity) casadi::IOSchemeVector< casadi::Sparsity >;
@@ -194,31 +194,31 @@ def PyFunction(obj,inputs,outputs):
   casadi::Matrix<double> getOutput(int oind=0) const            { static_cast<const casadi::Function*>($self)->assertInit(); return $self->output(oind);}
 }
 
-%include "casadi/symbolic/function/function.hpp"
+%include "casadi/core/function/function.hpp"
 
-%include "casadi/symbolic/function/sx_function.hpp"
-%include "casadi/symbolic/function/mx_function.hpp"
-%include "casadi/symbolic/function/linear_solver.hpp"
-%include "casadi/symbolic/function/symbolic_qr.hpp"
-%include "casadi/symbolic/function/implicit_function.hpp"
-%include "casadi/symbolic/function/integrator.hpp"
-%include "casadi/symbolic/function/simulator.hpp"
-%include "casadi/symbolic/function/control_simulator.hpp"
-%include "casadi/symbolic/function/nlp_solver.hpp"
-%include "casadi/symbolic/function/homotopy_nlp_solver.hpp"
-%include "casadi/symbolic/function/qp_solver.hpp"
-%include "casadi/symbolic/function/stabilized_qp_solver.hpp"
-%include "casadi/symbolic/function/lp_solver.hpp"
-%include "casadi/symbolic/function/ocp_solver.hpp"
-%include "casadi/symbolic/function/sdp_solver.hpp"
-%include "casadi/symbolic/function/socp_solver.hpp"
-%include "casadi/symbolic/function/qcqp_solver.hpp"
-%include "casadi/symbolic/function/sdqp_solver.hpp"
-%include "casadi/symbolic/function/external_function.hpp"
-%include "casadi/symbolic/function/parallelizer.hpp"
-%include "casadi/symbolic/function/custom_function.hpp"
-%include "casadi/symbolic/functor.hpp"
-%include "casadi/symbolic/function/nullspace.hpp"
+%include "casadi/core/function/sx_function.hpp"
+%include "casadi/core/function/mx_function.hpp"
+%include "casadi/core/function/linear_solver.hpp"
+%include "casadi/core/function/symbolic_qr.hpp"
+%include "casadi/core/function/implicit_function.hpp"
+%include "casadi/core/function/integrator.hpp"
+%include "casadi/core/function/simulator.hpp"
+%include "casadi/core/function/control_simulator.hpp"
+%include "casadi/core/function/nlp_solver.hpp"
+%include "casadi/core/function/homotopy_nlp_solver.hpp"
+%include "casadi/core/function/qp_solver.hpp"
+%include "casadi/core/function/stabilized_qp_solver.hpp"
+%include "casadi/core/function/lp_solver.hpp"
+%include "casadi/core/function/ocp_solver.hpp"
+%include "casadi/core/function/sdp_solver.hpp"
+%include "casadi/core/function/socp_solver.hpp"
+%include "casadi/core/function/qcqp_solver.hpp"
+%include "casadi/core/function/sdqp_solver.hpp"
+%include "casadi/core/function/external_function.hpp"
+%include "casadi/core/function/parallelizer.hpp"
+%include "casadi/core/function/custom_function.hpp"
+%include "casadi/core/functor.hpp"
+%include "casadi/core/function/nullspace.hpp"
 
 %template(IntegratorVector) std::vector<casadi::Integrator>;
 %template(Pair_Function_Function) std::pair<casadi::Function,casadi::Function>;

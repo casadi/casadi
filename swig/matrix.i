@@ -21,18 +21,18 @@
  */
 
 %{
-#include "casadi/symbolic/matrix/sparsity.hpp"
-#include "casadi/symbolic/matrix/matrix.hpp"
+#include "casadi/core/matrix/sparsity.hpp"
+#include "casadi/core/matrix/matrix.hpp"
 #include <sstream>
-#include "casadi/symbolic/casadi_exception.hpp"
+#include "casadi/core/casadi_exception.hpp"
 
 // to allow for typechecking
-#include "casadi/symbolic/sx/sx_element.hpp"
+#include "casadi/core/sx/sx_element.hpp"
 
 // to typecheck for MX
-#include "casadi/symbolic/mx/mx.hpp"
+#include "casadi/core/mx/mx.hpp"
 // to have prod available
-#include "casadi/symbolic/mx/mx_tools.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
 %}
 
 #ifdef SWIGPYTHON
@@ -78,11 +78,11 @@ class NZproxy:
         return (self.size1(),self.size2())
         
     def reshape(self,arg):
-        return _casadi_symbolic.reshape(self,arg)
+        return _casadi_core.reshape(self,arg)
         
     @property
     def T(self):
-        return _casadi_symbolic.transpose(self)
+        return _casadi_core.transpose(self)
         
     def __getitem__(self,s):
         if isinstance(s,tuple) and len(s)==2:

@@ -22,8 +22,8 @@
 
 #include "qpoases_internal.hpp"
 
-#include "../../symbolic/std_vector_tools.hpp"
-#include "../../symbolic/matrix/matrix_tools.hpp"
+#include "../../core/std_vector_tools.hpp"
+#include "../../core/matrix/matrix_tools.hpp"
 
 // Bug in qpOASES?
 #define ALLOW_QPROBLEMB true

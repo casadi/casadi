@@ -23,8 +23,8 @@
 #ifndef SOCP_QCQP_INTERNAL_HPP
 #define SOCP_QCQP_INTERNAL_HPP
 
-#include "casadi/symbolic/function/qcqp_solver_internal.hpp"
-#include "casadi/symbolic/function/socp_solver.hpp"
+#include "casadi/core/function/qcqp_solver_internal.hpp"
+#include "casadi/core/function/socp_solver.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 
 #include "socp_qcqp_solver.hpp"

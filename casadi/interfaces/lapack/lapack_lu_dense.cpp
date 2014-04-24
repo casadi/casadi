@@ -21,10 +21,10 @@
  */
 
 #include "lapack_lu_dense.hpp"
-#include "../../symbolic/std_vector_tools.hpp"
+#include "../../core/std_vector_tools.hpp"
 
-#include "../../symbolic/profiling.hpp"
-#include "../../symbolic/casadi_options.hpp"
+#include "../../core/profiling.hpp"
+#include "../../core/casadi_options.hpp"
 
 using namespace std;
 namespace casadi {

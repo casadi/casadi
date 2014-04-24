@@ -23,7 +23,7 @@
 #ifndef KNITRO_SOLVER_HPP
 #define KNITRO_SOLVER_HPP
 
-#include "casadi/symbolic/function/nlp_solver.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 #include <casadi/interfaces/knitro/casadi_knitro_interface_export.h>
 
 namespace casadi {

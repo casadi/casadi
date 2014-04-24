@@ -23,7 +23,7 @@
 #ifndef LIFTED_SQP_HPP
 #define LIFTED_SQP_HPP
 
-#include "symbolic/function/nlp_solver.hpp"
+#include "core/function/nlp_solver.hpp"
 
 namespace casadi{
   

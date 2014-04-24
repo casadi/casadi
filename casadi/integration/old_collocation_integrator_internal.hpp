@@ -24,9 +24,9 @@
 #define OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
 
 #include "old_collocation_integrator.hpp"
-#include "casadi/symbolic/function/integrator_internal.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
-#include "casadi/symbolic/function/implicit_function.hpp"
+#include "casadi/core/function/integrator_internal.hpp"
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/implicit_function.hpp"
 #include "integration_tools.hpp"
 
 /// \cond INTERNAL

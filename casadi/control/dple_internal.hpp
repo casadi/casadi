@@ -25,7 +25,7 @@
 
 #include "dple_solver.hpp"
 #include "dple_internal.hpp"
-#include "../symbolic/function/function_internal.hpp"
+#include "../core/function/function_internal.hpp"
 
 /// \cond INTERNAL
 

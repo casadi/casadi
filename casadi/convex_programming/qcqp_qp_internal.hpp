@@ -23,8 +23,8 @@
 #ifndef QCQP_QP_INTERNAL_HPP
 #define QCQP_QP_INTERNAL_HPP
 
-#include "casadi/symbolic/function/qp_solver_internal.hpp"
-#include "casadi/symbolic/function/qcqp_solver.hpp"
+#include "casadi/core/function/qp_solver_internal.hpp"
+#include "casadi/core/function/qcqp_solver.hpp"
 
 #include "qcqp_qp_solver.hpp"
 

@@ -10,7 +10,7 @@
 #include <map>
 #include <fstream>
 
-#include <symbolic/sx/sx_tools.hpp>
+#include <core/sx/sx_tools.hpp>
 
 class MultipleShooting
 {

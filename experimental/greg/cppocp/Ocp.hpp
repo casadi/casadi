@@ -11,8 +11,8 @@
 #include "Ode.hpp"
 #include "MultipleShooting.hpp"
 
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/std_vector_tools.hpp>
+#include <core/sx/sx_tools.hpp>
+#include <core/std_vector_tools.hpp>
 
 class Ocp
 {

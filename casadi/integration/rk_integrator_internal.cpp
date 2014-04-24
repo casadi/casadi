@@ -21,7 +21,7 @@
  */
 
 #include "rk_integrator_internal.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
 
 using namespace std;
 namespace casadi {

@@ -24,9 +24,9 @@
 #define NEWTON_IMPLICIT_INTERNAL_HPP
 
 #include "newton_implicit_solver.hpp"
-#include "casadi/symbolic/function/implicit_function_internal.hpp"
-#include "casadi/symbolic/function/nlp_solver.hpp"
-#include "casadi/symbolic/function/linear_solver.hpp"
+#include "casadi/core/function/implicit_function_internal.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
+#include "casadi/core/function/linear_solver.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

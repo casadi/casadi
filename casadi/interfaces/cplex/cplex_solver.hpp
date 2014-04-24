@@ -22,7 +22,7 @@
 #ifndef CPLEX_SOLVER_HPP
 #define CPLEX_SOLVER_HPP
 
-#include "casadi/symbolic/function/qp_solver.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 #include <casadi/interfaces/cplex/casadi_cplex_interface_export.h>
 
 namespace casadi {

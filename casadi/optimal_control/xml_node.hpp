@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "casadi/symbolic/casadi_exception.hpp"
+#include "casadi/core/casadi_exception.hpp"
 
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 

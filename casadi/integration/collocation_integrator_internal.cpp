@@ -21,13 +21,13 @@
  */
 
 #include "collocation_integrator_internal.hpp"
-#include "casadi/symbolic/polynomial.hpp"
-#include "casadi/symbolic/std_vector_tools.hpp"
-#include "casadi/symbolic/matrix/sparsity_tools.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/sx/sx_tools.hpp"
-#include "casadi/symbolic/function/sx_function.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
+#include "casadi/core/polynomial.hpp"
+#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/matrix/sparsity_tools.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/function/sx_function.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
 
 using namespace std;
 namespace casadi {

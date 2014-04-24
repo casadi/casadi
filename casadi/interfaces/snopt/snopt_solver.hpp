@@ -23,7 +23,7 @@
 #ifndef SNOPT_SOLVER_HPP
 #define SNOPT_SOLVER_HPP
 
-#include "casadi/symbolic/function/nlp_solver.hpp"
+#include "casadi/core/function/nlp_solver.hpp"
 #include <casadi/interfaces/snopt/casadi_snopt_interface_export.h>
 
 namespace casadi {

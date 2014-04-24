@@ -23,7 +23,7 @@
 #ifndef SQIC_SOLVER_HPP
 #define SQIC_SOLVER_HPP
 
-#include "casadi/symbolic/function/qp_solver.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 #include <casadi/interfaces/sqic/casadi_sqic_interface_export.h>
 
 namespace casadi {

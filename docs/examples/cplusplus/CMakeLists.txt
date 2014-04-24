@@ -7,11 +7,11 @@ endif()
 
 # Error handling
 add_executable(casadi_error_handling casadi_error_handling.cpp)
-target_link_libraries(casadi_error_handling casadi_symbolic)
+target_link_libraries(casadi_error_handling casadi_core)
 
 # Small example on how sparsity can be propagated throw a CasADi expression
 add_executable(propagating_sparsity propagating_sparsity.cpp)
-target_link_libraries(propagating_sparsity casadi_symbolic)
+target_link_libraries(propagating_sparsity casadi_core)
 
 # Rocket using Ipopt
 if(IPOPT_FOUND)
@@ -145,7 +145,7 @@ endif()
 
 if(WITH_DL AND NOT WIN32)
   add_executable(codegen_usage codegen_usage.cpp)
-  target_link_libraries(codegen_usage casadi_symbolic)
+  target_link_libraries(codegen_usage casadi_core)
 endif()
 
 # Implicit Runge-Kutta integrator from scratch

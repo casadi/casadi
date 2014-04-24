@@ -21,10 +21,10 @@
  */
 
 #include "direct_multiple_shooting_internal.hpp"
-#include "casadi/symbolic/function/integrator.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
-#include "casadi/symbolic/std_vector_tools.hpp"
+#include "casadi/core/function/integrator.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
+#include "casadi/core/std_vector_tools.hpp"
 
 using namespace std;
 namespace casadi {

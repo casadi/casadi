@@ -24,7 +24,7 @@
 
 %include "common.i"
 
-%import "casadi_symbolic.i"
+%import "casadi_core.i"
 
 #define CASADI_CSPARSE_INTERFACE_EXPORT
 

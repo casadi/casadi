@@ -21,11 +21,11 @@
  */
 
 #include "integration_tools.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
-#include "casadi/symbolic/function/implicit_function.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
-#include "casadi/symbolic/sx/sx_tools.hpp"
-#include "casadi/symbolic/function/integrator.hpp"
+#include "casadi/core/function/mx_function.hpp"
+#include "casadi/core/function/implicit_function.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/function/integrator.hpp"
 
 #include <vector>
 

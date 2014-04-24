@@ -23,7 +23,7 @@
 #ifndef IP_METHOD_HPP
 #define IP_METHOD_HPP
 
-#include "symbolic/function/nlp_solver.hpp"
+#include "core/function/nlp_solver.hpp"
 
 namespace casadi{
   

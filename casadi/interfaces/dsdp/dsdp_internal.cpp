@@ -22,10 +22,10 @@
 
 #include "dsdp_internal.hpp"
 
-#include "casadi/symbolic/std_vector_tools.hpp"
-#include "casadi/symbolic/matrix/matrix_tools.hpp"
-#include "casadi/symbolic/mx/mx_tools.hpp"
-#include "casadi/symbolic/function/mx_function.hpp"
+#include "casadi/core/std_vector_tools.hpp"
+#include "casadi/core/matrix/matrix_tools.hpp"
+#include "casadi/core/mx/mx_tools.hpp"
+#include "casadi/core/function/mx_function.hpp"
 /**
    Some implementation details
    "Multiple cones can be created for the same solver, but it is usually more efficient to group

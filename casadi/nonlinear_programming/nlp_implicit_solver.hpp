@@ -23,7 +23,7 @@
 #ifndef NLP_IMPLICIT_SOLVER_HPP
 #define NLP_IMPLICIT_SOLVER_HPP
 
-#include "casadi/symbolic/function/implicit_function.hpp"
+#include "casadi/core/function/implicit_function.hpp"
 
 #include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
 

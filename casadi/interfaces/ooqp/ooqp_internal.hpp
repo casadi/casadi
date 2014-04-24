@@ -23,7 +23,7 @@
 #ifndef OOQP_INTERNAL_HPP
 #define OOQP_INTERNAL_HPP
 
-#include "casadi/symbolic/function/qp_solver_internal.hpp"
+#include "casadi/core/function/qp_solver_internal.hpp"
 #include "ooqp_solver.hpp"
 
 /// \cond INTERNAL

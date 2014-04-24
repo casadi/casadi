@@ -23,7 +23,7 @@
 #ifndef DSDP_SOLVER_HPP
 #define DSDP_SOLVER_HPP
 
-#include "casadi/symbolic/function/sdp_solver.hpp"
+#include "casadi/core/function/sdp_solver.hpp"
 #include <casadi/interfaces/dsdp/casadi_dsdp_interface_export.h>
 
 namespace casadi {

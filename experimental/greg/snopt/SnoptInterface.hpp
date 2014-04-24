@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/function/function_tools.hpp>
-#include <symbolic/std_vector_tools.hpp>
-#include <symbolic/function/sx_function.hpp>
+#include <core/sx/sx_tools.hpp>
+#include <core/function/function_tools.hpp>
+#include <core/std_vector_tools.hpp>
+#include <core/function/sx_function.hpp>
 
 #include <experimental/greg/cppocp/Ocp.hpp>
 

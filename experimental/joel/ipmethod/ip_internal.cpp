@@ -21,12 +21,12 @@
  */
 
 #include "ip_internal.hpp"
-#include "symbolic/std_vector_tools.hpp"
-#include "symbolic/matrix/sparsity_tools.hpp"
-#include "symbolic/matrix/matrix_tools.hpp"
-#include "symbolic/function/sx_function.hpp"
-#include "symbolic/sx/sx_tools.hpp"
-#include "symbolic/casadi_calculus.hpp"
+#include "core/std_vector_tools.hpp"
+#include "core/matrix/sparsity_tools.hpp"
+#include "core/matrix/matrix_tools.hpp"
+#include "core/function/sx_function.hpp"
+#include "core/sx/sx_tools.hpp"
+#include "core/casadi_calculus.hpp"
 #include <ctime>
 #include <iomanip>
 
