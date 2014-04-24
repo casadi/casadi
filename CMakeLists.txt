@@ -102,6 +102,7 @@ endif()
 option(WITH_DOC "Enable documentation generation" OFF)
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
 
+option(WITH_EXAMPLES "Build examples" ON)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
 # option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
@@ -356,7 +357,6 @@ endif()
 
 add_subdirectory(external_packages)
 add_subdirectory(casadi)
-add_subdirectory(docs/examples)
 add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
@@ -379,7 +379,10 @@ if(WITH_DOC)
   add_custom_target(tutor)
 endif()
 
-add_subdirectory(docs/api/examples/ctemplate)
+if(WITH_EXAMPLES)
+  add_subdirectory(docs/examples)
+  add_subdirectory(docs/api/examples/ctemplate)
+endif()
 
 # Print a summary
 feature_summary(WHAT ALL)
