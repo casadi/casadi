@@ -130,7 +130,7 @@ NLP_NUM_OUT = deprecated["NLP_NUM_OUT"]
 
 
 import warnings
-warnings.filterwarnings("default",".*This function.*",DeprecationWarning)
+warnings.filterwarnings("default",".*This CasADi function.*",DeprecationWarning)
 
 import contextlib
 

@@ -416,11 +416,11 @@ if (internal("$decl")) SWIG_fail;
 #ifdef SWIGPYTHON
 %wrapper %{
 int deprecated(const std::string & c,const std::string & a) {
-  return PyErr_WarnEx(PyExc_DeprecationWarning,("This function (" + c+") is deprecated. "  + a).c_str(),2);
+  return PyErr_WarnEx(PyExc_DeprecationWarning,("This CasADi function (" + c+") is deprecated. "  + a).c_str(),2);
 }
 int internal(const std::string & c) {
   if (CasadiOptions::allowed_internal_api) return 0;
-  return PyErr_WarnEx(PyExc_SyntaxWarning,("This function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str(),2);
+  return PyErr_WarnEx(PyExc_SyntaxWarning,("This CasADi function ("+ c+ ") is not part of the public API. Use at your own risk.").c_str(),2);
 }
 %}
 #endif

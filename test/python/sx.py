@@ -28,10 +28,7 @@ from helpers import *
 
 scipy_available = True
 try:
-  import warnings
-  with warnings.catch_warnings():
-    warnings.simplefilter("ignore")
-    from scipy.sparse import csr_matrix
+	from scipy.sparse import csr_matrix
 except:
 	scipy_available = False
 	
