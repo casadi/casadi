@@ -88,11 +88,6 @@ namespace casadi {
     %nocallback;
 #endif
 
-    /// \cond INTERNAL
-    /// Set the default linear solver
-    static void setDefaultLinearSolver(const std::string& solver);
-    /// \endcond
-
   };
 
 } // namespace casadi
