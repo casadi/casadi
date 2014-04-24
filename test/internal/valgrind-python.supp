@@ -536,3 +536,26 @@
    ...
    fun:PyImport_ExecCodeModuleEx
 }
+
+{
+   leak in numpy 1.8.1
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/python2.7/dist-packages/numpy/lib/_compiled_base.so
+   fun:PyEval_EvalFrameEx
+   fun:PyEval_EvalCode
+   fun:PyImport_ExecCodeModuleEx
+}
+
+{
+   bug in numpy 1.8.1
+   Memcheck:Addr4
+   fun:_PyString_Resize
+   ...
+   fun:PyAST_Compile
+   fun:PyRun_StringFlags
+   ...
+   fun:PyImport_ExecCodeModuleEx
+   ...
+   fun:PyImport_ImportModuleLevel
+}
