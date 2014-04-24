@@ -11,7 +11,7 @@ set(IPOPT_INTERFACE_SRCS
   ipopt_nlp.cpp)
   
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-elseif()
+else()
   add_definitions(-DHAVE_CSTDDEF)
 endif()
 
