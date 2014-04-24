@@ -200,12 +200,12 @@ install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
   PATTERN .py EXCLUDE
 )
 
-install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
-  USE_SOURCE_PERMISSIONS
-  PATTERN .svn EXCLUDE
-)
+foreach(my_module ${modules_python})
+  install(TARGETS ${my_module}
+    DESTINATION "${PYTHON_PREFIX}/casadi"
+    COMPONENT install_python
+  )
+endforeach()
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/tools
   DESTINATION "${PYTHON_PREFIX}/casadi"
