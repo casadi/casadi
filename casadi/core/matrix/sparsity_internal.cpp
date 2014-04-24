@@ -769,12 +769,19 @@ namespace casadi {
 
     // return reverse permutation
     if (seed==-1) return p;
+    #if defined(_WIN32)
+    srand(seed);
+    #else
     unsigned int seedu = seed;
+    #endif
 
     for (int k=0; k<n; ++k) {
       // j = rand int in range k to n-1
+      #if defined(_WIN32)
+      int j = k + (rand() % (n-k)); // NOLINT(runtime/threadsafe_fn)
+      #else
       int j = k + (rand_r(&seedu) % (n-k));
-
+      #endif
       // swap p[k] and p[j]
       int t = p[j];
       p[j] = p[k];
