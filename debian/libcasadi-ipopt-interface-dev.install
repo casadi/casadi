@@ -1,0 +1,3 @@
+usr/lib/libcasadi_ipopt_interface.so
+usr/include/casadi/interfaces/ipopt/*
+usr/lib/pkgconfig/casadi_ipopt_interface.pc

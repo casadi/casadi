@@ -1,0 +1,3 @@
+usr/lib/libcasadi_core.so
+usr/lib/pkgconfig/casadi_core.pc
+usr/include/casadi/core/*
