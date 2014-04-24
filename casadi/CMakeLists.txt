@@ -29,6 +29,11 @@ macro(casadi_library name)
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
   )
+  SET_TARGET_PROPERTIES(
+    ${name}
+  PROPERTIES
+    SOVERSION ${PACKAGE_SO_VERSION}
+  )
   add_style_check_target(${name} "${ARGN}")
   set(LINT_TARGETS ${LINT_TARGETS} "lint_${name}" PARENT_SCOPE)
   add_spell_check_target(${name} "${ARGN}")
