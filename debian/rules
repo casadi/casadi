@@ -10,8 +10,10 @@
 export DH_VERBOSE=1
 
 CMAKE_FLAGS = \
-	-DCMAKE_BUILD_TYPE=Debug \
-	-DCMAKE_VERBOSE_MAKEFILE=OFF
+	-DCMAKE_SKIP_RPATH=ON \
+	-DWITH_EXAMPLES=OFF \
+	-DCMAKE_VERBOSE_MAKEFILE=ON \
+	-DCMAKE_BUILD_TYPE=Debug
 #	-DCMAKE_INSTALL_PREFIX=/usr \
 #	-DCMAKE_C_FLAGS_RELEASE="$(CFLAGS)" \
 #	-DCMAKE_CXX_FLAGS_RELEASE="$(CXXFLAGS)" \
@@ -19,7 +21,7 @@ CMAKE_FLAGS = \
 #	-DCMAKE_EXE_LINKER_FLAGS_RELEASE="$(LDFLAGS)" \
 
 %:
-	dh $@ --buildsystem=cmake --parallel
+	dh $@ --buildsystem=cmake --with python2 --parallel
 
 override_dh_auto_configure:
 	dh_auto_configure -- $(CMAKE_FLAGS)

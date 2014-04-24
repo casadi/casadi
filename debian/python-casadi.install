@@ -1,0 +1,4 @@
+usr/lib/python*/dist-packages/casadi/*.py
+usr/lib/python*/dist-packages/casadi/_casadi_core.so
+usr/lib/python*/dist-packages/casadi/_casadi_ipopt_interface.so
+usr/lib/python*/dist-packages/casadi/tools

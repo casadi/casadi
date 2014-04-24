@@ -6,12 +6,16 @@ Build-Depends: debhelper (>= 9),
                pkg-config,
                coinor-libipopt-dev,
                libblas-dev,
-               liblapack-dev
+               liblapack-dev,
+               python-dev,
+               python-support (>= 0.4.1),
+               python-numpy
 Standards-Version: 3.9.5
 Section: libs
 Homepage: http://casadi.org
 Vcs-Git: git://github.com/casadi/casadi.git
 Vcs-Browser: https://github.com/casadi/casadi
+
 
 Package: libcasadi2.0
 Architecture: all
@@ -24,6 +28,7 @@ Description: symbolic framework for numeric optimization
  CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
  Here is my description haha.
 
+
 Package: libcasadi-core2.0
 Section: libs
 Architecture: any
@@ -33,27 +38,30 @@ Description: symbolic framework for numeric optimization
  CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
  Here is my description haha.
 
+
 Package: libcasadi-ipopt-interface2.0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
          ${misc:Depends},
          libcasadi-core2.0 (= ${binary:Version}),
-	 coinor-libipopt1
+         coinor-libipopt1
 Description: ipopt interface for casadi
  CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
  Here is my description haha.
+
 
 Package: libcasadi-dev
 Section: libdevel
 Architecture: any
 Depends: ${misc:Depends},
          libcasadi-core-dev,
-	 libcasadi-ipopt-interface-dev
+         libcasadi-ipopt-interface-dev
 Description: development files for CasADi
  This is a metapackage providing development files for Casadi.
  .
  Here is my description haha.
+
 
 Package: libcasadi-core-dev
 Section: libdevel
@@ -64,6 +72,7 @@ Description: development files for CasADi core
  CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
  .
  Here is my description haha.
+
 
 Package: libcasadi-ipopt-interface-dev
 Section: libdevel
@@ -76,12 +85,17 @@ Description: development files for CasADi ipopt interface
  .
  Here is my description haha.
 
-#Package: python-casadi
-#Section: python
-#Architecture: any
-#Depends: ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}, python-numpy-abi9,
-#		python-numpy (>= 1:1.6.1)
-#Provides: ${python:Provides}
-#Description: Python bindings for CasADi
-# This package contains Python bindings for CasADi.
-# blah blah blah
+
+Package: python-casadi
+Section: python
+Architecture: any
+Depends: ${python:Depends}, ${shlibs:Depends}, ${misc:Depends},
+         libcasadi-core2.0 (= ${binary:Version}),
+         libcasadi-ipopt-interface2.0 (= ${binary:Version}),
+         python-numpy-abi9,
+	 python-numpy (>= 1:1.6.1)
+Provides: ${python:Provides}
+Description: Python bindings for CasADi
+ This package contains Python bindings for CasADi.
+ .
+ Description lala.
