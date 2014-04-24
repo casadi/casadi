@@ -240,7 +240,10 @@ PyObject* arrayView() {
 %pythoncode %{
   def toCsc_matrix(self):
     import numpy as n
-    from scipy.sparse import csc_matrix
+    import warnings
+    with warnings.catch_warnings():
+      warnings.simplefilter("ignore")
+      from scipy.sparse import csc_matrix
     return csc_matrix( (list(self.data()),self.row(),self.colind()), shape = self.shape, dtype=n.double )
 
   def tocsc(self):

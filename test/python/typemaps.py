@@ -898,8 +898,10 @@ class typemaptests(casadiTestCase):
       self.checkarray(val(SX(a.T).T),DMatrix([[1,2],[3,4]]))
       
   def test_matrices(self):
-
-    from scipy.sparse import csc_matrix
+    import warnings
+    with warnings.catch_warnings():
+      warnings.simplefilter("ignore")
+      from scipy.sparse import csc_matrix
 
 
     for D in [    
