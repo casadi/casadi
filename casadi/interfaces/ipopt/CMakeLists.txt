@@ -9,6 +9,11 @@ set(IPOPT_INTERFACE_SRCS
   ipopt_internal.cpp
   ipopt_nlp.hpp
   ipopt_nlp.cpp)
+  
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+elseif()
+  add_definitions(-DHAVE_CSTDDEF)
+endif()
 
 if(WITH_IPOPT_CALLBACK)
   add_definitions(-DWITH_IPOPT_CALLBACK)
