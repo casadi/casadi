@@ -307,7 +307,7 @@
 <tr><td>const_dim</td><td>OT_BOOLEAN</td><td>true</td><td>Assume constant dimension of P</td><td>casadi::DpleInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::DpleInternal</td></tr>
-<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i,i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
+<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::PsdIndefDpleInternal</td></tr>
@@ -331,7 +331,7 @@
 <tr><td>const_dim</td><td>OT_BOOLEAN</td><td>true</td><td>Assume constant dimension of P</td><td>casadi::DpleInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::DpleInternal</td></tr>
-<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i,i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
+<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::PsdIndefDpleInternal</td></tr>
@@ -842,16 +842,10 @@
 <tr><td>dvMax0</td><td>OT_REAL</td><td>100</td><td>Parameter used to defined the max step length.</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>eps_active</td><td>OT_REAL</td><td>1e-6</td><td>Threshold for the epsilon-active set.</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gamma1</td><td>OT_REAL</td><td>2.</td><td>Trust region increase parameter</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>gamma2</td><td>OT_REAL</td><td>1.</td><td>Trust region update parameter</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>gamma3</td><td>OT_REAL</td><td>1.</td><td>Trust region decrease parameter</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -873,7 +867,6 @@
 <tr><td>muR0</td><td>OT_REAL</td><td>1e-4</td><td>Initial choice of regularization parameter</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nu</td><td>OT_REAL</td><td>1</td><td>Parameter for primal-dual augmented Lagrangian.</td><td>casadi::StabilizedSQPInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>phiWeight</td><td>OT_REAL</td><td>1e-5</td><td>Weight used in pseudo-filter.</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -906,16 +899,10 @@
 <tr><td>dvMax0</td><td>OT_REAL</td><td>100</td><td>Parameter used to defined the max step length.</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>eps_active</td><td>OT_REAL</td><td>1e-6</td><td>Threshold for the epsilon-active set.</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gamma1</td><td>OT_REAL</td><td>2.</td><td>Trust region increase parameter</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>gamma2</td><td>OT_REAL</td><td>1.</td><td>Trust region update parameter</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>gamma3</td><td>OT_REAL</td><td>1.</td><td>Trust region decrease parameter</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -937,7 +924,6 @@
 <tr><td>muR0</td><td>OT_REAL</td><td>1e-4</td><td>Initial choice of regularization parameter</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>nu</td><td>OT_REAL</td><td>1</td><td>Parameter for primal-dual augmented Lagrangian.</td><td>casadi::StabilizedSQPInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>phiWeight</td><td>OT_REAL</td><td>1e-5</td><td>Weight used in pseudo-filter.</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::StabilizedSQPInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
@@ -1071,13 +1057,7 @@
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td></td><td>casadi::KnitroInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -1090,7 +1070,6 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::KnitroInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1135,13 +1114,7 @@
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td></td><td>casadi::KnitroInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -1154,7 +1127,6 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::KnitroInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -1175,13 +1147,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>detect_linear</td><td>OT_BOOLEAN</td><td>true</td><td>Make an effort to treat linear constraints and linear variables specially.</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -1194,7 +1160,6 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_nlp|setup_nlp)</td><td>casadi::FunctionInternal<br />casadi::SnoptInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>print information about execution time</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -1216,13 +1181,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>detect_linear</td><td>OT_BOOLEAN</td><td>true</td><td>Make an effort to treat linear constraints and linear variables specially.</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -1235,7 +1194,6 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_nlp|setup_nlp)</td><td>casadi::FunctionInternal<br />casadi::SnoptInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>print information about execution time</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
@@ -1982,7 +1940,7 @@
 <tr><td>const_dim</td><td>OT_BOOLEAN</td><td>true</td><td>Assume constant dimension of P</td><td>casadi::DpleInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::DpleInternal</td></tr>
-<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i,i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
+<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
@@ -2006,7 +1964,7 @@
 <tr><td>const_dim</td><td>OT_BOOLEAN</td><td>true</td><td>Assume constant dimension of P</td><td>casadi::DpleInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::DpleInternal</td></tr>
-<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i,i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
+<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>casadi::SimpleIndefDpleInternal</td></tr>
@@ -2316,7 +2274,7 @@
 <tr><td>const_dim</td><td>OT_BOOLEAN</td><td>true</td><td>Assume constant dimension of P</td><td>casadi::DpleInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::DpleInternal</td></tr>
-<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i,i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
+<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -2338,7 +2296,7 @@
 <tr><td>const_dim</td><td>OT_BOOLEAN</td><td>true</td><td>Assume constant dimension of P</td><td>casadi::DpleInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps_unstable</td><td>OT_REAL</td><td>1e-4</td><td>A margin for unstability detection</td><td>casadi::DpleInternal</td></tr>
-<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i,i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
+<tr><td>error_unstable</td><td>OT_BOOLEAN</td><td>false</td><td>Throw an exception when it is detected that Product(A_i, i=N..1) has eigenvalues greater than 1-eps_unstable</td><td>casadi::DpleInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
@@ -2489,13 +2447,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -2509,7 +2461,6 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::WorhpInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td><td>casadi::WorhpInternal</td></tr>
@@ -2529,7 +2480,7 @@
 <tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>True</td><td>Enables scaling on linear solver level.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_lsTol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for the linear solver.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>False</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported.Non-diagonal matrices will besolved with the chosen linear equation solver.</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations, i.e. for the quadratic subproblem solver.If the limit is reached before convergence,WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations,  i.e. for the quadratic subproblem solver.If the limit is reached before convergence, WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_method</td><td>OT_STRING</td><td>None</td><td>Select the solution method used by the QP solver.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>0.9</td><td>NSN stepsize decrease factor.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>True</td><td>Enable gradient steps in the NSN method.</td><td>casadi::WorhpInternal</td></tr>
@@ -2686,13 +2637,7 @@
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -2706,7 +2651,6 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />Monitor functions (eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>casadi::FunctionInternal<br />casadi::WorhpInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>Print information about execution time</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_ipBarrier</td><td>OT_REAL</td><td>7.8</td><td>IP barrier parameter.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_ipComTol</td><td>OT_REAL</td><td>2e-07</td><td>IP complementarity tolerance.</td><td>casadi::WorhpInternal</td></tr>
@@ -2726,7 +2670,7 @@
 <tr><td>qp_lsScale</td><td>OT_BOOLEAN</td><td>True</td><td>Enables scaling on linear solver level.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_lsTol</td><td>OT_REAL</td><td>1e-12</td><td>Tolerance for the linear solver.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_lsTrySimple</td><td>OT_BOOLEAN</td><td>False</td><td>Some matrices can be solved without calling a linear equation solver.Currently only diagonal matrices are supported.Non-diagonal matrices will besolved with the chosen linear equation solver.</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations, i.e. for the quadratic subproblem solver.If the limit is reached before convergence,WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>qp_maxIter</td><td>OT_INTEGER</td><td>80</td><td>Imposes an upper limit on the number of minor solver iterations,  i.e. for the quadratic subproblem solver.If the limit is reached before convergence, WORHP will activate QP recovery strategies to prevent a solver breakdown.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_method</td><td>OT_STRING</td><td>None</td><td>Select the solution method used by the QP solver.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_nsnBeta</td><td>OT_REAL</td><td>0.9</td><td>NSN stepsize decrease factor.</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>qp_nsnGradStep</td><td>OT_BOOLEAN</td><td>True</td><td>Enable gradient steps in the NSN method.</td><td>casadi::WorhpInternal</td></tr>
@@ -3019,13 +2963,7 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>"gcc -fPIC -O2"</td><td>Compiler command to be used for compiling generated code</td><td>casadi::SCPgenInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -3045,7 +2983,6 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx)</td><td>casadi::FunctionInternal<br />casadi::SCPgenInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>name_x</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Names of the variables.</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::SCPgenInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::SCPgenInternal</td></tr>
 <tr><td>print_x</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Which variables to print.</td><td>casadi::SCPgenInternal</td></tr>
@@ -3077,13 +3014,7 @@
 <tr><td>compiler</td><td>OT_STRING</td><td>"gcc -fPIC -O2"</td><td>Compiler command to be used for compiling generated code</td><td>casadi::SCPgenInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -3103,7 +3034,6 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx)</td><td>casadi::FunctionInternal<br />casadi::SCPgenInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
 <tr><td>name_x</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Names of the variables.</td><td>casadi::SCPgenInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::SCPgenInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::SCPgenInternal</td></tr>
 <tr><td>print_x</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>Which variables to print.</td><td>casadi::SCPgenInternal</td></tr>
@@ -3223,8 +3153,6 @@
 <tr><td>eta_phi</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the Armijo condition. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>evaluate_orig_obj_at_resto_trial</td><td>OT_STRING</td><td>yes</td><td>Determines if the original objective function should be evaluated at restoration phase trial points. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>expect_infeasible_problem</td><td>OT_STRING</td><td>no</td><td>Enable heuristics to quickly detect an infeasible problem. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>expect_infeasible_problem_ctol</td><td>OT_REAL</td><td>0.001</td><td>Threshold for disabling "expect_infeasible_problem" option. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>expect_infeasible_problem_ytol</td><td>OT_REAL</td><td>100000000.0</td><td>Multiplier threshold for activating "expect_infeasible_problem" option. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3243,10 +3171,6 @@
 <tr><td>gamma_theta</td><td>OT_REAL</td><td>1e-05</td><td>Relaxation factor in the filter margin for the constraint violation. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -3285,17 +3209,17 @@
 <tr><td>limited_memory_update_type</td><td>OT_STRING</td><td>bfgs</td><td>Quasi-Newton update formula for the limited memory approximation. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>line_search_method</td><td>OT_STRING</td><td>filter</td><td>Globalization method used in backtracking line search (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>linear_scaling_on_demand</td><td>OT_STRING</td><td>yes</td><td>Flag indicating that linear scaling is only done if it seems required. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>ma27</td><td>Linear solver used for step computations. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>linear_system_scaling</td><td>OT_STRING</td><td>mc19</td><td>Method for scaling the linear system. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>mumps</td><td>Linear solver used for step computations. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>linear_system_scaling</td><td>OT_STRING</td><td>none</td><td>Method for scaling the linear system. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_ignore_singularity</td><td>OT_STRING</td><td>no</td><td>Enables MA27's ability to solve a linear system even if the matrix is singular. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Real workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Integer workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>10.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>2.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma28_pivtol</td><td>OT_REAL</td><td>0.01</td><td>Pivot tolerance for linear solver MA28. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>yes</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>no</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_block_size</td><td>OT_INTEGER</td><td>16</td><td>Controls block size used by Level 3 BLAS in MA57BD (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td>16</td><td>Node amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td>5</td><td>Controls pivot order in MA57 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3303,12 +3227,39 @@
 <tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td>1.05</td><td>Safety factor for work space memory allocation for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_small_pivot_flag</td><td>OT_INTEGER</td><td>0</td><td>If set to 1, then when small entries defined by CNTL(2) are detected they are removed and the corresponding pivots placed at the end of the factorization.  This can be particularly efficient if the matrix is highly rank deficient. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_buffer_lpage</td><td>OT_INTEGER</td><td>4096</td><td>Number of scalars per MA77 buffer page (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_buffer_npage</td><td>OT_INTEGER</td><td>1600</td><td>Number of pages that make up MA77 buffer (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_file_size</td><td>OT_INTEGER</td><td>2097152</td><td>Target size of each temporary file for MA77, scalars per type (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_maxstore</td><td>OT_INTEGER</td><td>0</td><td>Maximum storage size for MA77 in-core mode (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA77 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA77 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_nemin</td><td>OT_INTEGER</td><td>32</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma86_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA86 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma86_scaling</td><td>OT_STRING</td><td>mc64</td><td>Controls scaling of matrix (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_order</td><td>OT_STRING</td><td>auto</td><td>Controls type of ordering used by HSL_MA97 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA97 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_scaling</td><td>OT_STRING</td><td>dynamic</td><td>Specifies strategy for scaling in HSL_MA97 linear solver (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_scaling1</td><td>OT_STRING</td><td>mc64</td><td>First scaling. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_scaling2</td><td>OT_STRING</td><td>mc64</td><td>Second scaling. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_scaling3</td><td>OT_STRING</td><td>mc64</td><td>Third scaling. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_solve_blas3</td><td>OT_STRING</td><td>no</td><td>Controls if blas2 or blas3 routines are used for solve (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_switch1</td><td>OT_STRING</td><td>od_hd_reuse</td><td>First switch, determine when ma97_scaling1 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_switch2</td><td>OT_STRING</td><td>never</td><td>Second switch, determine when ma97_scaling2 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_switch3</td><td>OT_STRING</td><td>never</td><td>Third switch, determine when ma97_scaling3 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>magic_steps</td><td>OT_STRING</td><td>no</td><td>Enables magic steps. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>max_cpu_time</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum number of CPU seconds. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>max_filter_resets</td><td>OT_INTEGER</td><td>5</td><td>Maximal allowed number of filter resets (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3335,7 +3286,7 @@
 <tr><td>mu_target</td><td>OT_REAL</td><td>0.0</td><td>Desired value of complementarity. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mult_diverg_feasibility_tol</td><td>OT_REAL</td><td>1e-07</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mult_diverg_y_tol</td><td>OT_REAL</td><td>100000000.0</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>-1.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>0.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td>1000</td><td>Percentage increase in the estimated working space for MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td>7</td><td>Controls permuting and scaling in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td>7</td><td>Controls pivot order in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3358,9 +3309,8 @@
 <tr><td>num_linear_variables</td><td>OT_INTEGER</td><td>0</td><td>Number of linear variables (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>obj_max_inc</td><td>OT_REAL</td><td>5.0</td><td>Determines the upper bound on the acceptable increase of barrier objective function. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>option_file_name</td><td>OT_STRING</td><td>ipopt.opt</td><td>File name of options file. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>pardiso_iter_dropping_schur</td><td>OT_REAL</td><td>0.1</td><td>dropping value for sparsify schur complement factor (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3393,6 +3343,8 @@
 <tr><td>piecewisepenalty_gamma_infeasi</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>piecewisepenalty_gamma_obj</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>point_perturbation_radius</td><td>OT_REAL</td><td>10.0</td><td>Maximal perturbation of an evaluation point. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>print_frequency_iter</td><td>OT_INTEGER</td><td>1</td><td>Determines at which iteration frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>print_frequency_time</td><td>OT_REAL</td><td>0.0</td><td>Determines at which time frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_info_string</td><td>OT_STRING</td><td>no</td><td>Enables printing of additional info string at end of iteration output. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>5</td><td>Output verbosity level. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_options_documentation</td><td>OT_STRING</td><td>no</td><td>Switch to print all algorithmic options. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3459,20 +3411,7 @@
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>watchdog_shortened_iter_trigger</td><td>OT_INTEGER</td><td>10</td><td>Number of shortened iterations that trigger the watchdog. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>watchdog_trial_iter_max</td><td>OT_INTEGER</td><td>3</td><td>Maximum number of watchdog iterations. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_inexact_droptol</td><td>OT_REAL</td><td>0.0</td><td>Drop tolerance for inexact factorization preconditioner in WISMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_inexact_fillin_limit</td><td>OT_REAL</td><td>0.0</td><td>Fill-in limit for inexact factorization preconditioner in WISMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>wsmp_iterative</td><td>OT_STRING</td><td>no</td><td>Switches to iterative solver in WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_max_iter</td><td>OT_INTEGER</td><td>1000</td><td>Maximal number of iterations in iterative WISMP (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_no_pivoting</td><td>OT_STRING</td><td>no</td><td>Use the static pivoting option of WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to be used in WSMP (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_ordering_option</td><td>OT_INTEGER</td><td>1</td><td>Determines how ordering is done in WSMP (IPARM(16) (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_ordering_option2</td><td>OT_INTEGER</td><td>1</td><td>Determines how ordering is done in WSMP (IPARM(20) (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_pivtol</td><td>OT_REAL</td><td>0.0001</td><td>Pivot tolerance for the linear solver WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_pivtolmax</td><td>OT_REAL</td><td>0.1</td><td>Maximum pivot tolerance for the linear solver WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_scaling</td><td>OT_INTEGER</td><td>0</td><td>Determines how the matrix is scaled by WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_singularity_threshold</td><td>OT_REAL</td><td>1e-18</td><td>WSMP's singularity threshold. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretent inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_write_matrix_iteration</td><td>OT_INTEGER</td><td>-1</td><td>Iteration in which the matrices are written to files. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 </table>
 */
 /// \endcond
@@ -3541,8 +3480,6 @@
 <tr><td>eta_phi</td><td>OT_REAL</td><td>1e-08</td><td>Relaxation factor in the Armijo condition. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>evaluate_orig_obj_at_resto_trial</td><td>OT_STRING</td><td>yes</td><td>Determines if the original objective function should be evaluated at restoration phase trial points. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>expect_infeasible_problem</td><td>OT_STRING</td><td>no</td><td>Enable heuristics to quickly detect an infeasible problem. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>expect_infeasible_problem_ctol</td><td>OT_REAL</td><td>0.001</td><td>Threshold for disabling "expect_infeasible_problem" option. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>expect_infeasible_problem_ytol</td><td>OT_REAL</td><td>100000000.0</td><td>Multiplier threshold for activating "expect_infeasible_problem" option. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3561,10 +3498,6 @@
 <tr><td>gamma_theta</td><td>OT_REAL</td><td>1e-05</td><td>Relaxation factor in the filter margin for the constraint violation. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gamma_tilde</td><td>OT_REAL</td><td>4.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -3603,17 +3536,17 @@
 <tr><td>limited_memory_update_type</td><td>OT_STRING</td><td>bfgs</td><td>Quasi-Newton update formula for the limited memory approximation. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>line_search_method</td><td>OT_STRING</td><td>filter</td><td>Globalization method used in backtracking line search (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>linear_scaling_on_demand</td><td>OT_STRING</td><td>yes</td><td>Flag indicating that linear scaling is only done if it seems required. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>ma27</td><td>Linear solver used for step computations. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>linear_system_scaling</td><td>OT_STRING</td><td>mc19</td><td>Method for scaling the linear system. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>mumps</td><td>Linear solver used for step computations. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>linear_system_scaling</td><td>OT_STRING</td><td>none</td><td>Method for scaling the linear system. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_ignore_singularity</td><td>OT_STRING</td><td>no</td><td>Enables MA27's ability to solve a linear system even if the matrix is singular. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Real workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td>5.0</td><td>Integer workspace memory for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>10.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td>2.0</td><td>Increment factor for workspace size for MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_pivtol</td><td>OT_REAL</td><td>1e-08</td><td>Pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA27. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma27_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretend inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma28_pivtol</td><td>OT_REAL</td><td>0.01</td><td>Pivot tolerance for linear solver MA28. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>yes</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td>no</td><td>Controls MA57 automatic scaling (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_block_size</td><td>OT_INTEGER</td><td>16</td><td>Controls block size used by Level 3 BLAS in MA57BD (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td>16</td><td>Node amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td>5</td><td>Controls pivot order in MA57 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3621,12 +3554,39 @@
 <tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum pivot tolerance for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td>1.05</td><td>Safety factor for work space memory allocation for the linear solver MA57. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma57_small_pivot_flag</td><td>OT_INTEGER</td><td>0</td><td>If set to 1, then when small entries defined by CNTL(2) are detected they are removed and the corresponding pivots placed at the end of the factorization.  This can be particularly efficient if the matrix is highly rank deficient. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_buffer_lpage</td><td>OT_INTEGER</td><td>4096</td><td>Number of scalars per MA77 buffer page (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_buffer_npage</td><td>OT_INTEGER</td><td>1600</td><td>Number of pages that make up MA77 buffer (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_file_size</td><td>OT_INTEGER</td><td>2097152</td><td>Target size of each temporary file for MA77, scalars per type (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_maxstore</td><td>OT_INTEGER</td><td>0</td><td>Maximum storage size for MA77 in-core mode (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA77 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA77 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma77_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_nemin</td><td>OT_INTEGER</td><td>32</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma86_order</td><td>OT_STRING</td><td>amd</td><td>Controls type of ordering used by HSL_MA86 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma86_print_level</td><td>OT_INTEGER</td><td>-1</td><td>Debug printing level for the linear solver MA86 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma86_scaling</td><td>OT_STRING</td><td>mc64</td><td>Controls scaling of matrix (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_static</td><td>OT_REAL</td><td>0.0</td><td>Static Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>ma86_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_nemin</td><td>OT_INTEGER</td><td>8</td><td>Node Amalgamation parameter (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_order</td><td>OT_STRING</td><td>auto</td><td>Controls type of ordering used by HSL_MA97 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_print_level</td><td>OT_INTEGER</td><td>0</td><td>Debug printing level for the linear solver MA97 (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_scaling</td><td>OT_STRING</td><td>dynamic</td><td>Specifies strategy for scaling in HSL_MA97 linear solver (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_scaling1</td><td>OT_STRING</td><td>mc64</td><td>First scaling. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_scaling2</td><td>OT_STRING</td><td>mc64</td><td>Second scaling. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_scaling3</td><td>OT_STRING</td><td>mc64</td><td>Third scaling. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_small</td><td>OT_REAL</td><td>1e-20</td><td>Zero Pivot Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_solve_blas3</td><td>OT_STRING</td><td>no</td><td>Controls if blas2 or blas3 routines are used for solve (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_switch1</td><td>OT_STRING</td><td>od_hd_reuse</td><td>First switch, determine when ma97_scaling1 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_switch2</td><td>OT_STRING</td><td>never</td><td>Second switch, determine when ma97_scaling2 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_switch3</td><td>OT_STRING</td><td>never</td><td>Third switch, determine when ma97_scaling3 is enabled. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_u</td><td>OT_REAL</td><td>1e-08</td><td>Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>ma97_umax</td><td>OT_REAL</td><td>0.0001</td><td>Maximum Pivoting Threshold (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>magic_steps</td><td>OT_STRING</td><td>no</td><td>Enables magic steps. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>max_cpu_time</td><td>OT_REAL</td><td>1000000.0</td><td>Maximum number of CPU seconds. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>max_filter_resets</td><td>OT_INTEGER</td><td>5</td><td>Maximal allowed number of filter resets (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3653,7 +3613,7 @@
 <tr><td>mu_target</td><td>OT_REAL</td><td>0.0</td><td>Desired value of complementarity. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mult_diverg_feasibility_tol</td><td>OT_REAL</td><td>1e-07</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mult_diverg_y_tol</td><td>OT_REAL</td><td>100000000.0</td><td>tolerance for deciding if the multipliers are diverging (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>-1.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>mumps_dep_tol</td><td>OT_REAL</td><td>0.0</td><td>Pivot threshold for detection of linearly dependent constraints in MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td>1000</td><td>Percentage increase in the estimated working space for MUMPS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td>7</td><td>Controls permuting and scaling in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td>7</td><td>Controls pivot order in MUMPS (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3676,9 +3636,8 @@
 <tr><td>num_linear_variables</td><td>OT_INTEGER</td><td>0</td><td>Number of linear variables (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>obj_max_inc</td><td>OT_REAL</td><td>5.0</td><td>Determines the upper bound on the acceptable increase of barrier objective function. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>obj_scaling_factor</td><td>OT_REAL</td><td>1.0</td><td>Scaling factor for the objective function. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td>File name of options file (to overwrite default). (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>option_file_name</td><td>OT_STRING</td><td>ipopt.opt</td><td>File name of options file. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>output_file</td><td>OT_STRING</td><td></td><td>File name of desired output file (leave unset for no file output). (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>pardiso_iter_coarse_size</td><td>OT_INTEGER</td><td>5000</td><td>Maximum Size of Coarse Grid Matrix (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>pardiso_iter_dropping_factor</td><td>OT_REAL</td><td>0.5</td><td>dropping value for incomplete factor (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>pardiso_iter_dropping_schur</td><td>OT_REAL</td><td>0.1</td><td>dropping value for sparsify schur complement factor (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3711,6 +3670,8 @@
 <tr><td>piecewisepenalty_gamma_infeasi</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>piecewisepenalty_gamma_obj</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>point_perturbation_radius</td><td>OT_REAL</td><td>10.0</td><td>Maximal perturbation of an evaluation point. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>print_frequency_iter</td><td>OT_INTEGER</td><td>1</td><td>Determines at which iteration frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
+<tr><td>print_frequency_time</td><td>OT_REAL</td><td>0.0</td><td>Determines at which time frequency the summarizing iteration output line should be printed. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_info_string</td><td>OT_STRING</td><td>no</td><td>Enables printing of additional info string at end of iteration output. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_level</td><td>OT_INTEGER</td><td>5</td><td>Output verbosity level. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>print_options_documentation</td><td>OT_STRING</td><td>no</td><td>Switch to print all algorithmic options. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
@@ -3777,20 +3738,7 @@
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>watchdog_shortened_iter_trigger</td><td>OT_INTEGER</td><td>10</td><td>Number of shortened iterations that trigger the watchdog. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>watchdog_trial_iter_max</td><td>OT_INTEGER</td><td>3</td><td>Maximum number of watchdog iterations. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_inexact_droptol</td><td>OT_REAL</td><td>0.0</td><td>Drop tolerance for inexact factorization preconditioner in WISMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_inexact_fillin_limit</td><td>OT_REAL</td><td>0.0</td><td>Fill-in limit for inexact factorization preconditioner in WISMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 <tr><td>wsmp_iterative</td><td>OT_STRING</td><td>no</td><td>Switches to iterative solver in WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_max_iter</td><td>OT_INTEGER</td><td>1000</td><td>Maximal number of iterations in iterative WISMP (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_no_pivoting</td><td>OT_STRING</td><td>no</td><td>Use the static pivoting option of WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to be used in WSMP (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_ordering_option</td><td>OT_INTEGER</td><td>1</td><td>Determines how ordering is done in WSMP (IPARM(16) (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_ordering_option2</td><td>OT_INTEGER</td><td>1</td><td>Determines how ordering is done in WSMP (IPARM(20) (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_pivtol</td><td>OT_REAL</td><td>0.0001</td><td>Pivot tolerance for the linear solver WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_pivtolmax</td><td>OT_REAL</td><td>0.1</td><td>Maximum pivot tolerance for the linear solver WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_scaling</td><td>OT_INTEGER</td><td>0</td><td>Determines how the matrix is scaled by WSMP. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_singularity_threshold</td><td>OT_REAL</td><td>1e-18</td><td>WSMP's singularity threshold. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretent inertia is correct. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
-<tr><td>wsmp_write_matrix_iteration</td><td>OT_INTEGER</td><td>-1</td><td>Iteration in which the matrices are written to files. (see IPOPT documentation)</td><td>casadi::IpoptInternal</td></tr>
 </table>
 */
 /// \cond INTERNAL
@@ -3839,13 +3787,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -3858,7 +3800,6 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -3875,13 +3816,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians. (forward: only forward mode|reverse: only adjoint mode|automatic: a heuristic decides which is more appropriate)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -3894,7 +3829,6 @@
 <tr><td>jac_g</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Jacobian of the constraints (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>Verbose evaluation -- for debugging</td><td>casadi::FunctionInternal</td></tr>
@@ -4185,13 +4119,7 @@
 <tr><td>c1</td><td>OT_REAL</td><td>1E-4</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::SQPInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -4210,7 +4138,6 @@
 <tr><td>min_step_size</td><td>OT_REAL</td><td>1e-10</td><td>The size (inf-norm) of the step size should not become smaller than this.</td><td>casadi::SQPInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx)</td><td>casadi::FunctionInternal<br />casadi::SQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::SQPInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::SQPInternal</td></tr>
 <tr><td>qp_solver</td><td>OT_QPSOLVER</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>casadi::SQPInternal</td></tr>
@@ -4236,13 +4163,7 @@
 <tr><td>c1</td><td>OT_REAL</td><td>1E-4</td><td>Armijo condition, coefficient of decrease in merit</td><td>casadi::SQPInternal</td></tr>
 <tr><td>derivative_generator</td><td>OT_DERIVATIVEGENERATOR</td><td>GenericType()</td><td>Function that returns a derivative function given a number of forward and reverse directional derivative, overrides internal routines. Check documentation of DerivativeGenerator.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>expand</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the NLP function in terms of scalar operations, i.e. MX-&gt;SX</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the objective function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Expand the constraint function in terms of scalar operations, i.e. MX-&gt;SX. Deprecated, use \"expand\" instead.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>gather_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Flag to indicate whether statistics must be gathered</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>gauss_newton</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Use Gauss Newton Hessian approximation</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_gradient</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate a function for calculating the gradient of the objective.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Hessian of the Lagrangian if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
-<tr><td>generate_jacobian</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Generate an exact Jacobian of the constraints if not supplied.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_f</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the objective (column, autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>grad_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the gradient of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>hess_lag</td><td>OT_FUNCTION</td><td>GenericType()</td><td>Function for calculating the Hessian of the Lagrangian (autogenerated by default)</td><td>casadi::NLPSolverInternal</td></tr>
@@ -4261,7 +4182,6 @@
 <tr><td>min_step_size</td><td>OT_REAL</td><td>1e-10</td><td>The size (inf-norm) of the step size should not become smaller than this.</td><td>casadi::SQPInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx)</td><td>casadi::FunctionInternal<br />casadi::SQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>GenericType()</td><td>Deprecated option. Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>casadi::NLPSolverInternal</td></tr>
 <tr><td>print_header</td><td>OT_BOOLEAN</td><td>true</td><td>Print the header with problem statistics</td><td>casadi::SQPInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>true</td><td>Print information about execution time</td><td>casadi::SQPInternal</td></tr>
 <tr><td>qp_solver</td><td>OT_QPSOLVER</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>casadi::SQPInternal</td></tr>

@@ -2637,15 +2637,15 @@ Base class for integrators. Solves an initial value problem (IVP) coupled to
 a terminal value problem with differential equation given as an implicit ODE
 coupled to an algebraic equation and a set of quadratures: Initial
 conditions at t=t0  x(t0)  = x0  q(t0)  = 0   Forward integration from t=t0
-to t=tf  der(x) = function(x,z,p,t) Forward ODE  0 = fz(x,z,p,t)
-Forward algebraic equations  der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  = 0
-Backward integration from t=tf to t=t0  der(rx) = gx(rx,rz,rp,x,z,p,t)
-Backward ODE  0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations
-der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures where we assume
-that both the forward and backwards integrations are index-1  (i.e. dfz/dz,
-dgz/drz are invertible) and furthermore that gx, gz and gq have a linear
-dependency on rx, rz and rp.
+to t=tf  der(x) = function(x, z, p, t) Forward ODE  0 = fz(x, z, p, t)
+Forward algebraic equations  der(q) = fq(x, z, p, t)
+Forward quadratures   Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  =
+0 Backward integration from t=tf to t=t0  der(rx) = gx(rx, rz, rp, x, z, p,
+t)        Backward ODE  0 = gz(rx, rz, rp, x, z, p, t) Backward algebraic
+equations  der(rq) = gq(rx, rz, rp, x, z, p, t) Backward quadratures   where
+we assume that both the forward and backwards integrations are index-1
+(i.e. dfz/dz, dgz/drz are invertible) and furthermore that  gx, gz and gq
+have a linear dependency on rx, rz and rp.
 
 Joel Andersson
 
@@ -2703,19 +2703,44 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Impl |
-| ter          |              |              | number of    | icitFixedSte |
-|              |              |              | barrier      | pIntegratorI |
-|              |              |              | iterations.  | nternal      |
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| collocation_ | OT_STRING    | \"radau\"      | Collocation  | casadi::Coll |
+| scheme       |              |              | scheme (rada | ocationInteg |
+|              |              |              | u|legendre)  | ratorInterna |
+|              |              |              |              | l            |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -2725,15 +2750,53 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (eval_f|eval | casadi::Coll |
-|              | TOR          | )            | _djac)       | ocationInteg |
-|              |              |              |              | ratorInterna |
-|              |              |              |              | l            |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_sol | OT_IMPLICITF | GenericType( | An implicit  | casadi::Impl |
+| ver          | UNCTION      | )            | function     | icitFixedSte |
+|              |              |              | solver       | pIntegratorI |
+|              |              |              |              | nternal      |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_sol | OT_DICTIONAR | GenericType( | Options to   | casadi::Impl |
+| ver_options  | Y            | )            | be passed to | icitFixedSte |
+|              |              |              | the NLP      | pIntegratorI |
+|              |              |              | Solver       | nternal      |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| interpolatio | OT_INTEGER   | 3            | Order of the | casadi::Coll |
+| n_order      |              |              | interpolatin | ocationInteg |
+|              |              |              | g            | ratorInterna |
+|              |              |              | polynomials  | l            |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -2743,24 +2806,41 @@ Joel Andersson
 | nite_element |              |              | finite       | dStepIntegra |
 | s            |              |              | elements     | torInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-+-----------+---------------------------------------+
-|    Id     |                Used in                |
-+===========+=======================================+
-| eval_djac | casadi::CollocationIntegratorInternal |
-+-----------+---------------------------------------+
-| eval_f    | casadi::CollocationIntegratorInternal |
-+-----------+---------------------------------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
 
@@ -5575,16 +5655,44 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| control_endp | OT_BOOLEAN   | false        | Used for int | casadi::Cont |
-| oint         |              |              | erpolation.  | rolSimulator |
-|              |              |              |              | Internal     |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| control_endp | OT_BOOLEAN   | false        | Include a    | casadi::Cont |
+| oint         |              |              | control      | rolSimulator |
+|              |              |              | value at the | Internal     |
+|              |              |              | end of the   |              |
+|              |              |              | simulation   |              |
+|              |              |              | domain. Used |              |
+|              |              |              | for interpol |              |
+|              |              |              | ation.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | control_inte | OT_STRING    | \"none\"       | none|nearest | casadi::Cont |
 | rpolation    |              |              | |linear      | rolSimulator |
 |              |              |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -5594,23 +5702,96 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Cont |
-| nted         |              |              | function     | rolSimulator |
-|              |              |              | also be      | Internal     |
-|              |              |              | SXFunction . |              |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_INTEGRATO | GenericType( | An           | casadi::Cont |
+|              | R            | )            | integrator   | rolSimulator |
+|              |              |              | creator      | Internal     |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Cont |
+| ptions       | Y            | )            | be passed to | rolSimulator |
+|              |              |              | the          | Internal     |
+|              |              |              | integrator   |              |
++--------------+--------------+--------------+--------------+--------------+
+| minor_grid   | OT_INTEGERVE | GenericType( | The local    | casadi::Cont |
+|              | CTOR         | )            | grid used on | rolSimulator |
+|              |              |              | each major   | Internal     |
+|              |              |              | interval,    |              |
+|              |              |              | with time    |              |
+|              |              |              | normalized   |              |
+|              |              |              | to 1. By     |              |
+|              |              |              | default,     |              |
+|              |              |              | option 'nf'  |              |
+|              |              |              | is used to   |              |
+|              |              |              | construct a  |              |
+|              |              |              | linearly     |              |
+|              |              |              | spaced grid. |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| nf           | OT_INTEGER   | 1            | Number of    | casadi::Cont |
+|              |              |              | minor        | rolSimulator |
+|              |              |              | grained      | Internal     |
+|              |              |              | integration  |              |
+|              |              |              | steps per    |              |
+|              |              |              | major        |              |
+|              |              |              | interval.    |              |
+|              |              |              | nf>0 must    |              |
+|              |              |              | hold. This   |              |
+|              |              |              | option is    |              |
+|              |              |              | not used     |              |
+|              |              |              | when         |              |
+|              |              |              | 'minor_grid' |              |
+|              |              |              | is provided. |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| simulator_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Cont |
+| tions        | Y            | )            | be passed to | rolSimulator |
+|              |              |              | the          | Internal     |
+|              |              |              | simulator    |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -6641,13 +6822,52 @@ Kozma, Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
 | barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Cple |
 | ter          |              |              | number of    | xInternal    |
 |              |              |              | barrier      |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| convex       | OT_BOOLEAN   | true         | Indicates if | casadi::Cple |
+|              |              |              | the QP is    | xInternal    |
+|              |              |              | convex or    |              |
+|              |              |              | not (affects |              |
+|              |              |              | only the     |              |
+|              |              |              | barrier      |              |
+|              |              |              | method).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| dep_check    | OT_STRING    | \"off\"        | Detect       | casadi::Cple |
+|              |              |              | redundant    | xInternal    |
+|              |              |              | constraints. |              |
+|              |              |              | (automatic:- |              |
+|              |              |              | 1|off:0|begi |              |
+|              |              |              | n:1|end:2|bo |              |
+|              |              |              | th:3)        |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -6665,21 +6885,49 @@ Kozma, Joel Andersson
 |              |              |              | CPLEX        |              |
 |              |              |              | format.      |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::Cple |
-|              |              | )            | argument     | xInternal    |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
+| qp_method    | OT_STRING    | \"automatic\"  | Determines   | casadi::Cple |
+|              |              |              | which CPLEX  | xInternal    |
+|              |              |              | algorithm to |              |
+|              |              |              | use. (automa |              |
+|              |              |              | tic|primal_s |              |
+|              |              |              | implex|dual_ |              |
+|              |              |              | simplex|netw |              |
+|              |              |              | ork|barrier| |              |
+|              |              |              | sifting|conc |              |
+|              |              |              | urrent|cross |              |
+|              |              |              | over)        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | simplex_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Cple |
 | ter          |              |              | number of    | xInternal    |
@@ -6689,10 +6937,29 @@ Kozma, Joel Andersson
 | tol          | OT_REAL      | 0.000        | Tolerance of | casadi::Cple |
 |              |              |              | solver       | xInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warm_start   | OT_BOOLEAN   | false        | Use warm     | casadi::Cple |
+|              |              |              | start with   | xInternal    |
+|              |              |              | simplex      |              |
+|              |              |              | methods      |              |
+|              |              |              | (affects     |              |
+|              |              |              | only the     |              |
+|              |              |              | simplex      |              |
+|              |              |              | methods).    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -7544,7 +7811,7 @@ singular
 If A is structurally singular, an error will be thrown during init. If A is
 numerically singular, the prepare step will fail.
 
-CSparse is an casadi::Function mapping from 2 inputs [ A (matrix),b
+CSparse is an casadi::Function mapping from 2 inputs [ A (matrix), b
 (vector)] to one output [x (vector)].
 
 The usual procedure to use CSparse is:  init()
@@ -7582,8 +7849,31 @@ therefore more expensive if A is invariant.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -7593,18 +7883,52 @@ therefore more expensive if A is invariant.
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -8798,7 +9122,7 @@ singular
 If A is structurally singular, an error will be thrown during init. If A is
 numerically singular, the prepare step will fail.
 
-CSparseCholesky is an casadi::Function mapping from 2 inputs [ A (matrix),b
+CSparseCholesky is an casadi::Function mapping from 2 inputs [ A (matrix), b
 (vector)] to one output [x (vector)].
 
 *  A = LL' *    Ax = b *    LL'x = b *    L'x = L^-1 b *
@@ -8838,8 +9162,31 @@ therefore more expensive if A is invariant.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -8849,18 +9196,52 @@ therefore more expensive if A is invariant.
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -9797,8 +10178,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -9808,18 +10212,52 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -10333,15 +10771,15 @@ Base class for integrators. Solves an initial value problem (IVP) coupled to
 a terminal value problem with differential equation given as an implicit ODE
 coupled to an algebraic equation and a set of quadratures: Initial
 conditions at t=t0  x(t0)  = x0  q(t0)  = 0   Forward integration from t=t0
-to t=tf  der(x) = function(x,z,p,t) Forward ODE  0 = fz(x,z,p,t)
-Forward algebraic equations  der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  = 0
-Backward integration from t=tf to t=t0  der(rx) = gx(rx,rz,rp,x,z,p,t)
-Backward ODE  0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations
-der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures where we assume
-that both the forward and backwards integrations are index-1  (i.e. dfz/dz,
-dgz/drz are invertible) and furthermore that gx, gz and gq have a linear
-dependency on rx, rz and rp.
+to t=tf  der(x) = function(x, z, p, t) Forward ODE  0 = fz(x, z, p, t)
+Forward algebraic equations  der(q) = fq(x, z, p, t)
+Forward quadratures   Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  =
+0 Backward integration from t=tf to t=t0  der(rx) = gx(rx, rz, rp, x, z, p,
+t)        Backward ODE  0 = gz(rx, rz, rp, x, z, p, t) Backward algebraic
+equations  der(rq) = gq(rx, rz, rp, x, z, p, t) Backward quadratures   where
+we assume that both the forward and backwards integrations are index-1
+(i.e. dfz/dz, dgz/drz are invertible) and furthermore that  gx, gz and gq
+have a linear dependency on rx, rz and rp.
 
 A call to evaluate will integrate to the end.
 
@@ -10403,18 +10841,54 @@ times t_i.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| allow_equili | OT_BOOLEAN   | false        |              | casadi::CVod |
-| bration_fail |              |              |              | esInternal   |
-| ure          |              |              |              |              |
+| abstol       | OT_REAL      | 0.000        | Absolute     | casadi::Sund |
+|              |              |              | tolerence    | ialsInternal |
+|              |              |              | for the IVP  |              |
+|              |              |              | solution     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| abstolB      | OT_REAL      | GenericType( | Absolute     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -10424,53 +10898,362 @@ times t_i.
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | GenericType( | [default:    | casadi::Sund |
-| anB          |              | )            | equal to exa | ialsInternal |
+| disable_inte | OT_BOOLEAN   | false        | Disable      | casadi::CVod |
+| rnal_warning |              |              | CVodes       | esInternal   |
+| s            |              |              | internal     |              |
+|              |              |              | warning      |              |
+|              |              |              | messages     |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | true         | Use exact    | casadi::Sund |
+| an           |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | casadi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
 |              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | [default:    | casadi::Sund |
-| rB           | VER          | )            | equal to lin | ialsInternal |
+| finite_diffe | OT_BOOLEAN   | false        | Use finite   | casadi::Sund |
+| rence_fsens  |              |              | differences  | ialsInternal |
+|              |              |              | to           |              |
+|              |              |              | approximate  |              |
+|              |              |              | the forward  |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
+|              |              |              | (if AD is    |              |
+|              |              |              | not          |              |
+|              |              |              | available)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_abstol | OT_REAL      | GenericType( | Absolute     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_all_at | OT_BOOLEAN   | true         | Calculate    | casadi::CVod |
+| _once        |              |              | all right    | esInternal   |
+|              |              |              | hand sides   |              |
+|              |              |              | of the       |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations at |              |
+|              |              |              | once         |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_err_co | OT_BOOLEAN   | true         | include the  | casadi::Sund |
+| n            |              |              | forward sens | ialsInternal |
+|              |              |              | itivities in |              |
+|              |              |              | all error    |              |
+|              |              |              | controls     |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_reltol | OT_REAL      | GenericType( | Relative     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_scalin | OT_REALVECTO | GenericType( | Scaling      | casadi::Sund |
+| g_factors    | R            | )            | factor for   | ialsInternal |
+|              |              |              | the          |              |
+|              |              |              | components   |              |
+|              |              |              | if finite    |              |
+|              |              |              | differences  |              |
+|              |              |              | is used      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_sensit | OT_INTEGERVE | GenericType( | Specifies    | casadi::Sund |
+| iviy_paramet | CTOR         | )            | which        | ialsInternal |
+| ers          |              |              | components   |              |
+|              |              |              | will be used |              |
+|              |              |              | when         |              |
+|              |              |              | estimating   |              |
+|              |              |              | the          |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| interpolatio | OT_STRING    | \"hermite\"    | Type of inte | casadi::Sund |
+| n_type       |              |              | rpolation    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint sens |              |
+|              |              |              | itivities (h |              |
+|              |              |              | ermite|polyn |              |
+|              |              |              | omial)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | casadi::Sund |
+| lver         |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | casadi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| linear_multi | OT_STRING    | \"bdf\"        | Integrator   | casadi::CVod |
+| step_method  |              |              | scheme       | esInternal   |
+|              |              |              | (bdf|adams)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | casadi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | casadi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
 |              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | [default:    | casadi::Sund |
-| r_optionsB   | Y            | )            | equal to lin | ialsInternal |
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Sund |
+| r_options    | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
 |              |              |              | ear_solver_o |              |
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| lower_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
-| dthB         |              | )            | equal to low | ialsInternal |
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
+| dth          |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | Jacobian (es |              |
+|              |              |              | timations)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | casadi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
 |              |              |              | er_bandwidth |              |
 |              |              |              | ]            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylov   | OT_INTEGER   | 10           | Maximum      | casadi::Sund |
+|              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | casadi::Sund |
+|              |              | )            | krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_multiste | OT_INTEGER   | 5            |              | casadi::Sund |
 | p_order      |              |              |              | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (eval_f|eval | casadi::Sund |
-|              | TOR          | )            | _djac)       | ialsInternal |
+| max_num_step | OT_INTEGER   | 10000        | Maximum      | casadi::Sund |
+| s            |              |              | number of    | ialsInternal |
+|              |              |              | integrator   |              |
+|              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::CVod |
+|              |              |              | uts)  (res|r | esInternal   |
+|              |              |              | esB|resQB|re |              |
+|              |              |              | set|psetupB| |              |
+|              |              |              | djacB)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| nonlinear_so | OT_STRING    | \"newton\"     | (newton|func | casadi::CVod |
+| lver_iterati |              |              | tional)      | esInternal   |
+| on           |              |              |              |              |
 +--------------+--------------+--------------+--------------+--------------+
-| upper_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
-| dthB         |              | )            | equal to upp | ialsInternal |
+| pretype      | OT_STRING    | \"none\"       | (none|left|r | casadi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | casadi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| quad_err_con | OT_BOOLEAN   | false        | Should the   | casadi::Sund |
+|              |              |              | quadratures  | ialsInternal |
+|              |              |              | affect the   |              |
+|              |              |              | step size    |              |
+|              |              |              | control      |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltol       | OT_REAL      | 0.000        | Relative     | casadi::Sund |
+|              |              |              | tolerence    | ialsInternal |
+|              |              |              | for the IVP  |              |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | casadi::Sund |
+| method       |              | s\"           | s|staggered) | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| steps_per_ch | OT_INTEGER   | 20           | Number of    | casadi::Sund |
+| eckpoint     |              |              | steps        | ialsInternal |
+|              |              |              | between two  |              |
+|              |              |              | consecutive  |              |
+|              |              |              | checkpoints  |              |
++--------------+--------------+--------------+--------------+--------------+
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | casadi::Sund |
+|              |              |              | integrator   | ialsInternal |
+|              |              |              | at the end   |              |
+|              |              |              | of the       |              |
+|              |              |              | interval     |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | casadi::Sund |
+| dth          |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | Jacobian (es |              |
+|              |              |              | timations)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | casadi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
 |              |              |              | er_bandwidth |              |
 |              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| use_precondi | OT_BOOLEAN   | false        | Precondition | casadi::Sund |
+| tioner       |              |              | an iterative | ialsInternal |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | casadi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++---------+--------------------------+
+|   Id    |         Used in          |
++=========+==========================+
+| djacB   | casadi::CVodesInternal   |
++---------+--------------------------+
+| inputs  | casadi::FunctionInternal |
++---------+--------------------------+
+| outputs | casadi::FunctionInternal |
++---------+--------------------------+
+| psetupB | casadi::CVodesInternal   |
++---------+--------------------------+
+| res     | casadi::CVodesInternal   |
++---------+--------------------------+
+| resB    | casadi::CVodesInternal   |
++---------+--------------------------+
+| resQB   | casadi::CVodesInternal   |
++---------+--------------------------+
+| reset   | casadi::CVodesInternal   |
++---------+--------------------------+
 
 >List of available stats
 +-------------+------------------------+
@@ -13378,13 +14161,35 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Dire |
-| ter          |              |              | number of    | ctCollocatio |
-|              |              |              | barrier      | nInternal    |
-|              |              |              | iterations.  |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| collocation_ | OT_STRING    | \"radau\"      | Collocation  | casadi::Dire |
+| scheme       |              |              | scheme (rada | ctCollocatio |
+|              |              |              | u|legendre)  | nInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -13398,9 +14203,44 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| interpolatio | OT_INTEGER   | 3            | Order of the | casadi::Dire |
+| n_order      |              |              | interpolatin | ctCollocatio |
+|              |              |              | g            | nInternal    |
+|              |              |              | polynomials  |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver   | OT_NLPSOLVER | GenericType( | An NLPSolver | casadi::Dire |
+|              |              | )            | creator      | ctCollocatio |
+|              |              |              | function     | nInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Dire |
+| ptions       | Y            | )            | be passed to | ctCollocatio |
+|              |              |              | the NLP      | nInternal    |
+|              |              |              | Solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_gr | OT_INTEGER   | 20           |              | casadi::OCPS |
 | id_points    |              |              |              | olverInterna |
@@ -13410,14 +14250,27 @@ Joel Andersson
 | rameters     |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -14583,8 +15436,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -14598,9 +15474,50 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_INTEGRATO | GenericType( | An           | casadi::Dire |
+|              | R            | )            | integrator   | ctMultipleSh |
+|              |              |              | creator      | ootingIntern |
+|              |              |              | function     | al           |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Dire |
+| ptions       | Y            | )            | be passed to | ctMultipleSh |
+|              |              |              | the          | ootingIntern |
+|              |              |              | integrator   | al           |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver   | OT_NLPSOLVER | GenericType( | An NLPSolver | casadi::Dire |
+|              |              | )            | creator      | ctMultipleSh |
+|              |              |              | function     | ootingIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Dire |
+| ptions       | Y            | )            | be passed to | ctMultipleSh |
+|              |              |              | the NLP      | ootingIntern |
+|              |              |              | Solver       | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_gr | OT_INTEGER   | 20           |              | casadi::OCPS |
 | id_points    |              |              |              | olverInterna |
@@ -14615,14 +15532,27 @@ Joel Andersson
 |              |              |              | llelizer     | ootingIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -15638,8 +16568,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -15653,9 +16606,49 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator   | OT_INTEGRATO | GenericType( | An           | casadi::Dire |
+|              | R            | )            | integrator   | ctSingleShoo |
+|              |              |              | creator      | tingInternal |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| integrator_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Dire |
+| ptions       | Y            | )            | be passed to | ctSingleShoo |
+|              |              |              | the          | tingInternal |
+|              |              |              | integrator   |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver   | OT_NLPSOLVER | GenericType( | An NLPSolver | casadi::Dire |
+|              |              | )            | creator      | ctSingleShoo |
+|              |              |              | function     | tingInternal |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Dire |
+| ptions       | Y            | )            | be passed to | ctSingleShoo |
+|              |              |              | the NLP      | tingInternal |
+|              |              |              | Solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_gr | OT_INTEGER   | 20           |              | casadi::OCPS |
 | id_points    |              |              |              | olverInterna |
@@ -15669,14 +16662,27 @@ Joel Andersson
 | ion          |              | )            | casadi::Para | ctSingleShoo |
 |              |              |              | llelizer     | tingInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -16986,13 +17992,36 @@ P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
 | const_dim    | OT_BOOLEAN   | true         | Assume       | casadi::Dple |
 |              |              |              | constant     | Internal     |
 |              |              |              | dimension of |              |
 |              |              |              | P            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -17006,11 +18035,38 @@ P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 |              |              |              | unstability  | Internal     |
 |              |              |              | detection    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| error_unstab | OT_BOOLEAN   | false        | has          | casadi::Dple |
-| le           |              |              | eigenvalues  | Internal     |
+| error_unstab | OT_BOOLEAN   | false        | Throw an     | casadi::Dple |
+| le           |              |              | exception    | Internal     |
+|              |              |              | when it is   |              |
+|              |              |              | detected     |              |
+|              |              |              | that Product |              |
+|              |              |              | (A_i,i=N..1) |              |
+|              |              |              | has          |              |
+|              |              |              | eigenvalues  |              |
 |              |              |              | greater than |              |
 |              |              |              | 1-eps_unstab |              |
 |              |              |              | le           |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -17020,14 +18076,27 @@ P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 |              |              |              | positive     | Internal     |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -17772,12 +18841,67 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| _isumm       | OT_INTEGER   | 6            |              | casadi::DSDP |
-|              |              |              |              | Internal     |
+| _loglevel    | OT_INTEGER   | 0            | An integer   | casadi::DSDP |
+|              |              |              | that         | Internal     |
+|              |              |              | specifies    |              |
+|              |              |              | how much     |              |
+|              |              |              | logging is   |              |
+|              |              |              | done on      |              |
+|              |              |              | stdout.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| _penalty     | OT_REAL      | 100000       | Penality     | casadi::DSDP |
+|              |              |              | parameter    | Internal     |
+|              |              |              | lambda. Must |              |
+|              |              |              | exceed the   |              |
+|              |              |              | trace of Y.  |              |
+|              |              |              | This         |              |
+|              |              |              | parameter    |              |
+|              |              |              | heavily      |              |
+|              |              |              | influences   |              |
+|              |              |              | the ability  |              |
+|              |              |              | of DSDP to   |              |
+|              |              |              | treat linear |              |
+|              |              |              | equalities.  |              |
+|              |              |              | The DSDP     |              |
+|              |              |              | standard     |              |
+|              |              |              | default      |              |
+|              |              |              | (1e8) will   |              |
+|              |              |              | make a       |              |
+|              |              |              | problem with |              |
+|              |              |              | linear       |              |
+|              |              |              | equality     |              |
+|              |              |              | return       |              |
+|              |              |              | unusable     |              |
+|              |              |              | solutions.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| _printlevel  | OT_INTEGER   | 1            | A printlevel | casadi::DSDP |
+|              |              |              | of zero will | Internal     |
+|              |              |              | disable all  |              |
+|              |              |              | output.      |              |
+|              |              |              | Another      |              |
+|              |              |              | number       |              |
+|              |              |              | indicates    |              |
+|              |              |              | how often a  |              |
+|              |              |              | line is      |              |
+|              |              |              | printed.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| _reuse       | OT_INTEGER   | 4            | Maximum on   | casadi::DSDP |
+|              |              |              | the number   | Internal     |
+|              |              |              | of times the |              |
+|              |              |              | Schur        |              |
+|              |              |              | complement   |              |
+|              |              |              | matrix is    |              |
+|              |              |              | reused       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | _rho         | OT_REAL      | 4            | Potential    | casadi::DSDP |
 |              |              |              | parameter.   | Internal     |
 |              |              |              | Must be >=1  |              |
++--------------+--------------+--------------+--------------+--------------+
+| _use_penalty | OT_BOOLEAN   | true         | Modifies the | casadi::DSDP |
+|              |              |              | algorithm to | Internal     |
+|              |              |              | use a        |              |
+|              |              |              | penality     |              |
+|              |              |              | gamma on r.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | _zbar        | OT_REAL      | 1.000e+10    | Initial      | casadi::DSDP |
 |              |              |              | upper bound  | Internal     |
@@ -17786,18 +18910,30 @@ Joris Gillis
 |              |              |              | the dual     |              |
 |              |              |              | problem.     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
 | calc_dual    | OT_BOOLEAN   | true         | Indicate if  | casadi::SDPS |
 |              |              |              | dual should  | olverInterna |
 |              |              |              | be allocated | l            |
 |              |              |              | and          |              |
 |              |              |              | calculated.  |              |
-|              |              |              | as is always |              |
-|              |              |              | dense (m x   |              |
-|              |              |              | m).          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| calc_p       | OT_BOOLEAN   | true         | You may want | casadi::SDPS |
-|              |              |              | to avoid     | olverInterna |
-|              |              |              | calculating  | l            |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
 |              |              |              | this         |              |
 |              |              |              | variable for |              |
 |              |              |              | problems     |              |
@@ -17806,8 +18942,34 @@ Joris Gillis
 |              |              |              | always dense |              |
 |              |              |              | (m x m).     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| calc_p       | OT_BOOLEAN   | true         | Indicate if  | casadi::SDPS |
+|              |              |              | the P-part   | olverInterna |
+|              |              |              | of primal    | l            |
+|              |              |              | solution     |              |
+|              |              |              | should be    |              |
+|              |              |              | allocated    |              |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (m x m).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -17817,11 +18979,30 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| dualTol      | OT_REAL      | 0.000        | (translates  | casadi::DSDP |
-|              |              |              | to primal in | Internal     |
+| dualTol      | OT_REAL      | 0.000        | Tolerance    | casadi::DSDP |
+|              |              |              | for dual inf | Internal     |
+|              |              |              | easibility   |              |
+|              |              |              | (translates  |              |
+|              |              |              | to primal in |              |
 |              |              |              | feasibility  |              |
 |              |              |              | in dsdp      |              |
 |              |              |              | terms)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| gapTol       | OT_REAL      | 0.000        | Convergence  | casadi::DSDP |
+|              |              |              | criterion    | Internal     |
+|              |              |              | based on     |              |
+|              |              |              | distance     |              |
+|              |              |              | between      |              |
+|              |              |              | primal and   |              |
+|              |              |              | dual         |              |
+|              |              |              | objective    |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | inf          | OT_REAL      | 1.000e+30    | Treat        | casadi::DSDP |
 |              |              |              | numbers      | Internal     |
@@ -17829,16 +19010,33 @@ Joris Gillis
 |              |              |              | this as      |              |
 |              |              |              | infinity     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
 | maxIter      | OT_INTEGER   | 500          | Maximum      | casadi::DSDP |
 |              |              |              | number of    | Internal     |
 |              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| primalTol    | OT_REAL      | 0.000        | (translates  | casadi::DSDP |
-|              |              |              | to dual infe | Internal     |
+| primalTol    | OT_REAL      | 0.000        | Tolerance    | casadi::DSDP |
+|              |              |              | for primal i | Internal     |
+|              |              |              | nfeasibility |              |
+|              |              |              | (translates  |              |
+|              |              |              | to dual infe |              |
 |              |              |              | asibility in |              |
 |              |              |              | dsdp terms)  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -17848,14 +19046,36 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| stepTol      | OT_REAL      | 0.050        | Terminate    | casadi::DSDP |
+|              |              |              | the solver   | Internal     |
+|              |              |              | if the step  |              |
+|              |              |              | length in    |              |
+|              |              |              | the primal   |              |
+|              |              |              | is below     |              |
+|              |              |              | this         |              |
+|              |              |              | tolerance.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -18308,11 +19528,11 @@ patten dense.
 matrix Make the matrix larger by inserting empty rows and columns, keeping
 the existing non-zeros.
 
-For the matrices A to B A(m,n) length(jj)=m , length(ii)=n B(nrow,ncol)
+For the matrices A to B A(m, n) length(jj)=m , length(ii)=n B(nrow, ncol)
 
-A=enlarge(m,n,ii,jj) makes sure that
+A=enlarge(m, n, ii, jj) makes sure that
 
-B[jj,ii] == A
+B[jj, ii] == A
 
 ";
 
@@ -18510,7 +19730,7 @@ matrix
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
 by Davis (2006). If the parameter ata is false, the algorithm is equivalent
 to Matlab's etree(A), except that the indices are zero- based. If ata is
-true, the algorithm is equivalent to Matlab's etree(A,'row').
+true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
@@ -18661,7 +19881,7 @@ Enlarge the matrix along the second dimension (i.e. insert columns)
 ";
 
 %feature("docstring") casadi::EmptySparsity::sizeU "[INTERNAL]  Number of
-non-zeros in the upper triangular half, i.e. the number of elements (i,j)
+non-zeros in the upper triangular half, i.e. the number of elements (i, j)
 with j>=i.
 
 ";
@@ -18674,13 +19894,13 @@ improper use will cause memory leaks!
 ";
 
 %feature("docstring") casadi::EmptySparsity::sizeL "[INTERNAL]  Number of
-non-zeros in the lower triangular half, i.e. the number of elements (i,j)
+non-zeros in the lower triangular half, i.e. the number of elements (i, j)
 with j<=i.
 
 ";
 
 %feature("docstring") casadi::EmptySparsity::sizeD "[INTERNAL]  Number of
-non-zeros on the diagonal, i.e. the number of elements (i,j) with j==i.
+non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i.
 
 ";
 
@@ -18807,9 +20027,9 @@ index[offset[i+1]]
 
 In the case that the matrix is symmetric, the result has a particular
 interpretation: Given a symmetric matrix A and n =
-A.stronglyConnectedComponents(p,r)
+A.stronglyConnectedComponents(p, r)
 
-=> A[p,p] will appear block-diagonal with n blocks and with the indices of
+=> A[p, p] will appear block-diagonal with n blocks and with the indices of
 the block boundaries to be found in r.
 
 ";
@@ -18868,7 +20088,7 @@ the node to a node class pointer (or null)
 ";
 
 %feature("docstring") casadi::EmptySparsity::hasNZ "[INTERNAL]  Returns
-true if the pattern has a non-zero at location rr,cc.
+true if the pattern has a non-zero at location rr, cc.
 
 ";
 
@@ -19291,8 +20511,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -19302,18 +20545,52 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -20593,14 +21870,39 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -20610,10 +21912,38 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -20623,14 +21953,40 @@ Joel Andersson
 | nite_element |              |              | finite       | dStepIntegra |
 | s            |              |              | elements     | torInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -21647,30 +23003,30 @@ General function.
 A general function $f$ in casadi can be multi-input, multi-output. Number of
 inputs: nin getNumInputs() Number of outputs: nout getNumOutputs()  We can
 view this function as a being composed of a ( nin, nout) grid of single-
-input, single-output primitive functions. Each such primitive function
-$f_{i,j} \\\\forall i \\\\in [0,nin-1], j \\\\in [0,nout-1]$ can map as
-$\\\\mathbf{R}^{n,m}\\\\to\\\\mathbf{R}^{p,q}$, in which n,m,p,q can take
-different values for every (i,j) pair.  When passing input, you specify
-which partition $i$ is active. You pass the numbers vectorized, as a vector
-of size $(n*m)$. When requesting output, you specify which partition $j$ is
-active. You get the numbers vectorized, as a vector of size $(p*q)$.  To
-calculate Jacobians, you need to have $(m=1,q=1)$.
+input, single-output primitive functions. Each such primitive function $f_
+{i, j} \\\\forall i \\\\in [0, nin-1], j \\\\in [0, nout-1]$ can map as
+$\\\\mathbf {R}^{n, m}\\\\to\\\\mathbf{R}^{p, q}$, in which n, m, p, q can
+take different values for every (i, j) pair.  When passing input, you
+specify which partition $i$ is active. You pass the numbers vectorized, as a
+vector of size $(n*m)$. When requesting output, you specify which partition
+$j$ is active. You get the numbers vectorized, as a vector of size $(p*q)$.
+To calculate Jacobians, you need to have $(m=1, q=1)$.
 
-Write the Jacobian as $J_{i,j} = \\\\nabla f_{i,j} = \\\\frac{\\\\partial
-f_{i,j}(\\\\vec{x})}{\\\\partial \\\\vec{x}}$.
+Write the Jacobian as $J_ {i, j} = \\\\nabla f_{i, j} = \\\\frac
+{\\\\partial f_{i, j}(\\\\vec{x})}{\\\\partial \\\\vec{x}}$.
 
-Using $\\\\vec{v} \\\\in \\\\mathbf{R}^n$ as a forward seed: setFwdSeed(v,i)
-Retrieving $\\\\vec{s}_f \\\\in \\\\mathbf{R}^p$ from: getFwdSens(sf,j)
-Using $\\\\vec{w} \\\\in \\\\mathbf{R}^p$ as a forward seed: setAdjSeed(w,j)
-Retrieving $\\\\vec{s}_a \\\\in \\\\mathbf{R}^n $ from: getAdjSens(sa,i)  We
-have the following relationships for function mapping from a row vector to a
-row vector:
+Using $\\\\vec {v} \\\\in \\\\mathbf{R}^n$ as a forward seed: setFwdSeed(v,
+i) Retrieving $\\\\vec {s}_f \\\\in \\\\mathbf{R}^p$ from: getFwdSens(sf, j)
+Using $\\\\vec {w} \\\\in \\\\mathbf{R}^p$ as a forward seed: setAdjSeed(w,
+j) Retrieving $\\\\vec {s}_a \\\\in \\\\mathbf{R}^n $ from: getAdjSens(sa,
+i)  We have the following relationships for function mapping from a row
+vector to a row vector:
 
-$ \\\\vec{s}_f = \\\\nabla f_{i,j} . \\\\vec{v}$ $ \\\\vec{s}_a = (\\\\nabla
-f_{i,j})^T . \\\\vec{w}$
+$ \\\\vec {s}_f = \\\\nabla f_{i, j} . \\\\vec{v}$ $ \\\\vec {s}_a =
+(\\\\nabla f_{i, j})^T . \\\\vec{w}$
 
 Some quantities in these formulas must be transposed: input col: transpose $
-\\\\vec{v} $ and $\\\\vec{s}_a$ output col: transpose $ \\\\vec{w} $ and
+\\\\vec {v} $ and $\\\\vec{s}_a$ output col: transpose $ \\\\vec {w} $ and
 $\\\\vec{s}_f$  NOTE: Functions are allowed to modify their input arguments
 when evaluating: implicitFunction, IDAS solver Further releases may disallow
 this.
@@ -21681,8 +23037,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -21692,19 +23071,62 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++---------+--------------------------+
+|   Id    |         Used in          |
++=========+==========================+
+| inputs  | casadi::FunctionInternal |
++---------+--------------------------+
+| outputs | casadi::FunctionInternal |
++---------+--------------------------+
 
 Diagrams
 
@@ -22248,7 +23670,7 @@ template pattern (CRTP) idiom.  The class is designed with the idea that
 philosophy makes it easy to use and to interface in particularly with Python
 and Matlab/Octave.  The syntax tries to stay as close as possible to the
 ublas syntax when it comes to vector/matrix operations.  Index starts with
-0. Index vec happens as follows: (rr,cc) -> k = rr+cc*size1() Vectors are
+0. Index vec happens as follows: (rr, cc) -> k = rr+cc*size1() Vectors are
 column vectors.  The storage format is Compressed Column Storage (CCS),
 similar to that used for sparse matrices in Matlab, but unlike this format,
 we do allow for elements to be structurally non-zero but numerically zero.
@@ -25210,10 +26632,10 @@ Generate the sparsity of a Jacobian block
 
 Base class for Homotopy NLP Solvers.
 
-Solves the following parametric nonlinear program (NLP):min
-F(x,p,tau)  x  subject to             LBX <=   x    <= UBX             LBG
-<= G(x,p) <= UBG                        p  == P nx: number of decision
-variables     ng: number of constraints     np: number of parameters
+Solves the following parametric nonlinear program (NLP):min          F(x, p,
+tau)  x  subject to             LBX <=   x    <= UBX             LBG <= G(x,
+p) <= UBG                        p  == P nx: number of decision variables
+ng: number of constraints     np: number of parameters
 
 In a homotopy from tau = 0 to tau = 1.
 
@@ -25290,8 +26712,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -25301,22 +26746,59 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| final_time   | OT_REAL      | 1            |              | casadi::Homo |
-|              |              |              |              | topyNLPInter |
-|              |              |              |              | nal          |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::Homo |
+|              |              |              | NLP function | topyNLPInter |
+|              |              |              | in terms of  | nal          |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -26340,7 +27822,7 @@ evaluation output.
 ";
 
 %feature("docstring") casadi::Horzsplit "[INTERNAL]  Horizontal split, x ->
-x0, x1,...
+x0, x1, ...
 
 Joel Andersson
 
@@ -27151,15 +28633,15 @@ Base class for integrators. Solves an initial value problem (IVP) coupled to
 a terminal value problem with differential equation given as an implicit ODE
 coupled to an algebraic equation and a set of quadratures: Initial
 conditions at t=t0  x(t0)  = x0  q(t0)  = 0   Forward integration from t=t0
-to t=tf  der(x) = function(x,z,p,t) Forward ODE  0 = fz(x,z,p,t)
-Forward algebraic equations  der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  = 0
-Backward integration from t=tf to t=t0  der(rx) = gx(rx,rz,rp,x,z,p,t)
-Backward ODE  0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations
-der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures where we assume
-that both the forward and backwards integrations are index-1  (i.e. dfz/dz,
-dgz/drz are invertible) and furthermore that gx, gz and gq have a linear
-dependency on rx, rz and rp.
+to t=tf  der(x) = function(x, z, p, t) Forward ODE  0 = fz(x, z, p, t)
+Forward algebraic equations  der(q) = fq(x, z, p, t)
+Forward quadratures   Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  =
+0 Backward integration from t=tf to t=t0  der(rx) = gx(rx, rz, rp, x, z, p,
+t)        Backward ODE  0 = gz(rx, rz, rp, x, z, p, t) Backward algebraic
+equations  der(rq) = gq(rx, rz, rp, x, z, p, t) Backward quadratures   where
+we assume that both the forward and backwards integrations are index-1
+(i.e. dfz/dz, dgz/drz are invertible) and furthermore that  gx, gz and gq
+have a linear dependency on rx, rz and rp.
 
 Joel Andersson
 
@@ -27217,30 +28699,85 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| abstol       | OT_REAL      | 0.000        | Absolute     | casadi::Sund |
+|              |              |              | tolerence    | ialsInternal |
+|              |              |              | for the IVP  |              |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| abstolB      | OT_REAL      | GenericType( | Absolute     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
 | abstolv      | OT_REALVECTO |              |              | casadi::Idas |
 |              | R            |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| calc_icB     | OT_BOOLEAN   | GenericType( | backwards    | casadi::Idas |
-|              |              | )            | system       | Internal     |
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_ic      | OT_BOOLEAN   | true         | Use          | casadi::Idas |
+|              |              |              | IDACalcIC to | Internal     |
+|              |              |              | get          |              |
+|              |              |              | consistent   |              |
+|              |              |              | initial      |              |
+|              |              |              | conditions.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| calc_icB     | OT_BOOLEAN   | GenericType( | Use          | casadi::Idas |
+|              |              | )            | IDACalcIC to | Internal     |
+|              |              |              | get          |              |
+|              |              |              | consistent   |              |
+|              |              |              | initial      |              |
+|              |              |              | conditions   |              |
+|              |              |              | for          |              |
+|              |              |              | backwards    |              |
+|              |              |              | system       |              |
 |              |              |              | [default:    |              |
 |              |              |              | equal to     |              |
 |              |              |              | calc_ic].    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constraints  | OT_INTEGERVE | GenericType( | 1: ui >=     | casadi::Idas |
-|              | CTOR         | )            | 0.0, -1: ui  | Internal     |
-|              |              |              | <= 0.0, 2:   |              |
-|              |              |              | ui > 0.0,    |              |
-|              |              |              | -2: ui <     |              |
-|              |              |              | 0.0.         |              |
+| cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | casadi::Idas |
+|              |              |              | on cj for    | Internal     |
+|              |              |              | the user-    |              |
+|              |              |              | defined      |              |
+|              |              |              | linear       |              |
+|              |              |              | solver       |              |
+|              |              |              | module       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -27250,56 +28787,386 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | GenericType( | [default:    | casadi::Sund |
-| anB          |              | )            | equal to exa | ialsInternal |
+| disable_inte | OT_BOOLEAN   | false        | Disable IDAS | casadi::Idas |
+| rnal_warning |              |              | internal     | Internal     |
+| s            |              |              | warning      |              |
+|              |              |              | messages     |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | true         | Use exact    | casadi::Sund |
+| an           |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | casadi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
 |              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
++--------------+--------------+--------------+--------------+--------------+
+| extra_fsens_ | OT_BOOLEAN   | false        | Call calc ic | casadi::Idas |
+| calc_ic      |              |              | an extra     | Internal     |
+|              |              |              | time, with   |              |
+|              |              |              | fsens=0      |              |
++--------------+--------------+--------------+--------------+--------------+
+| finite_diffe | OT_BOOLEAN   | false        | Use finite   | casadi::Sund |
+| rence_fsens  |              |              | differences  | ialsInternal |
+|              |              |              | to           |              |
+|              |              |              | approximate  |              |
+|              |              |              | the forward  |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
+|              |              |              | (if AD is    |              |
+|              |              |              | not          |              |
+|              |              |              | available)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| first_time   | OT_REAL      | GenericType( | First        | casadi::Idas |
+|              |              | )            | requested    | Internal     |
+|              |              |              | time as a    |              |
+|              |              |              | fraction of  |              |
+|              |              |              | the time     |              |
+|              |              |              | interval     |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_abstol | OT_REAL      | GenericType( | Absolute     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | fsens_abstol | OT_REALVECTO |              |              | casadi::Idas |
 | v            | R            |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | [default:    | casadi::Sund |
-| rB           | VER          | )            | equal to lin | ialsInternal |
+| fsens_err_co | OT_BOOLEAN   | true         | include the  | casadi::Sund |
+| n            |              |              | forward sens | ialsInternal |
+|              |              |              | itivities in |              |
+|              |              |              | all error    |              |
+|              |              |              | controls     |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_reltol | OT_REAL      | GenericType( | Relative     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_scalin | OT_REALVECTO | GenericType( | Scaling      | casadi::Sund |
+| g_factors    | R            | )            | factor for   | ialsInternal |
+|              |              |              | the          |              |
+|              |              |              | components   |              |
+|              |              |              | if finite    |              |
+|              |              |              | differences  |              |
+|              |              |              | is used      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_sensit | OT_INTEGERVE | GenericType( | Specifies    | casadi::Sund |
+| iviy_paramet | CTOR         | )            | which        | ialsInternal |
+| ers          |              |              | components   |              |
+|              |              |              | will be used |              |
+|              |              |              | when         |              |
+|              |              |              | estimating   |              |
+|              |              |              | the          |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| init_xdot    | OT_REALVECTO | GenericType( | Initial      | casadi::Idas |
+|              | R            | )            | values for   | Internal     |
+|              |              |              | the state    |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| interpolatio | OT_STRING    | \"hermite\"    | Type of inte | casadi::Sund |
+| n_type       |              |              | rpolation    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint sens |              |
+|              |              |              | itivities (h |              |
+|              |              |              | ermite|polyn |              |
+|              |              |              | omial)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | casadi::Sund |
+| lver         |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | casadi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | casadi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | casadi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
 |              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | [default:    | casadi::Sund |
-| r_optionsB   | Y            | )            | equal to lin | ialsInternal |
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Sund |
+| r_options    | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
 |              |              |              | ear_solver_o |              |
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| lower_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
-| dthB         |              | )            | equal to low | ialsInternal |
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
+| dth          |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | Jacobian (es |              |
+|              |              |              | timations)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | casadi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
 |              |              |              | er_bandwidth |              |
 |              |              |              | ]            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylov   | OT_INTEGER   | 10           | Maximum      | casadi::Sund |
+|              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | casadi::Sund |
+|              |              | )            | krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_multiste | OT_INTEGER   | 5            |              | casadi::Sund |
 | p_order      |              |              |              | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (eval_f|eval | casadi::Sund |
-|              | TOR          | )            | _djac)       | ialsInternal |
+| max_num_step | OT_INTEGER   | 10000        | Maximum      | casadi::Sund |
+| s            |              |              | number of    | ialsInternal |
+|              |              |              | integrator   |              |
+|              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_step_siz | OT_REAL      | 0            | Maximim step | casadi::Idas |
+| e            |              |              | size         | Internal     |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Idas |
+|              |              |              | uts)  (corre | Internal     |
+|              |              |              | ctInitialCon |              |
+|              |              |              | ditions|res| |              |
+|              |              |              | resS|resB|rh |              |
+|              |              |              | sQB|bjacB|jt |              |
+|              |              |              | imesB|psetup |              |
+|              |              |              | B|psolveB|ps |              |
+|              |              |              | etup)        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| pretype      | OT_STRING    | \"none\"       | (none|left|r | casadi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| upper_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
-| dthB         |              | )            | equal to upp | ialsInternal |
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | casadi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| quad_err_con | OT_BOOLEAN   | false        | Should the   | casadi::Sund |
+|              |              |              | quadratures  | ialsInternal |
+|              |              |              | affect the   |              |
+|              |              |              | step size    |              |
+|              |              |              | control      |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltol       | OT_REAL      | 0.000        | Relative     | casadi::Sund |
+|              |              |              | tolerence    | ialsInternal |
+|              |              |              | for the IVP  |              |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | casadi::Sund |
+| method       |              | s\"           | s|staggered) | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| steps_per_ch | OT_INTEGER   | 20           | Number of    | casadi::Sund |
+| eckpoint     |              |              | steps        | ialsInternal |
+|              |              |              | between two  |              |
+|              |              |              | consecutive  |              |
+|              |              |              | checkpoints  |              |
++--------------+--------------+--------------+--------------+--------------+
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | casadi::Sund |
+|              |              |              | integrator   | ialsInternal |
+|              |              |              | at the end   |              |
+|              |              |              | of the       |              |
+|              |              |              | interval     |              |
++--------------+--------------+--------------+--------------+--------------+
+| suppress_alg | OT_BOOLEAN   | false        | Supress      | casadi::Idas |
+| ebraic       |              |              | algebraic    | Internal     |
+|              |              |              | variables in |              |
+|              |              |              | the error    |              |
+|              |              |              | testing      |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | casadi::Sund |
+| dth          |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | Jacobian (es |              |
+|              |              |              | timations)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | casadi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
 |              |              |              | er_bandwidth |              |
 |              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| use_precondi | OT_BOOLEAN   | false        | Precondition | casadi::Sund |
+| tioner       |              |              | an iterative | ialsInternal |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | casadi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++--------------------------+--------------------------+
+|            Id            |         Used in          |
++==========================+==========================+
+| bjacB                    | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| correctInitialConditions | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| inputs                   | casadi::FunctionInternal |
++--------------------------+--------------------------+
+| jtimesB                  | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| outputs                  | casadi::FunctionInternal |
++--------------------------+--------------------------+
+| psetup                   | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| psetupB                  | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| psolveB                  | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| res                      | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| resB                     | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| resS                     | casadi::IdasInternal     |
++--------------------------+--------------------------+
+| rhsQB                    | casadi::IdasInternal     |
++--------------------------+--------------------------+
 
 >List of available stats
 +-------------+----------------------+
@@ -27983,19 +29850,39 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::Impl |
-| ter          |              |              | number of    | icitFixedSte |
-|              |              |              | barrier      | pIntegratorI |
-|              |              |              | iterations.  | nternal      |
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -28005,10 +29892,48 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_sol | OT_IMPLICITF | GenericType( | An implicit  | casadi::Impl |
+| ver          | UNCTION      | )            | function     | icitFixedSte |
+|              |              |              | solver       | pIntegratorI |
+|              |              |              |              | nternal      |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_sol | OT_DICTIONAR | GenericType( | Options to   | casadi::Impl |
+| ver_options  | Y            | )            | be passed to | icitFixedSte |
+|              |              |              | the NLP      | pIntegratorI |
+|              |              |              | Solver       | nternal      |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -28018,14 +29943,40 @@ Joel Andersson
 | nite_element |              |              | finite       | dStepIntegra |
 | s            |              |              | elements     | torInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -29083,15 +31034,44 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| constraints  | OT_INTEGERVE | GenericType( | 1: ui >=     | casadi::Impl |
-|              | CTOR         | )            | 0.0, -1: ui  | icitFunction |
-|              |              |              | <= 0.0, 2:   | Internal     |
-|              |              |              | ui > 0.0,    |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| constraints  | OT_INTEGERVE | GenericType( | Constrain    | casadi::Impl |
+|              | CTOR         | )            | the          | icitFunction |
+|              |              |              | unknowns. 0  | Internal     |
+|              |              |              | (default):   |              |
+|              |              |              | no           |              |
+|              |              |              | constraint   |              |
+|              |              |              | on ui, 1: ui |              |
+|              |              |              | >= 0.0, -1:  |              |
+|              |              |              | ui <= 0.0,   |              |
+|              |              |              | 2: ui > 0.0, |              |
 |              |              |              | -2: ui <     |              |
 |              |              |              | 0.0.         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -29101,22 +31081,79 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_inp | OT_INTEGER   | 0            | Index of the | casadi::Impl |
+| ut           |              |              | input that   | icitFunction |
+|              |              |              | corresponds  | Internal     |
+|              |              |              | to the       |              |
+|              |              |              | actual root- |              |
+|              |              |              | finding      |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_out | OT_INTEGER   | 0            | Index of the | casadi::Impl |
+| put          |              |              | output that  | icitFunction |
+|              |              |              | corresponds  | Internal     |
+|              |              |              | to the       |              |
+|              |              |              | actual root- |              |
+|              |              |              | finding      |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | casadi::Impl |
+| r            | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | GenericType( | Passed on to | casadi::Impl |
-| ion          |              | )            | casadi::Para | icitFunction |
-|              |              |              | llelizer     | Internal     |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -30671,16 +32708,16 @@ Integrator abstract base class
 Solves an initial value problem (IVP) coupled to a terminal value problem
 with differential equation given as an implicit ODE coupled to an algebraic
 equation and a set of quadratures: Initial conditions at t=t0  x(t0)  = x0
-q(t0)  = 0   Forward integration from t=t0 to t=tf  der(x) =
-function(x,z,p,t) Forward ODE  0 = fz(x,z,p,t)                  Forward
-algebraic equations  der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  = 0
-Backward integration from t=tf to t=t0  der(rx) = gx(rx,rz,rp,x,z,p,t)
-Backward ODE  0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations
-der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures where we assume
-that both the forward and backwards integrations are index-1  (i.e. dfz/dz,
-dgz/drz are invertible) and furthermore that gx, gz and gq have a linear
-dependency on rx, rz and rp.
+q(t0)  = 0   Forward integration from t=t0 to t=tf  der(x) = function(x, z,
+p, t) Forward ODE  0 = fz(x, z, p, t)                  Forward algebraic
+equations  der(q) = fq(x, z, p, t)                  Forward quadratures
+Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  = 0 Backward integration
+from t=tf to t=t0  der(rx) = gx(rx, rz, rp, x, z, p, t)        Backward ODE
+0 = gz(rx, rz, rp, x, z, p, t) Backward algebraic equations  der(rq) =
+gq(rx, rz, rp, x, z, p, t) Backward quadratures   where we assume that both
+the forward and backwards integrations are index-1  (i.e. dfz/dz, dgz/drz
+are invertible) and furthermore that  gx, gz and gq have a linear dependency
+on rx, rz and rp.
 
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points.
@@ -30744,14 +32781,39 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -30761,23 +32823,77 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -32691,8 +34807,8 @@ Access output argument
 
 interface to IPOPT NLP solver
 
-Solves the following parametric nonlinear program (NLP):min          F(x,p)
-x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
+Solves the following parametric nonlinear program (NLP):min          F(x, p)
+x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
 p  == P      nx: number of decision variables     ng: number of constraints
 np: number of parameters
 
@@ -32856,10 +34972,21 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ad_mode      | OT_STRING    | automatic    | How to       | casadi::Ipop |
-|              |              |              | calculate    | tInternal    |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
 |              |              |              | the          |              |
 |              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | adaptive_mu_ | OT_STRING    | obj-constr-  | Globalizatio | casadi::Ipop |
 | globalizatio |              | filter       | n strategy   | tInternal    |
@@ -33083,8 +35210,14 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | to be passed |              |
 |              |              |              | to IPOPT     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::Ipop |
-| md           | Y            | )            | to be passed | tInternal    |
+| con_numeric_ | OT_DICTIONAR | None         | Numeric      | casadi::Ipop |
+| md           | Y            |              | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of reals)    |              |
+|              |              |              | about        |              |
+|              |              |              | constraints  |              |
+|              |              |              | to be passed |              |
 |              |              |              | to IPOPT     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | con_string_m | OT_DICTIONAR | None         | String       | casadi::Ipop |
@@ -33214,8 +35347,15 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -33333,20 +35473,34 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | IPOPT docume |              |
 |              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand       | OT_BOOLEAN   | False        | Expand the   | casadi::Ipop |
-|              |              |              | NLP function | tInternal    |
-|              |              |              | in terms of  |              |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+|              |              |              | NLP function | olverInterna |
+|              |              |              | in terms of  | l            |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expect_infea | OT_STRING    | no           | Enable       | casadi::Ipop |
 | sible_proble |              |              | heuristics   | tInternal    |
@@ -33516,26 +35670,31 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| gather_stats | OT_BOOLEAN   | False        | Flag to      | casadi::Ipop |
-|              |              |              | indicate     | tInternal    |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | None         | Deprecated   | casadi::Ipop |
-|              |              |              | option. Use  | tInternal    |
-|              |              |              | Gauss Newton |              |
+| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option. Use  | olverInterna |
+|              |              |              | Gauss Newton | l            |
 |              |              |              | Hessian appr |              |
 |              |              |              | oximation    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | the gradient | casadi::NLPS |
-| dient        |              | )            | of the       | olverInterna |
-|              |              |              | objective.   | l            |
+| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| dient        |              | )            | option.      | olverInterna |
+|              |              |              | Generate a   | l            |
+|              |              |              | function for |              |
+|              |              |              | calculating  |              |
+|              |              |              | the gradient |              |
+|              |              |              | of the       |              |
+|              |              |              | objective.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | None         | Deprecated   | casadi::Ipop |
-| sian         |              |              | option.      | tInternal    |
-|              |              |              | Generate an  |              |
+| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| sian         |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
 |              |              |              | exact        |              |
 |              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
@@ -33543,9 +35702,9 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | if not       |              |
 |              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | None         | Deprecated   | casadi::Ipop |
-| obian        |              |              | option.      | tInternal    |
-|              |              |              | Generate an  |              |
+| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| obian        |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
 |              |              |              | exact        |              |
 |              |              |              | Jacobian of  |              |
 |              |              |              | the          |              |
@@ -33553,27 +35712,27 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | if not       |              |
 |              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| grad_f       | OT_Function  | None         | Function for | casadi::Ipop |
-|              |              |              | calculating  | tInternal    |
-|              |              |              | the gradient |              |
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
 |              |              |              | of the       |              |
 |              |              |              | objective    |              |
 |              |              |              | (column, aut |              |
 |              |              |              | ogenerated   |              |
 |              |              |              | by default)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| grad_lag     | OT_Function  | None         | Function for | casadi::Ipop |
-|              |              |              | calculating  | tInternal    |
-|              |              |              | the gradient |              |
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
 |              |              |              | of the       |              |
 |              |              |              | Lagrangian ( |              |
 |              |              |              | autogenerate |              |
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hess_lag     | OT_Function  | None         | Function for | casadi::Ipop |
-|              |              |              | calculating  | tInternal    |
-|              |              |              | the Hessian  |              |
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Hessian  | l            |
 |              |              |              | of the       |              |
 |              |              |              | Lagrangian ( |              |
 |              |              |              | autogenerate |              |
@@ -33618,9 +35777,9 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | IPOPT docume |              |
 |              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | False        | If set to    | casadi::Ipop |
-| _vec         |              |              | true, the    | tInternal    |
-|              |              |              | input shape  |              |
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
 |              |              |              | of F will    |              |
 |              |              |              | not be       |              |
 |              |              |              | checked.     |              |
@@ -33635,8 +35794,8 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | IPOPT docume |              |
 |              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| inputs_check | OT_BOOLEAN   | True         | Throw        | casadi::Ipop |
-|              |              |              | exceptions   | tInternal    |
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
 |              |              |              | when the     |              |
 |              |              |              | numerical    |              |
 |              |              |              | values of    |              |
@@ -33644,20 +35803,28 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | Check docume | casadi::NLPS |
-| llback       |              | )            | ntation of   | olverInterna |
-|              |              |              | Callback .   | l            |
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| llback       |              | )            | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration    |              |
+|              |              |              | with the     |              |
+|              |              |              | solver as    |              |
+|              |              |              | input. Check |              |
+|              |              |              | documentatio |              |
+|              |              |              | n of         |              |
+|              |              |              | Callback .   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_BOOLEAN   | False        | If set to    | casadi::Ipop |
-| llback_ignor |              |              | true, errors | tInternal    |
-| e_errors     |              |              | thrown by it |              |
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
 |              |              |              | eration_call |              |
 |              |              |              | back will be |              |
 |              |              |              | ignored.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::Ipop |
-| llback_step  |              |              | the callback | tInternal    |
-|              |              |              | function     |              |
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -33679,9 +35846,9 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_f        | OT_Function  | None         | Function for | casadi::Ipop |
-|              |              |              | calculating  | tInternal    |
-|              |              |              | the jacobian |              |
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the jacobian | l            |
 |              |              |              | of the       |              |
 |              |              |              | objective    |              |
 |              |              |              | (sparse row, |              |
@@ -33689,9 +35856,9 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_g        | OT_Function  | None         | Function for | casadi::Ipop |
-|              |              |              | calculating  | tInternal    |
-|              |              |              | the Jacobian |              |
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Jacobian | l            |
 |              |              |              | of the       |              |
 |              |              |              | constraints  |              |
 |              |              |              | (autogenerat |              |
@@ -34247,8 +36414,14 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | IPOPT docume |              |
 |              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | None         | Monitors to  | casadi::Ipop |
-|              | TOR          |              | be activated | tInternal    |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Ipop |
+|              |              |              | uts)  (eval_ | tInternal    |
+|              |              |              | f|eval_g|eva |              |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_allow_fas | OT_STRING    | yes          | Allow        | casadi::Ipop |
 | t_monotone_d |              |              | skipping of  | tInternal    |
@@ -34582,9 +36755,15 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::NLPS |
-|              |              | )            | argument     | olverInterna |
-|              |              |              | appended at  | l            |
+| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option.      | olverInterna |
+|              |              |              | Expect F, G, | l            |
+|              |              |              | H, J to have |              |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
 |              |              |              | the end,     |              |
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
@@ -34909,10 +37088,6 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | quality_func | OT_STRING    | none         | The          | casadi::Ipop |
 | tion_balanci |              |              | balancing    | tInternal    |
 | ng_term      |              |              | term         |              |
@@ -35014,8 +37189,8 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| regularity_c | OT_BOOLEAN   | True         | Throw        | casadi::Ipop |
-| heck         |              |              | exceptions   | tInternal    |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
 |              |              |              | when NaN or  |              |
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
@@ -35314,8 +37489,13 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -35366,8 +37546,8 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | False        | Verbose      | casadi::Ipop |
-|              |              |              | evaluation   | tInternal    |
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -35458,9 +37638,9 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warn_initial | OT_BOOLEAN   | False        | Warn if the  | casadi::Ipop |
-| _bounds      |              |              | initial      | tInternal    |
-|              |              |              | guess does   |              |
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
 |              |              |              | not satisfy  |              |
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -35600,6 +37780,25 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | IPOPT docume |              |
 |              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+--------------------------+
+|     Id      |         Used in          |
++=============+==========================+
+| eval_f      | casadi::IpoptInternal    |
++-------------+--------------------------+
+| eval_g      | casadi::IpoptInternal    |
++-------------+--------------------------+
+| eval_grad_f | casadi::IpoptInternal    |
++-------------+--------------------------+
+| eval_h      | casadi::IpoptInternal    |
++-------------+--------------------------+
+| eval_jac_g  | casadi::IpoptInternal    |
++-------------+--------------------------+
+| inputs      | casadi::FunctionInternal |
++-------------+--------------------------+
+| outputs     | casadi::FunctionInternal |
++-------------+--------------------------+
 
 >List of available stats
 +--------------------+-----------------------+
@@ -37258,15 +39457,44 @@ See:   ImplicitFunction for more information
 |              |              |              | criterion    | olInternal   |
 |              |              |              | tolerance    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constraints  | OT_INTEGERVE | GenericType( | 1: ui >=     | casadi::Impl |
-|              | CTOR         | )            | 0.0, -1: ui  | icitFunction |
-|              |              |              | <= 0.0, 2:   | Internal     |
-|              |              |              | ui > 0.0,    |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| constraints  | OT_INTEGERVE | GenericType( | Constrain    | casadi::Impl |
+|              | CTOR         | )            | the          | icitFunction |
+|              |              |              | unknowns. 0  | Internal     |
+|              |              |              | (default):   |              |
+|              |              |              | no           |              |
+|              |              |              | constraint   |              |
+|              |              |              | on ui, 1: ui |              |
+|              |              |              | >= 0.0, -1:  |              |
+|              |              |              | ui <= 0.0,   |              |
+|              |              |              | 2: ui > 0.0, |              |
 |              |              |              | -2: ui <     |              |
 |              |              |              | 0.0.         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -37276,14 +39504,63 @@ See:   ImplicitFunction for more information
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| disable_inte | OT_BOOLEAN   | false        | Disable      | casadi::Kins |
+| rnal_warning |              |              | KINSOL       | olInternal   |
+| s            |              |              | internal     |              |
+|              |              |              | warning      |              |
+|              |              |              | messages     |              |
++--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | true         |              | casadi::Kins |
 | an           |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
 | f_scale      | OT_REALVECTO |              |              | casadi::Kins |
 |              | R            |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_inp | OT_INTEGER   | 0            | Index of the | casadi::Impl |
+| ut           |              |              | input that   | icitFunction |
+|              |              |              | corresponds  | Internal     |
+|              |              |              | to the       |              |
+|              |              |              | actual root- |              |
+|              |              |              | finding      |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_out | OT_INTEGER   | 0            | Index of the | casadi::Impl |
+| put          |              |              | output that  | icitFunction |
+|              |              |              | corresponds  | Internal     |
+|              |              |              | to the       |              |
+|              |              |              | actual root- |              |
+|              |              |              | finding      |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | gmres|bcgsta | casadi::Kins |
 | lver         |              |              | b|tfqmr      | olInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | casadi::Impl |
+| r            | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | dense|banded | casadi::Kins |
 | r_type       |              |              | |iterative|u | olInternal   |
@@ -37292,26 +39569,43 @@ See:   ImplicitFunction for more information
 | lower_bandwi | OT_INTEGER   |              |              | casadi::Kins |
 | dth          |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 0            | Maximum      | casadi::Kins |
+|              |              |              | number of    | olInternal   |
+|              |              |              | Newton       |              |
+|              |              |              | iterations.  |              |
+|              |              |              | Putting 0    |              |
+|              |              |              | sets the     |              |
+|              |              |              | default      |              |
+|              |              |              | value of     |              |
+|              |              |              | KinSol.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 0            |              | casadi::Kins |
 |              |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (eval_f|eval | casadi::Kins |
-|              | TOR          | )            | _djac)       | olInternal   |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Kins |
+|              |              |              | uts)  (eval_ | olInternal   |
+|              |              |              | f|eval_djac) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | GenericType( | Passed on to | casadi::Impl |
-| ion          |              | )            | casadi::Para | icitFunction |
-|              |              |              | llelizer     | Internal     |
-+--------------+--------------+--------------+--------------+--------------+
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | casadi::Kins |
 |              |              |              | ight|both)   | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| strategy     | OT_STRING    | \"none\"       | Globalizatio | casadi::Kins |
+|              |              |              | n strategy ( | olInternal   |
+|              |              |              | none|linesea |              |
+|              |              |              | rch)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | u_scale      | OT_REALVECTO |              |              | casadi::Kins |
 |              | R            |              |              | olInternal   |
@@ -37323,30 +39617,34 @@ See:   ImplicitFunction for more information
 | tioner       |              |              | an iterative | olInternal   |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
-+-----------+------------------------+
-|    Id     |        Used in         |
-+===========+========================+
-| F         | casadi::KinsolInternal |
-+-----------+------------------------+
-| J         | casadi::KinsolInternal |
-+-----------+------------------------+
-| eval_djac | casadi::KinsolInternal |
-+-----------+------------------------+
-| eval_f    | casadi::KinsolInternal |
-+-----------+------------------------+
-| normF     | casadi::KinsolInternal |
-+-----------+------------------------+
-| step      | casadi::KinsolInternal |
-+-----------+------------------------+
-| stepsize  | casadi::KinsolInternal |
-+-----------+------------------------+
++-----------+--------------------------+
+|    Id     |         Used in          |
++===========+==========================+
+| eval_djac | casadi::KinsolInternal   |
++-----------+--------------------------+
+| eval_f    | casadi::KinsolInternal   |
++-----------+--------------------------+
+| inputs    | casadi::FunctionInternal |
++-----------+--------------------------+
+| outputs   | casadi::FunctionInternal |
++-----------+--------------------------+
 
 Diagrams
 
@@ -37812,8 +40110,8 @@ Get the number of function outputs.
 
 Interface to the Knitro NLP solver.
 
-Solves the following parametric nonlinear program (NLP):min          F(x,p)
-x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
+Solves the following parametric nonlinear program (NLP):min          F(x, p)
+x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
 p  == P      nx: number of decision variables     ng: number of constraints
 np: number of parameters
 
@@ -37991,18 +40289,34 @@ np: number of parameters
 |              |              |              | change       |              |
 |              |              |              | tolerance    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| codegen      | OT_BOOLEAN   | false        | C-code       | casadi::Knit |
-|              |              |              | generation   | roInternal   |
-+--------------+--------------+--------------+--------------+--------------+
-| con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
-| md           | Y            | )            | to be passed | olverInterna |
-|              |              |              | to IPOPT     | l            |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | contype      | OT_INTEGERVE |              |              | casadi::Knit |
 |              | CTOR         |              |              | roInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -38012,43 +40326,238 @@ np: number of parameters
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+|              |              |              | NLP function | olverInterna |
+|              |              |              | in terms of  | l            |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | the gradient | casadi::NLPS |
-| dient        |              | )            | of the       | olverInterna |
-|              |              |              | objective.   | l            |
+| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | Check docume | casadi::NLPS |
-| llback       |              | )            | ntation of   | olverInterna |
-|              |              |              | Callback .   | l            |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option. Use  | olverInterna |
+|              |              |              | Gauss Newton | l            |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| dient        |              | )            | option.      | olverInterna |
+|              |              |              | Generate a   | l            |
+|              |              |              | function for |              |
+|              |              |              | calculating  |              |
+|              |              |              | the gradient |              |
+|              |              |              | of the       |              |
+|              |              |              | objective.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| sian         |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| obian        |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (column, aut |              |
+|              |              |              | ogenerated   |              |
+|              |              |              | by default)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Hessian  | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| llback       |              | )            | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration    |              |
+|              |              |              | with the     |              |
+|              |              |              | solver as    |              |
+|              |              |              | input. Check |              |
+|              |              |              | documentatio |              |
+|              |              |              | n of         |              |
+|              |              |              | Callback .   |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (sparse row, |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | constraints  |              |
+|              |              |              | (autogenerat |              |
+|              |              |              | ed by        |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Knit |
+|              |              |              | uts)  (eval_ | roInternal   |
+|              |              |              | f|eval_g|eva |              |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::NLPS |
-|              |              | )            | argument     | olverInterna |
-|              |              |              | appended at  | l            |
+| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option.      | olverInterna |
+|              |              |              | Expect F, G, | l            |
+|              |              |              | H, J to have |              |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
 |              |              |              | the end,     |              |
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+--------------------------+
+|     Id      |         Used in          |
++=============+==========================+
+| eval_f      | casadi::KnitroInternal   |
++-------------+--------------------------+
+| eval_g      | casadi::KnitroInternal   |
++-------------+--------------------------+
+| eval_grad_f | casadi::KnitroInternal   |
++-------------+--------------------------+
+| eval_h      | casadi::KnitroInternal   |
++-------------+--------------------------+
+| eval_jac_g  | casadi::KnitroInternal   |
++-------------+--------------------------+
+| inputs      | casadi::FunctionInternal |
++-------------+--------------------------+
+| outputs     | casadi::FunctionInternal |
++-------------+--------------------------+
 
 Diagrams
 
@@ -39443,7 +41952,7 @@ numerically singular, the prepare step will fail.
 This class solves the linear system A.x=b by making an LU factorization of
 A: A = L.U, with L lower and U upper triangular
 
-LapackLUDense is an casadi::Function mapping from 2 inputs [ A (matrix),b
+LapackLUDense is an casadi::Function mapping from 2 inputs [ A (matrix), b
 (vector)] to one output [x (vector)].
 
 The usual procedure to use LapackLUDense is:  init()
@@ -39481,12 +41990,35 @@ therefore more expensive if A is invariant.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
 | allow_equili | OT_BOOLEAN   | false        |              | casadi::Lapa |
 | bration_fail |              |              |              | ckLUDenseInt |
 | ure          |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -39500,18 +42032,52 @@ therefore more expensive if A is invariant.
 | n            |              |              |              | ckLUDenseInt |
 |              |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -40064,7 +42630,7 @@ numerically singular, the prepare step will fail.
 This class solves the linear system A.x=b by making an QR factorization of
 A: A = Q.R, with Q orthogonal and R upper triangular
 
-LapackQRDense is an casadi::Function mapping from 2 inputs [ A (matrix),b
+LapackQRDense is an casadi::Function mapping from 2 inputs [ A (matrix), b
 (vector)] to one output [x (vector)].
 
 The usual procedure to use LapackQRDense is:  init()
@@ -40102,8 +42668,31 @@ therefore more expensive if A is invariant.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -40113,18 +42702,52 @@ therefore more expensive if A is invariant.
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -41252,8 +43875,31 @@ numerically singular, the prepare step will fail. Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -41263,18 +43909,52 @@ numerically singular, the prepare step will fail. Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -42634,8 +45314,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -42645,18 +45348,52 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -42825,7 +45562,7 @@ in the Symbolic Toolbox for Matlab but instead creating a CasADi symbolic
 primitive.
 
 */ %feature("docstring") casadi::Matrix::sanityCheck " [INTERNAL]  Check if
-the dimensions and colind,row vectors are compatible.
+the dimensions and colind, row vectors are compatible.
 
 Parameters:
 -----------
@@ -42871,7 +45608,7 @@ Get a set of nonzeros
 
 %feature("docstring") casadi::Matrix::hasNZ "
 
-Returns true if the matrix has a non-zero at location rr,cc.
+Returns true if the matrix has a non-zero at location rr, cc.
 
 ";
 
@@ -43447,7 +46184,7 @@ Sparse matrix class. SX and DMatrix are specializations.
 General sparse matrix class that is designed with the idea that \"everything
 is a matrix\", that is, also scalars and vectors. This philosophy makes it
 easy to use and to interface in particularly with Python and Matlab/Octave.
-Index starts with 0. Index vec happens as follows: (rr,cc) -> k =
+Index starts with 0. Index vec happens as follows: (rr, cc) -> k =
 rr+cc*size1() Vectors are column vectors.  The storage format is Compressed
 Column Storage (CCS), similar to that used for sparse matrices in Matlab,
 but unlike this format, we do allow for elements to be structurally non-zero
@@ -45528,7 +48265,7 @@ expressions are identical, i.e. points to the same node.
 
 a = x*x b = x*x
 
-a.isEqual(b,0) will return false, but a.isEqual(b,1) will return true
+a.isEqual(b, 0) will return false, but a.isEqual(b, 1) will return true
 
 >  bool casadi::MX::isEqual(const MXNode *y, int depth=0) const 
 ------------------------------------------------------------------------
@@ -46873,8 +49610,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -46884,18 +49644,52 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -48141,15 +50935,54 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| constraints  | OT_INTEGERVE | GenericType( | 1: ui >=     | casadi::Impl |
-|              | CTOR         | )            | 0.0, -1: ui  | icitFunction |
-|              |              |              | <= 0.0, 2:   | Internal     |
-|              |              |              | ui > 0.0,    |              |
+| abstol       | OT_REAL      | 0.000        | Stopping     | casadi::Newt |
+|              |              |              | criterion    | onImplicitIn |
+|              |              |              | tolerance on | ternal       |
+|              |              |              | max(|F|)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| abstolStep   | OT_REAL      | 0.000        | Stopping     | casadi::Newt |
+|              |              |              | criterion    | onImplicitIn |
+|              |              |              | tolerance on | ternal       |
+|              |              |              | step size    |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| constraints  | OT_INTEGERVE | GenericType( | Constrain    | casadi::Impl |
+|              | CTOR         | )            | the          | icitFunction |
+|              |              |              | unknowns. 0  | Internal     |
+|              |              |              | (default):   |              |
+|              |              |              | no           |              |
+|              |              |              | constraint   |              |
+|              |              |              | on ui, 1: ui |              |
+|              |              |              | >= 0.0, -1:  |              |
+|              |              |              | ui <= 0.0,   |              |
+|              |              |              | 2: ui > 0.0, |              |
 |              |              |              | -2: ui <     |              |
 |              |              |              | 0.0.         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -48159,31 +50992,89 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| just_in_time | OT_BOOLEAN   | false        | compilation  | casadi::Newt |
-| _sparsity    |              |              | to a CPU or  | onImplicitIn |
-|              |              |              | GPU using    | ternal       |
-|              |              |              | OpenCL       |              |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (step|stepsi | casadi::Newt |
-|              | TOR          | )            | ze|J|F|normF | onImplicitIn |
-|              |              |              | )            | ternal       |
+| implicit_inp | OT_INTEGER   | 0            | Index of the | casadi::Impl |
+| ut           |              |              | input that   | icitFunction |
+|              |              |              | corresponds  | Internal     |
+|              |              |              | to the       |              |
+|              |              |              | actual root- |              |
+|              |              |              | finding      |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_out | OT_INTEGER   | 0            | Index of the | casadi::Impl |
+| put          |              |              | output that  | icitFunction |
+|              |              |              | corresponds  | Internal     |
+|              |              |              | to the       |              |
+|              |              |              | actual root- |              |
+|              |              |              | finding      |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | casadi::Impl |
+| r            | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 1000         | Maximum      | casadi::Newt |
+|              |              |              | number of    | onImplicitIn |
+|              |              |              | Newton       | ternal       |
+|              |              |              | iterations   |              |
+|              |              |              | to perform   |              |
+|              |              |              | before       |              |
+|              |              |              | returning.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Newt |
+|              |              |              | uts)  (step| | onImplicitIn |
+|              |              |              | stepsize|J|F | ternal       |
+|              |              |              | |normF)      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | GenericType( | Passed on to | casadi::Impl |
-| ion          |              | )            | casadi::Para | icitFunction |
-|              |              |              | llelizer     | Internal     |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
@@ -48194,7 +51085,11 @@ Joris Gillis
 +----------+--------------------------------+
 | J        | casadi::NewtonImplicitInternal |
 +----------+--------------------------------+
+| inputs   | casadi::FunctionInternal       |
++----------+--------------------------------+
 | normF    | casadi::NewtonImplicitInternal |
++----------+--------------------------------+
+| outputs  | casadi::FunctionInternal       |
 +----------+--------------------------------+
 | step     | casadi::NewtonImplicitInternal |
 +----------+--------------------------------+
@@ -49582,20 +52477,44 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::NLPI |
-| ter          |              |              | number of    | mplicitInter |
-|              |              |              | barrier      | nal          |
-|              |              |              | iterations.  |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| constraints  | OT_INTEGERVE | GenericType( | 1: ui >=     | casadi::Impl |
-|              | CTOR         | )            | 0.0, -1: ui  | icitFunction |
-|              |              |              | <= 0.0, 2:   | Internal     |
-|              |              |              | ui > 0.0,    |              |
+| constraints  | OT_INTEGERVE | GenericType( | Constrain    | casadi::Impl |
+|              | CTOR         | )            | the          | icitFunction |
+|              |              |              | unknowns. 0  | Internal     |
+|              |              |              | (default):   |              |
+|              |              |              | no           |              |
+|              |              |              | constraint   |              |
+|              |              |              | on ui, 1: ui |              |
+|              |              |              | >= 0.0, -1:  |              |
+|              |              |              | ui <= 0.0,   |              |
+|              |              |              | 2: ui > 0.0, |              |
 |              |              |              | -2: ui <     |              |
 |              |              |              | 0.0.         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -49605,22 +52524,91 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_inp | OT_INTEGER   | 0            | Index of the | casadi::Impl |
+| ut           |              |              | input that   | icitFunction |
+|              |              |              | corresponds  | Internal     |
+|              |              |              | to the       |              |
+|              |              |              | actual root- |              |
+|              |              |              | finding      |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_out | OT_INTEGER   | 0            | Index of the | casadi::Impl |
+| put          |              |              | output that  | icitFunction |
+|              |              |              | corresponds  | Internal     |
+|              |              |              | to the       |              |
+|              |              |              | actual root- |              |
+|              |              |              | finding      |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | casadi::Impl |
+| r            | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | GenericType( | Passed on to | casadi::Impl |
-| ion          |              | )            | casadi::Para | icitFunction |
-|              |              |              | llelizer     | Internal     |
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | casadi::NLPI |
+|              |              | )            | NLPSolver    | mplicitInter |
+|              |              |              | used to      | nal          |
+|              |              |              | solve the    |              |
+|              |              |              | implicit     |              |
+|              |              |              | system.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::NLPI |
+| ptions       | Y            | )            | be passed to | mplicitInter |
+|              |              |              | the          | nal          |
+|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -50623,8 +53611,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::NLPQ |
-| enerator     | EGENERATOR   | )            | directional  | PInternal    |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -50634,18 +53645,63 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | casadi::NLPQ |
+|              |              | )            | NLPSOlver    | PInternal    |
+|              |              |              | used to      |              |
+|              |              |              | solve the    |              |
+|              |              |              | QPs.         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::NLPQ |
+| ptions       | Y            | )            | be passed to | PInternal    |
+|              |              |              | the          |              |
+|              |              |              | NLPSOlver    |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -51078,8 +54134,8 @@ check if the user has there is an option str
 
 NLPSolver.
 
-Solves the following parametric nonlinear program (NLP):min          F(x,p)
-x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
+Solves the following parametric nonlinear program (NLP):min          F(x, p)
+x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
 p  == P      nx: number of decision variables     ng: number of constraints
 np: number of parameters
 
@@ -51156,12 +54212,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
-| md           | Y            | )            | to be passed | olverInterna |
-|              |              |              | to IPOPT     | l            |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -51171,42 +54246,214 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+|              |              |              | NLP function | olverInterna |
+|              |              |              | in terms of  | l            |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | the gradient | casadi::NLPS |
-| dient        |              | )            | of the       | olverInterna |
-|              |              |              | objective.   | l            |
+| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | Check docume | casadi::NLPS |
-| llback       |              | )            | ntation of   | olverInterna |
-|              |              |              | Callback .   | l            |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option. Use  | olverInterna |
+|              |              |              | Gauss Newton | l            |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| dient        |              | )            | option.      | olverInterna |
+|              |              |              | Generate a   | l            |
+|              |              |              | function for |              |
+|              |              |              | calculating  |              |
+|              |              |              | the gradient |              |
+|              |              |              | of the       |              |
+|              |              |              | objective.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| sian         |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| obian        |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (column, aut |              |
+|              |              |              | ogenerated   |              |
+|              |              |              | by default)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Hessian  | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| llback       |              | )            | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration    |              |
+|              |              |              | with the     |              |
+|              |              |              | solver as    |              |
+|              |              |              | input. Check |              |
+|              |              |              | documentatio |              |
+|              |              |              | n of         |              |
+|              |              |              | Callback .   |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (sparse row, |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | constraints  |              |
+|              |              |              | (autogenerat |              |
+|              |              |              | ed by        |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::NLPS |
-|              |              | )            | argument     | olverInterna |
-|              |              |              | appended at  | l            |
+| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option.      | olverInterna |
+|              |              |              | Expect F, G, | l            |
+|              |              |              | H, J to have |              |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
 |              |              |              | the end,     |              |
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -55110,8 +58357,36 @@ basis Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| dense        | OT_BOOLEAN   | true         | Indicates    | casadi::Null |
+|              |              |              | that dense   | spaceInterna |
+|              |              |              | matrices can | l            |
+|              |              |              | be assumed   |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -55121,24 +58396,52 @@ basis Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| print_proble | OT_BOOLEAN   | false        | Print out    | casadi::Null |
-| m            |              |              | problem      | spaceInterna |
-|              |              |              | statement    | l            |
-|              |              |              | for          |              |
-|              |              |              | debugging.   |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -55481,8 +58784,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -55496,6 +58822,27 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -55508,14 +58855,27 @@ Joel Andersson
 | rameters     |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -56621,15 +59981,15 @@ Base class for integrators. Solves an initial value problem (IVP) coupled to
 a terminal value problem with differential equation given as an implicit ODE
 coupled to an algebraic equation and a set of quadratures: Initial
 conditions at t=t0  x(t0)  = x0  q(t0)  = 0   Forward integration from t=t0
-to t=tf  der(x) = function(x,z,p,t) Forward ODE  0 = fz(x,z,p,t)
-Forward algebraic equations  der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  = 0
-Backward integration from t=tf to t=t0  der(rx) = gx(rx,rz,rp,x,z,p,t)
-Backward ODE  0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations
-der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures where we assume
-that both the forward and backwards integrations are index-1  (i.e. dfz/dz,
-dgz/drz are invertible) and furthermore that gx, gz and gq have a linear
-dependency on rx, rz and rp.
+to t=tf  der(x) = function(x, z, p, t) Forward ODE  0 = fz(x, z, p, t)
+Forward algebraic equations  der(q) = fq(x, z, p, t)
+Forward quadratures   Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  =
+0 Backward integration from t=tf to t=t0  der(rx) = gx(rx, rz, rp, x, z, p,
+t)        Backward ODE  0 = gz(rx, rz, rp, x, z, p, t) Backward algebraic
+equations  der(rq) = gq(rx, rz, rp, x, z, p, t) Backward quadratures   where
+we assume that both the forward and backwards integrations are index-1
+(i.e. dfz/dz, dgz/drz are invertible) and furthermore that  gx, gz and gq
+have a linear dependency on rx, rz and rp.
 
 Joel Andersson
 
@@ -56687,16 +60047,46 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::OldC |
-| enerator     | EGENERATOR   | )            | directional  | ollocationIn |
-|              |              |              | derivative,  | tegratorInte |
-|              |              |              | overrides    | rnal         |
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
+| collocation_ | OT_STRING    | \"radau\"      | Collocation  | casadi::OldC |
+| scheme       |              |              | scheme (rada | ollocationIn |
+|              |              |              | u|legendre)  | tegratorInte |
+|              |              |              |              | rnal         |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivative,  |              |
+|              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines.    |              |
 |              |              |              | Check docume |              |
@@ -56704,23 +60094,140 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | casadi::OldC |
+|              |              |              | ODE/DAE      | ollocationIn |
+|              |              |              | residual     | tegratorInte |
+|              |              |              | function in  | rnal         |
+|              |              |              | an SX graph  |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_q     | OT_BOOLEAN   | false        | Expand the   | casadi::OldC |
+|              |              |              | quadrature   | ollocationIn |
+|              |              |              | function in  | tegratorInte |
+|              |              |              | an SX graph  | rnal         |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hotstart     | OT_BOOLEAN   | true         | Initialize   | casadi::OldC |
+|              |              |              | the          | ollocationIn |
+|              |              |              | trajectory   | tegratorInte |
+|              |              |              | at the       | rnal         |
+|              |              |              | previous     |              |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_sol | OT_IMPLICITF | GenericType( | An implicit  | casadi::OldC |
+| ver          | UNCTION      | )            | function     | ollocationIn |
+|              |              |              | solver       | tegratorInte |
+|              |              |              |              | rnal         |
++--------------+--------------+--------------+--------------+--------------+
+| implicit_sol | OT_DICTIONAR | GenericType( | Options to   | casadi::OldC |
+| ver_options  | Y            | )            | be passed to | ollocationIn |
+|              |              |              | the implicit | tegratorInte |
+|              |              |              | solver       | rnal         |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| interpolatio | OT_INTEGER   | 3            | Order of the | casadi::OldC |
+| n_order      |              |              | interpolatin | ollocationIn |
+|              |              |              | g            | tegratorInte |
+|              |              |              | polynomials  | rnal         |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| number_of_fi | OT_INTEGER   | 20           | Number of    | casadi::OldC |
+| nite_element |              |              | finite       | ollocationIn |
+| s            |              |              | elements     | tegratorInte |
+|              |              |              |              | rnal         |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| quadrature_s | OT_LINEARSOL | GenericType( | An linear    | casadi::OldC |
+| olver        | VER          | )            | solver to    | ollocationIn |
+|              |              |              | solver the   | tegratorInte |
+|              |              |              | quadrature   | rnal         |
+|              |              |              | equations    |              |
++--------------+--------------+--------------+--------------+--------------+
+| quadrature_s | OT_DICTIONAR | GenericType( | Options to   | casadi::OldC |
+| olver_option | Y            | )            | be passed to | ollocationIn |
+| s            |              |              | the          | tegratorInte |
+|              |              |              | quadrature   | rnal         |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| startup_inte | OT_INTEGRATO | GenericType( | An ODE/DAE   | casadi::OldC |
+| grator       | R            | )            | integrator   | ollocationIn |
+|              |              |              | that can be  | tegratorInte |
+|              |              |              | used to      | rnal         |
+|              |              |              | generate a   |              |
+|              |              |              | startup      |              |
+|              |              |              | trajectory   |              |
++--------------+--------------+--------------+--------------+--------------+
+| startup_inte | OT_DICTIONAR | GenericType( | Options to   | casadi::OldC |
+| grator_optio | Y            | )            | be passed to | ollocationIn |
+| ns           |              |              | the startup  | tegratorInte |
+|              |              |              | integrator   | rnal         |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -58332,14 +61839,37 @@ reInit();
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
 | artol        | OT_REAL      | 0.000        | tolerance as | casadi::OOQP |
 |              |              |              | provided     | Internal     |
 |              |              |              | with         |              |
 |              |              |              | setArTol to  |              |
 |              |              |              | OOQP         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -58348,6 +61878,27 @@ reInit();
 |              |              |              | ntation of D |              |
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | mutol        | OT_REAL      | 0.000        | tolerance as | casadi::OOQP |
 |              |              |              | provided     | Internal     |
@@ -58366,14 +61917,27 @@ reInit();
 |              |              |              | 0, 10 and    |              |
 |              |              |              | 100          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -59960,8 +63524,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -59971,6 +63558,27 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
@@ -59979,14 +63587,27 @@ Joel Andersson
 | ion          |              |              | mp|mpi)      | llelizerInte |
 |              |              |              |              | rnal         |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -61282,19 +64903,36 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::PsdI |
-|              |              |              | provided     | ndefDpleInte |
-|              |              |              | with         | rnal         |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | const_dim    | OT_BOOLEAN   | true         | Assume       | casadi::Dple |
 |              |              |              | constant     | Internal     |
 |              |              |              | dimension of |              |
 |              |              |              | P            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -61308,11 +64946,51 @@ Joris Gillis
 |              |              |              | unstability  | Internal     |
 |              |              |              | detection    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| error_unstab | OT_BOOLEAN   | false        | has          | casadi::Dple |
-| le           |              |              | eigenvalues  | Internal     |
+| error_unstab | OT_BOOLEAN   | false        | Throw an     | casadi::Dple |
+| le           |              |              | exception    | Internal     |
+|              |              |              | when it is   |              |
+|              |              |              | detected     |              |
+|              |              |              | that Product |              |
+|              |              |              | (A_i,i=N..1) |              |
+|              |              |              | has          |              |
+|              |              |              | eigenvalues  |              |
 |              |              |              | greater than |              |
 |              |              |              | 1-eps_unstab |              |
 |              |              |              | le           |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | casadi::PsdI |
+| r            | VER          | )            | linear       | ndefDpleInte |
+|              |              |              | solver       | rnal         |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::PsdI |
+| r_options    | Y            | )            | be passed to | ndefDpleInte |
+|              |              |              | the linear   | rnal         |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -61322,14 +65000,27 @@ Joris Gillis
 |              |              |              | positive     | Internal     |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -61947,8 +65638,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -61958,21 +65672,63 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| enableEquali | OT_BOOLEAN   | BooleanType_ | (True) or    | casadi::QCQP |
-| ties         |              | to_bool      | not (False)  | QPInternal   |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| qcqp_solver  | OT_QCQPSOLVE | GenericType( | The          | casadi::QCQP |
+|              | R            | )            | QCQPSolver   | QPInternal   |
+|              |              |              | used to      |              |
+|              |              |              | solve the    |              |
+|              |              |              | QPs.         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| qcqp_solver_ | OT_DICTIONAR | GenericType( | Options to   | casadi::QCQP |
+| options      | Y            | )            | be passed to | QPInternal   |
+|              |              |              | the          |              |
+|              |              |              | QCQPSOlver   |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -63271,8 +67027,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -63282,18 +67061,52 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -63670,14 +67483,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::QPLP |
-|              |              |              | provided     | Internal     |
-|              |              |              | with         |              |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -63687,18 +67517,61 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| qp_solver    | OT_QPSOLVER  | GenericType( | The QPSOlver | casadi::QPLP |
+|              |              | )            | used to      | Internal     |
+|              |              |              | solve the    |              |
+|              |              |              | LPs.         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| qp_solver_op | OT_DICTIONAR | GenericType( | Options to   | casadi::QPLP |
+| tions        | Y            | )            | be passed to | Internal     |
+|              |              |              | the QPSOlver |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -64760,15 +68633,44 @@ Joris Gillis, Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| CPUtime      | OT_REAL      | GenericType( | (and the     | casadi::QPOa |
-|              |              | )            | actually     | sesInternal  |
+| CPUtime      | OT_REAL      | GenericType( | The maximum  | casadi::QPOa |
+|              |              | )            | allowed CPU  | sesInternal  |
+|              |              |              | time in      |              |
+|              |              |              | seconds for  |              |
+|              |              |              | the whole in |              |
+|              |              |              | itialisation |              |
+|              |              |              | (and the     |              |
+|              |              |              | actually     |              |
 |              |              |              | required one |              |
 |              |              |              | on output).  |              |
 |              |              |              | Disabled if  |              |
 |              |              |              | unset.       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -64778,11 +68680,92 @@ Joris Gillis, Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| enableEquali | OT_BOOLEAN   | BooleanType_ | (True) or    | casadi::QPOa |
-| ties         |              | to_bool      | not (False)  | sesInternal  |
+| enableEquali | OT_BOOLEAN   | BooleanType_ | Specifies    | casadi::QPOa |
+| ties         |              | to_bool      | whether      | sesInternal  |
+|              |              |              | equalities   |              |
+|              |              |              | should be    |              |
+|              |              |              | treated as   |              |
+|              |              |              | always       |              |
+|              |              |              | active       |              |
+|              |              |              | (True) or    |              |
+|              |              |              | not (False)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nWSR         | OT_INTEGER   | GenericType( | the initial  | casadi::QPOa |
-|              |              | )            | homotopy.    | sesInternal  |
+| enableFarBou | OT_BOOLEAN   | BooleanType_ | Enables the  | casadi::QPOa |
+| nds          |              | to_bool      | use of far   | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableFlippi | OT_BOOLEAN   | BooleanType_ | Enables the  | casadi::QPOa |
+| ngBounds     |              | to_bool      | use of       | sesInternal  |
+|              |              |              | flipping     |              |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableFullLI | OT_BOOLEAN   | BooleanType_ | Enables      | casadi::QPOa |
+| Tests        |              | to_bool      | condition-   | sesInternal  |
+|              |              |              | hardened     |              |
+|              |              |              | (but more    |              |
+|              |              |              | expensive)   |              |
+|              |              |              | LI test.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableNZCTes | OT_BOOLEAN   | BooleanType_ | Enables      | casadi::QPOa |
+| ts           |              | to_bool      | nonzero      | sesInternal  |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableRampin | OT_BOOLEAN   | BooleanType_ | Enables      | casadi::QPOa |
+| g            |              | to_bool      | ramping.     | sesInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| enableRegula | OT_BOOLEAN   | BooleanType_ | Enables      | casadi::QPOa |
+| risation     |              | to_bool      | automatic    | sesInternal  |
+|              |              |              | Hessian regu |              |
+|              |              |              | larisation.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialStatu | OT_STRING    | SubjectToSta | Initial      | casadi::QPOa |
+| sBounds      |              | tus_to_strin | status of    | sesInternal  |
+|              |              | g            | bounds at    |              |
+|              |              |              | first        |              |
+|              |              |              | iteration. ( |              |
+|              |              |              | inactive::al |              |
+|              |              |              | l bounds ina |              |
+|              |              |              | ctive|lower  |              |
+|              |              |              | all bounds   |              |
+|              |              |              | active at    |              |
+|              |              |              | their lower  |              |
+|              |              |              | bound|upper  |              |
+|              |              |              | all bounds   |              |
+|              |              |              | active at    |              |
+|              |              |              | their upper  |              |
+|              |              |              | bound)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| nWSR         | OT_INTEGER   | GenericType( | The maximum  | casadi::QPOa |
+|              |              | )            | number of    | sesInternal  |
+|              |              |              | working set  |              |
+|              |              |              | recalculatio |              |
+|              |              |              | ns to be     |              |
+|              |              |              | performed    |              |
+|              |              |              | during the   |              |
+|              |              |              | initial      |              |
+|              |              |              | homotopy.    |              |
 |              |              |              | Default is   |              |
 |              |              |              | 5(nx + nc)   |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -64790,19 +68773,37 @@ Joris Gillis, Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| printLevel   | OT_STRING    | PrintLevel_t | see Section  | casadi::QPOa |
-|              |              | o_string     | 5.7 (none|lo | sesInternal  |
+| printLevel   | OT_STRING    | PrintLevel_t | Defines the  | casadi::QPOa |
+|              |              | o_string     | amount of    | sesInternal  |
+|              |              |              | text output  |              |
+|              |              |              | during QP    |              |
+|              |              |              | solution,    |              |
+|              |              |              | see Section  |              |
+|              |              |              | 5.7 (none|lo |              |
 |              |              |              | w|medium|hig |              |
 |              |              |              | h)           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -65723,8 +69724,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -65734,18 +69758,52 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -66727,12 +70785,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| codegen      | OT_BOOLEAN   | false        | C-code       | casadi::QPSt |
-|              |              |              | generation   | abilizerInte |
-|              |              |              |              | rnal         |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -66742,18 +70819,64 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | casadi::QPSt |
+|              |              | )            | solver used  | abilizerInte |
+|              |              |              | to solve the | rnal         |
+|              |              |              | stabilized   |              |
+|              |              |              | QPs.         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| qp_solver_op | OT_DICTIONAR | GenericType( | Options to   | casadi::QPSt |
+| tions        | Y            | )            | be passed to | abilizerInte |
+|              |              |              | the QP       | rnal         |
+|              |              |              | solver       |              |
+|              |              |              | instance     |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -68811,14 +72934,39 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -68828,10 +72976,38 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -68841,14 +73017,40 @@ Joel Andersson
 | nite_element |              |              | finite       | dStepIntegra |
 | s            |              |              | elements     | torInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -69199,7 +73401,7 @@ matrix
 %feature("docstring") casadi::ScalarSparseSparsity::eliminationTree "[INTERNAL]  Calculate the elimination tree See Direct Methods for Sparse
 Linear Systems by Davis (2006). If the parameter ata is false, the algorithm
 is equivalent to Matlab's etree(A), except that the indices are zero- based.
-If ata is true, the algorithm is equivalent to Matlab's etree(A,'row').
+If ata is true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
@@ -69293,7 +73495,7 @@ Assert that it is initialized
 ";
 
 %feature("docstring") casadi::ScalarSparseSparsity::hasNZ "[INTERNAL]
-Returns true if the pattern has a non-zero at location rr,cc.
+Returns true if the pattern has a non-zero at location rr, cc.
 
 ";
 
@@ -69351,11 +73553,11 @@ Get the location of all nonzero elements (inplace version)
 Enlarge matrix Make the matrix larger by inserting empty rows and columns,
 keeping the existing non-zeros.
 
-For the matrices A to B A(m,n) length(jj)=m , length(ii)=n B(nrow,ncol)
+For the matrices A to B A(m, n) length(jj)=m , length(ii)=n B(nrow, ncol)
 
-A=enlarge(m,n,ii,jj) makes sure that
+A=enlarge(m, n, ii, jj) makes sure that
 
-B[jj,ii] == A
+B[jj, ii] == A
 
 ";
 
@@ -69424,7 +73626,7 @@ optionally both dimensions)
 
 %feature("docstring") casadi::ScalarSparseSparsity::sizeL "[INTERNAL]
 Number of non-zeros in the lower triangular half, i.e. the number of
-elements (i,j) with j<=i.
+elements (i, j) with j<=i.
 
 ";
 
@@ -69611,7 +73813,7 @@ As an alternative, P can be transposed (inverted).
 
 %feature("docstring") casadi::ScalarSparseSparsity::sizeU "[INTERNAL]
 Number of non-zeros in the upper triangular half, i.e. the number of
-elements (i,j) with j>=i.
+elements (i, j) with j>=i.
 
 ";
 
@@ -69730,9 +73932,9 @@ index[offset[i+1]]
 
 In the case that the matrix is symmetric, the result has a particular
 interpretation: Given a symmetric matrix A and n =
-A.stronglyConnectedComponents(p,r)
+A.stronglyConnectedComponents(p, r)
 
-=> A[p,p] will appear block-diagonal with n blocks and with the indices of
+=> A[p, p] will appear block-diagonal with n blocks and with the indices of
 the block boundaries to be found in r.
 
 ";
@@ -69818,7 +74020,7 @@ Get a set of non-zero element return -1 if the element does not exist.
 ";
 
 %feature("docstring") casadi::ScalarSparseSparsity::sizeD "[INTERNAL]
-Number of non-zeros on the diagonal, i.e. the number of elements (i,j) with
+Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
 j==i.
 
 ";
@@ -70274,7 +74476,7 @@ sparsity pattern for a unit vector of length n and a nonzero on position el.
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
 by Davis (2006). If the parameter ata is false, the algorithm is equivalent
 to Matlab's etree(A), except that the indices are zero- based. If ata is
-true, the algorithm is equivalent to Matlab's etree(A,'row').
+true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
@@ -70413,9 +74615,9 @@ index[offset[i+1]]
 
 In the case that the matrix is symmetric, the result has a particular
 interpretation: Given a symmetric matrix A and n =
-A.stronglyConnectedComponents(p,r)
+A.stronglyConnectedComponents(p, r)
 
-=> A[p,p] will appear block-diagonal with n blocks and with the indices of
+=> A[p, p] will appear block-diagonal with n blocks and with the indices of
 the block boundaries to be found in r.
 
 ";
@@ -70448,18 +74650,18 @@ a sparsity, order of nonzeros remains the same.
 ";
 
 %feature("docstring") casadi::ScalarSparsity::sizeD "[INTERNAL]  Number of
-non-zeros on the diagonal, i.e. the number of elements (i,j) with j==i.
+non-zeros on the diagonal, i.e. the number of elements (i, j) with j==i.
 
 ";
 
 %feature("docstring") casadi::ScalarSparsity::sizeL "[INTERNAL]  Number of
-non-zeros in the lower triangular half, i.e. the number of elements (i,j)
+non-zeros in the lower triangular half, i.e. the number of elements (i, j)
 with j<=i.
 
 ";
 
 %feature("docstring") casadi::ScalarSparsity::sizeU "[INTERNAL]  Number of
-non-zeros in the upper triangular half, i.e. the number of elements (i,j)
+non-zeros in the upper triangular half, i.e. the number of elements (i, j)
 with j>=i.
 
 ";
@@ -70480,7 +74682,7 @@ sparse (empty) rectangular sparsity pattern.
 ";
 
 %feature("docstring") casadi::ScalarSparsity::hasNZ "[INTERNAL]  Returns
-true if the pattern has a non-zero at location rr,cc.
+true if the pattern has a non-zero at location rr, cc.
 
 ";
 
@@ -70523,11 +74725,11 @@ the pointer to the internal class
 matrix Make the matrix larger by inserting empty rows and columns, keeping
 the existing non-zeros.
 
-For the matrices A to B A(m,n) length(jj)=m , length(ii)=n B(nrow,ncol)
+For the matrices A to B A(m, n) length(jj)=m , length(ii)=n B(nrow, ncol)
 
-A=enlarge(m,n,ii,jj) makes sure that
+A=enlarge(m, n, ii, jj) makes sure that
 
-B[jj,ii] == A
+B[jj, ii] == A
 
 ";
 
@@ -71205,12 +75407,53 @@ Joel Andersson, Attila Kozma and Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
-| md           | Y            | )            | to be passed | olverInterna |
-|              |              |              | to IPOPT     | l            |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| beta         | OT_REAL      | 0.800        | Line-search  | casadi::SCPg |
+|              |              |              | parameter,   | enInternal   |
+|              |              |              | restoration  |              |
+|              |              |              | factor of    |              |
+|              |              |              | stepsize     |              |
++--------------+--------------+--------------+--------------+--------------+
+| c1           | OT_REAL      | 0.000        | Armijo       | casadi::SCPg |
+|              |              |              | condition,   | enInternal   |
+|              |              |              | coefficient  |              |
+|              |              |              | of decrease  |              |
+|              |              |              | in merit     |              |
++--------------+--------------+--------------+--------------+--------------+
+| codegen      | OT_BOOLEAN   | false        | C-code       | casadi::SCPg |
+|              |              |              | generation   | enInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| compiler     | OT_STRING    | \"gcc -fPIC   | Compiler     | casadi::SCPg |
+|              |              | -O2\"         | command to   | enInternal   |
+|              |              |              | be used for  |              |
+|              |              |              | compiling    |              |
+|              |              |              | generated    |              |
+|              |              |              | code         |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -71220,49 +75463,330 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+|              |              |              | NLP function | olverInterna |
+|              |              |              | in terms of  | l            |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | the gradient | casadi::NLPS |
-| dient        |              | )            | of the       | olverInterna |
-|              |              |              | objective.   | l            |
+| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | Check docume | casadi::NLPS |
-| llback       |              | )            | ntation of   | olverInterna |
-|              |              |              | Callback .   | l            |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option. Use  | olverInterna |
+|              |              |              | Gauss Newton | l            |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| dient        |              | )            | option.      | olverInterna |
+|              |              |              | Generate a   | l            |
+|              |              |              | function for |              |
+|              |              |              | calculating  |              |
+|              |              |              | the gradient |              |
+|              |              |              | of the       |              |
+|              |              |              | objective.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| sian         |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| obian        |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (column, aut |              |
+|              |              |              | ogenerated   |              |
+|              |              |              | by default)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Hessian  | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    | \"exact\"      | gauss-       | casadi::SCPg |
+| oximation    |              |              | newton|exact | enInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| llback       |              | )            | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration    |              |
+|              |              |              | with the     |              |
+|              |              |              | solver as    |              |
+|              |              |              | input. Check |              |
+|              |              |              | documentatio |              |
+|              |              |              | n of         |              |
+|              |              |              | Callback .   |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (sparse row, |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | constraints  |              |
+|              |              |              | (autogenerat |              |
+|              |              |              | ed by        |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| lbfgs_memory | OT_INTEGER   | 10           | Size of      | casadi::SCPg |
+|              |              |              | L-BFGS       | enInternal   |
+|              |              |              | memory.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 50           | Maximum      | casadi::SCPg |
+|              |              |              | number of    | enInternal   |
+|              |              |              | SQP          |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter_ls  | OT_INTEGER   | 1            | Maximum      | casadi::SCPg |
+|              |              |              | number of    | enInternal   |
+|              |              |              | linesearch   |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| merit_memsiz | OT_INTEGER   | 4            | Size of      | casadi::SCPg |
+| e            |              |              | memory to    | enInternal   |
+|              |              |              | store        |              |
+|              |              |              | history of   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| merit_start  | OT_REAL      | 0.000        | Lower bound  | casadi::SCPg |
+|              |              |              | for the      | enInternal   |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::SCPg |
+|              |              |              | uts)  (eval_ | enInternal   |
+|              |              |              | f|eval_g|eva |              |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h|qp|dx)    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::NLPS |
-|              |              | )            | argument     | olverInterna |
-|              |              |              | appended at  | l            |
+| name_x       | OT_STRINGVEC | GenericType( | Names of the | casadi::SCPg |
+|              | TOR          | )            | variables.   | enInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option.      | olverInterna |
+|              |              |              | Expect F, G, | l            |
+|              |              |              | H, J to have |              |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
 |              |              |              | the end,     |              |
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| print_proble | OT_BOOLEAN   | false        | Print out    | casadi::SCPg |
-| m            |              |              | problem      | enInternal   |
-|              |              |              | statement    |              |
-|              |              |              | for          |              |
-|              |              |              | debugging.   |              |
+| print_header | OT_BOOLEAN   | true         | Print the    | casadi::SCPg |
+|              |              |              | header with  | enInternal   |
+|              |              |              | problem      |              |
+|              |              |              | statistics   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| print_time   | OT_BOOLEAN   | true         | Print        | casadi::SCPg |
+|              |              |              | information  | enInternal   |
+|              |              |              | about        |              |
+|              |              |              | execution    |              |
+|              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| print_x      | OT_INTEGERVE | GenericType( | Which        | casadi::SCPg |
+|              | CTOR         | )            | variables to | enInternal   |
+|              |              |              | print.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | casadi::SCPg |
+|              |              | )            | solver to be | enInternal   |
+|              |              |              | used by the  |              |
+|              |              |              | SQP method   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_solver_op | OT_DICTIONAR | GenericType( | Options to   | casadi::SCPg |
+| tions        | Y            | )            | be passed to | enInternal   |
+|              |              |              | the QP       |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| reg_threshol | OT_REAL      | 0.000        | Threshold    | casadi::SCPg |
+| d            |              |              | for the regu | enInternal   |
+|              |              |              | larization.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularize   | OT_BOOLEAN   | false        | Automatic re | casadi::SCPg |
+|              |              |              | gularization | enInternal   |
+|              |              |              | of Lagrange  |              |
+|              |              |              | Hessian.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_du       | OT_REAL      | 0.000        | Stopping     | casadi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for dual inf |              |
+|              |              |              | easability   |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_pr       | OT_REAL      | 0.000        | Stopping     | casadi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for primal i |              |
+|              |              |              | nfeasibility |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_pr_step  | OT_REAL      | 0.000        | Stopping     | casadi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for the step |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_reg      | OT_REAL      | 0.000        | Stopping     | casadi::SCPg |
+|              |              |              | criterion    | enInternal   |
+|              |              |              | for regulari |              |
+|              |              |              | zation       |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+--------------------------+
+|     Id      |         Used in          |
++=============+==========================+
+| dx          | casadi::SCPgenInternal   |
++-------------+--------------------------+
+| eval_f      | casadi::SCPgenInternal   |
++-------------+--------------------------+
+| eval_g      | casadi::SCPgenInternal   |
++-------------+--------------------------+
+| eval_grad_f | casadi::SCPgenInternal   |
++-------------+--------------------------+
+| eval_h      | casadi::SCPgenInternal   |
++-------------+--------------------------+
+| eval_jac_g  | casadi::SCPgenInternal   |
++-------------+--------------------------+
+| inputs      | casadi::FunctionInternal |
++-------------+--------------------------+
+| outputs     | casadi::FunctionInternal |
++-------------+--------------------------+
+| qp          | casadi::SCPgenInternal   |
++-------------+--------------------------+
 
 >List of available stats
 +------------+------------------------+
@@ -72443,8 +76967,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -72454,22 +77001,63 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::SDQP |
-|              |              | red_object\"  | object       | SolverIntern |
-|              |              |              |              | al           |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | GenericType( | Passed on to | casadi::SDPS |
-| ion          |              | )            | casadi::Para | DQPInternal  |
-|              |              |              | llelizer     |              |
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| sdp_solver   | OT_SDPSOLVER | GenericType( | The          | casadi::SDPS |
+|              |              | )            | SDPSolver    | DQPInternal  |
+|              |              |              | used to      |              |
+|              |              |              | solve the    |              |
+|              |              |              | SDQPs.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| sdp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::SDPS |
+| ptions       | Y            | )            | be passed to | DQPInternal  |
+|              |              |              | the          |              |
+|              |              |              | SDPSOlver    |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -73372,13 +77960,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::SDPS |
-| ter          |              |              | number of    | OCPInternal  |
-|              |              |              | barrier      |              |
-|              |              |              | iterations.  |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -73388,13 +77994,37 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (initial|ste | casadi::SOCP |
-|              | TOR          | )            | p)           | SolverIntern |
-|              |              |              |              | al           |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| ni           | OT_INTEGERVE | GenericType( | Provide the  | casadi::SOCP |
+|              | CTOR         | )            | size of each | SolverIntern |
+|              |              |              | SOC          | al           |
+|              |              |              | constraint.  |              |
+|              |              |              | Must sum up  |              |
+|              |              |              | to N.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_proble | OT_BOOLEAN   | false        | Print out    | casadi::SOCP |
 | m            |              |              | problem      | SolverIntern |
@@ -73402,14 +78032,38 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| sdp_solver   | OT_SDPSOLVER | GenericType( | The          | casadi::SDPS |
+|              |              | )            | SDPSolver    | OCPInternal  |
+|              |              |              | used to      |              |
+|              |              |              | solve the    |              |
+|              |              |              | SOCPs.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| sdp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::SDPS |
+| ptions       | Y            | )            | be passed to | OCPInternal  |
+|              |              |              | the          |              |
+|              |              |              | SDPSOlver    |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -73954,18 +78608,30 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
 | calc_dual    | OT_BOOLEAN   | true         | Indicate if  | casadi::SDPS |
 |              |              |              | dual should  | olverInterna |
 |              |              |              | be allocated | l            |
 |              |              |              | and          |              |
 |              |              |              | calculated.  |              |
-|              |              |              | as is always |              |
-|              |              |              | dense (m x   |              |
-|              |              |              | m).          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| calc_p       | OT_BOOLEAN   | true         | You may want | casadi::SDPS |
-|              |              |              | to avoid     | olverInterna |
-|              |              |              | calculating  | l            |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
 |              |              |              | this         |              |
 |              |              |              | variable for |              |
 |              |              |              | problems     |              |
@@ -73974,8 +78640,34 @@ Joel Andersson
 |              |              |              | always dense |              |
 |              |              |              | (m x m).     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| calc_p       | OT_BOOLEAN   | true         | Indicate if  | casadi::SDPS |
+|              |              |              | the P-part   | olverInterna |
+|              |              |              | of primal    | l            |
+|              |              |              | solution     |              |
+|              |              |              | should be    |              |
+|              |              |              | allocated    |              |
+|              |              |              | and          |              |
+|              |              |              | calculated.  |              |
+|              |              |              | You may want |              |
+|              |              |              | to avoid     |              |
+|              |              |              | calculating  |              |
+|              |              |              | this         |              |
+|              |              |              | variable for |              |
+|              |              |              | problems     |              |
+|              |              |              | with n       |              |
+|              |              |              | large, as is |              |
+|              |              |              | always dense |              |
+|              |              |              | (m x m).     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -73984,6 +78676,27 @@ Joel Andersson
 |              |              |              | ntation of D |              |
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -73995,14 +78708,27 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -75189,8 +79915,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -75200,18 +79949,63 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::SDQP |
-|              |              | red_object\"  | object       | SolverIntern |
-|              |              |              |              | al           |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| sdp_solver   | OT_SDPSOLVER | GenericType( | The          | casadi::SDQP |
+|              |              | )            | SDQPSolver   | SolverIntern |
+|              |              |              | used to      | al           |
+|              |              |              | solve the    |              |
+|              |              |              | SDPs.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| sdp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::SDQP |
+| ptions       | Y            | )            | be passed to | SolverIntern |
+|              |              |              | the          | al           |
+|              |              |              | SDPSOlver    |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -78923,8 +83717,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -78934,22 +83751,76 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| final_time   | OT_REAL      | 1            |              | casadi::Homo |
-|              |              |              |              | topyNLPInter |
-|              |              |              |              | nal          |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::Homo |
+|              |              |              | NLP function | topyNLPInter |
+|              |              |              | in terms of  | nal          |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Simp |
-|              |              | red_object\"  | object       | leHomotopyNL |
-|              |              |              |              | PInternal    |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The NLP      | casadi::Simp |
+|              |              | )            | solver to be | leHomotopyNL |
+|              |              |              | used by the  | PInternal    |
+|              |              |              | Homotopy     |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | casadi::Simp |
+| ptions       | Y            | )            | be passed to | leHomotopyNL |
+|              |              |              | the Homotopy | PInternal    |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| num_steps    | OT_INTEGER   | 10           | Take this    | casadi::Simp |
+|              |              |              | many steps   | leHomotopyNL |
+|              |              |              | to go from   | PInternal    |
+|              |              |              | tau=0 to     |              |
+|              |              |              | tau=1.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -79746,13 +84617,36 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
 | const_dim    | OT_BOOLEAN   | true         | Assume       | casadi::Dple |
 |              |              |              | constant     | Internal     |
 |              |              |              | dimension of |              |
 |              |              |              | P            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -79766,15 +84660,51 @@ Joris Gillis
 |              |              |              | unstability  | Internal     |
 |              |              |              | detection    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| error_unstab | OT_BOOLEAN   | false        | has          | casadi::Dple |
-| le           |              |              | eigenvalues  | Internal     |
+| error_unstab | OT_BOOLEAN   | false        | Throw an     | casadi::Dple |
+| le           |              |              | exception    | Internal     |
+|              |              |              | when it is   |              |
+|              |              |              | detected     |              |
+|              |              |              | that Product |              |
+|              |              |              | (A_i,i=N..1) |              |
+|              |              |              | has          |              |
+|              |              |              | eigenvalues  |              |
 |              |              |              | greater than |              |
 |              |              |              | 1-eps_unstab |              |
 |              |              |              | le           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (step|stepsi | casadi::Simp |
-|              | TOR          | )            | ze|J|F|normF | leIndefDpleI |
-|              |              |              | )            | nternal      |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | casadi::Simp |
+| r            | VER          | )            | linear       | leIndefDpleI |
+|              |              |              | solver       | nternal      |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Simp |
+| r_options    | Y            | )            | be passed to | leIndefDpleI |
+|              |              |              | the linear   | nternal      |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -79784,30 +84714,28 @@ Joris Gillis
 |              |              |              | positive     | Internal     |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-+----------+---------------------------------+
-|    Id    |             Used in             |
-+==========+=================================+
-| F        | casadi::SimpleIndefDpleInternal |
-+----------+---------------------------------+
-| J        | casadi::SimpleIndefDpleInternal |
-+----------+---------------------------------+
-| normF    | casadi::SimpleIndefDpleInternal |
-+----------+---------------------------------+
-| step     | casadi::SimpleIndefDpleInternal |
-+----------+---------------------------------+
-| stepsize | casadi::SimpleIndefDpleInternal |
-+----------+---------------------------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
 
@@ -80640,8 +85568,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -80651,22 +85602,53 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (initial|ste | casadi::Simu |
-|              | TOR          | )            | p)           | latorInterna |
-|              |              |              |              | l            |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Simu |
+|              |              |              | uts)  (initi | latorInterna |
+|              |              |              | al|step)     | l            |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
@@ -80674,6 +85656,10 @@ Joel Andersson
 |   Id    |          Used in          |
 +=========+===========================+
 | initial | casadi::SimulatorInternal |
++---------+---------------------------+
+| inputs  | casadi::FunctionInternal  |
++---------+---------------------------+
+| outputs | casadi::FunctionInternal  |
 +---------+---------------------------+
 | step    | casadi::SimulatorInternal |
 +---------+---------------------------+
@@ -82120,8 +87106,8 @@ adheres to SCHEME_NLPINput
 
 interface to SNOPT NLP solver
 
-Solves the following parametric nonlinear program (NLP):min          F(x,p)
-x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
+Solves the following parametric nonlinear program (NLP):min          F(x, p)
+x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
 p  == P      nx: number of decision variables     ng: number of constraints
 np: number of parameters
 
@@ -82205,15 +87191,31 @@ np: number of parameters
 | _start       | OT_STRING    | \"Cold\"       | (Cold|Warm)  | casadi::Snop |
 |              |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
-| md           | Y            | )            | to be passed | olverInterna |
-|              |              |              | to IPOPT     | l            |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| contype      | OT_INTEGERVE |              |              | casadi::Snop |
-|              | CTOR         |              |              | tInternal    |
-+--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -82223,32 +87225,192 @@ np: number of parameters
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| detect_linea | OT_BOOLEAN   | true         | Make an      | casadi::Snop |
+| r            |              |              | effort to    | tInternal    |
+|              |              |              | treat linear |              |
+|              |              |              | constraints  |              |
+|              |              |              | and linear   |              |
+|              |              |              | variables    |              |
+|              |              |              | specially.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+|              |              |              | NLP function | olverInterna |
+|              |              |              | in terms of  | l            |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | the gradient | casadi::NLPS |
-| dient        |              | )            | of the       | olverInterna |
-|              |              |              | objective.   | l            |
+| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | Check docume | casadi::NLPS |
-| llback       |              | )            | ntation of   | olverInterna |
-|              |              |              | Callback .   | l            |
+| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (eval_nlp|se | casadi::Snop |
-|              | TOR          | )            | tup_nlp)     | tInternal    |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option. Use  | olverInterna |
+|              |              |              | Gauss Newton | l            |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| dient        |              | )            | option.      | olverInterna |
+|              |              |              | Generate a   | l            |
+|              |              |              | function for |              |
+|              |              |              | calculating  |              |
+|              |              |              | the gradient |              |
+|              |              |              | of the       |              |
+|              |              |              | objective.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| sian         |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| obian        |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (column, aut |              |
+|              |              |              | ogenerated   |              |
+|              |              |              | by default)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Hessian  | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| llback       |              | )            | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration    |              |
+|              |              |              | with the     |              |
+|              |              |              | solver as    |              |
+|              |              |              | input. Check |              |
+|              |              |              | documentatio |              |
+|              |              |              | n of         |              |
+|              |              |              | Callback .   |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (sparse row, |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | constraints  |              |
+|              |              |              | (autogenerat |              |
+|              |              |              | ed by        |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Snop |
+|              |              |              | uts)  (eval_ | tInternal    |
+|              |              |              | nlp|setup_nl |              |
+|              |              |              | p)           |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::NLPS |
-|              |              | )            | argument     | olverInterna |
-|              |              |              | appended at  | l            |
+| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option.      | olverInterna |
+|              |              |              | Expect F, G, | l            |
+|              |              |              | H, J to have |              |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
 |              |              |              | the end,     |              |
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
@@ -82260,24 +87422,47 @@ np: number of parameters
 |              |              |              | execution    |              |
 |              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
 
 >List of available monitors
-+-----------+-----------------------+
-|    Id     |        Used in        |
-+===========+=======================+
-| eval_nlp  | casadi::SnoptInternal |
-+-----------+-----------------------+
-| setup_nlp | casadi::SnoptInternal |
-+-----------+-----------------------+
++-----------+--------------------------+
+|    Id     |         Used in          |
++===========+==========================+
+| eval_nlp  | casadi::SnoptInternal    |
++-----------+--------------------------+
+| inputs    | casadi::FunctionInternal |
++-----------+--------------------------+
+| outputs   | casadi::FunctionInternal |
++-----------+--------------------------+
+| setup_nlp | casadi::SnoptInternal    |
++-----------+--------------------------+
 
 >List of available stats
 +----------------+-----------------------+
@@ -82811,7 +87996,7 @@ A better implementation would rely on matrix square root, but we need
 singular value decomposition to implement that.
 
 This implementation makes use of the epigraph reformulation:*  min f(x) *
-x * *   min  t *    x,t  f(x) <= t *
+x * *   min  t *    x, t  f(x) <= t *
 
 This implementation makes use of the following identity:*  || Gx+h||_2 <=
 e'x + f * *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0 * where we
@@ -82899,8 +88084,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -82910,21 +88118,63 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | \"serial\"     | (serial|open | casadi::SOCP |
-| ion          |              |              | mp|mpi)      | QCQPInternal |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| socp_solver  | OT_SOCPSOLVE | GenericType( | The          | casadi::SOCP |
+|              | R            | )            | SOCPSolver   | QCQPInternal |
+|              |              |              | used to      |              |
+|              |              |              | solve the    |              |
+|              |              |              | QCQPs.       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| socp_solver_ | OT_DICTIONAR | GenericType( | Options to   | casadi::SOCP |
+| options      | Y            | )            | be passed to | QCQPInternal |
+|              |              |              | the          |              |
+|              |              |              | SOCPSOlver   |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 >List of available stats
@@ -84425,8 +89675,31 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -84436,13 +89709,37 @@ Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (initial|ste | casadi::SOCP |
-|              | TOR          | )            | p)           | SolverIntern |
-|              |              |              |              | al           |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| ni           | OT_INTEGERVE | GenericType( | Provide the  | casadi::SOCP |
+|              | CTOR         | )            | size of each | SolverIntern |
+|              |              |              | SOC          | al           |
+|              |              |              | constraint.  |              |
+|              |              |              | Must sum up  |              |
+|              |              |              | to N.        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_proble | OT_BOOLEAN   | false        | Print out    | casadi::SOCP |
 | m            |              |              | problem      | SolverIntern |
@@ -84450,24 +89747,28 @@ Joris Gillis
 |              |              |              | for          |              |
 |              |              |              | debugging.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-+---------+----------------------------+
-|   Id    |          Used in           |
-+=========+============================+
-| initial | casadi::SOCPSolverInternal |
-+---------+----------------------------+
-| step    | casadi::SOCPSolverInternal |
-+---------+----------------------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
 
@@ -85255,7 +90556,7 @@ Propagate sparsity, no work.
 // File: classcasadi_1_1SparseStorage.xml
 %feature("docstring") casadi::SparseStorage::sanityCheck "
 
-Check if the dimensions and colind,row vectors are compatible.
+Check if the dimensions and colind, row vectors are compatible.
 
 Parameters:
 -----------
@@ -85293,7 +90594,7 @@ Const access the sparsity - reference to data member.
 
 %feature("docstring") casadi::SparseStorage::hasNZ "
 
-Returns true if the matrix has a non-zero at location rr,cc.
+Returns true if the matrix has a non-zero at location rr, cc.
 
 ";
 
@@ -85489,7 +90790,7 @@ for each of the structural non-zeros.
 
 Note that with this format, it is cheap to loop over all the non-zero
 elements of a particular column, at constant time per element, but expensive
-to jump to access a location (i,j).
+to jump to access a location (i, j).
 
 If the matrix is dense, i.e. length(row) == size1()*size2(), the format
 reduces to standard dense column major format, which allows access to an
@@ -85745,9 +91046,9 @@ index[offset[i+1]]
 
 In the case that the matrix is symmetric, the result has a particular
 interpretation: Given a symmetric matrix A and n =
-A.stronglyConnectedComponents(p,r)
+A.stronglyConnectedComponents(p, r)
 
-=> A[p,p] will appear block-diagonal with n blocks and with the indices of
+=> A[p, p] will appear block-diagonal with n blocks and with the indices of
 the block boundaries to be found in r.
 
 ";
@@ -86139,18 +91440,18 @@ Is a null pointer?
 Enlarge matrix Make the matrix larger by inserting empty rows and columns,
 keeping the existing non-zeros.
 
-For the matrices A to B A(m,n) length(jj)=m , length(ii)=n B(nrow,ncol)
+For the matrices A to B A(m, n) length(jj)=m , length(ii)=n B(nrow, ncol)
 
-A=enlarge(m,n,ii,jj) makes sure that
+A=enlarge(m, n, ii, jj) makes sure that
 
-B[jj,ii] == A
+B[jj, ii] == A
 
 ";
 
 %feature("docstring") casadi::Sparsity::sizeL "
 
 Number of non-zeros in the lower triangular half, i.e. the number of
-elements (i,j) with j<=i.
+elements (i, j) with j<=i.
 
 ";
 
@@ -86229,7 +91530,7 @@ for Sparse Linear Systems by Davis (2006).
 
 %feature("docstring") casadi::Sparsity::sizeD "
 
-Number of non-zeros on the diagonal, i.e. the number of elements (i,j) with
+Number of non-zeros on the diagonal, i.e. the number of elements (i, j) with
 j==i.
 
 ";
@@ -86258,7 +91559,7 @@ optionally both dimensions)
 %feature("docstring") casadi::Sparsity::sizeU "
 
 Number of non-zeros in the upper triangular half, i.e. the number of
-elements (i,j) with j>=i.
+elements (i, j) with j>=i.
 
 ";
 
@@ -86272,7 +91573,7 @@ See:   numel()
 
 %feature("docstring") casadi::Sparsity::hasNZ "
 
-Returns true if the pattern has a non-zero at location rr,cc.
+Returns true if the pattern has a non-zero at location rr, cc.
 
 ";
 
@@ -86301,7 +91602,7 @@ Erase rows and/or columns of a matrix.
 Calculate the elimination tree See Direct Methods for Sparse Linear Systems
 by Davis (2006). If the parameter ata is false, the algorithm is equivalent
 to Matlab's etree(A), except that the indices are zero- based. If ata is
-true, the algorithm is equivalent to Matlab's etree(A,'row').
+true, the algorithm is equivalent to Matlab's etree(A, 'row').
 
 ";
 
@@ -87465,8 +92766,31 @@ Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -87476,18 +92800,52 @@ Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -88511,17 +93869,43 @@ Attila Kozma, Joel Andersson and Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | casadi::SQPI |
-| ter          |              |              | number of    | nternal      |
-|              |              |              | barrier      |              |
-|              |              |              | iterations.  |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
-| md           | Y            | )            | to be passed | olverInterna |
-|              |              |              | to IPOPT     | l            |
+| beta         | OT_REAL      | 0.800        | Line-search  | casadi::SQPI |
+|              |              |              | parameter,   | nternal      |
+|              |              |              | restoration  |              |
+|              |              |              | factor of    |              |
+|              |              |              | stepsize     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| c1           | OT_REAL      | 0.000        | Armijo       | casadi::SQPI |
+|              |              |              | condition,   | nternal      |
+|              |              |              | coefficient  |              |
+|              |              |              | of decrease  |              |
+|              |              |              | in merit     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -88531,43 +93915,311 @@ Attila Kozma, Joel Andersson and Joris Gillis
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+|              |              |              | NLP function | olverInterna |
+|              |              |              | in terms of  | l            |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | the gradient | casadi::NLPS |
-| dient        |              | )            | of the       | olverInterna |
-|              |              |              | objective.   | l            |
+| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | Check docume | casadi::NLPS |
-| llback       |              | )            | ntation of   | olverInterna |
-|              |              |              | Callback .   | l            |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option. Use  | olverInterna |
+|              |              |              | Gauss Newton | l            |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| dient        |              | )            | option.      | olverInterna |
+|              |              |              | Generate a   | l            |
+|              |              |              | function for |              |
+|              |              |              | calculating  |              |
+|              |              |              | the gradient |              |
+|              |              |              | of the       |              |
+|              |              |              | objective.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| sian         |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| obian        |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (column, aut |              |
+|              |              |              | ogenerated   |              |
+|              |              |              | by default)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Hessian  | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    | \"exact\"      | limited-     | casadi::SQPI |
+| oximation    |              |              | memory|exact | nternal      |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| llback       |              | )            | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration    |              |
+|              |              |              | with the     |              |
+|              |              |              | solver as    |              |
+|              |              |              | input. Check |              |
+|              |              |              | documentatio |              |
+|              |              |              | n of         |              |
+|              |              |              | Callback .   |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (sparse row, |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | constraints  |              |
+|              |              |              | (autogenerat |              |
+|              |              |              | ed by        |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| lbfgs_memory | OT_INTEGER   | 10           | Size of      | casadi::SQPI |
+|              |              |              | L-BFGS       | nternal      |
+|              |              |              | memory.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 50           | Maximum      | casadi::SQPI |
+|              |              |              | number of    | nternal      |
+|              |              |              | SQP          |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter_ls  | OT_INTEGER   | 3            | Maximum      | casadi::SQPI |
+|              |              |              | number of    | nternal      |
+|              |              |              | linesearch   |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| merit_memory | OT_INTEGER   | 4            | Size of      | casadi::SQPI |
+|              |              |              | memory to    | nternal      |
+|              |              |              | store        |              |
+|              |              |              | history of   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| min_step_siz | OT_REAL      | 0.000        | The size     | casadi::SQPI |
+| e            |              |              | (inf-norm)   | nternal      |
+|              |              |              | of the step  |              |
+|              |              |              | size should  |              |
+|              |              |              | not become   |              |
+|              |              |              | smaller than |              |
+|              |              |              | this.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::SQPI |
+|              |              |              | uts)  (eval_ | nternal      |
+|              |              |              | f|eval_g|eva |              |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h|qp|dx)    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::NLPS |
-|              |              | )            | argument     | olverInterna |
-|              |              |              | appended at  | l            |
+| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option.      | olverInterna |
+|              |              |              | Expect F, G, | l            |
+|              |              |              | H, J to have |              |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
 |              |              |              | the end,     |              |
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| print_header | OT_BOOLEAN   | true         | Print the    | casadi::SQPI |
+|              |              |              | header with  | nternal      |
+|              |              |              | problem      |              |
+|              |              |              | statistics   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| print_time   | OT_BOOLEAN   | true         | Print        | casadi::SQPI |
+|              |              |              | information  | nternal      |
+|              |              |              | about        |              |
+|              |              |              | execution    |              |
+|              |              |              | time         |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | casadi::SQPI |
+|              |              | )            | solver to be | nternal      |
+|              |              |              | used by the  |              |
+|              |              |              | SQP method   |              |
++--------------+--------------+--------------+--------------+--------------+
+| qp_solver_op | OT_DICTIONAR | GenericType( | Options to   | casadi::SQPI |
+| tions        | Y            | )            | be passed to | nternal      |
+|              |              |              | the QP       |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularize   | OT_BOOLEAN   | false        | Automatic re | casadi::SQPI |
+|              |              |              | gularization | nternal      |
+|              |              |              | of Lagrange  |              |
+|              |              |              | Hessian.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_du       | OT_REAL      | 0.000        | Stopping     | casadi::SQPI |
+|              |              |              | criterion    | nternal      |
+|              |              |              | for dual inf |              |
+|              |              |              | easability   |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_pr       | OT_REAL      | 0.000        | Stopping     | casadi::SQPI |
+|              |              |              | criterion    | nternal      |
+|              |              |              | for primal i |              |
+|              |              |              | nfeasibility |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+--------------------------+
+|     Id      |         Used in          |
++=============+==========================+
+| dx          | casadi::SQPInternal      |
++-------------+--------------------------+
+| eval_f      | casadi::SQPInternal      |
++-------------+--------------------------+
+| eval_g      | casadi::SQPInternal      |
++-------------+--------------------------+
+| eval_grad_f | casadi::SQPInternal      |
++-------------+--------------------------+
+| eval_h      | casadi::SQPInternal      |
++-------------+--------------------------+
+| eval_jac_g  | casadi::SQPInternal      |
++-------------+--------------------------+
+| inputs      | casadi::FunctionInternal |
++-------------+--------------------------+
+| outputs     | casadi::FunctionInternal |
++-------------+--------------------------+
+| qp          | casadi::SQPInternal      |
++-------------+--------------------------+
 
 >List of available stats
 +--------------------+---------------------+
@@ -89028,8 +94680,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -89039,18 +94714,52 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -90011,8 +95720,31 @@ casadi::StabilizedSQICSolver "
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -90022,18 +95754,52 @@ casadi::StabilizedSQICSolver "
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -91622,12 +97388,61 @@ Slava Kung
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
-| md           | Y            | )            | to be passed | olverInterna |
-|              |              |              | to IPOPT     | l            |
+| TReta1       | OT_REAL      | 0.800        | Required     | casadi::Stab |
+|              |              |              | predicted /  | ilizedSQPInt |
+|              |              |              | actual       | ernal        |
+|              |              |              | decrease for |              |
+|              |              |              | TR increase  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| TReta2       | OT_REAL      | 0.200        | Required     | casadi::Stab |
+|              |              |              | predicted /  | ilizedSQPInt |
+|              |              |              | actual       | ernal        |
+|              |              |              | decrease for |              |
+|              |              |              | TR decrease  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| alphaMin     | OT_REAL      | 0.001        | Used to      | casadi::Stab |
+|              |              |              | check        | ilizedSQPInt |
+|              |              |              | whether to   | ernal        |
+|              |              |              | increase     |              |
+|              |              |              | rho.         |              |
++--------------+--------------+--------------+--------------+--------------+
+| beta         | OT_REAL      | 0.500        | Line-search  | casadi::Stab |
+|              |              |              | parameter,   | ilizedSQPInt |
+|              |              |              | restoration  | ernal        |
+|              |              |              | factor of    |              |
+|              |              |              | stepsize     |              |
++--------------+--------------+--------------+--------------+--------------+
+| c1           | OT_REAL      | 0.001        | Armijo       | casadi::Stab |
+|              |              |              | condition,   | ilizedSQPInt |
+|              |              |              | coefficient  | ernal        |
+|              |              |              | of decrease  |              |
+|              |              |              | in merit     |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -91637,43 +97452,365 @@ Slava Kung
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| dvMax0       | OT_REAL      | 100          | Parameter    | casadi::Stab |
+|              |              |              | used to      | ilizedSQPInt |
+|              |              |              | defined the  | ernal        |
+|              |              |              | max step     |              |
+|              |              |              | length.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| eps_active   | OT_REAL      | 0.000        | Threshold    | casadi::Stab |
+|              |              |              | for the      | ilizedSQPInt |
+|              |              |              | epsilon-     | ernal        |
+|              |              |              | active set.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | the gradient | casadi::NLPS |
-| dient        |              | )            | of the       | olverInterna |
-|              |              |              | objective.   | l            |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+|              |              |              | NLP function | olverInterna |
+|              |              |              | in terms of  | l            |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | Check docume | casadi::NLPS |
-| llback       |              | )            | ntation of   | olverInterna |
-|              |              |              | Callback .   | l            |
+| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Stab |
-|              |              | red_object\"  | object       | ilizedSQPInt |
+| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gamma1       | OT_REAL      | 2            | Trust region | casadi::Stab |
+|              |              |              | increase     | ilizedSQPInt |
+|              |              |              | parameter    | ernal        |
++--------------+--------------+--------------+--------------+--------------+
+| gamma2       | OT_REAL      | 1            | Trust region | casadi::Stab |
+|              |              |              | update       | ilizedSQPInt |
+|              |              |              | parameter    | ernal        |
++--------------+--------------+--------------+--------------+--------------+
+| gamma3       | OT_REAL      | 1            | Trust region | casadi::Stab |
+|              |              |              | decrease     | ilizedSQPInt |
+|              |              |              | parameter    | ernal        |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option. Use  | olverInterna |
+|              |              |              | Gauss Newton | l            |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| dient        |              | )            | option.      | olverInterna |
+|              |              |              | Generate a   | l            |
+|              |              |              | function for |              |
+|              |              |              | calculating  |              |
+|              |              |              | the gradient |              |
+|              |              |              | of the       |              |
+|              |              |              | objective.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| sian         |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| obian        |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
+|              |              |              | exact        |              |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (column, aut |              |
+|              |              |              | ogenerated   |              |
+|              |              |              | by default)  |              |
++--------------+--------------+--------------+--------------+--------------+
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Hessian  | l            |
+|              |              |              | of the       |              |
+|              |              |              | Lagrangian ( |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    | \"exact\"      | limited-     | casadi::Stab |
+| oximation    |              |              | memory|exact | ilizedSQPInt |
 |              |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::NLPS |
-|              |              | )            | argument     | olverInterna |
-|              |              |              | appended at  | l            |
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| llback       |              | )            | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration    |              |
+|              |              |              | with the     |              |
+|              |              |              | solver as    |              |
+|              |              |              | input. Check |              |
+|              |              |              | documentatio |              |
+|              |              |              | n of         |              |
+|              |              |              | Callback .   |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | objective    |              |
+|              |              |              | (sparse row, |              |
+|              |              |              | autogenerate |              |
+|              |              |              | d by         |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Jacobian | l            |
+|              |              |              | of the       |              |
+|              |              |              | constraints  |              |
+|              |              |              | (autogenerat |              |
+|              |              |              | ed by        |              |
+|              |              |              | default)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| lbfgs_memory | OT_INTEGER   | 10           | Size of      | casadi::Stab |
+|              |              |              | L-BFGS       | ilizedSQPInt |
+|              |              |              | memory.      | ernal        |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 100          | Maximum      | casadi::Stab |
+|              |              |              | number of    | ilizedSQPInt |
+|              |              |              | SQP          | ernal        |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter_ls  | OT_INTEGER   | 20           | Maximum      | casadi::Stab |
+|              |              |              | number of    | ilizedSQPInt |
+|              |              |              | linesearch   | ernal        |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_time     | OT_REAL      | 1.000e+12    | Timeout      | casadi::Stab |
+|              |              |              |              | ilizedSQPInt |
+|              |              |              |              | ernal        |
++--------------+--------------+--------------+--------------+--------------+
+| merit_memory | OT_INTEGER   | 4            | Size of      | casadi::Stab |
+|              |              |              | memory to    | ilizedSQPInt |
+|              |              |              | store        | ernal        |
+|              |              |              | history of   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| min_step_siz | OT_REAL      | 0.000        | The size     | casadi::Stab |
+| e            |              |              | (inf-norm)   | ilizedSQPInt |
+|              |              |              | of the step  | ernal        |
+|              |              |              | size should  |              |
+|              |              |              | not become   |              |
+|              |              |              | smaller than |              |
+|              |              |              | this.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Stab |
+|              |              |              | uts)  (eval_ | ilizedSQPInt |
+|              |              |              | f|eval_g|eva | ernal        |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h|qp|dx)    |              |
++--------------+--------------+--------------+--------------+--------------+
+| muR0         | OT_REAL      | 0.000        | Initial      | casadi::Stab |
+|              |              |              | choice of re | ilizedSQPInt |
+|              |              |              | gularization | ernal        |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nu           | OT_REAL      | 1            | Parameter    | casadi::Stab |
+|              |              |              | for primal-  | ilizedSQPInt |
+|              |              |              | dual         | ernal        |
+|              |              |              | augmented    |              |
+|              |              |              | Lagrangian.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option.      | olverInterna |
+|              |              |              | Expect F, G, | l            |
+|              |              |              | H, J to have |              |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
 |              |              |              | the end,     |              |
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| phiWeight    | OT_REAL      | 0.000        | Weight used  | casadi::Stab |
+|              |              |              | in pseudo-   | ilizedSQPInt |
+|              |              |              | filter.      | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| print_header | OT_BOOLEAN   | true         | Print the    | casadi::Stab |
+|              |              |              | header with  | ilizedSQPInt |
+|              |              |              | problem      | ernal        |
+|              |              |              | statistics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularize   | OT_BOOLEAN   | false        | Automatic re | casadi::Stab |
+|              |              |              | gularization | ilizedSQPInt |
+|              |              |              | of Lagrange  | ernal        |
+|              |              |              | Hessian.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| stabilized_q | OT_STABILIZE | GenericType( | The          | casadi::Stab |
+| p_solver     | DQPSOLVER    | )            | Stabilized   | ilizedSQPInt |
+|              |              |              | QP solver to | ernal        |
+|              |              |              | be used by   |              |
+|              |              |              | the SQP      |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| stabilized_q | OT_DICTIONAR | GenericType( | Options to   | casadi::Stab |
+| p_solver_opt | Y            | )            | be passed to | ilizedSQPInt |
+| ions         |              |              | the          | ernal        |
+|              |              |              | Stabilized   |              |
+|              |              |              | QP solver    |              |
++--------------+--------------+--------------+--------------+--------------+
+| tau0         | OT_REAL      | 0.010        | Initial      | casadi::Stab |
+|              |              |              | parameter    | ilizedSQPInt |
+|              |              |              | for the      | ernal        |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | optimality   |              |
+|              |              |              | threshold.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_du       | OT_REAL      | 0.000        | Stopping     | casadi::Stab |
+|              |              |              | criterion    | ilizedSQPInt |
+|              |              |              | for dual inf | ernal        |
+|              |              |              | easability   |              |
++--------------+--------------+--------------+--------------+--------------+
+| tol_pr       | OT_REAL      | 0.000        | Stopping     | casadi::Stab |
+|              |              |              | criterion    | ilizedSQPInt |
+|              |              |              | for primal i | ernal        |
+|              |              |              | nfeasibility |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+| yEinitial    | OT_STRING    | \"simple\"     | Initial      | casadi::Stab |
+|              |              |              | multiplier.  | ilizedSQPInt |
+|              |              |              | Simple (all  | ernal        |
+|              |              |              | zero) or     |              |
+|              |              |              | least (LSQ). |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+-------------------------------+
+|     Id      |            Used in            |
++=============+===============================+
+| dx          | casadi::StabilizedSQPInternal |
++-------------+-------------------------------+
+| eval_f      | casadi::StabilizedSQPInternal |
++-------------+-------------------------------+
+| eval_g      | casadi::StabilizedSQPInternal |
++-------------+-------------------------------+
+| eval_grad_f | casadi::StabilizedSQPInternal |
++-------------+-------------------------------+
+| eval_h      | casadi::StabilizedSQPInternal |
++-------------+-------------------------------+
+| eval_jac_g  | casadi::StabilizedSQPInternal |
++-------------+-------------------------------+
+| inputs      | casadi::FunctionInternal      |
++-------------+-------------------------------+
+| outputs     | casadi::FunctionInternal      |
++-------------+-------------------------------+
+| qp          | casadi::StabilizedSQPInternal |
++-------------+-------------------------------+
 
 >List of available stats
 +---------------+-------------------------------+
@@ -93503,15 +99640,15 @@ Base class for integrators. Solves an initial value problem (IVP) coupled to
 a terminal value problem with differential equation given as an implicit ODE
 coupled to an algebraic equation and a set of quadratures: Initial
 conditions at t=t0  x(t0)  = x0  q(t0)  = 0   Forward integration from t=t0
-to t=tf  der(x) = function(x,z,p,t) Forward ODE  0 = fz(x,z,p,t)
-Forward algebraic equations  der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  = 0
-Backward integration from t=tf to t=t0  der(rx) = gx(rx,rz,rp,x,z,p,t)
-Backward ODE  0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations
-der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures where we assume
-that both the forward and backwards integrations are index-1  (i.e. dfz/dz,
-dgz/drz are invertible) and furthermore that gx, gz and gq have a linear
-dependency on rx, rz and rp.
+to t=tf  der(x) = function(x, z, p, t) Forward ODE  0 = fz(x, z, p, t)
+Forward algebraic equations  der(q) = fq(x, z, p, t)
+Forward quadratures   Terminal conditions at t=tf  rx(tf)  = rx0  rq(tf)  =
+0 Backward integration from t=tf to t=t0  der(rx) = gx(rx, rz, rp, x, z, p,
+t)        Backward ODE  0 = gz(rx, rz, rp, x, z, p, t) Backward algebraic
+equations  der(rq) = gq(rx, rz, rp, x, z, p, t) Backward quadratures   where
+we assume that both the forward and backwards integrations are index-1
+(i.e. dfz/dz, dgz/drz are invertible) and furthermore that  gx, gz and gq
+have a linear dependency on rx, rz and rp.
 
 >Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 7) [integratorIn]
 +------------------------+------------------------+------------------------+
@@ -93567,14 +99704,54 @@ dependency on rx, rz and rp.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| artol        | OT_REAL      | 0.000        | tolerance as | casadi::Inte |
-|              |              |              | provided     | gratorIntern |
-|              |              |              | with         | al           |
-|              |              |              | setArTol to  |              |
-|              |              |              | OOQP         |              |
+| abstol       | OT_REAL      | 0.000        | Absolute     | casadi::Sund |
+|              |              |              | tolerence    | ialsInternal |
+|              |              |              | for the IVP  |              |
+|              |              |              | solution     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| abstolB      | OT_REAL      | GenericType( | Absolute     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | casadi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -93584,62 +99761,316 @@ dependency on rx, rz and rp.
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | GenericType( | [default:    | casadi::Sund |
-| anB          |              | )            | equal to exa | ialsInternal |
+| exact_jacobi | OT_BOOLEAN   | true         | Use exact    | casadi::Sund |
+| an           |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | casadi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
 |              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_augme | OT_BOOLEAN   | true         | DAE callback | casadi::Inte |
-| nted         |              |              | function     | gratorIntern |
-|              |              |              | also be      | al           |
+| expand_augme | OT_BOOLEAN   | true         | If DAE       | casadi::Inte |
+| nted         |              |              | callback     | gratorIntern |
+|              |              |              | functions    | al           |
+|              |              |              | are          |              |
+|              |              |              | SXFunction , |              |
+|              |              |              | have         |              |
+|              |              |              | augmented    |              |
+|              |              |              | DAE callback |              |
+|              |              |              | function     |              |
+|              |              |              | also be      |              |
 |              |              |              | SXFunction . |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | [default:    | casadi::Sund |
-| rB           | VER          | )            | equal to lin | ialsInternal |
+| finite_diffe | OT_BOOLEAN   | false        | Use finite   | casadi::Sund |
+| rence_fsens  |              |              | differences  | ialsInternal |
+|              |              |              | to           |              |
+|              |              |              | approximate  |              |
+|              |              |              | the forward  |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
+|              |              |              | (if AD is    |              |
+|              |              |              | not          |              |
+|              |              |              | available)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_abstol | OT_REAL      | GenericType( | Absolute     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_err_co | OT_BOOLEAN   | true         | include the  | casadi::Sund |
+| n            |              |              | forward sens | ialsInternal |
+|              |              |              | itivities in |              |
+|              |              |              | all error    |              |
+|              |              |              | controls     |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_reltol | OT_REAL      | GenericType( | Relative     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_scalin | OT_REALVECTO | GenericType( | Scaling      | casadi::Sund |
+| g_factors    | R            | )            | factor for   | ialsInternal |
+|              |              |              | the          |              |
+|              |              |              | components   |              |
+|              |              |              | if finite    |              |
+|              |              |              | differences  |              |
+|              |              |              | is used      |              |
++--------------+--------------+--------------+--------------+--------------+
+| fsens_sensit | OT_INTEGERVE | GenericType( | Specifies    | casadi::Sund |
+| iviy_paramet | CTOR         | )            | which        | ialsInternal |
+| ers          |              |              | components   |              |
+|              |              |              | will be used |              |
+|              |              |              | when         |              |
+|              |              |              | estimating   |              |
+|              |              |              | the          |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | equations    |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| interpolatio | OT_STRING    | \"hermite\"    | Type of inte | casadi::Sund |
+| n_type       |              |              | rpolation    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint sens |              |
+|              |              |              | itivities (h |              |
+|              |              |              | ermite|polyn |              |
+|              |              |              | omial)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | casadi::Sund |
+| lver         |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | casadi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | casadi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | casadi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
 |              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | [default:    | casadi::Sund |
-| r_optionsB   | Y            | )            | equal to lin | ialsInternal |
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Sund |
+| r_options    | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | casadi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
 |              |              |              | ear_solver_o |              |
 |              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| lower_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
-| dthB         |              | )            | equal to low | ialsInternal |
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | casadi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | GenericType( | (user_define | casadi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | casadi::Sund |
+| dth          |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | Jacobian (es |              |
+|              |              |              | timations)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | casadi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
 |              |              |              | er_bandwidth |              |
 |              |              |              | ]            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylov   | OT_INTEGER   | 10           | Maximum      | casadi::Sund |
+|              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | casadi::Sund |
+|              |              | )            | krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_multiste | OT_INTEGER   | 5            |              | casadi::Sund |
 | p_order      |              |              |              | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | (eval_f|eval | casadi::Sund |
-|              | TOR          | )            | _djac)       | ialsInternal |
+| max_num_step | OT_INTEGER   | 10000        | Maximum      | casadi::Sund |
+| s            |              |              | number of    | ialsInternal |
+|              |              |              | integrator   |              |
+|              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| pretype      | OT_STRING    | \"none\"       | (none|left|r | casadi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| upper_bandwi | OT_INTEGER   | GenericType( | [default:    | casadi::Sund |
-| dthB         |              | )            | equal to upp | ialsInternal |
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | casadi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| print_stats  | OT_BOOLEAN   | false        | Print out    | casadi::Inte |
+|              |              |              | statistics   | gratorIntern |
+|              |              |              | after        | al           |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| quad_err_con | OT_BOOLEAN   | false        | Should the   | casadi::Sund |
+|              |              |              | quadratures  | ialsInternal |
+|              |              |              | affect the   |              |
+|              |              |              | step size    |              |
+|              |              |              | control      |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltol       | OT_REAL      | 0.000        | Relative     | casadi::Sund |
+|              |              |              | tolerence    | ialsInternal |
+|              |              |              | for the IVP  |              |
+|              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | casadi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | casadi::Sund |
+| method       |              | s\"           | s|staggered) | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
+| steps_per_ch | OT_INTEGER   | 20           | Number of    | casadi::Sund |
+| eckpoint     |              |              | steps        | ialsInternal |
+|              |              |              | between two  |              |
+|              |              |              | consecutive  |              |
+|              |              |              | checkpoints  |              |
++--------------+--------------+--------------+--------------+--------------+
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | casadi::Sund |
+|              |              |              | integrator   | ialsInternal |
+|              |              |              | at the end   |              |
+|              |              |              | of the       |              |
+|              |              |              | interval     |              |
++--------------+--------------+--------------+--------------+--------------+
+| t0           | OT_REAL      | 0            | Beginning of | casadi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
++--------------+--------------+--------------+--------------+--------------+
+| tf           | OT_REAL      | 1            | End of the   | casadi::Inte |
+|              |              |              | time horizon | gratorIntern |
+|              |              |              |              | al           |
++--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | casadi::Sund |
+| dth          |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | Jacobian (es |              |
+|              |              |              | timations)   |              |
++--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | casadi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
 |              |              |              | er_bandwidth |              |
 |              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| use_precondi | OT_BOOLEAN   | false        | Precondition | casadi::Sund |
+| tioner       |              |              | an iterative | ialsInternal |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | casadi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-
->List of available monitors
-+-----------+--------------------------+
-|    Id     |         Used in          |
-+===========+==========================+
-| eval_djac | casadi::SundialsInternal |
-+-----------+--------------------------+
-| eval_f    | casadi::SundialsInternal |
-+-----------+--------------------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
 
@@ -94200,7 +100631,7 @@ expressions are identical, i.e. points to the same node.
 
 a = x*x b = x*x
 
-a.isEqual(b,0) will return false, but a.isEqual(b,1) will return true
+a.isEqual(b, 0) will return false, but a.isEqual(b, 1) will return true
 
 ";
 
@@ -95275,8 +101706,31 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -95286,23 +101740,70 @@ Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| just_in_time | OT_BOOLEAN   | false        | compilation  | casadi::SXFu |
-| _sparsity    |              |              | to a CPU or  | nctionIntern |
-|              |              |              | GPU using    | al           |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| just_in_time | OT_BOOLEAN   | false        | Just-in-time | casadi::SXFu |
+| _opencl      |              |              | compilation  | nctionIntern |
+|              |              |              | for numeric  | al           |
+|              |              |              | evaluation   |              |
+|              |              |              | using OpenCL |              |
+|              |              |              | (experimenta |              |
+|              |              |              | l)           |              |
++--------------+--------------+--------------+--------------+--------------+
+| just_in_time | OT_BOOLEAN   | false        | Propagate    | casadi::SXFu |
+| _sparsity    |              |              | sparsity     | nctionIntern |
+|              |              |              | patterns     | al           |
+|              |              |              | using just-  |              |
+|              |              |              | in-time      |              |
+|              |              |              | compilation  |              |
+|              |              |              | to a CPU or  |              |
+|              |              |              | GPU using    |              |
 |              |              |              | OpenCL       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -96432,17 +102933,17 @@ dependent variables
 
 Equations:
 
-explicit or implicit ODE: \\\\dot{x} = ode(t,x,z,u,p_free,pi,pd) or 0 =
-ode(t,x,z,\\\\dot{x},u,p_free,pi,pd) algebraic equations: 0 =
-alg(t,x,z,u,p_free,pi,pd) quadratures:              \\\\dot{q} =
-quad(t,x,z,u,p_free,pi,pd) dependent equations:            y =
-dep(t,x,z,u,p_free,pi,pd) initial equations:              0 =
-initial(t,x,z,u,p_free,pi,pd)
+explicit or implicit ODE: \\\\dot {x} = ode(t, x, z, u, p_free, pi, pd) or
+0 = ode(t, x, z,\\\\dot {x}, u, p_free, pi, pd) algebraic equations:
+0 = alg(t, x, z, u, p_free, pi, pd) quadratures:              \\\\dot {q} =
+quad(t, x, z, u, p_free, pi, pd) dependent equations:            y = dep(t,
+x, z, u, p_free, pi, pd) initial equations:              0 = initial(t, x,
+z, u, p_free, pi, pd)
 
 Objective function terms:
 
-Mayer terms:          \\\\sum{mterm_k} Lagrange terms:
-\\\\sum{\\\\integral{mterm}}
+Mayer terms:          \\\\sum {mterm_k} Lagrange terms:       \\\\sum
+{\\\\integral{mterm}}
 
 Note that when parsed, all dynamic equations end up in the implicit category
 \"dae\". At a later state, the DAE can be reformulated, for example in semi-
@@ -97344,12 +103845,42 @@ numerically singular, the prepare step will fail. Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
+|              |              |              | the          |              |
+|              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
 | codegen      | OT_BOOLEAN   | false        | C-code       | casadi::Symb |
 |              |              |              | generation   | olicQRIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| compiler     | OT_STRING    | \"gcc -fPIC   | Compiler     | casadi::Symb |
+|              |              | -O2\"         | command to   | olicQRIntern |
+|              |              |              | be used for  | al           |
+|              |              |              | compiling    |              |
+|              |              |              | generated    |              |
+|              |              |              | code         |              |
++--------------+--------------+--------------+--------------+--------------+
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -97359,18 +103890,52 @@ numerically singular, the prepare step will fail. Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
+|              |              |              | whether      |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
+|              |              |              | when the     |              |
+|              |              |              | numerical    |              |
+|              |              |              | values of    |              |
+|              |              |              | the inputs   |              |
+|              |              |              | don't make   |              |
+|              |              |              | sense        |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Func |
-| rn           |              | scaleIntern  | scaling on   | tionInternal |
-|              |              |              | QP level.    |              |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 Diagrams
@@ -99753,7 +106318,7 @@ Propagate sparsity.
 ";
 
 %feature("docstring") casadi::Vertsplit "[INTERNAL]  Vertical split of
-vectors, x -> x0, x1,...
+vectors, x -> x0, x1, ...
 
 Joel Andersson
 
@@ -100065,8 +106630,8 @@ the class able to propagate seeds through the algorithm?
 
 interface to WORHP NLP solver
 
-Solves the following parametric nonlinear program (NLP):min          F(x,p)
-x  subject to             LBX <=   x    <= UBX LBG <= G(x,p) <= UBG
+Solves the following parametric nonlinear program (NLP):min          F(x, p)
+x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
 p  == P      nx: number of decision variables     ng: number of constraints
 np: number of parameters
 
@@ -100850,17 +107415,31 @@ np: number of parameters
 | WeakActiveSe | OT_BOOLEAN   | False        | (experimenta | casadi::Worh |
 | t            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| ad_mode      | OT_STRING    | automatic    | How to       | casadi::Worh |
-|              |              |              | calculate    | pInternal    |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
+|              |              |              | calculate    | tionInternal |
 |              |              |              | the          |              |
 |              |              |              | Jacobians.   |              |
+|              |              |              | (forward:    |              |
+|              |              |              | only forward |              |
+|              |              |              | mode|reverse |              |
+|              |              |              | : only       |              |
+|              |              |              | adjoint mode |              |
+|              |              |              | |automatic:  |              |
+|              |              |              | a heuristic  |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| con_numeric_ | OT_DICTIONAR | GenericType( | constraints  | casadi::NLPS |
-| md           | Y            | )            | to be passed | olverInterna |
-|              |              |              | to IPOPT     | l            |
-+--------------+--------------+--------------+--------------+--------------+
-| derivative_g | OT_DERIVATIV | GenericType( | and reverse  | casadi::Func |
-| enerator     | EGENERATOR   | )            | directional  | tionInternal |
+| derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
+| enerator     | EGENERATOR   | )            | that returns | tionInternal |
+|              |              |              | a derivative |              |
+|              |              |              | function     |              |
+|              |              |              | given a      |              |
+|              |              |              | number of    |              |
+|              |              |              | forward and  |              |
+|              |              |              | reverse      |              |
+|              |              |              | directional  |              |
 |              |              |              | derivative,  |              |
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
@@ -100873,45 +107452,60 @@ np: number of parameters
 | eps          | OT_REAL      | 0.000        | Machine      | casadi::Worh |
 |              |              |              | epsilon      | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| eps_unstable | OT_REAL      | 0.000        | A margin for | casadi::Worh |
-|              |              |              | unstability  | pInternal    |
-|              |              |              | detection    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand       | OT_BOOLEAN   | False        | Expand the   | casadi::Worh |
-|              |              |              | NLP function | pInternal    |
-|              |              |              | in terms of  |              |
+| expand       | OT_BOOLEAN   | false        | Expand the   | casadi::NLPS |
+|              |              |              | NLP function | olverInterna |
+|              |              |              | in terms of  | l            |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Deprecated,  | casadi::NLPS |
-|              |              | )            | use \"expand\" | olverInterna |
-|              |              |              | instead.     | l            |
+| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
+|              |              | )            | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX->SX. |              |
+|              |              |              | Deprecated,  |              |
+|              |              |              | use \"expand\" |              |
+|              |              |              | instead.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| gather_stats | OT_BOOLEAN   | False        | Flag to      | casadi::Worh |
-|              |              |              | indicate     | pInternal    |
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
+|              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | None         | Deprecated   | casadi::Worh |
-|              |              |              | option. Use  | pInternal    |
-|              |              |              | Gauss Newton |              |
+| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option. Use  | olverInterna |
+|              |              |              | Gauss Newton | l            |
 |              |              |              | Hessian appr |              |
 |              |              |              | oximation    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | the gradient | casadi::NLPS |
-| dient        |              | )            | of the       | olverInterna |
-|              |              |              | objective.   | l            |
+| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| dient        |              | )            | option.      | olverInterna |
+|              |              |              | Generate a   | l            |
+|              |              |              | function for |              |
+|              |              |              | calculating  |              |
+|              |              |              | the gradient |              |
+|              |              |              | of the       |              |
+|              |              |              | objective.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | None         | Deprecated   | casadi::Worh |
-| sian         |              |              | option.      | pInternal    |
-|              |              |              | Generate an  |              |
+| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| sian         |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
 |              |              |              | exact        |              |
 |              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
@@ -100919,9 +107513,9 @@ np: number of parameters
 |              |              |              | if not       |              |
 |              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | None         | Deprecated   | casadi::Worh |
-| obian        |              |              | option.      | pInternal    |
-|              |              |              | Generate an  |              |
+| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+| obian        |              | )            | option.      | olverInterna |
+|              |              |              | Generate an  | l            |
 |              |              |              | exact        |              |
 |              |              |              | Jacobian of  |              |
 |              |              |              | the          |              |
@@ -100929,42 +107523,42 @@ np: number of parameters
 |              |              |              | if not       |              |
 |              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| grad_f       | OT_Function  | None         | Function for | casadi::Worh |
-|              |              |              | calculating  | pInternal    |
-|              |              |              | the gradient |              |
+| grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
 |              |              |              | of the       |              |
 |              |              |              | objective    |              |
 |              |              |              | (column, aut |              |
 |              |              |              | ogenerated   |              |
 |              |              |              | by default)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| grad_lag     | OT_Function  | None         | Function for | casadi::Worh |
-|              |              |              | calculating  | pInternal    |
-|              |              |              | the gradient |              |
+| grad_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the gradient | l            |
 |              |              |              | of the       |              |
 |              |              |              | Lagrangian ( |              |
 |              |              |              | autogenerate |              |
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hess_lag     | OT_Function  | None         | Function for | casadi::Worh |
-|              |              |              | calculating  | pInternal    |
-|              |              |              | the Hessian  |              |
+| hess_lag     | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Hessian  | l            |
 |              |              |              | of the       |              |
 |              |              |              | Lagrangian ( |              |
 |              |              |              | autogenerate |              |
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | False        | If set to    | casadi::Worh |
-| _vec         |              |              | true, the    | pInternal    |
-|              |              |              | input shape  |              |
+| ignore_check | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
 |              |              |              | of F will    |              |
 |              |              |              | not be       |              |
 |              |              |              | checked.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| inputs_check | OT_BOOLEAN   | True         | Throw        | casadi::Worh |
-|              |              |              | exceptions   | pInternal    |
+| inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+|              |              |              | exceptions   | tionInternal |
 |              |              |              | when the     |              |
 |              |              |              | numerical    |              |
 |              |              |              | values of    |              |
@@ -100978,26 +107572,34 @@ np: number of parameters
 |              |              |              | Internal use |              |
 |              |              |              | only.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_CALLBACK  | GenericType( | Check docume | casadi::NLPS |
-| llback       |              | )            | ntation of   | olverInterna |
-|              |              |              | Callback .   | l            |
+| iteration_ca | OT_CALLBACK  | GenericType( | A function   | casadi::NLPS |
+| llback       |              | )            | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration    |              |
+|              |              |              | with the     |              |
+|              |              |              | solver as    |              |
+|              |              |              | input. Check |              |
+|              |              |              | documentatio |              |
+|              |              |              | n of         |              |
+|              |              |              | Callback .   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_BOOLEAN   | False        | If set to    | casadi::Worh |
-| llback_ignor |              |              | true, errors | pInternal    |
-| e_errors     |              |              | thrown by it |              |
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | casadi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
 |              |              |              | eration_call |              |
 |              |              |              | back will be |              |
 |              |              |              | ignored.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::Worh |
-| llback_step  |              |              | the callback | pInternal    |
-|              |              |              | function     |              |
+| iteration_ca | OT_INTEGER   | 1            | Only call    | casadi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_f        | OT_Function  | None         | Function for | casadi::Worh |
-|              |              |              | calculating  | pInternal    |
-|              |              |              | the jacobian |              |
+| jac_f        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the jacobian | l            |
 |              |              |              | of the       |              |
 |              |              |              | objective    |              |
 |              |              |              | (sparse row, |              |
@@ -101005,27 +107607,39 @@ np: number of parameters
 |              |              |              | d by         |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_g        | OT_Function  | None         | Function for | casadi::Worh |
-|              |              |              | calculating  | pInternal    |
-|              |              |              | the Jacobian |              |
+| jac_g        | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
+|              |              | )            | calculating  | olverInterna |
+|              |              |              | the Jacobian | l            |
 |              |              |              | of the       |              |
 |              |              |              | constraints  |              |
 |              |              |              | (autogenerat |              |
 |              |              |              | ed by        |              |
 |              |              |              | default)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | None         | Monitors to  | casadi::Worh |
-|              | TOR          |              | be activated | pInternal    |
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
+|              | TOR          | )            | be activated | tionInternal |
+|              |              |              | (inputs|outp | casadi::Worh |
+|              |              |              | uts)         | pInternal    |
 |              |              |              | Monitor      |              |
-|              |              |              | functions    |              |
+|              |              |              | functions (e |              |
+|              |              |              | val_f|eval_g |              |
+|              |              |              | |eval_jac_g| |              |
+|              |              |              | eval_grad_f| |              |
+|              |              |              | eval_h)      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | input        | casadi::NLPS |
-|              |              | )            | argument     | olverInterna |
-|              |              |              | appended at  | l            |
+| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
+|              |              | )            | option.      | olverInterna |
+|              |              |              | Expect F, G, | l            |
+|              |              |              | H, J to have |              |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
 |              |              |              | the end,     |              |
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
@@ -101219,8 +107833,8 @@ np: number of parameters
 |              |              |              | solver       |              |
 |              |              |              | output.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| qp_scaleInte | OT_BOOLEAN   | worhp_p_.qp. | Enable       | casadi::Worh |
-| rn           |              | scaleIntern  | scaling on   | pInternal    |
+| qp_scaleInte | OT_BOOLEAN   | False        | Enable       | casadi::Worh |
+| rn           |              |              | scaling on   | pInternal    |
 |              |              |              | QP level.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | qp_strict    | OT_BOOLEAN   | True         | Use strict   | casadi::Worh |
@@ -101228,29 +107842,53 @@ np: number of parameters
 |              |              |              | criteria in  |              |
 |              |              |              | IP method.   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| regularity_c | OT_BOOLEAN   | True         | Throw        | casadi::Worh |
-| heck         |              |              | exceptions   | pInternal    |
+| regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
+| heck         |              |              | exceptions   | tionInternal |
 |              |              |              | when NaN or  |              |
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | the function | casadi::Func |
-|              |              | )            | or pass      | tionInternal |
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
+|              |              | )            | defined      | tionInternal |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | False        | Verbose      | casadi::Worh |
-|              |              |              | evaluation   | pInternal    |
+| verbose      | OT_BOOLEAN   | false        | Verbose      | casadi::Func |
+|              |              |              | evaluation   | tionInternal |
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warn_initial | OT_BOOLEAN   | False        | Warn if the  | casadi::Worh |
-| _bounds      |              |              | initial      | pInternal    |
-|              |              |              | guess does   |              |
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | casadi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
 |              |              |              | not satisfy  |              |
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+--------------------------+
+|     Id      |         Used in          |
++=============+==========================+
+| eval_f      | casadi::WorhpInternal    |
++-------------+--------------------------+
+| eval_g      | casadi::WorhpInternal    |
++-------------+--------------------------+
+| eval_grad_f | casadi::WorhpInternal    |
++-------------+--------------------------+
+| eval_h      | casadi::WorhpInternal    |
++-------------+--------------------------+
+| eval_jac_g  | casadi::WorhpInternal    |
++-------------+--------------------------+
+| inputs      | casadi::FunctionInternal |
++-------------+--------------------------+
+| outputs     | casadi::FunctionInternal |
++-------------+--------------------------+
 
 >List of available stats
 +--------------------+-----------------------+
@@ -102894,7 +109532,7 @@ Get typename.
 
 %feature("docstring") casadi::complement "
 
-Returns the list of all i in [0,size[ not found in supplied list.
+Returns the list of all i in [0, size[ not found in supplied list.
 
 The supplied vector may contain duplicates and may be non-monotonous The
 supplied vector will be checked for bounds The result vector is guaranteed
@@ -102922,7 +109560,7 @@ Parameters:
 output_offset:  List of all start rows for each group the last row group
 will run to the end.
 
-vertcat(vertsplit(x,...)) = x
+vertcat(vertsplit(x, ...)) = x
 
 >  std::vector< MX > casadi::vertsplit(const MX &x, int incr=1)
 
@@ -102936,7 +109574,7 @@ Parameters:
 
 incr:  Size of each group of rows
 
-vertcat(vertsplit(x,...)) = x
+vertcat(vertsplit(x, ...)) = x
 
 ";
 
@@ -102952,7 +109590,7 @@ vertcat(vertsplit(x,...)) = x
 
 Construct a matrix from a list of list of blocks.
 
-blockcat(blocksplit(x,...,...)) = x
+blockcat(blocksplit(x,..., ...)) = x
 
 >  MX casadi::blockcat(const MX &A, const MX &B, const MX &C, const MX &D)
 ------------------------------------------------------------------------
@@ -103006,24 +109644,6 @@ CasADi additions.
 %feature("docstring") casadi::dense_mul_tn "[INTERNAL] ";
 
 %feature("docstring") casadi::dlaqge_ "[INTERNAL]  Equilibrate the system.
-
-";
-
-%feature("docstring") casadi::jacGIn "
-
->  JacGInputIOSchemeVector<M> casadi::jacGIn(const std::string &arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M())
-------------------------------------------------------------------------
-
-Input arguments of an NLP Jacobian function
-
->Input scheme: casadi::JacGInput (JACG_NUM_IN = 3) [jacGIn]
-+-----------+-------+---------------------+
-| Full name | Short |     Description     |
-+===========+=======+=====================+
-| JACG_X    | x     | Decision variable . |
-+-----------+-------+---------------------+
-| JACG_P    | p     | Fixed parameter .   |
-+-----------+-------+---------------------+
 
 ";
 
@@ -103280,7 +109900,28 @@ Parameters:
 
 stop:
 
-list [0,1,2...stop-1]
+list [0, 1, 2...stop-1]
+
+";
+
+%feature("docstring") casadi::collocationInterpolators "[INTERNAL]  Obtain
+collocation interpolating matrices.
+
+Parameters:
+-----------
+
+tau_root:  location of collocation points, as obtained from
+collocationPoints
+
+C:  interpolating coefficients to obtain derivatives Length: order+1, order
++ 1
+
+dX/dt (j) ~ Sum_i C[j][i]*X(i)
+
+Parameters:
+-----------
+
+D:  interpolating coefficients to obtain end state Length: order+1
 
 ";
 
@@ -103308,50 +109949,21 @@ Pre-C99 elementary functions from the 'math.h' ('cmath') header.
 
 ";
 
-%feature("docstring") casadi::implicitRK "
+%feature("docstring") casadi::jacGIn "
 
-Construct an implicit Runge-Kutta integrator.
+>  JacGInputIOSchemeVector<M> casadi::jacGIn(const std::string &arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M())
+------------------------------------------------------------------------
 
-Parameters:
------------
+Input arguments of an NLP Jacobian function
 
-f:  dynamical system
-
->Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
-+-----------+-------+----------------------------+
-| Full name | Short |        Description         |
-+===========+=======+============================+
-| DAE_X     | x     | Differential state .       |
-+-----------+-------+----------------------------+
-| DAE_Z     | z     | Algebraic state .          |
-+-----------+-------+----------------------------+
-| DAE_P     | p     | Parameter .                |
-+-----------+-------+----------------------------+
-| DAE_T     | t     | Explicit time dependence . |
-+-----------+-------+----------------------------+
-
->Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
-+-----------+-------+--------------------------------------------+
-| Full name | Short |                Description                 |
-+===========+=======+============================================+
-| DAE_ODE   | ode   | Right hand side of the implicit ODE .      |
-+-----------+-------+--------------------------------------------+
-| DAE_ALG   | alg   | Right hand side of algebraic equations .   |
-+-----------+-------+--------------------------------------------+
-| DAE_QUAD  | quad  | Right hand side of quadratures equations . |
-+-----------+-------+--------------------------------------------+
-
-Parameters:
------------
-
-tf:  Integration end time
-
-order:  Order of integration
-
-scheme:  Collocation scheme, as excepted by collocationPoints function.
-
-ne:  Number of times the RK primitive is repeated over the integration
-interval
+>Input scheme: casadi::JacGInput (JACG_NUM_IN = 3) [jacGIn]
++-----------+-------+---------------------+
+| Full name | Short |     Description     |
++===========+=======+=====================+
+| JACG_X    | x     | Decision variable . |
++-----------+-------+---------------------+
+| JACG_P    | p     | Fixed parameter .   |
++-----------+-------+---------------------+
 
 ";
 
@@ -103419,7 +110031,7 @@ chop up into blocks
 vert_offset Defines the boundaries of the block cols horz_offset Defines the
 boundaries of the block rows
 
-blockcat(blocksplit(x,...,...)) = x
+blockcat(blocksplit(x,..., ...)) = x
 
 >  std::vector< std::vector< MX > > casadi::blocksplit(const MX &x, int vert_incr=1, int horz_incr=1)
 ------------------------------------------------------------------------
@@ -103429,7 +110041,7 @@ chop up into blocks
 vert_incr Defines the increment for block boundaries in col dimension
 horz_incr Defines the increment for block boundaries in row dimension
 
-blockcat(blocksplit(x,...,...)) = x
+blockcat(blocksplit(x,..., ...)) = x
 
 >  std::vector< std::vector< Matrix< DataType > > > casadi::blocksplit(const Matrix< DataType > &x, const std::vector< int > &vert_offset, const std::vector< int > &horz_offset)
 ------------------------------------------------------------------------
@@ -103439,7 +110051,7 @@ chop up into blocks
 vert_offset Defines the boundaries of the block rows horz_offset Defines the
 boundaries of the block columns
 
-blockcat(blocksplit(x,...,...)) = x
+blockcat(blocksplit(x,..., ...)) = x
 
 >  std::vector< std::vector< Matrix< DataType > > > casadi::blocksplit(const Matrix< DataType > &x, int vert_incr=1, int horz_incr=1)
 ------------------------------------------------------------------------
@@ -103449,14 +110061,14 @@ chop up into blocks
 vert_incr Defines the increment for block boundaries in row dimension
 horz_incr Defines the increment for block boundaries in column dimension
 
-blockcat(blocksplit(x,...,...)) = x
+blockcat(blocksplit(x,..., ...)) = x
 
 ";
 
 %feature("docstring") casadi::jacobianTimesVector "
 
 Calculate the Jacobian and multiply by a vector from the left This is
-equivalent to mul(jacobian(ex,arg),v) or mul(jacobian(ex,arg).T,v) for
+equivalent to mul(jacobian(ex, arg), v) or mul(jacobian(ex, arg).T, v) for
 transpose_jacobian set to false and true respectively. If contrast to these
 expressions, it will use directional derivatives which is typically (but not
 necessarily) more efficient if the complete Jacobian is not needed and v has
@@ -103563,8 +110175,8 @@ integer.
 
 ramp function
 
-\\\\[ \\\\begin{cases} R(x) = 0 & x <= 1 \\\\\\\\ R(x) = x & x > 1 \\\\\\\\
-\\\\end{cases} \\\\]
+\\\\[ \\\\begin {cases} R(x) = 0 & x <= 1 \\\\\\\\ R(x) = x & x > 1 \\\\\\\\
+\\\\end {cases} \\\\]
 
 Also called: slope function
 
@@ -103583,7 +110195,7 @@ Parameters:
 output_offset:  List of all start cols for each group the last col group
 will run to the end.
 
-horzcat(horzsplit(x,...)) = x
+horzcat(horzsplit(x, ...)) = x
 
 >  SX casadi::tangent(const SX &ex, const SX &arg)
 ------------------------------------------------------------------------
@@ -103782,8 +110394,8 @@ Input arguments of a SDQP problem
 
 triangle function
 
-\\\\[ \\\\begin{cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x) =
-1-|x| & |x| < 1 \\\\end{cases} \\\\]
+\\\\[ \\\\begin {cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x)
+= 1-|x| & |x| < 1 \\\\end {cases} \\\\]
 
 ";
 
@@ -103931,7 +110543,7 @@ constraints: from cfcn.input(0).size()
 
 %feature("docstring") casadi::addMultiple "
 
-same as: res += mul(A,v)
+same as: res += mul(A, v)
 
 ";
 
@@ -103969,44 +110581,13 @@ concatenate vertically while vectorizing all arguments with vecNZ
 
 ";
 
-%feature("docstring") casadi::casadi_dot "[INTERNAL]  DOT: inner_prod(x,y)
+%feature("docstring") casadi::casadi_dot "[INTERNAL]  DOT: inner_prod(x, y)
 -> return.
 
 ";
 
-%feature("docstring") casadi::isMonotone "
-
-Check if the vector is monotone.
-
-";
-
-%feature("docstring") casadi::mtaylor "
-
->  SX casadi::mtaylor(const SX &ex, const SX &x, const SX &a, int order=1)
-------------------------------------------------------------------------
-
-multivariate Taylor series expansion
-
-Do Taylor expansions until the aggregated order of a term is equal to
-'order'. The aggregated order of $x^n y^m$ equals $n+m$.
-
->  SX casadi::mtaylor(const SX &ex, const SX &x, const SX &a, int order, const std::vector< int > &order_contributions)
-------------------------------------------------------------------------
-
-multivariate Taylor series expansion
-
-Do Taylor expansions until the aggregated order of a term is equal to
-'order'. The aggregated order of $x^n y^m$ equals $n+m$.
-
-The argument order_contributions can denote how match each variable
-contributes to the aggregated order. If x=[x,y] and
-order_contributions=[1,2], then the aggregated order of $x^n y^m$ equals
-$1n+2m$.
-
-Example usage
-
-$ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
-x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
+%feature("docstring") casadi::dormqr_ "[INTERNAL]  Multiply right hand side
+with Q-transpose (lapack)
 
 ";
 
@@ -104127,8 +110708,32 @@ Duplicates are treated by looking up last occurrence
 %feature("docstring") casadi::ProfilingType< ProfilingData_IO > " [INTERNAL]
 ";
 
-%feature("docstring") casadi::dormqr_ "[INTERNAL]  Multiply right hand side
-with Q-transpose (lapack)
+%feature("docstring") casadi::mtaylor "
+
+>  SX casadi::mtaylor(const SX &ex, const SX &x, const SX &a, int order=1)
+------------------------------------------------------------------------
+
+multivariate Taylor series expansion
+
+Do Taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+>  SX casadi::mtaylor(const SX &ex, const SX &x, const SX &a, int order, const std::vector< int > &order_contributions)
+------------------------------------------------------------------------
+
+multivariate Taylor series expansion
+
+Do Taylor expansions until the aggregated order of a term is equal to
+'order'. The aggregated order of $x^n y^m$ equals $n+m$.
+
+The argument order_contributions can denote how match each variable
+contributes to the aggregated order. If x=[x, y] and order_contributions=[1,
+2], then the aggregated order of $x^n y^m$ equals $1n+2m$.
+
+Example usage
+
+$ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
+x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $
 
 ";
 
@@ -104219,7 +110824,7 @@ concatenate vertically, two matrices
 
 concatenate vertically
 
-horzcat(horzsplit(x,...)) = x
+horzcat(horzsplit(x, ...)) = x
 
 >  Matrix< DataType > casadi::horzcat(const std::vector< Matrix< DataType > > &v)
 ------------------------------------------------------------------------
@@ -104227,7 +110832,7 @@ horzcat(horzsplit(x,...)) = x
 Concatenate a list of matrices vertically Alternative terminology: vertical
 stack, vstack, vertical append, [a;b].
 
-horzcat(horzsplit(x,...)) = x
+horzcat(horzsplit(x, ...)) = x
 
 >  Matrix< DataType > casadi::horzcat(const Matrix< DataType > &x, const Matrix< DataType > &y)
 ------------------------------------------------------------------------
@@ -104332,8 +110937,8 @@ Output arguments of an NLP Hessian function
 
 Heaviside function.
 
-\\\\[ \\\\begin{cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
-H(x) = 1 & x>0 \\\\\\\\ \\\\end{cases} \\\\]
+\\\\[ \\\\begin {cases} H(x) = 0 & x<0 \\\\\\\\ H(x) = 1/2 & x=0 \\\\\\\\
+H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 
 ";
 
@@ -104452,7 +111057,7 @@ Return a col-wise summation of elements.
 
 Kronecker tensor product.
 
-Creates a block matrix in which each element (i,j) is a_ij*b
+Creates a block matrix in which each element (i, j) is a_ij*b
 
 ";
 
@@ -104514,14 +111119,6 @@ terms.
 %feature("docstring") casadi::hessian "
 
 Integrate f from a to b using Gaussian quadrature with n points.
-
-";
-
-%feature("docstring") casadi::qr "[INTERNAL]  QR factorization using the
-modified Gram-Schmidt algorithm More stable than the classical Gram-Schmidt,
-but may break down if the rows of A are nearly linearly dependent See J.
-Demmel: Applied Numerical Linear Algebra (algorithm 3.1.). Note that in
-SWIG, Q and R are returned by value.
 
 ";
 
@@ -104598,8 +111195,11 @@ convert vectors to vectors of pointers.
 
 ";
 
-%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
-system (lapack)
+%feature("docstring") casadi::qr "[INTERNAL]  QR factorization using the
+modified Gram-Schmidt algorithm More stable than the classical Gram-Schmidt,
+but may break down if the rows of A are nearly linearly dependent See J.
+Demmel: Applied Numerical Linear Algebra (algorithm 3.1.). Note that in
+SWIG, Q and R are returned by value.
 
 ";
 
@@ -104622,7 +111222,7 @@ Parameters:
 output_offset:  List of all start cols for each group the last col group
 will run to the end.
 
-horzcat(horzsplit(x,...)) = x
+horzcat(horzsplit(x, ...)) = x
 
 >  SX casadi::gradient(const SX &ex, const SX &arg)
 ------------------------------------------------------------------------
@@ -104838,24 +111438,9 @@ nonzero and 0 otherwise.
 
 %feature("docstring") casadi::adj "";
 
-%feature("docstring") casadi::collocationInterpolators "[INTERNAL]  Obtain
-collocation interpolating matrices.
+%feature("docstring") casadi::isMonotone "
 
-Parameters:
------------
-
-tau_root:  location of collocation points, as obtained from
-collocationPoints
-
-C:  interpolating coefficients to obtain derivatives Length: order+1, order
-+ 1
-
-dX/dt (j) ~ Sum_i C[j][i]*X(i)
-
-Parameters:
------------
-
-D:  interpolating coefficients to obtain end state Length: order+1
+Check if the vector is monotone.
 
 ";
 
@@ -104975,8 +111560,8 @@ parts (loops) of your code, always use SXFunction.
 
 rectangle function
 
-\\\\[ \\\\begin{cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
-|x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end{cases} \\\\]
+\\\\[ \\\\begin {cases} \\\\Pi(x) = 1 & |x| < 1/2 \\\\\\\\ \\\\Pi(x) = 1/2 &
+|x| = 1/2 \\\\\\\\ \\\\Pi(x) = 0 & |x| > 1/2 \\\\\\\\ \\\\end {cases} \\\\]
 
 Also called: gate function, block function, band function, pulse function,
 window function
@@ -105045,16 +111630,16 @@ functions from the 'math.h' ('cmath') header.
 
 Computes the Moore-Penrose pseudo-inverse.
 
-If the matrix A is fat (size1>size2), mul(A,pinv(A)) is unity. If the matrix
-A is slender (size2<size1), mul(pinv(A),A) is unity.
+If the matrix A is fat (size1>size2), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
 
 >  Matrix< DataType > casadi::pinv(const Matrix< DataType > &A)
 ------------------------------------------------------------------------
 
 Computes the Moore-Penrose pseudo-inverse.
 
-If the matrix A is fat (size2>size1), mul(A,pinv(A)) is unity. If the matrix
-A is slender (size1<size2), mul(pinv(A),A) is unity.
+If the matrix A is fat (size2>size1), mul(A, pinv(A)) is unity. If the
+matrix A is slender (size1<size2), mul(pinv(A), A) is unity.
 
 ";
 
@@ -105371,7 +111956,7 @@ Parameters:
 output_offset:  List of all start cols for each group the last col group
 will run to the end.
 
-horzcat(horzsplit(x,...)) = x
+horzcat(horzsplit(x, ...)) = x
 
 >  std::vector< MX > casadi::horzsplit(const MX &x, int incr=1)
 
@@ -105385,7 +111970,7 @@ Parameters:
 
 incr:  Size of each group of cols
 
-horzcat(horzsplit(x,...)) = x
+horzcat(horzsplit(x, ...)) = x
 
 >  std::vector< Matrix< DataType > > casadi::horzsplit(const Matrix< DataType > &v, const std::vector< int > &offset)
 ------------------------------------------------------------------------
@@ -105398,7 +111983,7 @@ Parameters:
 offset:  List of all start cols for each group the last col group will run
 to the end.
 
-horzcat(horzsplit(x,...)) = x
+horzcat(horzsplit(x, ...)) = x
 
 ";
 
@@ -105429,7 +112014,8 @@ univariate Taylor series expansion
 Calculate the Taylor expansion of expression 'ex' up to order 'order' with
 respect to variable 'x' around the point 'a'
 
-$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
+$(x)=f(a)+f'(a)(x-a)+f''(a)\\\\frac
+{(x-a)^2}{2!}+f'''(a)\\\\frac{(x-a)^3}{3!}+\\\\ldots$
 
 Example usage:>>   x
 
@@ -105592,7 +112178,7 @@ Vectorize the pattern.
 >  MX casadi::vec(const MX &x)
 ------------------------------------------------------------------------
 
-Returns a vectorized version of the MX Same as reshape(x, x.numel(),1)
+Returns a vectorized version of the MX Same as reshape(x, x.numel(), 1)
 
 a c b d
 
@@ -105604,8 +112190,8 @@ a b c d
 ------------------------------------------------------------------------
 
 make a vector Reshapes/vectorizes the Matrix<DataType> such that the shape
-becomes (expr.numel(),1). Columns are stacked on top of each other. Same as
-reshape(expr, expr.numel(),1)
+becomes (expr.numel(), 1). Columns are stacked on top of each other. Same as
+reshape(expr, expr.numel(), 1)
 
 a c b d  turns into
 
@@ -105772,7 +112358,7 @@ concatenate horizontally, two matrices
 
 concatenate horizontally
 
-vertcat(vertsplit(x,...)) = x
+vertcat(vertsplit(x, ...)) = x
 
 >  Matrix< DataType > casadi::vertcat(const std::vector< Matrix< DataType > > &v)
 ------------------------------------------------------------------------
@@ -105780,7 +112366,7 @@ vertcat(vertsplit(x,...)) = x
 Concatenate a list of matrices horizontally Alternative terminology:
 horizontal stack, hstack, horizontal append, [a b].
 
-vertcat(vertsplit(x,...)) = x
+vertcat(vertsplit(x, ...)) = x
 
 >  Matrix< DataType > casadi::vertcat(const Matrix< DataType > &x, const Matrix< DataType > &y)
 ------------------------------------------------------------------------
@@ -105924,6 +112510,11 @@ Matlab's linspace.
 
 ";
 
+%feature("docstring") casadi::dtrsm_ "[INTERNAL]   Solve upper triangular
+system (lapack)
+
+";
+
 %feature("docstring") casadi::qpStruct "
 
 >  QPStructIOSchemeVector<M> casadi::qpStruct(const std::string &arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M())
@@ -105942,18 +112533,17 @@ create a clipped view into a matrix Create a sparse matrix from a dense
 matrix A, with sparsity pattern sp
 
 MX clip(const MX& A, const Sparsity& sp) { Join the sparsity patterns
-std::vector<int> mapping; Sparsity sp =
-A.sparsity().patternIntersection(sp,mapping);
+std::vector<int> mapping; Sparsity sp = A.sparsity().patternIntersection(sp,
+mapping);
 
-Split up the mapping std::vector<int> nzA,nzB;
+Split up the mapping std::vector<int> nzA, nzB;
 
-Copy sparsity for(int k=0; k<mapping.size(); ++k){ if(mapping[k]<0){
-nzA.push_back(k); } else if(mapping[k]>0){ nzB.push_back(k); } else { throw
-CasadiException(\"Pattern intersection not empty\"); } }
+Copy sparsity for (int k=0; k<mapping.size(); ++k) { if (mapping[k]<0) {
+nzA.push_back(k); } else if (mapping[k]>0) { nzB.push_back(k); } else {
+throw CasadiException(\"Pattern intersection not empty\"); } }
 
-Create mapping MX ret; ret.assignNode(new Mapping(sp));
-ret->assign(A,range(nzA.size()),nzA); ret->assign(B,range(nzB.size()),nzB);
-return ret;
+Create mapping MX ret; ret.assignNode(new Mapping(sp)); ret->assign(A,
+range(nzA.size()), nzA); ret->assign(B, range(nzB.size()), nzB); return ret;
 
 }
 
@@ -106163,6 +112753,53 @@ Output arguments of an NLP function
 
 %feature("docstring") casadi::isnan "[INTERNAL]  throw () C99 elementary
 functions from the 'math.h' header.
+
+";
+
+%feature("docstring") casadi::implicitRK "
+
+Construct an implicit Runge-Kutta integrator.
+
+Parameters:
+-----------
+
+f:  dynamical system
+
+>Input scheme: casadi::DAEInput (DAE_NUM_IN = 5) [daeIn]
++-----------+-------+----------------------------+
+| Full name | Short |        Description         |
++===========+=======+============================+
+| DAE_X     | x     | Differential state .       |
++-----------+-------+----------------------------+
+| DAE_Z     | z     | Algebraic state .          |
++-----------+-------+----------------------------+
+| DAE_P     | p     | Parameter .                |
++-----------+-------+----------------------------+
+| DAE_T     | t     | Explicit time dependence . |
++-----------+-------+----------------------------+
+
+>Output scheme: casadi::DAEOutput (DAE_NUM_OUT = 4) [daeOut]
++-----------+-------+--------------------------------------------+
+| Full name | Short |                Description                 |
++===========+=======+============================================+
+| DAE_ODE   | ode   | Right hand side of the implicit ODE .      |
++-----------+-------+--------------------------------------------+
+| DAE_ALG   | alg   | Right hand side of algebraic equations .   |
++-----------+-------+--------------------------------------------+
+| DAE_QUAD  | quad  | Right hand side of quadratures equations . |
++-----------+-------+--------------------------------------------+
+
+Parameters:
+-----------
+
+tf:  Integration end time
+
+order:  Order of integration
+
+scheme:  Collocation scheme, as excepted by collocationPoints function.
+
+ne:  Number of times the RK primitive is repeated over the integration
+interval
 
 ";
 
@@ -106412,7 +113049,7 @@ number of other expressions piggyback (vector version)
 // File: assertion_8cpp.xml
 
 
-// File: casadi_2symbolic_2mx_2assertion_8hpp.xml
+// File: casadi_2core_2mx_2assertion_8hpp.xml
 
 
 // File: docs_2api_2examples_2misc_2assertion_8hpp.xml
@@ -106466,7 +113103,10 @@ number of other expressions piggyback (vector version)
 // File: casadi__math_8hpp.xml
 
 
-// File: casadi__meta_8cpp.xml
+// File: core_2casadi__meta_8cpp.xml
+
+
+// File: symbolic_2casadi__meta_8cpp.xml
 
 
 // File: casadi__meta_8hpp.xml
@@ -107149,7 +113789,7 @@ This file does absolutely nothing but including all headers ";
 // File: parallelizer_8cpp.xml
 
 
-// File: casadi_2symbolic_2function_2parallelizer_8hpp.xml
+// File: casadi_2core_2function_2parallelizer_8hpp.xml
 
 
 // File: docs_2api_2examples_2Function_2parallelizer_8hpp.xml
@@ -107416,7 +114056,7 @@ This file does absolutely nothing but including all headers ";
 // File: simulator_8cpp.xml
 
 
-// File: casadi_2symbolic_2function_2simulator_8hpp.xml
+// File: casadi_2core_2function_2simulator_8hpp.xml
 
 
 // File: docs_2api_2examples_2integrators_2simulator_8hpp.xml
@@ -107796,9 +114436,6 @@ This file does absolutely nothing but including all headers ";
 // File: group__DPLE__doc.xml
 
 
-// File: group__IdasIntegrator__doc.xml
-
-
 // File: group__HomotopyNLPSolver__doc.xml
 
 
@@ -107857,6 +114494,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: group__expression__tools.xml
+
+
+// File: group__IdasIntegrator__doc.xml
 
 
 // File: group__scheme__IntegratorOutput.xml
@@ -108009,6 +114649,9 @@ This file does absolutely nothing but including all headers ";
 // File: dir_3ae11b6e1cd218aed6bbf0b97d0cf4d1.xml
 
 
+// File: dir_84ec18459fb5686aa61a50c9a4a5f1ce.xml
+
+
 // File: dir_165538d1629d63b540b717a0a8f8d17c.xml
 
 
@@ -108030,7 +114673,7 @@ This file does absolutely nothing but including all headers ";
 // File: dir_97f17b870f201e193796f88aa8b24ee7.xml
 
 
-// File: dir_6e3d614fa64b802750fbd65459f15a64.xml
+// File: dir_b0fbc30274a97f995867282301b5a22c.xml
 
 
 // File: dir_2fcc9b76d63d907023752974d9503363.xml
@@ -108051,7 +114694,7 @@ This file does absolutely nothing but including all headers ";
 // File: dir_d560fb3fdf7c7d0fd11fcef22350e515.xml
 
 
-// File: dir_94468a9e86a61fac66a6ce6d282beb7e.xml
+// File: dir_2d4c4b22cf4ab2426dc22dcaf8e55868.xml
 
 
 // File: dir_2ad7570a4726f50d9009d41ebbe56c46.xml
@@ -108063,7 +114706,7 @@ This file does absolutely nothing but including all headers ";
 // File: dir_62b1d21e3c79c65cf07537ce621f8931.xml
 
 
-// File: dir_5747921307c9ef9a6022c01a3e0aee8d.xml
+// File: dir_35c4f5a62eb3f9b26d6fc9bafe9412e0.xml
 
 
 // File: dir_dee56dc1f1f085e33b8d83efe818a164.xml
@@ -108078,7 +114721,7 @@ This file does absolutely nothing but including all headers ";
 // File: dir_0e38855d9854873885416e0db777a031.xml
 
 
-// File: dir_ae1002fbeec105b10c49654865022e65.xml
+// File: dir_c7851ef3eb1eedcf1931ca03c2b2de61.xml
 
 
 // File: dir_4c54b8644cdb97524ad2593db88f43f8.xml
@@ -108099,7 +114742,7 @@ This file does absolutely nothing but including all headers ";
 // File: dir_4d46dafef57ae63a601f2959a12876ee.xml
 
 
-// File: dir_533f3073d471754d54dc885a5ddf63ae.xml
+// File: dir_32807da43d094e5518f780a9c1b04df2.xml
 
 
 // File: dir_6c79c789c79fca814583aab1f7f5a2d6.xml

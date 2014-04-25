@@ -108,13 +108,12 @@
 <tr><td>RDAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
 </table>
 */
-/** \defgroup scheme_DAEOutput
+/** \defgroup scheme_NLPOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::DAEOutput  (DAE_NUM_OUT = 4) [daeOut]</caption>
+<caption>Output scheme: casadi::NLPOutput  (NL_NUM_OUT = 3) [nlpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DAE_ODE</td><td>ode</td><td>Right hand side of the implicit ODE .</td></tr>
-<tr><td>DAE_ALG</td><td>alg</td><td>Right hand side of algebraic equations .</td></tr>
-<tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations .</td></tr>
+<tr><td>NL_F</td><td>f</td><td>Objective function .</td></tr>
+<tr><td>NL_G</td><td>g</td><td>Constraint function .</td></tr>
 </table>
 */
 /** \defgroup scheme_DPLEInput
@@ -152,20 +151,23 @@
 <tr><td>NLP_SOLVER_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_NLPInput
+/** \defgroup scheme_DAEInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::NLPInput  (NL_NUM_IN = 3) [nlpIn]</caption>
+<caption>Input scheme: casadi::DAEInput  (DAE_NUM_IN = 5) [daeIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NL_X</td><td>x</td><td>Decision variable .</td></tr>
-<tr><td>NL_P</td><td>p</td><td>Fixed parameter .</td></tr>
+<tr><td>DAE_X</td><td>x</td><td>Differential state .</td></tr>
+<tr><td>DAE_Z</td><td>z</td><td>Algebraic state .</td></tr>
+<tr><td>DAE_P</td><td>p</td><td>Parameter .</td></tr>
+<tr><td>DAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
 </table>
 */
-/** \defgroup scheme_NLPOutput
+/** \defgroup scheme_DAEOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::NLPOutput  (NL_NUM_OUT = 3) [nlpOut]</caption>
+<caption>Output scheme: casadi::DAEOutput  (DAE_NUM_OUT = 4) [daeOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NL_F</td><td>f</td><td>Objective function .</td></tr>
-<tr><td>NL_G</td><td>g</td><td>Constraint function .</td></tr>
+<tr><td>DAE_ODE</td><td>ode</td><td>Right hand side of the implicit ODE .</td></tr>
+<tr><td>DAE_ALG</td><td>alg</td><td>Right hand side of algebraic equations .</td></tr>
+<tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations .</td></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
@@ -292,14 +294,12 @@
 <tr><td>CONTROL_DAE_TF</td><td>tf</td><td>Time at end of control interval (1-by-1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_DAEInput
+/** \defgroup scheme_NLPInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::DAEInput  (DAE_NUM_IN = 5) [daeIn]</caption>
+<caption>Input scheme: casadi::NLPInput  (NL_NUM_IN = 3) [nlpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DAE_X</td><td>x</td><td>Differential state .</td></tr>
-<tr><td>DAE_Z</td><td>z</td><td>Algebraic state .</td></tr>
-<tr><td>DAE_P</td><td>p</td><td>Parameter .</td></tr>
-<tr><td>DAE_T</td><td>t</td><td>Explicit time dependence .</td></tr>
+<tr><td>NL_X</td><td>x</td><td>Decision variable .</td></tr>
+<tr><td>NL_P</td><td>p</td><td>Fixed parameter .</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
