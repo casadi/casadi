@@ -102,7 +102,6 @@ endif()
 option(WITH_DOC "Enable documentation generation" OFF)
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
 
-option(PURE_INSTALL "Produce an installation without RPATH" OFF)
 option(WITH_EXAMPLES "Build examples" ON)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
 # option(WITH_GSL "Compile the GSL interface" ON)
@@ -125,6 +124,12 @@ option(WITH_LAPACK "Compile the interface to LAPACK" ON)
 option(WITH_OPENCL "Compile with OpenCL support" OFF)
 option(WITH_PROFILING "Enable a built-in profiler to be switched used" OFF)
 option(WITH_COVERAGE "Create coverage report" OFF)
+
+# "make install" will preserve rpaths from linker flags
+if(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+else()
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
+endif()
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
