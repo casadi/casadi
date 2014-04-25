@@ -102,6 +102,7 @@ endif()
 option(WITH_DOC "Enable documentation generation" OFF)
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
 
+option(PURE_INSTALL "Produce an installation without RPATH" OFF)
 option(WITH_EXAMPLES "Build examples" ON)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
 # option(WITH_GSL "Compile the GSL interface" ON)
