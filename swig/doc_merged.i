@@ -18039,9 +18039,9 @@ P_0 = A_(K-1)*P_(K-1)*A_(K-1)' + V_k P_k+1 = A_k*P_k*A_k' + V_k  for k =
 | le           |              |              | exception    | Internal     |
 |              |              |              | when it is   |              |
 |              |              |              | detected     |              |
-|              |              |              | that Product |              |
-|              |              |              | (A_i,i=N..1) |              |
-|              |              |              | has          |              |
+|              |              |              | that         |              |
+|              |              |              | Product(A_i, |              |
+|              |              |              | i=N..1) has  |              |
 |              |              |              | eigenvalues  |              |
 |              |              |              | greater than |              |
 |              |              |              | 1-eps_unstab |              |
@@ -35480,28 +35480,6 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | expect_infea | OT_STRING    | no           | Enable       | casadi::Ipop |
 | sible_proble |              |              | heuristics   | tInternal    |
 | m            |              |              | to quickly   |              |
@@ -35676,41 +35654,6 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option. Use  | olverInterna |
-|              |              |              | Gauss Newton | l            |
-|              |              |              | Hessian appr |              |
-|              |              |              | oximation    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| dient        |              | )            | option.      | olverInterna |
-|              |              |              | Generate a   | l            |
-|              |              |              | function for |              |
-|              |              |              | calculating  |              |
-|              |              |              | the gradient |              |
-|              |              |              | of the       |              |
-|              |              |              | objective.   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| sian         |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Hessian of   |              |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| obian        |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Jacobian of  |              |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
 |              |              | )            | calculating  | olverInterna |
@@ -36085,7 +36028,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | ma27         | Linear       | casadi::Ipop |
+| linear_solve | OT_STRING    | mumps        | Linear       | casadi::Ipop |
 | r            |              |              | solver used  | tInternal    |
 |              |              |              | for step com |              |
 |              |              |              | putations.   |              |
@@ -36093,7 +36036,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_syste | OT_STRING    | mc19         | Method for   | casadi::Ipop |
+| linear_syste | OT_STRING    | none         | Method for   | casadi::Ipop |
 | m_scaling    |              |              | scaling the  | tInternal    |
 |              |              |              | linear       |              |
 |              |              |              | system. (see |              |
@@ -36127,7 +36070,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | IPOPT docume |              |
 |              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma27_meminc_ | OT_REAL      | 10           | Increment    | casadi::Ipop |
+| ma27_meminc_ | OT_REAL      | 2            | Increment    | casadi::Ipop |
 | factor       |              |              | factor for   | tInternal    |
 |              |              |              | workspace    |              |
 |              |              |              | size for     |              |
@@ -36170,7 +36113,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma57_automat | OT_STRING    | yes          | Controls     | casadi::Ipop |
+| ma57_automat | OT_STRING    | no           | Controls     | casadi::Ipop |
 | ic_scaling   |              |              | MA57         | tInternal    |
 |              |              |              | automatic    |              |
 |              |              |              | scaling (see |              |
@@ -36256,6 +36199,89 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| ma77_buffer_ | OT_INTEGER   | 4096         | Number of    | casadi::Ipop |
+| lpage        |              |              | scalars per  | tInternal    |
+|              |              |              | MA77 buffer  |              |
+|              |              |              | page (see    |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_buffer_ | OT_INTEGER   | 1600         | Number of    | casadi::Ipop |
+| npage        |              |              | pages that   | tInternal    |
+|              |              |              | make up MA77 |              |
+|              |              |              | buffer (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_file_si | OT_INTEGER   | 2097152      | Target size  | casadi::Ipop |
+| ze           |              |              | of each      | tInternal    |
+|              |              |              | temporary    |              |
+|              |              |              | file for     |              |
+|              |              |              | MA77,        |              |
+|              |              |              | scalars per  |              |
+|              |              |              | type (see    |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_maxstor | OT_INTEGER   | 0            | Maximum      | casadi::Ipop |
+| e            |              |              | storage size | tInternal    |
+|              |              |              | for MA77 in- |              |
+|              |              |              | core mode    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_nemin   | OT_INTEGER   | 8            | Node         | casadi::Ipop |
+|              |              |              | Amalgamation | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_order   | OT_STRING    | amd          | Controls     | casadi::Ipop |
+|              |              |              | type of      | tInternal    |
+|              |              |              | ordering     |              |
+|              |              |              | used by      |              |
+|              |              |              | HSL_MA77     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_print_l | OT_INTEGER   | -1           | Debug        | casadi::Ipop |
+| evel         |              |              | printing     | tInternal    |
+|              |              |              | level for    |              |
+|              |              |              | the linear   |              |
+|              |              |              | solver MA77  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_small   | OT_REAL      | 0.000        | Zero Pivot   | casadi::Ipop |
+|              |              |              | Threshold    | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_static  | OT_REAL      | 0            | Static       | casadi::Ipop |
+|              |              |              | Pivoting     | tInternal    |
+|              |              |              | Threshold    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_u       | OT_REAL      | 0.000        | Pivoting     | casadi::Ipop |
+|              |              |              | Threshold    | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma77_umax    | OT_REAL      | 0.000        | Maximum      | casadi::Ipop |
+|              |              |              | Pivoting     | tInternal    |
+|              |              |              | Threshold    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
 | ma86_nemin   | OT_INTEGER   | 32           | Node         | casadi::Ipop |
 |              |              |              | Amalgamation | tInternal    |
 |              |              |              | parameter    |              |
@@ -36263,7 +36289,16 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ma86_print_l | OT_INTEGER   | 0            | Debug        | casadi::Ipop |
+| ma86_order   | OT_STRING    | amd          | Controls     | casadi::Ipop |
+|              |              |              | type of      | tInternal    |
+|              |              |              | ordering     |              |
+|              |              |              | used by      |              |
+|              |              |              | HSL_MA86     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_print_l | OT_INTEGER   | -1           | Debug        | casadi::Ipop |
 | evel         |              |              | printing     | tInternal    |
 |              |              |              | level for    |              |
 |              |              |              | the linear   |              |
@@ -36271,6 +36306,12 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | (see IPOPT d |              |
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma86_scaling | OT_STRING    | mc64         | Controls     | casadi::Ipop |
+|              |              |              | scaling of   | tInternal    |
+|              |              |              | matrix (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ma86_small   | OT_REAL      | 0.000        | Zero Pivot   | casadi::Ipop |
 |              |              |              | Threshold    | tInternal    |
@@ -36292,6 +36333,116 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ma86_umax    | OT_REAL      | 0.000        | Maximum      | casadi::Ipop |
+|              |              |              | Pivoting     | tInternal    |
+|              |              |              | Threshold    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_nemin   | OT_INTEGER   | 8            | Node         | casadi::Ipop |
+|              |              |              | Amalgamation | tInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_order   | OT_STRING    | auto         | Controls     | casadi::Ipop |
+|              |              |              | type of      | tInternal    |
+|              |              |              | ordering     |              |
+|              |              |              | used by      |              |
+|              |              |              | HSL_MA97     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_print_l | OT_INTEGER   | 0            | Debug        | casadi::Ipop |
+| evel         |              |              | printing     | tInternal    |
+|              |              |              | level for    |              |
+|              |              |              | the linear   |              |
+|              |              |              | solver MA97  |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_scaling | OT_STRING    | dynamic      | Specifies    | casadi::Ipop |
+|              |              |              | strategy for | tInternal    |
+|              |              |              | scaling in   |              |
+|              |              |              | HSL_MA97     |              |
+|              |              |              | linear       |              |
+|              |              |              | solver (see  |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_scaling | OT_STRING    | mc64         | First        | casadi::Ipop |
+| 1            |              |              | scaling.     | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_scaling | OT_STRING    | mc64         | Second       | casadi::Ipop |
+| 2            |              |              | scaling.     | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_scaling | OT_STRING    | mc64         | Third        | casadi::Ipop |
+| 3            |              |              | scaling.     | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_small   | OT_REAL      | 0.000        | Zero Pivot   | casadi::Ipop |
+|              |              |              | Threshold    | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_solve_b | OT_STRING    | no           | Controls if  | casadi::Ipop |
+| las3         |              |              | blas2 or     | tInternal    |
+|              |              |              | blas3        |              |
+|              |              |              | routines are |              |
+|              |              |              | used for     |              |
+|              |              |              | solve (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_switch1 | OT_STRING    | od_hd_reuse  | First        | casadi::Ipop |
+|              |              |              | switch,      | tInternal    |
+|              |              |              | determine    |              |
+|              |              |              | when ma97_sc |              |
+|              |              |              | aling1 is    |              |
+|              |              |              | enabled.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_switch2 | OT_STRING    | never        | Second       | casadi::Ipop |
+|              |              |              | switch,      | tInternal    |
+|              |              |              | determine    |              |
+|              |              |              | when ma97_sc |              |
+|              |              |              | aling2 is    |              |
+|              |              |              | enabled.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_switch3 | OT_STRING    | never        | Third        | casadi::Ipop |
+|              |              |              | switch,      | tInternal    |
+|              |              |              | determine    |              |
+|              |              |              | when ma97_sc |              |
+|              |              |              | aling3 is    |              |
+|              |              |              | enabled.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_u       | OT_REAL      | 0.000        | Pivoting     | casadi::Ipop |
+|              |              |              | Threshold    | tInternal    |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| ma97_umax    | OT_REAL      | 0.000        | Maximum      | casadi::Ipop |
 |              |              |              | Pivoting     | tInternal    |
 |              |              |              | Threshold    |              |
 |              |              |              | (see IPOPT d |              |
@@ -36531,7 +36682,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| mumps_dep_to | OT_REAL      | -1           | Pivot        | casadi::Ipop |
+| mumps_dep_to | OT_REAL      | 0            | Pivot        | casadi::Ipop |
 | l            |              |              | threshold    | tInternal    |
 |              |              |              | for          |              |
 |              |              |              | detection of |              |
@@ -36736,14 +36887,11 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| option_file_ | OT_STRING    |              | File name of | casadi::Ipop |
-| name         |              |              | options file | tInternal    |
-|              |              |              | (to          |              |
-|              |              |              | overwrite    |              |
-|              |              |              | default).    |              |
-|              |              |              | (see IPOPT d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | )            |              |
+| option_file_ | OT_STRING    | ipopt.opt    | File name of | casadi::Ipop |
+| name         |              |              | options      | tInternal    |
+|              |              |              | file. (see   |              |
+|              |              |              | IPOPT docume |              |
+|              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | output_file  | OT_STRING    |              | File name of | casadi::Ipop |
 |              |              |              | desired      | tInternal    |
@@ -36754,20 +36902,6 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | (see IPOPT d |              |
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option.      | olverInterna |
-|              |              |              | Expect F, G, | l            |
-|              |              |              | H, J to have |              |
-|              |              |              | an           |              |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | pardiso_iter | OT_INTEGER   | 5000         | Maximum Size | casadi::Ipop |
 | _coarse_size |              |              | of Coarse    | tInternal    |
@@ -37038,6 +37172,34 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | point. (see  |              |
 |              |              |              | IPOPT docume |              |
 |              |              |              | ntation)     |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_freque | OT_INTEGER   | 1            | Determines   | casadi::Ipop |
+| ncy_iter     |              |              | at which     | tInternal    |
+|              |              |              | iteration    |              |
+|              |              |              | frequency    |              |
+|              |              |              | the          |              |
+|              |              |              | summarizing  |              |
+|              |              |              | iteration    |              |
+|              |              |              | output line  |              |
+|              |              |              | should be    |              |
+|              |              |              | printed.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_freque | OT_REAL      | 0            | Determines   | casadi::Ipop |
+| ncy_time     |              |              | at which     | tInternal    |
+|              |              |              | time         |              |
+|              |              |              | frequency    |              |
+|              |              |              | the          |              |
+|              |              |              | summarizing  |              |
+|              |              |              | iteration    |              |
+|              |              |              | output line  |              |
+|              |              |              | should be    |              |
+|              |              |              | printed.     |              |
+|              |              |              | (see IPOPT d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_info_s | OT_STRING    | no           | Enables      | casadi::Ipop |
 | tring        |              |              | printing of  | tInternal    |
@@ -37662,121 +37824,10 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| wsmp_inexact | OT_REAL      | 0            | Drop         | casadi::Ipop |
-| _droptol     |              |              | tolerance    | tInternal    |
-|              |              |              | for inexact  |              |
-|              |              |              | factorizatio |              |
-|              |              |              | n preconditi |              |
-|              |              |              | oner in      |              |
-|              |              |              | WISMP. (see  |              |
-|              |              |              | IPOPT docume |              |
-|              |              |              | ntation)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_inexact | OT_REAL      | 0            | Fill-in      | casadi::Ipop |
-| _fillin_limi |              |              | limit for    | tInternal    |
-| t            |              |              | inexact fact |              |
-|              |              |              | orization pr |              |
-|              |              |              | econditioner |              |
-|              |              |              | in WISMP.    |              |
-|              |              |              | (see IPOPT d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
 | wsmp_iterati | OT_STRING    | no           | Switches to  | casadi::Ipop |
 | ve           |              |              | iterative    | tInternal    |
 |              |              |              | solver in    |              |
 |              |              |              | WSMP. (see   |              |
-|              |              |              | IPOPT docume |              |
-|              |              |              | ntation)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_max_ite | OT_INTEGER   | 1000         | Maximal      | casadi::Ipop |
-| r            |              |              | number of    | tInternal    |
-|              |              |              | iterations   |              |
-|              |              |              | in iterative |              |
-|              |              |              | WISMP (see   |              |
-|              |              |              | IPOPT docume |              |
-|              |              |              | ntation)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_no_pivo | OT_STRING    | no           | Use the      | casadi::Ipop |
-| ting         |              |              | static       | tInternal    |
-|              |              |              | pivoting     |              |
-|              |              |              | option of    |              |
-|              |              |              | WSMP. (see   |              |
-|              |              |              | IPOPT docume |              |
-|              |              |              | ntation)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_num_thr | OT_INTEGER   | 1            | Number of    | casadi::Ipop |
-| eads         |              |              | threads to   | tInternal    |
-|              |              |              | be used in   |              |
-|              |              |              | WSMP (see    |              |
-|              |              |              | IPOPT docume |              |
-|              |              |              | ntation)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_orderin | OT_INTEGER   | 1            | Determines   | casadi::Ipop |
-| g_option     |              |              | how ordering | tInternal    |
-|              |              |              | is done in   |              |
-|              |              |              | WSMP         |              |
-|              |              |              | (IPARM(16)   |              |
-|              |              |              | (see IPOPT d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_orderin | OT_INTEGER   | 1            | Determines   | casadi::Ipop |
-| g_option2    |              |              | how ordering | tInternal    |
-|              |              |              | is done in   |              |
-|              |              |              | WSMP         |              |
-|              |              |              | (IPARM(20)   |              |
-|              |              |              | (see IPOPT d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_pivtol  | OT_REAL      | 0.000        | Pivot        | casadi::Ipop |
-|              |              |              | tolerance    | tInternal    |
-|              |              |              | for the      |              |
-|              |              |              | linear       |              |
-|              |              |              | solver WSMP. |              |
-|              |              |              | (see IPOPT d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_pivtolm | OT_REAL      | 0.100        | Maximum      | casadi::Ipop |
-| ax           |              |              | pivot        | tInternal    |
-|              |              |              | tolerance    |              |
-|              |              |              | for the      |              |
-|              |              |              | linear       |              |
-|              |              |              | solver WSMP. |              |
-|              |              |              | (see IPOPT d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_scaling | OT_INTEGER   | 0            | Determines   | casadi::Ipop |
-|              |              |              | how the      | tInternal    |
-|              |              |              | matrix is    |              |
-|              |              |              | scaled by    |              |
-|              |              |              | WSMP. (see   |              |
-|              |              |              | IPOPT docume |              |
-|              |              |              | ntation)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_singula | OT_REAL      | 0.000        | WSMP's       | casadi::Ipop |
-| rity_thresho |              |              | singularity  | tInternal    |
-| ld           |              |              | threshold.   |              |
-|              |              |              | (see IPOPT d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_skip_in | OT_STRING    | no           | Always       | casadi::Ipop |
-| ertia_check  |              |              | pretent      | tInternal    |
-|              |              |              | inertia is   |              |
-|              |              |              | correct.     |              |
-|              |              |              | (see IPOPT d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| wsmp_write_m | OT_INTEGER   | -1           | Iteration in | casadi::Ipop |
-| atrix_iterat |              |              | which the    | tInternal    |
-| ion          |              |              | matrices are |              |
-|              |              |              | written to   |              |
-|              |              |              | files. (see  |              |
 |              |              |              | IPOPT docume |              |
 |              |              |              | ntation)     |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -40333,69 +40384,12 @@ np: number of parameters
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option. Use  | olverInterna |
-|              |              |              | Gauss Newton | l            |
-|              |              |              | Hessian appr |              |
-|              |              |              | oximation    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| dient        |              | )            | option.      | olverInterna |
-|              |              |              | Generate a   | l            |
-|              |              |              | function for |              |
-|              |              |              | calculating  |              |
-|              |              |              | the gradient |              |
-|              |              |              | of the       |              |
-|              |              |              | objective.   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| sian         |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Hessian of   |              |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| obian        |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Jacobian of  |              |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
 |              |              | )            | calculating  | olverInterna |
@@ -40496,20 +40490,6 @@ np: number of parameters
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option.      | olverInterna |
-|              |              |              | Expect F, G, | l            |
-|              |              |              | H, J to have |              |
-|              |              |              | an           |              |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
@@ -54253,69 +54233,12 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option. Use  | olverInterna |
-|              |              |              | Gauss Newton | l            |
-|              |              |              | Hessian appr |              |
-|              |              |              | oximation    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| dient        |              | )            | option.      | olverInterna |
-|              |              |              | Generate a   | l            |
-|              |              |              | function for |              |
-|              |              |              | calculating  |              |
-|              |              |              | the gradient |              |
-|              |              |              | of the       |              |
-|              |              |              | objective.   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| sian         |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Hessian of   |              |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| obian        |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Jacobian of  |              |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
 |              |              | )            | calculating  | olverInterna |
@@ -54412,20 +54335,6 @@ Joel Andersson
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option.      | olverInterna |
-|              |              |              | Expect F, G, | l            |
-|              |              |              | H, J to have |              |
-|              |              |              | an           |              |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
@@ -64950,9 +64859,9 @@ Joris Gillis
 | le           |              |              | exception    | Internal     |
 |              |              |              | when it is   |              |
 |              |              |              | detected     |              |
-|              |              |              | that Product |              |
-|              |              |              | (A_i,i=N..1) |              |
-|              |              |              | has          |              |
+|              |              |              | that         |              |
+|              |              |              | Product(A_i, |              |
+|              |              |              | i=N..1) has  |              |
 |              |              |              | eigenvalues  |              |
 |              |              |              | greater than |              |
 |              |              |              | 1-eps_unstab |              |
@@ -75470,69 +75379,12 @@ Joel Andersson, Attila Kozma and Joris Gillis
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option. Use  | olverInterna |
-|              |              |              | Gauss Newton | l            |
-|              |              |              | Hessian appr |              |
-|              |              |              | oximation    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| dient        |              | )            | option.      | olverInterna |
-|              |              |              | Generate a   | l            |
-|              |              |              | function for |              |
-|              |              |              | calculating  |              |
-|              |              |              | the gradient |              |
-|              |              |              | of the       |              |
-|              |              |              | objective.   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| sian         |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Hessian of   |              |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| obian        |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Jacobian of  |              |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
 |              |              | )            | calculating  | olverInterna |
@@ -75667,20 +75519,6 @@ Joel Andersson, Attila Kozma and Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 | name_x       | OT_STRINGVEC | GenericType( | Names of the | casadi::SCPg |
 |              | TOR          | )            | variables.   | enInternal   |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option.      | olverInterna |
-|              |              |              | Expect F, G, | l            |
-|              |              |              | H, J to have |              |
-|              |              |              | an           |              |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_header | OT_BOOLEAN   | true         | Print the    | casadi::SCPg |
 |              |              |              | header with  | enInternal   |
@@ -84664,9 +84502,9 @@ Joris Gillis
 | le           |              |              | exception    | Internal     |
 |              |              |              | when it is   |              |
 |              |              |              | detected     |              |
-|              |              |              | that Product |              |
-|              |              |              | (A_i,i=N..1) |              |
-|              |              |              | has          |              |
+|              |              |              | that         |              |
+|              |              |              | Product(A_i, |              |
+|              |              |              | i=N..1) has  |              |
 |              |              |              | eigenvalues  |              |
 |              |              |              | greater than |              |
 |              |              |              | 1-eps_unstab |              |
@@ -87240,69 +87078,12 @@ np: number of parameters
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option. Use  | olverInterna |
-|              |              |              | Gauss Newton | l            |
-|              |              |              | Hessian appr |              |
-|              |              |              | oximation    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| dient        |              | )            | option.      | olverInterna |
-|              |              |              | Generate a   | l            |
-|              |              |              | function for |              |
-|              |              |              | calculating  |              |
-|              |              |              | the gradient |              |
-|              |              |              | of the       |              |
-|              |              |              | objective.   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| sian         |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Hessian of   |              |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| obian        |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Jacobian of  |              |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
 |              |              | )            | calculating  | olverInterna |
@@ -87401,20 +87182,6 @@ np: number of parameters
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option.      | olverInterna |
-|              |              |              | Expect F, G, | l            |
-|              |              |              | H, J to have |              |
-|              |              |              | an           |              |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_time   | OT_BOOLEAN   | true         | print        | casadi::Snop |
 |              |              |              | information  | tInternal    |
@@ -93922,69 +93689,12 @@ Attila Kozma, Joel Andersson and Joris Gillis
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option. Use  | olverInterna |
-|              |              |              | Gauss Newton | l            |
-|              |              |              | Hessian appr |              |
-|              |              |              | oximation    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| dient        |              | )            | option.      | olverInterna |
-|              |              |              | Generate a   | l            |
-|              |              |              | function for |              |
-|              |              |              | calculating  |              |
-|              |              |              | the gradient |              |
-|              |              |              | of the       |              |
-|              |              |              | objective.   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| sian         |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Hessian of   |              |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| obian        |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Jacobian of  |              |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
 |              |              | )            | calculating  | olverInterna |
@@ -94118,20 +93828,6 @@ Attila Kozma, Joel Andersson and Joris Gillis
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option.      | olverInterna |
-|              |              |              | Expect F, G, | l            |
-|              |              |              | H, J to have |              |
-|              |              |              | an           |              |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_header | OT_BOOLEAN   | true         | Print the    | casadi::SQPI |
 |              |              |              | header with  | nternal      |
@@ -97470,28 +97166,6 @@ Slava Kung
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gamma1       | OT_REAL      | 2            | Trust region | casadi::Stab |
 |              |              |              | increase     | ilizedSQPInt |
 |              |              |              | parameter    | ernal        |
@@ -97510,41 +97184,6 @@ Slava Kung
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option. Use  | olverInterna |
-|              |              |              | Gauss Newton | l            |
-|              |              |              | Hessian appr |              |
-|              |              |              | oximation    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| dient        |              | )            | option.      | olverInterna |
-|              |              |              | Generate a   | l            |
-|              |              |              | function for |              |
-|              |              |              | calculating  |              |
-|              |              |              | the gradient |              |
-|              |              |              | of the       |              |
-|              |              |              | objective.   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| sian         |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Hessian of   |              |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| obian        |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Jacobian of  |              |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
 |              |              | )            | calculating  | olverInterna |
@@ -97694,20 +97333,6 @@ Slava Kung
 |              |              |              | dual         | ernal        |
 |              |              |              | augmented    |              |
 |              |              |              | Lagrangian.  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option.      | olverInterna |
-|              |              |              | Expect F, G, | l            |
-|              |              |              | H, J to have |              |
-|              |              |              | an           |              |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | phiWeight    | OT_REAL      | 0.000        | Weight used  | casadi::Stab |
 |              |              |              | in pseudo-   | ilizedSQPInt |
@@ -107459,69 +107084,12 @@ np: number of parameters
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX->SX  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | GenericType( | Expand the   | casadi::NLPS |
-|              |              | )            | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX->SX. |              |
-|              |              |              | Deprecated,  |              |
-|              |              |              | use \"expand\" |              |
-|              |              |              | instead.     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
 |              |              |              | whether      |              |
 |              |              |              | statistics   |              |
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option. Use  | olverInterna |
-|              |              |              | Gauss Newton | l            |
-|              |              |              | Hessian appr |              |
-|              |              |              | oximation    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_gra | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| dient        |              | )            | option.      | olverInterna |
-|              |              |              | Generate a   | l            |
-|              |              |              | function for |              |
-|              |              |              | calculating  |              |
-|              |              |              | the gradient |              |
-|              |              |              | of the       |              |
-|              |              |              | objective.   |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| sian         |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Hessian of   |              |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-| obian        |              | )            | option.      | olverInterna |
-|              |              |              | Generate an  | l            |
-|              |              |              | exact        |              |
-|              |              |              | Jacobian of  |              |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | grad_f       | OT_FUNCTION  | GenericType( | Function for | casadi::NLPS |
 |              |              | )            | calculating  | olverInterna |
@@ -107630,20 +107198,6 @@ np: number of parameters
 | name         | OT_STRING    | \"unnamed_sha | name of the  | casadi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | GenericType( | Deprecated   | casadi::NLPS |
-|              |              | )            | option.      | olverInterna |
-|              |              |              | Expect F, G, | l            |
-|              |              |              | H, J to have |              |
-|              |              |              | an           |              |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | print_time   | OT_BOOLEAN   | True         | Print        | casadi::Worh |
 |              |              |              | information  | pInternal    |
@@ -107784,9 +107338,9 @@ np: number of parameters
 |              |              |              | solver.If    |              |
 |              |              |              | the limit is |              |
 |              |              |              | reached      |              |
-|              |              |              | before conve |              |
-|              |              |              | rgence,WORHP |              |
-|              |              |              | will         |              |
+|              |              |              | before       |              |
+|              |              |              | convergence, |              |
+|              |              |              | WORHP will   |              |
 |              |              |              | activate QP  |              |
 |              |              |              | recovery     |              |
 |              |              |              | strategies   |              |
@@ -114526,7 +114080,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__RDAEInput.xml
 
 
-// File: group__scheme__DAEOutput.xml
+// File: group__scheme__NLPOutput.xml
 
 
 // File: group__scheme__DPLEInput.xml
@@ -114538,10 +114092,10 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__NLPSolverInput.xml
 
 
-// File: group__scheme__NLPInput.xml
+// File: group__scheme__DAEInput.xml
 
 
-// File: group__scheme__NLPOutput.xml
+// File: group__scheme__DAEOutput.xml
 
 
 // File: group__scheme__InputOutputScheme.xml
@@ -114574,7 +114128,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ControlledDAEInput.xml
 
 
-// File: group__scheme__DAEInput.xml
+// File: group__scheme__NLPInput.xml
 
 
 // File: group__scheme__IntegratorInput.xml
