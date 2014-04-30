@@ -78,6 +78,7 @@ namespace casadi {
 
       vector<SX> out(INTEGRATOR_NUM_OUT);
       out[INTEGRATOR_XF] = x;
+      out[INTEGRATOR_ZF] = z;
 
       // Create the output function
       output_fcn_ = SXFunction(arg, out);
