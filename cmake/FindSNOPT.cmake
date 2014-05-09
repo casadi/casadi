@@ -22,7 +22,7 @@ endforeach()
 
 if(SNOPT_LIBRARIES)
   set(SNOPT_LIBRARIES ${SNOPT_LIBRARIES})
-  message(STATUS "Found Snopt libs: ${SNOPT_LIBRARIES}")
+  message(STATUS "Found Snopt libs")
   set(SNOPT_FOUND_LIBS TRUE)
 else()
   message(STATUS "Could not find Snopt libs")

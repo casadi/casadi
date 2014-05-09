@@ -20,8 +20,6 @@ target_link_libraries(rocketCppocp
 
 endif()
 
-find_package(SNOPT QUIET)
-
 if(SNOPT_FOUND)
 include_directories(../snopt)
 include_directories(${SNOPT_INCLUDE_DIRS})
@@ -92,8 +90,6 @@ target_link_libraries(ddpSpring
   snopt_interface)
 
 endif()
-
-find_package(MATLAB)
 
 if(MATLAB_FOUND)
 
