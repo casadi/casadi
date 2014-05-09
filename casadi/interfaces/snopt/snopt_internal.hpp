@@ -25,6 +25,7 @@
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "snopt_solver.hpp"
+#include "wsnopt.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
@@ -132,6 +133,23 @@ namespace casadi {
       void snSeti(const std::string &snopt_name, int value);
       void snSetr(const std::string &snopt_name, double value);
       void snSet(const std::string &snopt_name, const std::string &value);
+      void snMemb(int *INFO, const int *m_, const int *nx_,
+                  const int *neA, const int * negCon, const int * nnCon_,
+                  const int *nnJac_, const int *nnObj_,
+                  int *mincw, int *miniw, int *minrw);
+      void snoptC(
+        const std::string & start, const int * m_, const int * n, const int * neA,
+        const int *nnCon, const int *nnObj, const int *nnJac, const int *iObj, const double *ObjAdd,
+        const std::string & prob, UserFun userfunPtr,
+        const std::vector<double>& A_data_, const std::vector<int>& row,
+        const std::vector<int>& col,
+        std::vector<double>& bl_, std::vector<double>& bu_,
+        // Initial values
+        int* hs, double* x, double* pi, double * rc,
+        // Outputs
+        int *info, int* mincw, int* miniw, int* minrw, int * nS,
+        int* nInf, double* sInf, double* Obj,
+        std::vector<int>&iu);
 
       // Accumulated time in last evaluate():
       double t_eval_grad_f_; // time spent in eval_grad_f

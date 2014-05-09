@@ -23,10 +23,10 @@ endif()
 if(SNOPT_FOUND)
   add_executable(snopt_nl snopt_nl.cpp)
   target_link_libraries(snopt_nl
-    casadi_snopt_interface casadi_nonlinear_programming)
+    casadi_snopt_interface casadi_nonlinear_programming ${SNOPT_LIBRARIES})
 
   add_executable(rocket_snopt rocket_snopt.cpp)
-  target_link_libraries(rocket_snopt casadi_snopt_interface casadi_nonlinear_programming)
+  target_link_libraries(rocket_snopt casadi_snopt_interface casadi_nonlinear_programming ${SNOPT_LIBRARIES})
 endif()
 
 # Rocket solved with MX + SX

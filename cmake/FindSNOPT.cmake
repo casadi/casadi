@@ -4,6 +4,9 @@ set(SNOPT_LIBS_LIST
   snprint7
   snblas)
 
+# snopt interface will be build no matter what
+# this is only to decide if we actually have snopt
+# and should build the examples
 set(SNOPT_LIBRARIES)
 foreach(LIB in ${SNOPT_LIBS_LIST})
   find_library(SNOPT_LIB_${LIB}
@@ -24,7 +27,6 @@ if(SNOPT_LIBRARIES)
 else()
   message(STATUS "Could not find Snopt libs")
 endif()
-
 
 if(SNOPT_FOUND_LIBS)
   set(SNOPT_FOUND TRUE)

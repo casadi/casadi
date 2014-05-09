@@ -42,7 +42,7 @@ if(SQIC_FOUND)
   add_subdirectory(sqic)
 endif()
 
-if(SNOPT_FOUND)
+if(WITH_SNOPT)
   add_subdirectory(snopt)
 endif()
 
