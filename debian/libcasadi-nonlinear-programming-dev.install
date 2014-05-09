@@ -1,0 +1,3 @@
+usr/lib/libcasadi_nonlinear_programming.so
+usr/lib/pkgconfig/casadi_nonlinear_programming.pc
+usr/include/casadi/nonlinear_programming/*
