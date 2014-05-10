@@ -47,23 +47,23 @@ void sninit_(const int * iPrint, const int * iSumm,
              char* cw, const int* lencw,
              int* iw, const int* leniw,
              double* rw, const int* lenrw,
-             const long cw_len8){weakSymbolMissing("sninit_");}
+             const long cw_len8) {weakSymbolMissing("sninit_");}
 void snseti_(const char *buffer, const int *ivalue, int * iPrint, int * iSumm, int* Errors,
              char* cw, const int* lencw,
              int* iw, const int* leniw,
              double* rw, const int* lenrw,
-             const long buffer_ftn_len, const long cw_len8){weakSymbolMissing("snseti_");}
+             const long buffer_ftn_len, const long cw_len8) {weakSymbolMissing("snseti_");}
 void snsetr_(const char *buffer, const double *ivalue, int * iPrint, int * iSumm, int* Errors,
              char* cw, const int* lencw,
              int* iw, const int* leniw,
              double* rw, const int* lenrw,
-             const long buffer_ftn_len, const long cw_len8){weakSymbolMissing("snsetr_");}
+             const long buffer_ftn_len, const long cw_len8) {weakSymbolMissing("snsetr_");}
 
 void snset_(const char *buffer, int * iPrint, int * iSumm, int* Errors,
             char* cw, const int* lencw,
             int* iw, const int* leniw,
             double* rw, const int* lenrw,
-            const long buffer_ftn_len, const long cw_len8){weakSymbolMissing("snset_");}
+            const long buffer_ftn_len, const long cw_len8) {weakSymbolMissing("snset_");}
 
 void snmemb_(int *INFO, const int* m, const int* n, const int* neA, const int*  negCon,
              const int* nnCon, const int* nnJac, const int*  nnObj,
@@ -71,7 +71,7 @@ void snmemb_(int *INFO, const int* m, const int* n, const int* neA, const int*  
              char* cw, const int* lencw,
              int* iw, const int* leniw,
              double* rw, const int* lenrw,
-             const long cw_len8){weakSymbolMissing("snmemb_");}
+             const long cw_len8) {weakSymbolMissing("snmemb_");}
 
 void snoptc_(const char * Start, const int * m, const int * n, const int * neA,
              const int * nName, const int *nnCon, const int *nnObj, const int *nnJac,
@@ -89,7 +89,7 @@ void snoptc_(const char * Start, const int * m, const int * n, const int * neA,
              char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw,
              // fortran char array hack
              const long start_len8, const long prob_len8, const long names_len8,
-             const long cu_len8, const long cw_len8){weakSymbolMissing("snoptc_");}
+             const long cu_len8, const long cw_len8) {weakSymbolMissing("snoptc_");}
 
 namespace casadi {
 
