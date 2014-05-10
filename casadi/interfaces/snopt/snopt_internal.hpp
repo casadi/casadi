@@ -24,7 +24,7 @@
 #define SNOPT_INTERNAL_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
-#include "snopt_solver.hpp"
+#include "casadi/interfaces/snopt/casadi_snopt_interface_export.h"
 #include "wsnopt.hpp"
 
 /// \cond INTERNAL
