@@ -135,7 +135,7 @@ int main(){
   }
 
   // Solve the problem
-  ocp_solver.solve();
+  ocp_solver.evaluate();
   
     
   

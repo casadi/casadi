@@ -156,9 +156,6 @@ namespace casadi {
     /** \brief  Evaluate */
     void evaluate();
 
-    /// the same as evaluate()
-    void solve();
-
     ///@{
     /** \brief Generate a Jacobian function of output \a oind with respect to input \a iind
      * \param iind The index of the input

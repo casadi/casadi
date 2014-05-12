@@ -146,13 +146,10 @@ int main(){
   ms.input("lbx")(1,ns) = ms.input("ubx")(1,ns) = 0; 
   
   // Solve the problem
-  ms.solve();
+  ms.evaluate();
 
   cout << ms.output("x_opt") << endl;
   cout << ms.output("u_opt") << endl;
   
   return 0;
 }
-
-
-

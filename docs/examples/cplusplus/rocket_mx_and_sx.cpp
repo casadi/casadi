@@ -140,7 +140,7 @@ int main(){
   solver.setInput(Gmax,"ubg");
 
   // Solve the problem
-  solver.solve();
+  solver.evaluate();
 
   // Get the solution
   solver.getOutput(Usol,"x");

@@ -104,7 +104,7 @@ int main(){
   solver.input("ubx").setAll(1);
 
   // Solve the problem
-  solver.solve();
+  solver.evaluate();
   
   return 0;
 }

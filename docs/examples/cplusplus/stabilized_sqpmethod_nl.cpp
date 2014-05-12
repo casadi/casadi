@@ -105,6 +105,6 @@ int main(int argc, char **argv){
   nlp_solver.setInput(nl.x_init,"x0");
 
   // Solve NLP
-  nlp_solver.solve();
+  nlp_solver.evaluate();
   return 0;
 }

@@ -126,10 +126,6 @@ namespace casadi {
     (*this)->evaluate();
   }
 
-  void Function::solve() {
-    evaluate();
-  }
-
   int Function::getNumInputNonzeros() const {
     return (*this)->getNumInputNonzeros();
   }

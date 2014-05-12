@@ -72,10 +72,6 @@ void LPSolverInternal::evaluate() {
   throw CasadiException("LPSolverInternal::evaluate: Not implemented");
 }
 
-void LPSolverInternal::solve() {
-  throw CasadiException("LPSolverInternal::solve: Not implemented");
-}
-
 void LPSolverInternal::checkInputs() const {
   for (int i=0;i<input(LP_SOLVER_LBX).size();++i) {
     casadi_assert_message(input(LP_SOLVER_LBX).at(i)<=input(LP_SOLVER_UBX).at(i),

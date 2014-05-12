@@ -338,7 +338,7 @@ void DirectMultipleShootingInternal::evaluate() {
                       nlp_solver_.input(NLP_SOLVER_UBG).data());
 
   //Solve the problem
-  nlp_solver_.solve();
+  nlp_solver_.evaluate();
 
   // Save the optimal solution
   setOptimalSolution(nlp_solver_.output(NLP_SOLVER_X).data());

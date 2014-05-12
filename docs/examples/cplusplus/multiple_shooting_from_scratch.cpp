@@ -182,7 +182,7 @@ int main(){
   nlp_solver.setInput(0.,"ubg");
   
   // Solve the problem
-  nlp_solver.solve();
+  nlp_solver.evaluate();
 
   // Optimal solution of the NLP
   const Matrix<double>& V_opt = nlp_solver.output("x");

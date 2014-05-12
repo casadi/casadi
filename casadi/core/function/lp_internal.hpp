@@ -46,9 +46,6 @@ class CASADI_CORE_EXPORT LPSolverInternal : public FunctionInternal {
     // Solve the system of equations
     virtual void evaluate();
 
-    // Solve the system of equations
-    virtual void solve();
-
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
 

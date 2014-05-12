@@ -107,7 +107,7 @@ int main(){
   solver.setInput(gmax,"ubg");
 
   // Solve the problem
-  solver.solve();
+  solver.evaluate();
 
   // Print the optimal cost
   double cost;
