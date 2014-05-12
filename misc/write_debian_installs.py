@@ -15,7 +15,7 @@ if __name__=='__main__':
     stuff['nonlinear-programming'] = {'dir': 'nonlinear_programming'}
     #stuff['optimal-control'] = {'dir': 'optimal_control'}
     #stuff['qpoases-interface'] = {'dir': 'interfaces/qpoases'}
-    #stuff['snopt-interface'] = {'dir': 'interfaces/snopt'}
+    stuff['snopt-interface'] = {'dir': 'interfaces/snopt'}
     #stuff['sundials-interface'] = {'dir': 'interfaces/sundials'}
 
     stuff['core']['desc_short'] = 'symbolic framework for numeric optimization'

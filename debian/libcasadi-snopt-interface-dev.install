@@ -1,0 +1,3 @@
+usr/lib/libcasadi_snopt_interface.so
+usr/lib/pkgconfig/casadi_snopt_interface.pc
+usr/include/casadi/interfaces/snopt/*

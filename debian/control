@@ -122,6 +122,27 @@ Description: development files for CasADi nonlinear-programming
  .
  Here is my description haha.
 
+Package: libcasadi-snopt-interface2.0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         libcasadi-core2.0 (= ${binary:Version})
+Description: lol, missing description
+ CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
+ .
+ Here is my description haha.
+
+Package: libcasadi-snopt-interface-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends},
+         libcasadi-core-dev (= ${binary:Version})
+Description: development files for CasADi snopt-interface
+ CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
+ .
+ Here is my description haha.
+
 Package: python-casadi
 Section: python
 Architecture: any
