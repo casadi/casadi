@@ -3,6 +3,7 @@
 if __name__=='__main__':
     version = '2.0'
 
+    # all the modules we current generate
     stuff = {}
     stuff['core'] = {'dir': 'core'}
     stuff['control'] = {'dir': 'control'}
@@ -18,9 +19,18 @@ if __name__=='__main__':
     stuff['snopt-interface'] = {'dir': 'interfaces/snopt'}
     #stuff['sundials-interface'] = {'dir': 'interfaces/sundials'}
 
+    # extra module-specific customization
     stuff['core']['desc_short'] = 'symbolic framework for numeric optimization'
+    stuff['core']['desc_long'] = '''\
+ CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
+ .
+ Here is my description haha.
+ Woohoo
+'''
+
     stuff['ipopt-interface']['libdeps'] = ['coinor-libipopt1']
 
+    # (end of customization, should need to edit no further)
 
     control_file = '''\
 Source: casadi
