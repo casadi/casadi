@@ -20,12 +20,13 @@ if __name__=='__main__':
     #stuff['sundials-interface'] = {'dir': 'interfaces/sundials'}
 
     # extra module-specific customization
-    stuff['core']['desc_short'] = 'symbolic framework for numeric optimization'
+    stuff['core']['desc_short'] = 'CasADi core module'
     stuff['core']['desc_long'] = '''\
- CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
+ Core module of CasADi, in particular containing the symbolic framework and a self-contained implementation
+ of algorithmic differentiation.
  .
- Here is my description haha.
- Woohoo
+ CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+ For more information, see http://casadi.org.
 '''
 
     stuff['ipopt-interface']['libdeps'] = ['coinor-libipopt1']
@@ -85,7 +86,7 @@ Vcs-Browser: https://github.com/casadi/casadi
             desc_short = info['desc_short']
         else:
             print name + " missing desc_short"
-            desc_short = 'lol, missing description'
+            desc_short = 'CasADi module: ' + name + '. No further information available.'
 
         # long description
         if 'desc_long' in info:
@@ -93,9 +94,8 @@ Vcs-Browser: https://github.com/casadi/casadi
         else:
             print name + " missing desc_long"
             desc_long = '''\
- CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
- .
- Here is my description haha.
+ CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+ For more information, see http://casadi.org.
 '''
         control_file += '''\
 Package: libcasadi-%(name)s%(version)s
@@ -111,10 +111,9 @@ Section: libdevel
 Architecture: any
 Depends: ${misc:Depends}%(devlibdeps)s
 Description: development files for CasADi %(name)s
- CasADi is a symbolic framework for algorithmic (a.k.a. automatic).
  .
- Here is my description haha.
-
+ CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+ For more information, see http://casadi.org.
 ''' % {'name':name,
        'version':version,
        'libdeps':libdeps,
@@ -151,7 +150,8 @@ Provides: ${python:Provides}
 Description: Python bindings for CasADi
  This package contains Python bindings for CasADi.
  .
- Description lala.
+ CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+ For more information, see http://casadi.org.
 '''.rstrip()
 
     f = open('control', 'w')
