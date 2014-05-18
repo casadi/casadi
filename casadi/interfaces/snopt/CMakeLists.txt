@@ -13,15 +13,11 @@ casadi_library(casadi_snopt_interface ${SNOPT_INTERFACE_SRCS})
 
 if(ENABLE_STATIC)
 add_library(snopt7 STATIC empty_lib.cpp)
-add_library(snprint7 STATIC empty_lib.cpp)
-add_library(snblas STATIC empty_lib.cpp)
 endif()
 if(ENABLE_SHARED)
 add_library(snopt7 SHARED empty_lib.cpp)
-add_library(snprint7 SHARED empty_lib.cpp)
-add_library(snblas SHARED empty_lib.cpp)
 endif()
-target_link_libraries(casadi_snopt_interface ${CMAKE_DL_LIBS} snopt7 snprint7 snblas)
+target_link_libraries(casadi_snopt_interface ${CMAKE_DL_LIBS} snopt7)
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/snopt

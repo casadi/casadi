@@ -1,8 +1,5 @@
 # libraries
-set(SNOPT_LIBS_LIST
-  snopt7
-  snprint7
-  snblas)
+set(SNOPT_LIBS_LIST snopt7)
 
 # snopt interface will be build no matter what
 # this is only to decide if we actually have snopt
