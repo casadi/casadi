@@ -1,9 +1,6 @@
 # libraries
 set(SNOPT_LIBS_LIST snopt7)
 
-# snopt interface will be build no matter what
-# this is only to decide if we actually have snopt
-# and should build the examples
 set(SNOPT_LIBRARIES)
 foreach(LIB in ${SNOPT_LIBS_LIST})
   find_library(SNOPT_LIB_${LIB}

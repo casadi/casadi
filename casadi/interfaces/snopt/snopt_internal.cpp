@@ -38,59 +38,6 @@
 #include "snopt_internal.hpp"
 #include "wsnopt.hpp"
 
-// this is used only in the next few functions
-void weakSymbolMissing(const std::string & sym) {
-    throw casadi::CasadiException(sym + " symbol not available, try linking with libsnopt");
-}
-
-void sninit_(const int * iPrint, const int * iSumm,
-             char* cw, const int* lencw,
-             int* iw, const int* leniw,
-             double* rw, const int* lenrw,
-             const long cw_len8) {weakSymbolMissing("sninit_");}
-void snseti_(const char *buffer, const int *ivalue, int * iPrint, int * iSumm, int* Errors,
-             char* cw, const int* lencw,
-             int* iw, const int* leniw,
-             double* rw, const int* lenrw,
-             const long buffer_ftn_len, const long cw_len8) {weakSymbolMissing("snseti_");}
-void snsetr_(const char *buffer, const double *ivalue, int * iPrint, int * iSumm, int* Errors,
-             char* cw, const int* lencw,
-             int* iw, const int* leniw,
-             double* rw, const int* lenrw,
-             const long buffer_ftn_len, const long cw_len8) {weakSymbolMissing("snsetr_");}
-
-void snset_(const char *buffer, int * iPrint, int * iSumm, int* Errors,
-            char* cw, const int* lencw,
-            int* iw, const int* leniw,
-            double* rw, const int* lenrw,
-            const long buffer_ftn_len, const long cw_len8) {weakSymbolMissing("snset_");}
-
-void snmemb_(int *INFO, const int* m, const int* n, const int* neA, const int*  negCon,
-             const int* nnCon, const int* nnJac, const int*  nnObj,
-             int* mincw, int* miniw, int* minrw,
-             char* cw, const int* lencw,
-             int* iw, const int* leniw,
-             double* rw, const int* lenrw,
-             const long cw_len8) {weakSymbolMissing("snmemb_");}
-
-void snoptc_(const char * Start, const int * m, const int * n, const int * neA,
-             const int * nName, const int *nnCon, const int *nnObj, const int *nnJac,
-             const int *iObj, const double *ObjAdd, const char* Prob , UserFun userfun,
-             const double* Acol, const int* indA, const int *locA, double* bl, double* bu,
-             char* Names,
-             // Initial values
-             int* hs, double* x, double* pi, double * rc,
-             // Outputs
-             int *info, int* mincw, int* miniw, int* minrw, int * nS,
-             int* nInf, double* sInf, double* Obj,
-             // Working spaces for usrfun
-             char* cu, const int* lencu, int* iu, const int* leniu, double* ru, const int* lenru,
-             // Working spaces for SNOPT
-             char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw,
-             // fortran char array hack
-             const long start_len8, const long prob_len8, const long names_len8,
-             const long cu_len8, const long cw_len8) {weakSymbolMissing("snoptc_");}
-
 namespace casadi {
 
   SnoptInternal::SnoptInternal(const Function& nlp) : NLPSolverInternal(nlp) {

@@ -45,34 +45,26 @@ extern "C" {
 //  extern void snopt_memb(int *INFO, const int* m, const int* n, const int* neA, const int*  negCon, const int* nnCon, const int* nnJac, const int*  nnObj, int* mincw, int* miniw, int* minrw, char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 
     // direct calls to the fortran library
-  #pragma weak sninit_
   void sninit_(const int * iPrint, const int * iSumm,
                char* cw, const int* lencw,
                int* iw, const int* leniw,
                double* rw, const int* lenrw,
                const long cw_len8);
-  #pragma weak snseti_
   void snseti_(const char *buffer, const int *ivalue, int * iPrint, int * iSumm, int* Errors,
                char* cw, const int* lencw,
                int* iw, const int* leniw,
                double* rw, const int* lenrw,
                const long buffer_ftn_len, const long cw_len8);
-
-  #pragma weak snsetr_
   void snsetr_(const char *buffer, const double *ivalue, int * iPrint, int * iSumm, int* Errors,
                char* cw, const int* lencw,
                int* iw, const int* leniw,
                double* rw, const int* lenrw,
                const long buffer_ftn_len, const long cw_len8);
-
-  #pragma weak snset_
   void snset_(const char *buffer, int * iPrint, int * iSumm, int* Errors,
               char* cw, const int* lencw,
               int* iw, const int* leniw,
               double* rw, const int* lenrw,
               const long buffer_ftn_len, const long cw_len8);
-
-  #pragma weak snmemb_
   void snmemb_(int *INFO, const int* m, const int* n, const int* neA, const int*  negCon,
                const int* nnCon, const int* nnJac, const int*  nnObj,
                int* mincw, int* miniw, int* minrw,
@@ -80,8 +72,6 @@ extern "C" {
                int* iw, const int* leniw,
                double* rw, const int* lenrw,
                const long cw_len8);
-
-  #pragma weak snoptc_
   void snoptc_(const char * Start, const int * m, const int * n, const int * neA,
                const int * nName, const int *nnCon, const int *nnObj, const int *nnJac,
                const int *iObj, const double *ObjAdd, const char* Prob , UserFun userfun,
