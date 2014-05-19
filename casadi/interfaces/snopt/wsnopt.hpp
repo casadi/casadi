@@ -87,7 +87,7 @@ extern "C" {
     char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw);
 */
 
-    // direct calls to the fortran library
+  /* direct calls to the Fortran library */
   void sninit_(const int * iPrint, const int * iSumm,
                char* cw, const int* lencw,
                int* iw, const int* leniw,
@@ -120,16 +120,16 @@ extern "C" {
                const int *iObj, const double *ObjAdd, const char* Prob , UserFun userfun,
                const double* Acol, const int* indA, const int *locA, double* bl, double* bu,
                char* Names,
-               // Initial values
+               /* Initial values */
                int* hs, double* x, double* pi, double * rc,
-               // Outputs
+               /* Outputs */
                int *info, int* mincw, int* miniw, int* minrw, int * nS,
                int* nInf, double* sInf, double* Obj,
-               // Working spaces for usrfun
+               /* Working spaces for usrfun */
                char* cu, const int* lencu, int* iu, const int* leniu, double* ru, const int* lenru,
-               // Working spaces for SNOPT
+               /* Working spaces for SNOPT */
                char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw,
-               // fortran char array hack
+               /* Fortran char array hack */
                const long start_len8, const long prob_len8, const long names_len8,
                const long cu_len8, const long cw_len8);
 
