@@ -56,21 +56,23 @@ void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::v
 *  Finds Z_i such that
 
 \verbatim
-          Z_1' * H_1 * Z_2 = T_1,
-          Z_2' * H_2 * Z_3 = T_2,
+          Z_1' * A_1 * Z_2 = T_1,
+          Z_2' * A_2 * Z_3 = T_2,
                  ...
-          Z_K' * H_K * Z_1 = T_K,
+          Z_K' * A_K * Z_1 = T_K,
 \endverbatim
 *
 *  with T_1 in Hessenberg form (upper triangular + one band below the diagonal)
 *   and T_2..T_K  upper diagonal
+*
+*  with Z_k Z_k' = eye(n) = Z_k' Z_k
 *
 */
 CASADI_SLICOT_INTERFACE_EXPORT void slicot_periodic_schur(
     const std::vector< Matrix<double> > & A,
     std::vector< Matrix<double> > & SWIG_OUTPUT(T),
     std::vector< Matrix<double> > & SWIG_OUTPUT(Z),
-    std::vector<double> &eig_real,
+    std::vector<double> &SWIG_OUTPUT(eig_real),
     std::vector<double> &SWIG_OUTPUT(eig_imag));
 
 } // namespace casadi

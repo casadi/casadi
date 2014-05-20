@@ -139,9 +139,30 @@ class ControlTests(casadiTestCase):
           for a,v,x,xp in zip(A_,V_,X,sigma(X)):
             self.checkarray(xp,mul([a,x,a.T])+v,digits=7)
           
-       
-      
-      
-
+  @requires("slicot_periodic_schur")
+  def test_slicot_periodic_schur(self):
+    for K in ([1,2,3,4,5] if args.run_slow else [1,2,3]):
+      for n in ([2,3,4,8,16,32] if args.run_slow else [2,3,4]):
+        numpy.random.seed(1)
+        A = [DMatrix(numpy.random.random((n,n))) for i in range(K)]
+        T,Z,er,ec = slicot_periodic_schur(A)
+        def sigma(a):
+          return a[1:] + [a[0]]
+              
+        for z,zp,a,t in zip(Z,sigma(Z),A,T):
+          self.checkarray(mul([z.T,a,zp]),t,digits=7)
+          
+        hess = Sparsity.band(n,1)+Sparsity.triu(n)
+        # T[0]  in hessenberg form
+        self.checkarray(T[0][hess.patternInverse()],DMatrix.zeros(n,n),digits=12)
+        
+        # remainder of T is upper triangular
+        for t in T[1:]:
+          self.checkarray(t[Sparsity.triu(n).patternInverse()],DMatrix.zeros(n,n),digits=12)
+          
+        for z in Z:
+          self.checkarray(mul(z,z.T),DMatrix.eye(n))
+          self.checkarray(mul(z.T,z),DMatrix.eye(n))
+          
 if __name__ == '__main__':
     unittest.main()
