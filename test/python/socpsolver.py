@@ -73,7 +73,7 @@ class SOCPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([5-8/sqrt(5),7-4/sqrt(5)]),str(socpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=5)
@@ -112,7 +112,7 @@ class SOCPSolverTests(casadiTestCase):
       solver.setInput([0,-3],"ubx")
 
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
       
   def test_simple2(self):
     #  min  2 x + y
@@ -148,7 +148,7 @@ class SOCPSolverTests(casadiTestCase):
       solver.setInput(E,"e")
       solver.setInput(F,"f")
 
-      solver.solve()
+      solver.evaluate()
       
       # solution: intersection of 2*x-4*y-(2*a*(a*x+4))=0,x^2+y^2=(4+a*x)^2
       
@@ -196,7 +196,7 @@ class SOCPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([1.655450403084473,4.805919456574478]),str(socpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(socpsolver),digits=5)
@@ -236,7 +236,7 @@ class SOCPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       # checked with http://abel.ee.ucla.edu/cvxopt/userguide/coneprog.html
       self.checkarray(solver.getOutput(),DMatrix([-5.0147928622,-5.766930599,-8.52180472]),str(socpsolver),digits=5)
