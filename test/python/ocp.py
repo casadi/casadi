@@ -62,7 +62,7 @@ class OCPtests(casadiTestCase):
     solver.setInput([1000 for i in range(V.size())],"ubx")
     solver.setInput([0 for i in range(N+1)],"lbg")
     solver.setInput([0 for i in range(N+1)],"ubg")
-    solver.solve()
+    solver.evaluate()
     ocp_sol=solver.getOutput("f")[0]
     # solve the ricatti equation exactly
     K = q+0.0
@@ -120,7 +120,7 @@ class OCPtests(casadiTestCase):
     solver.init()
     solver.setInput([-1, -1],"lbx")
     solver.setInput([1, 0.2],"ubx")
-    solver.solve()
+    solver.evaluate()
     self.assertAlmostEqual(solver.getOutput("x")[0],1,8,"X_opt")
     self.assertAlmostEqual(solver.getOutput("x")[1],0.2,8,"X_opt")
     
@@ -181,7 +181,7 @@ class OCPtests(casadiTestCase):
     solver.setInput([1, 0.2],"ubx")
     solver.setInput([-1],"lbg")
     solver.setInput([0],"ubg")
-    solver.solve()
+    solver.evaluate()
 
     self.assertAlmostEqual(solver.getOutput("x")[0],0.2,6,"X_opt")
     self.assertAlmostEqual(solver.getOutput("x")[1],0.2,6,"X_opt")
@@ -394,7 +394,7 @@ class OCPtests(casadiTestCase):
     ms.input("lbx")[2,0] = 0
     ms.input("ubx")[2,0] = 0
     
-    ms.solve()
+    ms.evaluate()
     
     self.checkarray(sign(matrix(ms.getOutput("x_opt"))[0,:-1]),ms.getOutput("u_opt"),"solution")
 
@@ -468,7 +468,7 @@ class OCPtests(casadiTestCase):
     ms.input("lbx")[0,0] = 0
     ms.input("ubx")[0,0] = 0
    
-    ms.solve()
+    ms.evaluate()
     
   
 if __name__ == '__main__':

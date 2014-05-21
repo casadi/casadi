@@ -95,7 +95,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
 
     for Solver, solver_options in solvers:
       solver = Solver(nlp)
@@ -110,7 +110,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([-20],"ubg")
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
         
   def testIPOPT(self):
     x=SX.sym("x")
@@ -129,7 +129,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10],"ubx")
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("g")[0],1,9,str(Solver))
@@ -154,7 +154,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
       solver.setInput(1,"p")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
@@ -180,13 +180,13 @@ class NLPtests(casadiTestCase):
 
       if 'Worhp' in str(Solver):
         with self.assertRaises(Exception):
-          solver.solve()
+          solver.evaluate()
         return
 
 
 
 
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver) + str(solver.getOutput("x")[0]-1))
       self.assertAlmostEqual(solver.getOutput("lam_x")[0],0,9,str(Solver))
@@ -209,7 +209,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,6,str(Solver))
@@ -234,7 +234,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*2,"ubx")
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
-      solver.solve()
+      solver.evaluate()
       
       digits = 6
 
@@ -267,13 +267,13 @@ class NLPtests(casadiTestCase):
 
       if 'Worhp' in str(Solver):
         with self.assertRaises(Exception):
-          solver.solve()
+          solver.evaluate()
         return
 
 
 
 
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,7,str(Solver))
@@ -320,7 +320,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*2,"ubx")
       solver.setInput([0],"lbg")
       solver.setInput([1],"ubg")
-      solver.solve()
+      solver.evaluate()
       
       digits = 5
         
@@ -355,7 +355,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*2,"ubx")
       solver.setInput([0],"lbg")
       solver.setInput([1],"ubg")
-      solver.solve()
+      solver.evaluate()
       
       digits = 5
         
@@ -386,7 +386,7 @@ class NLPtests(casadiTestCase):
         solver.setOutput(oldsolver.getOutput("lam_x"),"lam_x")
         
         
-        solver.solve()
+        solver.evaluate()
 
   def testIPOPTrhb2_gen(self):
     self.message("rosenbrock, exact hessian generated, constrained")
@@ -416,7 +416,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*2,"ubx")
       solver.setInput([0],"lbg")
       solver.setInput([1],"ubg")
-      solver.solve()
+      solver.evaluate()
       
       digits = 5
       
@@ -447,7 +447,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*2,"ubx")
       solver.setInput([0],"lbg")
       solver.setInput([2],"ubg")
-      solver.solve()
+      solver.evaluate()
       
       digits = 5
         
@@ -488,7 +488,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0],"lbg")
       solver.setInput([1],"ubg")
       solver.setInput([1],"p")
-      solver.solve()
+      solver.evaluate()
       
       digits = 5
         
@@ -529,7 +529,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0],"lbg")
       solver.setInput([1],"ubg")
       solver.setInput([1],"p")
-      solver.solve()
+      solver.evaluate()
       
       digits = 5
 
@@ -564,7 +564,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
@@ -592,7 +592,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
@@ -623,12 +623,12 @@ class NLPtests(casadiTestCase):
 
       if 'Worhp' in str(Solver):
         with self.assertRaises(Exception):
-          solver.solve()
+          solver.evaluate()
         return
 
 
 
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,6,str(Solver))
@@ -661,7 +661,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.setInput(1,"p")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
@@ -691,7 +691,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10]*2,"lbx")
       solver.setInput([10]*2,"ubx")
       solver.setInput(1,"p")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1,9,str(Solver))
@@ -717,7 +717,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10]*N,"ubx")
       solver.setInput([-10]*N,"lbg")
       solver.setInput([10]*N,"ubg")
-      solver.solve()
+      solver.evaluate()
       print "residuals"
       print array(solver.getOutput("x")).squeeze()-x0
       print "bazmeg", solver.getOutput("f")
@@ -742,7 +742,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.setInput([-10],"lbx")
       solver.setInput([10],"ubx")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
     
@@ -763,7 +763,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10],"ubx")
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,9,str(Solver))
     
@@ -784,7 +784,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10],"ubx")
       solver.setInput([-10, -10, -10],"lbg")
       solver.setInput([10, 10, 10],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,9,str(Solver) )
       self.assertAlmostEqual(solver.getOutput("x")[0],1,5,str(Solver))
     
@@ -805,7 +805,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10],"ubx")
       solver.setInput([-10, -10, -10],"lbg")
       solver.setInput([10, 10, 10],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,8,str(Solver))
     
@@ -826,7 +826,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10],"ubx")
       solver.setInput([-10,-10,-10],"lbg")
       solver.setInput([10,10,10],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],0,9,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,8,str(Solver))
 
@@ -847,7 +847,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10, 10],"ubx")
       solver.setInput([0, 3],"lbg")
       solver.setInput([0, 3],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],4 if "SQIC" in str(solver_options) else 10,"IPOPT")
 
   def testIPOPTdegc(self):
@@ -869,7 +869,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10, 10],"ubx")
       solver.setInput([0, 3 , -10],"lbg")
       solver.setInput([0, 3, 10],"ubg")
-      solver.solve()
+      solver.evaluate()
       # todo: catch error when set([0, 3 , 5]) two times
       self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],4 if "SQIC" in str(solver_options) else 10,"IPOPT")
       
@@ -892,7 +892,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10,10],"ubx")
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
-      solver.solve()
+      solver.evaluate()
       solver.setInput([-10,1],"lbx")
       solver.setInput([10,1],"ubx")
       solver.setInput([-10],"lbg")
@@ -900,11 +900,11 @@ class NLPtests(casadiTestCase):
 
       if 'Worhp' in str(Solver):
         with self.assertRaises(Exception):
-          solver.solve()
+          solver.evaluate()
         return
 
 
-      solver.solve()
+      solver.evaluate()
       
       self.assertAlmostEqual(solver.getOutput("f")[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1,7,str(Solver))
@@ -929,7 +929,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10,2],"ubx")
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],9.0908263002590e-3,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1.0952466252248,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1.2,5,str(Solver))
@@ -956,7 +956,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10,10],"ubx")
       solver.setInput([2.2],"lbg")
       solver.setInput([10],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],4.252906468284e-3,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],1.065181061847138,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],1.1348189166291160,6,str(Solver))
@@ -983,7 +983,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10,10],"ubx")
       solver.setInput([0],"lbg")
       solver.setInput([1.8],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],4.64801220074552e-3,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],9.318651964592811e-1,5,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],8.68134821123689e-1,5,str(Solver))
@@ -1010,7 +1010,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([10,0.9],"ubx")
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
-      solver.solve()
+      solver.evaluate()
       self.assertAlmostEqual(solver.getOutput("f")[0],2.626109721583e-3,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[0],9.4882542279172277e-01,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput("x")[1],0.9,6,str(Solver))
@@ -1039,7 +1039,7 @@ class NLPtests(casadiTestCase):
       solver.init()
       solver.setInput(-1000,"lbx")
       solver.setInput(1000,"ubx")
-      solver.solve()
+      solver.evaluate()
       self.checkarray(solver.getOutput("x"),x0,str(Solver),digits=2)
       self.assertAlmostEqual(solver.getOutput("f")[0],0,3,str(Solver))
       self.checkarray(solver.getOutput("lam_x"),DMatrix.zeros(N,1),str(Solver),digits=4)
@@ -1075,7 +1075,7 @@ class NLPtests(casadiTestCase):
       solver.setInput(LBA,"lbg")
       solver.setInput(UBA,"ubg")
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
@@ -1118,10 +1118,10 @@ class NLPtests(casadiTestCase):
         continue
       if 'Worhp' in str(Solver):
         with self.assertRaises(Exception):
-          solver.solve()
+          solver.evaluate()
         return
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
@@ -1145,7 +1145,7 @@ class NLPtests(casadiTestCase):
       solver.setInput(LBA,"lbg")
       solver.setInput(UBA,"ubg")
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(Solver))
       self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(Solver))
@@ -1185,7 +1185,7 @@ class NLPtests(casadiTestCase):
       solver.setInput(LBA,"lbg")
       solver.setInput(UBA,"ubg")
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(solver))
       self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(solver))
@@ -1209,7 +1209,7 @@ class NLPtests(casadiTestCase):
       solver.setInput(LBA,"lbg")
       solver.setInput(UBA,"ubg")
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(solver))
       self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(solver))
@@ -1392,7 +1392,7 @@ class NLPtests(casadiTestCase):
     solver.setInput([-10],"lbg")
     solver.setInput([10],"ubg")
 
-    solver.solve()
+    solver.evaluate()
     
     self.checkarray(solver.getOutput("f"),DMatrix([0]))
     self.checkarray(solver.getOutput("x"),DMatrix([1,0]))
@@ -1418,7 +1418,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10,-1],"lbx")
       solver.setInput([10,2],"ubx")
 
-      solver.solve()
+      solver.evaluate()
       
       self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=7)
       self.checkarray(solver.getOutput("x"),DMatrix([1,0]),digits=7,failmessage=str(Solver))
@@ -1442,7 +1442,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10,0],"lbx")
       solver.setInput([10,2],"ubx")
 
-      solver.solve()
+      solver.evaluate()
       
       self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=7)
       self.checkarray(solver.getOutput("x"),DMatrix([1,0]),digits=7)
@@ -1469,7 +1469,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([2],"lbg")
       solver.setInput([2],"ubg")
       
-      solver.solve()
+      solver.evaluate()
       
       self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=7)
       self.checkarray(solver.getOutput("x"),DMatrix([1,1]),digits=7)
@@ -1493,7 +1493,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0],"lbx")
       solver.setInput([0],"ubx")
       
-      solver.solve()
+      solver.evaluate()
       
       self.checkarray(solver.getOutput("f"),DMatrix([0]),digits=7)
       self.checkarray(solver.getOutput("x"),DMatrix([0]),digits=7)

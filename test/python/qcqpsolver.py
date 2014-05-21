@@ -60,7 +60,7 @@ class QCQPSolverTests(casadiTestCase):
       solver.setInput(UBX,"ubx")
 
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
       
   def test_bounds(self):
     #  min  1/2 x' H x + 2 x + y
@@ -92,7 +92,7 @@ class QCQPSolverTests(casadiTestCase):
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
 
-      solver.solve()
+      solver.evaluate()
       
       socp = solver.getSolver()
         
@@ -132,7 +132,7 @@ class QCQPSolverTests(casadiTestCase):
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
 
-      solver.solve()
+      solver.evaluate()
       
       socp = solver.getSolver()
         

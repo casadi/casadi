@@ -93,7 +93,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(UBA,"uba")
 
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
 
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
@@ -126,7 +126,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(UBA,"uba")
 
       with self.assertRaises(Exception):
-        solver.solve()
+        solver.evaluate()
         
   def test_scalar(self):
     # 1/2 x H x + G' x
@@ -161,7 +161,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],-1,6,str(qpsolver))
     
@@ -203,7 +203,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],2.0/3,6,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],4.0/3,6,str(qpsolver))
@@ -298,7 +298,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
       
       self.checkarray(solver.getOutput(),DMatrix([0.873908,0.95630465,0,0,0]),str(qpsolver),digits=6)
       
@@ -342,7 +342,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      self.assertRaises(Exception,lambda : solver.solve())
+      self.assertRaises(Exception,lambda : solver.evaluate())
 
   def test_equality(self):
     self.message("Regression 452 test: equality constraints give wrong multipliers")
@@ -380,10 +380,10 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(UBA,"uba")
       if 'Worhp' in str(qp_options):
         with self.assertRaises(Exception):
-          solver.solve()
+          solver.evaluate()
         return
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],0.5,6,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],1.25,6,str(qpsolver))
@@ -411,7 +411,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],0.4,4,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],1.6,4,str(qpsolver))
@@ -461,7 +461,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([5.5,5,-10]),str(qpsolver),digits=4) 
       
@@ -509,7 +509,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.assertAlmostEqual(solver.getOutput()[0],-0.5,6,str(qpsolver))
       self.assertAlmostEqual(solver.getOutput()[1],1,6,str(qpsolver))
@@ -558,7 +558,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([10,8]),str(qpsolver),digits=3)
       
@@ -600,7 +600,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([-0.2,1.2]),str(qpsolver),digits=3)
       
@@ -644,7 +644,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBX,"lbx")
       solver.setInput(UBX,"ubx")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),x0,str(qpsolver)+str(qp_options),digits=2)
       self.assertAlmostEqual(solver.getOutput("cost")[0],-0.5*mul([x0.T,H,x0]),3,str(qpsolver))
@@ -686,7 +686,7 @@ class QPSolverTests(casadiTestCase):
         solver.setInput(UBX,"ubx")
         solver.setInput(LBA,"lba")
         solver.setInput(UBA,"uba")
-        solver.solve()
+        solver.evaluate()
         
         self.checkarray(solver.getOutput(),DMatrix([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsolver),digits=6)
         self.assertAlmostEqual(solver.getOutput("cost")[0],-5.850384678537,5,str(qpsolver))
@@ -724,7 +724,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([0.5,1.5]),str(qpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qpsolver),digits=5)
@@ -763,7 +763,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
 
-      solver.solve()
+      solver.evaluate()
 
       self.checkarray(solver.getOutput(),DMatrix([2,3]),str(qpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,-3]),str(qpsolver),digits=5)
