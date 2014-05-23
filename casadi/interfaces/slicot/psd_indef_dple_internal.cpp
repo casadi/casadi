@@ -599,18 +599,16 @@ namespace casadi {
           int na1 = partition_[r+1]-partition_[r];
           int nb2 = partition_[l+1]-partition_[l];
 
-          for (int k=0;k<K_;++k) {
-            std::fill(F_.begin()+k*4*n_+4*r, F_.begin()+k*4*n_+4*r+4, 0);
-          }
-
-          for (int j=0;j<l;++j) {
-            int na2 = partition_[j+1]-partition_[j];
-            for (int k=0;k<K_;++k) {
-              for (int ii=0;ii<na1;++ii) {
-                for (int jj=0;jj<nb2;++jj) {
-                  for (int kk=0;kk<na2;++kk) {
-                    F_[k*4*n_+4*r+2*ii+jj] +=
-                        dX_[partindex(r, j, k, ii, kk)]*T_[partindex(l, j, k, jj, kk)];
+          if (r==l) {
+            for (int j=0;j<l;++j) {
+              int na2 = partition_[j+1]-partition_[j];
+              for (int k=0;k<K_;++k) {
+                for (int ii=0;ii<na1;++ii) {
+                  for (int jj=0;jj<nb2;++jj) {
+                    for (int kk=0;kk<na2;++kk) {
+                      F_[k*4*n_+4*r+2*ii+jj] +=
+                          dX_[partindex(r, j, k, ii, kk)]*T_[partindex(l, j, k, jj, kk)];
+                    }
                   }
                 }
               }
