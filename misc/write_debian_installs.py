@@ -3,6 +3,9 @@
 if __name__=='__main__':
     version = '2.0'
 
+    shortdesc = 'framework for mathematical optimization'
+    
+
     # all the modules we current generate
     stuff = {}
     stuff['core'] = {'dir': 'core'}
@@ -20,7 +23,7 @@ if __name__=='__main__':
     #stuff['sundials-interface'] = {'dir': 'interfaces/sundials'}
 
     # extra module-specific customization
-    stuff['core']['desc_short'] = 'CasADi core module'
+    stuff['core']['desc_short'] = shortdesc + ' (core module)'
     stuff['core']['desc_long'] = '''\
  Core module of CasADi, in particular containing the symbolic framework and a self-contained implementation
  of algorithmic differentiation.
@@ -86,8 +89,7 @@ Vcs-Browser: https://github.com/casadi/casadi
             desc_short = info['desc_short']
         else:
             print name + " missing desc_short"
-            desc_short = 'CasADi module: ' + name + '. No further information available.'
-
+            desc_short = shortdesc + ' (' + name + ' module)'
         # long description
         if 'desc_long' in info:
             desc_long = info['desc_long']
@@ -95,6 +97,10 @@ Vcs-Browser: https://github.com/casadi/casadi
             print name + " missing desc_long"
             desc_long = '''\
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+
+
+
+
  For more information, see http://casadi.org.
 '''
         control_file += '''\
@@ -110,7 +116,7 @@ Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
 Depends: ${misc:Depends}%(devlibdeps)s
-Description: development files for CasADi %(name)s
+Description: framework for mathematical optimization (%(name)s dev module)
  .
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.
