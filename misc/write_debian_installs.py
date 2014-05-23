@@ -3,9 +3,13 @@
 if __name__=='__main__':
     version = '2.0'
 
-    shortdesc = 'framework for mathematical optimization'
-    
+    casadi_short = 'framework for numerical optimization and algorithmic differentiation'
+    casadi_long = '''\
+ CasADi is a framework for numerical optimization and algorithmic differentiation. It can be used from C++ or Python.
 
+It provides users with a set of building blocks that simplify the process of implementing highly efficient gradient-based solvers for numerical optimization problems in general and simulation-based nonlinear programs (optimal control) in particular. This can be done with a range of different methods including direct collocation, direct multiple shooting and indirect methods. Contained in the package is a symbolic framework that allows constructing large computational graphs made up by matrix-valued operations and a state-of-the-art framework for algorithmic differentiation (AD) - also known as automatic differentiation - that operates on these computational graphs. Coupled to this is a set of solvers and interfaces to third-party solvers for nonlinear programming (NLP), quadratic programming (QP) and initial-value problems in ordinary differential equations (ODE) or diffential-algebraic equations (DAE). Other features of interest include generation of self-contained C-code and symbolic import of models from the Modelica physical modeling language and the AMPL algebraic modeling language. More information about CasADi can be found on the project website, http://casadi.org.
+'''
+    
     # all the modules we current generate
     stuff = {}
     stuff['core'] = {'dir': 'core'}
@@ -23,12 +27,13 @@ if __name__=='__main__':
     #stuff['sundials-interface'] = {'dir': 'interfaces/sundials'}
 
     # extra module-specific customization
-    stuff['core']['desc_short'] = shortdesc + ' (core module)'
+    stuff['core']['desc_short'] = casadi_short + ' (core module)'
     stuff['core']['desc_long'] = '''\
  Core module of CasADi, in particular containing the symbolic framework and a self-contained implementation
  of algorithmic differentiation.
  .
- CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+ CasADi is a framework for numerical optimization
+algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.
 '''
 
@@ -89,20 +94,13 @@ Vcs-Browser: https://github.com/casadi/casadi
             desc_short = info['desc_short']
         else:
             print name + " missing desc_short"
-            desc_short = shortdesc + ' (' + name + ' module)'
+            desc_short = casadi_short + ' (' + name + ' module)'
         # long description
         if 'desc_long' in info:
             desc_long = info['desc_long']
         else:
             print name + " missing desc_long"
-            desc_long = '''\
- CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
-
-
-
-
- For more information, see http://casadi.org.
-'''
+            desc_long = casadi_long
         control_file += '''\
 Package: libcasadi-%(name)s%(version)s
 Section: libs
@@ -116,7 +114,7 @@ Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
 Depends: ${misc:Depends}%(devlibdeps)s
-Description: framework for mathematical optimization (%(name)s dev module)
+Description: framework for numerical optimization and algorithmic differentiation (%(name)s dev module)
  .
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.

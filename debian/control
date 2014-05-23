@@ -17,140 +17,105 @@ Homepage: http://casadi.org
 Vcs-Git: git://github.com/casadi/casadi.git
 Vcs-Browser: https://github.com/casadi/casadi
 
-Package: libcasadi-control2.0
+Package: libcasadi-%(name)s%(version)s
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
-         ${misc:Depends},
-         libcasadi-core2.0 (= ${binary:Version})
-Description: framework for mathematical optimization (control module)
- CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+         ${misc:Depends}%(libdeps)s
+Description: %(desc_short)s
+%(desc_long)s
 
-
-
-
- For more information, see http://casadi.org.
-
-Package: libcasadi-control-dev
+Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends},
-         libcasadi-core-dev (= ${binary:Version})
-Description: framework for mathematical optimization (control dev module)
+Depends: ${misc:Depends}%(devlibdeps)s
+Description: 
+framework for numerical optimization and algorithmic differentiation (control dev module)
  .
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.
-Package: libcasadi-core2.0
+Package: libcasadi-%(name)s%(version)s
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
-         ${misc:Depends}
-Description: framework for mathematical optimization (core module)
- Core module of CasADi, in particular containing the symbolic framework and a self-contained implementation
- of algorithmic differentiation.
- .
- CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
- For more information, see http://casadi.org.
+         ${misc:Depends}%(libdeps)s
+Description: %(desc_short)s
+%(desc_long)s
 
-Package: libcasadi-core-dev
+Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends},
-         libcasadi-core2.0 (= ${binary:Version})
-Description: framework for mathematical optimization (core dev module)
+Depends: ${misc:Depends}%(devlibdeps)s
+Description: 
+framework for numerical optimization and algorithmic differentiation (core dev module)
  .
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.
-Package: libcasadi-integration2.0
+Package: libcasadi-%(name)s%(version)s
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
-         ${misc:Depends},
-         libcasadi-core2.0 (= ${binary:Version})
-Description: framework for mathematical optimization (integration module)
- CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+         ${misc:Depends}%(libdeps)s
+Description: %(desc_short)s
+%(desc_long)s
 
-
-
-
- For more information, see http://casadi.org.
-
-Package: libcasadi-integration-dev
+Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends},
-         libcasadi-core-dev (= ${binary:Version})
-Description: framework for mathematical optimization (integration dev module)
+Depends: ${misc:Depends}%(devlibdeps)s
+Description: 
+framework for numerical optimization and algorithmic differentiation (integration dev module)
  .
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.
-Package: libcasadi-ipopt-interface2.0
+Package: libcasadi-%(name)s%(version)s
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
-         ${misc:Depends},
-         libcasadi-core2.0 (= ${binary:Version}),
-         coinor-libipopt1
-Description: framework for mathematical optimization (ipopt-interface module)
- CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+         ${misc:Depends}%(libdeps)s
+Description: %(desc_short)s
+%(desc_long)s
 
-
-
-
- For more information, see http://casadi.org.
-
-Package: libcasadi-ipopt-interface-dev
+Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends},
-         libcasadi-core-dev (= ${binary:Version})
-Description: framework for mathematical optimization (ipopt-interface dev module)
+Depends: ${misc:Depends}%(devlibdeps)s
+Description: 
+framework for numerical optimization and algorithmic differentiation (ipopt-interface dev module)
  .
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.
-Package: libcasadi-nonlinear-programming2.0
+Package: libcasadi-%(name)s%(version)s
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
-         ${misc:Depends},
-         libcasadi-core2.0 (= ${binary:Version})
-Description: framework for mathematical optimization (nonlinear-programming module)
- CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+         ${misc:Depends}%(libdeps)s
+Description: %(desc_short)s
+%(desc_long)s
 
-
-
-
- For more information, see http://casadi.org.
-
-Package: libcasadi-nonlinear-programming-dev
+Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends},
-         libcasadi-core-dev (= ${binary:Version})
-Description: framework for mathematical optimization (nonlinear-programming dev module)
+Depends: ${misc:Depends}%(devlibdeps)s
+Description: 
+framework for numerical optimization and algorithmic differentiation (nonlinear-programming dev module)
  .
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.
-Package: libcasadi-snopt-interface2.0
+Package: libcasadi-%(name)s%(version)s
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends},
-         ${misc:Depends},
-         libcasadi-core2.0 (= ${binary:Version})
-Description: framework for mathematical optimization (snopt-interface module)
- CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
+         ${misc:Depends}%(libdeps)s
+Description: %(desc_short)s
+%(desc_long)s
 
-
-
-
- For more information, see http://casadi.org.
-
-Package: libcasadi-snopt-interface-dev
+Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends},
-         libcasadi-core-dev (= ${binary:Version})
-Description: framework for mathematical optimization (snopt-interface dev module)
+Depends: ${misc:Depends}%(devlibdeps)s
+Description: 
+framework for numerical optimization and algorithmic differentiation (snopt-interface dev module)
  .
  CasADi is a symbolic framework for algorithmic differentiation and numerical optimization.
  For more information, see http://casadi.org.
