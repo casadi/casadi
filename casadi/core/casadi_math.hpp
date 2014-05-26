@@ -60,6 +60,7 @@ bool operation_checker(unsigned int op) {
     case OP_IF_ELSE_ZERO:   return F<OP_IF_ELSE_ZERO>::check;
     case OP_FLOOR:         return F<OP_FLOOR>::check;
     case OP_CEIL:          return F<OP_CEIL>::check;
+    case OP_FMOD:          return F<OP_FMOD>::check;
     case OP_FABS:          return F<OP_FABS>::check;
     case OP_SIGN:          return F<OP_SIGN>::check;
     case OP_COPYSIGN:      return F<OP_COPYSIGN>::check;
@@ -225,6 +226,7 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f) 
     case OP_IF_ELSE_ZERO: CNAME<OP_IF_ELSE_ZERO>::fcn(X, Y, F, N); break;\
     case OP_FLOOR:     CNAME<OP_FLOOR>::fcn(X, Y, F, N);         break;\
     case OP_CEIL:      CNAME<OP_CEIL>::fcn(X, Y, F, N);          break;\
+    case OP_FMOD:      CNAME<OP_FMOD>::fcn(X, Y, F, N);          break;\
     case OP_FABS:      CNAME<OP_FABS>::fcn(X, Y, F, N);          break;\
     case OP_SIGN:      CNAME<OP_SIGN>::fcn(X, Y, F, N);          break;\
     case OP_COPYSIGN:  CNAME<OP_COPYSIGN>::fcn(X, Y, F, N);      break;\
@@ -306,6 +308,7 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_IF_ELSE_ZERO: BinaryOperation<OP_IF_ELSE_ZERO>::der(X, Y, F, D);         break;\
     case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X, Y, F, D);      break;\
     case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X, Y, F, D);       break;\
+    case OP_FMOD:      BinaryOperation<OP_FMOD>::der(X, Y, F, D);       break;\
     case OP_FABS:      BinaryOperation<OP_FABS>::der(X, Y, F, D);       break;\
     case OP_SIGN:      BinaryOperation<OP_SIGN>::der(X, Y, F, D);       break;\
     case OP_COPYSIGN:  BinaryOperation<OP_COPYSIGN>::der(X, Y, F, D);   break;\
@@ -364,6 +367,7 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_IF_ELSE_ZERO: DerBinaryOpertion<OP_IF_ELSE_ZERO>::derf(X, Y, F, D);         break;\
     case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X, Y, F, D);      break;\
     case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X, Y, F, D);       break;\
+    case OP_FMOD:      DerBinaryOpertion<OP_FMOD>::derf(X, Y, F, D);       break;\
     case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X, Y, F, D);       break;\
     case OP_SIGN:      DerBinaryOpertion<OP_SIGN>::derf(X, Y, F, D);       break;\
     case OP_COPYSIGN:  DerBinaryOpertion<OP_COPYSIGN>::derf(X, Y, F, D);   break;\
@@ -473,6 +477,7 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream) {
     case OP_IF_ELSE_ZERO: stream << "(";        break;
     case OP_FLOOR:     stream << "floor(";   break;
     case OP_CEIL:      stream << "ceil(";    break;
+    case OP_FMOD:      stream << "fmod(";    break;
     case OP_FABS:      stream << "fabs(";    break;
     case OP_SIGN:      stream << "sign(";    break;
     case OP_COPYSIGN:  stream << "__copysign__(";break;

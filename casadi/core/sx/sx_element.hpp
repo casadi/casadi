@@ -231,6 +231,7 @@ namespace casadi {
     SXElement arctan() const;
     SXElement floor() const;
     SXElement ceil() const;
+    SXElement fmod(const SXElement &y) const;
     SXElement erf() const;
     SXElement erfinv() const;
     SXElement fabs() const;

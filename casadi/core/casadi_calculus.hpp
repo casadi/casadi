@@ -26,6 +26,8 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <ctgmath>
+
 #include <limits>
 #include <algorithm>
 #include "casadi_exception.hpp"
@@ -51,7 +53,7 @@ namespace casadi {
     OP_SIN,  OP_COS,  OP_TAN,
     OP_ASIN,  OP_ACOS,  OP_ATAN,
     OP_LT, OP_LE, OP_EQ, OP_NE, OP_NOT, OP_AND, OP_OR,
-    OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, OP_COPYSIGN, OP_IF_ELSE_ZERO,
+    OP_FLOOR,  OP_CEIL,  OP_FMOD, OP_FABS, OP_SIGN, OP_COPYSIGN, OP_IF_ELSE_ZERO,
     OP_ERF,  OP_FMIN,  OP_FMAX,
     OP_INV,
     OP_SINH,  OP_COSH,  OP_TANH,
@@ -231,6 +233,9 @@ namespace casadi {
 
   template<class T> T ceil(const T &x) {return x.ceil();}
   using std::ceil;
+
+  template<class T> T fmod(const T &x, const T &y) {return x.fmod(y);}
+  using std::fmod;
 
   template<class T> T atan2(const T &x, const T &n) { return x.arctan2(n);}
   template<class T> T atan2(const T &x,   double n) { return x.arctan2(n);}
@@ -480,6 +485,7 @@ namespace casadi {
   template<>      struct SmoothChecker<OP_LE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_CEIL>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_FMOD>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_EQ>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_NE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
@@ -508,6 +514,7 @@ namespace casadi {
   template<>      struct F0XChecker<OP_ASIN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_FLOOR>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_CEIL>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_FMOD>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_FABS>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SIGN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_COPYSIGN>{ static const bool check=true;};
@@ -780,6 +787,14 @@ namespace casadi {
   public:
     template<typename T> static inline void fcn(const T& x, T& f) { f = ceil(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d) { d[0] = 0;}
+  };
+
+  /// Remainder of division
+  template<>
+  struct BinaryOperation<OP_FMOD>{
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmod(x,y);}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
+      d[0]=1; d[1]=(f-x)/y;}
   };
 
   /// Equal to

@@ -632,6 +632,7 @@ namespace casadi {
     Matrix<DataType> sqrt() const;
     Matrix<DataType> floor() const;
     Matrix<DataType> ceil() const;
+    Matrix<DataType> fmod(const Matrix<DataType>& y) const;
     Matrix<DataType> fabs() const;
     Matrix<DataType> sign() const;
     Matrix<DataType> __copysign__(const Matrix<DataType>& y) const;

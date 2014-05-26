@@ -485,6 +485,7 @@ namespace casadi {
     MX constpow(const MX& y) const;
     MX fmin(const MX& y) const;
     MX fmax(const MX& y) const;
+    MX fmod(const MX& y) const;
     MX printme(const MX& y) const;
     MX arctan2(const MX& y) const;
     MX logic_and(const MX& y) const;

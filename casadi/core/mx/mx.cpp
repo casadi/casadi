@@ -651,6 +651,10 @@ namespace casadi {
     return binary(OP_FMAX, *this, b);
   }
 
+  MX MX::fmod(const MX& b) const {
+    return binary(OP_FMOD, *this, b);
+  }
+
   MX MX::arctan2(const MX& b) const {
     return binary(OP_ATAN2, *this, b);
   }

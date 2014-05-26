@@ -670,6 +670,10 @@ namespace casadi {
     return UnarySX::create(OP_CEIL, *this);
   }
 
+  SXElement SXElement::fmod(const SXElement &b) const {
+    return BinarySX::create(OP_FMOD, *this, b);
+  }
+
   SXElement SXElement::erf() const {
     return UnarySX::create(OP_ERF, *this);
   }

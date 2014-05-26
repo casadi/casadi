@@ -1303,6 +1303,11 @@ namespace casadi {
   }
 
   template<typename DataType>
+  Matrix<DataType> Matrix<DataType>::fmod(const Matrix<DataType>& y) const {
+    return binary(OP_FMOD, *this, y);
+  }
+
+  template<typename DataType>
   Matrix<DataType> Matrix<DataType>::fabs() const {
     return unary(OP_FABS, *this);
   }
