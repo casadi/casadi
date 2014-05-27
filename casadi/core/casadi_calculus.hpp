@@ -26,7 +26,6 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include <ctgmath>
 
 #include <limits>
 #include <algorithm>
