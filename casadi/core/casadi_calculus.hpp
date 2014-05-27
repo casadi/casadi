@@ -792,7 +792,7 @@ namespace casadi {
   /// Remainder of division
   template<>
   struct BinaryOperation<OP_FMOD>{
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmod(x,y);}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmod(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
       d[0]=1; d[1]=(f-x)/y;}
   };
