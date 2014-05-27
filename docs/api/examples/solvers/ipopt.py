@@ -40,7 +40,7 @@ solver = IpoptSolver(nlp)
 solver.init()
 solver.setInput([-10],"lbx")
 solver.setInput([10],"ubx")
-solver.solve()
+solver.evaluate()
 
 #! The solution is obviously 1:
 print solver.getOutput()
@@ -68,7 +68,7 @@ solver.setInput([10]*n,"ubx")
 #$  $ 2 \le x_0 \le 2$ is not really as bad it looks. Ipopt will recognise this situation as an equality constraint. 
 solver.setInput([0,2],"lbg")
 solver.setInput([1,2],"ubg")
-solver.solve()
+solver.evaluate()
 
 #! The solution is obviously [2,0.5,0.5,1,1]:
 print solver.getOutput()
@@ -93,7 +93,7 @@ solver.init()
 solver.setInput([-10],"lbx")
 solver.setInput([10],"ubx")
 solver.setInput([a_],"p")
-solver.solve()
+solver.evaluate()
 
 #! The solution is obviously a:
 print solver.getOutput()
@@ -101,7 +101,7 @@ assert(abs(solver.getOutput()[0]-a_)<1e-9)
 
 #! The parameter can change inbetween two solve calls:
 solver.setInput([2*a_],"p")
-solver.solve()
+solver.evaluate()
 
 #! The solution is obviously 2*a:
 print solver.getOutput()

@@ -61,7 +61,7 @@ solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")
 solver.setInput([10],"ubg")
-solver.solve()
+solver.evaluate()
 
 #! Matplotlib callback
 #! ===================
@@ -120,7 +120,7 @@ solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([-10],"lbg")
 solver.setInput([10],"ubg")
-solver.solve()
+solver.evaluate()
 
 #! By setting matplotlib interactivity off, we can inspect the figure at ease
 matplotlib.interactive(False)

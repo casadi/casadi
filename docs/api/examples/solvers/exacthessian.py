@@ -55,7 +55,7 @@ solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([0],"lbg")
 solver.setInput([1],"ubg")
-solver.solve()
+solver.evaluate()
 
 for sol in array(solver.getOutput()):
   print "%.15f" % sol
@@ -67,7 +67,7 @@ solver.setInput([-10]*2,"lbx")
 solver.setInput([10]*2,"ubx")
 solver.setInput([0],"lbg")
 solver.setInput([1],"ubg")
-solver.solve()
+solver.evaluate()
 
 for sol in array(solver.getOutput()):
   print "%.15f" % sol
