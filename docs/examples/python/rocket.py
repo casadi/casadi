@@ -90,7 +90,7 @@ solver.setInput([10,0],"lbg")
 solver.setInput([10,0],"ubg")
 
 # Solve the problem
-solver.solve()
+solver.evaluate()
 
 # Get the solution
 plot(solver.getOutput("x"))

@@ -220,7 +220,7 @@ solver.setInput(NP.concatenate(lbg),"lbg")
 solver.setInput(NP.concatenate(ubg),"ubg")
 
 # Solve the problem
-solver.solve()
+solver.evaluate()
 
 # Print the optimal cost
 print "optimal cost: ", float(solver.getOutput("f"))

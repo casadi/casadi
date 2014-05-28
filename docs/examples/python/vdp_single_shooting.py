@@ -74,7 +74,7 @@ solver.setInput( 0.,   "lbg")
 solver.setInput( 0.,   "ubg")
 
 # Solve the problem
-solver.solve()
+solver.evaluate()
 
 # Retrieve the solution
 u_opt = NP.array(solver.getOutput("x"))

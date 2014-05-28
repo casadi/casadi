@@ -88,6 +88,6 @@ solver.setInput(b,"ubg")
 solver.setInput([-100,-100,-100,-100,-100],"lbg")
 
 
-solver.solve()
+solver.evaluate()
 print solver.getOutput("x")
 #! Nested optimization

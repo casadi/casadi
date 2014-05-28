@@ -155,7 +155,7 @@ for N in range(1,11):
   solver.setInput(lubg,"ubg")
   
   # Solve the problem
-  solver.solve()
+  solver.evaluate()
   
   ## Print the time points
   t_opt = N*(K+1) * [0]

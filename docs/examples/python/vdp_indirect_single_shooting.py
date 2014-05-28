@@ -120,7 +120,7 @@ solver.init()
 #solver.setInput([   0,   0], "x0")
 
 # Solve the problem
-solver.solve()
+solver.evaluate()
 
 # Retrieve the optimal solution
 l_init_opt = NP.array(solver.output().data())

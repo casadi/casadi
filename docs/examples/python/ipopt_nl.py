@@ -60,5 +60,5 @@ nlp_solver.setInput(nl.g_ub,"ubg")
 nlp_solver.setInput(nl.x_init,"x0")
   
 # Solve NLP
-nlp_solver.solve()
+nlp_solver.evaluate()
 

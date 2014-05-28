@@ -127,7 +127,7 @@ solver.setInput(NP.concatenate(g_min),"lbg")
 solver.setInput(NP.concatenate(g_max),"ubg")
 
 # Solve the problem
-solver.solve()
+solver.evaluate()
 
 # Retrieve the solution
 v_opt = solver.getOutput("x")

@@ -131,7 +131,7 @@ solver.init()
 #solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], "x0")
 
 # Solve the problem
-solver.solve()
+solver.evaluate()
 
 # Time grid for visualization
 tgrid = NP.linspace(0,tf,100)
