@@ -227,7 +227,7 @@ Wt_  = out["Wt"]
 eAt_ = out["eAt"]
 
 # Check that eAt is indeed the matrix exponential
-e = max(fabs(eAt_-scipy.linalg.expm(A*te)))/max(fabs(eAt_))
+e = max(fabs(eAt_-scipy.linalg.expm(numpy.array(A*te))))/max(fabs(eAt_))
 assert(e<1e-7)
 
 # Simulate with feedforward controls
@@ -520,7 +520,7 @@ for k,(caption,K_) in enumerate([("K: zero",DMatrix.zeros((nu,ns))),("K: LQR",K)
 
 print "Spectral radius of exp((A-BK)*te): "
 
-[D,V] = linalg.eig(scipy.linalg.expm((A-mul(B,K))*te))
+[D,V] = linalg.eig(scipy.linalg.expm(numpy.array((A-mul(B,K))*te)))
 print max(abs(D))
 
 # Simulation of the controller:
