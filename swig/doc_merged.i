@@ -1087,6 +1087,13 @@ Minimum.
 C++ includes: casadi_calculus.hpp ";
 
 
+// File: structcasadi_1_1BinaryOperation_3_01OP__FMOD_01_4.xml
+%feature("docstring") casadi::BinaryOperation< OP_FMOD > " [INTERNAL]
+Remainder of division.
+
+C++ includes: casadi_calculus.hpp ";
+
+
 // File: structcasadi_1_1BinaryOperation_3_01OP__IF__ELSE__ZERO_01_4.xml
 %feature("docstring") casadi::BinaryOperation< OP_IF_ELSE_ZERO > "
 [INTERNAL]  Conditional assignment.
@@ -3206,12 +3213,6 @@ Access input argument
 ";
 
 %feature("docstring") casadi::CollocationIntegrator::output_struct "[INTERNAL]  Input/output structures of the function
-
-";
-
-%feature("docstring") casadi::CollocationIntegrator::solve "
-
-the same as evaluate()
 
 ";
 
@@ -5558,12 +5559,6 @@ Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::ControlSimulator::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::ControlSimulator::spCanEvaluate "[INTERNAL]
 Is the class able to propagate seeds through the algorithm?
 
@@ -7009,12 +7004,6 @@ that it is initialized
 
 ";
 
-%feature("docstring") casadi::CplexSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::CplexSolver::makeUnique "
 
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
@@ -7959,11 +7948,6 @@ Solve the system of equations, internal vector.
 ------------------------------------------------------------------------
 
 Create a solve node.
-
->  void casadi::Function::solve()
-------------------------------------------------------------------------
-
-the same as evaluate()
 
 ";
 
@@ -9104,11 +9088,6 @@ Solve the system of equations, internal vector.
 ------------------------------------------------------------------------
 
 Create a solve node.
-
->  void casadi::Function::solve()
-------------------------------------------------------------------------
-
-the same as evaluate()
 
 ";
 
@@ -10327,12 +10306,6 @@ Create a function, user sets inputs outputs manually.
 
 ";
 
-%feature("docstring") casadi::CustomFunction::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::CustomFunction::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
@@ -11439,12 +11412,6 @@ propagating_sparsity.cpp)
 %feature("docstring") casadi::CVodesIntegrator::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
-
-";
-
-%feature("docstring") casadi::CVodesIntegrator::solve "
-
-the same as evaluate()
 
 ";
 
@@ -14464,12 +14431,6 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::DirectCollocation::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::DirectCollocation::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
@@ -16001,12 +15962,6 @@ get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring") casadi::DirectMultipleShooting::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::DirectMultipleShooting::outputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::outputS(int i)
@@ -16335,12 +16290,6 @@ Get the allowed values of a certain option.
 %feature("docstring") casadi::DirectSingleShooting::hasOption "
 
 check if there is an option str
-
-";
-
-%feature("docstring") casadi::DirectSingleShooting::solve "
-
-the same as evaluate()
 
 ";
 
@@ -17277,12 +17226,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 %feature("docstring") casadi::DpleSolver::print "[INTERNAL]  Print a
 description of the object.
-
-";
-
-%feature("docstring") casadi::DpleSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -19299,12 +19242,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::DSDPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::DSDPSolver::spInit "[INTERNAL]  Reset the
 sparsity propagation.
 
@@ -20276,7 +20213,9 @@ weak reference to the object.
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
+%feature("docstring") casadi::ExternalFunction::isNull "
+
+Is a null pointer?
 
 ";
 
@@ -20828,15 +20767,7 @@ Is the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::ExternalFunction::solve "
-
-the same as evaluate()
-
-";
-
-%feature("docstring") casadi::ExternalFunction::isNull "
-
-Is a null pointer?
+%feature("docstring") casadi::ExternalFunction::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
@@ -21242,6 +21173,11 @@ includes: casadi_calculus.hpp ";
 
 // File: structcasadi_1_1F0XChecker_3_01OP__FLOOR_01_4.xml
 %feature("docstring") casadi::F0XChecker< OP_FLOOR > " [INTERNAL] C++
+includes: casadi_calculus.hpp ";
+
+
+// File: structcasadi_1_1F0XChecker_3_01OP__FMOD_01_4.xml
+%feature("docstring") casadi::F0XChecker< OP_FMOD > " [INTERNAL] C++
 includes: casadi_calculus.hpp ";
 
 
@@ -22041,12 +21977,6 @@ a description of the object.
 
 ";
 
-%feature("docstring") casadi::FixedStepIntegrator::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::FixedStepIntegrator::hasOption "
 
 check if there is an option str
@@ -22701,12 +22631,6 @@ Is initialized?
 
 %feature("docstring") casadi::Function::output_struct "[INTERNAL]
 Input/output structures of the function
-
-";
-
-%feature("docstring") casadi::Function::solve "
-
-the same as evaluate()
 
 ";
 
@@ -27087,12 +27011,6 @@ values.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::HomotopyNLPSolver::spInit "[INTERNAL]  Reset
 the sparsity propagation.
 
@@ -28403,9 +28321,11 @@ Const access an output.
 
 ";
 
-%feature("docstring") casadi::IdasIntegrator::solve "
+%feature("docstring") casadi::IdasIntegrator::schemeEntry "[INTERNAL]  Find
+the index for a string describing a particular entry of a scheme.
 
-the same as evaluate()
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
@@ -29536,14 +29456,6 @@ Get a list of all option names
 
 ";
 
-%feature("docstring") casadi::IdasIntegrator::schemeEntry "[INTERNAL]  Find
-the index for a string describing a particular entry of a scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
 %feature("docstring") casadi::IdasIntegrator::getOutputScheme "
 
 Get output scheme.
@@ -30367,12 +30279,6 @@ Set the number of function inputs.
 ";
 
 %feature("docstring") casadi::ImplicitFixedStepIntegrator::inputScheme "[INTERNAL]  Access input/output scheme.
-
-";
-
-%feature("docstring") casadi::ImplicitFixedStepIntegrator::solve "
-
-the same as evaluate()
 
 ";
 
@@ -31582,12 +31488,6 @@ Get output scheme.
 
 ";
 
-%feature("docstring") casadi::ImplicitFunction::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::ImplicitFunction::checkNode "
 
 Check if the node is pointing to the right type of object.
@@ -32572,12 +32472,6 @@ Get the index into allowed options of a certain option.
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
-
-";
-
-%feature("docstring") casadi::Integrator::solve "
-
-the same as evaluate()
 
 ";
 
@@ -38075,12 +37969,6 @@ input/output scheme.
 
 ";
 
-%feature("docstring") casadi::IpoptSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::IpoptSolver::setNumOutputs "
 
 Set the number of function outputs.
@@ -38967,11 +38855,9 @@ input/output scheme.
 
 ";
 
-%feature("docstring") casadi::KinsolSolver::getOptionNames "
+%feature("docstring") casadi::KinsolSolver::getNumInputs "
 
-INTERNAL.
-
-Get a list of all option names
+Get the number of function inputs.
 
 ";
 
@@ -39024,12 +38910,6 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 %feature("docstring") casadi::KinsolSolver::evaluate "
 
 Evaluate.
-
-";
-
-%feature("docstring") casadi::KinsolSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -39789,9 +39669,11 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::KinsolSolver::getNumInputs "
+%feature("docstring") casadi::KinsolSolver::getOptionNames "
 
-Get the number of function inputs.
+INTERNAL.
+
+Get a list of all option names
 
 ";
 
@@ -41235,12 +41117,6 @@ Get a list of all option names
 
 ";
 
-%feature("docstring") casadi::KnitroSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::KnitroSolver::inputScheme "[INTERNAL]  Access
 input/output scheme.
 
@@ -41754,11 +41630,6 @@ Solve the system of equations, internal vector.
 ------------------------------------------------------------------------
 
 Create a solve node.
-
->  void casadi::Function::solve()
-------------------------------------------------------------------------
-
-the same as evaluate()
 
 ";
 
@@ -42483,11 +42354,6 @@ Solve the system of equations, internal vector.
 ------------------------------------------------------------------------
 
 Create a solve node.
-
->  void casadi::Function::solve()
-------------------------------------------------------------------------
-
-the same as evaluate()
 
 ";
 
@@ -44164,11 +44030,6 @@ Solve the system of equations, internal vector.
 
 Create a solve node.
 
->  void casadi::Function::solve()
-------------------------------------------------------------------------
-
-the same as evaluate()
-
 ";
 
 %feature("docstring") casadi::LinearSolver::setJacSparsity "
@@ -45233,12 +45094,6 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::LPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::LPSolver "
 
 LPSolver.
@@ -45732,6 +45587,11 @@ sparsity, make a copy if there are multiple references to it.
 ";
 
 %feature("docstring") casadi::Matrix::__rdiv__ "";
+
+%feature("docstring") casadi::Matrix::fmod "[INTERNAL]  Operations defined
+in the standard namespace for unambiguous access and Numpy compatibility
+
+";
 
 %feature("docstring") casadi::Matrix::indexed "[INTERNAL]  Indexing for
 interfaced languages get a non-zero
@@ -48128,7 +47988,7 @@ If y does not evaluate to 1, a runtime error is raised
 
 ";
 
-%feature("docstring") casadi::MX::sqrt "";
+%feature("docstring") casadi::MX::fmod "";
 
 %feature("docstring") casadi::MX::__rgt__ "";
 
@@ -48234,6 +48094,8 @@ Get the second dimension (i.e. number of columns)
 Get the first dimension (i.e. number of rows)
 
 ";
+
+%feature("docstring") casadi::MX::sqrt "";
 
 %feature("docstring") casadi::MX::isEqual "
 
@@ -49948,12 +49810,6 @@ Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::MXFunction::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::MXFunction::call "
 
 Evaluate the function symbolically or numerically.
@@ -50802,12 +50658,6 @@ Const access an input.
 ";
 
 %feature("docstring") casadi::NewtonImplicitSolver::setOptionByEnumValue "[INTERNAL]  Set a certain option by giving an enum value.
-
-";
-
-%feature("docstring") casadi::NewtonImplicitSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -51930,12 +51780,6 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring") casadi::NLPImplicitSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -53388,12 +53232,6 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::NLPQPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::NLPQPSolver::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
 
@@ -54003,12 +53841,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 INTERNAL.
 
 Get the default of a certain option
-
-";
-
-%feature("docstring") casadi::NLPSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -57759,12 +57591,6 @@ Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::Nullspace::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::Nullspace::addMonitor "
 
 Add modules to be monitored.
@@ -58941,10 +58767,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::OCPSolver::fullJacobian "
+%feature("docstring") casadi::OCPSolver::getDescription "
 
-Generate a Jacobian function of all the inputs elements with respect to all
-the output elements).
+Return a string with a description (for SWIG)
 
 ";
 
@@ -59005,9 +58830,10 @@ Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::OCPSolver::getDescription "
+%feature("docstring") casadi::OCPSolver::fullJacobian "
 
-Return a string with a description (for SWIG)
+Generate a Jacobian function of all the inputs elements with respect to all
+the output elements).
 
 ";
 
@@ -59080,12 +58906,6 @@ description of the object.
 
 %feature("docstring") casadi::OCPSolver::swap "[INTERNAL]  Swap content
 with another instance.
-
-";
-
-%feature("docstring") casadi::OCPSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -60261,12 +60081,6 @@ a certain option by giving its index into the allowed values.
 
 ";
 
-%feature("docstring") casadi::OldCollocationIntegrator::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::OldCollocationIntegrator::print "[INTERNAL]
 Print a description of the object.
 
@@ -61001,9 +60815,9 @@ Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::OOQPSolver::solve "
+%feature("docstring") casadi::OOQPSolver::copyOptions "
 
-the same as evaluate()
+Copy all options from another object.
 
 ";
 
@@ -61419,12 +61233,6 @@ Evaluate.
 %feature("docstring") casadi::OOQPSolver::hasSetOption "
 
 check if the user has there is an option str
-
-";
-
-%feature("docstring") casadi::OOQPSolver::copyOptions "
-
-Copy all options from another object.
 
 ";
 
@@ -63677,12 +63485,6 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::Parallelizer::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::Parallelizer::printPtr "[INTERNAL]  Print the
 pointer to the internal class
 
@@ -64678,12 +64480,6 @@ oind:  The index of the output
 
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients.
-
-";
-
-%feature("docstring") casadi::PsdIndefDpleSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -65944,12 +65740,6 @@ Set options that make the QP solver more suitable for solving LPs.
 
 ";
 
-%feature("docstring") casadi::QCQPQPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::QCQPQPSolver::getNumOutputs "
 
 Get the number of function outputs.
@@ -66172,12 +65962,6 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 %feature("docstring") casadi::QCQPSolver::hasOption "
 
 check if there is an option str
-
-";
-
-%feature("docstring") casadi::QCQPSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -67208,12 +66992,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::QPLPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::QPLPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
@@ -67662,16 +67440,16 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::QPLPSolver::setNumInputs "
-
-Set the number of function inputs.
-
-";
-
 %feature("docstring") casadi::QPLPSolver::spCanEvaluate "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
+
+";
+
+%feature("docstring") casadi::QPLPSolver::setNumInputs "
+
+Set the number of function inputs.
 
 ";
 
@@ -69122,9 +68900,9 @@ the class able to propagate seeds through the algorithm?
 
 ";
 
-%feature("docstring") casadi::QPOasesSolver::solve "
+%feature("docstring") casadi::QPOasesSolver::dictionary "
 
-the same as evaluate()
+Get the dictionary.
 
 ";
 
@@ -69219,12 +68997,6 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::QPOasesSolver::call "
-
-Evaluate the function symbolically or numerically.
-
-";
-
 %feature("docstring") casadi::QPOasesSolver::getNumOutputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
@@ -69270,9 +69042,9 @@ Get a list of all option names
 
 ";
 
-%feature("docstring") casadi::QPOasesSolver::dictionary "
+%feature("docstring") casadi::QPOasesSolver::call "
 
-Get the dictionary.
+Evaluate the function symbolically or numerically.
 
 ";
 
@@ -69755,12 +69527,6 @@ Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QPSolver::QPSolver "
-
-Default constructor.
-
-";
-
 %feature("docstring") casadi::QPSolver::getOptionDefault "
 
 INTERNAL.
@@ -70227,9 +69993,9 @@ description of the object.
 
 ";
 
-%feature("docstring") casadi::QPSolver::solve "
+%feature("docstring") casadi::QPSolver::QPSolver "
 
-the same as evaluate()
+Default constructor.
 
 ";
 
@@ -70441,12 +70207,6 @@ the node to a node class pointer (or null)
 %feature("docstring") casadi::QPStabilizer::isInit "
 
 Is initialized?
-
-";
-
-%feature("docstring") casadi::QPStabilizer::solve "
-
-the same as evaluate()
 
 ";
 
@@ -70810,9 +70570,9 @@ reference count.
 
 ";
 
-%feature("docstring") casadi::QPStabilizer::getNumInputs "
+%feature("docstring") casadi::QPStabilizer::addMonitor "
 
-Get the number of function inputs.
+Add modules to be monitored.
 
 ";
 
@@ -70836,9 +70596,9 @@ Access input argument
 
 ";
 
-%feature("docstring") casadi::QPStabilizer::addMonitor "
+%feature("docstring") casadi::QPStabilizer::getNumInputs "
 
-Add modules to be monitored.
+Get the number of function inputs.
 
 ";
 
@@ -73190,12 +72950,6 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::RKIntegrator::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::RKIntegrator::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
@@ -74980,14 +74734,6 @@ Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::SCPgen::schemeEntry "[INTERNAL]  Find the
-index for a string describing a particular entry of a scheme.
-
-example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
-adheres to SCHEME_NLPINput
-
-";
-
 %feature("docstring") casadi::SCPgen::call "
 
 Evaluate the function symbolically or numerically.
@@ -75016,9 +74762,11 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::SCPgen::solve "
+%feature("docstring") casadi::SCPgen::schemeEntry "[INTERNAL]  Find the
+index for a string describing a particular entry of a scheme.
 
-the same as evaluate()
+example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
+adheres to SCHEME_NLPINput
 
 ";
 
@@ -77087,12 +76835,6 @@ SWIGINTERNAL
 
 ";
 
-%feature("docstring") casadi::SDPSDQPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SDPSDQPSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
 
@@ -78000,12 +77742,6 @@ val:  can be double, const std::vector<double>&, const Matrix<double>&,
 double *
 
 iname:  input name. Only allowed when an input scheme is set.
-
-";
-
-%feature("docstring") casadi::SDPSOCPSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -79227,12 +78963,6 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SDPSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
@@ -80295,12 +80025,6 @@ Parameters:
 -----------
 
 paropt:  Set of options to be passed to the Parallelizer
-
-";
-
-%feature("docstring") casadi::SDQPSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -83412,12 +83136,6 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::SimpleHomotopyNLPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SimpleHomotopyNLPSolver::makeUnique "
 
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
@@ -84819,12 +84537,6 @@ Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::SimpleIndefDpleSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SimpleIndefDpleSolver::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
@@ -86111,12 +85823,6 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::Simulator::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::Simulator::addMonitor "
 
 Add modules to be monitored.
@@ -86298,6 +86004,11 @@ includes: casadi_calculus.hpp ";
 includes: casadi_calculus.hpp ";
 
 
+// File: structcasadi_1_1SmoothChecker_3_01OP__FMOD_01_4.xml
+%feature("docstring") casadi::SmoothChecker< OP_FMOD > " [INTERNAL] C++
+includes: casadi_calculus.hpp ";
+
+
 // File: structcasadi_1_1SmoothChecker_3_01OP__IF__ELSE__ZERO_01_4.xml
 %feature("docstring") casadi::SmoothChecker< OP_IF_ELSE_ZERO > " [INTERNAL]
 C++ includes: casadi_calculus.hpp ";
@@ -86455,9 +86166,9 @@ description of the object.
 
 ";
 
-%feature("docstring") casadi::SnoptSolver::solve "
+%feature("docstring") casadi::SnoptSolver::getDescription "
 
-the same as evaluate()
+Return a string with a description (for SWIG)
 
 ";
 
@@ -87301,12 +87012,6 @@ Get output scheme.
 %feature("docstring") casadi::SnoptSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
-
-";
-
-%feature("docstring") casadi::SnoptSolver::getDescription "
-
-Return a string with a description (for SWIG)
 
 ";
 
@@ -88580,12 +88285,6 @@ Access input argument
 
 ";
 
-%feature("docstring") casadi::SOCPQCQPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SOCPQCQPSolver::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
@@ -89248,12 +88947,6 @@ Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::SOCPSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SOCPSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
@@ -89277,11 +88970,6 @@ that it is initialized
 
 ";
 
-%feature("docstring") casadi::SOCPSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
-values.
-
-";
-
 %feature("docstring") casadi::SOCPSolver::input "
 
 [UNSAFE] Obtain reference to inputs  getInput, setInput
@@ -89293,6 +88981,12 @@ Access input argument
 %feature("docstring") casadi::SOCPSolver::copyOptions "
 
 Copy all options from another object.
+
+";
+
+%feature("docstring") casadi::SOCPSolver::getOptionTypeName "
+
+Get the type name of a certain option.
 
 ";
 
@@ -89308,9 +89002,8 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::SOCPSolver::getOptionTypeName "
-
-Get the type name of a certain option.
+%feature("docstring") casadi::SOCPSolver::getCount "[INTERNAL]  Get the
+reference count.
 
 ";
 
@@ -89550,8 +89243,8 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::SOCPSolver::getCount "[INTERNAL]  Get the
-reference count.
+%feature("docstring") casadi::SOCPSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+values.
 
 ";
 
@@ -92052,12 +91745,6 @@ Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::SQICSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SQICSolver::outputScheme "[INTERNAL]  Access
 input/output scheme.
 
@@ -94114,12 +93801,6 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::SQPMethod::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SQPMethod::assignNodeNoCount "[INTERNAL]
 Assign the node to a node class pointer without reference counting.
 
@@ -94465,12 +94146,6 @@ C++ includes: stabilized_qp_solver.hpp ";
 %feature("docstring") casadi::StabilizedQPSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
-
-";
-
-%feature("docstring") casadi::StabilizedQPSolver::solve "
-
-the same as evaluate()
 
 ";
 
@@ -95829,17 +95504,9 @@ content with another instance.
 
 ";
 
-%feature("docstring") casadi::StabilizedSQICSolver::get "
+%feature("docstring") casadi::StabilizedSQICSolver::getNumOutputs "
 
->  const SharedObjectNode * casadi::SharedObject::get() const 
-------------------------------------------------------------------------
-[INTERNAL] 
-Get a const pointer to the node.
-
->  SharedObjectNode * casadi::SharedObject::get()
-------------------------------------------------------------------------
-[INTERNAL] 
-Get a pointer to the node.
+Get the number of function outputs.
 
 ";
 
@@ -95873,12 +95540,6 @@ Const access an output.
 
 ";
 
-%feature("docstring") casadi::StabilizedSQICSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::StabilizedSQICSolver::setOptionByEnumValue "[INTERNAL]  Set a certain option by giving an enum value.
 
 ";
@@ -95895,12 +95556,6 @@ Add modules to be monitored.
 ";
 
 %feature("docstring") casadi::StabilizedSQICSolver::outputScheme "[INTERNAL]  Access input/output scheme.
-
-";
-
-%feature("docstring") casadi::StabilizedSQICSolver::getNumOutputs "
-
-Get the number of function outputs.
 
 ";
 
@@ -96017,6 +95672,20 @@ Copy all options from another object.
 %feature("docstring") casadi::StabilizedSQICSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block
+
+";
+
+%feature("docstring") casadi::StabilizedSQICSolver::get "
+
+>  const SharedObjectNode * casadi::SharedObject::get() const 
+------------------------------------------------------------------------
+[INTERNAL] 
+Get a const pointer to the node.
+
+>  SharedObjectNode * casadi::SharedObject::get()
+------------------------------------------------------------------------
+[INTERNAL] 
+Get a pointer to the node.
 
 ";
 
@@ -96399,12 +96068,6 @@ propagating_sparsity.cpp)
 %feature("docstring") casadi::StabilizedSQPMethod::setNumOutputs "
 
 Set the number of function outputs.
-
-";
-
-%feature("docstring") casadi::StabilizedSQPMethod::solve "
-
-the same as evaluate()
 
 ";
 
@@ -99006,12 +98669,6 @@ Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::SundialsIntegrator::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::SundialsIntegrator::spInit "[INTERNAL]  Reset
 the sparsity propagation.
 
@@ -100172,6 +99829,8 @@ An SXElement qualifies as leaf when it has no dependencies.
 
 %feature("docstring") casadi::SXElement::tan "";
 
+%feature("docstring") casadi::SXElement::fmod "";
+
 %feature("docstring") casadi::SXElement::isNull "
 
 SXElement nodes are not allowed to be null.
@@ -101016,12 +100675,6 @@ index for a string describing a particular entry of a scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
 adheres to SCHEME_NLPINput
-
-";
-
-%feature("docstring") casadi::SXFunction::solve "
-
-the same as evaluate()
 
 ";
 
@@ -102964,11 +102617,6 @@ Solve the system of equations, internal vector.
 ------------------------------------------------------------------------
 
 Create a solve node.
-
->  void casadi::Function::solve()
-------------------------------------------------------------------------
-
-the same as evaluate()
 
 ";
 
@@ -108017,12 +107665,6 @@ get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring") casadi::WorhpSolver::solve "
-
-the same as evaluate()
-
-";
-
 %feature("docstring") casadi::WorhpSolver::spInit "[INTERNAL]  Reset the
 sparsity propagation.
 
@@ -109244,31 +108886,8 @@ seperately ";
 %feature("docstring") casadi::ProfilingType< ProfilingData_SOURCE > "
 [INTERNAL] ";
 
-%feature("docstring") casadi::controlsimulatorIn "
-
->  ControlSimulatorInputIOSchemeVector<M> casadi::controlsimulatorIn(const std::string &arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const std::string &arg_s2="", const M &arg_m2=M())
-------------------------------------------------------------------------
-
-Input arguments of a control simulator
-
->Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 4) [controlsimulatorIn]
-+------------------------+------------------------+------------------------+
-|       Full name        |         Short          |      Description       |
-+========================+========================+========================+
-| CONTROLSIMULATOR_X0    | x0                     | Differential or        |
-|                        |                        | algebraic state at t0  |
-|                        |                        | (dimension nx-by-1) .  |
-+------------------------+------------------------+------------------------+
-| CONTROLSIMULATOR_P     | p                      | Parameters that are    |
-|                        |                        | fixed over the entire  |
-|                        |                        | horizon (dimension np- |
-|                        |                        | by-1) .                |
-+------------------------+------------------------+------------------------+
-| CONTROLSIMULATOR_U     | u                      | Parameters that change |
-|                        |                        | over the integration   |
-|                        |                        | intervals (dimension   |
-|                        |                        | nu-by-(ns-1)) .        |
-+------------------------+------------------------+------------------------+
+%feature("docstring") casadi::fmod "[INTERNAL]  Pre-C99 elementary
+functions from the 'math.h' ('cmath') header.
 
 ";
 
@@ -110104,6 +109723,11 @@ same as: res += mul(A, v)
 %feature("docstring") casadi::isStrictlyMonotone "
 
 Check if the vector is strictly monotone.
+
+";
+
+%feature("docstring") casadi::casadi_asum "[INTERNAL]  ASUM: ||x||_1 ->
+return.
 
 ";
 
@@ -112249,8 +111873,31 @@ Return summation of all elements.
 
 ";
 
-%feature("docstring") casadi::casadi_asum "[INTERNAL]  ASUM: ||x||_1 ->
-return.
+%feature("docstring") casadi::controlsimulatorIn "
+
+>  ControlSimulatorInputIOSchemeVector<M> casadi::controlsimulatorIn(const std::string &arg_s0="", const M &arg_m0=M(), const std::string &arg_s1="", const M &arg_m1=M(), const std::string &arg_s2="", const M &arg_m2=M())
+------------------------------------------------------------------------
+
+Input arguments of a control simulator
+
+>Input scheme: casadi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 4) [controlsimulatorIn]
++------------------------+------------------------+------------------------+
+|       Full name        |         Short          |      Description       |
++========================+========================+========================+
+| CONTROLSIMULATOR_X0    | x0                     | Differential or        |
+|                        |                        | algebraic state at t0  |
+|                        |                        | (dimension nx-by-1) .  |
++------------------------+------------------------+------------------------+
+| CONTROLSIMULATOR_P     | p                      | Parameters that are    |
+|                        |                        | fixed over the entire  |
+|                        |                        | horizon (dimension np- |
+|                        |                        | by-1) .                |
++------------------------+------------------------+------------------------+
+| CONTROLSIMULATOR_U     | u                      | Parameters that change |
+|                        |                        | over the integration   |
+|                        |                        | intervals (dimension   |
+|                        |                        | nu-by-(ns-1)) .        |
++------------------------+------------------------+------------------------+
 
 ";
 
@@ -112879,6 +112526,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: e0__diagram_8hpp.xml
+
+
+// File: empty__lib_8cpp.xml
 
 
 // File: exacthessian_8hpp.xml
@@ -113934,33 +113584,17 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: wsnopt_8hpp.xml
-%feature("docstring") snopt_memb  "
+%feature("docstring") sninit_  "
 [INTERNAL] ";
-%feature("docstring") snopt_init  "[INTERNAL] ";
-
-%feature("docstring") snopt_spec  "[INTERNAL] ";
-
-%feature("docstring") sninit_  "[INTERNAL] ";
-
-%feature("docstring") snopt_geti  "[INTERNAL] ";
-
-%feature("docstring") snopt_c  "[INTERNAL] ";
-
-%feature("docstring") snset_  "[INTERNAL] ";
-
 %feature("docstring") snseti_  "[INTERNAL] ";
-
-%feature("docstring") snopt_getc  "[INTERNAL] ";
 
 %feature("docstring") snsetr_  "[INTERNAL] ";
 
-%feature("docstring") snopt_getr  "[INTERNAL] ";
+%feature("docstring") snset_  "[INTERNAL] ";
 
-%feature("docstring") snopt_seti  "[INTERNAL] ";
+%feature("docstring") snoptc_  "[INTERNAL] ";
 
-%feature("docstring") snopt_setr  "[INTERNAL] ";
-
-%feature("docstring") snopt_set  "[INTERNAL] ";
+%feature("docstring") snmemb_  "[INTERNAL] ";
 
 
 // File: wsqic_8cpp.xml

@@ -1156,6 +1156,9 @@
 %exception  casadi::Matrix< DataType >::fmin(const Matrix< DataType > &y) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::Matrix< DataType >::fmod(const Matrix< DataType > &y) const  {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::Matrix< DataType >::get(DataType &val, SparsityType sp=SPARSE) const  {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -2855,6 +2858,9 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::fmin(int x, int y) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  casadi::fmod(const T &x, const T &y) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::getDescription(const std::vector< T > &v) {
