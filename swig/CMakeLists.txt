@@ -206,7 +206,6 @@ file(GLOB dlls "${PROJECT_BINARY_DIR}/lib/*.dll")
 install(FILES ${dlls}
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
-  USE_SOURCE_PERMISSIONS
 )
 
 foreach(my_module ${modules_python})
