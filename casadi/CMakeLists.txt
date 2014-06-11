@@ -28,6 +28,7 @@ macro(casadi_library name)
   install(TARGETS ${name}
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION lib
   )
   SET_TARGET_PROPERTIES(
     ${name}

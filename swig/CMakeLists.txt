@@ -200,6 +200,17 @@ install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi
   PATTERN .py EXCLUDE
 )
 
+#  For DLL-based systems, rpath is not available,
+# so copy the dlls to the same directory as the .pyd files
+install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
+  DESTINATION "${PYTHON_PREFIX}/casadi"
+  COMPONENT install_python
+  USE_SOURCE_PERMISSIONS
+  FILES_MATCHING
+  PATTERN .dll
+  PATTERN .svn EXCLUDE
+)
+
 foreach(my_module ${modules_python})
   install(TARGETS ${my_module}
     DESTINATION "${PYTHON_PREFIX}/casadi"
