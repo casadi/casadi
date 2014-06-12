@@ -65,7 +65,7 @@ void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::v
 *  with T_1 in Hessenberg form (upper triangular + one band below the diagonal)
 *   and T_2..T_K  upper diagonal
 *
-*  with Z_k Z_k' = eye(n) = Z_k' Z_k
+*  with <tt>Z_k Z_k' = eye(n) = Z_k' Z_k</tt>
 *
 */
 CASADI_SLICOT_INTERFACE_EXPORT void slicot_periodic_schur(
