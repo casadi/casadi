@@ -755,7 +755,17 @@ class Toolstests(casadiTestCase):
     self.checkarray(f.getOutput(0),s_["a"])
     self.checkarray(f.getOutput(1),s_["b"])
     self.checkarray(f.getOutput(2),s_["c"])
-
+   
+  def test_issue1116(self):
+    S = struct([entry("A",shape=(4,4),type="symm")])
+    v = S()
+    v["A"]  = np.eye(4)
+    
+    a = DMatrix(v["A"])
+    v["A"]  = DMatrix(np.eye(4))
+    b = DMatrix(v["A"])
+    
+    self.checkarray(a,b)
     
 if __name__ == '__main__':
     unittest.main()

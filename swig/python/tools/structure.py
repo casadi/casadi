@@ -544,23 +544,24 @@ class GetterDispatcher(Dispatcher):
 
 class SetterDispatcher(Dispatcher):
   def __call__(self,payload,canonicalIndex,extraIndex=None,entry=None):
+    payload_ = self.mtype(payload)
     type = None if entry is None else entry.type
     if canonicalIndex in self.struct.map:
       i = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry)
       try:
         if type is None:
-          self.master[i] = payload
+          self.master[i] = payload_
         elif type=="symm":
           iflip = performExtraIndex(self.struct.map[canonicalIndex],extraIndex=extraIndex,entry=entry,flip=True)
-          if not(hasattr(payload,"isScalar")) or payload.isScalar():
-            self.master[i] = payload
-            self.master[iflip] = payload
+          if payload_.isScalar():
+            self.master[i] = payload_
+            self.master[iflip] = payload_
           else:
             oi = performExtraIndex(DMatrix(entry.originalsparsity,1),extraIndex=extraIndex,entry=entry)
-            if oi.sparsity()!=payload.sparsity():
-              raise Exception("Payload sparsity " + payload.dimString() +  " does not match lhs sparisty " + oi.dimString() + "." )
-            self.master[iflip] = payload.T[iflip.sparsity()]
-            self.master[i] = payload[i.sparsity()]
+            if oi.sparsity()!=payload_.sparsity():
+              raise Exception("Payload sparsity " + payload_.dimString() +  " does not match lhs sparisty " + oi.dimString() + "." )
+            self.master[iflip] = payload_.T[iflip.sparsity()]
+            self.master[i] = payload_[i.sparsity()]
         else:
           raise Exception("Cannot handle type '%s'." % entry.type)
       except NotImplementedError as e:
@@ -593,7 +594,8 @@ class MasterGettable:
 class MasterSettable:
   @properGetitem
   def __setitem__(self,powerIndex,value):
-    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=SetterDispatcher(struct=self.struct,master=self.master),payload=value)
+    return self.struct.traverseByPowerIndex(powerIndex,dispatcher=
+    SetterDispatcher(struct=self.struct,master=self.master,mtype=self.mtype),payload=value)
     
 def delegation(extraIndex,entry,i):
   if isString(extraIndex) or (isinstance(extraIndex,list) and len(extraIndex)>0 and all([isString(e) for e in extraIndex])):
