@@ -109176,18 +109176,20 @@ Reshape the MX.
 ------------------------------------------------------------------------
 [INTERNAL]
 
->  void casadi::slicot_periodic_schur(const std::vector< Matrix< double > > &A, std::vector< Matrix< double > > &output_T, std::vector< Matrix< double > > &output_Z, std::vector< double > &eig_real, std::vector< double > &output_eig_imag)
+>  void casadi::slicot_periodic_schur(const std::vector< Matrix< double > > &A, std::vector< Matrix< double > > &output_T, std::vector< Matrix< double > > &output_Z, std::vector< double > &output_eig_real, std::vector< double > &output_eig_imag)
 ------------------------------------------------------------------------
 
 Obtain Periodic Schur Form of a set of matrices.
 
 Finds Z_i such that
 
-Z_1' * H_1 * Z_2 = T_1,           Z_2' * H_2 * Z_3 = T_2, ...           Z_K'
-* H_K * Z_1 = T_K,
+Z_1' * A_1 * Z_2 = T_1,           Z_2' * A_2 * Z_3 = T_2, ...           Z_K'
+* A_K * Z_1 = T_K,
 
 with T_1 in Hessenberg form (upper triangular + one band below the diagonal)
 and T_2..T_K upper diagonal
+
+with Z_k Z_k' = eye(n) = Z_k' Z_k
 
 ";
 
