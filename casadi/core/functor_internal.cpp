@@ -33,7 +33,7 @@ namespace casadi {
   //Call
 
   DerivativeGeneratorCInternal::DerivativeGeneratorCInternal(DerivativeGeneratorCPtr ptr) :
-      FunctorCInternal(ptr) {
+      FunctorCInternal<DerivativeGeneratorCPtr>(ptr) {
   }
 
   Function DerivativeGeneratorCInternal::call(Function& fcn, int nfwd, int nadj, void* user_data) {
