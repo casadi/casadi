@@ -5,7 +5,7 @@ if __name__=='__main__':
 
     casadi_short = 'framework for numerical optimization and algorithmic differentiation'
     casadi_long = '''\
- CasADi is a framework for numerical optimization and algorithmic differentiation. It can be used from C++ or Python.
+CasADi is a framework for numerical optimization and algorithmic differentiation. It can be used from C++ or Python.
 
 It provides users with a set of building blocks that simplify the process of implementing highly efficient gradient-based solvers for numerical optimization problems in general and simulation-based nonlinear programs (optimal control) in particular. This can be done with a range of different methods including direct collocation, direct multiple shooting and indirect methods.
 
@@ -101,7 +101,7 @@ Vcs-Browser: https://github.com/casadi/casadi
         else:
             print name + " missing desc_long"
             desc_long = casadi_long
-        control_file += '''\
+        control_file += ('''\
 Package: libcasadi-%(name)s%(version)s
 Section: libs
 Architecture: any
@@ -118,7 +118,7 @@ Description:
 ''' + casadi_short + '''\
  (%(name)s dev module)
  
-''' + casadi_long % {
+''' + casadi_long) % {
        'name':name,
        'version':version,
        'libdeps':libdeps,
