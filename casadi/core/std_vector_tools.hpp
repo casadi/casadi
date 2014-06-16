@@ -62,7 +62,7 @@ namespace std {
 
 namespace casadi {
 
-  #ifndef SWIG
+#ifndef SWIG
   /** Range function
   * \param start
   * \param stop
@@ -119,7 +119,7 @@ namespace casadi {
 
 
   /// \cond INTERNAL
-  #ifndef SWIG
+#ifndef SWIG
   /**
   Apply a function f to each element in a vector
   */
@@ -131,7 +131,7 @@ namespace casadi {
   */
   template<class T>
   void applymap(void (*f)(T&), std::vector<T>&);
-  #endif // SWIG
+#endif // SWIG
   /// \endcond
 
 
@@ -185,7 +185,7 @@ namespace casadi {
   template<typename T>
   void read_matlab(std::ifstream &file, std::vector<std::vector<T> > &v);
 
-  #ifndef SWIG
+#ifndef SWIG
   /// Matlab's linspace
   template<typename T, typename F, typename L>
   void linspace(std::vector<T> &v, const F& first, const L& last);
@@ -225,7 +225,7 @@ namespace casadi {
   template<typename T>
   void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,
             bool invert_indices =false);
-  #endif //SWIG
+#endif //SWIG
 
   /** \brief Make a vector of a certain length with its entries specified
   * Usage C++:
@@ -233,7 +233,7 @@ namespace casadi {
   * Usage Python:
   *   makeVector(ClassName,(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...)
   */
-  #ifndef SWIG
+#ifndef SWIG
   template<typename T>
   std::vector<T> makeVector(int size,
                             int ind0=-1, const T& val0=T(),
@@ -256,22 +256,22 @@ namespace casadi {
                             int ind17=-1, const T& val17=T(),
                             int ind18=-1, const T& val18=T(),
                             int ind19=-1, const T& val19=T());
-  #else // SWIG
-  #ifdef SWIGPYTHON
+#else // SWIG
+#ifdef SWIGPYTHON
 %pythoncode %{ #NOLINT(whitespace/braces)
-   def makeVector(T, size, *elems):
-      assert len(elems) % 2 == 0, \
-        "The number of provided indices does not the number of provided values"
-      num_elem = len(elems)/2
-      ret = [T()]*size
-      for i in range(num_elem):
-        ind = elems[2*i]
-        val = elems[2*i+1]
-        ret[ind] = val
-      return ret
+ def makeVector(T, size, *elems):
+     assert len(elems) % 2 == 0, \
+         "The number of provided indices does not the number of provided values"
+     num_elem = len(elems)/2
+     ret = [T()]*size
+     for i in range(num_elem):
+         ind = elems[2*i]
+         val = elems[2*i+1]
+         ret[ind] = val
+     return ret
 %}
-  #endif // SWIGPYTHON
-  #endif // SWIG
+#endif // SWIGPYTHON
+#endif // SWIG
 
 #ifndef SWIG
   // Create a vector of length 1
@@ -374,7 +374,7 @@ namespace casadi {
     }
   }
 
-  #ifndef SWIG
+#ifndef SWIG
   template<class T>
   std::vector<T> applymap(T (*f)(const T&) , const std::vector<T>& comp) {
     std::vector<T> ret(comp.size());
@@ -386,7 +386,7 @@ namespace casadi {
   void applymap(void (*f)(T &), std::vector<T>& comp) {
     std::for_each(comp.begin(), comp.end(), f);
   }
-  #endif //SWIG
+#endif //SWIG
 
   template<typename T>
   bool inBounds(const std::vector<T> &v, int upper) {
