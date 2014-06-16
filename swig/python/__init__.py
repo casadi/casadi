@@ -28,39 +28,39 @@ import warnings
 # libraries we linked against are visible to the libraries dlopen loads.
 # Specifically, hsl.so needs blas and lapack.
 try:
-  import numpy as np
+    import numpy as np
 except:
-  pass
+    pass
 
 import sys
 import ctypes
 
 if hasattr(sys,"getdlopenflags"):
-  flags0 = sys.getdlopenflags() # get the original flags
-  sys.setdlopenflags( flags0 | ctypes.RTLD_GLOBAL ) # set our workaround flags
+    flags0 = sys.getdlopenflags() # get the original flags
+    sys.setdlopenflags( flags0 | ctypes.RTLD_GLOBAL ) # set our workaround flags
 
 from casadi import *    # import everything
 import casadi as casadi # import everything
 
 if 'casadi_core' in failed_modules:
-  raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
+    raise Exception("Error while loading casadi: %s" % str(failed_modules["casadi_core"]))
 
 if hasattr(sys,"getdlopenflags"):
-  sys.setdlopenflags( flags0 ) # set the old flags back
+    sys.setdlopenflags( flags0 ) # set the old flags back
   
 import os
 import types
   
 def wrapper(f, warning,error=False):
     def new(*args, **kwargs):
-      print "*" * 40
-      print "Deprecation Warning"
-      print "-" * 40
-      print warning
-      print "*" * 40
-      if error:
-        raise Exception("Deprecation error: " + warning)
-      return f(*args, **kwargs)
+        print "*" * 40
+        print "Deprecation Warning"
+        print "-" * 40
+        print warning
+        print "*" * 40
+        if error:
+            raise Exception("Deprecation error: " + warning)
+        return f(*args, **kwargs)
     return new
 
 
@@ -90,12 +90,12 @@ import contextlib
 
 @contextlib.contextmanager
 def internalAPI():
-  backup = CasadiOptions.getAllowedInternalAPI()
-  CasadiOptions.setAllowedInternalAPI(True)
-  yield
-  CasadiOptions.setAllowedInternalAPI(backup)
+    backup = CasadiOptions.getAllowedInternalAPI()
+    CasadiOptions.setAllowedInternalAPI(True)
+    yield
+    CasadiOptions.setAllowedInternalAPI(backup)
 
 __version__ = CasadiMeta.getVersion()
 if '+' in __version__ and CasadiMeta.getGitDescribe()!='':
-  __version__  = CasadiMeta.getGitDescribe()
+    __version__  = CasadiMeta.getGitDescribe()
   
