@@ -258,18 +258,17 @@ namespace casadi {
                             int ind19=-1, const T& val19=T());
 #else // SWIG
 #ifdef SWIGPYTHON
-%pythoncode %{
-#NOLINT(whitespace/braces)
-def makeVector(T, size, *elems):
-    assert len(elems) % 2 == 0, \
-        "The number of provided indices does not the number of provided values"
-    num_elem = len(elems)/2
-    ret = [T()]*size
-    for i in range(num_elem):
-        ind = elems[2*i]
-        val = elems[2*i+1]
-        ret[ind] = val
-    return ret
+%pythoncode %{ #NOLINT(whitespace/braces)
+ def makeVector(T, size, *elems):
+     assert len(elems) % 2 == 0, \
+         "The number of provided indices does not the number of provided values"
+     num_elem = len(elems)/2
+     ret = [T()]*size
+     for i in range(num_elem):
+         ind = elems[2*i]
+         val = elems[2*i+1]
+         ret[ind] = val
+     return ret
 %}
 #endif // SWIGPYTHON
 #endif // SWIG
