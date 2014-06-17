@@ -5,11 +5,11 @@ if __name__=='__main__':
 
     casadi_short = 'framework for numerical optimization and algorithmic differentiation'
     casadi_long = '''\
-CasADi is a framework for numerical optimization and algorithmic differentiation. It can be used from C++ or Python.
+ CasADi is a framework for numerical optimization and algorithmic differentiation. It can be used from C++ or Python.
 
-It provides users with a set of building blocks that simplify the process of implementing highly efficient gradient-based solvers for numerical optimization problems in general and simulation-based nonlinear programs (optimal control) in particular. This can be done with a range of different methods including direct collocation, direct multiple shooting and indirect methods.
+ It provides users with a set of building blocks that simplify the process of implementing highly efficient gradient-based solvers for numerical optimization problems in general and simulation-based nonlinear programs (optimal control) in particular. This can be done with a range of different methods including direct collocation, direct multiple shooting and indirect methods.
 
-Contained in the package is a symbolic framework that allows constructing large computational graphs made up by matrix-valued operations and a state-of-the-art framework for algorithmic differentiation (AD) - also known as automatic differentiation - that operates on these computational graphs. Also contained is a set of solvers and interfaces to third-party solvers for nonlinear programming (NLP), quadratic programming (QP) and initial-value problems in ordinary differential equations (ODE) or diffential-algebraic equations (DAE). Other features of interest include generation of self-contained C-code and symbolic import of models from the Modelica physical modeling language and the AMPL algebraic modeling language.
+ Contained in the package is a symbolic framework that allows constructing large computational graphs made up by matrix-valued operations and a state-of-the-art framework for algorithmic differentiation (AD) - also known as automatic differentiation - that operates on these computational graphs. Also contained is a set of solvers and interfaces to third-party solvers for nonlinear programming (NLP), quadratic programming (QP) and initial-value problems in ordinary differential equations (ODE) or diffential-algebraic equations (DAE). Other features of interest include generation of self-contained C-code and symbolic import of models from the Modelica physical modeling language and the AMPL algebraic modeling language.
 
 More information about CasADi can be found on the project website, http://casadi.org.
 '''
