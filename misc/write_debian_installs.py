@@ -67,7 +67,7 @@ Build-Depends: debhelper (>= 9),
                coinor-libipopt-dev,
                libblas-dev,
                liblapack-dev,
-               swig,
+               swig2.0,
                python-dev,
                python-support (>= 0.4.1),
                python-numpy
