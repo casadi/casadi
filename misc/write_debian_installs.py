@@ -3,15 +3,30 @@
 if __name__=='__main__':
     version = '2.0'
 
-    casadi_short = 'framework for numerical optimization and algorithmic differentiation'
+    casadi_short = 'numerical optimization / algorithmic differentiation framework'
     casadi_long = '''\
- CasADi is a framework for numerical optimization and algorithmic differentiation. It can be used from C++ or Python.
+ CasADi is a numerical optimization / algorithmic differentiation framework.
+ It can be used from C++ or Python.
  .
- It provides users with a set of building blocks that simplify the process of implementing highly efficient gradient-based solvers for numerical optimization problems in general and simulation-based nonlinear programs (optimal control) in particular. This can be done with a range of different methods including direct collocation, direct multiple shooting and indirect methods.
+ It provides users with a set of building blocks that simplify the process of
+ implementing highly efficient gradient-based solvers for numerical optimization
+ problems in general and simulation-based nonlinear programs (optimal control)
+ in particular. This can be done with a range of different methods including
+ direct collocation, direct multiple shooting and indirect methods.
  .
- Contained in the package is a symbolic framework that allows constructing large computational graphs made up by matrix-valued operations and a state-of-the-art framework for algorithmic differentiation (AD) - also known as automatic differentiation - that operates on these computational graphs. Also contained is a set of solvers and interfaces to third-party solvers for nonlinear programming (NLP), quadratic programming (QP) and initial-value problems in ordinary differential equations (ODE) or diffential-algebraic equations (DAE). Other features of interest include generation of self-contained C-code and symbolic import of models from the Modelica physical modeling language and the AMPL algebraic modeling language.
+ Contained in the package is a symbolic framework that allows constructing
+ large computational graphs made up by matrix-valued operations and a
+ state-of-the-art framework for algorithmic differentiation (AD) - also known
+ as automatic differentiation - that operates on these computational graphs.
+ Also contained is a set of solvers and interfaces to third-party solvers for
+ nonlinear programming (NLP), quadratic programming (QP) and initial-value
+ problems in ordinary differential equations (ODE) or diffential-algebraic
+ equations (DAE). Other features of interest include generation of
+ self-contained C-code and symbolic import of models from the Modelica physical
+ modeling language and the AMPL algebraic modeling language.
  .
- More information about CasADi can be found on the project website, http://casadi.org.
+ More information about CasADi can be found on the project website,
+ http://casadi.org.
 '''
     
     # all the modules we current generate
@@ -31,8 +46,10 @@ if __name__=='__main__':
     #stuff['sundials-interface'] = {'dir': 'interfaces/sundials'}
 
     # extra module-specific customization
+    stuff['core']['desc_short'] = 'numerical optimization and algorithmic differentiation framework'
     stuff['core']['desc_long'] = '''\
- Core module of CasADi, in particular containing the symbolic framework and a self-contained implementation of algorithmic differentiation.
+ Core module of CasADi, in particular containing the symbolic framework and a
+ self-contained implementation of algorithmic differentiation.
  .
 ''' + casadi_long
 
@@ -93,13 +110,25 @@ Vcs-Browser: https://github.com/casadi/casadi
             desc_short = info['desc_short']
         else:
             print name + " missing desc_short"
-            desc_short = casadi_short + ' (' + name + ' module)'
+            desc_short = name + ' module for CasADi optimization framework'
         # long description
         if 'desc_long' in info:
             desc_long = info['desc_long']
         else:
             print name + " missing desc_long"
             desc_long = casadi_long
+
+        # development version descriptions
+        dev_desc_short = 'development files for CasADi ' + name + ' module'
+        dev_desc_long = desc_long
+
+        ##################### DON'T CHANGE ANYTHING AFTER THIS LINE #####################
+        assert len(desc_short) <= 80, (name+ ": short description must be 80 chars or less")
+        assert len(dev_desc_short) <= 80, (name+ ": development short description must be 80 chars or less")
+        for line in desc_long:
+            assert len(line) <= 80, (name+ ": each line of long description must be 80 chars or less")
+        for line in dev_desc_long:
+            assert len(line) <= 80, (name+ ": each line of development long description must be 80 chars or less")
         control_file += '''\
 Package: libcasadi-%(name)s%(version)s
 Section: libs
@@ -113,15 +142,17 @@ Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
 Depends: ${misc:Depends}%(devlibdeps)s
-Description: development files for CasADi %(name)s module
-%(desc_long)s
+Description: %(dev_desc_short)s
+%(dev_desc_long)s
 
 ''' % {'name':name,
        'version':version,
        'libdeps':libdeps,
        'devlibdeps':devlibdeps,
        'desc_short':desc_short,
-       'desc_long':desc_long.rstrip()}
+       'dev_desc_short':dev_desc_short,
+       'desc_long':desc_long.rstrip(),
+       'dev_desc_long':dev_desc_long.rstrip()}
 
         devfile = '''\
 usr/lib/libcasadi_%(name)s.so
