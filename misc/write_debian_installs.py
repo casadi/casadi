@@ -6,12 +6,12 @@ if __name__=='__main__':
     casadi_short = 'framework for numerical optimization and algorithmic differentiation'
     casadi_long = '''\
  CasADi is a framework for numerical optimization and algorithmic differentiation. It can be used from C++ or Python.
-
+ .
  It provides users with a set of building blocks that simplify the process of implementing highly efficient gradient-based solvers for numerical optimization problems in general and simulation-based nonlinear programs (optimal control) in particular. This can be done with a range of different methods including direct collocation, direct multiple shooting and indirect methods.
-
+ .
  Contained in the package is a symbolic framework that allows constructing large computational graphs made up by matrix-valued operations and a state-of-the-art framework for algorithmic differentiation (AD) - also known as automatic differentiation - that operates on these computational graphs. Also contained is a set of solvers and interfaces to third-party solvers for nonlinear programming (NLP), quadratic programming (QP) and initial-value problems in ordinary differential equations (ODE) or diffential-algebraic equations (DAE). Other features of interest include generation of self-contained C-code and symbolic import of models from the Modelica physical modeling language and the AMPL algebraic modeling language.
-
-More information about CasADi can be found on the project website, http://casadi.org.
+ .
+ More information about CasADi can be found on the project website, http://casadi.org.
 '''
     
     # all the modules we current generate
@@ -31,10 +31,9 @@ More information about CasADi can be found on the project website, http://casadi
     #stuff['sundials-interface'] = {'dir': 'interfaces/sundials'}
 
     # extra module-specific customization
-    stuff['core']['desc_short'] = casadi_short + ' (core module)'
     stuff['core']['desc_long'] = '''\
  Core module of CasADi, in particular containing the symbolic framework and a self-contained implementation of algorithmic differentiation.
-
+ .
 ''' + casadi_long
 
     stuff['ipopt-interface']['libdeps'] = ['coinor-libipopt1']
@@ -101,7 +100,7 @@ Vcs-Browser: https://github.com/casadi/casadi
         else:
             print name + " missing desc_long"
             desc_long = casadi_long
-        control_file += ('''\
+        control_file += '''\
 Package: libcasadi-%(name)s%(version)s
 Section: libs
 Architecture: any
@@ -114,12 +113,10 @@ Package: libcasadi-%(name)s-dev
 Section: libdevel
 Architecture: any
 Depends: ${misc:Depends}%(devlibdeps)s
-Description: 
-''' + casadi_short + '''\
- (%(name)s dev module)
- 
-''' + casadi_long) % {
-       'name':name,
+Description: development files for CasADi %(name)s module
+%(desc_long)s
+
+''' % {'name':name,
        'version':version,
        'libdeps':libdeps,
        'devlibdeps':devlibdeps,
@@ -154,7 +151,7 @@ Depends: ${python:Depends}, ${shlibs:Depends}, ${misc:Depends},
 Provides: ${python:Provides}
 Description: Python bindings for CasADi
  This package contains Python bindings for CasADi.
- 
+ .
 ''' + casadi_long).rstrip()
 
     f = open('control', 'w')
