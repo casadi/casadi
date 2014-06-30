@@ -28,73 +28,56 @@ def optionDocumented(name,cl,metadata):
   for c in acl:
     if 'options' in metadata[c] and name in metadata[c]['options']: return True
   return False
+  
+def extra(metadata,i,iname):
+  for name in i.getOptionNames():
+    if optionDocumented(name,"casadi::%s" % iname,metadata):
+      continue
+    meta = metadata["casadi::%s" % iname]["options"][name] = dict()
+    meta['name'] = name
+    meta['type'] = i.getOptionTypeName(name)
+    meta['used'] = "casadi::%s" % iname
+    meta['inherit'] = False
+    meta['description'] = i.getOptionDescription(name)
+    try:
+      meta['default'] = i.getOptionDefault(name)
+    except:
+      meta['default'] = ''
+      pass #too bad
 
 def addExtra(metadata):
 
   x=SX.sym("x")
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
-  i = IpoptSolver(f)
-  
-  for name in i.getOptionNames():
-    if optionDocumented(name,"casadi::IpoptInternal",metadata):
-      continue
-    meta = metadata["casadi::IpoptInternal"]["options"][name] = dict()
-    meta['name'] = name
-    meta['type'] = i.getOptionTypeName(name)
-    meta['used'] = 'casadi::IpoptInternal'
-    meta['inherit'] = False
-    meta['description'] = i.getOptionDescription(name)
-    try:
-      meta['default'] = i.getOptionDefault(name)
-    except:
-      meta['default'] = ''
-      pass #too bad
-    #if (len(i.getOptionAllowed(name))>1):
-    #  meta['description'] += "(" + "|".join(i.getOptionAllowed(name))  + ")"
-
+  try:
+    i = IpoptSolver(f)
+    extra(metadata,i,"IpoptInternal")
+  except Exception as e:
+    print e 
   
   x=SX.sym("x")
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
   try:
     i = WorhpSolver(f)
-  except:
-    return
+    extra(metadata,i,"WorhpInternal")
+  except Exception as e:
+    print e
     
-  for name in i.getOptionNames():
-    if optionDocumented(name,"casadi::WorhpInternal",metadata): continue
-    meta = metadata["casadi::WorhpInternal"]["options"][name] = dict()
-    meta['name'] = name
-    meta['type'] = i.getOptionTypeName(name)
-    meta['used'] = 'casadi::WorhpInternal'
-    meta['inherit'] = False
-    meta['description'] = i.getOptionDescription(name)
-    try:
-      meta['default'] = i.getOptionDefault(name)
-    except:
-      meta['default'] = ''
-      pass #too bad
-    #if (len(i.getOptionAllowed(name))>1):
-    #  meta['description'] += "(" + "|".join(i.getOptionAllowed(name))  + ")"
-
+  x=SX.sym("x")
+  f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
+  f.init()
   try:
-    i = QPOasesSolver(qpStruct(h=sp_dense(3,3),a=sp_dense(1,3)))
-  except:
-    return
+    i = SnoptSolver(f)
+    extra(metadata,i,"SnoptInternal")
+  except Exception as e:
+    print e
+ 
+  try:
+    i = QPOasesSolver(qpStruct(h=Sparsity.dense(3,3),a=Sparsity.dense(1,3)))
+    extra(metadata,i,"QPOasesInternal")
+  except Exception as e:
+    print e
     
-  for name in i.getOptionNames():
-    if optionDocumented(name,"casadi::QPOasesInternal",metadata): continue
-    meta = metadata["casadi::QPOasesInternal"]["options"][name] = dict()
-    meta['name'] = name
-    meta['type'] = i.getOptionTypeName(name)
-    meta['used'] = 'casadi::QPOasesInternal'
-    meta['inherit'] = False
-    meta['description'] = i.getOptionDescription(name)
-    try:
-      meta['default'] = i.getOptionDefault(name)
-    except:
-      meta['default'] = ''
-      pass #too bad
-    #if (len(i.getOptionAllowed(name))>1):
-    #  meta['description'] += "(" + "|".join(i.getOptionAllowed(name))  + ")"
+
