@@ -69,12 +69,12 @@ namespace casadi {
                           "pos_def option set to True: Solver only handles the indefinite case.");
     casadi_assert_message(const_dim_,
                           "const_dim option set to False: Solver only handles the True case.");
-                          
+
     for (int k=0;k<K_;k++) {
-      casadi_assert_message(A_[k].isDense(),"Solver requires arguments to be dense.");
-      casadi_assert_message(V_[k].isDense(),"Solver requires arguments to be dense.");
+      casadi_assert_message(A_[k].isDense(), "Solver requires arguments to be dense.");
+      casadi_assert_message(V_[k].isDense(), "Solver requires arguments to be dense.");
     }
-    
+
     n_ = A_[0].size1();
 
     // Allocate data structures
