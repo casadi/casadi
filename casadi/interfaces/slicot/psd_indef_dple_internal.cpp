@@ -987,7 +987,7 @@ namespace casadi {
 
         dense_mul_nt(n_, n_, n_, &nnKa_[k].data()[0], &Vbar[n_*n_*k], &Abar[n_*n_*k]);
       }
-      
+
       for (int i=0;i<Abar.size();++i) {
         Abar[i]*=2;
       }
