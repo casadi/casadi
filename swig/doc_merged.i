@@ -68320,8 +68320,8 @@ Joris Gillis, Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| CPUtime      | OT_REAL      | GenericType( | The maximum  | casadi::QPOa |
-|              |              | )            | allowed CPU  | sesInternal  |
+| CPUtime      | OT_REAL      | None         | The maximum  | casadi::QPOa |
+|              |              |              | allowed CPU  | sesInternal  |
 |              |              |              | time in      |              |
 |              |              |              | seconds for  |              |
 |              |              |              | the whole in |              |
@@ -68349,6 +68349,26 @@ Joris Gillis, Joel Andersson
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
+| boundRelaxat | OT_REAL      | 10000        | Initial      | casadi::QPOa |
+| ion          |              |              | relaxation   | sesInternal  |
+|              |              |              | of bounds to |              |
+|              |              |              | start        |              |
+|              |              |              | homotopy and |              |
+|              |              |              | initial      |              |
+|              |              |              | value for    |              |
+|              |              |              | far bounds.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| boundToleran | OT_REAL      | 0.000        | If upper and | casadi::QPOa |
+| ce           |              |              | lower bounds | sesInternal  |
+|              |              |              | differ less  |              |
+|              |              |              | than this    |              |
+|              |              |              | tolerance,   |              |
+|              |              |              | they are     |              |
+|              |              |              | regarded     |              |
+|              |              |              | equal, i.e.  |              |
+|              |              |              | as equality  |              |
+|              |              |              | constraint.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | derivative_g | OT_DERIVATIV | GenericType( | Function     | casadi::Func |
 | enerator     | EGENERATOR   | )            | that returns | tionInternal |
 |              |              |              | a derivative |              |
@@ -68367,8 +68387,30 @@ Joris Gillis, Joel Andersson
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| enableEquali | OT_BOOLEAN   | BooleanType_ | Specifies    | casadi::QPOa |
-| ties         |              | to_bool      | whether      | sesInternal  |
+| enableCholes | OT_INTEGER   | 0            | Specifies    | casadi::QPOa |
+| kyRefactoris |              |              | the          | sesInternal  |
+| ation        |              |              | frequency of |              |
+|              |              |              | a full re-fa |              |
+|              |              |              | ctorisation  |              |
+|              |              |              | of projected |              |
+|              |              |              | Hessian      |              |
+|              |              |              | matrix: 0:   |              |
+|              |              |              | turns them   |              |
+|              |              |              | off, 1: uses |              |
+|              |              |              | them at each |              |
+|              |              |              | iteration    |              |
+|              |              |              | etc.         |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableDriftC | OT_INTEGER   | 1            | Specifies    | casadi::QPOa |
+| orrection    |              |              | the          | sesInternal  |
+|              |              |              | frequency of |              |
+|              |              |              | drift        |              |
+|              |              |              | corrections: |              |
+|              |              |              | 0: turns     |              |
+|              |              |              | them off.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| enableEquali | OT_BOOLEAN   | False        | Specifies    | casadi::QPOa |
+| ties         |              |              | whether      | sesInternal  |
 |              |              |              | equalities   |              |
 |              |              |              | should be    |              |
 |              |              |              | treated as   |              |
@@ -68377,34 +68419,82 @@ Joris Gillis, Joel Andersson
 |              |              |              | (True) or    |              |
 |              |              |              | not (False)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| enableFarBou | OT_BOOLEAN   | BooleanType_ | Enables the  | casadi::QPOa |
-| nds          |              | to_bool      | use of far   | sesInternal  |
+| enableFarBou | OT_BOOLEAN   | True         | Enables the  | casadi::QPOa |
+| nds          |              |              | use of far   | sesInternal  |
 |              |              |              | bounds.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| enableFlippi | OT_BOOLEAN   | BooleanType_ | Enables the  | casadi::QPOa |
-| ngBounds     |              | to_bool      | use of       | sesInternal  |
+| enableFlippi | OT_BOOLEAN   | True         | Enables the  | casadi::QPOa |
+| ngBounds     |              |              | use of       | sesInternal  |
 |              |              |              | flipping     |              |
 |              |              |              | bounds.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| enableFullLI | OT_BOOLEAN   | BooleanType_ | Enables      | casadi::QPOa |
-| Tests        |              | to_bool      | condition-   | sesInternal  |
+| enableFullLI | OT_BOOLEAN   | False        | Enables      | casadi::QPOa |
+| Tests        |              |              | condition-   | sesInternal  |
 |              |              |              | hardened     |              |
 |              |              |              | (but more    |              |
 |              |              |              | expensive)   |              |
 |              |              |              | LI test.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| enableNZCTes | OT_BOOLEAN   | BooleanType_ | Enables      | casadi::QPOa |
-| ts           |              | to_bool      | nonzero      | sesInternal  |
+| enableNZCTes | OT_BOOLEAN   | True         | Enables      | casadi::QPOa |
+| ts           |              |              | nonzero      | sesInternal  |
 |              |              |              | curvature    |              |
 |              |              |              | tests.       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| enableRampin | OT_BOOLEAN   | BooleanType_ | Enables      | casadi::QPOa |
-| g            |              | to_bool      | ramping.     | sesInternal  |
+| enableRampin | OT_BOOLEAN   | True         | Enables      | casadi::QPOa |
+| g            |              |              | ramping.     | sesInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| enableRegula | OT_BOOLEAN   | BooleanType_ | Enables      | casadi::QPOa |
-| risation     |              | to_bool      | automatic    | sesInternal  |
+| enableRegula | OT_BOOLEAN   | False        | Enables      | casadi::QPOa |
+| risation     |              |              | automatic    | sesInternal  |
 |              |              |              | Hessian regu |              |
 |              |              |              | larisation.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsDen       | OT_REAL      | 0.000        | Denominator  | casadi::QPOa |
+|              |              |              | tolerance    | sesInternal  |
+|              |              |              | for ratio    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsFlipping  | OT_REAL      | 0.000        | Tolerance of | casadi::QPOa |
+|              |              |              | squared      | sesInternal  |
+|              |              |              | Cholesky     |              |
+|              |              |              | diagonal     |              |
+|              |              |              | factor which |              |
+|              |              |              | triggers     |              |
+|              |              |              | flipping     |              |
+|              |              |              | bound.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsIterRef   | OT_REAL      | 0.000        | Early        | casadi::QPOa |
+|              |              |              | termination  | sesInternal  |
+|              |              |              | tolerance    |              |
+|              |              |              | for          |              |
+|              |              |              | iterative    |              |
+|              |              |              | refinement.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsLITests   | OT_REAL      | 0.000        | Tolerance    | casadi::QPOa |
+|              |              |              | for linear   | sesInternal  |
+|              |              |              | independence |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsNZCTests  | OT_REAL      | 0.000        | Tolerance    | casadi::QPOa |
+|              |              |              | for nonzero  | sesInternal  |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsNum       | OT_REAL      | -0.000       | Numerator    | casadi::QPOa |
+|              |              |              | tolerance    | sesInternal  |
+|              |              |              | for ratio    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| epsRegularis | OT_REAL      | 0.000        | Scaling      | casadi::QPOa |
+| ation        |              |              | factor of    | sesInternal  |
+|              |              |              | identity     |              |
+|              |              |              | matrix used  |              |
+|              |              |              | for Hessian  |              |
+|              |              |              | regularisati |              |
+|              |              |              | on.          |              |
++--------------+--------------+--------------+--------------+--------------+
+| finalRamping | OT_REAL      | 1            | Final value  | casadi::QPOa |
+|              |              |              | for ramping  | sesInternal  |
+|              |              |              | strategy.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gather_stats | OT_BOOLEAN   | false        | Flag to      | casadi::Func |
 |              |              |              | indicate     | tionInternal |
@@ -68413,22 +68503,23 @@ Joris Gillis, Joel Andersson
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| initialStatu | OT_STRING    | SubjectToSta | Initial      | casadi::QPOa |
-| sBounds      |              | tus_to_strin | status of    | sesInternal  |
-|              |              | g            | bounds at    |              |
+| growFarBound | OT_REAL      | 1000         | Factor to    | casadi::QPOa |
+| s            |              |              | grow far     | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialFarBo | OT_REAL      | 1000000      | Initial size | casadi::QPOa |
+| unds         |              |              | for far      | sesInternal  |
+|              |              |              | bounds.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialRampi | OT_REAL      | 0.500        | Start value  | casadi::QPOa |
+| ng           |              |              | for ramping  | sesInternal  |
+|              |              |              | strategy.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialStatu | OT_STRING    | lower        | Initial      | casadi::QPOa |
+| sBounds      |              |              | status of    | sesInternal  |
+|              |              |              | bounds at    |              |
 |              |              |              | first        |              |
-|              |              |              | iteration. ( |              |
-|              |              |              | inactive::al |              |
-|              |              |              | l bounds ina |              |
-|              |              |              | ctive|lower  |              |
-|              |              |              | all bounds   |              |
-|              |              |              | active at    |              |
-|              |              |              | their lower  |              |
-|              |              |              | bound|upper  |              |
-|              |              |              | all bounds   |              |
-|              |              |              | active at    |              |
-|              |              |              | their upper  |              |
-|              |              |              | bound)       |              |
+|              |              |              | iteration.   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | inputs_check | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 |              |              |              | exceptions   | tionInternal |
@@ -68439,13 +68530,29 @@ Joris Gillis, Joel Andersson
 |              |              |              | don't make   |              |
 |              |              |              | sense        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| maxDualJump  | OT_REAL      | 100000000    | Maximum      | casadi::QPOa |
+|              |              |              | allowed jump | sesInternal  |
+|              |              |              | in dual      |              |
+|              |              |              | variables in |              |
+|              |              |              | linear       |              |
+|              |              |              | independence |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| maxPrimalJum | OT_REAL      | 100000000    | Maximum      | casadi::QPOa |
+| p            |              |              | allowed jump | sesInternal  |
+|              |              |              | in primal    |              |
+|              |              |              | variables in |              |
+|              |              |              | nonzero      |              |
+|              |              |              | curvature    |              |
+|              |              |              | tests.       |              |
++--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | casadi::Func |
 |              | TOR          | )            | be activated | tionInternal |
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nWSR         | OT_INTEGER   | GenericType( | The maximum  | casadi::QPOa |
-|              |              | )            | number of    | sesInternal  |
+| nWSR         | OT_INTEGER   | None         | The maximum  | casadi::QPOa |
+|              |              |              | number of    | sesInternal  |
 |              |              |              | working set  |              |
 |              |              |              | recalculatio |              |
 |              |              |              | ns to be     |              |
@@ -68460,15 +68567,25 @@ Joris Gillis, Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| printLevel   | OT_STRING    | PrintLevel_t | Defines the  | casadi::QPOa |
-|              |              | o_string     | amount of    | sesInternal  |
+| numRefinemen | OT_INTEGER   | 1            | Maximum      | casadi::QPOa |
+| tSteps       |              |              | number of    | sesInternal  |
+|              |              |              | iterative    |              |
+|              |              |              | refinement   |              |
+|              |              |              | steps.       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numRegularis | OT_INTEGER   | 0            | Maximum      | casadi::QPOa |
+| ationSteps   |              |              | number of    | sesInternal  |
+|              |              |              | successive r |              |
+|              |              |              | egularisatio |              |
+|              |              |              | n steps.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| printLevel   | OT_STRING    | medium       | Defines the  | casadi::QPOa |
+|              |              |              | amount of    | sesInternal  |
 |              |              |              | text output  |              |
 |              |              |              | during QP    |              |
 |              |              |              | solution,    |              |
 |              |              |              | see Section  |              |
-|              |              |              | 5.7 (none|lo |              |
-|              |              |              | w|medium|hig |              |
-|              |              |              | h)           |              |
+|              |              |              | 5.7          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | casadi::Func |
 | heck         |              |              | exceptions   | tionInternal |
@@ -68476,6 +68593,12 @@ Joris Gillis, Joel Andersson
 |              |              |              | Inf appears  |              |
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| terminationT | OT_REAL      | 0.000        | Relative     | casadi::QPOa |
+| olerance     |              |              | termination  | sesInternal  |
+|              |              |              | tolerance to |              |
+|              |              |              | stop         |              |
+|              |              |              | homotopy.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | casadi::Func |
 |              |              | )            | defined      | tionInternal |
@@ -86731,14 +86854,34 @@ np: number of parameters
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| _iprint      | OT_INTEGER   | 0            |              | casadi::Snop |
+| _feasibility | OT_REAL      | None         | Feasibility  | casadi::Snop |
+| _tolerance   |              |              | tolerance    | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| _iprint      | OT_INTEGER   | 0            | n/a          | casadi::Snop |
 |              |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| _isumm       | OT_INTEGER   | 6            |              | casadi::Snop |
+| _isumm       | OT_INTEGER   | 6            | n/a          | casadi::Snop |
 |              |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| _start       | OT_STRING    | \"Cold\"       | (Cold|Warm)  | casadi::Snop |
+| _major_itera | OT_INTEGER   | None         | Major        | casadi::Snop |
+| tion_limit   |              |              | iteration    | tInternal    |
+|              |              |              | limit        |              |
++--------------+--------------+--------------+--------------+--------------+
+| _minor_itera | OT_INTEGER   | None         | Minor        | casadi::Snop |
+| tion_limit   |              |              | iteration    | tInternal    |
+|              |              |              | limit        |              |
++--------------+--------------+--------------+--------------+--------------+
+| _optimality_ | OT_REAL      | None         | Optimality   | casadi::Snop |
+| tolerance    |              |              | tolerance    | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| _scale_optio | OT_INTEGER   | None         | Scale option | casadi::Snop |
+| n            |              |              |              | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| _start       | OT_STRING    | Cold         |              | casadi::Snop |
 |              |              |              |              | tInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| _verify_leve | OT_INTEGER   | None         | Verify level | casadi::Snop |
+| l            |              |              |              | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | casadi::Func |
 |              |              |              | calculate    | tionInternal |
@@ -86774,7 +86917,7 @@ np: number of parameters
 |              |              |              | erivativeGen |              |
 |              |              |              | erator .     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| detect_linea | OT_BOOLEAN   | true         | Make an      | casadi::Snop |
+| detect_linea | OT_BOOLEAN   | True         | Make an      | casadi::Snop |
 | r            |              |              | effort to    | tInternal    |
 |              |              |              | treat linear |              |
 |              |              |              | constraints  |              |
@@ -86894,7 +87037,7 @@ np: number of parameters
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| print_time   | OT_BOOLEAN   | true         | print        | casadi::Snop |
+| print_time   | OT_BOOLEAN   | True         | print        | casadi::Snop |
 |              |              |              | information  | tInternal    |
 |              |              |              | about        |              |
 |              |              |              | execution    |              |
