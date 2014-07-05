@@ -176,6 +176,9 @@ namespace casadi {
   public:
     /// Default constructor
     Integrator();
+    
+    /// Integrator factory
+    Integrator(const std::string& name, const Function& f, const Function& g=Function());
 
     /// Clone
     Integrator clone() const;
@@ -216,6 +219,23 @@ namespace casadi {
 
     /// Get the DAE
     Function getDAE();
+
+    /// Load a plugin dynamically
+    static void loadPlugin(const std::string& name, const std::string& lib=std::string());
+
+#ifndef SWIG
+    // Creator function for internal class
+    typedef IntegratorInternal* (*Creator)(const Function& f, const Function& g);
+
+    // Plugin registration function
+    typedef int (*RegFcn)();
+
+    /// Register an integrator in the factory
+    static void registerPlugin(const std::string& name, Creator creator);
+
+    /// Collection of solvers
+    static std::map<std::string,Creator> solvers_;
+#endif // SWIG
   };
 
 } // namespace casadi

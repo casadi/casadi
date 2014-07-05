@@ -1951,5 +1951,9 @@ namespace casadi {
     }
   }
 
+  int casadi_register_integrator_cvodes(){
+    Integrator::registerPlugin("cvodes",CVodesInternal::creator);
+    return 0;
+  }
 
 } // namespace casadi

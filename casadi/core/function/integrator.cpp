@@ -24,10 +24,77 @@
 #include "integrator_internal.hpp"
 #include <cassert>
 
+// For dynamic loading
+#ifdef WITH_DL
+#ifdef _WIN32 // also for 64-bit
+#include <windows.h>
+#else // _WIN32
+#include <dlfcn.h>
+#endif // _WIN32
+#endif // WITH_DL
+
 using namespace std;
 namespace casadi {
 
   Integrator::Integrator() {
+  }
+
+  Integrator::Integrator(const std::string& name, const Function& f, const Function& g){
+    // Check if the solver has been loaded
+    std::map<std::string,Creator>::iterator it=solvers_.find(name);
+
+    // Load the solver if needed
+    if(it==solvers_.end()){
+      loadPlugin(name);
+      it=solvers_.find(name);
+    }
+    casadi_assert(it!=solvers_.end());
+    assignNode(it->second(f,g));
+  }
+
+  std::map<std::string,Integrator::Creator> Integrator::solvers_;
+
+  void Integrator::registerPlugin(const std::string& name, Creator creator){
+    // Check if the solver name is in use
+    std::map<std::string,Creator>::iterator it=solvers_.find(name);
+    casadi_assert_message(it==solvers_.end(),"Solver " + name + " is already in use");
+    
+    // Add to list of solvers
+    solvers_.insert(it,pair<std::string,Creator>(name,creator));
+  }
+  
+  void Integrator::loadPlugin(const std::string& name, const std::string& lib){
+#ifndef WITH_DL
+    casadi_error("WITH_DL option needed for dynamic loading");
+#else // WITH_DL
+    casadi_assert_message(!lib.empty(),"Not implemented");
+    
+    // Load the dll
+    void* handle;
+    RegFcn reg;
+    std::string regName = "casadi_register_integrator_" + name;
+#ifdef _WIN32
+    handle = LoadLibrary(TEXT(lib.c_str()));
+    casadi_assert_message(handle!=0, "Integrator: Cannot open function: "
+                        << lib << ". error code (WIN32): "<< GetLastError());
+
+    reg = (RegFcn)GetProcAddress(handle_, TEXT(regName.c_str()));
+    if (reg==0) throw CasadiException("Integrator: no \"" + regName + "\" found");
+#else // _WIN32
+  handle  = dlopen(lib.c_str(), RTLD_LAZY);
+  casadi_assert_message(handle!=0, "Integrator: Cannot open function: "
+                        << lib << ". error code: "<< dlerror());
+
+  // reset error
+  dlerror();
+
+  // Load creator
+  reg = (RegFcn)dlsym(handle, regName.c_str());
+  if (dlerror()) throw CasadiException("Integrator: no \"" + regName + "\" found");
+#endif // _WIN32
+  // Register the plugin
+  reg();
+#endif // WITH_DL
   }
 
   Integrator  Integrator::clone() const {

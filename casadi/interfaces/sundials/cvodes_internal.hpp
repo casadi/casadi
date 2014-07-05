@@ -58,6 +58,10 @@ public:
   virtual CVodesInternal* create(const Function& f, const Function& g) const
   { return new CVodesInternal(f, g);}
 
+  /** \brief  Create a new integrator */
+  static IntegratorInternal* creator(const Function& f, const Function& g)
+  { return new CVodesInternal(f, g);}
+
   /** \brief  Destructor */
   virtual ~CVodesInternal();
 
@@ -279,6 +283,10 @@ public:
 };
 
 } // namespace casadi
+
+  // Register plugin
+extern "C"
+int casadi_register_integrator_cvodes();
 
 /// \endcond
 #endif //CVODES_INTERNAL_HPP
