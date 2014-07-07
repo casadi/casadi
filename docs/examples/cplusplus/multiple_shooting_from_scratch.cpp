@@ -40,9 +40,9 @@
 // CasADi core
 #include <casadi/core/casadi.hpp>
 
-// Interfaces
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/interfaces/sundials/cvodes_integrator.hpp>
+// Declare solvers to be loaded manually
+extern "C" void casadi_load_integrator_cvodes();
+extern "C" void casadi_load_nlpsolver_ipopt();
 
 using namespace casadi;
 using namespace std;
@@ -51,6 +51,8 @@ using namespace std;
 double inf = numeric_limits<double>::infinity();
 
 int main(){
+  casadi_load_integrator_cvodes();
+  casadi_load_nlpsolver_ipopt();
 
   // Declare variables
   SX u = SX::sym("u"); // control
@@ -89,7 +91,7 @@ int main(){
   SXFunction rhs(daeIn("x",x,"p",u),daeOut("ode",ode,"quad",quad));
 
   // Create an integrator (CVodes)
-  CVodesIntegrator integrator(rhs);
+  Integrator integrator("cvodes", rhs);
   integrator.setOption("t0",0);
   integrator.setOption("tf",tf/ns);
   integrator.init();
@@ -166,7 +168,7 @@ int main(){
   MXFunction nlp(nlpIn("x",V),nlpOut("f",J,"g",vertcat(g)));
   
   // Create an NLP solver instance
-  IpoptSolver nlp_solver(nlp);
+  NLPSolver nlp_solver("ipopt", nlp);
   nlp_solver.setOption("tol",1e-5);
   nlp_solver.setOption("max_iter",100);
   nlp_solver.setOption("linear_solver","ma57");

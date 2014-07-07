@@ -20,7 +20,6 @@
  *
  */
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/nonlinear_programming/symbolic_nlp.hpp>
 
 /**
@@ -32,10 +31,14 @@
  \date 2012
 */
 
+// Load manually
+extern "C" void casadi_load_nlpsolver_ipopt();
 
 using namespace casadi;
 
 int main(int argc, char **argv){
+  casadi_load_nlpsolver_ipopt();
+
   // Get the problem
   std::string problem = (argc==2) ? argv[1] : "../docs/examples/nl_files/hs107.nl";
   
@@ -47,7 +50,7 @@ int main(int argc, char **argv){
   SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
 
   // Allocate NLP solver
-  IpoptSolver nlp_solver(nlp);
+  NLPSolver nlp_solver("ipopt", nlp);
     
   // Set options
   //  nlp_solver.setOption("max_iter",10);

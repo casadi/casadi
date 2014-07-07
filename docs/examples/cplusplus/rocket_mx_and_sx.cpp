@@ -22,8 +22,9 @@
 
 #include <iostream>
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/core/function/external_function.hpp>
+
+extern "C" void casadi_load_nlpsolver_ipopt();
 
 using namespace casadi;
 using namespace std;
@@ -73,7 +74,8 @@ Function create_integrator(int nj, int nu){
 
 
 int main(){
-  {
+  casadi_load_nlpsolver_ipopt();
+
   // Dimensions
   int nj = 1000; // Number of integration steps per control segment
   int nu = 1000; // Number of control segments
@@ -112,7 +114,7 @@ int main(){
   MXFunction nlp(nlpIn("x",U),nlpOut("f",F,"g",G));
 
   // Allocate an NLP solver
-  IpoptSolver solver(nlp);
+  NLPSolver solver("ipopt", nlp);
   
   // Set options
   solver.setOption("tol",1e-10);
@@ -146,9 +148,6 @@ int main(){
   solver.getOutput(Usol,"x");
   cout << "optimal solution: " << Usol << endl;
 
-  }
-  
   return 0;
-
 }
 

@@ -25,8 +25,9 @@
 #include <ctime>
 #include <iomanip>
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/core/std_vector_tools.hpp>
+
+extern "C" void casadi_load_nlpsolver_ipopt();
 
 using namespace casadi;
 using namespace std;
@@ -40,6 +41,7 @@ using namespace std;
  */
 
 int main(){
+  casadi_load_nlpsolver_ipopt();
     
   /** Test problem (Ganesh & Biegler, A reduced Hessian strategy for sensitivity analysis of optimal flowsheets, AIChE 33, 1987, pp. 282-296)
    * 
@@ -90,7 +92,7 @@ int main(){
   SXFunction nlp(nlpIn("x",x,"p",p),nlpOut("f",f,"g",g));
 
   // Create NLP solver
-  IpoptSolver solver(nlp);
+  NLPSolver solver("ipopt", nlp);
   
   // Set options and initialize solver
   solver.init();

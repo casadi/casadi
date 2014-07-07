@@ -24,8 +24,10 @@
 #include <fstream>
 #include <ctime>
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/core/std_vector_tools.hpp>
+
+// Load manually
+extern "C" void casadi_load_nlpsolver_ipopt();
 
 using namespace casadi;
 using namespace std;
@@ -33,6 +35,7 @@ using namespace std;
 int main(){
     
   cout << "program started" << endl;
+  casadi_load_nlpsolver_ipopt();
       
   // Dimensions
   int nu = 20;  // Number of control segments
@@ -80,7 +83,7 @@ int main(){
   SXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
   
   // Allocate an NLP solver
-  IpoptSolver solver(nlp);
+  NLPSolver solver("ipopt", nlp);
 
   // initialize the solver
   solver.init();

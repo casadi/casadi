@@ -25,14 +25,15 @@
 #include <casadi/nonlinear_programming/scpgen.hpp>
 #include <casadi/nonlinear_programming/nlp_qp_solver.hpp>
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include "casadi/integration/rk_integrator.hpp"
 
 using namespace casadi;
 using namespace std;
 
-// Declare integrators to be loaded manually
+// Declare solvers to be loaded manually
 extern "C" void casadi_load_integrator_cvodes();
 extern "C" void casadi_load_integrator_idas();
+extern "C" void casadi_load_integrator_rk();
+extern "C" void casadi_load_nlpsolver_ipopt();
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
@@ -42,6 +43,8 @@ int main(){
   // Load integrators manually
   casadi_load_integrator_cvodes();
   casadi_load_integrator_idas();
+  casadi_load_integrator_rk();
+  casadi_load_nlpsolver_ipopt();
   
   // Time length
   double T = 10.0;
@@ -96,13 +99,13 @@ int main(){
   if(sundials_integrator){
     if(explicit_integrator){
       // Explicit integrator (CVODES)
-      integrator = Integrator("cvodes",daefcn);
+      integrator = Integrator("cvodes", daefcn);
       // integrator.setOption("exact_jacobian",true);
       // integrator.setOption("linear_multistep_method","bdf"); // adams or bdf
       // integrator.setOption("nonlinear_solver_iteration","newton"); // newton or functional
     } else {
       // Implicit integrator (IDAS)
-      integrator = Integrator("idas",daefcn);
+      integrator = Integrator("idas", daefcn);
       integrator.setOption("calc_ic",false);
     }
     integrator.setOption("fsens_err_con",true);
@@ -114,7 +117,7 @@ int main(){
     integrator.setOption("steps_per_checkpoint",100); // BUG: Too low number causes segfaults
   } else {
     // An explicit Euler integrator
-    integrator = RKIntegrator(daefcn);
+    integrator = Integrator("rk", daefcn);
     integrator.setOption("expand_f",true);
     integrator.setOption("interpolation_order",1);
     integrator.setOption("number_of_finite_elements",1000);
@@ -174,7 +177,7 @@ int main(){
     qp_solver_options["nlp_solver_options"] = ipopt_options;
     solver.setOption("qp_solver_options",qp_solver_options);
   } else {
-    solver = IpoptSolver(nlp);
+    solver = NLPSolver("ipopt", nlp);
     
     // Set options
     solver.setOption("tol",1e-10);
