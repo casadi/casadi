@@ -23,9 +23,9 @@
 #ifndef FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 #define FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
-#include "fixed_step_integrator.hpp"
 #include "casadi/core/function/integrator_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
+#include <casadi/integration/casadi_integration_export.h>
 
 /// \cond INTERNAL
 namespace casadi {

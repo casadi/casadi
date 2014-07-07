@@ -23,7 +23,8 @@
 #ifndef RK_INTEGRATOR_HPP
 #define RK_INTEGRATOR_HPP
 
-#include "fixed_step_integrator.hpp"
+#include "casadi/core/function/integrator.hpp"
+#include <casadi/integration/casadi_integration_export.h>
 
 namespace casadi {
 
@@ -37,7 +38,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2011-2014
   */
-  class CASADI_INTEGRATION_EXPORT RKIntegrator : public FixedStepIntegrator {
+  class CASADI_INTEGRATION_EXPORT RKIntegrator : public Integrator {
   public:
     /** \brief  Default constructor */
     RKIntegrator();

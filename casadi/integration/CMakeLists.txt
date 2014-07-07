@@ -1,11 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 set(INTEGRATION_SRCS
-  fixed_step_integrator.hpp
-  fixed_step_integrator.cpp
   fixed_step_integrator_internal.hpp
   fixed_step_integrator_internal.cpp
-  implicit_fixed_step_integrator.hpp
-  implicit_fixed_step_integrator.cpp
   implicit_fixed_step_integrator_internal.hpp
   implicit_fixed_step_integrator_internal.cpp
   rk_integrator.hpp

@@ -29,16 +29,12 @@
 #define CASADI_INTEGRATION_EXPORT
 
 %{
-#include "casadi/integration/fixed_step_integrator.hpp"
-#include "casadi/integration/implicit_fixed_step_integrator.hpp"
 #include "casadi/integration/rk_integrator.hpp"
 #include "casadi/integration/collocation_integrator.hpp"
 #include "casadi/integration/old_collocation_integrator.hpp"
 #include "casadi/integration/integration_tools.hpp"
 %}
 
-%include "casadi/integration/fixed_step_integrator.hpp"
-%include "casadi/integration/implicit_fixed_step_integrator.hpp"
 %include "casadi/integration/rk_integrator.hpp"
 %include "casadi/integration/collocation_integrator.hpp"
 %include "casadi/integration/old_collocation_integrator.hpp"

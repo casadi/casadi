@@ -23,7 +23,6 @@
 #ifndef IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 #define IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
-#include "implicit_fixed_step_integrator.hpp"
 #include "fixed_step_integrator_internal.hpp"
 #include "casadi/core/function/implicit_function.hpp"
 
