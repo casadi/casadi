@@ -33,6 +33,16 @@
 #endif // _WIN32
 #endif // WITH_DL
 
+// Set default shared library prefix
+#ifndef SHARED_LIBRARY_PREFIX
+#define SHARED_LIBRARY_PREFIX "lib"
+#endif // SHARED_LIBRARY_PREFIX
+
+// Set default shared library suffix
+#ifndef SHARED_LIBRARY_SUFFIX
+#define SHARED_LIBRARY_SUFFIX ".so"
+#endif // SHARED_LIBRARY_SUFFIX
+
 using namespace std;
 namespace casadi {
 
@@ -42,6 +52,7 @@ namespace casadi {
   Integrator::Integrator(const std::string& name, const Function& f, const Function& g) {
     // Check if the solver has been loaded
     std::map<std::string, IntegratorPlugin>::iterator it=solvers_.find(name);
+    std::string lib = SHARED_LIBRARY_PREFIX "casadi_integrator_" + name + SHARED_LIBRARY_SUFFIX;
 
     // Load the solver if needed
     if (it==solvers_.end()) {
@@ -74,7 +85,7 @@ namespace casadi {
 #ifndef WITH_DL
     casadi_error("WITH_DL option needed for dynamic loading");
 #else // WITH_DL
-    std::string lib = "libcasadi_integrator_" + name + ".dylib";
+    std::string lib = SHARED_LIBRARY_PREFIX "casadi_integrator_" + name + SHARED_LIBRARY_SUFFIX;
 
     // Load the dll
     void* handle;
