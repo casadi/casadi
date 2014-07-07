@@ -25,18 +25,23 @@
 #include <casadi/nonlinear_programming/scpgen.hpp>
 #include <casadi/nonlinear_programming/nlp_qp_solver.hpp>
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include "casadi/interfaces/sundials/cvodes_integrator.hpp"
-#include "casadi/interfaces/sundials/idas_integrator.hpp"
 #include "casadi/integration/rk_integrator.hpp"
 
 using namespace casadi;
 using namespace std;
+
+// Declare integrators to be loaded manually
+extern "C" void casadi_load_integrator_cvodes();
+extern "C" void casadi_load_integrator_idas();
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
 bool lifted_newton = false;
 
 int main(){
+  // Load integrators manually
+  casadi_load_integrator_cvodes();
+  casadi_load_integrator_idas();
   
   // Time length
   double T = 10.0;
@@ -91,13 +96,13 @@ int main(){
   if(sundials_integrator){
     if(explicit_integrator){
       // Explicit integrator (CVODES)
-      integrator = CVodesIntegrator(daefcn);
+      integrator = Integrator("cvodes",daefcn);
       // integrator.setOption("exact_jacobian",true);
       // integrator.setOption("linear_multistep_method","bdf"); // adams or bdf
       // integrator.setOption("nonlinear_solver_iteration","newton"); // newton or functional
     } else {
       // Implicit integrator (IDAS)
-      integrator = IdasIntegrator(daefcn);
+      integrator = Integrator("idas",daefcn);
       integrator.setOption("calc_ic",false);
     }
     integrator.setOption("fsens_err_con",true);
