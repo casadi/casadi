@@ -21,11 +21,6 @@
  */
 
 #include <casadi/core/casadi.hpp>
-#include <casadi/integration/rk_integrator.hpp>
-#include <casadi/integration/collocation_integrator.hpp>
-#include <casadi/integration/old_collocation_integrator.hpp>
-#include <casadi/interfaces/sundials/cvodes_integrator.hpp>
-#include <casadi/interfaces/sundials/idas_integrator.hpp>
 #include <casadi/interfaces/sundials/kinsol_solver.hpp>
 #include <casadi/interfaces/csparse/csparse.hpp>
 
@@ -35,6 +30,9 @@
 // Declare integrators to be loaded manually
 extern "C" void casadi_load_integrator_cvodes();
 extern "C" void casadi_load_integrator_idas();
+extern "C" void casadi_load_integrator_rk();
+extern "C" void casadi_load_integrator_collocation();
+extern "C" void casadi_load_integrator_oldcollocation();
 
 using namespace std;
 using namespace casadi;
@@ -123,6 +121,9 @@ int main(){
   // Load integrators manually
   casadi_load_integrator_cvodes();
   casadi_load_integrator_idas();
+  casadi_load_integrator_rk();
+  casadi_load_integrator_collocation();
+  casadi_load_integrator_oldcollocation();
 
   // For all problems
   enum Problems{ODE,DAE,NUM_PROBLEMS};
@@ -163,11 +164,11 @@ int main(){
       case RK:
         if(problem==DAE) continue; // Skip if DAE
         cout << endl << "== RKIntegrator == " << endl;
-        I = RKIntegrator(ffcn);
+        I = Integrator("rk", ffcn);
         break;
       case COLLOCATION:        
         cout << endl << "== CollocationIntegrator == " << endl;
-        I = CollocationIntegrator(ffcn);
+        I = Integrator("collocation", ffcn);
 
         // Set collocation integrator specific options
         I.setOption("implicit_solver",KinsolSolver::creator);
@@ -181,7 +182,7 @@ int main(){
         break;
       case OLD_COLLOCATION:        
         cout << endl << "== OldCollocationIntegrator == " << endl;
-        I = OldCollocationIntegrator(ffcn);
+        I = Integrator("oldcollocation", ffcn);
 
         // Set collocation integrator specific options
         I.setOption("expand_f",true);

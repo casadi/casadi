@@ -26,6 +26,20 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_INTEGRATION_EXPORT casadi_register_integrator_rk(Integrator::IntegratorPlugin* plugin){
+    plugin->creator = RKIntegratorInternal::creator;
+    plugin->name = "rk";
+    plugin->doc = "rk docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_INTEGRATION_EXPORT casadi_load_integrator_rk(){
+    Integrator::registerPlugin(casadi_register_integrator_rk);
+  }
+
   RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) :
       FixedStepIntegratorInternal(f, g) { }
 

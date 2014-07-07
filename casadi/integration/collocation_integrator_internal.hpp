@@ -50,6 +50,10 @@ namespace casadi {
     virtual CollocationIntegratorInternal* create(const Function& f, const Function& g) const
     { return new CollocationIntegratorInternal(f, g);}
 
+    /** \brief  Create a new integrator */
+    static IntegratorInternal* creator(const Function& f, const Function& g)
+    { return new CollocationIntegratorInternal(f, g);}
+
     /// Destructor
     virtual ~CollocationIntegratorInternal();
 

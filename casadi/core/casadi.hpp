@@ -48,4 +48,8 @@
 #include "function/mx_function.hpp"
 #include "function/external_function.hpp"
 
+// Misc solvers
+#include "function/integrator.hpp"
+
+
 #endif //CASADI_HPP

@@ -45,6 +45,10 @@ namespace casadi {
     virtual RKIntegratorInternal* create(const Function& f, const Function& g) const
     { return new RKIntegratorInternal(f, g);}
 
+    /** \brief  Create a new integrator */
+    static IntegratorInternal* creator(const Function& f, const Function& g)
+    { return new RKIntegratorInternal(f, g);}
+
     /// Destructor
     virtual ~RKIntegratorInternal();
 

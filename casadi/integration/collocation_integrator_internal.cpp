@@ -32,6 +32,20 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_INTEGRATION_EXPORT casadi_register_integrator_collocation(Integrator::IntegratorPlugin* plugin){
+    plugin->creator = CollocationIntegratorInternal::creator;
+    plugin->name = "collocation";
+    plugin->doc = "collocation docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_INTEGRATION_EXPORT casadi_load_integrator_collocation(){
+    Integrator::registerPlugin(casadi_register_integrator_collocation);
+  }
+
   CollocationIntegratorInternal::CollocationIntegratorInternal(const Function& f,
                                                                const Function& g)
       : ImplicitFixedStepIntegratorInternal(f, g) {
