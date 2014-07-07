@@ -228,7 +228,7 @@ namespace casadi {
     typedef IntegratorInternal* (*Creator)(const Function& f, const Function& g);
 
     /// Fields
-    struct IntegratorPlugin{
+    struct Plugin{
       Creator creator;
       const char* name;
       const char* doc;
@@ -236,13 +236,13 @@ namespace casadi {
     };
 
     // Plugin registration function
-    typedef int (*RegFcn)(IntegratorPlugin* plugin);
+    typedef int (*RegFcn)(Plugin* plugin);
 
     /// Register an integrator in the factory
     static void registerPlugin(RegFcn regfcn);
 
     /// Collection of solvers
-    static std::map<std::string, IntegratorPlugin> solvers_;
+    static std::map<std::string, Plugin> solvers_;
 #endif // SWIG
   };
 

@@ -33,6 +33,49 @@ namespace casadi {
   NLPSolver::NLPSolver() {
   }
 
+  NLPSolver::NLPSolver(const std::string& name, const Function& nlp) {
+    // Check if the solver has been loaded
+    std::map<std::string, Plugin>::iterator it=solvers_.find(name);
+
+    // Load the solver if needed
+    if (it==solvers_.end()) {
+      loadPlugin(name);
+      it=solvers_.find(name);
+    }
+    casadi_assert(it!=solvers_.end());
+    assignNode(it->second.creator(nlp));
+  }
+
+  std::map<std::string, NLPSolver::Plugin> NLPSolver::solvers_;
+
+  void NLPSolver::registerPlugin(RegFcn regfcn) {
+    // Create a temporary struct
+    Plugin plugin;
+   
+    // Set the fields
+    int flag = regfcn(&plugin);
+    casadi_assert(flag==0);
+
+    // Check if the solver name is in use
+    std::map<std::string, Plugin>::iterator it=solvers_.find(plugin.name);
+    casadi_assert_message(it==solvers_.end(), "Solver " << plugin.name << " is already in use");
+
+    // Add to list of solvers
+    solvers_[plugin.name] = plugin;
+  }
+
+  void NLPSolver::loadPlugin(const std::string& name) {
+#ifndef WITH_DL
+    casadi_error("WITH_DL option needed for dynamic loading");
+#else // WITH_DL
+    // Retrieve the registration function
+    RegFcn reg = FunctionInternal::loadPlugin<RegFcn>(name,"nlpsolver");
+
+    // Register the plugin
+    registerPlugin(reg);
+#endif // WITH_DL
+  }
+
   NLPSolverInternal* NLPSolver::operator->() {
     return static_cast<NLPSolverInternal*>(Function::operator->());
   }

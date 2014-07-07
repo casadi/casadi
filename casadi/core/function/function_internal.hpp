@@ -30,6 +30,25 @@
 #include "code_generator.hpp"
 #include "../matrix/sparse_storage.hpp"
 
+// For dynamic loading
+#ifdef WITH_DL
+#ifdef _WIN32 // also for 64-bit
+#include <windows.h>
+#else // _WIN32
+#include <dlfcn.h>
+#endif // _WIN32
+
+// Set default shared library prefix
+#ifndef SHARED_LIBRARY_PREFIX
+#define SHARED_LIBRARY_PREFIX "lib"
+#endif // SHARED_LIBRARY_PREFIX
+
+// Set default shared library suffix
+#ifndef SHARED_LIBRARY_SUFFIX
+#define SHARED_LIBRARY_SUFFIX ".so"
+#endif // SHARED_LIBRARY_SUFFIX
+#endif // WITH_DL
+
 // This macro is for documentation purposes
 #define INPUTSCHEME(name)
 
@@ -413,8 +432,45 @@ namespace casadi {
 
     /** \brief get function name with all non alphanumeric characters converted to '_' */
     std::string getSanitizedName() const;
+
+    // Load plugins
+    template<typename RegFcn>
+      static RegFcn loadPlugin(const std::string& name, const std::string& infix);
   };
 
+  // Implementation
+  template<typename RegFcn>
+  RegFcn FunctionInternal::loadPlugin(const std::string& name, const std::string& infix){
+    // Return function
+    RegFcn reg;
+    
+    // Get the name of the shared library
+    std::string lib = SHARED_LIBRARY_PREFIX "casadi_" + infix + "_" + name + SHARED_LIBRARY_SUFFIX;
+
+    // Load the dll
+    void* handle;
+    std::string regName = "casadi_register_" + infix + "_" + name;
+#ifdef _WIN32
+    handle = LoadLibrary(TEXT(lib.c_str()));
+    casadi_assert_message(handle!=0, "FunctionInternal::loadPlugin: Cannot open function: "
+                        << lib << ". error code (WIN32): "<< GetLastError());
+
+    reg = (RegFcn)GetProcAddress(handle_, TEXT(regName.c_str()));
+    if (reg==0) throw CasadiException("FunctionInternal::loadPlugin: no \"" + regName + "\" found");
+#else // _WIN32
+  handle  = dlopen(lib.c_str(), RTLD_LAZY);
+  casadi_assert_message(handle!=0, "FunctionInternal::loadPlugin: Cannot open function: "
+                        << lib << ". error code: "<< dlerror());
+
+  // reset error
+  dlerror();
+
+  // Load creator
+  reg = (RegFcn)dlsym(handle, regName.c_str());
+  if (dlerror()) throw CasadiException("FunctionInternal::loadPlugin: no \"" + regName + "\" found");
+#endif // _WIN32
+  return reg;
+  }
 
 } // namespace casadi
 

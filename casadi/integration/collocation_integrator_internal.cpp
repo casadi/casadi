@@ -33,7 +33,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_INTEGRATION_EXPORT casadi_register_integrator_collocation(Integrator::IntegratorPlugin* plugin){
+  int CASADI_INTEGRATION_EXPORT casadi_register_integrator_collocation(Integrator::Plugin* plugin){
     plugin->creator = CollocationIntegratorInternal::creator;
     plugin->name = "collocation";
     plugin->doc = "collocation docs not available";

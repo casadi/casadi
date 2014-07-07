@@ -40,6 +40,10 @@ public:
   virtual ~IpoptInternal();
   virtual IpoptInternal* clone() const { return new IpoptInternal(*this);}
 
+  /** \brief  Create a new NLP Solver */
+  static NLPSolverInternal* creator(const Function& nlp)
+  { return new IpoptInternal(nlp);}
+
   // Free Ipopt related memory
   void freeIpopt();
 

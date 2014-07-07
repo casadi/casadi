@@ -24,25 +24,6 @@
 #include "integrator_internal.hpp"
 #include <cassert>
 
-// For dynamic loading
-#ifdef WITH_DL
-#ifdef _WIN32 // also for 64-bit
-#include <windows.h>
-#else // _WIN32
-#include <dlfcn.h>
-#endif // _WIN32
-#endif // WITH_DL
-
-// Set default shared library prefix
-#ifndef SHARED_LIBRARY_PREFIX
-#define SHARED_LIBRARY_PREFIX "lib"
-#endif // SHARED_LIBRARY_PREFIX
-
-// Set default shared library suffix
-#ifndef SHARED_LIBRARY_SUFFIX
-#define SHARED_LIBRARY_SUFFIX ".so"
-#endif // SHARED_LIBRARY_SUFFIX
-
 using namespace std;
 namespace casadi {
 
@@ -51,8 +32,7 @@ namespace casadi {
 
   Integrator::Integrator(const std::string& name, const Function& f, const Function& g) {
     // Check if the solver has been loaded
-    std::map<std::string, IntegratorPlugin>::iterator it=solvers_.find(name);
-    std::string lib = SHARED_LIBRARY_PREFIX "casadi_integrator_" + name + SHARED_LIBRARY_SUFFIX;
+    std::map<std::string, Plugin>::iterator it=solvers_.find(name);
 
     // Load the solver if needed
     if (it==solvers_.end()) {
@@ -63,18 +43,18 @@ namespace casadi {
     assignNode(it->second.creator(f, g));
   }
 
-  std::map<std::string, Integrator::IntegratorPlugin> Integrator::solvers_;
+  std::map<std::string, Integrator::Plugin> Integrator::solvers_;
 
   void Integrator::registerPlugin(RegFcn regfcn) {
     // Create a temporary struct
-    IntegratorPlugin plugin;
+    Plugin plugin;
    
     // Set the fields
     int flag = regfcn(&plugin);
     casadi_assert(flag==0);
 
     // Check if the solver name is in use
-    std::map<std::string, IntegratorPlugin>::iterator it=solvers_.find(plugin.name);
+    std::map<std::string, Plugin>::iterator it=solvers_.find(plugin.name);
     casadi_assert_message(it==solvers_.end(), "Solver " << plugin.name << " is already in use");
 
     // Add to list of solvers
@@ -85,35 +65,11 @@ namespace casadi {
 #ifndef WITH_DL
     casadi_error("WITH_DL option needed for dynamic loading");
 #else // WITH_DL
-    std::string lib = SHARED_LIBRARY_PREFIX "casadi_integrator_" + name + SHARED_LIBRARY_SUFFIX;
+    // Retrieve the registration function
+    RegFcn reg = FunctionInternal::loadPlugin<RegFcn>(name,"integrator");
 
-    // Load the dll
-    void* handle;
-    RegFcn reg;
-    std::string regName = "casadi_register_integrator_" + name;
-#ifdef _WIN32
-    handle = LoadLibrary(TEXT(lib.c_str()));
-    casadi_assert_message(handle!=0, "Integrator: Cannot open function: "
-                        << lib << ". error code (WIN32): "<< GetLastError());
-
-    reg = (RegFcn)GetProcAddress(handle_, TEXT(regName.c_str()));
-    if (reg==0) throw CasadiException("Integrator: no \"" + regName + "\" found");
-#else // _WIN32
-  handle  = dlopen(lib.c_str(), RTLD_LAZY);
-  casadi_assert_message(handle!=0, "Integrator: Cannot open function: "
-                        << lib << ". error code: "<< dlerror());
-
-  // reset error
-  dlerror();
-
-  // Load creator
-  reg = (RegFcn)dlsym(handle, regName.c_str());
-  if (dlerror()) throw CasadiException("Integrator: no \"" + regName + "\" found");
-#endif // _WIN32
-
-  // Register the plugin
-  registerPlugin(reg);
-
+    // Register the plugin
+    registerPlugin(reg);
 #endif // WITH_DL
   }
 

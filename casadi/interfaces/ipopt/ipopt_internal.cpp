@@ -41,6 +41,20 @@ using namespace std;
 
 namespace casadi {
 
+  extern "C"
+  int CASADI_IPOPT_INTERFACE_EXPORT casadi_register_nlpsolver_ipopt(NLPSolver::Plugin* plugin){
+    plugin->creator = IpoptInternal::creator;
+    plugin->name = "ipopt";
+    plugin->doc = "IPOPT docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_IPOPT_INTERFACE_EXPORT casadi_load_nlpsolver_ipopt(){
+    NLPSolver::registerPlugin(casadi_register_nlpsolver_ipopt);
+  }
+
   IpoptInternal::IpoptInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     addOption("pass_nonlinear_variables", OT_BOOLEAN, false);
     addOption("print_time",               OT_BOOLEAN, true,
