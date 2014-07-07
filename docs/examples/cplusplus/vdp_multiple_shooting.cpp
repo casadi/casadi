@@ -30,8 +30,6 @@
 // 3rd party interfaces
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 #include <casadi/interfaces/sundials/cvodes_integrator.hpp>
-#include <casadi/interfaces/sundials/idas_integrator.hpp>
-#include <casadi/interfaces/sundials/kinsol_solver.hpp>
 #include <casadi/interfaces/csparse/csparse.hpp>
 
 bool use_old_collocation_integrator = false;
@@ -70,7 +68,6 @@ int main(){
   
   Dictionary integrator_options;
   if(use_old_collocation_integrator){
-    // integrator_options["implicit_solver"] = KinsolSolver::creator;    
     integrator_options["implicit_solver"] = NewtonImplicitSolver::creator;
     Dictionary implicit_solver_options;
     implicit_solver_options["linear_solver"] = CSparse::creator;
@@ -101,7 +98,6 @@ int main(){
     ms.setOption("integrator",OldCollocationIntegrator::creator);
   } else {
     ms.setOption("integrator",CVodesIntegrator::creator);
-    //ms.setOption("integrator",IdasIntegrator::creator);
   }
   ms.setOption("integrator_options",integrator_options);
   ms.setOption("number_of_grid_points",ns);

@@ -20,7 +20,7 @@
  *
  */
 
-%module casadi_sundials_interface
+%module casadi_integrator_cvodes
 
 %include "common.i"
 
@@ -31,11 +31,7 @@
 %{
 #include "casadi/interfaces/sundials/sundials_integrator.hpp"
 #include "casadi/interfaces/sundials/cvodes_integrator.hpp"
-#include "casadi/interfaces/sundials/idas_integrator.hpp"
-#include "casadi/interfaces/sundials/kinsol_solver.hpp"
 %}
 
 %include "casadi/interfaces/sundials/sundials_integrator.hpp"
 %include "casadi/interfaces/sundials/cvodes_integrator.hpp"
-%include "casadi/interfaces/sundials/idas_integrator.hpp"
-%include "casadi/interfaces/sundials/kinsol_solver.hpp"

@@ -71,14 +71,14 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting
-    casadi_sundials_interface casadi_ipopt_interface casadi_integration casadi_nonlinear_programming)
+    casadi_integrator_cvodes casadi_integrator_idas casadi_ipopt_interface casadi_integration casadi_nonlinear_programming)
 endif()
 
 # Van der pol with multiple shooting
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
   target_link_libraries(vdp_multiple_shooting
-    casadi_sundials_interface casadi_ipopt_interface  casadi_csparse_interface
+    casadi_integrator_cvodes casadi_ipopt_interface  casadi_csparse_interface
     casadi_optimal_control casadi_integration casadi_nonlinear_programming)
 endif()
 
@@ -86,14 +86,14 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(multiple_shooting_from_scratch multiple_shooting_from_scratch.cpp)
   target_link_libraries(multiple_shooting_from_scratch
-    casadi_sundials_interface casadi_ipopt_interface)
+    casadi_integrator_cvodes casadi_ipopt_interface)
 endif()
 
 # CSTR multiple shooting
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(cstr cstr.cpp)
   target_link_libraries(cstr
-    casadi_sundials_interface casadi_ipopt_interface casadi_optimal_control casadi_integration casadi_csparse_interface)
+    casadi_integrator_idas casadi_ipopt_interface casadi_optimal_control casadi_integration casadi_csparse_interface)
 endif()
 
 # CSparse via CasADi
@@ -106,7 +106,7 @@ endif()
 if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(sensitivity_analysis sensitivity_analysis.cpp)
   target_link_libraries(sensitivity_analysis
-    casadi_integration casadi_sundials_interface casadi_csparse_interface)
+    casadi_integration casadi_integrator_cvodes casadi_integrator_idas casadi_implicitfunction_kinsol casadi_csparse_interface)
 endif()
 
 if(LIFTOPT_FOUND)
@@ -152,5 +152,5 @@ endif()
 if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(implicit_runge-kutta implicit_runge-kutta.cpp)
   target_link_libraries(implicit_runge-kutta
-    casadi_nonlinear_programming casadi_integration casadi_sundials_interface casadi_csparse_interface)
+    casadi_nonlinear_programming casadi_integration casadi_integrator_cvodes casadi_csparse_interface)
 endif()
