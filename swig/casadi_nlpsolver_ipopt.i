@@ -20,7 +20,7 @@
  *
  */
 
-%module casadi_ipopt_interface
+%module casadi_nlpsolver_ipopt
 
 %include "common.i"
 

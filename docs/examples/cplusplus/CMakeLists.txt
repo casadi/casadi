@@ -16,7 +16,7 @@ target_link_libraries(propagating_sparsity casadi_core)
 # Rocket using Ipopt
 if(IPOPT_FOUND)
   add_executable(rocket_ipopt rocket_ipopt.cpp)
-  target_link_libraries(rocket_ipopt casadi_ipopt_interface)
+  target_link_libraries(rocket_ipopt casadi_nlpsolver_ipopt)
 endif()
 
 # basic snopt example
@@ -32,25 +32,25 @@ endif()
 # Rocket solved with MX + SX
 if(IPOPT_FOUND)
   add_executable(rocket_mx_and_sx rocket_mx_and_sx.cpp)
-  target_link_libraries(rocket_mx_and_sx casadi_ipopt_interface)
+  target_link_libraries(rocket_mx_and_sx casadi_nlpsolver_ipopt)
 endif()
 
 # Parse AMPL models and solve with Ipopt
 if(IPOPT_FOUND)
   add_executable(ipopt_nl ipopt_nl.cpp)
   target_link_libraries(ipopt_nl
-    casadi_ipopt_interface casadi_nonlinear_programming)
+    casadi_nlpsolver_ipopt casadi_nonlinear_programming)
 
   add_executable(sqpmethod_nl sqpmethod_nl.cpp)
   target_link_libraries(sqpmethod_nl
-    casadi_ipopt_interface casadi_nonlinear_programming)
+    casadi_nlpsolver_ipopt casadi_nonlinear_programming)
 
 endif()
 
 if(SQIC_FOUND AND IPOPT_FOUND)
   add_executable(stabilized_sqpmethod_nl stabilized_sqpmethod_nl.cpp)
   target_link_libraries(stabilized_sqpmethod_nl
-    casadi_ipopt_interface casadi_nonlinear_programming casadi_sqic_interface casadi_convex_programming)
+    casadi_nlpsolver_ipopt casadi_nonlinear_programming casadi_sqic_interface casadi_convex_programming)
 endif()
 
 # Parse AMPL models and solve with Worhp
@@ -71,14 +71,14 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting
-    casadi_integrator_cvodes casadi_integrator_idas casadi_ipopt_interface casadi_integrator_rk casadi_nonlinear_programming)
+    casadi_integrator_cvodes casadi_integrator_idas casadi_nlpsolver_ipopt casadi_integrator_rk casadi_nonlinear_programming)
 endif()
 
 # Van der pol with multiple shooting
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
   target_link_libraries(vdp_multiple_shooting
-    casadi_integrator_cvodes casadi_ipopt_interface  casadi_csparse_interface
+    casadi_integrator_cvodes casadi_nlpsolver_ipopt  casadi_csparse_interface
     casadi_optimal_control casadi_integrator_oldcollocation casadi_nonlinear_programming)
 endif()
 
@@ -86,14 +86,14 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(multiple_shooting_from_scratch multiple_shooting_from_scratch.cpp)
   target_link_libraries(multiple_shooting_from_scratch
-    casadi_integrator_cvodes casadi_ipopt_interface)
+    casadi_integrator_cvodes casadi_nlpsolver_ipopt)
 endif()
 
 # CSTR multiple shooting
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(cstr cstr.cpp)
   target_link_libraries(cstr
-    casadi_integrator_idas casadi_ipopt_interface casadi_optimal_control casadi_integration casadi_csparse_interface)
+    casadi_integrator_idas casadi_nlpsolver_ipopt casadi_optimal_control casadi_integration casadi_csparse_interface)
 endif()
 
 # CSparse via CasADi
@@ -117,19 +117,19 @@ endif()
 # Parametric sensitivities with sIPOPT
 if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
   add_executable(parametric_sensitivities parametric_sensitivities.cpp)
-  target_link_libraries(parametric_sensitivities casadi_ipopt_interface)
+  target_link_libraries(parametric_sensitivities casadi_nlpsolver_ipopt)
 endif()
 
 # Reduced hessian calculations with sIPOPT
 if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
   add_executable(reduced_hessian reduced_hessian.cpp)
-  target_link_libraries(reduced_hessian casadi_ipopt_interface)
+  target_link_libraries(reduced_hessian casadi_nlpsolver_ipopt)
 endif()
 
 # Parametric NLP
 if(IPOPT_FOUND AND USE_CXX11)
   add_executable(parametric_nlp parametric_nlp.cpp)
-  target_link_libraries(parametric_nlp casadi_ipopt_interface)
+  target_link_libraries(parametric_nlp casadi_nlpsolver_ipopt)
 endif()
 
 # Test OpenCL and show all devices
@@ -140,7 +140,7 @@ endif()
 
 if(WITH_DL AND IPOPT_FOUND)
   add_executable(nlp_codegen nlp_codegen.cpp)
-  target_link_libraries(nlp_codegen casadi_ipopt_interface)
+  target_link_libraries(nlp_codegen casadi_nlpsolver_ipopt)
 endif()
 
 if(WITH_DL AND NOT WIN32)

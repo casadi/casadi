@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(${IPOPT_INCLUDE_DIRS})
 link_directories(${IPOPT_LIBRARY_DIRS})
 
-set(IPOPT_INTERFACE_SRCS
+set(NLPSOLVER_IPOPT_SRCS
   ipopt_solver.hpp
   ipopt_solver.cpp
   ipopt_internal.hpp
@@ -27,10 +27,10 @@ if(WITH_SIPOPT)
   add_definitions(-DWITH_SIPOPT)
 endif()
 
-casadi_library(casadi_ipopt_interface ${IPOPT_INTERFACE_SRCS})
-target_link_libraries(casadi_ipopt_interface ${IPOPT_LIBRARIES})
+casadi_library(casadi_nlpsolver_ipopt ${NLPSOLVER_IPOPT_SRCS})
+target_link_libraries(casadi_nlpsolver_ipopt ${IPOPT_LIBRARIES})
 
-set_property(TARGET casadi_ipopt_interface PROPERTY PKG_CONFIG_REQUIRES ipopt)
+set_property(TARGET casadi_nlpsolver_ipopt PROPERTY PKG_CONFIG_REQUIRES ipopt)
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/ipopt
