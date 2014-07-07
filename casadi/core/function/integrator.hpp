@@ -176,7 +176,7 @@ namespace casadi {
   public:
     /// Default constructor
     Integrator();
-    
+
     /// Integrator factory
     Integrator(const std::string& name, const Function& f, const Function& g=Function());
 
@@ -234,7 +234,7 @@ namespace casadi {
     static void registerPlugin(const std::string& name, Creator creator);
 
     /// Collection of solvers
-    static std::map<std::string,Creator> solvers_;
+    static std::map<std::string, Creator> solvers_;
 #endif // SWIG
   };
 
