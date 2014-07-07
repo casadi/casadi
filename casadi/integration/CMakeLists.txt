@@ -1,26 +1,37 @@
 cmake_minimum_required(VERSION 2.6)
-set(INTEGRATION_SRCS
+casadi_library(casadi_integration
   fixed_step_integrator_internal.hpp
   fixed_step_integrator_internal.cpp
   implicit_fixed_step_integrator_internal.hpp
   implicit_fixed_step_integrator_internal.cpp
-  rk_integrator.hpp
-  rk_integrator.cpp
-  rk_integrator_internal.hpp
-  rk_integrator_internal.cpp
-  collocation_integrator.hpp
-  collocation_integrator.cpp
-  collocation_integrator_internal.hpp
-  collocation_integrator_internal.cpp
-  old_collocation_integrator.hpp
-  old_collocation_integrator.cpp
-  old_collocation_integrator_internal.hpp
-  old_collocation_integrator_internal.cpp
   integration_tools.cpp
   integration_tools.hpp
 )
+target_link_libraries(casadi_integration casadi)
 
-casadi_library(casadi_integration ${INTEGRATION_SRCS})
+# Explicit Runge-Kutta integrator
+casadi_library(casadi_integrator_rk
+  rk_integrator.hpp
+  rk_integrator.cpp
+  rk_integrator_internal.hpp
+  rk_integrator_internal.cpp)
+target_link_libraries(casadi_integrator_rk casadi_integration)
+
+# Collocation integrator
+casadi_library(casadi_integrator_collocation
+  collocation_integrator.hpp
+  collocation_integrator.cpp
+  collocation_integrator_internal.hpp
+  collocation_integrator_internal.cpp)
+target_link_libraries(casadi_integrator_collocation casadi_integration)
+
+# Old (all-at-once) collocation integrator
+casadi_library(casadi_integrator_oldcollocation
+  old_collocation_integrator.hpp
+  old_collocation_integrator.cpp
+  old_collocation_integrator_internal.hpp
+  old_collocation_integrator_internal.cpp)
+target_link_libraries(casadi_integrator_oldcollocation casadi_integration)
 
 install(DIRECTORY ./
   DESTINATION include/casadi/integration
