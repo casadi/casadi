@@ -41,7 +41,7 @@ namespace casadi {
 
   Integrator::Integrator(const std::string& name, const Function& f, const Function& g) {
     // Check if the solver has been loaded
-    std::map<std::string, Creator>::iterator it=solvers_.find(name);
+    std::map<std::string, IntegratorPlugin>::iterator it=solvers_.find(name);
 
     // Load the solver if needed
     if (it==solvers_.end()) {
@@ -49,18 +49,25 @@ namespace casadi {
       it=solvers_.find(name);
     }
     casadi_assert(it!=solvers_.end());
-    assignNode(it->second(f, g));
+    assignNode(it->second.creator(f, g));
   }
 
-  std::map<std::string, Integrator::Creator> Integrator::solvers_;
+  std::map<std::string, Integrator::IntegratorPlugin> Integrator::solvers_;
 
-  void Integrator::registerPlugin(const std::string& name, Creator creator) {
+  void Integrator::registerPlugin(RegFcn regfcn) {
+    // Create a temporary struct
+    IntegratorPlugin plugin;
+   
+    // Set the fields
+    int flag = regfcn(&plugin);
+    casadi_assert(flag==0);
+
     // Check if the solver name is in use
-    std::map<std::string, Creator>::iterator it=solvers_.find(name);
-    casadi_assert_message(it==solvers_.end(), "Solver " + name + " is already in use");
+    std::map<std::string, IntegratorPlugin>::iterator it=solvers_.find(plugin.name);
+    casadi_assert_message(it==solvers_.end(), "Solver " << plugin.name << " is already in use");
 
     // Add to list of solvers
-    solvers_[name] = creator;
+    solvers_[plugin.name] = plugin;
   }
 
   void Integrator::loadPlugin(const std::string& name) {
@@ -92,8 +99,10 @@ namespace casadi {
   reg = (RegFcn)dlsym(handle, regName.c_str());
   if (dlerror()) throw CasadiException("Integrator: no \"" + regName + "\" found");
 #endif // _WIN32
+
   // Register the plugin
-  reg();
+  registerPlugin(reg);
+
 #endif // WITH_DL
   }
 

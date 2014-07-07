@@ -60,6 +60,10 @@ class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal {
   virtual IdasInternal* create(const Function& f, const Function& g) const
   { return new IdasInternal(f, g);}
 
+  /** \brief  Create a new integrator */
+  static IntegratorInternal* creator(const Function& f, const Function& g)
+  { return new IdasInternal(f, g);}
+
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 

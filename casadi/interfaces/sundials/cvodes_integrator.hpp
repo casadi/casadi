@@ -77,4 +77,3 @@ public:
 } // namespace casadi
 
 #endif //CVODES_INTEGRATOR_HPP
-

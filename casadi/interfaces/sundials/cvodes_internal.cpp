@@ -28,7 +28,22 @@
 #include "casadi/core/mx/mx_tools.hpp"
 
 using namespace std;
+
 namespace casadi {
+
+  extern "C"
+  int CASADI_SUNDIALS_INTERFACE_EXPORT casadi_register_integrator_cvodes(Integrator::IntegratorPlugin* plugin){
+    plugin->creator = CVodesInternal::creator;
+    plugin->name = "cvodes";
+    plugin->doc = "CVODES docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_SUNDIALS_INTERFACE_EXPORT casadi_load_integrator_cvodes(){
+    Integrator::registerPlugin(casadi_register_integrator_cvodes);
+  }
 
   CVodesInternal* CVodesInternal::clone() const {
     // Return a deep copy
@@ -1949,11 +1964,6 @@ namespace casadi {
     } else {
       throw CasadiException("CVodesInternal::getJac(): Not an SXFunction or MXFunction");
     }
-  }
-
-  int casadi_register_integrator_cvodes(){
-    Integrator::registerPlugin("cvodes",CVodesInternal::creator);
-    return 0;
   }
 
 } // namespace casadi

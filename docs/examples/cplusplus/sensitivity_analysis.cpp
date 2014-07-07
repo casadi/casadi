@@ -32,6 +32,10 @@
 #include <iostream>
 #include <iomanip>
 
+// Declare integrators to be loaded manually
+extern "C" void casadi_load_integrator_cvodes();
+extern "C" void casadi_load_integrator_idas();
+
 using namespace std;
 using namespace casadi;
 
@@ -115,6 +119,11 @@ void simpleDAE(Function& ffcn, double& tf, vector<double>& x0, double& u0){
 
 
 int main(){
+
+  // Load integrators manually
+  casadi_load_integrator_cvodes();
+  casadi_load_integrator_idas();
+
   // For all problems
   enum Problems{ODE,DAE,NUM_PROBLEMS};
   for(int problem=0; problem<NUM_PROBLEMS; ++problem){
@@ -145,11 +154,11 @@ int main(){
       case CVODES:
         if(problem==DAE) continue; // Skip if DAE
         cout << endl << "== CVodesIntegrator == " << endl;
-        I = CVodesIntegrator(ffcn);
+        I = Integrator("cvodes", ffcn);
         break;
       case IDAS:
         cout << endl << "== IdasIntegrator == " << endl;
-        I = IdasIntegrator(ffcn);
+        I = Integrator("idas", ffcn);
         break;
       case RK:
         if(problem==DAE) continue; // Skip if DAE

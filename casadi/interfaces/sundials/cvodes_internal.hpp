@@ -284,10 +284,6 @@ public:
 
 } // namespace casadi
 
-  // Register plugin
-extern "C"
-int casadi_register_integrator_cvodes();
-
 /// \endcond
 #endif //CVODES_INTERNAL_HPP
 

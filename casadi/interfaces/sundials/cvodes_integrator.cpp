@@ -47,4 +47,3 @@ bool CVodesIntegrator::checkNode() const {
 
 } // namespace casadi
 
-
