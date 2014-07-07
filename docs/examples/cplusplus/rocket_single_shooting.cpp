@@ -22,7 +22,6 @@
 
 #include <iostream>
 #include <casadi/core/casadi.hpp>
-#include <casadi/nonlinear_programming/scpgen.hpp>
 #include <casadi/nonlinear_programming/nlp_qp_solver.hpp>
 #include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 
@@ -34,6 +33,7 @@ extern "C" void casadi_load_integrator_cvodes();
 extern "C" void casadi_load_integrator_idas();
 extern "C" void casadi_load_integrator_rk();
 extern "C" void casadi_load_nlpsolver_ipopt();
+extern "C" void casadi_load_nlpsolver_scpgen();
 
 bool sundials_integrator = true;
 bool explicit_integrator = false;
@@ -45,6 +45,7 @@ int main(){
   casadi_load_integrator_idas();
   casadi_load_integrator_rk();
   casadi_load_nlpsolver_ipopt();
+  casadi_load_nlpsolver_scpgen();
   
   // Time length
   double T = 10.0;
@@ -159,7 +160,7 @@ int main(){
   // Allocate an NLP solver
   NLPSolver solver;
   if(lifted_newton){
-    solver = SCPgen(nlp);
+    solver = NLPSolver("scpgen", nlp);
 
     solver.setOption("verbose",true);
     solver.setOption("regularize",false);

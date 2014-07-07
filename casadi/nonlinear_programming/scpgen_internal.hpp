@@ -39,6 +39,10 @@ public:
   virtual ~SCPgenInternal();
   virtual SCPgenInternal* clone() const { return new SCPgenInternal(*this);}
 
+  /** \brief  Create a new NLP Solver */
+  static NLPSolverInternal* creator(const Function& nlp)
+  { return new SCPgenInternal(nlp);}
+
   virtual void init();
   virtual void evaluate();
 

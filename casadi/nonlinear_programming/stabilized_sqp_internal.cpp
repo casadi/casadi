@@ -36,6 +36,20 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_NONLINEAR_PROGRAMMING_EXPORT casadi_register_nlpsolver_stabilizedsqp(NLPSolver::Plugin* plugin){
+    plugin->creator = StabilizedSQPInternal::creator;
+    plugin->name = "stabilizedsqp";
+    plugin->doc = "StabilizedSQP docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_NONLINEAR_PROGRAMMING_EXPORT casadi_load_nlpsolver_stabilizedsqp(){
+    NLPSolver::registerPlugin(casadi_register_nlpsolver_stabilizedsqp);
+  }
+
   StabilizedSQPInternal::StabilizedSQPInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     casadi_warning("The SQP method is under development");
     addOption("stabilized_qp_solver",         OT_STABILIZEDQPSOLVER,   GenericType(),

@@ -20,7 +20,7 @@
  *
  */
  
-%module casadi_nonlinear_programming
+%module casadi_nlpsolver_stabilizedsqp
 
 %include "common.i"
 
@@ -29,17 +29,7 @@
 #define CASADI_NONLINEAR_PROGRAMMING_EXPORT
 
 %{
-#include "casadi/nonlinear_programming/symbolic_nlp.hpp"
 #include "casadi/nonlinear_programming/stabilized_sqp_method.hpp"
-#include "casadi/nonlinear_programming/nlp_qp_solver.hpp"
-#include "casadi/nonlinear_programming/nlp_implicit_solver.hpp"
-#include "casadi/nonlinear_programming/newton_implicit_solver.hpp"
-#include "casadi/nonlinear_programming/simple_homotopy_nlp_solver.hpp"
 %}
 
-%include "casadi/nonlinear_programming/symbolic_nlp.hpp"
 %include "casadi/nonlinear_programming/stabilized_sqp_method.hpp"
-%include "casadi/nonlinear_programming/nlp_qp_solver.hpp"
-%include "casadi/nonlinear_programming/nlp_implicit_solver.hpp"
-%include "casadi/nonlinear_programming/newton_implicit_solver.hpp"
-%include "casadi/nonlinear_programming/simple_homotopy_nlp_solver.hpp"

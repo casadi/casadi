@@ -38,6 +38,10 @@ public:
   virtual ~SQPInternal();
   virtual SQPInternal* clone() const { return new SQPInternal(*this);}
 
+  /** \brief  Create a new NLP Solver */
+  static NLPSolverInternal* creator(const Function& nlp)
+  { return new SQPInternal(nlp);}
+
   virtual void init();
   virtual void evaluate();
 

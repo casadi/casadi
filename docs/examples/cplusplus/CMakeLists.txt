@@ -43,7 +43,7 @@ if(IPOPT_FOUND)
 
   add_executable(sqpmethod_nl sqpmethod_nl.cpp)
   target_link_libraries(sqpmethod_nl
-    casadi_nlpsolver_ipopt casadi_nonlinear_programming)
+    casadi_nlpsolver_ipopt casadi_nlpsolver_sqpmethod)
 
 endif()
 
@@ -71,7 +71,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting
-    casadi_integrator_cvodes casadi_integrator_idas casadi_nlpsolver_ipopt casadi_integrator_rk casadi_nonlinear_programming)
+    casadi_integrator_cvodes casadi_integrator_idas casadi_nlpsolver_ipopt casadi_integrator_rk casadi_nlpsolver_scpgen)
 endif()
 
 # Van der pol with multiple shooting
