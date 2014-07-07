@@ -63,11 +63,11 @@ namespace casadi {
     solvers_[name] = creator;
   }
 
-  void Integrator::loadPlugin(const std::string& name, const std::string& lib) {
+  void Integrator::loadPlugin(const std::string& name) {
 #ifndef WITH_DL
     casadi_error("WITH_DL option needed for dynamic loading");
 #else // WITH_DL
-    casadi_assert_message(!lib.empty(), "Not implemented");
+    std::string lib = "libcasadi_integrator_" + name + ".dylib";
 
     // Load the dll
     void* handle;

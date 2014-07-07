@@ -221,7 +221,7 @@ namespace casadi {
     Function getDAE();
 
     /// Load a plugin dynamically
-    static void loadPlugin(const std::string& name, const std::string& lib=std::string());
+    static void loadPlugin(const std::string& name);
 
 #ifndef SWIG
     // Creator function for internal class
