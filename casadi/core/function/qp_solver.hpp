@@ -117,6 +117,12 @@ namespace casadi {
     /// Default constructor
     QPSolver();
 
+    /** \brief Constructor
+     *  \param st Problem structure
+     *  \copydoc scheme_QPStruct
+     */
+    QPSolver(const std::string& name, const QPStructure& st);
+
     /// Access functions of the node
     QPSolverInternal* operator->();
     const QPSolverInternal* operator->() const;
@@ -132,6 +138,35 @@ namespace casadi {
 
     /** Generate native code in the interfaced language for debugging */
     virtual void generateNativeCode(std::ostream &file) const;
+
+    /// Load a plugin dynamically
+    static void loadPlugin(const std::string& name);
+
+/// \cond INTERNAL
+#ifndef SWIG
+    // Creator function for internal class
+    typedef QPSolverInternal* (*Creator)(const QPStructure& st);
+
+    /// Fields
+    struct Plugin{
+      Creator creator;
+      const char* name;
+      const char* doc;
+      int version;
+    };
+
+    // Plugin registration function
+    typedef int (*RegFcn)(Plugin* plugin);
+
+    /// Register an integrator in the factory
+    static void registerPlugin(RegFcn regfcn);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+#endif // SWIG
+/// \endcond
+
+
 
   };
 

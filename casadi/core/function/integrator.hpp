@@ -223,6 +223,7 @@ namespace casadi {
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
+/// \cond INTERNAL
 #ifndef SWIG
     // Creator function for internal class
     typedef IntegratorInternal* (*Creator)(const Function& f, const Function& g);
@@ -244,6 +245,7 @@ namespace casadi {
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
 #endif // SWIG
+/// \endcond
   };
 
 } // namespace casadi

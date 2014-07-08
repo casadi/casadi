@@ -71,6 +71,9 @@ enum LinsolOutput {
     /// Create a linear solver given a sparsity pattern (creates a dummy solver only)
     explicit LinearSolver(const Sparsity& sp, int nrhs=1);
 
+    /// Create a linear solver given a sparsity pattern
+    LinearSolver(const std::string& name, const Sparsity& sp, int nrhs=1);
+
     /// \cond INTERNAL
     /// Access functions of the node
     LinearSolverInternal* operator->();
@@ -85,6 +88,9 @@ enum LinsolOutput {
     /// Solve the system of equations, internal vector
     void solve(bool transpose=false);
 
+    /// Load a plugin dynamically
+    static void loadPlugin(const std::string& name);
+
 /// \cond INTERNAL
 #ifndef SWIG
     /// Solve the factorized system of equations
@@ -96,6 +102,25 @@ enum LinsolOutput {
     void spSolve(DMatrix& X, const DMatrix& B, bool transpose=false) const;
     ///@}
 
+    // Creator function for internal class
+    typedef LinearSolverInternal* (*Creator)(const Sparsity& sp, int nrhs);
+
+    /// Fields
+    struct Plugin{
+      Creator creator;
+      const char* name;
+      const char* doc;
+      int version;
+    };
+
+    // Plugin registration function
+    typedef int (*RegFcn)(Plugin* plugin);
+
+    /// Register an integrator in the factory
+    static void registerPlugin(RegFcn regfcn);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
 #endif // SWIG
 /// \endcond
 
