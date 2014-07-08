@@ -37,7 +37,8 @@ namespace casadi {
   /**
      @copydoc LinearSolver_doc
   */
-  class CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT CSparseCholeskyInternal : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
+  CSparseCholeskyInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     CSparseCholeskyInternal(const Sparsity& sp, int nrhs);
