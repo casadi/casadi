@@ -26,16 +26,14 @@
 #include "implicit_function.hpp"
 #include "function_internal.hpp"
 #include "linear_solver.hpp"
+#include "plugin_interface.hpp"
 
 
 /// \cond INTERNAL
 namespace casadi {
 
-  // Forward declaration of internal class
-  class ImplicitFunctionInternal;
-
   /// Internal class
-  class CASADI_CORE_EXPORT ImplicitFunctionInternal : public FunctionInternal {
+  class CASADI_CORE_EXPORT ImplicitFunctionInternal : public FunctionInternal, public PluginInterface<ImplicitFunctionInternal> {
   public:
     /** \brief Constructor
      *
@@ -100,6 +98,15 @@ namespace casadi {
 
     /// Indices of the input and output that correspond to the actual root-finding
     int iin_, iout_;
+
+    // Creator function for internal class
+    typedef ImplicitFunctionInternal* (*Creator)(const Function& f, const Function& J, const LinearSolver& linsol);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+
+    /// Infix
+    static const std::string infix_;
   };
 
 

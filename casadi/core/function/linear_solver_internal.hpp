@@ -105,7 +105,6 @@ namespace casadi {
 
     /// Infix
     static const std::string infix_;
-
   };
 
 
