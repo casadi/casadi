@@ -33,7 +33,7 @@ namespace casadi {
   /**
      @copydoc NLPSolver_doc
   */
-  class CASADI_KNITRO_INTERFACE_EXPORT KnitroInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInternal : public NLPSolverInternal {
 
   public:
     explicit KnitroInternal(const Function& nlp);

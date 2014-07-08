@@ -25,6 +25,8 @@
 
 #include "sundials_integrator.hpp"
 
+#include <casadi/interfaces/sundials/casadi_integrator_idas_export.h>
+
 /**
 * \defgroup IdasIntegrator_doc
 
@@ -44,7 +46,7 @@ class IdasInternal;
    \author Joel Andersson
    \date 2010
 */
-class CASADI_SUNDIALS_INTERFACE_EXPORT IdasIntegrator : public SundialsIntegrator {
+class CASADI_INTEGRATOR_IDAS_EXPORT IdasIntegrator : public SundialsIntegrator {
 public:
 
   /// Default constructor

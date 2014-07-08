@@ -32,7 +32,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_INTEGRATION_EXPORT CollocationIntegratorInternal :
+  class CASADI_INTEGRATOR_COLLOCATION_EXPORT CollocationIntegratorInternal :
         public ImplicitFixedStepIntegratorInternal {
   public:
 

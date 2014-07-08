@@ -42,7 +42,7 @@ namespace casadi {
 /**
 @copydoc IdasIntegrator_doc
 */
-class CASADI_SUNDIALS_INTERFACE_EXPORT IdasInternal : public SundialsInternal {
+class CASADI_INTEGRATOR_IDAS_EXPORT IdasInternal : public SundialsInternal {
   friend class IdasIntegrator;
 
   public:

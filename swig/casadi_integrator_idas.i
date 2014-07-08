@@ -24,14 +24,12 @@
 
 %include "common.i"
 
-%import "casadi_core.i"
+%import "casadi_sundials_common.i"
 
-#define CASADI_SUNDIALS_INTERFACE_EXPORT
+#define  CASADI_INTEGRATOR_IDAS_EXPORT
 
 %{
-#include "casadi/interfaces/sundials/sundials_integrator.hpp"
 #include "casadi/interfaces/sundials/idas_integrator.hpp"
 %}
 
-%include "casadi/interfaces/sundials/sundials_integrator.hpp"
 %include "casadi/interfaces/sundials/idas_integrator.hpp"

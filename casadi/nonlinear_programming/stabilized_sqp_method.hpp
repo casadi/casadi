@@ -25,7 +25,7 @@
 
 #include "casadi/core/function/nlp_solver.hpp"
 
-#include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
+#include <casadi/nonlinear_programming/casadi_nlpsolver_stabilizedsqp_export.h>
 
 namespace casadi {
 
@@ -37,7 +37,7 @@ namespace casadi {
      \author Slava Kung
      \date 2013
   */
-  class CASADI_NONLINEAR_PROGRAMMING_EXPORT StabilizedSQPMethod : public NLPSolver {
+  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSQPMethod : public NLPSolver {
   public:
     /// Default constructor
     StabilizedSQPMethod();

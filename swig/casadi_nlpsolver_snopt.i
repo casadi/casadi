@@ -20,16 +20,15 @@
  *
  */
 
-%module casadi_integrator_rk
+%module casadi_nlpsolver_snopt
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define  CASADI_INTEGRATOR_RK_EXPORT
+#define CASADI_NLPSOLVER_SNOPT_EXPORT
 
 %{
-#include "casadi/integration/rk_integrator.hpp"
+#include "casadi/interfaces/snopt/snopt_solver.hpp"
 %}
-
-%include "casadi/integration/rk_integrator.hpp"
+%include "casadi/interfaces/snopt/snopt_solver.hpp"

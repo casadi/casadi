@@ -32,7 +32,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_SUNDIALS_INTERFACE_EXPORT casadi_register_integrator_cvodes(IntegratorInternal::Plugin* plugin){
+  int CASADI_INTEGRATOR_CVODES_EXPORT casadi_register_integrator_cvodes(IntegratorInternal::Plugin* plugin){
     plugin->creator = CVodesInternal::creator;
     plugin->name = "cvodes";
     plugin->doc = "CVODES docs not available";
@@ -41,7 +41,7 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_SUNDIALS_INTERFACE_EXPORT casadi_load_integrator_cvodes(){
+  void CASADI_INTEGRATOR_CVODES_EXPORT casadi_load_integrator_cvodes(){
     IntegratorInternal::registerPlugin(casadi_register_integrator_cvodes);
   }
 

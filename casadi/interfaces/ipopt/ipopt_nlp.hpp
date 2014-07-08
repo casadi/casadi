@@ -45,7 +45,7 @@
 using namespace Ipopt;
 namespace casadi {
 
-class CASADI_IPOPT_INTERFACE_EXPORT IpoptUserClass : public TNLP {
+class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptUserClass : public TNLP {
 #ifdef WITH_IPOPT_CALLBACK
 friend class TNLPAdapter;
 #endif // WITH_IPOPT_CALLBACK

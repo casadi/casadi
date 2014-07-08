@@ -26,7 +26,7 @@
 
 %import "casadi_core.i"
 
-#define CASADI_INTEGRATION_EXPORT
+#define  CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT
 
 %{
 #include "casadi/integration/old_collocation_integrator.hpp"

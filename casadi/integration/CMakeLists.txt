@@ -7,7 +7,6 @@ casadi_library(casadi_integration
   integration_tools.cpp
   integration_tools.hpp
 )
-target_link_libraries(casadi_integration casadi)
 
 # Explicit Runge-Kutta integrator
 casadi_library(casadi_integrator_rk
