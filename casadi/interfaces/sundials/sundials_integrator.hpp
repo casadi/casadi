@@ -25,7 +25,7 @@
 
 #include "casadi/core/function/integrator.hpp"
 
-#include <casadi/interfaces/sundials/casadi_sundials_interface_export.h>
+#include <casadi/interfaces/sundials/casadi_sundials_common_export.h>
 
 namespace casadi {
 
@@ -36,7 +36,7 @@ class SundialsInternal;
 
   @copydoc DAE_doc
 */
-class CASADI_SUNDIALS_INTERFACE_EXPORT SundialsIntegrator : public Integrator {
+class CASADI_SUNDIALS_COMMON_EXPORT SundialsIntegrator : public Integrator {
 public:
   /// Default constructor
   SundialsIntegrator();

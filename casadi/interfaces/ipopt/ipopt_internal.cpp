@@ -42,7 +42,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_IPOPT_INTERFACE_EXPORT casadi_register_nlpsolver_ipopt(NLPSolver::Plugin* plugin){
+  int CASADI_NLPSOLVER_IPOPT_EXPORT casadi_register_nlpsolver_ipopt(NLPSolver::Plugin* plugin){
     plugin->creator = IpoptInternal::creator;
     plugin->name = "ipopt";
     plugin->doc = "IPOPT docs not available";
@@ -51,7 +51,7 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_IPOPT_INTERFACE_EXPORT casadi_load_nlpsolver_ipopt(){
+  void CASADI_NLPSOLVER_IPOPT_EXPORT casadi_load_nlpsolver_ipopt(){
     NLPSolver::registerPlugin(casadi_register_nlpsolver_ipopt);
   }
 

@@ -24,7 +24,7 @@
 #define COLLOCATION_INTEGRATOR_HPP
 
 #include "casadi/core/function/integrator.hpp"
-#include <casadi/integration/casadi_integration_export.h>
+#include <casadi/integration/casadi_integrator_collocation_export.h>
 
 namespace casadi {
 
@@ -41,7 +41,7 @@ namespace casadi {
      \author Joel Andersson
      \date 2014
   */
-  class CASADI_INTEGRATION_EXPORT CollocationIntegrator : public Integrator {
+  class CASADI_INTEGRATOR_COLLOCATION_EXPORT CollocationIntegrator : public Integrator {
   public:
     /** \brief  Default constructor */
     CollocationIntegrator();

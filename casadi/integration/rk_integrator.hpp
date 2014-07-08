@@ -24,7 +24,7 @@
 #define RK_INTEGRATOR_HPP
 
 #include "casadi/core/function/integrator.hpp"
-#include <casadi/integration/casadi_integration_export.h>
+#include <casadi/integration/casadi_integrator_rk_export.h>
 
 namespace casadi {
 
@@ -38,7 +38,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2011-2014
   */
-  class CASADI_INTEGRATION_EXPORT RKIntegrator : public Integrator {
+  class CASADI_INTEGRATOR_RK_EXPORT RKIntegrator : public Integrator {
   public:
     /** \brief  Default constructor */
     RKIntegrator();

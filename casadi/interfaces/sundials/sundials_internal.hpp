@@ -34,7 +34,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-class CASADI_SUNDIALS_INTERFACE_EXPORT SundialsInternal : public IntegratorInternal {
+class CASADI_SUNDIALS_COMMON_EXPORT SundialsInternal : public IntegratorInternal {
 public:
   /** \brief  Constructor */
   SundialsInternal(const Function& f, const Function& g);

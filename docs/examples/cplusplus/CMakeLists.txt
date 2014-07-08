@@ -23,10 +23,10 @@ endif()
 if(SNOPT_FOUND)
   add_executable(snopt_nl snopt_nl.cpp)
   target_link_libraries(snopt_nl
-    casadi_snopt_interface casadi_nonlinear_programming ${SNOPT_LIBRARIES})
+    casadi_nlpsolver_snopt casadi_nonlinear_programming ${SNOPT_LIBRARIES})
 
   add_executable(rocket_snopt rocket_snopt.cpp)
-  target_link_libraries(rocket_snopt casadi_snopt_interface casadi_nonlinear_programming ${SNOPT_LIBRARIES})
+  target_link_libraries(rocket_snopt casadi_nlpsolver_snopt casadi_nonlinear_programming ${SNOPT_LIBRARIES})
 endif()
 
 # Rocket solved with MX + SX
@@ -50,7 +50,9 @@ endif()
 if(SQIC_FOUND AND IPOPT_FOUND)
   add_executable(stabilized_sqpmethod_nl stabilized_sqpmethod_nl.cpp)
   target_link_libraries(stabilized_sqpmethod_nl
-    casadi_nlpsolver_ipopt casadi_nonlinear_programming casadi_sqic_interface casadi_convex_programming)
+    casadi_nlpsolver_ipopt casadi_nonlinear_programming
+    casadi_nlpsolver_stabilizedsqp
+    casadi_sqic_interface casadi_convex_programming)
 endif()
 
 # Parse AMPL models and solve with Worhp

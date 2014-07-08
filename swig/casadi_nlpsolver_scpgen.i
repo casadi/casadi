@@ -26,7 +26,7 @@
 
 %import "casadi_core.i"
 
-#define CASADI_NONLINEAR_PROGRAMMING_EXPORT
+#define CASADI_NLPSOLVER_SCPGEN_EXPORT
 
 %{
 #include "casadi/nonlinear_programming/scpgen.hpp"

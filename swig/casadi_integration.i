@@ -29,9 +29,7 @@
 #define CASADI_INTEGRATION_EXPORT
 
 %{
-#include "casadi/integration/rk_integrator.hpp"
 #include "casadi/integration/integration_tools.hpp"
 %}
 
-%include "casadi/integration/rk_integrator.hpp"
 %include "casadi/integration/integration_tools.hpp"

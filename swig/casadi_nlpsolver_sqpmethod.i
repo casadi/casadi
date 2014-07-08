@@ -26,10 +26,10 @@
 
 %import "casadi_core.i"
 
-#define CASADI_NONLINEAR_PROGRAMMING_EXPORT
+#define CASADI_NLPSOLVER_SQPMETHOD_EXPORT
 
 %{
-#include "casadi/nonlinear_programming/sqpmethod.hpp"
+#include "casadi/nonlinear_programming/sqp_method.hpp"
 %}
 
-%include "casadi/nonlinear_programming/sqpmethod.hpp"
+%include "casadi/nonlinear_programming/sqp_method.hpp"

@@ -25,6 +25,8 @@
 
 #include "sundials_integrator.hpp"
 
+#include <casadi/interfaces/sundials/casadi_integrator_cvodes_export.h>
+
 namespace casadi {
 
 // Forward declaration of internal class
@@ -41,7 +43,7 @@ class CVodesInternal;
 
 
 */
-class CASADI_SUNDIALS_INTERFACE_EXPORT CVodesIntegrator : public SundialsIntegrator {
+class CASADI_INTEGRATOR_CVODES_EXPORT CVodesIntegrator : public SundialsIntegrator {
 public:
 
   /** \brief  Default constructor */

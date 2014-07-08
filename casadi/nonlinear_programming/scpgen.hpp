@@ -25,7 +25,7 @@
 
 #include "casadi/core/function/nlp_solver.hpp"
 
-#include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
+#include <casadi/nonlinear_programming/casadi_nlpsolver_scpgen_export.h>
 
 namespace casadi {
 
@@ -38,7 +38,7 @@ namespace casadi {
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */
-  class CASADI_NONLINEAR_PROGRAMMING_EXPORT SCPgen : public NLPSolver {
+  class CASADI_NLPSOLVER_SCPGEN_EXPORT SCPgen : public NLPSolver {
   public:
     /// Default constructor
     SCPgen();

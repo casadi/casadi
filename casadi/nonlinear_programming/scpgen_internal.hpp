@@ -32,7 +32,7 @@
 
 namespace casadi {
 
-class CASADI_NONLINEAR_PROGRAMMING_EXPORT SCPgenInternal : public NLPSolverInternal {
+class CASADI_NLPSOLVER_SCPGEN_EXPORT SCPgenInternal : public NLPSolverInternal {
 
 public:
   explicit SCPgenInternal(const Function& nlp);

@@ -20,16 +20,16 @@
  *
  */
 
-%module casadi_integrator_rk
+%module casadi_sundials_common
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define  CASADI_INTEGRATOR_RK_EXPORT
+#define CASADI_SUNDIALS_COMMON_EXPORT
 
 %{
-#include "casadi/integration/rk_integrator.hpp"
+#include "casadi/interfaces/sundials/sundials_integrator.hpp"
 %}
 
-%include "casadi/integration/rk_integrator.hpp"
+%include "casadi/interfaces/sundials/sundials_integrator.hpp"

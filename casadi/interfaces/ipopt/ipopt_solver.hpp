@@ -24,7 +24,7 @@
 #define IPOPT_SOLVER_HPP
 
 #include "casadi/core/function/nlp_solver.hpp"
-#include <casadi/interfaces/ipopt/casadi_ipopt_interface_export.h>
+#include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
 
 namespace casadi {
 
@@ -57,7 +57,7 @@ namespace casadi {
    *
    *
    */
-  class CASADI_IPOPT_INTERFACE_EXPORT IpoptSolver : public NLPSolver {
+  class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptSolver : public NLPSolver {
   public:
     /// Default constructor
     IpoptSolver();

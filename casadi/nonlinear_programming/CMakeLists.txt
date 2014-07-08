@@ -7,7 +7,6 @@ casadi_library(casadi_nonlinear_programming
   newton_implicit_solver.hpp newton_implicit_solver.cpp newton_implicit_internal.hpp newton_implicit_internal.cpp
   simple_homotopy_nlp_solver.hpp simple_homotopy_nlp_solver.cpp simple_homotopy_nlp_internal.hpp simple_homotopy_nlp_internal.cpp
 )
-target_link_libraries(casadi_nonlinear_programming casadi)
 
 # SQPMethod -  A basic SQP method
 casadi_library(casadi_nlpsolver_sqpmethod

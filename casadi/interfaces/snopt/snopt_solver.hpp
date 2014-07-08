@@ -24,7 +24,7 @@
 #define SNOPT_SOLVER_HPP
 
 #include "casadi/core/function/nlp_solver.hpp"
-#include <casadi/interfaces/snopt/casadi_snopt_interface_export.h>
+#include <casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h>
 
 namespace casadi {
 
@@ -36,7 +36,7 @@ namespace casadi {
    * @copydoc NLPSolver_doc
 
    */
-  class CASADI_SNOPT_INTERFACE_EXPORT SnoptSolver : public NLPSolver {
+  class CASADI_NLPSOLVER_SNOPT_EXPORT SnoptSolver : public NLPSolver {
   public:
     /// Default constructor
     SnoptSolver();

@@ -32,7 +32,7 @@ namespace casadi {
 /**
 @copydoc NLPSolver_doc
 */
-class CASADI_IPOPT_INTERFACE_EXPORT IpoptInternal : public NLPSolverInternal {
+class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInternal : public NLPSolverInternal {
 friend class IpoptUserClass;
 
 public:
