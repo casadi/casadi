@@ -111,11 +111,6 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
     casadi_integrator_collocation casadi_integrator_oldcollocation casadi_integrator_rk casadi_integrator_cvodes casadi_integrator_idas casadi_implicitfunction_kinsol casadi_csparse_interface)
 endif()
 
-if(LIFTOPT_FOUND)
-  add_executable(test_liftopt test_liftopt.cpp)
-  target_link_libraries(test_liftopt casadi_liftopt_interface)
-endif()
-
 # Parametric sensitivities with sIPOPT
 if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
   add_executable(parametric_sensitivities parametric_sensitivities.cpp)
