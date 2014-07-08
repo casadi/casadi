@@ -29,6 +29,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_LINEARSOLVER_LAPACKLU_EXPORT
+  casadi_register_linearsolver_lapacklu(LinearSolverInternal::Plugin* plugin) {
+    plugin->creator = LapackLUDenseInternal::creator;
+    plugin->name = "lapacklu";
+    plugin->doc = "LapackLU docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_LINEARSOLVER_LAPACKLU_EXPORT casadi_load_linearsolver_lapacklu() {
+    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapacklu);
+  }
+
   LapackLUDense::LapackLUDense() {
   }
 

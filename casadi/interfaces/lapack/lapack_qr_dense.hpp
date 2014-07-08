@@ -24,7 +24,7 @@
 #define LAPACK_QR_DENSE_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/lapack/casadi_lapack_interface_export.h>
+#include <casadi/interfaces/lapack/casadi_linearsolver_lapackqr_export.h>
 
 namespace casadi {
 
@@ -55,7 +55,7 @@ namespace casadi {
    * therefore more expensive if A is invariant.
    *
    */
-  class CASADI_LAPACK_INTERFACE_EXPORT LapackQRDense : public LinearSolver {
+  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQRDense : public LinearSolver {
   public:
 
     /// Default (empty) constructor
@@ -96,13 +96,17 @@ namespace casadi {
                          double *alpha, double *a, int *lda, double *b, int *ldb);
 
   /// Internal class
-  class CASADI_LAPACK_INTERFACE_EXPORT LapackQRDenseInternal : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQRDenseInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackQRDenseInternal(const Sparsity& sparsity, int nrhs);
 
     // Clone
     virtual LapackQRDenseInternal* clone() const;
+
+    /** \brief  Create a new LinearSolver */
+    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
+    { return new LapackQRDenseInternal(sp, nrhs);}
 
     // Destructor
     virtual ~LapackQRDenseInternal();

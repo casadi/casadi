@@ -24,7 +24,7 @@
 #define LAPACK_LU_DENSE_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/interfaces/lapack/casadi_lapack_interface_export.h>
+#include <casadi/interfaces/lapack/casadi_linearsolver_lapacklu_export.h>
 
 namespace casadi {
 
@@ -55,7 +55,7 @@ namespace casadi {
    * therefore more expensive if A is invariant.
    *
    */
-  class CASADI_LAPACK_INTERFACE_EXPORT LapackLUDense : public LinearSolver {
+  class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLUDense : public LinearSolver {
   public:
 
     /// Default (empty) constructor
@@ -98,10 +98,14 @@ namespace casadi {
                           double *colcnd, double *rowcnd, double *amax, char *equed);
 
   /// Internal class
-  class CASADI_LAPACK_INTERFACE_EXPORT LapackLUDenseInternal : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLUDenseInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     LapackLUDenseInternal(const Sparsity& sparsity, int nrhs);
+
+    /** \brief  Create a new LinearSolver */
+    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
+    { return new LapackLUDenseInternal(sp, nrhs);}
 
     // Clone
     virtual LapackLUDenseInternal* clone() const;

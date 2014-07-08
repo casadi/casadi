@@ -26,6 +26,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_LINEARSOLVER_LAPACKQR_EXPORT
+  casadi_register_linearsolver_lapackqr(LinearSolverInternal::Plugin* plugin) {
+    plugin->creator = LapackQRDenseInternal::creator;
+    plugin->name = "lapackqr";
+    plugin->doc = "LapackQR docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_LINEARSOLVER_LAPACKQR_EXPORT casadi_load_linearsolver_lapackqr() {
+    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapackqr);
+  }
+
   LapackQRDense::LapackQRDense() {
   }
 

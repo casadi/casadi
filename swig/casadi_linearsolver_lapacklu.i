@@ -20,18 +20,16 @@
  *
  */
 
-%module casadi_lapack_interface
+%module casadi_linearsolver_lapacklu
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_LAPACK_INTERFACE_EXPORT
+#define CASADI_LINEARSOLVER_LAPACKLU_EXPORT
 
 %{
 #include "casadi/interfaces/lapack/lapack_lu_dense.hpp"
-#include "casadi/interfaces/lapack/lapack_qr_dense.hpp"
 %}
 
 %include "casadi/interfaces/lapack/lapack_lu_dense.hpp"
-%include "casadi/interfaces/lapack/lapack_qr_dense.hpp"
