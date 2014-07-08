@@ -87,6 +87,7 @@ set(CASADI_SRCS
   function/io_interface.hpp                                   # Input/output interface for Function and FunctionInternal
   function/io_scheme.hpp           function/io_scheme.cpp           function/io_scheme_internal.hpp           function/io_scheme_internal.cpp
   function/function.hpp                  function/function.cpp                  function/function_internal.hpp                  function/function_internal.cpp
+  function/plugin_interface.hpp                                   # Plugin interface for Function
   function/x_function_internal.hpp                            # Base class for SXFunction and MXFunction
   function/sx_function.hpp         function/sx_function.cpp         function/sx_function_internal.hpp         function/sx_function_internal.cpp
   function/mx_function.hpp         function/mx_function.cpp         function/mx_function_internal.hpp         function/mx_function_internal.cpp

@@ -36,7 +36,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_INTEGRATION_EXPORT casadi_register_integrator_oldcollocation(Integrator::Plugin* plugin){
+  int CASADI_INTEGRATION_EXPORT casadi_register_integrator_oldcollocation(IntegratorInternal::Plugin* plugin){
     plugin->creator = OldCollocationIntegratorInternal::creator;
     plugin->name = "oldcollocation";
     plugin->doc = "old collocation docs not available";
@@ -46,7 +46,7 @@ namespace casadi {
 
   extern "C"
   void CASADI_INTEGRATION_EXPORT casadi_load_integrator_oldcollocation(){
-    Integrator::registerPlugin(casadi_register_integrator_oldcollocation);
+    IntegratorInternal::registerPlugin(casadi_register_integrator_oldcollocation);
   }
 
   OldCollocationIntegratorInternal::OldCollocationIntegratorInternal(const Function& f,

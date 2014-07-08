@@ -954,6 +954,10 @@ namespace casadi {
     return ret;
   }
 
+  std::map<std::string, IntegratorInternal::Plugin> IntegratorInternal::solvers_;
+
+  const std::string IntegratorInternal::infix_ = "integrator";
+
 } // namespace casadi
 
 

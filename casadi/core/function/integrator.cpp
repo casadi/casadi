@@ -31,46 +31,7 @@ namespace casadi {
   }
 
   Integrator::Integrator(const std::string& name, const Function& f, const Function& g) {
-    // Check if the solver has been loaded
-    std::map<std::string, Plugin>::iterator it=solvers_.find(name);
-
-    // Load the solver if needed
-    if (it==solvers_.end()) {
-      loadPlugin(name);
-      it=solvers_.find(name);
-    }
-    casadi_assert(it!=solvers_.end());
-    assignNode(it->second.creator(f, g));
-  }
-
-  std::map<std::string, Integrator::Plugin> Integrator::solvers_;
-
-  void Integrator::registerPlugin(RegFcn regfcn) {
-    // Create a temporary struct
-    Plugin plugin;
-   
-    // Set the fields
-    int flag = regfcn(&plugin);
-    casadi_assert(flag==0);
-
-    // Check if the solver name is in use
-    std::map<std::string, Plugin>::iterator it=solvers_.find(plugin.name);
-    casadi_assert_message(it==solvers_.end(), "Solver " << plugin.name << " is already in use");
-
-    // Add to list of solvers
-    solvers_[plugin.name] = plugin;
-  }
-
-  void Integrator::loadPlugin(const std::string& name) {
-#ifndef WITH_DL
-    casadi_error("WITH_DL option needed for dynamic loading");
-#else // WITH_DL
-    // Retrieve the registration function
-    RegFcn reg = FunctionInternal::loadPlugin<RegFcn>(name,"integrator");
-
-    // Register the plugin
-    registerPlugin(reg);
-#endif // WITH_DL
+    assignNode(IntegratorInternal::getPlugin(name).creator(f, g));
   }
 
   Integrator  Integrator::clone() const {

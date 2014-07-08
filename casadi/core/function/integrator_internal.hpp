@@ -25,6 +25,7 @@
 
 #include "integrator.hpp"
 #include "function_internal.hpp"
+#include "plugin_interface.hpp"
 
 /// \cond INTERNAL
 
@@ -36,7 +37,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT IntegratorInternal : public FunctionInternal {
+  class CASADI_CORE_EXPORT IntegratorInternal : public FunctionInternal, public PluginInterface<IntegratorInternal> {
   public:
     /** \brief  Constructor */
     IntegratorInternal(const Function& f, const Function& g);
@@ -153,6 +154,14 @@ namespace casadi {
     /// Options
     bool print_stats_;
 
+    // Creator function for internal class
+    typedef IntegratorInternal* (*Creator)(const Function& f, const Function& g);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+
+    /// Infix
+    static const std::string infix_;
   };
 
 } // namespace casadi
