@@ -199,4 +199,8 @@ void SDPSolverInternal::checkInputs() const {
   }
 }
 
+  std::map<std::string, SDPSolverInternal::Plugin> SDPSolverInternal::solvers_;
+
+  const std::string SDPSolverInternal::infix_ = "sdpsolver";
+
 } // namespace casadi
