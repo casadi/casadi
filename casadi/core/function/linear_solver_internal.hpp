@@ -25,6 +25,7 @@
 
 #include "linear_solver.hpp"
 #include "function_internal.hpp"
+#include "plugin_interface.hpp"
 
 /// \cond INTERNAL
 
@@ -33,7 +34,7 @@ namespace casadi {
   /** Internal class
       @copydoc LinearSolver_doc
   */
-  class CASADI_CORE_EXPORT LinearSolverInternal : public FunctionInternal {
+  class CASADI_CORE_EXPORT LinearSolverInternal : public FunctionInternal, public PluginInterface<LinearSolverInternal> {
   public:
     /// Constructor
     LinearSolverInternal(const Sparsity& sparsity, int nrhs);
@@ -95,6 +96,16 @@ namespace casadi {
     int nnz() const { return input(LINSOL_A).size();}
     const std::vector<int>& row() const { return input(LINSOL_A).row();}
     const std::vector<int>& colind() const { return input(LINSOL_A).colind();}
+
+    // Creator function for internal class
+    typedef LinearSolverInternal* (*Creator)(const Sparsity& sp, int nrhs);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+
+    /// Infix
+    static const std::string infix_;
+
   };
 
 
