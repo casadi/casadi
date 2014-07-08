@@ -20,13 +20,13 @@
  *
  */
 
-%module casadi_qpoases_interface
+%module casadi_qpsolver_qpoases
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_QPOASES_INTERFACE_EXPORT
+#define CASADI_QPSOLVER_QPOASES_EXPORT
 
 %{
 #include "casadi/interfaces/qpoases/qpoases_solver.hpp"
