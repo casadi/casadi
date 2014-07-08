@@ -56,7 +56,7 @@ namespace casadi {
     (*this)->generateNativeCode(file);
   }
 
-  QPSolver::QPSolver(const std::string& name, const QPStructure& st){
+  QPSolver::QPSolver(const std::string& name, const QPStructure& st) {
     assignNode(QPSolverInternal::getPlugin(name).creator(st));
   }
 

@@ -32,7 +32,9 @@
 namespace casadi {
 
   /// Internal class
-  class CASADI_CORE_EXPORT SDPSolverInternal : public FunctionInternal, public PluginInterface<SDPSolverInternal> {
+  class CASADI_CORE_EXPORT
+  SDPSolverInternal : public FunctionInternal,
+                      public PluginInterface<SDPSolverInternal> {
   public:
 
     // Constructor

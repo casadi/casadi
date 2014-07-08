@@ -80,7 +80,7 @@ namespace casadi {
   LinearSolver::LinearSolver(const std::string& name, const Sparsity& sp, int nrhs) {
     assignNode(LinearSolverInternal::getPlugin(name).creator(sp, nrhs));
   }
- 
+
 } // namespace casadi
 
 

@@ -31,7 +31,9 @@
 namespace casadi {
 
   /// Internal class
-  class CASADI_CORE_EXPORT QPSolverInternal : public FunctionInternal, public PluginInterface<QPSolverInternal> {
+  class CASADI_CORE_EXPORT
+  QPSolverInternal : public FunctionInternal,
+                     public PluginInterface<QPSolverInternal> {
   public:
 
     // Constructor

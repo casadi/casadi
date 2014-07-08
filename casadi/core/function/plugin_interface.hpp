@@ -63,7 +63,7 @@ namespace casadi {
     };
 
     // Plugin registration function
-    typedef int (*RegFcn)(Plugin* plugin);        
+    typedef int (*RegFcn)(Plugin* plugin);
 
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
@@ -82,9 +82,10 @@ namespace casadi {
 #else // WITH_DL
     // Retrieve the registration function
     RegFcn reg;
-    
+
     // Get the name of the shared library
-    std::string lib = SHARED_LIBRARY_PREFIX "casadi_" + Derived::infix_ + "_" + name + SHARED_LIBRARY_SUFFIX;
+    std::string lib = SHARED_LIBRARY_PREFIX "casadi_"
+      + Derived::infix_ + "_" + name + SHARED_LIBRARY_SUFFIX;
 
     // Load the dll
     void* handle;
@@ -118,21 +119,23 @@ namespace casadi {
   void PluginInterface<Derived>::registerPlugin(RegFcn regfcn) {
     // Create a temporary struct
     Plugin plugin;
-   
+
     // Set the fields
     int flag = regfcn(&plugin);
     casadi_assert(flag==0);
 
     // Check if the solver name is in use
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(plugin.name);
-             casadi_assert_message(it==Derived::solvers_.end(), "Solver " << plugin.name << " is already in use");
+             casadi_assert_message(it==Derived::solvers_.end(),
+                                   "Solver " << plugin.name << " is already in use");
 
     // Add to list of solvers
     Derived::solvers_[plugin.name] = plugin;
   }
 
   template<class Derived>
-  typename PluginInterface<Derived>::Plugin& PluginInterface<Derived>::getPlugin(const std::string& name){
+  typename PluginInterface<Derived>::Plugin&
+  PluginInterface<Derived>::getPlugin(const std::string& name) {
 
     // Check if the solver has been loaded
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(name);

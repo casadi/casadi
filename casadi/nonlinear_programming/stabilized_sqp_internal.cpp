@@ -37,7 +37,8 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT casadi_register_nlpsolver_stabilizedsqp(NLPSolverInternal::Plugin* plugin){
+  int CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT
+  casadi_register_nlpsolver_stabilizedsqp(NLPSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedSQPInternal::creator;
     plugin->name = "stabilizedsqp";
     plugin->doc = "StabilizedSQP docs not available";
@@ -46,7 +47,7 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT casadi_load_nlpsolver_stabilizedsqp(){
+  void CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT casadi_load_nlpsolver_stabilizedsqp() {
     NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_stabilizedsqp);
   }
 

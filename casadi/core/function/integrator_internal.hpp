@@ -37,7 +37,9 @@ namespace casadi {
       \author Joel Andersson
       \date 2010
   */
-  class CASADI_CORE_EXPORT IntegratorInternal : public FunctionInternal, public PluginInterface<IntegratorInternal> {
+  class CASADI_CORE_EXPORT
+  IntegratorInternal : public FunctionInternal,
+                       public PluginInterface<IntegratorInternal> {
   public:
     /** \brief  Constructor */
     IntegratorInternal(const Function& f, const Function& g);
