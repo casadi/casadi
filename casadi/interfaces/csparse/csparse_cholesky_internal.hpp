@@ -37,13 +37,17 @@ namespace casadi {
   /**
      @copydoc LinearSolver_doc
   */
-  class CASADI_CSPARSE_INTERFACE_EXPORT CSparseCholeskyInternal : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT CSparseCholeskyInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
     CSparseCholeskyInternal(const Sparsity& sp, int nrhs);
 
     // Copy constructor
     CSparseCholeskyInternal(const CSparseCholeskyInternal& linsol);
+
+    /** \brief  Create a new LinearSolver */
+    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
+    { return new CSparseCholeskyInternal(sp, nrhs);}
 
     // Destructor
     virtual ~CSparseCholeskyInternal();

@@ -20,18 +20,16 @@
  *
  */
 
-%module casadi_csparse_interface
+%module casadi_linearsolver_csparsecholesky
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_CSPARSE_INTERFACE_EXPORT
+#define CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
 
 %{
-#include "casadi/interfaces/csparse/csparse.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 %}
-%include "casadi/interfaces/csparse/csparse.hpp"
 %include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 

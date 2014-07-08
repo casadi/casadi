@@ -28,6 +28,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT
+  casadi_register_linearsolver_csparsecholesky(LinearSolverInternal::Plugin* plugin) {
+    plugin->creator = CSparseCholeskyInternal::creator;
+    plugin->name = "csparsecholesky";
+    plugin->doc = "CSparse Cholesky docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_LINEARSOLVER_CSPARSECHOLESKY_EXPORT casadi_load_linearsolver_csparsecholesky() {
+    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_csparsecholesky);
+  }
+
   CSparseCholeskyInternal::CSparseCholeskyInternal(const Sparsity& sparsity, int nrhs) :
       LinearSolverInternal(sparsity, nrhs) {
     L_ = 0;

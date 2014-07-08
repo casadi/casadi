@@ -24,7 +24,7 @@
 #define CSPARSE_HPP
 
 #include "casadi/core/function/linear_solver.hpp"
-#include <casadi/interfaces/csparse/casadi_csparse_interface_export.h>
+#include <casadi/interfaces/csparse/casadi_linearsolver_csparse_export.h>
 
 namespace casadi {
 
@@ -51,7 +51,7 @@ namespace casadi {
    * step and is therefore more expensive if A is invariant.
    *
    */
-  class CASADI_CSPARSE_INTERFACE_EXPORT CSparse : public LinearSolver {
+  class CASADI_LINEARSOLVER_CSPARSE_EXPORT CSparse : public LinearSolver {
   public:
 
     /// Default (empty) constructor

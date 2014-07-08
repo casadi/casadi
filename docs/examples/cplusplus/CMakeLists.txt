@@ -80,7 +80,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
   target_link_libraries(vdp_multiple_shooting
-    casadi_integrator_cvodes casadi_nlpsolver_ipopt  casadi_csparse_interface
+    casadi_integrator_cvodes casadi_nlpsolver_ipopt  casadi_linearsolver_csparse
     casadi_optimal_control casadi_integrator_oldcollocation casadi_nonlinear_programming)
 endif()
 
@@ -95,20 +95,20 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(cstr cstr.cpp)
   target_link_libraries(cstr
-    casadi_integrator_idas casadi_nlpsolver_ipopt casadi_optimal_control casadi_integration casadi_csparse_interface)
+    casadi_integrator_idas casadi_nlpsolver_ipopt casadi_optimal_control casadi_integration casadi_linearsolver_csparse)
 endif()
 
 # CSparse via CasADi
 if(WITH_CSPARSE)
   add_executable(test_csparse_casadi test_csparse_casadi.cpp)
-  target_link_libraries(test_csparse_casadi casadi_csparse_interface)
+  target_link_libraries(test_csparse_casadi casadi_linearsolver_csparse)
 endif()
 
 # Test integrators
 if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(sensitivity_analysis sensitivity_analysis.cpp)
   target_link_libraries(sensitivity_analysis
-    casadi_integrator_collocation casadi_integrator_oldcollocation casadi_integrator_rk casadi_integrator_cvodes casadi_integrator_idas casadi_implicitfunction_kinsol casadi_csparse_interface)
+    casadi_integrator_collocation casadi_integrator_oldcollocation casadi_integrator_rk casadi_integrator_cvodes casadi_integrator_idas casadi_implicitfunction_kinsol casadi_linearsolver_csparse)
 endif()
 
 # Parametric sensitivities with sIPOPT
@@ -149,5 +149,5 @@ endif()
 if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(implicit_runge-kutta implicit_runge-kutta.cpp)
   target_link_libraries(implicit_runge-kutta
-    casadi_nonlinear_programming casadi_integration casadi_integrator_cvodes casadi_csparse_interface)
+    casadi_nonlinear_programming casadi_integration casadi_integrator_cvodes casadi_linearsolver_csparse)
 endif()
