@@ -20,13 +20,13 @@
  *
  */
 
-%module casadi_cplex_interface
+%module casadi_qpsolver_cplex
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_CPLEX_INTERFACE_EXPORT
+#define CASADI_QPSOLVER_CPLEX_EXPORT
 
 %{ 
   #include "casadi/interfaces/cplex/cplex_solver.hpp"

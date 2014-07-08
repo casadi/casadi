@@ -34,6 +34,21 @@ namespace casadi {
 
   using namespace std;
 
+  extern "C"
+  int CASADI_QPSOLVER_CPLEX_EXPORT
+  casadi_register_qpsolver_cplex(QPSolverInternal::Plugin* plugin) {
+    plugin->creator = CplexInternal::creator;
+    plugin->name = "cplex";
+    plugin->doc = "CPLEX docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_QPSOLVER_CPLEX_EXPORT casadi_load_qpsolver_cplex() {
+    QPSolverInternal::registerPlugin(casadi_register_qpsolver_cplex);
+  }
+
   CplexInternal::CplexInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st) {
     // Options available
     addOption("qp_method",    OT_STRING, "automatic", "Determines which CPLEX algorithm to use.",

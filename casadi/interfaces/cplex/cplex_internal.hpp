@@ -35,7 +35,7 @@ namespace casadi {
   /** Internal class for CplexSolver
       @copydoc QPSolver_doc
   */
-  class CASADI_CPLEX_INTERFACE_EXPORT CplexInternal : public QPSolverInternal {
+  class CASADI_QPSOLVER_CPLEX_EXPORT CplexInternal : public QPSolverInternal {
     friend class CplexSolver;
   public:
     /** \brief Default constructor */
@@ -43,6 +43,10 @@ namespace casadi {
 
     /// Clone
     virtual CplexInternal* clone() const;
+
+    /** \brief  Create a new QP Solver */
+    static QPSolverInternal* creator(const QPStructure& st)
+    { return new CplexInternal(st);}
 
     /// Constructor using sparsity patterns
     explicit CplexInternal(const std::vector<Sparsity>& st);
