@@ -80,6 +80,18 @@ namespace casadi {
                  double* x, double* fObj, double*gObj, double* fCon, double* gCon,
                  int nState, char* cu, int lencu, int* iu, int leniu, double* ru, int lenru);
 
+    void callback(int* iAbort, int* info, int HQNType, int* KTcond, int MjrPrt, int minimz,
+        int m, int maxS, int n, int nb, int nnCon0, int nnCon, int nnObj0, int nnObj, int nS,
+        int itn, int nMajor, int nMinor, int nSwap,
+        double condHz, int iObj, double sclObj, double ObjAdd,
+        double fMrt,  double PenNrm, double step,
+        double prInf,  double duInf,  double vimax,  double virel, int* hs,
+        int ne, int nlocJ, int* locJ, int* indJ, double* Jcol, int negCon,
+        double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
+        double* yCon, double* pi, double* rc, double* rg, double* x,
+        double*  cu, int lencu, int* iu, int leniu, double* ru, int lenru,
+        char*   cw, int lencw,  int* iw, int leniw, double* rw, int lenrw);
+
     int nnJac_;
     int nnObj_;
     int nnCon_;
@@ -118,6 +130,19 @@ namespace casadi {
                            double *x, double *fObj, double *gObj, double * fCon, double* gCon,
                            int* nState, char* cu, int* lencu, int* iu, int* leniu,
                            double* ru, int *lenru);
+    static void snStopPtr(
+        int* iAbort, int* info, int* HQNType, int* KTcond, int* MjrPrt, int* minimz,
+        int* m, int* maxS, int* n, int* nb,
+        int* nnCon0, int* nnCon, int* nnObj0, int* nnObj, int* nS,
+        int* itn, int* nMajor, int* nMinor, int* nSwap,
+        double * condHz, int* iObj, double * sclObj,  double *ObjAdd,
+        double * fMrt,  double * PenNrm,  double * step,
+        double *prInf,  double *duInf,  double *vimax,  double *virel, int* hs,
+        int* ne, int* nlocJ, int* locJ, int* indJ, double* Jcol, int* negCon,
+        double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
+        double* yCon, double* pi, double* rc, double* rg, double* x,
+        double*  cu, int * lencu, int* iu, int* leniu, double* ru, int *lenru,
+        char*   cw, int* lencw,  int* iw, int *leniw, double* rw, int* lenrw);
 
     typedef std::map< std::string, std::pair< opt_type, std::string> > OptionsMap;
 
@@ -140,7 +165,7 @@ namespace casadi {
       void snoptC(
         const std::string & start, const int * m_, const int * n, const int * neA,
         const int *nnCon, const int *nnObj, const int *nnJac, const int *iObj, const double *ObjAdd,
-        const std::string & prob, UserFun userfunPtr,
+        const std::string & prob, UserFun userfunPtr, snStop snStopPtr,
         const std::vector<double>& A_data_, const std::vector<int>& row,
         const std::vector<int>& col,
         std::vector<double>& bl_, std::vector<double>& bu_,
@@ -161,6 +186,7 @@ namespace casadi {
       int n_eval_grad_f_; // number of calls to eval_grad_f
       int n_eval_jac_g_; // number of calls to eval_jac_g
       int n_callback_fun_; // number of calls to callback function
+      int n_iter_; // number of major iterations
   };
 
 } // namespace casadi

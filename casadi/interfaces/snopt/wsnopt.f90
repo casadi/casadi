@@ -21,6 +21,40 @@ interface
   !  character*(*) , intent(in):: buffer
   !  real, intent(inout) :: rw(lenrw)
   !end subroutine
+  
+  subroutine snSTOP &
+     &   ( iAbort, info, HQNType, KTcond, MjrPrt, minimz,
+     &     m, maxS, n, nb, nnCon0, nnCon, nnObj0, nnObj, nS,
+     &     itn, nMajor, nMinor, nSwap,
+     &     condHz, iObj, sclObj, ObjAdd, fMrt, PenNrm, step,
+     &     prInf, duInf, vimax, virel, hs,
+     &     ne, nlocJ, locJ, indJ, Jcol, negCon,
+     &     Ascale, bl, bu, fCon, gCon, gObj,
+     &     yCon, pi, rc, rg, x,
+     &     cu, lencu, iu, leniu, ru, lenru,
+     &     cw, lencw, iw, leniw, rw, lenrw ) bind(c)
+     
+     import :: c_int, c_double, c_char
+     
+     logical(c_bool), intent(in) ::  KTcond(2)
+     
+     integer(c_int), intent(in) :: HQNType, info(6), iObj, itn,
+     &     lencu, lencw, leniu, leniw, lenru, lenrw,
+     &     MjrPrt, minimz, m, maxS, n, nb, ne, negCon, nlocJ,
+     &     nnCon0, nnCon, nnObj0, nnObj, nMajor, nMinor, nS, nSwap,
+     &     hs(nb), locJ(nlocJ), indJ(ne), iu(leniu), iw(leniw)
+     
+     real(c_double), intent(in) :: condHz, sclObj, ObjAdd, fMrt, PenNrm, virel, vimax, step,
+     &     prInf, duInf, Ascale(nb), bl(nb), bu(nb), fCon(nnCon0),
+     &     gCon(negCon), gObj(nnObj0), Jcol(ne), pi(m),
+     &     rc(nb), rg(maxS), yCon(nnCon0), x(nb), ru(lenru), rw(lenrw)
+     
+     integer(c_int), intent(inout) :: iAbort
+     
+     character(c_char), intent(inout) ::  cu(lencu*8)
+
+  end subroutine
+
 end interface
 
 contains
@@ -156,11 +190,13 @@ end subroutine
 
 
 subroutine snopt_c &
-(Start, lenstart, m, n, neA, nName, nnCon, nnObj, nnJac, iObj,ObjAdd, Prob,userfun, Acol, indA, locA, bl, bu, Names, hs, x,&
+(Start, lenstart, m, n, neA, nName, nnCon, nnObj, nnJac, iObj,ObjAdd, Prob,userfun, snStop, Acol, indA, locA, bl, bu, Names, hs, x,&
 pi, rc, INFO, mincw, miniw, minrw, nS, nInf, sInf, Obj,&
 cu, lencu, iu, leniu, ru, lenru,&
 cw, lencw, iw, leniw, rw, lenrw) bind (c)
     type(c_funptr) userfun
+    external snLog, snLog2, sqLog
+    type(c_funptr) snSTOP
     integer(c_int), intent(in) :: lenstart, INFO, iObj, lencu, leniu, lenru, lencw, leniw, lenrw, &
       mincw, miniw, minrw, m, n, neA, nName, nS, nInf, nnCon, nnObj, nnJac
     integer(c_int), intent(in) :: indA(neA), hs(n+m), locA(n+1)
@@ -170,8 +206,8 @@ cw, lencw, iw, leniw, rw, lenrw) bind (c)
     character(c_char), intent(inout) :: Prob(8), Names(nName*8), cu(lencu*8), cw(lencw*8)
     character(c_char), intent(in) :: Start(lenstart)
 
-    call snoptc &
-      (Start, m, n, neA, nName, nnCon, nnObj, nnJac, iObj,ObjAdd, Prob, userfun, Acol, indA,&
+    call snKerC &
+      (Start, m, n, neA, nName, nnCon, nnObj, nnJac, iObj,ObjAdd, Prob, userfun, snSTOP, Acol, indA,&
        locA, bl, bu, Names, hs, x,&
        pi, rc, INFO, mincw, miniw, minrw, nS, nInf, sInf, Obj, cu, lencu, iu,&
        leniu, ru, lenru, cw, lencw, iw, leniw, rw, lenrw)
