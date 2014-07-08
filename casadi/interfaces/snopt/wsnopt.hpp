@@ -29,6 +29,22 @@ typedef void (*UserFun)(
     double *x, double *fObj, double *gObj, double * fCon, double* gCon, int* nState,
     char* cu, int* lencu, int* iu, int* leniu, double* ru, int *lenru);
 
+typedef void (*snStop)(
+    int* iAbort, int* info, int* HQNType, int* KTcond, int* MjrPrt, int* minimz,
+    int* m, int* maxS, int* n, int* nb,
+    int* nnCon0, int* nnCon, int* nnObj0, int* nnObj, int* nS,
+    int* itn, int* nMajor, int* nMinor, int* nSwap,
+    double * condHz, int* iObj, double * sclObj,  double *ObjAdd,
+    double * fMrt,  double * PenNrm,  double * step,
+    double *prInf,  double *duInf,  double *vimax,  double *virel, int* hs,
+    int* ne, int* nlocJ, int* locJ, int* indJ, double* Jcol, int* negCon,
+    double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
+    double* yCon, double* pi, double* rc, double* rg, double* x,
+    double*  cu, int * lencu, int* iu, int* leniu, double* ru, int *lenru,
+    char*   cw, int* lencw,  int* iw, int *leniw, double* rw, int* lenrw);
+
+typedef void (*dummyFun)();
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -132,6 +148,30 @@ extern "C" {
                /* Fortran char array hack */
                const long start_len8, const long prob_len8, const long names_len8,
                const long cu_len8, const long cw_len8);
+
+  void snkerc_(const char * Start, const int * m, const int * n, const int * neA,
+               const int * nName, const int *nnCon, const int *nnObj, const int *nnJac,
+               const int *iObj, const double *ObjAdd, const char* Prob ,
+               UserFun userfun, dummyFun snlog, dummyFun snlog2, dummyFun sqlog, snStop snstop,
+               const double* Acol, const int* indA, const int *locA, double* bl, double* bu,
+               char* Names,
+               /* Initial values */
+               int* hs, double* x, double* pi, double * rc,
+               /* Outputs */
+               int *info, int* mincw, int* miniw, int* minrw, int * nS,
+               int* nInf, double* sInf, double* Obj,
+               /* Working spaces for usrfun */
+               char* cu, const int* lencu, int* iu, const int* leniu, double* ru, const int* lenru,
+               /* Working spaces for SNOPT */
+               char* cw, const int* lencw, int* iw, const int* leniw, double* rw, const int* lenrw,
+               /* Fortran char array hack */
+               const long start_len8, const long prob_len8, const long names_len8,
+               const long cu_len8, const long cw_len8);
+
+  // Dummy symbols that point to Fortran functions
+  void snlog_();
+  void snlog2_();
+  void sqlog_();
 
 #ifdef __cplusplus
 }

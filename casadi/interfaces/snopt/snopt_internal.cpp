@@ -407,7 +407,7 @@ namespace casadi {
 
     // Reset the counters
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
-    n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = 0;
+    n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
   }
 
   void SnoptInternal::reset() {
@@ -435,6 +435,18 @@ namespace casadi {
     // Initial checks
     if (inputs_check_) checkInputs();
     checkInitialBounds();
+
+    if (gather_stats_) {
+      Dictionary iterations;
+      iterations["inf_pr"] = std::vector<double>();
+      iterations["inf_du"] = std::vector<double>();
+      iterations["merit"] = std::vector<double>();
+      iterations["step_size"] = std::vector<double>();
+      iterations["pen_norm"] = std::vector<double>();
+      iterations["cond_H"] = std::vector<double>();
+      iterations["qp_num_iter"] = std::vector<int>();
+      stats_["iterations"] = iterations;
+    }
 
     std::string start = getOption("_start");
 
@@ -563,7 +575,7 @@ namespace casadi {
     double time0 = clock();
     snoptC(start, &m_, &n, &nea,
            &nnCon_, &nnObj_, &nnJac_, &iObj_, &ObjAdd,
-           prob, userfunPtr,
+           prob, userfunPtr, snStopPtr,
            A_data_, row, col, bl_, bu_,
            // Initial values
            getPtr(hs_), getPtr(x_), getPtr(pi_), getPtr(rc_),
@@ -645,10 +657,11 @@ namespace casadi {
     stats_["n_eval_grad_f"] = n_eval_grad_f_;
     stats_["n_eval_jac_g"] = n_eval_jac_g_;
     stats_["n_callback_fun"] = n_callback_fun_;
+    stats_["iter_count"] = n_iter_;
 
     // Reset the counters
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
-    n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = 0;
+    n_eval_grad_f_ = n_eval_jac_g_ = n_callback_fun_ = n_iter_ = 0;
   }
 
   void SnoptInternal::setOptionsFromFile(const std::string & file) {
@@ -770,8 +783,40 @@ namespace casadi {
         }
       }
 
+    } catch(std::exception& ex) {
+      std::cerr << "eval_nlp failed: " << ex.what() << std::endl;
+      *mode = -1;  // Reduce step size - we've got problems
+      return;
+    }
+  }
+
+  void SnoptInternal::callback(
+      int* iAbort, int* info, int HQNType, int* KTcond, int MjrPrt, int minimz,
+      int m, int maxS, int n, int nb, int nnCon0, int nnCon, int nnObj0, int nnObj, int nS,
+      int itn, int nMajor, int nMinor, int nSwap,
+      double condHz, int iObj, double sclObj, double ObjAdd,
+      double fMrt,  double PenNrm,  double step,
+      double prInf,  double duInf,  double vimax,  double virel, int* hs,
+      int ne, int nlocJ, int* locJ, int* indJ, double* Jcol, int negCon,
+      double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
+      double* yCon, double* pi, double* rc, double* rg, double* x,
+      double*  cu, int lencu, int* iu, int leniu, double* ru, int lenru,
+      char*   cw, int lencw,  int* iw, int leniw, double* rw, int lenrw) {
+    try {
+      n_iter_+=1;
+      if (gather_stats_) {
+        Dictionary & iterations = stats_["iterations"];
+        static_cast<std::vector<double> &>(iterations["inf_pr"]).push_back(prInf);
+        static_cast<std::vector<double> &>(iterations["inf_du"]).push_back(duInf);
+        static_cast<std::vector<double> &>(iterations["merit"]).push_back(fMrt);
+        static_cast<std::vector<double> &>(iterations["step_size"]).push_back(step);
+        static_cast<std::vector<double> &>(iterations["pen_norm"]).push_back(PenNrm);
+        static_cast<std::vector<double> &>(iterations["cond_H"]).push_back(condHz);
+        static_cast<std::vector<int> &>(
+        iterations["qp_num_iter"]).push_back(nMinor);
+      }
       if (!callback_.isNull()) {
-        time0 = clock();
+        double time0 = clock();
         for (int k = 0; k < nx_; ++k) {
           int kk = x_order_[k];
           output(NLP_SOLVER_X).data()[kk] = x_[k];
@@ -785,14 +830,16 @@ namespace casadi {
           output(NLP_SOLVER_G).data()[kk] = x_[nx_+k];
         }
 
-        *mode = callback_(ref_, user_data_);
+        *iAbort = callback_(ref_, user_data_);
         t_callback_fun_ += static_cast<double>(clock()-time0)/CLOCKS_PER_SEC;
         n_callback_fun_ += 1;
       }
     } catch(std::exception& ex) {
-      std::cerr << "eval_nlp failed: " << ex.what() << std::endl;
-      *mode = -1;  // Reduce step size - we've got problems
-      return;
+      if (getOption("iteration_callback_ignore_errors")) {
+        std::cerr << "callback: " << ex.what() << std::endl;
+      } else {
+        throw ex;
+      }
     }
   }
 
@@ -807,6 +854,34 @@ namespace casadi {
     interface->userfun(mode, *nnObj, *nnCon, *nJac, *nnL, *neJac,
                        x, fObj, gObj, fCon, gCon, *nState,
                        cu, *lencu, iu, *leniu, ru, *lenru);
+  }
+
+  void SnoptInternal::snStopPtr(
+    int* iAbort, int* info, int* HQNType, int* KTcond, int* MjrPrt, int* minimz,
+    int* m, int* maxS, int* n, int* nb,
+    int* nnCon0, int* nnCon, int* nnObj0, int* nnObj, int* nS,
+    int* itn, int* nMajor, int* nMinor, int* nSwap,
+    double * condHz, int* iObj, double * sclObj,  double *ObjAdd,
+    double * fMrt,  double * PenNrm,  double * step,
+    double *prInf,  double *duInf,  double *vimax,  double *virel, int* hs,
+    int* ne, int* nlocJ, int* locJ, int* indJ, double* Jcol, int* negCon,
+    double* Ascale, double* bl, double* bu, double* fCon, double* gCon, double* gObj,
+    double* yCon, double* pi, double* rc, double* rg, double* x,
+    double*  cu, int * lencu, int* iu, int* leniu, double* ru, int *lenru,
+    char*   cw, int* lencw,  int* iw, int *leniw, double* rw, int* lenrw) {
+    SnoptInternal* interface;  // = reinterpret_cast<SnoptInternal*>(iu);
+    memcpy(&interface, &(iu[0]), sizeof(SnoptInternal*));
+
+    interface->callback(iAbort, info, *HQNType, KTcond, *MjrPrt, *minimz,
+    *m, *maxS, *n, *nb, *nnCon0, *nnCon, *nnObj0, *nnObj, *nS,
+    *itn, *nMajor, *nMinor, *nSwap,
+    *condHz, *iObj, *sclObj, *ObjAdd,  *fMrt,  *PenNrm,  *step,
+    *prInf,  *duInf, *vimax, *virel, hs,
+    *ne, *nlocJ, locJ, indJ, Jcol, *negCon,
+    Ascale, bl, bu, fCon, gCon, gObj,
+    yCon, pi, rc, rg, x,
+     cu, *lencu, iu, *leniu, ru, *lenru,
+    cw, *lencw,  iw, *leniw, rw, *lenrw);
   }
 
   void SnoptInternal::snMemb(int *INFO, const int *m_, const int *nx_,
@@ -916,7 +991,7 @@ namespace casadi {
          const std::string & start, const int * m_, const int * n, const int * neA,
          const int *nnCon, const int *nnObj, const int *nnJac,
          const int *iObj, const double *ObjAdd,
-         const std::string & prob, UserFun userfunPtr,
+         const std::string & prob, UserFun userfunPtr, snStop snStopPtr,
          const std::vector<double>& A_data_, const std::vector<int>& row,
          const std::vector<int>& col,
          std::vector<double>& bl_, std::vector<double>& bu_,
@@ -955,10 +1030,10 @@ namespace casadi {
 //        getPtr(snopt_cw_), &clen,
 //        getPtr(snopt_iw_), &ilen,
 //        getPtr(snopt_rw_), &rlen);
-      snoptc_(
+      snkerc_(
           start.c_str(), m_, n, neA, &nName,
           nnCon, nnObj, nnJac, iObj, ObjAdd,
-          prob.c_str(), userfunPtr,
+          prob.c_str(), userfunPtr, snlog_, snlog2_, sqlog_, snStopPtr,
           getPtr(A_data_), getPtr(row), getPtr(col), getPtr(bl_), getPtr(bu_),
           0,
           // Initial values
