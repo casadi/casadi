@@ -13,7 +13,7 @@ endif()
 
 set(CASADI_LIBS_LIST
   casadi_cplex_interface
-  casadi_ipopt_interface
+  casadi_nlpsolver_ipopt
   casadi_lapack_interface
   casadi_sundials_interface
   casadi_csparse_interface

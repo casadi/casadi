@@ -240,35 +240,6 @@ namespace casadi {
 
     /// Join F and G in old signature style to a common NLP function
     static Function joinFG(Function F, Function G);
-
-    /// Load a plugin dynamically
-    static void loadPlugin(const std::string& name);
-
-/// \cond INTERNAL
-#ifndef SWIG
-    // Creator function for internal class
-    typedef NLPSolverInternal* (*Creator)(const Function& nlp);
-
-    /// Fields
-    struct Plugin{
-      Creator creator;
-      const char* name;
-      const char* doc;
-      int version;
-    };
-
-    // Plugin registration function
-    typedef int (*RegFcn)(Plugin* plugin);
-
-    /// Register an integrator in the factory
-    static void registerPlugin(RegFcn regfcn);
-
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
-#endif // SWIG
-/// \endcond
-
-
   };
 
 } // namespace casadi

@@ -36,7 +36,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_NLPSOLVER_SCPGEN_EXPORT casadi_register_nlpsolver_scpgen(NLPSolver::Plugin* plugin){
+  int CASADI_NLPSOLVER_SCPGEN_EXPORT casadi_register_nlpsolver_scpgen(NLPSolverInternal::Plugin* plugin){
     plugin->creator = SCPgenInternal::creator;
     plugin->name = "scpgen";
     plugin->doc = "SCPgen docs not available";
@@ -46,7 +46,7 @@ namespace casadi {
 
   extern "C"
   void CASADI_NLPSOLVER_SCPGEN_EXPORT casadi_load_nlpsolver_scpgen(){
-    NLPSolver::registerPlugin(casadi_register_nlpsolver_scpgen);
+    NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_scpgen);
   }
 
   SCPgenInternal::SCPgenInternal(const Function& nlp) : NLPSolverInternal(nlp) {

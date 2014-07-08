@@ -25,6 +25,7 @@
 
 #include "nlp_solver.hpp"
 #include "function_internal.hpp"
+#include "plugin_interface.hpp"
 
 
 /// \cond INTERNAL
@@ -36,7 +37,7 @@ namespace casadi {
   \author Joel Andersson
   \date 2010-2013
 */
-  class CASADI_CORE_EXPORT NLPSolverInternal : public FunctionInternal {
+  class CASADI_CORE_EXPORT NLPSolverInternal : public FunctionInternal, public PluginInterface<NLPSolverInternal> {
 
   public:
     /// Constructor
@@ -134,6 +135,15 @@ namespace casadi {
 
     /// A reference to this object to be passed to the user functions
     Function ref_;
+
+    // Creator function for internal class
+    typedef NLPSolverInternal* (*Creator)(const Function& nlp);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+
+    /// Infix
+    static const std::string infix_;
 
   };
 

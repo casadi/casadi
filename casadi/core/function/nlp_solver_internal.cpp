@@ -355,4 +355,8 @@ namespace casadi {
     }
   }
 
+  std::map<std::string, NLPSolverInternal::Plugin> NLPSolverInternal::solvers_;
+
+  const std::string NLPSolverInternal::infix_ = "nlpsolver";
+
 } // namespace casadi
