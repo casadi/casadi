@@ -35,7 +35,7 @@ namespace casadi {
    *
    @copydoc SDPSolver_doc
    * */
-  class CASADI_DSDP_INTERFACE_EXPORT DSDPInternal : public SDPSolverInternal {
+  class CASADI_SDPSOLVER_DSDP_EXPORT DSDPInternal : public SDPSolverInternal {
     friend class DSDPSolver;
   public:
 
@@ -44,6 +44,10 @@ namespace casadi {
 
     /** \brief Clone */
     virtual DSDPInternal* clone() const;
+
+    /** \brief  Create a new SDP Solver */
+    static SDPSolverInternal* creator(const SDPStructure& st)
+    { return new DSDPInternal(st);}
 
     /** \brief Destructor */
     virtual ~DSDPInternal();

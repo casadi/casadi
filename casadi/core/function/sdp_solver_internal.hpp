@@ -62,7 +62,7 @@ namespace casadi {
     void printProblem(std::ostream &stream=std::cout) const;
 
     // Creator function for internal class
-    typedef SDPSolverInternal* (*Creator)(const std::vector<Sparsity>& st);
+    typedef SDPSolverInternal* (*Creator)(const SDPStructure& st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

@@ -20,13 +20,13 @@
  *
  */
 
-%module casadi_dsdp_interface
+%module casadi_sdpsolver_dsdp
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_DSDP_INTERFACE_EXPORT
+#define CASADI_SDPSOLVER_DSDP_EXPORT
 
 %{
 #include "casadi/interfaces/dsdp/dsdp_solver.hpp"

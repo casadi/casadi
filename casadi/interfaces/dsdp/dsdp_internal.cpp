@@ -34,6 +34,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_SDPSOLVER_DSDP_EXPORT
+  casadi_register_sdpsolver_dsdp(SDPSolverInternal::Plugin* plugin) {
+    plugin->creator = DSDPInternal::creator;
+    plugin->name = "dsdp";
+    plugin->doc = "DSDP docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_SDPSOLVER_DSDP_EXPORT casadi_load_sdpsolver_dsdp() {
+    SDPSolverInternal::registerPlugin(casadi_register_sdpsolver_dsdp);
+  }
+
   DSDPInternal* DSDPInternal::clone() const {
     // Return a deep copy
     DSDPInternal* node = new DSDPInternal(st_);
