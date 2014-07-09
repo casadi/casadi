@@ -168,7 +168,7 @@ extern "C" {
                const long start_len8, const long prob_len8, const long names_len8,
                const long cu_len8, const long cw_len8);
 
-  // Dummy symbols that point to Fortran functions
+  // Dummy symbols that point to functions in the snopt library
   void snlog_();
   void snlog2_();
   void sqlog_();
