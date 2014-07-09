@@ -26,6 +26,7 @@
 #include "homotopy_nlp_solver.hpp"
 #include "nlp_solver.hpp"
 #include "function_internal.hpp"
+#include "plugin_interface.hpp"
 
 
 /// \cond INTERNAL
@@ -37,8 +38,9 @@ namespace casadi {
   \author Joris Gillis
   \date 2013-2014
 */
-  class CASADI_CORE_EXPORT HomotopyNLPInternal : public FunctionInternal {
-
+  class CASADI_CORE_EXPORT 
+  HomotopyNLPInternal : public FunctionInternal,
+                        public PluginInterface<HomotopyNLPInternal> {    
   public:
     /// Constructor
     HomotopyNLPInternal(const Function& hnlp);
@@ -55,6 +57,15 @@ namespace casadi {
     int nx_;
     int np_;
     int ng_;
+
+    // Creator function for internal class
+    typedef HomotopyNLPInternal* (*Creator)(const Function& hnlp);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+
+    /// Infix
+    static const std::string infix_;
 
   };
 

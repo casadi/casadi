@@ -8,6 +8,9 @@ casadi_library(casadi_nonlinear_programming
   simple_homotopy_nlp_solver.hpp simple_homotopy_nlp_solver.cpp simple_homotopy_nlp_internal.hpp simple_homotopy_nlp_internal.cpp
 )
 
+
+
+
 # SQPMethod -  A basic SQP method
 casadi_library(casadi_nlpsolver_sqpmethod
   sqp_method.hpp          sqp_method.cpp          sqp_internal.hpp          sqp_internal.cpp)

@@ -103,8 +103,11 @@ namespace casadi {
         hnlp_.init();
       }
     }
-
   }
+
+  std::map<std::string, HomotopyNLPInternal::Plugin> HomotopyNLPInternal::solvers_;
+
+  const std::string HomotopyNLPInternal::infix_ = "homotopynlp";
 
 
 } // namespace casadi
