@@ -42,7 +42,7 @@ namespace casadi {
   extern "C"
   int CASADI_QPSOLVER_OOQP_EXPORT
   casadi_register_qpsolver_ooqp(QPSolverInternal::Plugin* plugin) {
-    plugin->creator = OoqpInternal::creator;
+    plugin->creator = OOQPInternal::creator;
     plugin->name = "ooqp";
     plugin->doc = "OOQP docs not available";
     plugin->version = 20;
