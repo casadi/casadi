@@ -36,6 +36,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
+  casadi_register_homotopynlpsolver_simple(HomotopyNLPInternal::Plugin* plugin) {
+    plugin->creator = SimpleHomotopyNLPInternal::creator;
+    plugin->name = "simple";
+    plugin->doc = "SimpleHomotopyNLP docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT casadi_load_homotopynlpsolver_simple() {
+    HomotopyNLPInternal::registerPlugin(casadi_register_homotopynlpsolver_simple);
+  }
+
   SimpleHomotopyNLPInternal::SimpleHomotopyNLPInternal(const Function& nlp)
       : HomotopyNLPInternal(nlp) {
     addOption("nlp_solver",         OT_NLPSOLVER,   GenericType(),

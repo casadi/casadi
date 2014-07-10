@@ -4,12 +4,12 @@ casadi_library(casadi_nonlinear_programming
   symbolic_nlp.hpp         symbolic_nlp.cpp
   nlp_qp_solver.hpp       nlp_qp_solver.cpp       nlp_qp_internal.hpp       nlp_qp_internal.cpp
   nlp_implicit_solver.hpp nlp_implicit_solver.cpp nlp_implicit_internal.hpp nlp_implicit_internal.cpp
-  newton_implicit_solver.hpp newton_implicit_solver.cpp newton_implicit_internal.hpp newton_implicit_internal.cpp
-  simple_homotopy_nlp_solver.hpp simple_homotopy_nlp_solver.cpp simple_homotopy_nlp_internal.hpp simple_homotopy_nlp_internal.cpp
-)
+  newton_implicit_solver.hpp newton_implicit_solver.cpp newton_implicit_internal.hpp newton_implicit_internal.cpp)
 
-
-
+casadi_library(casadi_homotopynlpsolver_simple
+  simple_homotopy_nlp_solver.hpp simple_homotopy_nlp_solver.cpp
+  simple_homotopy_nlp_internal.hpp simple_homotopy_nlp_internal.cpp)
+target_link_libraries(casadi_homotopynlpsolver_simple casadi_nonlinear_programming)
 
 # SQPMethod -  A basic SQP method
 casadi_library(casadi_nlpsolver_sqpmethod

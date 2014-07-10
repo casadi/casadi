@@ -30,12 +30,17 @@
 /// \cond INTERNAL
 namespace casadi {
 
-class CASADI_NONLINEAR_PROGRAMMING_EXPORT SimpleHomotopyNLPInternal : public HomotopyNLPInternal {
+class CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
+SimpleHomotopyNLPInternal : public HomotopyNLPInternal {
 
 public:
   explicit SimpleHomotopyNLPInternal(const Function& hnlp);
   virtual ~SimpleHomotopyNLPInternal();
   virtual SimpleHomotopyNLPInternal* clone() const { return new SimpleHomotopyNLPInternal(*this);}
+
+  /** \brief  Create a new Homotopy NLP Solver */
+  static HomotopyNLPInternal* creator(const Function& hnlp)
+  { return new SimpleHomotopyNLPInternal(hnlp);}
 
   virtual void init();
   virtual void evaluate();

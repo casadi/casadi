@@ -107,7 +107,7 @@ namespace casadi {
 
   std::map<std::string, HomotopyNLPInternal::Plugin> HomotopyNLPInternal::solvers_;
 
-  const std::string HomotopyNLPInternal::infix_ = "homotopynlp";
+  const std::string HomotopyNLPInternal::infix_ = "homotopynlpsolver";
 
 
 } // namespace casadi
