@@ -172,6 +172,7 @@ if (dwork==0) {
 
   }
 
+  CASADI_SLICOT_INTERFACE_EXPORT
   void slicot_periodic_schur(const std::vector< Matrix<double> > & a,
                              std::vector< Matrix<double> > & t, std::vector< Matrix<double> > & z,
                              std::vector< double > & eig_real, std::vector< double > & eig_imag) {
