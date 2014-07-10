@@ -62,7 +62,7 @@ namespace casadi {
 
     /** \brief  Create a new NLP Solver */
     static NLPSolverInternal* creator(const Function& nlp)
-    { return new WorhpInternal(nlp);}    
+    { return new WorhpInternal(nlp);}
 
     // Reset solver
     void reset();
