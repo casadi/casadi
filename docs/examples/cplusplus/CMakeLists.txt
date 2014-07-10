@@ -59,14 +59,14 @@ endif()
 if(WORHP_FOUND AND IPOPT_FOUND)
   add_executable(worhp_nl worhp_nl.cpp)
   target_link_libraries(worhp_nl
-    casadi_worhp_interface casadi_nonlinear_programming)
+    casadi_nlpsolver_worhp casadi_nonlinear_programming)
 endif()
 
 # Parse AMPL models and solve with KNITRO
 if(KNITRO_FOUND)
   add_executable(knitro_nl knitro_nl.cpp)
   target_link_libraries(knitro_nl
-    casadi_knitro_interface casadi_nonlinear_programming)
+    casadi_nlpsolver_knitro casadi_nonlinear_programming)
 endif()
 
 # rocket example using sundials and ipopt
