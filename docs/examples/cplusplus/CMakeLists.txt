@@ -52,7 +52,8 @@ if(SQIC_FOUND AND IPOPT_FOUND)
   target_link_libraries(stabilized_sqpmethod_nl
     casadi_nlpsolver_ipopt casadi_nonlinear_programming
     casadi_nlpsolver_stabilizedsqp
-    casadi_sqic_interface casadi_convex_programming)
+    casadi_sqic_interface
+    casadi_stabilizedqpsolver_qp)
 endif()
 
 # Parse AMPL models and solve with Worhp
