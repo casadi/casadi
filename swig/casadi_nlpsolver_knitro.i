@@ -20,13 +20,13 @@
  *
  */
 
-%module casadi_knitro_interface
+%module casadi_nlpsolver_knitro
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_KNITRO_INTERFACE_EXPORT
+#define CASADI_NLPSOLVER_KNITRO_EXPORT
 
 %{ 
   #include "casadi/interfaces/knitro/knitro_solver.hpp"

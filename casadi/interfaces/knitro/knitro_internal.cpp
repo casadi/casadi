@@ -30,6 +30,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_NLPSOLVER_KNITRO_EXPORT
+  casadi_register_nlpsolver_knitro(NLPSolverInternal::Plugin* plugin) {
+    plugin->creator = KnitroInternal::creator;
+    plugin->name = "knitro";
+    plugin->doc = "KNITRO docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_NLPSOLVER_KNITRO_EXPORT casadi_load_nlpsolver_knitro() {
+    NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_knitro);
+  }
+
   KnitroInternal::KnitroInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     casadi_warning("KnitroInternal: the KNITRO interface is still experimental, "
                    "more tests are needed");

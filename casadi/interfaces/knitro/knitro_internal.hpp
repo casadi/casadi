@@ -40,6 +40,10 @@ namespace casadi {
     virtual ~KnitroInternal();
     virtual KnitroInternal* clone() const { return new KnitroInternal(*this);}
 
+    /** \brief  Create a new NLP Solver */
+    static NLPSolverInternal* creator(const Function& nlp)
+    { return new KnitroInternal(nlp);}
+
     virtual void init();
     virtual void evaluate();
 
