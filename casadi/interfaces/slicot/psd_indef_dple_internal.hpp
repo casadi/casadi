@@ -35,7 +35,7 @@ namespace casadi {
      \author Joris Gillis
       \date 2014
   */
-  class CASADI_SLICOT_INTERFACE_EXPORT PsdIndefDpleInternal : public DpleInternal {
+  class CASADI_DPLESOLVER_SLICOT_EXPORT PsdIndefDpleInternal : public DpleInternal {
   public:
     /** \brief  Constructor
      *  \param[in] A  List of sparsities of A_i
@@ -54,9 +54,14 @@ namespace casadi {
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new solver */
-    virtual PsdIndefDpleInternal* create(const std::vector< Sparsity > & A,
-                                         const std::vector< Sparsity > &V) const
+    virtual PsdIndefDpleInternal* create(const std::vector< Sparsity >& A,
+                                         const std::vector< Sparsity >& V) const
     { return new PsdIndefDpleInternal(A, V); }
+
+    /** \brief  Create a new DPLE Solver */
+    static DpleInternal* creator(const std::vector< Sparsity >& A,
+                                 const std::vector< Sparsity >& V)
+    { return new PsdIndefDpleInternal(A, V);}
 
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}

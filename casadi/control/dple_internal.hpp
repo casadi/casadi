@@ -26,6 +26,7 @@
 #include "dple_solver.hpp"
 #include "dple_internal.hpp"
 #include "../core/function/function_internal.hpp"
+#include "../core/function/plugin_interface.hpp"
 
 /// \cond INTERNAL
 
@@ -37,7 +38,9 @@ namespace casadi {
      \author Joris Gillis
       \date 2014
   */
-  class CASADI_CONTROL_EXPORT DpleInternal : public FunctionInternal {
+  class CASADI_CONTROL_EXPORT
+  DpleInternal : public FunctionInternal,
+                 public PluginInterface<DpleInternal> {
   public:
     /** \brief  Constructor
      *  \param[in] A  List of sparsities of A_i
@@ -100,6 +103,15 @@ namespace casadi {
     /// Number of adjoint derivatives
     int nadj_;
 
+    // Creator function for internal class
+    typedef DpleInternal* (*Creator)(const std::vector< Sparsity >& A,
+                                     const std::vector< Sparsity >& V);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+
+    /// Infix
+    static const std::string infix_;
   };
 
 } // namespace casadi

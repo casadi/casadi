@@ -41,6 +41,21 @@ OUTPUTSCHEME(DPLEOutput)
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_DPLESOLVER_SLICOT_EXPORT
+  casadi_register_dplesolver_slicot(DpleInternal::Plugin* plugin) {
+    plugin->creator = PsdIndefDpleInternal::creator;
+    plugin->name = "slicot";
+    plugin->doc = "slicot docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_DPLESOLVER_SLICOT_EXPORT casadi_load_dplesolver_slicot() {
+    DpleInternal::registerPlugin(casadi_register_dplesolver_slicot);
+  }
+
   PsdIndefDpleInternal::PsdIndefDpleInternal(const std::vector< Sparsity > & A,
                                              const std::vector< Sparsity > &V, int nfwd, int nadj)
       : DpleInternal(A, V, nfwd, nadj) {

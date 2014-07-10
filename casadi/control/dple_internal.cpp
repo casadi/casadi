@@ -141,6 +141,10 @@ namespace casadi {
     FunctionInternal::deepCopyMembers(already_copied);
   }
 
+  std::map<std::string, DpleInternal::Plugin> DpleInternal::solvers_;
+
+  const std::string DpleInternal::infix_ = "dplesolver";
+
 
 } // namespace casadi
 

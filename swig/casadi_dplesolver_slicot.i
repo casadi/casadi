@@ -20,18 +20,18 @@
  *
  */
 
-%module casadi_slicot_interface
+%module casadi_dplesolver_slicot
 
 %include "common.i"
 
 %import "casadi_control.i"
 
-#define CASADI_SLICOT_INTERFACE_EXPORT
+#define CASADI_DPLESOLVER_SLICOT_EXPORT
 
 %{
 #include "casadi/control/dple_solver.hpp"
 #include "casadi/control/simple_indef_dple_solver.hpp"
-#include "casadi/interfaces/slicot/slicot_tools.hpp"
+#include "casadi/interfaces/slicot/psd_indef_dple_solver.hpp"
 %}
 
-%include "casadi/interfaces/slicot/slicot_tools.hpp"
+%include "casadi/interfaces/slicot/psd_indef_dple_solver.hpp"
