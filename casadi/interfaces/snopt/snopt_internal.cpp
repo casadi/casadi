@@ -39,7 +39,7 @@
 #include "wsnopt.hpp"
 
 namespace casadi {
-  
+
   extern "C"
   int CASADI_NLPSOLVER_SNOPT_EXPORT
   casadi_register_nlpsolver_snopt(NLPSolverInternal::Plugin* plugin) {
