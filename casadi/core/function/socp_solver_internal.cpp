@@ -67,9 +67,9 @@ namespace casadi {
     n_ = A.size2();
 
     casadi_assert_message(n_==G.size1(),
-                          "SOCPSolverInternal: Supplied G sparsity: number of rows ("
-                          << G.size1()
-                          <<  ") must match number of decision variables (cols of A): " << n_ << ".");
+       "SOCPSolverInternal: Supplied G sparsity: number of rows ("
+        << G.size1()
+        <<  ") must match number of decision variables (cols of A): " << n_ << ".");
 
 
     // Input arguments

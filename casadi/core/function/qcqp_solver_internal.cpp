@@ -44,10 +44,10 @@ namespace casadi {
 
     if (!A.isNull()) {
       casadi_assert_message(A.size2()==n_,
-                            "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
-                            << std::endl
-                            << "H: " << H.dimString() << " - A: " << A.dimString() << std::endl
-                            << "We need: H.size2()==A.size2()" << std::endl);
+        "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :"
+          << std::endl
+          << "H: " << H.dimString() << " - A: " << A.dimString() << std::endl
+          << "We need: H.size2()==A.size2()" << std::endl);
     }
 
     casadi_assert_message(H.size1()==H.size2(),

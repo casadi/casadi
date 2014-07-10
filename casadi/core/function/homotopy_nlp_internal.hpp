@@ -38,9 +38,9 @@ namespace casadi {
   \author Joris Gillis
   \date 2013-2014
 */
-  class CASADI_CORE_EXPORT 
+  class CASADI_CORE_EXPORT
   HomotopyNLPInternal : public FunctionInternal,
-                        public PluginInterface<HomotopyNLPInternal> {    
+                        public PluginInterface<HomotopyNLPInternal> {
   public:
     /// Constructor
     HomotopyNLPInternal(const Function& hnlp);
