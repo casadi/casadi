@@ -33,7 +33,7 @@ namespace casadi {
    *
    @copydoc QPSolver_doc
    * */
-  class CASADI_OOQP_INTERFACE_EXPORT OOQPInternal : public QPSolverInternal {
+  class CASADI_QPSOLVER_OOQP_EXPORT OOQPInternal : public QPSolverInternal {
     friend class OOQPSolver;
   public:
 
@@ -45,6 +45,10 @@ namespace casadi {
 
     /** \brief  Create a new Solver */
     explicit OOQPInternal(const std::vector<Sparsity>& st);
+
+    /** \brief  Create a new QP Solver */
+    static QPSolverInternal* creator(const QPStructure& st)
+    { return new OOQPInternal(st);}
 
     /** \brief  Destructor */
     virtual ~OOQPInternal();

@@ -39,6 +39,21 @@ extern int gOoqpPrintLevel;
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_QPSOLVER_OOQP_EXPORT
+  casadi_register_qpsolver_ooqp(QPSolverInternal::Plugin* plugin) {
+    plugin->creator = OoqpInternal::creator;
+    plugin->name = "ooqp";
+    plugin->doc = "OOQP docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_QPSOLVER_OOQP_EXPORT casadi_load_qpsolver_ooqp() {
+    QPSolverInternal::registerPlugin(casadi_register_qpsolver_ooqp);
+  }
+
   OOQPInternal::OOQPInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st) {
     addOption("print_level", OT_INTEGER, 0,
               "Print level. OOQP listens to print_level 0, 10 and 100");

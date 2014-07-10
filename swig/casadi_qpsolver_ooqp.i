@@ -20,13 +20,13 @@
  *
  */
 
-%module casadi_ooqp_interface
+%module casadi_qpsolver_ooqp
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_OOQP_INTERFACE_EXPORT
+#define CASADI_QPSOLVER_OOQP_EXPORT
 
 %{
 #include "casadi/interfaces/ooqp/ooqp_solver.hpp"

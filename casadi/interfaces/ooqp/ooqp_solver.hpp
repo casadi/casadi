@@ -24,7 +24,7 @@
 #define OOQP_SOLVER_HPP
 
 #include "casadi/core/function/qp_solver.hpp"
-#include <casadi/interfaces/ooqp/casadi_ooqp_interface_export.h>
+#include <casadi/interfaces/ooqp/casadi_qpsolver_ooqp_export.h>
 
 namespace casadi {
 
@@ -40,7 +40,7 @@ class OOQPInternal;
 
       NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
 */
-class CASADI_OOQP_INTERFACE_EXPORT OOQPSolver : public QPSolver {
+class CASADI_QPSOLVER_OOQP_EXPORT OOQPSolver : public QPSolver {
 public:
 
   /** \brief  Default constructor */
