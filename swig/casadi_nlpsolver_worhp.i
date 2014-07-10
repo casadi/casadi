@@ -20,13 +20,13 @@
  *
  */
 
-%module casadi_worhp_interface
+%module casadi_nlpsolver_worhp
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_WORHP_INTERFACE_EXPORT
+#define CASADI_NLPSOLVER_WORHP_EXPORT
 
 %{
 #include "casadi/interfaces/worhp/worhp_solver.hpp"

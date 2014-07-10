@@ -32,6 +32,21 @@ using namespace std;
 
 namespace casadi {
 
+  extern "C"
+  int CASADI_NLPSOLVER_WORHP_EXPORT
+  casadi_register_nlpsolver_worhp(NLPSolverInternal::Plugin* plugin) {
+    plugin->creator = WorhpInternal::creator;
+    plugin->name = "worhp";
+    plugin->doc = "WORHP docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_NLPSOLVER_WORHP_EXPORT casadi_load_nlpsolver_worhp() {
+    NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_worhp);
+  }
+
   WorhpInternal::WorhpInternal(const Function& nlp) : NLPSolverInternal(nlp) {
 
     // Monitors

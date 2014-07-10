@@ -24,7 +24,7 @@
 #define WORHP_SOLVER_HPP
 
 #include "casadi/core/function/nlp_solver.hpp"
-#include <casadi/interfaces/worhp/casadi_worhp_interface_export.h>
+#include <casadi/interfaces/worhp/casadi_nlpsolver_worhp_export.h>
 
 namespace casadi {
 
@@ -37,7 +37,7 @@ namespace casadi {
    * @copydoc NLPSolver_doc
 
    */
-  class CASADI_WORHP_INTERFACE_EXPORT WorhpSolver : public NLPSolver {
+  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpSolver : public NLPSolver {
   public:
     /// Default constructor
     WorhpSolver();
