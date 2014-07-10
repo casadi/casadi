@@ -145,6 +145,8 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter_count</td><td>casadi::SnoptInternal</td></tr>
+<tr><td>iterations</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>n_callback_fun</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>n_eval_grad_f</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>n_eval_jac_g</td><td>casadi::SnoptInternal</td></tr>
@@ -162,6 +164,8 @@
 <a name='stats'></a><table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter_count</td><td>casadi::SnoptInternal</td></tr>
+<tr><td>iterations</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>n_callback_fun</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>n_eval_grad_f</td><td>casadi::SnoptInternal</td></tr>
 <tr><td>n_eval_jac_g</td><td>casadi::SnoptInternal</td></tr>

@@ -3085,7 +3085,16 @@
 %exception  casadi::vertcat(const Sparsity &a, const Sparsity &b) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  snlog2_() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  snlog_() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  sqicDestroy() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception  sqlog_() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::Assertion::Assertion(const MX &x, const MX &y, const std::string &s) {

@@ -113726,11 +113726,19 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: wsnopt_8hpp.xml
-%feature("docstring") sninit_  "
+%feature("docstring") snkerc_  "
 [INTERNAL] ";
+%feature("docstring") sqlog_  "[INTERNAL] ";
+
+%feature("docstring") sninit_  "[INTERNAL] ";
+
+%feature("docstring") snlog2_  "[INTERNAL] ";
+
 %feature("docstring") snseti_  "[INTERNAL] ";
 
 %feature("docstring") snsetr_  "[INTERNAL] ";
+
+%feature("docstring") snlog_  "[INTERNAL] ";
 
 %feature("docstring") snset_  "[INTERNAL] ";
 
