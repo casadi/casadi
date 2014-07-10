@@ -35,7 +35,7 @@ namespace casadi {
    *
    @copydoc ImplicitFunction_doc
    * */
-  class CASADI_NONLINEAR_PROGRAMMING_EXPORT NewtonImplicitInternal
+  class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT NewtonImplicitInternal
       : public ImplicitFunctionInternal {
     friend class NewtonImplicitSolver;
   public:
@@ -52,6 +52,11 @@ namespace casadi {
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
                                              const LinearSolver& linsol) const
+    { return new NewtonImplicitInternal(f, jac, linsol);}
+
+    /** \brief  Create a new ImplicitFunction */
+    static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
+                                             const LinearSolver& linsol)
     { return new NewtonImplicitInternal(f, jac, linsol);}
 
     /** \brief  Initialize */

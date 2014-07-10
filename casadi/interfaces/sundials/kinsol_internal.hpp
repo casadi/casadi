@@ -42,7 +42,7 @@ namespace casadi {
 
   typedef std::pair< std::string, std::string> Message;
 
-  class CASADI_SUNDIALS_INTERFACE_EXPORT KinsolInternal : public ImplicitFunctionInternal {
+  class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInternal : public ImplicitFunctionInternal {
     friend class KinsolSolver;
   public:
     /** \brief  Constructor */
@@ -57,6 +57,11 @@ namespace casadi {
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
                                              const LinearSolver& linsol) const
+    { return new KinsolInternal(f, jac, linsol);}
+
+    /** \brief  Create a new ImplicitFunction */
+    static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
+                                             const LinearSolver& linsol)
     { return new KinsolInternal(f, jac, linsol);}
 
     /** \brief  Initialize stage */

@@ -32,6 +32,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_IMPLICITFUNCTION_NEWTON_EXPORT
+  casadi_register_implicitfunction_newton(ImplicitFunctionInternal::Plugin* plugin) {
+    plugin->creator = NewtonImplicitInternal::creator;
+    plugin->name = "newton";
+    plugin->doc = "NEWTON docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_IMPLICITFUNCTION_NEWTON_EXPORT casadi_load_implicitfunction_newton() {
+    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_newton);
+  }
+
   NewtonImplicitInternal::NewtonImplicitInternal(const Function& f, const Function& jac,
                                                  const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {

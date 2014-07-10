@@ -28,6 +28,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_IMPLICITFUNCTION_NLP_EXPORT
+  casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin* plugin) {
+    plugin->creator = NLPImplicitInternal::creator;
+    plugin->name = "nlp";
+    plugin->doc = "NLP docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_IMPLICITFUNCTION_NLP_EXPORT casadi_load_implicitfunction_nlp() {
+    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_nlp);
+  }
+
   NLPImplicitInternal::NLPImplicitInternal(const Function& f, const Function& jac,
                                            const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {

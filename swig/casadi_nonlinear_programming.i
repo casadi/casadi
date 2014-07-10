@@ -30,12 +30,6 @@
 
 %{
 #include "casadi/nonlinear_programming/symbolic_nlp.hpp"
-#include "casadi/nonlinear_programming/nlp_qp_solver.hpp"
-#include "casadi/nonlinear_programming/nlp_implicit_solver.hpp"
-#include "casadi/nonlinear_programming/newton_implicit_solver.hpp"
 %}
 
 %include "casadi/nonlinear_programming/symbolic_nlp.hpp"
-%include "casadi/nonlinear_programming/nlp_qp_solver.hpp"
-%include "casadi/nonlinear_programming/nlp_implicit_solver.hpp"
-%include "casadi/nonlinear_programming/newton_implicit_solver.hpp"

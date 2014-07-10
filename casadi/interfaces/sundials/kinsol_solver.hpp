@@ -25,7 +25,7 @@
 
 #include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/function/linear_solver.hpp"
-#include <casadi/interfaces/sundials/casadi_sundials_interface_export.h>
+#include <casadi/interfaces/sundials/casadi_implicitfunction_kinsol_export.h>
 
 namespace casadi {
 
@@ -52,7 +52,7 @@ namespace casadi {
    * \see ImplicitFunction for more information
    *
    */
-  class CASADI_SUNDIALS_INTERFACE_EXPORT KinsolSolver : public ImplicitFunction {
+  class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolSolver : public ImplicitFunction {
   public:
 
     /** \brief  Default constructor */

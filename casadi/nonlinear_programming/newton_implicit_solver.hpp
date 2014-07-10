@@ -24,8 +24,7 @@
 #define NEWTON_IMPLICIT_SOLVER_HPP
 
 #include "casadi/core/function/implicit_function.hpp"
-
-#include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
+#include <casadi/nonlinear_programming/casadi_implicitfunction_newton_export.h>
 
 namespace casadi {
 
@@ -40,7 +39,7 @@ class NewtonImplicitInternal;
    \author Joris Gillis
    \date 2012
   */
-class CASADI_NONLINEAR_PROGRAMMING_EXPORT NewtonImplicitSolver : public ImplicitFunction {
+class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT NewtonImplicitSolver : public ImplicitFunction {
 public:
 
   /** \brief Default constructor */

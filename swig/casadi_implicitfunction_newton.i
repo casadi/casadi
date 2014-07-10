@@ -19,17 +19,17 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
-%module casadi_implicitfunction_kinsol
+ 
+%module casadi_implicitfunction_newton
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_IMPLICITFUNCTION_KINSOL_EXPORT
+#define CASADI_IMPLICITFUNCTION_NEWTON_EXPORT
 
 %{
-#include "casadi/interfaces/sundials/kinsol_solver.hpp"
+#include "casadi/nonlinear_programming/newton_implicit_solver.hpp"
 %}
 
-%include "casadi/interfaces/sundials/kinsol_solver.hpp"
+%include "casadi/nonlinear_programming/newton_implicit_solver.hpp"

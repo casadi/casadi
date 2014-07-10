@@ -29,6 +29,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_IMPLICITFUNCTION_KINSOL_EXPORT
+  casadi_register_implicitfunction_kinsol(ImplicitFunctionInternal::Plugin* plugin) {
+    plugin->creator = KinsolInternal::creator;
+    plugin->name = "kinsol";
+    plugin->doc = "KINSOL docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_IMPLICITFUNCTION_KINSOL_EXPORT casadi_load_implicitfunction_kinsol() {
+    ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_kinsol);
+  }
+
   KinsolInternal::KinsolInternal(const Function& f, const Function& jac,
                                  const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {

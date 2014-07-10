@@ -19,17 +19,17 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-
-%module casadi_implicitfunction_kinsol
+ 
+%module casadi_homotopynlpsolver_simple
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_IMPLICITFUNCTION_KINSOL_EXPORT
+#define CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
 
 %{
-#include "casadi/interfaces/sundials/kinsol_solver.hpp"
+#include "casadi/nonlinear_programming/simple_homotopy_nlp_solver.hpp"
 %}
 
-%include "casadi/interfaces/sundials/kinsol_solver.hpp"
+%include "casadi/nonlinear_programming/simple_homotopy_nlp_solver.hpp"

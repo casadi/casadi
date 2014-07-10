@@ -1,10 +1,22 @@
 cmake_minimum_required(VERSION 2.6)
 
 casadi_library(casadi_nonlinear_programming
-  symbolic_nlp.hpp         symbolic_nlp.cpp
-  nlp_qp_solver.hpp       nlp_qp_solver.cpp       nlp_qp_internal.hpp       nlp_qp_internal.cpp
-  nlp_implicit_solver.hpp nlp_implicit_solver.cpp nlp_implicit_internal.hpp nlp_implicit_internal.cpp
-  newton_implicit_solver.hpp newton_implicit_solver.cpp newton_implicit_internal.hpp newton_implicit_internal.cpp)
+  symbolic_nlp.hpp         symbolic_nlp.cpp)
+
+casadi_library(casadi_qpsolver_nlp
+  nlp_qp_solver.hpp         nlp_qp_solver.cpp
+  nlp_qp_internal.hpp       nlp_qp_internal.cpp)
+target_link_libraries(casadi_qpsolver_nlp casadi_nonlinear_programming)
+
+casadi_library(casadi_implicitfunction_nlp
+  nlp_implicit_solver.hpp nlp_implicit_solver.cpp
+  nlp_implicit_internal.hpp nlp_implicit_internal.cpp)
+target_link_libraries(casadi_implicitfunction_nlp casadi_nonlinear_programming)
+
+casadi_library(casadi_implicitfunction_newton
+  newton_implicit_solver.hpp newton_implicit_solver.cpp
+  newton_implicit_internal.hpp newton_implicit_internal.cpp)
+target_link_libraries(casadi_implicitfunction_newton casadi_nonlinear_programming)
 
 casadi_library(casadi_homotopynlpsolver_simple
   simple_homotopy_nlp_solver.hpp simple_homotopy_nlp_solver.cpp

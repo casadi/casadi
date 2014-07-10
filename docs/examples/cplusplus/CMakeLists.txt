@@ -43,7 +43,7 @@ if(IPOPT_FOUND)
 
   add_executable(sqpmethod_nl sqpmethod_nl.cpp)
   target_link_libraries(sqpmethod_nl
-    casadi_nlpsolver_ipopt casadi_nlpsolver_sqpmethod)
+    casadi_nlpsolver_ipopt casadi_nlpsolver_sqpmethod casadi_qpsolver_nlp)
 
 endif()
 
@@ -73,7 +73,8 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting
-    casadi_integrator_cvodes casadi_integrator_idas casadi_nlpsolver_ipopt casadi_integrator_rk casadi_nlpsolver_scpgen)
+    casadi_integrator_cvodes casadi_integrator_idas casadi_nlpsolver_ipopt casadi_integrator_rk
+    casadi_nlpsolver_scpgen casadi_implicitfunction_newton casadi_qpsolver_nlp)
 endif()
 
 # Van der pol with multiple shooting
@@ -81,7 +82,8 @@ if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
   target_link_libraries(vdp_multiple_shooting
     casadi_integrator_cvodes casadi_nlpsolver_ipopt  casadi_linearsolver_csparse
-    casadi_optimal_control casadi_integrator_oldcollocation casadi_nonlinear_programming)
+    casadi_optimal_control casadi_integrator_oldcollocation casadi_nonlinear_programming
+    casadi_implicitfunction_newton)
 endif()
 
 # Writing a multiple shooting code from scratch
@@ -149,5 +151,6 @@ endif()
 if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(implicit_runge-kutta implicit_runge-kutta.cpp)
   target_link_libraries(implicit_runge-kutta
-    casadi_nonlinear_programming casadi_integration casadi_integrator_cvodes casadi_linearsolver_csparse)
+    casadi_nonlinear_programming casadi_integration casadi_integrator_cvodes casadi_linearsolver_csparse
+    casadi_implicitfunction_newton casadi_qpsolver_nlp)
 endif()

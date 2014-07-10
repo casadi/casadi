@@ -35,7 +35,7 @@ namespace casadi {
    *
       @copydoc QPSolver_doc
    * */
-class CASADI_NONLINEAR_PROGRAMMING_EXPORT NLPQPInternal : public QPSolverInternal {
+class CASADI_QPSOLVER_NLP_EXPORT NLPQPInternal : public QPSolverInternal {
   friend class NLPQPSolver;
 public:
   /** \brief  Constructor */
@@ -43,6 +43,10 @@ public:
 
   /** \brief  Clone */
   virtual NLPQPInternal* clone() const;
+
+  /** \brief  Create a new QP Solver */
+  static QPSolverInternal* creator(const QPStructure& st)
+  { return new NLPQPInternal(st);}
 
   /** \brief  Create a new Solver */
   explicit NLPQPInternal(const std::vector<Sparsity> &st);

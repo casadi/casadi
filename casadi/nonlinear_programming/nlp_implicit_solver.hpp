@@ -24,8 +24,7 @@
 #define NLP_IMPLICIT_SOLVER_HPP
 
 #include "casadi/core/function/implicit_function.hpp"
-
-#include <casadi/nonlinear_programming/casadi_nonlinear_programming_export.h>
+#include <casadi/nonlinear_programming/casadi_implicitfunction_nlp_export.h>
 
 namespace casadi {
 
@@ -40,7 +39,7 @@ class NLPImplicitInternal;
    \author Joris Gillis
    \date 2012
   */
-class CASADI_NONLINEAR_PROGRAMMING_EXPORT NLPImplicitSolver : public ImplicitFunction {
+class CASADI_IMPLICITFUNCTION_NLP_EXPORT NLPImplicitSolver : public ImplicitFunction {
 public:
 
   /** \brief  Default constructor */

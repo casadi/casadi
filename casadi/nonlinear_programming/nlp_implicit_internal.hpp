@@ -35,7 +35,7 @@ namespace casadi {
    *
    @copydoc ImplicitFunction_doc
    * */
-  class CASADI_NONLINEAR_PROGRAMMING_EXPORT NLPImplicitInternal : public ImplicitFunctionInternal {
+  class CASADI_IMPLICITFUNCTION_NLP_EXPORT NLPImplicitInternal : public ImplicitFunctionInternal {
     friend class NLPImplicitSolver;
   public:
     /** \brief  Constructor */
@@ -54,6 +54,11 @@ namespace casadi {
     /** \brief  Create a new ImplicitFunctionInternal */
     virtual NLPImplicitInternal* create(const Function& f, const Function& jac,
                                         const LinearSolver& linsol) const
+    { return new NLPImplicitInternal(f, jac, linsol);}
+
+    /** \brief  Create a new ImplicitFunction */
+    static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
+                                             const LinearSolver& linsol)
     { return new NLPImplicitInternal(f, jac, linsol);}
 
     /** \brief  Initialize */
