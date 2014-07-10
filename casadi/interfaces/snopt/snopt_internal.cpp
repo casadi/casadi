@@ -39,6 +39,21 @@
 #include "wsnopt.hpp"
 
 namespace casadi {
+  
+  extern "C"
+  int CASADI_NLPSOLVER_SNOPT_EXPORT
+  casadi_register_nlpsolver_snopt(NLPSolverInternal::Plugin* plugin) {
+    plugin->creator = SnoptInternal::creator;
+    plugin->name = "snopt";
+    plugin->doc = "SNOPT docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_NLPSOLVER_SNOPT_EXPORT casadi_load_nlpsolver_snopt() {
+    NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_snopt);
+  }
 
   SnoptInternal::SnoptInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     addOption("detect_linear", OT_BOOLEAN, true,

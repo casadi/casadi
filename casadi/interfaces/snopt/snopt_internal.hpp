@@ -45,6 +45,10 @@ namespace casadi {
     // Clone function
     virtual SnoptInternal* clone() const;
 
+    /** \brief  Create a new NLP Solver */
+    static NLPSolverInternal* creator(const Function& nlp)
+    { return new SnoptInternal(nlp);}
+
     // Reset solver
     void reset();
 

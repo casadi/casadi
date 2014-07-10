@@ -3,14 +3,12 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(../)
 include_directories(${SNOPT_INCLUDE_DIR})
 
-set(SNOPT_INTERFACE_SRCS
+casadi_library(casadi_nlpsolver_snopt
   snopt_internal.hpp
   snopt_internal.cpp
   snopt_solver.hpp
   snopt_solver.cpp
   wsnopt.hpp)
-
-casadi_library(casadi_nlpsolver_snopt ${SNOPT_INTERFACE_SRCS})
 
 if(WITH_SNOPT_FORCE_DUMMY)
   if(ENABLE_STATIC)
