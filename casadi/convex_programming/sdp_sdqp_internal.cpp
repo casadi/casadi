@@ -31,6 +31,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_SDQPSOLVER_SDP_EXPORT
+  casadi_register_sdqpsolver_sdp(SDQPSolverInternal::Plugin* plugin) {
+    plugin->creator = SDPSDQPInternal::creator;
+    plugin->name = "sdp";
+    plugin->doc = "sdp docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_SDQPSOLVER_SDP_EXPORT casadi_load_sdqpsolver_sdp() {
+    SDQPSolverInternal::registerPlugin(casadi_register_sdqpsolver_sdp);
+  }
+
   SDPSDQPInternal::SDPSDQPInternal(const std::vector<Sparsity> &st) : SDQPSolverInternal(st) {
     addOption("sdp_solver",            OT_SDPSOLVER, GenericType(),
               "The SDPSolver used to solve the SDQPs.");

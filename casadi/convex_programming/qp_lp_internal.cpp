@@ -28,68 +28,83 @@
 using namespace std;
 namespace casadi {
 
-QPLPInternal* QPLPInternal::clone() const {
-  // Return a deep copy
-  QPLPInternal* node = new QPLPInternal(st_);
-  if (!node->is_init_)
-    node->init();
-  return node;
-}
-
-QPLPInternal::QPLPInternal(const std::vector<Sparsity> &st) : LPSolverInternal(st) {
-  addOption("qp_solver",       OT_QPSOLVER, GenericType(),
-            "The QPSOlver used to solve the LPs.");
-  addOption("qp_solver_options",       OT_DICTIONARY, GenericType(),
-            "Options to be passed to the QPSOlver");
-
-}
-
-QPLPInternal::~QPLPInternal() {
-}
-
-void QPLPInternal::evaluate() {
-
-  // Pass inputs of LP to QP form
-  qpsolver_.input(QP_SOLVER_A).set(input(LP_SOLVER_A));
-  qpsolver_.input(QP_SOLVER_G).set(input(LP_SOLVER_C));
-
-  qpsolver_.input(QP_SOLVER_LBX).set(input(LP_SOLVER_LBX));
-  qpsolver_.input(QP_SOLVER_UBX).set(input(LP_SOLVER_UBX));
-
-  qpsolver_.input(QP_SOLVER_LBA).set(input(LP_SOLVER_LBA));
-  qpsolver_.input(QP_SOLVER_UBA).set(input(LP_SOLVER_UBA));
-
-  // Delegate computation to NLP Solver
-  qpsolver_.evaluate();
-
-  // Pass the stats
-  stats_["qp_solver_stats"] = qpsolver_.getStats();
-
-  // Read the outputs from Ipopt
-  output(QP_SOLVER_X).set(qpsolver_.output(LP_SOLVER_X));
-  output(QP_SOLVER_COST).set(qpsolver_.output(LP_SOLVER_COST));
-  output(QP_SOLVER_LAM_A).set(qpsolver_.output(LP_SOLVER_LAM_A));
-  output(QP_SOLVER_LAM_X).set(qpsolver_.output(LP_SOLVER_LAM_X));
-}
-
-void QPLPInternal::init() {
-
-  LPSolverInternal::init();
-
-  // Create an qpsolver instance
-  QPSolverCreator qpsolver_creator = getOption("qp_solver");
-  qpsolver_ = qpsolver_creator(qpStruct("h", Sparsity::sparse(n_, n_),
-                                        "a", input(LP_SOLVER_A).sparsity()));
-
-  qpsolver_.setLPOptions();
-  if (hasSetOption("qp_solver_options")) {
-    qpsolver_.setOption(getOption("qp_solver_options"));
+  extern "C"
+  int CASADI_LPSOLVER_QP_EXPORT
+  casadi_register_lpsolver_qp(LPSolverInternal::Plugin* plugin) {
+    plugin->creator = QPLPInternal::creator;
+    plugin->name = "qp";
+    plugin->doc = "QP docs not available";
+    plugin->version = 20;
+    return 0;
   }
 
-  // Initialize the NLP solver
-  qpsolver_.init();
+  extern "C"
+  void CASADI_LPSOLVER_QP_EXPORT casadi_load_lpsolver_qp() {
+    LPSolverInternal::registerPlugin(casadi_register_lpsolver_qp);
+  }
 
-}
+  QPLPInternal* QPLPInternal::clone() const {
+    // Return a deep copy
+    QPLPInternal* node = new QPLPInternal(st_);
+    if (!node->is_init_)
+      node->init();
+    return node;
+  }
+
+  QPLPInternal::QPLPInternal(const std::vector<Sparsity> &st) : LPSolverInternal(st) {
+    addOption("qp_solver",       OT_QPSOLVER, GenericType(),
+              "The QPSOlver used to solve the LPs.");
+    addOption("qp_solver_options",       OT_DICTIONARY, GenericType(),
+              "Options to be passed to the QPSOlver");
+
+  }
+
+  QPLPInternal::~QPLPInternal() {
+  }
+
+  void QPLPInternal::evaluate() {
+
+    // Pass inputs of LP to QP form
+    qpsolver_.input(QP_SOLVER_A).set(input(LP_SOLVER_A));
+    qpsolver_.input(QP_SOLVER_G).set(input(LP_SOLVER_C));
+
+    qpsolver_.input(QP_SOLVER_LBX).set(input(LP_SOLVER_LBX));
+    qpsolver_.input(QP_SOLVER_UBX).set(input(LP_SOLVER_UBX));
+
+    qpsolver_.input(QP_SOLVER_LBA).set(input(LP_SOLVER_LBA));
+    qpsolver_.input(QP_SOLVER_UBA).set(input(LP_SOLVER_UBA));
+
+    // Delegate computation to NLP Solver
+    qpsolver_.evaluate();
+
+    // Pass the stats
+    stats_["qp_solver_stats"] = qpsolver_.getStats();
+
+    // Read the outputs from Ipopt
+    output(QP_SOLVER_X).set(qpsolver_.output(LP_SOLVER_X));
+    output(QP_SOLVER_COST).set(qpsolver_.output(LP_SOLVER_COST));
+    output(QP_SOLVER_LAM_A).set(qpsolver_.output(LP_SOLVER_LAM_A));
+    output(QP_SOLVER_LAM_X).set(qpsolver_.output(LP_SOLVER_LAM_X));
+  }
+
+  void QPLPInternal::init() {
+
+    LPSolverInternal::init();
+
+    // Create an qpsolver instance
+    QPSolverCreator qpsolver_creator = getOption("qp_solver");
+    qpsolver_ = qpsolver_creator(qpStruct("h", Sparsity::sparse(n_, n_),
+                                          "a", input(LP_SOLVER_A).sparsity()));
+
+    qpsolver_.setLPOptions();
+    if (hasSetOption("qp_solver_options")) {
+      qpsolver_.setOption(getOption("qp_solver_options"));
+    }
+
+    // Initialize the NLP solver
+    qpsolver_.init();
+
+  }
 
 } // namespace casadi
 

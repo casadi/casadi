@@ -35,7 +35,7 @@ namespace casadi {
    *
    @copydoc StabilizedQPSolver_doc
    * */
-  class CASADI_CONVEX_PROGRAMMING_EXPORT QPStabilizerInternal : public StabilizedQPSolverInternal {
+  class CASADI_STABILIZEDQPSOLVER_QP_EXPORT QPStabilizerInternal : public StabilizedQPSolverInternal {
     friend class QPStabilizer;
   public:
 
@@ -47,6 +47,10 @@ namespace casadi {
 
     /** \brief  Clone */
     virtual QPStabilizerInternal* clone() const { return new QPStabilizerInternal(*this);}
+
+    /** \brief  Create a new Stabilized QP Solver */
+    static StabilizedQPSolverInternal* creator(const QPStructure& st)
+    { return new QPStabilizerInternal(st);}
 
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);

@@ -28,6 +28,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_STABILIZEDQPSOLVER_QP_EXPORT
+  casadi_register_stabilizedqpsolver_qp(StabilizedQPSolverInternal::Plugin* plugin) {
+    plugin->creator = QPStabilizerInternal::creator;
+    plugin->name = "qp";
+    plugin->doc = "QPStabilizer docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_STABILIZEDQPSOLVER_QP_EXPORT casadi_load_stabilizedqpsolver_qp() {
+    StabilizedQPSolverInternal::registerPlugin(casadi_register_stabilizedqpsolver_qp);
+  }
+
   QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st)
       : StabilizedQPSolverInternal(st) {
     addOption("qp_solver",         OT_QPSOLVER,   GenericType(),

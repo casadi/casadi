@@ -35,18 +35,22 @@ namespace casadi {
    *
       @copydoc LPSolver_doc
    * */
-class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
+class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
   friend class SDPSOCPSolver;
 public:
-
-  /** \brief  Clone */
-  virtual SDPSOCPInternal* clone() const;
 
   /** \brief  Create a new Solver */
   explicit SDPSOCPInternal(const std::vector<Sparsity> &st);
 
   /** \brief  Destructor */
   virtual ~SDPSOCPInternal();
+
+  /** \brief  Clone */
+  virtual SDPSOCPInternal* clone() const;
+  
+  /** \brief  Create a new SOCP Solver */
+  static SOCPSolverInternal* creator(const SOCPStructure& st)
+  { return new SDPSOCPInternal(st);}
 
   /** \brief  Initialize */
   virtual void init();

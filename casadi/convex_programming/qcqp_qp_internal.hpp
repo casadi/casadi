@@ -35,18 +35,22 @@ namespace casadi {
    *
       @copydoc QPSolver_doc
    * */
-class CASADI_CONVEX_PROGRAMMING_EXPORT QCQPQPInternal : public QPSolverInternal {
+class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QPSolverInternal {
   friend class QCQPQPSolver;
 public:
-
-  /** \brief  Clone */
-  virtual QCQPQPInternal* clone() const;
 
   /** \brief  Create a new Solver */
   explicit QCQPQPInternal(const std::vector<Sparsity> &st);
 
   /** \brief  Destructor */
   virtual ~QCQPQPInternal();
+
+  /** \brief  Clone */
+  virtual QCQPQPInternal* clone() const;
+
+  /** \brief  Create a new QP Solver */
+  static QPSolverInternal* creator(const QPStructure& st)
+  { return new QCQPQPInternal(st);}
 
   /** \brief  Initialize */
   virtual void init();

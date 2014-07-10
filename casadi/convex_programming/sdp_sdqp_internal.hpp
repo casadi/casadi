@@ -36,7 +36,7 @@ namespace casadi {
    *
    @copydoc SDQPSolver_doc
    * */
-  class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSDQPInternal : public SDQPSolverInternal {
+  class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPInternal : public SDQPSolverInternal {
     friend class SDPSDQPSolver;
   public:
 
@@ -45,6 +45,10 @@ namespace casadi {
 
     /** \brief Clone */
     virtual SDPSDQPInternal* clone() const { return new SDPSDQPInternal(*this);}
+
+    /** \brief  Create a new SDQP Solver */
+    static SDQPSolverInternal* creator(const SDQPStructure& st)
+    { return new SDPSDQPInternal(st);}
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);

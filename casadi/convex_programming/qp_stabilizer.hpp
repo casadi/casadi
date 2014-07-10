@@ -24,8 +24,7 @@
 #define QP_STABILIZER_HPP
 
 #include "casadi/core/function/stabilized_qp_solver.hpp"
-
-#include <casadi/convex_programming/casadi_convex_programming_export.h>
+#include <casadi/convex_programming/casadi_stabilizedqpsolver_qp_export.h>
 
 namespace casadi {
 
@@ -40,7 +39,7 @@ class QPStabilizerInternal;
    \author Joris Gillis
    \date 2013
   */
-class CASADI_CONVEX_PROGRAMMING_EXPORT QPStabilizer : public StabilizedQPSolver {
+class CASADI_STABILIZEDQPSOLVER_QP_EXPORT QPStabilizer : public StabilizedQPSolver {
 public:
 
   /** \brief  Default constructor */

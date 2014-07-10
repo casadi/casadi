@@ -25,13 +25,16 @@
 
 #include "lp_solver.hpp"
 #include "function_internal.hpp"
+#include "plugin_interface.hpp"
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-/// Internal class
-class CASADI_CORE_EXPORT LPSolverInternal : public FunctionInternal {
+  /// Internal class
+  class CASADI_CORE_EXPORT
+  LPSolverInternal : public FunctionInternal,
+                     public PluginInterface<LPSolverInternal> {
   public:
 
     // Constructor
@@ -51,6 +54,15 @@ class CASADI_CORE_EXPORT LPSolverInternal : public FunctionInternal {
 
     /// \brief Check if the numerical values of the supplied bounds make sense
     virtual void checkInputs() const;
+
+    // Creator function for internal class
+    typedef LPSolverInternal* (*Creator)(const LPStructure& st);
+
+    /// Collection of solvers
+    static std::map<std::string, Plugin> solvers_;
+
+    /// Infix
+    static const std::string infix_;
 
   protected:
 

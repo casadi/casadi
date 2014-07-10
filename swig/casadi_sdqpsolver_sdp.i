@@ -20,50 +20,16 @@
  *
  */
 
-#ifndef QP_LP_INTERNAL_HPP
-#define QP_LP_INTERNAL_HPP
+%module casadi_sdqpsolver_sdp
 
-#include "casadi/core/function/lp_internal.hpp"
-#include "casadi/core/function/qp_solver.hpp"
+%include "common.i"
 
-#include "qp_lp_solver.hpp"
+%import "casadi_core.i"
 
-/// \cond INTERNAL
-namespace casadi {
+#define CASADI_SDQPSOLVER_SDP_EXPORT
 
-  /** \brief Internal class for QPLPInternal
-   *
-      @copydoc LPSolver_doc
-   * */
-class CASADI_LPSOLVER_QP_EXPORT QPLPInternal : public LPSolverInternal {
-  friend class QPLPSolver;
-public:
+%{
+#include "casadi/convex_programming/sdp_sdqp_solver.hpp"
+%}
 
-  /** \brief  Create a new Solver */
-  explicit QPLPInternal(const std::vector<Sparsity> &st);
-
-  /** \brief  Destructor */
-  virtual ~QPLPInternal();
-
-  /** \brief  Clone */
-  virtual QPLPInternal* clone() const;
-
-  /** \brief  Create a new QP Solver */
-  static LPSolverInternal* creator(const LPStructure& st)
-  { return new QPLPInternal(st);}
-
-  /** \brief  Initialize */
-  virtual void init();
-
-  virtual void evaluate();
-
-  protected:
-    QPSolver qpsolver_;
-
-};
-
-} // namespace casadi
-/// \endcond
-
-#endif //QP_LP_INTERNAL_HPP
-
+%include "casadi/convex_programming/sdp_sdqp_solver.hpp"

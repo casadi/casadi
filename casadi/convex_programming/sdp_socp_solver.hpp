@@ -24,8 +24,7 @@
 #define SDP_SOCP_SOLVER_HPP
 
 #include "casadi/core/function/socp_solver.hpp"
-
-#include <casadi/convex_programming/casadi_convex_programming_export.h>
+#include <casadi/convex_programming/casadi_socpsolver_sdp_export.h>
 
 namespace casadi {
 
@@ -40,12 +39,11 @@ class SDPSOCPInternal;
    \author Joris Gillis
    \date 2013
   */
-class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSOCPSolver : public SOCPSolver {
+class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPSolver : public SOCPSolver {
 public:
 
   /** \brief  Default constructor */
   SDPSOCPSolver();
-
 
   /** \brief Constructor
   *  \param st Problem structure

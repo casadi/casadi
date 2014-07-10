@@ -20,31 +20,15 @@
  *
  */
 
-%module casadi_convex_programming
+%module casadi_qcqpsolver_socp
 
 %include "common.i"
 
 %import "casadi_core.i"
 
-#define CASADI_CONVEX_PROGRAMMING_EXPORT
+#define CASADI_QCQPSOLVER_SOCP_EXPORT
 
-%{
-#include "casadi/convex_programming/qp_lp_solver.hpp"
-#include "casadi/convex_programming/qcqp_qp_solver.hpp"
-#include "casadi/convex_programming/sdp_socp_solver.hpp"
-#include "casadi/convex_programming/qp_stabilizer.hpp"
-%}
-
-%include "casadi/convex_programming/qp_lp_solver.hpp"
-%include "casadi/convex_programming/qcqp_qp_solver.hpp"
-%include "casadi/convex_programming/sdp_socp_solver.hpp"
-%include "casadi/convex_programming/qp_stabilizer.hpp"
-
-#ifdef WITH_CSPARSE
 %{
 #include "casadi/convex_programming/socp_qcqp_solver.hpp"
-#include "casadi/convex_programming/sdp_sdqp_solver.hpp"
 %}
 %include "casadi/convex_programming/socp_qcqp_solver.hpp"
-%include "casadi/convex_programming/sdp_sdqp_solver.hpp"
-#endif // WITH_CSPARSE

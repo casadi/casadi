@@ -24,8 +24,7 @@
 #define SDP_SDQP_SOLVER_HPP
 
 #include "casadi/core/function/sdqp_solver.hpp"
-
-#include <casadi/convex_programming/casadi_convex_programming_export.h>
+#include <casadi/convex_programming/casadi_sdqpsolver_sdp_export.h>
 
 namespace casadi {
 
@@ -49,7 +48,7 @@ class SDPSDQPInternal;
    \author Joris Gillis
    \date 2013
   */
-class CASADI_CONVEX_PROGRAMMING_EXPORT SDPSDQPSolver : public SDQPSolver {
+class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPSolver : public SDQPSolver {
 public:
 
   /** \brief  Default constructor */
