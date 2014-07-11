@@ -30,8 +30,7 @@ OOQPSolver::OOQPSolver() {
 }
 
 
-OOQPSolver::OOQPSolver(const QPStructure& st)  {
-  assignNode(new OOQPInternal(st));
+OOQPSolver::OOQPSolver(const QPStructure& st) : QPSolver("ooqp", st) {
 }
 
 OOQPInternal* OOQPSolver::operator->() {

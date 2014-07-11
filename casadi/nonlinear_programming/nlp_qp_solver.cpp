@@ -30,8 +30,7 @@ NLPQPSolver::NLPQPSolver() {
 }
 
 
-NLPQPSolver::NLPQPSolver(const QPStructure &st)  {
-  assignNode(new NLPQPInternal(st));
+NLPQPSolver::NLPQPSolver(const QPStructure &st) : QPSolver("nlp", st) {
 }
 
 NLPQPInternal* NLPQPSolver::operator->() {

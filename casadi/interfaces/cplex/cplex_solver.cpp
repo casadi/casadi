@@ -28,7 +28,7 @@ namespace casadi {
 
 CplexSolver::CplexSolver() {}
 
-CplexSolver::CplexSolver(const QPStructure &st) {
+CplexSolver::CplexSolver(const QPStructure &st) : QPSolver("cplex", st) {
   assignNode(new CplexInternal(st));
 }
 

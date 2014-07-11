@@ -30,8 +30,7 @@ QCQPQPSolver::QCQPQPSolver() {
 }
 
 
-QCQPQPSolver::QCQPQPSolver(const QPStructure & st)  {
-  assignNode(new QCQPQPInternal(st));
+QCQPQPSolver::QCQPQPSolver(const QPStructure & st) : QPSolver("qcqp", st) {
 }
 
 QCQPQPInternal* QCQPQPSolver::operator->() {
