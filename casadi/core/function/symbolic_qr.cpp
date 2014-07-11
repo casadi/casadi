@@ -28,7 +28,8 @@ namespace casadi {
   SymbolicQR::SymbolicQR() {
   }
 
-  SymbolicQR::SymbolicQR(const Sparsity& sp, int nrhs) : LinearSolver("symbolicqr", sp, nrhs) {
+  SymbolicQR::SymbolicQR(const Sparsity& sp, int nrhs) {
+    assignNode(new SymbolicQRInternal(sp, nrhs));
   }
 
   SymbolicQRInternal* SymbolicQR::operator->() {
