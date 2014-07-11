@@ -99,8 +99,6 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_STRINGVECTOR";
       case OT_DICTIONARY:
               return "OT_DICTIONARY";
-      case OT_NLPSOLVER:
-              return "OT_NLPSOLVER";
       case OT_LINEARSOLVER:
               return "OT_LINEARSOLVER";
       case OT_LPSOLVER:
@@ -377,10 +375,6 @@ bool GenericType::operator!=(const GenericType& op2) const {
   return true;
 }
 
-GenericType::GenericType(NLPSolverCreator ptr)  : type_(OT_NLPSOLVER) {
-  assignNode(new GenericTypeInternal<NLPSolverCreator>(ptr));
-}
-
 GenericType::GenericType(linearSolverCreator ptr) : type_(OT_LINEARSOLVER) {
   assignNode(new GenericTypeInternal<linearSolverCreator >(ptr));
 }
@@ -419,11 +413,6 @@ GenericType::GenericType(QCQPSolverCreator ptr) : type_(OT_QCQPSOLVER) {
 
 GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
-}
-
-GenericType::operator NLPSolverCreator() const {
-  casadi_assert_message(is_a<NLPSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<NLPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator LPSolverCreator() const {

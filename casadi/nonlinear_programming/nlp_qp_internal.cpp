@@ -53,7 +53,7 @@ namespace casadi {
 
   NLPQPInternal::NLPQPInternal(const std::vector<Sparsity> &st) : QPSolverInternal(st) {
 
-    addOption("nlp_solver",       OT_NLPSOLVER, GenericType(),
+    addOption("nlp_solver",       OT_STRING, GenericType(),
               "The NLPSOlver used to solve the QPs.");
     addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the NLPSOlver");
@@ -125,8 +125,8 @@ namespace casadi {
                                     "g", mul(A, X)));
 
     // Create an nlpsolver instance
-    NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");
-    nlpsolver_ = nlpsolver_creator(QP_SOLVER_nlp);
+    std::string nlpsolver_name = getOption("nlp_solver");
+    nlpsolver_ = NLPSolver(nlpsolver_name, QP_SOLVER_nlp);
 
     nlpsolver_.setQPOptions();
     if (hasSetOption("nlp_solver_options")) {

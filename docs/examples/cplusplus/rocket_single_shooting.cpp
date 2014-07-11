@@ -170,7 +170,7 @@ int main(){
     // Use IPOPT as QP solver
     solver.setOption("qp_solver",NLPQPSolver::creator);
     Dictionary qp_solver_options;
-    qp_solver_options["nlp_solver"] = IpoptSolver::creator;
+    qp_solver_options["nlp_solver"] = "ipopt";
     Dictionary ipopt_options;
     ipopt_options["tol"] = 1e-12;
     ipopt_options["print_level"] = 0;

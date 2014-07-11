@@ -105,7 +105,7 @@ int main(){
   ms.setOption("parallelization","openmp");
   
   // NLP solver
-  ms.setOption("nlp_solver",IpoptSolver::creator);
+  ms.setOption("nlp_solver", "ipopt");
   Dictionary nlp_solver_dict;
   nlp_solver_dict["tol"] = 1e-5;
   nlp_solver_dict["hessian_approximation"] = "limited-memory";

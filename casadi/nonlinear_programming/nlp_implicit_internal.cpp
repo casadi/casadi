@@ -46,7 +46,7 @@ namespace casadi {
   NLPImplicitInternal::NLPImplicitInternal(const Function& f, const Function& jac,
                                            const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {
-    addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(),
+    addOption("nlp_solver",               OT_STRING,  GenericType(),
               "The NLPSolver used to solve the implicit system.");
     addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the NLPSolver");
@@ -137,8 +137,8 @@ namespace casadi {
     MXFunction nlp(nlpIn("x", u, "p", p), nlpOut("f", nlp_f, "g", nlp_g));
 
     // Create an nlpsolver instance
-    NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
-    nlp_solver_ = nlp_solvercreator(nlp);
+    std::string solver_name = getOption("nlp_solver");
+    nlp_solver_ = NLPSolver(solver_name, nlp);
     if (hasSetOption("nlp_solver_options")) {
       nlp_solver_.setOption(getOption("nlp_solver_options"));
     }

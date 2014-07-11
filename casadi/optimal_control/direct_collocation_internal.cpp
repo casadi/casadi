@@ -33,7 +33,7 @@ namespace casadi {
 DirectCollocationInternal::DirectCollocationInternal(const Function& ffcn, const Function& mfcn,
                                                      const Function& cfcn, const Function& rfcn) :
     OCPSolverInternal(ffcn, mfcn, cfcn, rfcn) {
-  addOption("nlp_solver",                       OT_NLPSOLVER,  GenericType(),
+  addOption("nlp_solver",                       OT_STRING,  GenericType(),
             "An NLPSolver creator function");
   addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(),
             "Options to be passed to the NLP Solver");
@@ -205,10 +205,10 @@ void DirectCollocationInternal::init() {
   nlp_ = MXFunction(nlpIn("x", nlp_x), nlpOut("f", nlp_j, "g", vertcat(nlp_g)));
 
   // Get the NLP creator function
-  NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
+  std::string nlp_solver_name = getOption("nlp_solver");
 
   // Allocate an NLP solver
-  nlp_solver_ = nlp_solver_creator(nlp_);
+  nlp_solver_ = NLPSolver(nlp_solver_name, nlp_);
 
   // Pass options
   if (hasSetOption("nlp_solver_options")) {

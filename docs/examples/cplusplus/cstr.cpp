@@ -100,7 +100,7 @@ int main(){
 //  ocp_solver.setOption("parallelization","serial");
 
   // NLP solver
-  ocp_solver.setOption("nlp_solver",IpoptSolver::creator);
+  ocp_solver.setOption("nlp_solver", "ipopt");
   Dictionary nlp_solver_dict;
   nlp_solver_dict["tol"] = 1e-5;
   nlp_solver_dict["hessian_approximation"] = "limited-memory"; // For BFGS

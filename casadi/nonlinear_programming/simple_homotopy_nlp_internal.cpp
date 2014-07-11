@@ -53,7 +53,7 @@ namespace casadi {
 
   SimpleHomotopyNLPInternal::SimpleHomotopyNLPInternal(const Function& nlp)
       : HomotopyNLPInternal(nlp) {
-    addOption("nlp_solver",         OT_NLPSOLVER,   GenericType(),
+    addOption("nlp_solver",         OT_STRING,   GenericType(),
               "The NLP solver to be used by the Homotopy solver");
     addOption("nlp_solver_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the Homotopy solver");
@@ -89,8 +89,8 @@ namespace casadi {
                    hnlp_.call(hnlpIn("x", x, "p", p_tau[0], "tau", p_tau[1])));
 
     // Create an nlpsolver instance
-    NLPSolverCreator nlpsolver_creator = getOption("nlp_solver");
-    nlpsolver_ = nlpsolver_creator(nlp);
+    std::string nlpsolver_name = getOption("nlp_solver");
+    nlpsolver_ = NLPSolver(nlpsolver_name, nlp);
 
     if (hasSetOption("nlp_solver_options")) {
       nlpsolver_.setOption(getOption("nlp_solver_options"));

@@ -41,7 +41,6 @@ namespace casadi {
     OT_REALVECTOR,
     OT_STRINGVECTOR,
     OT_DICTIONARY,
-    OT_NLPSOLVER,
     OT_LPSOLVER,
     OT_LINEARSOLVER,
     OT_INTEGRATOR,
@@ -95,7 +94,6 @@ namespace casadi {
     GenericType(const Dictionary& dict);
 
     /// Creator functions
-    GenericType(NLPSolverCreator ptr);
     GenericType(linearSolverCreator ptr);
     GenericType(LPSolverCreator ptr);
     GenericType(integratorCreator ptr);
@@ -126,7 +124,6 @@ namespace casadi {
     operator std::vector<double>& () { return toDoubleVector();}
     operator std::map<std::string, GenericType>& ();
 
-    operator NLPSolverCreator() const;
     operator linearSolverCreator() const;
     operator LPSolverCreator() const;
     operator integratorCreator() const;

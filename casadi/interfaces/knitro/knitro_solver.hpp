@@ -69,10 +69,6 @@ class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroSolver : public NLPSolver {
     #ifdef SWIG
     %nocallback;
     #endif
-
-    /// @Joris: This would be an alternative
-    static NLPSolverCreator getCreator() {return creator;}
-
 };
 
 } // namespace casadi

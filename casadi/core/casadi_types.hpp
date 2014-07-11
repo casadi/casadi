@@ -69,9 +69,6 @@ namespace casadi {
   class CustomEvaluate;
   class CustomFunction;
 
-  /// Function pointer to a nonlinear solver creator function
-  typedef NLPSolver (*NLPSolverCreator)(const Function& nlp);
-
   /// Function pointer to a linear solver creator function
   typedef LinearSolver (*linearSolverCreator)(const Sparsity& sparsity, int nrhs);
 
