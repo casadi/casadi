@@ -64,6 +64,9 @@ namespace casadi {
               "If set to true, the input shape of F will not be checked.");
     addOption("warn_initial_bounds", OT_BOOLEAN,  false,
               "Warn if the initial guess does not satisfy LBX and UBX");
+    addOption("eval_errors_fatal", OT_BOOLEAN, false,
+              "When errors occur during evaluation of f,g,...,"
+              "stop the iterations");
 
     // Enable string notation for IO
     input_.scheme = SCHEME_NLPSolverInput;
@@ -142,6 +145,8 @@ namespace casadi {
     }
 
     callback_step_ = getOption("iteration_callback_step");
+    eval_errors_fatal_ = getOption("eval_errors_fatal");
+
   }
 
   void NLPSolverInternal::checkInitialBounds() {

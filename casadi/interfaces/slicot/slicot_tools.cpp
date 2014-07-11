@@ -126,15 +126,16 @@ if (dwork==0) {
 
    void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
                               std::vector< double > & t,  std::vector< double > & z,
-                              std::vector<double> &eig_real, std::vector<double> &eig_imag) {
+                              std::vector<double> &eig_real, std::vector<double> &eig_imag,
+                              double num_zero) {
      std::vector<double> dwork(std::max(n+K-2, 4*n)+(n-1)*K);
-     slicot_periodic_schur(n, K, a, t, z, dwork, eig_real, eig_imag);
+     slicot_periodic_schur(n, K, a, t, z, dwork, eig_real, eig_imag, num_zero);
    }
 
    void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
                               std::vector< double > & t,  std::vector< double > & z,
                               std::vector<double> &dwork, std::vector<double> &eig_real,
-                              std::vector<double> &eig_imag) {
+                              std::vector<double> &eig_imag, double num_zero) {
     int mem_base = std::max(n+K-2, 4*n);
     int mem_needed = mem_base+(n-1)*K;
 
@@ -167,6 +168,14 @@ if (dwork==0) {
 
     slicot_mb03vy(n, K, 1, n, &z[0], n, n, &dwork[mem_base], n-1, &dwork[0], mem_needed);
 
+    // Set numerical zeros to zero
+    if (num_zero>0) {
+      for (int k = 0;k<t.size();++k) {
+        double &r = t[k];
+        if (fabs(r)<num_zero) r = 0.0;
+      }
+    }
+
     slicot_mb03wd('S', 'V', n, K, 1, n, 1, n, &t[0], n, n, &z[0], n, n,
                   &eig_real[0], &eig_imag[0], &dwork[0], mem_needed);
 
@@ -175,7 +184,8 @@ if (dwork==0) {
   CASADI_SLICOT_INTERFACE_EXPORT
   void slicot_periodic_schur(const std::vector< Matrix<double> > & a,
                              std::vector< Matrix<double> > & t, std::vector< Matrix<double> > & z,
-                             std::vector< double > & eig_real, std::vector< double > & eig_imag) {
+                             std::vector< double > & eig_real, std::vector< double > & eig_imag,
+                             double num_zero) {
     int K = a.size();
     int n = a[0].size1();
     for (int k=0;k<K;++k) {
@@ -194,7 +204,7 @@ if (dwork==0) {
     std::vector<double> t_data(n*n*K);
     std::vector<double> z_data(n*n*K);
 
-    slicot_periodic_schur(n, K, a_data, t_data, z_data, eig_real, eig_imag);
+    slicot_periodic_schur(n, K, a_data, t_data, z_data, eig_real, eig_imag, num_zero);
 
     t.resize(K);
     z.resize(K);

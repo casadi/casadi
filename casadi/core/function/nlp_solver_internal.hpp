@@ -114,6 +114,9 @@ namespace casadi {
     /// Execute the callback function only after this amount of iterations
     int callback_step_;
 
+    // Evaluation errors are fatal
+    bool eval_errors_fatal_;
+
     /// The NLP
     Function nlp_;
 

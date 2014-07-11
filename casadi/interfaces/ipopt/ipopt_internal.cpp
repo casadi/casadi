@@ -579,6 +579,7 @@ namespace casadi {
       log("eval_h ok");
       return true;
     } catch(exception& ex) {
+      if (eval_errors_fatal_) throw ex;
       cerr << "eval_h failed: " << ex.what() << endl;
       return false;
     }
@@ -636,6 +637,7 @@ namespace casadi {
       log("eval_jac_g ok");
       return true;
     } catch(exception& ex) {
+      if (eval_errors_fatal_) throw ex;
       cerr << "eval_jac_g failed: " << ex.what() << endl;
       return false;
     }
@@ -674,6 +676,7 @@ namespace casadi {
       log("eval_f ok");
       return true;
     } catch(exception& ex) {
+      if (eval_errors_fatal_) throw ex;
       cerr << "eval_f failed: " << ex.what() << endl;
       return false;
     }
@@ -712,6 +715,7 @@ namespace casadi {
       log("eval_g ok");
       return true;
     } catch(exception& ex) {
+      if (eval_errors_fatal_) throw ex;
       cerr << "eval_g failed: " << ex.what() << endl;
       return false;
     }
@@ -748,6 +752,7 @@ namespace casadi {
       log("eval_grad_f ok");
       return true;
     } catch(exception& ex) {
+      if (eval_errors_fatal_) throw ex;
       cerr << "eval_grad_f failed: " << ex.what() << endl;
       return false;
     }
