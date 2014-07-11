@@ -46,7 +46,7 @@ namespace casadi {
               "The local grid used on each major interval, with time "
               "normalized to 1. By default, option 'nf' is used to "
               "construct a linearly spaced grid.");
-    addOption("integrator",               OT_INTEGRATOR, GenericType(),
+    addOption("integrator",               OT_STRING, GenericType(),
               "An integrator creator function");
     addOption("integrator_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the integrator");
@@ -174,8 +174,8 @@ namespace casadi {
     dae_.init();
 
     // Create an integrator instance
-    integratorCreator integrator_creator = getOption("integrator");
-    integrator_ = integrator_creator(dae_, Function());
+    std::string integrator_name = getOption("integrator");
+    integrator_ = Integrator(integrator_name, dae_, Function());
     if (hasSetOption("integrator_options")) {
       integrator_.setOption(getOption("integrator_options"));
     }

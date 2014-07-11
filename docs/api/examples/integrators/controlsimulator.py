@@ -63,7 +63,7 @@ f.init()
 ts = linspace(0,50,10)
 
 sim=ControlSimulator(f,ts)
-sim.setOption("integrator",CVodesIntegrator)
+sim.setOption("integrator", "cvodes")
 
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
@@ -105,7 +105,7 @@ h=SXFunction(fin,[x0,u])
 h.init()
 
 sim=ControlSimulator(f,h,ts)
-sim.setOption("integrator",CVodesIntegrator)
+sim.setOption("integrator", "cvodes")
 
 #! Each control interval will be subdived in 8
 sim.setOption("nf",8) 
@@ -151,7 +151,7 @@ h=SXFunction(fin,[x,ui])
 h.init()
 
 sim=ControlSimulator(f,h,ts)
-sim.setOption("integrator",CVodesIntegrator)
+sim.setOption("integrator", "cvodes")
 
 #! Each control interval will be subdived in 8
 sim.setOption("control_interpolation","linear")

@@ -50,14 +50,14 @@ except:
   pass
 
 try:
-  qp_solver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12} }
+  qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12} }
   solvers.append((SQPMethod,{"qp_solver": NLPQPSolver,"qp_solver_options": qp_solver_options}))
   print "Will test SQPMethod"
 except:
   pass
   
 try:
-  qp_solver_options = {"nlp_solver": IpoptSolver, "nlp_solver_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
+  qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
   solvers.append((StabilizedSQPMethod,{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": QPStabilizer, "stabilized_qp_solver_options": {"qp_solver": NLPQPSolver, "qp_solver_options": qp_solver_options}}))
   print "Will test Stabilized SQPMethod"
 except:

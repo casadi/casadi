@@ -39,7 +39,7 @@ DirectMultipleShootingInternal::DirectMultipleShootingInternal(const Function& f
             "An NLPSolver creator function");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
             "Options to be passed to the NLP Solver");
-  addOption("integrator",               OT_INTEGRATOR, GenericType(),
+  addOption("integrator",               OT_STRING, GenericType(),
             "An integrator creator function");
   addOption("integrator_options",       OT_DICTIONARY, GenericType(),
             "Options to be passed to the integrator");
@@ -53,8 +53,8 @@ void DirectMultipleShootingInternal::init() {
   OCPSolverInternal::init();
 
   // Create an integrator instance
-  integratorCreator integrator_creator = getOption("integrator");
-  integrator_ = integrator_creator(ffcn_, Function());
+  std::string integrator_name = getOption("integrator");
+  integrator_ = Integrator(integrator_name, ffcn_, Function());
   if (hasSetOption("integrator_options")) {
     integrator_.setOption(getOption("integrator_options"));
   }

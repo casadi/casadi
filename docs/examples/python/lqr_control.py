@@ -86,7 +86,7 @@ cdae.init()
 
 
 sim = ControlSimulator(cdae,tn)
-sim.setOption("integrator", CVodesIntegrator)
+sim.setOption("integrator", "cvodes")
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
 sim.setOption("nf",20)
 sim.init()
@@ -260,7 +260,7 @@ out = SXFunction(controldaeIn(x=states),[states,u])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
-sim.setOption("integrator", CVodesIntegrator)
+sim.setOption("integrator", "cvodes")
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
 sim.setOption("nf",20)
 sim.init()
@@ -407,7 +407,7 @@ for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-
   out.init()
 
   sim = ControlSimulator(cdae,out,tn)
-  sim.setOption("integrator", CVodesIntegrator)
+  sim.setOption("integrator", "cvodes")
   sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-12})
   sim.setOption("nf",200)
   sim.init()
@@ -473,7 +473,7 @@ out = SXFunction(controldaeIn(x=states, p=param),[states,u,uref,states["yref"]])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
-sim.setOption("integrator", CVodesIntegrator)
+sim.setOption("integrator", "cvodes")
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()
@@ -554,7 +554,7 @@ out = SXFunction(controldaeIn(x=y, u=controls, p=param),[y,u,controls["uref"],co
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
-sim.setOption("integrator", CVodesIntegrator)
+sim.setOption("integrator", "cvodes")
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()
@@ -610,7 +610,7 @@ out = SXFunction(controldaeIn(x=y, x_major=y0, u=controls, p=param),[y,u,control
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
-sim.setOption("integrator", CVodesIntegrator)
+sim.setOption("integrator", "cvodes")
 sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()

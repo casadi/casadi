@@ -269,10 +269,10 @@ class OCPtests(casadiTestCase):
     daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
     mayer = SXFunction([x0],[7*x0[0]])
     ms = DirectMultipleShooting(daeres,mayer)
-    ms.setOption("integrator",CVodesIntegrator)
+    ms.setOption("integrator", "cvodes")
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("final_time",tf)
-    ms.setOption("nlp_solver",IpoptSolver)
+    ms.setOption("nlp_solver", "ipopt")
     ms.init()
     
     for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
@@ -306,11 +306,11 @@ class OCPtests(casadiTestCase):
     cfcn.init()
     
     ms = DirectMultipleShooting(daeres,mayer,cfcn)
-    ms.setOption("integrator",CVodesIntegrator)
+    ms.setOption("integrator", "cvodes")
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("number_of_parameters",np)
     ms.setOption("final_time",tf)
-    ms.setOption("nlp_solver",IpoptSolver)
+    ms.setOption("nlp_solver", "ipopt")
     ms.init()
     
     for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
@@ -363,11 +363,11 @@ class OCPtests(casadiTestCase):
     mayer.init()
     
     ms = DirectMultipleShooting(f,mayer)
-    ms.setOption("integrator",CVodesIntegrator)
+    ms.setOption("integrator", "cvodes")
     ms.setOption("integrator_options",integrator_options)
     ms.setOption("number_of_grid_points",N)
     ms.setOption("final_time",te)
-    ms.setOption("nlp_solver",IpoptSolver)
+    ms.setOption("nlp_solver", "ipopt")
     nlp_solver_options = {}
     nlp_solver_options["tol"] = 1e-10
     nlp_solver_options["hessian_approximation"] = "limited-memory"
@@ -437,13 +437,13 @@ class OCPtests(casadiTestCase):
     mayer.init()
     
     ms = DirectMultipleShooting(f,mayer)
-    ms.setOption("integrator",CVodesIntegrator)
+    ms.setOption("integrator", "cvodes")
     ms.setOption("integrator_options",integrator_options)
     ms.setOption("number_of_grid_points",N);
     ms.setOption("number_of_parameters",1);
     ms.setOption("final_time",te);
 
-    ms.setOption("nlp_solver",IpoptSolver)
+    ms.setOption("nlp_solver", "ipopt")
     nlp_solver_options = {}
     nlp_solver_options["tol"] = 1e-10
     nlp_solver_options["hessian_approximation"] = "limited-memory"

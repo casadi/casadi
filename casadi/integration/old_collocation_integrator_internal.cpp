@@ -73,7 +73,7 @@ namespace casadi {
               "An linear solver to solver the quadrature equations");
     addOption("quadrature_solver_options",     OT_DICTIONARY, GenericType(),
               "Options to be passed to the quadrature solver");
-    addOption("startup_integrator",            OT_INTEGRATOR,  GenericType(),
+    addOption("startup_integrator",            OT_STRING,  GenericType(),
               "An ODE/DAE integrator that can be used to generate a startup trajectory");
     addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(),
               "Options to be passed to the startup integrator");
@@ -396,10 +396,10 @@ namespace casadi {
     if (hasSetOption("startup_integrator")) {
 
       // Create the linear solver
-      integratorCreator startup_integrator_creator = getOption("startup_integrator");
+      std::string startup_integrator_name = getOption("startup_integrator");
 
       // Allocate a root-finding solver
-      startup_integrator_ = startup_integrator_creator(f_, g_);
+      startup_integrator_ = Integrator(startup_integrator_name, f_, g_);
 
       // Pass options
       startup_integrator_.setOption("t0", coll_time_.front().front());

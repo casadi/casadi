@@ -134,7 +134,7 @@ print Ji
 
 # csim = ControlSimulator(cf,linspace(0,tf,50))
 # csim.setOption("nf",10)
-# csim.setOption("integrator",CVodesIntegrator)
+# csim.setOption("integrator","cvodes")
 # csim.setOption("integrator_options",{"reltol":1e-11,"abstol":1e-11, "fsens_err_con": True})
 # csim.init()
 

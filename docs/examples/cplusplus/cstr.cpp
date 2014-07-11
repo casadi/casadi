@@ -91,7 +91,7 @@ int main(){
   // Create a multiple shooting discretization
   DirectMultipleShooting ocp_solver;
   ocp_solver = DirectMultipleShooting(dae,mterm);
-  ocp_solver.setOption("integrator",IdasIntegrator::creator);
+  ocp_solver.setOption("integrator", "idas");
   ocp_solver.setOption("integrator_options",integrator_options);
   ocp_solver.setOption("number_of_grid_points",num_nodes);
   ocp_solver.setOption("final_time",ocp.tf);

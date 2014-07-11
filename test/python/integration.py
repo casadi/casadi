@@ -50,7 +50,7 @@ except:
 integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18}))
 
 integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":CVodesIntegrator}))
-#integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": IpoptSolver,"linear_solver_creator": CSparse}}))
+#integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": CSparse}}))
 integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
 
 print "Will test these integrators:"
@@ -73,7 +73,7 @@ class Integrationtests(casadiTestCase):
         
     f=SXFunction(daeIn(t=t, x=q, p=p),daeOut(ode=q/p*t**2))
     f.init()
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("fsens_err_con", True)
@@ -570,7 +570,7 @@ class Integrationtests(casadiTestCase):
     p=SX.sym("p")
     f=SXFunction(daeIn(t=t, x=x, p=p),daeOut(ode=x/p*t**2))
     f.init()
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("fsens_err_con", True)
@@ -637,7 +637,7 @@ class Integrationtests(casadiTestCase):
     x=SXElement.sym("x")
     y=SXElement.sym("y")
     f=SXFunction(daeIn(t=t, x=vertcat([x,y])),daeOut(ode=vertcat([x,(1+1e-9)*x])))
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0)
     integrator.setOption("tf",1)
@@ -661,7 +661,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(t=t,x=q),daeOut(ode=dq))
     f.init()
 
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-12)
     integrator.setOption("t0",0)
@@ -755,7 +755,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],dh])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     #integrator.setOption("verbose",True)
@@ -782,7 +782,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],(1+1e-9)*dh])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     #integrator.setOption("verbose",True)
@@ -903,7 +903,7 @@ class Integrationtests(casadiTestCase):
     f_out = daeOut(ode=mul(c.reshape(p,3,3),q))
     f=SXFunction(f_in,f_out)
     f.init()
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("steps_per_checkpoint",1000)
     integrator.setOption("t0",0)
@@ -938,7 +938,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(t=t,x=q,p=p),daeOut(ode=mul(c.reshape(p,3,3),q)))
     f.init()
 
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
@@ -1005,7 +1005,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
@@ -1055,7 +1055,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes",f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     #integrator.setOption("verbose",True)
@@ -1185,7 +1185,7 @@ class Integrationtests(casadiTestCase):
     x = SX.sym("x",N)
 
     ode = SXFunction(daeIn(x=x, p=vec(A)),daeOut(ode=mul(A,x)))
-    I = CVodesIntegrator(ode)
+    I = Integrator("cvodes",ode)
     I.setOption("fsens_err_con", True)
     I.setOption('reltol',1e-12)
     I.init()
@@ -1235,7 +1235,7 @@ class Integrationtests(casadiTestCase):
     g = SXFunction(rdaeIn(**{'x': x, 'z': z, 'rx': rx, 'rz': rz}),rdaeOut(**{'alg': x-rz, 'ode': rz}))
     g.init()
 
-    integrator = IdasIntegrator(f,g)
+    integrator = Integrator("idas",f,g)
     integrator.setOption({'calc_ic': True, 'tf': 2.3, 'reltol': 1e-10, 'augmented_options': {'reltol': 1e-09, 'abstol': 1e-09 }, 'calc_icB': True, 'abstol': 1e-10, 't0': 0.2})
     integrator.init()
 

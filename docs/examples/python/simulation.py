@@ -46,7 +46,7 @@ tgrid = linspace(0,10.0,N)
 
 # ControlSimulator will output on each node of the timegrid
 csim = ControlSimulator(f,tgrid)
-csim.setOption("integrator",CVodesIntegrator)
+csim.setOption("integrator", "cvodes")
 csim.setOption("integrator_options",{"abstol":1e-10,"reltol":1e-10})
 csim.init()
 
@@ -114,7 +114,7 @@ f_aug = SXFunction(controldaeIn(x=states_aug,p=parameters,u=controls),daeOut(ode
 f_aug.init()
 
 csim_aug = ControlSimulator(f_aug,tgrid)
-csim_aug.setOption("integrator",CVodesIntegrator)
+csim_aug.setOption("integrator", "cvodes")
 csim_aug.init()
 
 states_aug(csim_aug.input("x0"))["orig"] = x0

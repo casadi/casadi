@@ -75,9 +75,6 @@ namespace casadi {
   /// Function pointer to a LP solver creator function
   typedef LPSolver (*LPSolverCreator)(const LPStructure& st);
 
-  /// Function pointer to an integrator creator function
-  typedef Integrator (*integratorCreator)(const Function& f, const Function& g);
-
   /// Function pointer to a QP solver creator function
   typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
 

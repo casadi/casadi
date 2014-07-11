@@ -32,7 +32,7 @@ try:
 except:
   pass
 try:
-  solvers.append((NLPImplicitSolver,{"linear_solver": CSparse,"nlp_solver": IpoptSolver}))
+  solvers.append((NLPImplicitSolver,{"linear_solver": CSparse,"nlp_solver": "ipopt"}))
 except:
   pass
 try:

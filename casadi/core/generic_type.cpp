@@ -103,8 +103,6 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_LINEARSOLVER";
       case OT_LPSOLVER:
               return "OT_LPSOLVER";
-      case OT_INTEGRATOR:
-              return "OT_INTEGRATOR";
       case OT_QPSOLVER:
               return "OT_QPSOLVER";
       case OT_STABILIZEDQPSOLVER:
@@ -379,10 +377,6 @@ GenericType::GenericType(linearSolverCreator ptr) : type_(OT_LINEARSOLVER) {
   assignNode(new GenericTypeInternal<linearSolverCreator >(ptr));
 }
 
-GenericType::GenericType(integratorCreator ptr) : type_(OT_INTEGRATOR) {
-  assignNode(new GenericTypeInternal<integratorCreator>(ptr));
-}
-
 GenericType::GenericType(QPSolverCreator ptr) : type_(OT_QPSOLVER) {
   assignNode(new GenericTypeInternal<QPSolverCreator>(ptr));
 }
@@ -443,10 +437,6 @@ GenericType::operator QCQPSolverCreator() const {
 GenericType::operator linearSolverCreator() const {
   casadi_assert_message(is_a<linearSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<linearSolverCreator>*>(get())->d_;
-}
-GenericType::operator integratorCreator() const {
-  casadi_assert_message(is_a<integratorCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<integratorCreator>*>(get())->d_;
 }
 
 GenericType::operator QPSolverCreator() const {

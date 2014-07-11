@@ -95,9 +95,9 @@ int main(){
   // Create a multiple shooting discretization
   DirectMultipleShooting ms(res,mterm);
   if(use_old_collocation_integrator){
-    ms.setOption("integrator",OldCollocationIntegrator::creator);
+    ms.setOption("integrator", "oldcollocation");
   } else {
-    ms.setOption("integrator",CVodesIntegrator::creator);
+    ms.setOption("integrator", "cvodes");
   }
   ms.setOption("integrator_options",integrator_options);
   ms.setOption("number_of_grid_points",ns);

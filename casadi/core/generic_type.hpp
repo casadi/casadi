@@ -43,7 +43,6 @@ namespace casadi {
     OT_DICTIONARY,
     OT_LPSOLVER,
     OT_LINEARSOLVER,
-    OT_INTEGRATOR,
     OT_QPSOLVER,
     OT_STABILIZEDQPSOLVER,
     OT_SOCPSOLVER,
@@ -96,7 +95,6 @@ namespace casadi {
     /// Creator functions
     GenericType(linearSolverCreator ptr);
     GenericType(LPSolverCreator ptr);
-    GenericType(integratorCreator ptr);
     GenericType(QPSolverCreator ptr);
     GenericType(StabilizedQPSolverCreator ptr);
     GenericType(SOCPSolverCreator ptr);
@@ -126,7 +124,6 @@ namespace casadi {
 
     operator linearSolverCreator() const;
     operator LPSolverCreator() const;
-    operator integratorCreator() const;
     operator QPSolverCreator() const;
     operator StabilizedQPSolverCreator() const;
     operator SDPSolverCreator() const;
