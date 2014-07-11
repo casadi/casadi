@@ -119,6 +119,12 @@ class CASADI_CORE_EXPORT SOCPSolver : public Function {
   /// Default constructor
   SOCPSolver();
 
+  /** \brief Constructor
+   *  \param st Problem structure
+   *  \copydoc scheme_SOCPStruct
+   */
+  SOCPSolver(const std::string& name, const SOCPStructure& st);
+
   /// Access functions of the node
   SOCPSolverInternal* operator->();
   const SOCPSolverInternal* operator->() const;

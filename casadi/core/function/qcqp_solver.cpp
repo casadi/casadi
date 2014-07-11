@@ -25,28 +25,27 @@
 using namespace std;
 namespace casadi {
 
+  QCQPSolver::QCQPSolver() {
+  }
 
-QCQPSolver::QCQPSolver() {
-}
+  QCQPSolverInternal* QCQPSolver::operator->() {
+    return static_cast<QCQPSolverInternal*>(Function::operator->());
+  }
 
-QCQPSolverInternal* QCQPSolver::operator->() {
-  return static_cast<QCQPSolverInternal*>(Function::operator->());
-}
-
-const QCQPSolverInternal* QCQPSolver::operator->() const {
+  const QCQPSolverInternal* QCQPSolver::operator->() const {
     return static_cast<const QCQPSolverInternal*>(Function::operator->());
-}
+  }
 
-bool QCQPSolver::checkNode() const {
-  return dynamic_cast<const QCQPSolverInternal*>(get())!=0;
-}
+  bool QCQPSolver::checkNode() const {
+    return dynamic_cast<const QCQPSolverInternal*>(get())!=0;
+  }
 
-void QCQPSolver::setQPOptions() {
-  (*this)->setQPOptions();
-}
+  void QCQPSolver::setQPOptions() {
+    (*this)->setQPOptions();
+  }
+
+  QCQPSolver::QCQPSolver(const std::string& name, const QCQPStructure& st) {
+    assignNode(QCQPSolverInternal::getPlugin(name).creator(st));
+  }
 
 } // namespace casadi
-
-
-
-

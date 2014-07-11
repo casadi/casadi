@@ -30,8 +30,7 @@ SDPSDQPSolver::SDPSDQPSolver() {
 }
 
 
-SDPSDQPSolver::SDPSDQPSolver(const SDQPStructure & st)  {
-  assignNode(new SDPSDQPInternal(st));
+SDPSDQPSolver::SDPSDQPSolver(const SDQPStructure & st) : SDQPSolver("sdp", st) {
 }
 
 SDPSDQPInternal* SDPSDQPSolver::operator->() {

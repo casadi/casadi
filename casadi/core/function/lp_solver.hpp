@@ -105,6 +105,12 @@ class CASADI_CORE_EXPORT LPSolver : public Function {
   /// Default constructor
   LPSolver();
 
+  /** \brief Constructor
+   *  \param st Problem structure
+   *  \copydoc scheme_LPStruct
+   */
+  LPSolver(const std::string& name, const LPStructure& st);
+
   /// Access functions of the node
   LPSolverInternal* operator->();
   const LPSolverInternal* operator->() const;

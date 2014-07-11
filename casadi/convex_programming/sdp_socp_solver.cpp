@@ -29,9 +29,7 @@ namespace casadi {
 SDPSOCPSolver::SDPSOCPSolver() {
 }
 
-
-SDPSOCPSolver::SDPSOCPSolver(const SOCPStructure & st)  {
-  assignNode(new SDPSOCPInternal(st));
+SDPSOCPSolver::SDPSOCPSolver(const SOCPStructure & st) : SOCPSolver("sdp", st) {
 }
 
 SDPSOCPInternal* SDPSOCPSolver::operator->() {

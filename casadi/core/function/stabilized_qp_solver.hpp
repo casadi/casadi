@@ -102,6 +102,12 @@ class CASADI_CORE_EXPORT StabilizedQPSolver : public Function {
   /// Default constructor
   StabilizedQPSolver();
 
+  /** \brief Constructor
+   *  \param st Problem structure
+   *  \copydoc scheme_QPStruct
+   */
+  StabilizedQPSolver(const std::string& name, const QPStructure& st);
+
   /// Access functions of the node
   StabilizedQPSolverInternal* operator->();
   const StabilizedQPSolverInternal* operator->() const;

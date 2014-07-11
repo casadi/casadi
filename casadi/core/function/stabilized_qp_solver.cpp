@@ -25,34 +25,33 @@
 using namespace std;
 namespace casadi {
 
+  StabilizedQPSolver::StabilizedQPSolver() {
+  }
 
-StabilizedQPSolver::StabilizedQPSolver() {
-}
+  StabilizedQPSolverInternal* StabilizedQPSolver::operator->() {
+    return static_cast<StabilizedQPSolverInternal*>(Function::operator->());
+  }
 
-StabilizedQPSolverInternal* StabilizedQPSolver::operator->() {
-  return static_cast<StabilizedQPSolverInternal*>(Function::operator->());
-}
-
-const StabilizedQPSolverInternal* StabilizedQPSolver::operator->() const {
+  const StabilizedQPSolverInternal* StabilizedQPSolver::operator->() const {
     return static_cast<const StabilizedQPSolverInternal*>(Function::operator->());
-}
+  }
 
-bool StabilizedQPSolver::checkNode() const {
-  return dynamic_cast<const StabilizedQPSolverInternal*>(get())!=0;
-}
+  bool StabilizedQPSolver::checkNode() const {
+    return dynamic_cast<const StabilizedQPSolverInternal*>(get())!=0;
+  }
 
-void StabilizedQPSolver::setLPOptions() {
-  (*this)->setLPOptions();
-}
+  void StabilizedQPSolver::setLPOptions() {
+    (*this)->setLPOptions();
+  }
 
-void StabilizedQPSolver::generateNativeCode(const std::string &filename) const {
-  std::ofstream file;
-  file.open(filename.c_str());
-  (*this)->generateNativeCode(file);
-}
+  void StabilizedQPSolver::generateNativeCode(const std::string &filename) const {
+    std::ofstream file;
+    file.open(filename.c_str());
+    (*this)->generateNativeCode(file);
+  }
+
+  StabilizedQPSolver::StabilizedQPSolver(const std::string& name, const QPStructure& st) {
+    assignNode(StabilizedQPSolverInternal::getPlugin(name).creator(st));
+  }
 
 } // namespace casadi
-
-
-
-
