@@ -30,8 +30,7 @@ QPOasesSolver::QPOasesSolver() {
 }
 
 
-QPOasesSolver::QPOasesSolver(const QPStructure& st)  {
-  assignNode(new QPOasesInternal(st));
+QPOasesSolver::QPOasesSolver(const QPStructure& st) : QPSolver("qpoases", st) {
 }
 
 QPOasesInternal* QPOasesSolver::operator->() {

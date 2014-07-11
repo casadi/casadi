@@ -175,6 +175,12 @@ class CASADI_CORE_EXPORT SDPSolver : public Function {
   /// Default constructor
   SDPSolver();
 
+  /** \brief Constructor
+   *  \param st Problem structure
+   *  \copydoc scheme_SDPStruct
+   */
+  SDPSolver(const std::string& name, const SDPStructure& st);
+
   /// Access functions of the node
   SDPSolverInternal* operator->();
   const SDPSolverInternal* operator->() const;

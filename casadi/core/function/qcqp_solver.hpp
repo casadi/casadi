@@ -130,6 +130,12 @@ class CASADI_CORE_EXPORT QCQPSolver : public Function {
   /// Default constructor
   QCQPSolver();
 
+  /** \brief Constructor
+   *  \param st Problem structure
+   *  \copydoc scheme_QCQPStruct
+   */
+  QCQPSolver(const std::string& name, const QCQPStructure& st);
+
   /// Access functions of the node
   QCQPSolverInternal* operator->();
   const QCQPSolverInternal* operator->() const;

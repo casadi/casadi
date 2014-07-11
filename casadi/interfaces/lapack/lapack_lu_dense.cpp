@@ -47,8 +47,7 @@ namespace casadi {
   LapackLUDense::LapackLUDense() {
   }
 
-  LapackLUDense::LapackLUDense(const Sparsity& sparsity, int nrhs) {
-    assignNode(new LapackLUDenseInternal(sparsity, nrhs));
+  LapackLUDense::LapackLUDense(const Sparsity& sparsity, int nrhs) : LinearSolver("lapacklu", sparsity, nrhs) {
   }
 
   LapackLUDenseInternal* LapackLUDense::operator->() {

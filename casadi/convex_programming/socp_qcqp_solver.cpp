@@ -29,9 +29,7 @@ namespace casadi {
 SOCPQCQPSolver::SOCPQCQPSolver() {
 }
 
-
-SOCPQCQPSolver::SOCPQCQPSolver(const QCQPStructure & st)  {
-  assignNode(new SOCPQCQPInternal(st));
+SOCPQCQPSolver::SOCPQCQPSolver(const QCQPStructure & st) : QCQPSolver("socp", st) {
 }
 
 SOCPQCQPInternal* SOCPQCQPSolver::operator->() {

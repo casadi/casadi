@@ -28,8 +28,8 @@ namespace casadi {
   CSparseCholesky::CSparseCholesky() {
   }
 
-  CSparseCholesky::CSparseCholesky(const Sparsity& sp, int nrhs) {
-    assignNode(new CSparseCholeskyInternal(sp, nrhs));
+  CSparseCholesky::CSparseCholesky(const Sparsity& sp, int nrhs)
+    : LinearSolver("csparsecholesky", sp, nrhs) {
   }
 
   CSparseCholeskyInternal* CSparseCholesky::operator->() {

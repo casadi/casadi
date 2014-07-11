@@ -29,9 +29,7 @@ namespace casadi {
 QPStabilizer::QPStabilizer() {
 }
 
-
-QPStabilizer::QPStabilizer(const QPStructure & st)  {
-  assignNode(new QPStabilizerInternal(st));
+QPStabilizer::QPStabilizer(const QPStructure & st) : StabilizedQPSolver("qp", st) {
 }
 
 QPStabilizerInternal* QPStabilizer::operator->() {

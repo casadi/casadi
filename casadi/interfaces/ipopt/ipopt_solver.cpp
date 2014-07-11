@@ -29,8 +29,7 @@ namespace casadi {
   IpoptSolver::IpoptSolver() {
   }
 
-  IpoptSolver::IpoptSolver(const Function& nlp) {
-    assignNode(new IpoptInternal(nlp));
+  IpoptSolver::IpoptSolver(const Function& nlp) : NLPSolver("ipopt", nlp) {
   }
 
   IpoptInternal* IpoptSolver::operator->() {

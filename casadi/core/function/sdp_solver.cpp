@@ -25,28 +25,27 @@
 using namespace std;
 namespace casadi {
 
+  SDPSolver::SDPSolver() {
+  }
 
-SDPSolver::SDPSolver() {
-}
+  SDPSolverInternal* SDPSolver::operator->() {
+    return static_cast<SDPSolverInternal*>(Function::operator->());
+  }
 
-SDPSolverInternal* SDPSolver::operator->() {
-  return static_cast<SDPSolverInternal*>(Function::operator->());
-}
-
-const SDPSolverInternal* SDPSolver::operator->() const {
+  const SDPSolverInternal* SDPSolver::operator->() const {
     return static_cast<const SDPSolverInternal*>(Function::operator->());
-}
+  }
 
-bool SDPSolver::checkNode() const {
-  return dynamic_cast<const SDPSolverInternal*>(get())!=0;
-}
+  bool SDPSolver::checkNode() const {
+    return dynamic_cast<const SDPSolverInternal*>(get())!=0;
+  }
 
-void SDPSolver::setSOCPOptions() {
-  (*this)->setSOCPOptions();
-}
+  void SDPSolver::setSOCPOptions() {
+    (*this)->setSOCPOptions();
+  }
+
+  SDPSolver::SDPSolver(const std::string& name, const SDPStructure& st) {
+    assignNode(SDPSolverInternal::getPlugin(name).creator(st));
+  }
 
 } // namespace casadi
-
-
-
-

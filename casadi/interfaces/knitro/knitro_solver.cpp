@@ -29,8 +29,7 @@ namespace casadi {
   KnitroSolver::KnitroSolver() {
   }
 
-  KnitroSolver::KnitroSolver(const Function& nlp) {
-    assignNode(new KnitroInternal(nlp));
+  KnitroSolver::KnitroSolver(const Function& nlp) : NLPSolver("knitro", nlp) {
   }
 
   KnitroInternal* KnitroSolver::operator->() {

@@ -103,6 +103,12 @@ class CASADI_CORE_EXPORT SDQPSolver : public Function {
   /// Default constructor
   SDQPSolver();
 
+  /** \brief Constructor
+   *  \param st Problem structure
+   *  \copydoc scheme_SDQPStruct
+   */
+  SDQPSolver(const std::string& name, const SDQPStructure& st);
+
   /// Access functions of the node
   SDQPSolverInternal* operator->();
   const SDQPSolverInternal* operator->() const;

@@ -44,6 +44,10 @@ namespace casadi {
     /** \brief  Deep copy data members */
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
+    /** \brief  Create a new LinearSolver */
+    static LinearSolverInternal* creator(const Sparsity& sp, int nrhs)
+    { return new SymbolicQRInternal(sp, nrhs);}
+
     // Initialize
     virtual void init();
 

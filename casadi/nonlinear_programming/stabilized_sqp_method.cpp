@@ -29,8 +29,7 @@ namespace casadi {
   StabilizedSQPMethod::StabilizedSQPMethod() {
   }
 
-  StabilizedSQPMethod::StabilizedSQPMethod(const Function& nlp) {
-    assignNode(new StabilizedSQPInternal(nlp));
+  StabilizedSQPMethod::StabilizedSQPMethod(const Function& nlp) : NLPSolver("stabilizedsqp", nlp) {
   }
 
   StabilizedSQPInternal* StabilizedSQPMethod::operator->() {

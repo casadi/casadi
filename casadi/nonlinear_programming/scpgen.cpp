@@ -29,8 +29,7 @@ namespace casadi {
   SCPgen::SCPgen() {
   }
 
-  SCPgen::SCPgen(const Function& nlp) {
-    assignNode(new SCPgenInternal(nlp));
+  SCPgen::SCPgen(const Function& nlp) : NLPSolver("scpgen", nlp) {
   }
 
   SCPgenInternal* SCPgen::operator->() {
