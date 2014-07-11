@@ -27,7 +27,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_INTEGRATION_EXPORT casadi_register_integrator_rk(IntegratorInternal::Plugin* plugin){
+  int CASADI_INTEGRATOR_RK_EXPORT casadi_register_integrator_rk(IntegratorInternal::Plugin* plugin) {
     plugin->creator = RKIntegratorInternal::creator;
     plugin->name = "rk";
     plugin->doc = "rk docs not available";
@@ -36,12 +36,13 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_INTEGRATION_EXPORT casadi_load_integrator_rk(){
+  void CASADI_INTEGRATOR_RK_EXPORT casadi_load_integrator_rk() {
     IntegratorInternal::registerPlugin(casadi_register_integrator_rk);
   }
 
   RKIntegratorInternal::RKIntegratorInternal(const Function& f, const Function& g) :
-      FixedStepIntegratorInternal(f, g) { }
+      FixedStepIntegratorInternal(f, g) {
+  }
 
   void RKIntegratorInternal::deepCopyMembers(
       std::map<SharedObjectNode*, SharedObject>& already_copied) {
