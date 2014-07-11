@@ -29,8 +29,7 @@ namespace casadi {
   SQPMethod::SQPMethod() {
   }
 
-  SQPMethod::SQPMethod(const Function& nlp) {
-    assignNode(new SQPInternal(nlp));
+  SQPMethod::SQPMethod(const Function& nlp) : NLPSolver("sqpmethod", nlp) {
   }
 
   SQPInternal* SQPMethod::operator->() {

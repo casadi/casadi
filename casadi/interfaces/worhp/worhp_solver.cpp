@@ -30,8 +30,7 @@ namespace casadi {
   WorhpSolver::WorhpSolver() {
   }
 
-  WorhpSolver::WorhpSolver(const Function& nlp) {
-    assignNode(new WorhpInternal(nlp));
+  WorhpSolver::WorhpSolver(const Function& nlp) : NLPSolver("worhp", nlp) {
   }
 
   WorhpInternal* WorhpSolver::operator->() {

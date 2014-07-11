@@ -30,8 +30,7 @@ namespace casadi {
   SnoptSolver::SnoptSolver() {
   }
 
-  SnoptSolver::SnoptSolver(const Function& nlp) {
-    assignNode(new SnoptInternal(nlp));
+  SnoptSolver::SnoptSolver(const Function& nlp) : NLPSolver("snopt", nlp) {
   }
 
   SnoptInternal* SnoptSolver::operator->() {
