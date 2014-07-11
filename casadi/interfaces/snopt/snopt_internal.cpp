@@ -657,7 +657,7 @@ namespace casadi {
     stats_["n_eval_grad_f"] = n_eval_grad_f_;
     stats_["n_eval_jac_g"] = n_eval_jac_g_;
     stats_["n_callback_fun"] = n_callback_fun_;
-    stats_["iter_count"] = n_iter_;
+    stats_["iter_count"] = n_iter_-1;
 
     // Reset the counters
     t_eval_grad_f_ = t_eval_jac_g_ = t_callback_fun_ = t_mainloop_ = 0;
