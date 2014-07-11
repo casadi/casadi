@@ -29,7 +29,7 @@ namespace casadi {
   KinsolSolver::KinsolSolver() {
   }
 
-  KinsolSolver::KinsolSolver(const Function& f, const Function& jac, const LinearSolver& linsol) 
+  KinsolSolver::KinsolSolver(const Function& f, const Function& jac, const LinearSolver& linsol)
     : ImplicitFunction("kinsol", f, jac, linsol) {
   }
 
