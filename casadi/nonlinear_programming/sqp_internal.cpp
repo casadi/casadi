@@ -69,7 +69,7 @@ namespace casadi {
 
     // Monitors
     addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "",
-              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
+              "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx|bfgs", true);
     addOption("print_time",         OT_BOOLEAN,       true,
               "Print information about execution time");
   }
@@ -528,6 +528,11 @@ namespace casadi {
 
         // Get the updated Hessian
         bfgs_.getOutput(Bk_);
+        if (monitored("bfgs")) {
+          cout << "x = " << x_ << endl;
+          cout << "BFGS = "  << endl;
+          Bk_.printSparse();
+        }
       } else {
         // Exact Hessian
         log("Evaluating hessian");
