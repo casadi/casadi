@@ -727,17 +727,19 @@ namespace casadi {
 
         }
 
+        // n^3 K
         output(DPLE_NUM_OUT*(d+1)+DPLE_P).set(0.0);
+      }
 
-        for (int k=0;k<K_;++k) {
-          nnKa_[k].set(0.0);
+      for (int k=0;k<K_;++k) {
+        nnKa_[k].set(0.0);
 
-          // nnKa[k] <- V[k]*Z[k]'
-          dense_mul_nn(n_, n_, n_, &dX_[k*n_*n_], &Z_[k*n_*n_], &nnKa_[k].data()[0]);
-          // output <- Z[k]*V[k]*Z[k]'
-          dense_mul_tn(n_, n_, n_, &Z_[k*n_*n_], &nnKa_[k].data()[0],
-                       &output(DPLE_NUM_OUT*(d+1)+DPLE_P).data()[k*n_*n_]);
-        }
+        // nnKa[k] <- V[k]*Z[k]'
+        // n^3 K
+        dense_mul_nn(n_, n_, n_, &dX_[k*n_*n_], &Z_[k*n_*n_], &nnKa_[k].data()[0]);
+        // output <- Z[k]*V[k]*Z[k]'
+        dense_mul_tn(n_, n_, n_, &Z_[k*n_*n_], &nnKa_[k].data()[0],
+                     &output(DPLE_NUM_OUT*(d+1)+DPLE_P).data()[k*n_*n_]);
       }
 
       if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
@@ -785,9 +787,7 @@ namespace casadi {
       // Outer main loop
       for (int l=partition_.size()-2;l>=0;--l) {
 
-        for (int k=0;k<K_;++k) {
-          std::fill(F_.begin(), F_.end(), 0);
-        }
+        std::fill(F_.begin(), F_.end(), 0);
 
         // Inner main loop
         for (int r=l;r>=0;--r) {
