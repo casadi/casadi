@@ -29,9 +29,7 @@ namespace casadi {
 DSDPSolver::DSDPSolver() {
 }
 
-
-DSDPSolver::DSDPSolver(const SDPStructure &st)  {
-  assignNode(new DSDPInternal(st));
+DSDPSolver::DSDPSolver(const SDPStructure &st) : SDPSolver("dsdp", st) {
 }
 
 DSDPInternal* DSDPSolver::operator->() {
