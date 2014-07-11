@@ -32,6 +32,7 @@
 
 #include "../../core/profiling.hpp"
 #include "../../core/casadi_options.hpp"
+#include <ctime>
 
 #include <numeric>
 
@@ -217,6 +218,12 @@ namespace casadi {
   void PsdIndefDpleInternal::evaluate() {
     // Obtain a periodic Schur form
 
+    double t_linear_solve_ = 0; // Time spent in linear solve
+    double t_psd_ = 0;          // Time spent in Periodic Schur decomposition
+    double t_total_ = 0;        // Time spent in total
+
+    double time_total_start = clock();
+
     // Set up timers for profiling
     double time_zero=0;
     double time_start=0;
@@ -238,7 +245,10 @@ namespace casadi {
         }
       }
     }
+
+    double time_psd_start = clock();
     slicot_periodic_schur(n_, K_, X_, T_, Z_, dwork_, eig_real_, eig_imag_);
+    t_psd_+=(clock()-time_psd_start)/CLOCKS_PER_SEC;
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_stop = getRealTime(); // Stop timer
@@ -462,8 +472,11 @@ namespace casadi {
         }
         // ********** STOP ***************
         // Solve Discrete Periodic Sylvester Equation Solver
+
+        double time_linear_solve_start = clock();
         solver.prepare();
         solver.solve(true);
+        t_linear_solve_ += (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
 
         // Extract solution and store it in X
         std::vector<double> & sol = solver.output().data();
@@ -702,7 +715,9 @@ namespace casadi {
           // ********** STOP ***************
 
           // Critical observation: Prepare step is not needed
+          double time_linear_solve_start = clock();
           solver.solve(true);
+          t_linear_solve_ += (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
 
           // Extract solution and store it in dX
           std::vector<double> & sol = solver.output().data();
@@ -820,8 +835,9 @@ namespace casadi {
           }
           // ********** STOP ***************
 
+          double time_linear_solve_start = clock();
           solver.solve(false);
-
+          t_linear_solve_ += (clock()-time_linear_solve_start)/CLOCKS_PER_SEC;
 
           // for k in range(p): V_bar[r][l][k]+=M_bar[k]
           std::vector<double> &Mbar = solver.output().data();
@@ -1002,11 +1018,17 @@ namespace casadi {
 
     }
 
-
-
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
       time_stop = getRealTime();
       profileWriteExit(CasadiOptions::profilingLog, this, time_stop-time_zero);
+    }
+
+    t_total_ += (clock()-time_total_start)/CLOCKS_PER_SEC;
+
+    if (gather_stats_) {
+      stats_["t_psd"] = t_psd_;
+      stats_["t_total"] = t_total_;
+      stats_["t_linear_solve"] = t_linear_solve_;
     }
 
   }
