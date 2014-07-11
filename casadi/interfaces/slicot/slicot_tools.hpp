@@ -45,7 +45,8 @@ void slicot_periodic_schur(int n, int K, const std::vector< double > & a,
                            std::vector< double > & t, std::vector< double > & z,
                            std::vector<double> &eig_real, std::vector<double> &eig_imag);
 
-void slicot_periodic_schur(int n, int K, const std::vector< double > & a, std::vector< double > & t,
+CASADI_SLICOT_INTERFACE_EXPORT void slicot_periodic_schur(
+                           int n, int K, const std::vector< double > & a, std::vector< double > & t,
                            std::vector< double > & z, std::vector<double> &dwork,
                            std::vector<double> &eig_real, std::vector<double> &eig_imag);
 #endif // SWIG
