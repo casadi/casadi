@@ -29,9 +29,7 @@ namespace casadi {
 QPLPSolver::QPLPSolver() {
 }
 
-
-QPLPSolver::QPLPSolver(const LPStructure & st)  {
-  assignNode(new QPLPInternal(st));
+QPLPSolver::QPLPSolver(const LPStructure & st) : LPSolver("qp", st) {
 }
 
 QPLPInternal* QPLPSolver::operator->() {
