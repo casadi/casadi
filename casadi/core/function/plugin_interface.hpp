@@ -111,7 +111,7 @@ namespace casadi {
 #endif // _WIN32
 
     // Register the plugin
-  //    registerPlugin(reg);
+  registerPlugin(reg);
 #endif // WITH_DL
   }
 
