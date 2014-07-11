@@ -44,7 +44,7 @@ namespace casadi {
   LapackQRDense::LapackQRDense() {
   }
 
-  LapackQRDense::LapackQRDense(const Sparsity& sparsity, int nrhs) {
+  LapackQRDense::LapackQRDense(const Sparsity& sparsity, int nrhs) : LinearSolver("lapackqr", sparsity, nrhs) {
     assignNode(new LapackQRDenseInternal(sparsity, nrhs));
   }
 

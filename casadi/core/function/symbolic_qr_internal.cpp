@@ -31,6 +31,21 @@
 using namespace std;
 namespace casadi {
 
+  extern "C"
+  int CASADI_CORE_EXPORT
+  casadi_register_linearsolver_symbolicqr(LinearSolverInternal::Plugin* plugin) {
+    plugin->creator = SymbolicQRInternal::creator;
+    plugin->name = "symbolicqr";
+    plugin->doc = "SymbolicQR docs not available";
+    plugin->version = 20;
+    return 0;
+  }
+
+  extern "C"
+  void CASADI_CORE_EXPORT casadi_load_linearsolver_symbolicqr() {
+    LinearSolverInternal::registerPlugin(casadi_register_linearsolver_symbolicqr);
+  }
+
   SymbolicQRInternal::SymbolicQRInternal(const Sparsity& sparsity, int nrhs) :
       LinearSolverInternal(sparsity, nrhs) {
     addOption("codegen",           OT_BOOLEAN,  false,               "C-code generation");

@@ -28,8 +28,7 @@ namespace casadi {
   CSparse::CSparse() {
   }
 
-  CSparse::CSparse(const Sparsity& sp, int nrhs) {
-    assignNode(new CSparseInternal(sp, nrhs));
+  CSparse::CSparse(const Sparsity& sp, int nrhs) : LinearSolver("csparse", sp, nrhs) {
   }
 
   CSparseInternal* CSparse::operator->() {
