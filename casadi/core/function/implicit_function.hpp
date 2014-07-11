@@ -64,6 +64,18 @@ namespace casadi {
   class CASADI_CORE_EXPORT ImplicitFunction : public Function {
   public:
 
+    /** \brief  Default constructor */
+    ImplicitFunction();
+
+    /** \brief  Create an implicit function solver
+     *
+     * \param f Function mapping from (n+1) inputs to 1 output
+     *
+     */
+    ImplicitFunction(const std::string& name, const Function& f,
+                     const Function& jac=Function(),
+                     const LinearSolver& linsol=LinearSolver());
+
     /// Access functions of the node
     ImplicitFunctionInternal* operator->();
 
