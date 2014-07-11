@@ -52,6 +52,11 @@ public:
 
   /// Set a stop time for the forward integration
   void setStopTime(double tf);
+
+#ifndef SWIG
+ protected:
+  SundialsIntegrator(const std::string& name, const Function& f, const Function& g);
+#endif // SWIG
 };
 
 } // namespace casadi

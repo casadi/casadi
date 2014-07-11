@@ -30,8 +30,7 @@ namespace casadi {
 IdasIntegrator::IdasIntegrator() {
 }
 
-IdasIntegrator::IdasIntegrator(const Function& f, const Function& g) {
-  assignNode(new IdasInternal(f, g));
+IdasIntegrator::IdasIntegrator(const Function& f, const Function& g) : SundialsIntegrator("idas", f, g){
 }
 
 IdasInternal* IdasIntegrator::operator->() {

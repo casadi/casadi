@@ -29,8 +29,7 @@ namespace casadi {
 CVodesIntegrator::CVodesIntegrator() {
 }
 
-CVodesIntegrator::CVodesIntegrator(const Function& f, const Function& g) {
-  assignNode(new CVodesInternal(f, g));
+CVodesIntegrator::CVodesIntegrator(const Function& f, const Function& g) : SundialsIntegrator("cvodes", f, g) {
 }
 
 CVodesInternal* CVodesIntegrator::operator->() {

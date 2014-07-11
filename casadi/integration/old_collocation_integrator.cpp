@@ -29,8 +29,7 @@ namespace casadi {
   OldCollocationIntegrator::OldCollocationIntegrator() {
   }
 
-  OldCollocationIntegrator::OldCollocationIntegrator(const Function& f, const Function& g) {
-    assignNode(new OldCollocationIntegratorInternal(f, g));
+  OldCollocationIntegrator::OldCollocationIntegrator(const Function& f, const Function& g) : Integrator("oldcollocation", f, g) {
   }
 
   OldCollocationIntegratorInternal* OldCollocationIntegrator::operator->() {

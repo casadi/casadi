@@ -46,5 +46,8 @@ void SundialsIntegrator::setStopTime(double tf) {
   (*this)->setStopTime(tf);
 }
 
+  SundialsIntegrator::SundialsIntegrator(const std::string& name, const Function& f, const Function& g) : Integrator(name, f, g) {
+  }
+
 } // namespace casadi
 
