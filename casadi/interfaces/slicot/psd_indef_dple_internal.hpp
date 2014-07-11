@@ -122,6 +122,9 @@ namespace casadi {
     /// Work vector for periodic Schur form
     std::vector< double > dwork_;
 
+    /// Numerical zero, used in periodic Schur form
+    double psd_num_zero_;
+
   };
 
 } // namespace casadi

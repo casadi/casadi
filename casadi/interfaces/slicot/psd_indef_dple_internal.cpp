@@ -56,6 +56,10 @@ namespace casadi {
               "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
+    addOption("psd_num_zero",             OT_REAL,         1e-12,
+              "Numerical zero used in Periodic Schur decomposition with slicot."
+              "This option is needed when your systems has Floquet multipliers"
+              "zero or close to zero");
   }
 
   PsdIndefDpleInternal::~PsdIndefDpleInternal() {
@@ -170,6 +174,8 @@ namespace casadi {
       profileWriteSourceLine(CasadiOptions::profilingLog, this, 3, "adjoint", -1);
     }
 
+    psd_num_zero_ = getOption("psd_num_zero");
+
   }
 
   /// \cond INTERNAL
@@ -248,7 +254,7 @@ namespace casadi {
     }
 
     double time_psd_start = clock();
-    slicot_periodic_schur(n_, K_, X_, T_, Z_, dwork_, eig_real_, eig_imag_);
+    slicot_periodic_schur(n_, K_, X_, T_, Z_, dwork_, eig_real_, eig_imag_, psd_num_zero_);
     t_psd_+=(clock()-time_psd_start)/CLOCKS_PER_SEC;
 
     if (CasadiOptions::profiling && CasadiOptions::profilingBinary) {
