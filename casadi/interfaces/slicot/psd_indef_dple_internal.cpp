@@ -283,6 +283,7 @@ namespace casadi {
       }
       j = i;
       partition_.push_back(i);
+      i += 1;
     }
 
     // ********** START ***************
