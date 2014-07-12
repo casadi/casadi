@@ -23,7 +23,7 @@
 #ifndef CASADI_KINSOL_INTERNAL_HPP
 #define CASADI_KINSOL_INTERNAL_HPP
 
-#include "kinsol_solver.hpp"
+#include <casadi/interfaces/sundials/casadi_implicitfunction_kinsol_export.h>
 #include "casadi/core/function/implicit_function_internal.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
