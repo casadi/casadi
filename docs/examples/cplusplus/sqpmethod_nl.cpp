@@ -20,8 +20,6 @@
 *
 */
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/nonlinear_programming/nlp_qp_solver.hpp>
 #include <casadi/nonlinear_programming/symbolic_nlp.hpp>
 
 extern "C" void casadi_load_nlpsolver_sqpmethod();
