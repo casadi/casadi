@@ -20,7 +20,6 @@
 *
 */
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/knitro/knitro_solver.hpp>
 #include <casadi/nonlinear_programming/symbolic_nlp.hpp>
  
 /**
@@ -47,7 +46,7 @@ int main(int argc, char **argv){
   SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
  
   // Allocate NLP solver
-  KnitroSolver nlp_solver(nlp);
+  NLPSolver nlp_solver("knitro", nlp);
 
   // Set options
   // nlp_solver.setOption("verbose",true);

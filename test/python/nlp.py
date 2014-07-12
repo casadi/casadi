@@ -77,8 +77,9 @@ except:
   pass
 
 #try:
-#  solvers.append(KnitroSolver)
-#  print "Will test KnitroSolver"
+#NLPSolver.loadPlugin("knitro")
+#  solvers.append(("knitro",{}))
+#  print "Will test knitro"
 #except:
 #  pass
 
