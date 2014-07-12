@@ -222,6 +222,9 @@ namespace casadi {
 
     /// Get the DAE
     Function getDAE();
+
+    /// Set a stop time for the forward integration
+    void setStopTime(double tf);
   };
 
 } // namespace casadi

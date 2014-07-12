@@ -92,6 +92,9 @@ namespace casadi {
     /** \brief Calculate the jacobian of output \a oind with respect to input \a iind */
     virtual Function getJacobian(int iind, int oind, bool compact, bool symmetric);
 
+    /** \brief  Set stop time for the integration */
+    virtual void setStopTime(double tf);
+
     // Helper structure
     struct AugOffset {
       std::vector<int> x, z, q, p, rx, rz, rq, rp;

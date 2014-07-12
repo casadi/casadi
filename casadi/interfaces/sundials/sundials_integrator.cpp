@@ -42,10 +42,6 @@ bool SundialsIntegrator::checkNode() const {
   return dynamic_cast<const SundialsInternal*>(get())!=0;
 }
 
-void SundialsIntegrator::setStopTime(double tf) {
-  (*this)->setStopTime(tf);
-}
-
   SundialsIntegrator::SundialsIntegrator(const std::string& name, const Function& f, const Function& g) : Integrator(name, f, g) {
   }
 

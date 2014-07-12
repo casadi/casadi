@@ -50,9 +50,6 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /// Set a stop time for the forward integration
-  void setStopTime(double tf);
-
 #ifndef SWIG
  protected:
   SundialsIntegrator(const std::string& name, const Function& f, const Function& g);

@@ -85,5 +85,9 @@ namespace casadi {
     IntegratorInternal::loadPlugin(name);
   }
 
+  void Integrator::setStopTime(double tf) {
+    (*this)->setStopTime(tf);
+  }
+
 } // namespace casadi
 
