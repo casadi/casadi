@@ -3,8 +3,6 @@ include_directories(${IPOPT_INCLUDE_DIRS})
 link_directories(${IPOPT_LIBRARY_DIRS})
 
 set(NLPSOLVER_IPOPT_SRCS
-  ipopt_solver.hpp
-  ipopt_solver.cpp
   ipopt_internal.hpp
   ipopt_internal.cpp
   ipopt_nlp.hpp

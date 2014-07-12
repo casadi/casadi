@@ -9,7 +9,7 @@ set(OPTIMAL_CONTROL
   direct_collocation.hpp         direct_collocation.cpp         direct_collocation_internal.hpp         direct_collocation_internal.cpp
 )
 
-casadi_library(casadi_optimal_control ${OPTIMAL_CONTROL})
+casadi_library_swig(casadi_optimal_control ${OPTIMAL_CONTROL})
 
 target_link_libraries(casadi_optimal_control
   casadi_integration

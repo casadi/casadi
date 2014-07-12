@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 include_directories(${KNITRO_INCLUDE_DIR})
 
-casadi_library(casadi_nlpsolver_knitro
+casadi_library_swig(casadi_nlpsolver_knitro
   knitro_solver.hpp
   knitro_solver.cpp
   knitro_internal.hpp

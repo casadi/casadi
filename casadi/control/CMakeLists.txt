@@ -9,7 +9,7 @@ set(CONTROL_SRCS
   simple_indef_dple_internal.hpp
   simple_indef_dple_internal.cpp)
 
-casadi_library(casadi_control ${CONTROL_SRCS})
+casadi_library_swig(casadi_control ${CONTROL_SRCS})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/control

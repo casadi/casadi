@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 include_directories(${QPOASES_INCLUDE_DIR})
 
-casadi_library(casadi_qpsolver_qpoases
+casadi_library_swig(casadi_qpsolver_qpoases
   qpoases_internal.hpp
   qpoases_internal.cpp
   qpoases_solver.hpp

@@ -18,7 +18,7 @@ set(SQIC_INTERFACE_SRCS
   stabilized_sqic_solver.cpp
   ${resource_file})
 
-casadi_library(casadi_sqic_interface ${SQIC_INTERFACE_SRCS})
+casadi_library_swig(casadi_sqic_interface ${SQIC_INTERFACE_SRCS})
 if(ENABLE_STATIC)
 add_library(sqic_fortran_c_bridge STATIC wsqic.f90)
 endif()

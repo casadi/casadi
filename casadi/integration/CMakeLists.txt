@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-casadi_library(casadi_integration
+casadi_library_swig(casadi_integration
   fixed_step_integrator_internal.hpp
   fixed_step_integrator_internal.cpp
   implicit_fixed_step_integrator_internal.hpp
@@ -9,7 +9,7 @@ casadi_library(casadi_integration
 )
 
 # Explicit Runge-Kutta integrator
-casadi_library(casadi_integrator_rk
+casadi_library_swig(casadi_integrator_rk
   rk_integrator.hpp
   rk_integrator.cpp
   rk_integrator_internal.hpp
@@ -17,7 +17,7 @@ casadi_library(casadi_integrator_rk
 target_link_libraries(casadi_integrator_rk casadi_integration)
 
 # Collocation integrator
-casadi_library(casadi_integrator_collocation
+casadi_library_swig(casadi_integrator_collocation
   collocation_integrator.hpp
   collocation_integrator.cpp
   collocation_integrator_internal.hpp
@@ -25,7 +25,7 @@ casadi_library(casadi_integrator_collocation
 target_link_libraries(casadi_integrator_collocation casadi_integration)
 
 # Old (all-at-once) collocation integrator
-casadi_library(casadi_integrator_oldcollocation
+casadi_library_swig(casadi_integrator_oldcollocation
   old_collocation_integrator.hpp
   old_collocation_integrator.cpp
   old_collocation_integrator_internal.hpp

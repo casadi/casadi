@@ -21,7 +21,6 @@
  */
 
 #include <core/casadi.hpp>
-#include <interfaces/ipopt/ipopt_solver.hpp>
 #include <core/std_vector_tools.hpp>
 
 using namespace casadi;
@@ -41,7 +40,7 @@ int main(){
   ExternalFunction hess_lag("./hess_lag.casadi");
 
   // Create an NLP solver passing derivative information
-  IpoptSolver solver(nlp);
+  NLPSolver solver("ipopt", nlp);
   solver.setOption("grad_f",grad_f);
   solver.setOption("jac_g",jac_g);
   solver.setOption("hess_lag",hess_lag);

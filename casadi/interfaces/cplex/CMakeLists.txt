@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 include_directories(${CPLEX_INCLUDE_DIR})
 
-casadi_library(casadi_qpsolver_cplex
+casadi_library_swig(casadi_qpsolver_cplex
   cplex_solver.hpp
   cplex_solver.cpp
   cplex_internal.hpp

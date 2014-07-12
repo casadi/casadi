@@ -63,7 +63,7 @@ g = X[:2]
 
 # Allocate an NLP solver
 nlp = MXFunction(nlpIn(x=U),nlpOut(f=f,g=g))
-solver = IpoptSolver(nlp)
+solver = NLPSolver("ipopt", nlp)
 solver.init()
 
 # Set bounds and initial guess

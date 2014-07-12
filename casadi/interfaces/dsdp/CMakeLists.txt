@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 include_directories(${DSDP_INCLUDE_DIR})
 
-casadi_library(casadi_sdpsolver_dsdp
+casadi_library_swig(casadi_sdpsolver_dsdp
   dsdp_internal.hpp
   dsdp_internal.cpp
   dsdp_solver.hpp

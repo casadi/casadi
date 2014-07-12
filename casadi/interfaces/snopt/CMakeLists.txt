@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(../)
 include_directories(${SNOPT_INCLUDE_DIR})
 
-casadi_library(casadi_nlpsolver_snopt
+casadi_library_swig(casadi_nlpsolver_snopt
   snopt_internal.hpp
   snopt_internal.cpp
   snopt_solver.hpp

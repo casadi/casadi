@@ -69,7 +69,7 @@ for k in range(20):
 nlp = MXFunction(nlpIn(x=U),nlpOut(f=J,g=X))
 
 # Allocate an NLP solver
-solver = IpoptSolver(nlp)
+solver = NLPSolver("ipopt", nlp)
 solver.init()
 
 # Pass bounds, initial guess and solve NLP

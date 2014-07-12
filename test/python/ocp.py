@@ -52,7 +52,7 @@ class OCPtests(casadiTestCase):
     
     nlp = SXFunction(nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
     
-    solver = IpoptSolver(nlp)
+    solver = NLPSolver("ipopt", nlp)
     solver.setOption("tol",1e-5)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",100)
@@ -111,7 +111,7 @@ class OCPtests(casadiTestCase):
     f.init()
     nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
     nlp.init()
-    solver = IpoptSolver(nlp)
+    solver = NLPSolver("ipopt", nlp)
     solver.setOption("tol",1e-12)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",10)
@@ -170,7 +170,7 @@ class OCPtests(casadiTestCase):
     nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
     nlp.init()
     
-    solver = IpoptSolver(nlp)
+    solver = NLPSolver("ipopt", nlp)
     solver.setOption("tol",1e-12)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",10)

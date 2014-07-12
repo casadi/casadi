@@ -380,7 +380,7 @@ nlp = MXFunction(nlpIn(x=V),nlpOut(f=Obj,g=vertcat(g)))
 ## ----
   
 # Allocate an NLP solver
-solver = IpoptSolver(nlp)
+solver = NLPSolver("ipopt", nlp)
 
 # Set options
 solver.setOption("expand",True)

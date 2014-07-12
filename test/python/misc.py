@@ -84,8 +84,8 @@ class Misctests(casadiTestCase):
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x))
 
     try:
-        print "IpoptSolver"
-        g = IpoptSolver(nlp)
+        print "ipopt"
+        g = NLPSolver("ipopt", nlp)
     except:
         return
     
@@ -221,12 +221,12 @@ class Misctests(casadiTestCase):
     self.assertEqual(g.getInput(0),2)
     self.assertEqual(g.getOutput(),0)
 
-  @requires("IpoptSolver")
+  @requires("ipopt")
   def test_options_introspection(self):
     self.message("options introspection")
     x=SX.sym("x")
     nlp = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
-    i = IpoptSolver(nlp)
+    i = NLPSolver("ipopt", nlp)
     
     opts = i.getOptionNames()
     self.assertTrue(isinstance(opts,list))

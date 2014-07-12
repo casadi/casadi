@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(../)
 include_directories(${WORHP_INCLUDE_DIR})
 
-casadi_library(casadi_nlpsolver_worhp
+casadi_library_swig(casadi_nlpsolver_worhp
   worhp_internal.hpp
   worhp_internal.cpp
   worhp_solver.hpp

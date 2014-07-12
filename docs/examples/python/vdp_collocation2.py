@@ -199,7 +199,7 @@ nlp = MXFunction(nlpIn(x=V),nlpOut(f=f,g=g))
 ## ----
   
 # Allocate an NLP solver
-solver = IpoptSolver(nlp)
+solver = NLPSolver("ipopt", nlp)
 
 # Set options
 solver.setOption("expand",True)

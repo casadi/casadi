@@ -23,7 +23,7 @@
 #ifndef IPOPT_INTERNAL_HPP
 #define IPOPT_INTERNAL_HPP
 
-#include "ipopt_solver.hpp"
+#include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
 #include "casadi/core/function/nlp_solver_internal.hpp"
 
 /// \cond INTERNAL

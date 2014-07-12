@@ -2,7 +2,7 @@
 set(LINT_TARGETS)
 set(SPELL_TARGETS)
 
-macro(casadi_library name)
+macro(casadi_library_swig name)
   if(ENABLE_STATIC)
     add_library(${name} STATIC ${ARGN})
   endif()
@@ -41,6 +41,51 @@ macro(casadi_library name)
   add_spell_check_target(${name} "${ARGN}")
   set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
 endmacro()
+
+
+
+macro(casadi_library name)
+  if(ENABLE_STATIC)
+    add_library(${name} STATIC ${ARGN})
+  endif()
+  if(ENABLE_SHARED)
+    add_definitions(-DSHARED_LIBRARY)
+    if(NOT ENABLE_EXPORT_ALL)
+      add_compiler_export_flags()
+    endif()
+    add_library(${name} SHARED ${ARGN})
+  endif()
+  generate_export_header(${name})
+  
+  # Make sure the exported header is installed
+  file(RELATIVE_PATH RELPATH "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h")
+  get_filename_component(RELPATH ${RELPATH} PATH)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}_export.h
+  DESTINATION include/${RELPATH})
+  
+  if(NOT "${name}" STREQUAL "casadi_core")
+    target_link_libraries(${name} casadi_core)
+  endif()
+ 
+  install(TARGETS ${name}
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION lib
+  )
+  SET_TARGET_PROPERTIES(
+    ${name}
+  PROPERTIES
+    SOVERSION ${PACKAGE_SO_VERSION}
+  )
+  add_style_check_target(${name} "${ARGN}")
+  set(LINT_TARGETS ${LINT_TARGETS} "lint_${name}" PARENT_SCOPE)
+  add_spell_check_target(${name} "${ARGN}")
+  set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
+endmacro()
+
+
+
+
 
 add_subdirectory(core)  # needed by all except external_packages
 add_subdirectory(interfaces)             # needs external_packages

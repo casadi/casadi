@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.6)
 include_directories(../)
 include_directories(${OOQP_INCLUDE_DIRS})
 
-casadi_library(casadi_qpsolver_ooqp
+casadi_library_swig(casadi_qpsolver_ooqp
   ooqp_internal.hpp
   ooqp_internal.cpp
   ooqp_solver.hpp
