@@ -28,11 +28,22 @@
 
 namespace casadi {
 
-  /** \brief  Forward declaration of internal class
+/// \cond INTERNAL
 
-      @copydoc LinearSolver_doc
-  */
-  class LapackLUDenseInternal;
+  /// LU-Factorize dense matrix (lapack)
+  extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
+
+  /// Solve a system of equation using an LU-factorized matrix (lapack)
+  extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a,
+                          int *lda, int *ipiv, double *b, int *ldb, int *info);
+
+  /// Calculate col and row scaling
+  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
+                          double *colcnd, double *rowcnd, double *amax, int *info);
+
+  /// Equilibrate the system
+  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
+                          double *colcnd, double *rowcnd, double *amax, char *equed);
 
   /** \brief  LU LinearSolver with Lapack Interface
    * @copydoc LinearSolver_doc
@@ -55,49 +66,6 @@ namespace casadi {
    * therefore more expensive if A is invariant.
    *
    */
-  class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLUDense : public LinearSolver {
-  public:
-
-    /// Default (empty) constructor
-    LapackLUDense();
-
-    /// Create a linear solver given a sparsity pattern
-    explicit LapackLUDense(const Sparsity& sparsity, int nrhs=1);
-
-    /// Access functions of the node
-    LapackLUDenseInternal* operator->();
-    const LapackLUDenseInternal* operator->() const;
-
-    /// Static creator function
-#ifdef SWIG
-    %callback("%s_cb");
-#endif
-    static LinearSolver creator(const Sparsity& sp, int nrhs) { return LapackLUDense(sp, nrhs);}
-#ifdef SWIG
-    %nocallback;
-#endif
-
-  };
-
-/// \cond INTERNAL
-#ifndef SWIG
-
-  /// LU-Factorize dense matrix (lapack)
-  extern "C" void dgetrf_(int *m, int *n, double *a, int *lda, int *ipiv, int *info);
-
-  /// Solve a system of equation using an LU-factorized matrix (lapack)
-  extern "C" void dgetrs_(char* trans, int *n, int *nrhs, double *a,
-                          int *lda, int *ipiv, double *b, int *ldb, int *info);
-
-  /// Calculate col and row scaling
-  extern "C" void dgeequ_(int *m, int *n, double *a, int *lda, double *r, double *c,
-                          double *colcnd, double *rowcnd, double *amax, int *info);
-
-  /// Equilibrate the system
-  extern "C" void dlaqge_(int *m, int *n, double *a, int *lda, double *r, double *c,
-                          double *colcnd, double *rowcnd, double *amax, char *equed);
-
-  /// Internal class
   class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLUDenseInternal : public LinearSolverInternal {
   public:
     // Create a linear solver given a sparsity pattern and a number of right hand sides
@@ -153,10 +121,8 @@ namespace casadi {
 
   };
 
-#endif // SWIG
 /// \endcond
 
 } // namespace casadi
-
 
 #endif //LAPACK_LU_DENSE_HPP

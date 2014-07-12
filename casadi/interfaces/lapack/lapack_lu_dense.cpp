@@ -44,20 +44,6 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapacklu);
   }
 
-  LapackLUDense::LapackLUDense() {
-  }
-
-  LapackLUDense::LapackLUDense(const Sparsity& sparsity, int nrhs) : LinearSolver("lapacklu", sparsity, nrhs) {
-  }
-
-  LapackLUDenseInternal* LapackLUDense::operator->() {
-    return static_cast<LapackLUDenseInternal*>(Function::operator->());
-  }
-
-  const LapackLUDenseInternal* LapackLUDense::operator->() const {
-    return static_cast<const LapackLUDenseInternal*>(Function::operator->());
-  }
-
   LapackLUDenseInternal::LapackLUDenseInternal(const Sparsity& sparsity, int nrhs)
       : LinearSolverInternal(sparsity, nrhs) {
     // Equilibrate the matrix

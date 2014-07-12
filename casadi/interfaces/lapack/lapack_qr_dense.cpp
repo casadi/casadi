@@ -41,22 +41,6 @@ namespace casadi {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_lapackqr);
   }
 
-  LapackQRDense::LapackQRDense() {
-  }
-
-  LapackQRDense::LapackQRDense(const Sparsity& sparsity, int nrhs)
-    : LinearSolver("lapackqr", sparsity, nrhs) {
-    assignNode(new LapackQRDenseInternal(sparsity, nrhs));
-  }
-
-  LapackQRDenseInternal* LapackQRDense::operator->() {
-    return static_cast<LapackQRDenseInternal*>(Function::operator->());
-  }
-
-  const LapackQRDenseInternal* LapackQRDense::operator->() const {
-    return static_cast<const LapackQRDenseInternal*>(Function::operator->());
-  }
-
   LapackQRDenseInternal::LapackQRDenseInternal(const Sparsity& sparsity, int nrhs) :
       LinearSolverInternal(sparsity, nrhs) {
   }
