@@ -22,10 +22,6 @@
 
 #include <casadi/core/casadi.hpp>
 
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/interfaces/sundials/idas_integrator.hpp>
-#include <casadi/interfaces/csparse/csparse.hpp>
-
 #include <casadi/optimal_control/symbolic_ocp.hpp>
 #include <casadi/optimal_control/direct_multiple_shooting.hpp>
 
