@@ -53,7 +53,7 @@ namespace casadi {
 
   StabilizedSQPInternal::StabilizedSQPInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     casadi_warning("The SQP method is under development");
-    addOption("stabilized_qp_solver",         OT_STABILIZEDQPSOLVER,   GenericType(),
+    addOption("stabilized_qp_solver",         OT_STRING,   GenericType(),
               "The Stabilized QP solver to be used by the SQP method");
     addOption("stabilized_qp_solver_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the Stabilized QP solver");
@@ -172,10 +172,10 @@ namespace casadi {
     Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_)
         : jacG().output().sparsity();
 
-    StabilizedQPSolverCreator stabilized_qp_solver_creator = getOption("stabilized_qp_solver");
-    stabilized_qp_solver_ =
-        stabilized_qp_solver_creator(qpStruct("h", H_sparsity, "a", A_sparsity));
-
+    std::string stabilized_qp_solver_name = getOption("stabilized_qp_solver");
+    stabilized_qp_solver_ = StabilizedQPSolver(stabilized_qp_solver_name,
+                                               qpStruct("h", H_sparsity, "a", A_sparsity));
+    
     // Set options if provided
     if (hasSetOption("stabilized_qp_solver_options")) {
       Dictionary stabilized_qp_solver_options = getOption("stabilized_qp_solver_options");

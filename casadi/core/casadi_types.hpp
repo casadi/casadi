@@ -72,12 +72,6 @@ namespace casadi {
   /// Function pointer to a linear solver creator function
   typedef LinearSolver (*linearSolverCreator)(const Sparsity& sparsity, int nrhs);
 
-  /// Function pointer to a QP solver creator function
-  typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
-
-  /// Function pointer to a Stabilized QP solver creator function
-  typedef StabilizedQPSolver (*StabilizedQPSolverCreator)(const QPStructure& st);
-
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized
   const int optimized_num_dir = 64;

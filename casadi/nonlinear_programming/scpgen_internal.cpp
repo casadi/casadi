@@ -51,7 +51,7 @@ namespace casadi {
 
   SCPgenInternal::SCPgenInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     casadi_warning("SCPgen is under development");
-    addOption("qp_solver",         OT_QPSOLVER,   GenericType(),
+    addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the QP solver");
@@ -576,8 +576,9 @@ namespace casadi {
     qpB_.resize(ng_);
 
     // Allocate a QP solver
-    QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpStruct("h", qpH_.sparsity(), "a", qpA_.sparsity()));
+    std::string qp_solver_name = getOption("qp_solver");
+    qp_solver_ = QPSolver(qp_solver_name,
+                          qpStruct("h", qpH_.sparsity(), "a", qpA_.sparsity()));
 
     // Set options if provided
     if (hasSetOption("qp_solver_options")) {

@@ -62,7 +62,7 @@ int main(int argc, char **argv){
   // nlp_solver.setOption("derivative_test","second-order");
 
   // Specify QP solver
-  nlp_solver.setOption("qp_solver",NLPQPSolver::creator);
+  nlp_solver.setOption("qp_solver","nlp");
   Dictionary qp_solver_options;
   qp_solver_options["nlp_solver"] = "ipopt"; 
   Dictionary nlp_solver_options;

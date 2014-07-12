@@ -33,14 +33,14 @@ nlp = SXFunction([x,[]],[
 
 
 # Pick an NLP solver
-MySolver = IpoptSolver
-#MySolver = WorhpSolver
-#MySolver = SQPMethod
+MySolver = "ipopt"
+#MySolver = "worhp"
+#MySolver = "sqpmethod"
 
 # Allocate a solver
-solver = MySolver(nlp)
-if MySolver==SQPMethod:
-  solver.setOption("qp_solver",QPOasesSolver)
+solver = NLPSolver(MySolver, nlp)
+if MySolver=="sqpmethod":
+  solver.setOption("qp_solver","qpoases")
   solver.setOption("qp_solver_options",{"printLevel":"none"})
 solver.init()
 

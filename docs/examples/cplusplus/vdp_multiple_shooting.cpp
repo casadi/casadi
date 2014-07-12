@@ -23,13 +23,9 @@
 #include <casadi/core/casadi.hpp>
                                    
 // Solvers
-#include <casadi/integration/old_collocation_integrator.hpp>
-#include <casadi/nonlinear_programming/newton_implicit_solver.hpp>
 #include <casadi/optimal_control/direct_multiple_shooting.hpp>
 
 // 3rd party interfaces
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/interfaces/sundials/cvodes_integrator.hpp>
 #include <casadi/interfaces/csparse/csparse.hpp>
 
 bool use_old_collocation_integrator = false;
@@ -68,7 +64,7 @@ int main(){
   
   Dictionary integrator_options;
   if(use_old_collocation_integrator){
-    integrator_options["implicit_solver"] = NewtonImplicitSolver::creator;
+    integrator_options["implicit_solver"] = "newton";
     Dictionary implicit_solver_options;
     implicit_solver_options["linear_solver"] = CSparse::creator;
     integrator_options["implicit_solver_options"] = implicit_solver_options;

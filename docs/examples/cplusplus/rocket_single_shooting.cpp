@@ -168,7 +168,7 @@ int main(){
     solver.setOption("max_iter",100);
     
     // Use IPOPT as QP solver
-    solver.setOption("qp_solver",NLPQPSolver::creator);
+    solver.setOption("qp_solver","nlp");
     Dictionary qp_solver_options;
     qp_solver_options["nlp_solver"] = "ipopt";
     Dictionary ipopt_options;

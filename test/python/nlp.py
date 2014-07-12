@@ -32,40 +32,46 @@ import itertools
 solvers= []
  
 try:
+  NLPSolver.loadPlugin("worhp")
   solvers.append((WorhpSolver,{}))
   print "Will test WorhpSolver"
 except:
   pass
   
 try:
+  NLPSolver.loadPlugin("ipopt")
   solvers.append((IpoptSolver,{}))
   print "Will test IpoptSolver"
 except:
   pass
 
 try:
+  NLPSolver.loadPlugin("snopt")
   solvers.append((SnoptSolver,{"_verify_level": 3,"detect_linear": True,"_optimality_tolerance":1e-12,"_feasibility_tolerance":1e-12}))
   print "Will test SnoptSolver"
 except:
   pass
 
 try:
+  NLPSolver.loadPlugin("ipopt")
   qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12} }
-  solvers.append((SQPMethod,{"qp_solver": NLPQPSolver,"qp_solver_options": qp_solver_options}))
+  solvers.append((SQPMethod,{"qp_solver": "nlp","qp_solver_options": qp_solver_options}))
   print "Will test SQPMethod"
 except:
   pass
   
 try:
+  NLPSolver.loadPlugin("ipopt")
   qp_solver_options = {"nlp_solver": "ipopt", "nlp_solver_options": {"tol": 1e-12, "print_level": 0, "print_time": False} }
-  solvers.append((StabilizedSQPMethod,{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": QPStabilizer, "stabilized_qp_solver_options": {"qp_solver": NLPQPSolver, "qp_solver_options": qp_solver_options}}))
+  solvers.append((StabilizedSQPMethod,{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "nlp", "qp_solver_options": qp_solver_options}}))
   print "Will test Stabilized SQPMethod"
 except:
   pass
   
 try:
   qp_solver_options = {}
-  solvers.append((StabilizedSQPMethod,{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": QPStabilizer, "stabilized_qp_solver_options": {"qp_solver": SQICSolver}}))
+  QPSolver.loadPlugin("sqic")
+  solvers.append((StabilizedSQPMethod,{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "sqic"}}))
   print "Will test Stabilized SQPMethod"
 except:
   pass

@@ -52,7 +52,7 @@ namespace casadi {
 
   SQPInternal::SQPInternal(const Function& nlp) : NLPSolverInternal(nlp) {
     casadi_warning("The SQP method is under development");
-    addOption("qp_solver",         OT_QPSOLVER,   GenericType(),
+    addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver to be used by the SQP method");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the QP solver");
@@ -123,8 +123,9 @@ namespace casadi {
     Sparsity A_sparsity = jacG().isNull() ? Sparsity::sparse(0, nx_)
         : jacG().output().sparsity();
 
-    QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpStruct("h", H_sparsity, "a", A_sparsity));
+    std::string qp_solver_name = getOption("qp_solver");
+    qp_solver_ = QPSolver(qp_solver_name,
+                          qpStruct("h", H_sparsity, "a", A_sparsity));
 
     // Set options if provided
     if (hasSetOption("qp_solver_options")) {

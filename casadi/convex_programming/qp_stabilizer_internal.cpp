@@ -45,7 +45,7 @@ namespace casadi {
 
   QPStabilizerInternal::QPStabilizerInternal(const std::vector<Sparsity> &st)
       : StabilizedQPSolverInternal(st) {
-    addOption("qp_solver",         OT_QPSOLVER,   GenericType(),
+    addOption("qp_solver",         OT_STRING,   GenericType(),
               "The QP solver used to solve the stabilized QPs.");
     addOption("qp_solver_options", OT_DICTIONARY, GenericType(),
               "Options to be passed to the QP solver instance");
@@ -67,8 +67,9 @@ namespace casadi {
     // Form augmented QP
     Sparsity H_sparsity_qp = blkdiag(st_[QP_STRUCT_H], Sparsity::diag(nc_));
     Sparsity A_sparsity_qp = horzcat(st_[QP_STRUCT_A], Sparsity::diag(nc_));
-    QPSolverCreator qp_solver_creator = getOption("qp_solver");
-    qp_solver_ = qp_solver_creator(qpStruct("h", H_sparsity_qp, "a", A_sparsity_qp));
+    std::string qp_solver_name = getOption("qp_solver");
+    qp_solver_ = QPSolver(qp_solver_name,
+                          qpStruct("h", H_sparsity_qp, "a", A_sparsity_qp));
 
     // Pass options if provided
     if (hasSetOption("qp_solver_options")) {

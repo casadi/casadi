@@ -101,10 +101,6 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_DICTIONARY";
       case OT_LINEARSOLVER:
               return "OT_LINEARSOLVER";
-      case OT_QPSOLVER:
-              return "OT_QPSOLVER";
-      case OT_STABILIZEDQPSOLVER:
-              return "OT_STABILIZEDQPSOLVER";
       case OT_DERIVATIVEGENERATOR:
               return "OT_DERIVATIVEGENERATOR";
       case OT_CALLBACK:
@@ -365,27 +361,9 @@ GenericType::GenericType(linearSolverCreator ptr) : type_(OT_LINEARSOLVER) {
   assignNode(new GenericTypeInternal<linearSolverCreator >(ptr));
 }
 
-GenericType::GenericType(QPSolverCreator ptr) : type_(OT_QPSOLVER) {
-  assignNode(new GenericTypeInternal<QPSolverCreator>(ptr));
-}
-
-GenericType::GenericType(StabilizedQPSolverCreator ptr) : type_(OT_STABILIZEDQPSOLVER) {
-  assignNode(new GenericTypeInternal<StabilizedQPSolverCreator>(ptr));
-}
-
 GenericType::operator linearSolverCreator() const {
   casadi_assert_message(is_a<linearSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<linearSolverCreator>*>(get())->d_;
-}
-
-GenericType::operator QPSolverCreator() const {
-  casadi_assert_message(is_a<QPSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<QPSolverCreator>*>(get())->d_;
-}
-
-GenericType::operator StabilizedQPSolverCreator() const {
-  casadi_assert_message(is_a<StabilizedQPSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<StabilizedQPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator const DerivativeGenerator &() const {
