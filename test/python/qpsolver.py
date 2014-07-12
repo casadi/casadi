@@ -28,10 +28,12 @@ from helpers import *
 
 qpsolvers = []
 try:
+  NLPSolver.loadPlugin("ipopt")
   qpsolvers.append((NLPQPSolver,{"nlp_solver":"ipopt", "nlp_solver_options": {"tol": 1e-12}}))
 except:
   pass
 try:
+  NLPSolver.loadPlugin("worhp")
   qpsolvers.append((NLPQPSolver,{"nlp_solver": "worhp", "nlp_solver_options": {"TolOpti": 1e-12}}))
   pass
 except:

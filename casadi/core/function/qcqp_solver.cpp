@@ -48,4 +48,8 @@ namespace casadi {
     assignNode(QCQPSolverInternal::getPlugin(name).creator(st));
   }
 
+  void QCQPSolver::loadPlugin(const std::string& name) {
+    QCQPSolverInternal::loadPlugin(name);
+  }
+
 } // namespace casadi

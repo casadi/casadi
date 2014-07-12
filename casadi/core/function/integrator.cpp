@@ -81,5 +81,9 @@ namespace casadi {
     return (*this)->getAugmented(nfwd, nadj, offset);
   }
 
+  void Integrator::loadPlugin(const std::string& name) {
+    IntegratorInternal::loadPlugin(name);
+  }
+
 } // namespace casadi
 

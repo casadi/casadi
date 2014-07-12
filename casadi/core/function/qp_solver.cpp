@@ -60,6 +60,10 @@ namespace casadi {
     assignNode(QPSolverInternal::getPlugin(name).creator(st));
   }
 
+  void QPSolver::loadPlugin(const std::string& name) {
+    QPSolverInternal::loadPlugin(name);
+  }
+
 } // namespace casadi
 
 

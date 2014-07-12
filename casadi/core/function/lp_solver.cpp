@@ -44,4 +44,8 @@ namespace casadi {
     assignNode(LPSolverInternal::getPlugin(name).creator(st));
   }
 
+  void LPSolver::loadPlugin(const std::string& name) {
+    LPSolverInternal::loadPlugin(name);
+  }
+
 } // namespace casadi

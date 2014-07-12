@@ -205,6 +205,9 @@ namespace casadi {
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
+    /// Load a plugin dynamically
+    static void loadPlugin(const std::string& name);
+
     /// Prints out a human readable report about possible constraint violations, after solving
     void reportConstraints(std::ostream &stream=std::cout);
 

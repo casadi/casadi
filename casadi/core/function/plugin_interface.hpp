@@ -77,6 +77,12 @@ namespace casadi {
 
   template<class Derived>
   void PluginInterface<Derived>::loadPlugin(const std::string& name) {
+    // Issue warning and quick return if already loaded
+    if (Derived::solvers_.find(name) != Derived::solvers_.end()) {
+      casadi_warning("PluginInterface: Solver " + name + " is already in use. Ignored.");
+      return;
+    }
+
 #ifndef WITH_DL
     casadi_error("WITH_DL option needed for dynamic loading");
 #else // WITH_DL
@@ -99,7 +105,7 @@ namespace casadi {
     if (reg==0) throw CasadiException("PluginInterface::loadPlugin: no \"" + regName + "\" found");
 #else // _WIN32
   handle  = dlopen(lib.c_str(), RTLD_LAZY);
-  casadi_assert_message(handle!=0, "FunctionInternal::loadPlugin: Cannot open function: "
+  casadi_assert_message(handle!=0, "PluginInterface::loadPlugin: Cannot open function: "
                         << lib << ". error code: "<< dlerror());
 
   // reset error
@@ -126,8 +132,8 @@ namespace casadi {
 
     // Check if the solver name is in use
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(plugin.name);
-             casadi_assert_message(it==Derived::solvers_.end(),
-                                   "Solver " << plugin.name << " is already in use");
+    casadi_assert_message(it==Derived::solvers_.end(),
+                          "Solver " << plugin.name << " is already in use");
 
     // Add to list of solvers
     Derived::solvers_[plugin.name] = plugin;

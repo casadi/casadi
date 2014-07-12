@@ -191,6 +191,8 @@ namespace casadi {
     } // constrained/unconstrained
   }
 
+  void NLPSolver::loadPlugin(const std::string& name) {
+    NLPSolverInternal::loadPlugin(name);
+  }
 
 } // namespace casadi
-

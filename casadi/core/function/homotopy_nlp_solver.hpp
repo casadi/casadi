@@ -83,6 +83,9 @@ namespace casadi {
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
+    /// Load a plugin dynamically
+    static void loadPlugin(const std::string& name);
+
   };
 
 } // namespace casadi

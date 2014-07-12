@@ -28,96 +28,99 @@
 
 /** \defgroup LPSolver_doc
 
-  Solves the following linear problem:
+    Solves the following linear problem:
 
-  \verbatim
-  min          c' x
-   x
+    \verbatim
+    min          c' x
+    x
 
-  subject to
-              LBA <= A x <= UBA
-              LBX <= x   <= UBX
+    subject to
+    LBA <= A x <= UBA
+    LBX <= x   <= UBX
 
-      with x ( n x 1)
-           c ( n x 1 )
-           A sparse matrix ( nc x n)
-           LBA, UBA dense vector (nc x 1)
-           LBX, UBX dense vector (n x 1)
+    with x ( n x 1)
+    c ( n x 1 )
+    A sparse matrix ( nc x n)
+    LBA, UBA dense vector (nc x 1)
+    LBX, UBX dense vector (n x 1)
 
-      n: number of decision variables (x)
-      nc: number of constraints (A)
+    n: number of decision variables (x)
+    nc: number of constraints (A)
 
-  \endverbatim
+    \endverbatim
 
 
 */
 
 namespace casadi {
 
-/// Input arguments of a LP problem [lpIn]
-enum LPSolverInput {
-  /// The vector c: dense (n x 1) [c]
-  LP_SOLVER_C,
-  /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
-  LP_SOLVER_A,
-  /// dense, (nc x 1) [lba]
-  LP_SOLVER_LBA,
-  /// dense, (nc x 1) [uba]
-  LP_SOLVER_UBA,
-  /// dense, (n x 1) [lbx]
-  LP_SOLVER_LBX,
-  /// dense, (n x 1) [ubx]
-  LP_SOLVER_UBX,
-  LP_SOLVER_NUM_IN};
+  /// Input arguments of a LP problem [lpIn]
+  enum LPSolverInput {
+    /// The vector c: dense (n x 1) [c]
+    LP_SOLVER_C,
+    /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
+    LP_SOLVER_A,
+    /// dense, (nc x 1) [lba]
+    LP_SOLVER_LBA,
+    /// dense, (nc x 1) [uba]
+    LP_SOLVER_UBA,
+    /// dense, (n x 1) [lbx]
+    LP_SOLVER_LBX,
+    /// dense, (n x 1) [ubx]
+    LP_SOLVER_UBX,
+    LP_SOLVER_NUM_IN};
 
-/// Output arguments of an LP Solver [lpOut]
-enum LPSolverOutput {
-  /// The primal solution [x]
-  LP_SOLVER_X,
-  /// The optimal cost [cost]
-  LP_SOLVER_COST,
-  /// The dual solution corresponding to linear bounds [lam_a]
-  LP_SOLVER_LAM_A,
-  /// The dual solution corresponding to simple bounds [lam_x]
-  LP_SOLVER_LAM_X,
-  LP_SOLVER_NUM_OUT};
+  /// Output arguments of an LP Solver [lpOut]
+  enum LPSolverOutput {
+    /// The primal solution [x]
+    LP_SOLVER_X,
+    /// The optimal cost [cost]
+    LP_SOLVER_COST,
+    /// The dual solution corresponding to linear bounds [lam_a]
+    LP_SOLVER_LAM_A,
+    /// The dual solution corresponding to simple bounds [lam_x]
+    LP_SOLVER_LAM_X,
+    LP_SOLVER_NUM_OUT};
 
-/// Structure specification of an LP [lpStruct]
-enum LPStruct {
-  /// The matrix A: sparse [a]
-  LP_STRUCT_A,
-  LP_STRUCT_NUM};
+  /// Structure specification of an LP [lpStruct]
+  enum LPStruct {
+    /// The matrix A: sparse [a]
+    LP_STRUCT_A,
+    LP_STRUCT_NUM};
 
-// Forward declaration of internal class
-class LPSolverInternal;
+  // Forward declaration of internal class
+  class LPSolverInternal;
 
-/** \brief LPSolver
+  /** \brief LPSolver
 
 
-@copydoc LPSolver_doc
+      @copydoc LPSolver_doc
 
-  \author Joris Gillis
-  \date 2013
-*/
-class CASADI_CORE_EXPORT LPSolver : public Function {
+      \author Joris Gillis
+      \date 2013
+  */
+  class CASADI_CORE_EXPORT LPSolver : public Function {
   public:
 
-  /// Default constructor
-  LPSolver();
+    /// Default constructor
+    LPSolver();
 
-  /** \brief Constructor
-   *  \param st Problem structure
-   *  \copydoc scheme_LPStruct
-   */
-  LPSolver(const std::string& name, const LPStructure& st);
+    /** \brief Constructor
+     *  \param st Problem structure
+     *  \copydoc scheme_LPStruct
+     */
+    LPSolver(const std::string& name, const LPStructure& st);
 
-  /// Access functions of the node
-  LPSolverInternal* operator->();
-  const LPSolverInternal* operator->() const;
+    /// Access functions of the node
+    LPSolverInternal* operator->();
+    const LPSolverInternal* operator->() const;
 
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
-};
+    /// Check if the node is pointing to the right type of object
+    virtual bool checkNode() const;
+
+    /// Load a plugin dynamically
+    static void loadPlugin(const std::string& name);
+  };
 
 } // namespace casadi
 

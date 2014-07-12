@@ -48,4 +48,8 @@ namespace casadi {
     assignNode(SDPSolverInternal::getPlugin(name).creator(st));
   }
 
+  void SDPSolver::loadPlugin(const std::string& name) {
+    SDPSolverInternal::loadPlugin(name);
+  }
+
 } // namespace casadi
