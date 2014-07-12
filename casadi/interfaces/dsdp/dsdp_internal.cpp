@@ -300,7 +300,7 @@ namespace casadi {
     DSDPSetup(dsdp_);
     int info = DSDPSolve(dsdp_);
 
-    casadi_assert_message(info==0, "DSDPSolver failed");
+    casadi_assert_message(info==0, "DSDPInternal failed");
 
     // Get termination reason
     DSDPTerminationReason reason;
