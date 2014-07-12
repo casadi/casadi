@@ -20,7 +20,7 @@ target_link_libraries(casadi_integrator_idas casadi_integrator_cvodes)
 
 # KINSOL
 casadi_library_swig(casadi_implicitfunction_kinsol 
-   kinsol_internal.hpp    kinsol_internal.cpp    kinsol_solver.hpp        kinsol_solver.cpp)
+   kinsol_internal.hpp    kinsol_internal.cpp)
 target_link_libraries(casadi_implicitfunction_kinsol ${SUNDIALS_LIBRARIES})
 
 install(DIRECTORY ./

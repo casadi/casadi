@@ -44,6 +44,25 @@ namespace casadi {
     ImplicitFunctionInternal::registerPlugin(casadi_register_implicitfunction_kinsol);
   }
 
+  /** \brief Kinsol solver class
+   *
+   * @copydoc ImplicitFunction_doc
+   * You can provide an initial guess by setting output(0).\n
+   * A good initial guess may be needed to avoid errors like
+   * "The linear solver's setup function failed in an unrecoverable manner."
+   *
+   The constraints option expects an integer entry for each variable u:\n
+
+   0 then no constraint is imposed on \p ui. \n
+   1 then \p ui will be constrained to be \p ui >= 0.0. \n
+   −1 then \p ui will be constrained to be \p ui <= 0.0. \n
+   2 then \p ui will be constrained to be \p ui > 0.0. \n
+   −2 then \p ui will be constrained to be \p ui < 0.0. \n
+
+   *
+   * \see ImplicitFunction for more information
+   *
+   */
   KinsolInternal::KinsolInternal(const Function& f, const Function& jac,
                                  const LinearSolver& linsol)
       : ImplicitFunctionInternal(f, jac, linsol) {

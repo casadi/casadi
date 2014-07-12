@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* casadi::kinsolSolver();
+* casadi::ImplicitFunction();
 * \endcode
 *
 */
