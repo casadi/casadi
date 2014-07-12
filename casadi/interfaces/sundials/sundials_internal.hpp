@@ -23,7 +23,7 @@
 #ifndef SUNDIALS_INTERNAL_HPP
 #define SUNDIALS_INTERNAL_HPP
 
-#include "sundials_integrator.hpp"
+#include <casadi/interfaces/sundials/casadi_sundials_common_export.h>
 #include "casadi/core/function/integrator_internal.hpp"
 
 #include <nvector/nvector_serial.h>

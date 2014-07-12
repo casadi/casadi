@@ -49,7 +49,7 @@ if coll:
     {'linear_solver' : CSparse})
   integrator.setOption("expand_f",True)
 else:
-  integrator = CVodesIntegrator(dae)
+  integrator = Integrator("cvodes", dae)
   integrator.setOption("abstol",1e-8) # tolerance
   integrator.setOption("reltol",1e-8) # tolerance
   integrator.setOption("steps_per_checkpoint",1000)

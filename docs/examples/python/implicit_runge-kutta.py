@@ -148,7 +148,7 @@ irk_integrator.setOption("name","irk_integrator")
 irk_integrator.init()
 
 # Create a convensional integrator for reference
-ref_integrator = CVodesIntegrator(f)
+ref_integrator = Integrator("cvodes", f)
 ref_integrator.setOption("name","ref_integrator")
 ref_integrator.setOption("tf",tf)
 ref_integrator.init()

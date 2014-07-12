@@ -214,7 +214,7 @@ rhs["Wt"]  = mul([eAt,B,B.T,eAt.T])
 dae = SXFunction(daeIn(x=states),daeOut(ode=rhs))
 dae.init()
 
-integrator = CVodesIntegrator(dae)
+integrator = Integrator("cvodes", dae)
 integrator.setOption("tf",t1)
 integrator.setOption("reltol",1e-12)
 integrator.init()
@@ -299,7 +299,7 @@ dae = SXFunction(daeIn(x=vec(P)),daeOut(ode=vec(ric)))
 dae.init()
 
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
-integrator = CVodesIntegrator(dae)
+integrator = Integrator("cvodes", dae)
 integrator.setOption("reltol",1e-16)
 integrator.setOption("stop_at_end",False)
 integrator.init()
@@ -347,7 +347,7 @@ print "Open-loop eigenvalues: ", D
 dae = SXFunction(daeIn(x = vec(P)),daeOut(ode=vec(-ric)))
 dae.init()
 
-integrator = CVodesIntegrator(dae)
+integrator = Integrator("cvodes", dae)
 integrator.setOption("reltol",1e-16)
 integrator.setOption("stop_at_end",False)
 integrator.init()

@@ -7,20 +7,16 @@ if(PRECOND_TEST)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPRECOND_TEST")
 endif()
 
-# Common for CVODES and IDAS
-casadi_library_swig(casadi_sundials_common 
-  sundials_internal.hpp  sundials_internal.cpp  sundials_integrator.hpp  sundials_integrator.cpp)
-target_link_libraries(casadi_sundials_common ${SUNDIALS_LIBRARIES})
-
 # CVODES
-casadi_library_swig(casadi_integrator_cvodes
-  cvodes_internal.hpp    cvodes_internal.cpp    cvodes_integrator.hpp    cvodes_integrator.cpp)
-target_link_libraries(casadi_integrator_cvodes casadi_sundials_common)
+casadi_library(casadi_integrator_cvodes
+  sundials_internal.hpp  sundials_internal.cpp
+  cvodes_internal.hpp    cvodes_internal.cpp)
+target_link_libraries(casadi_integrator_cvodes ${SUNDIALS_LIBRARIES})
 
 # IDAS
-casadi_library_swig(casadi_integrator_idas
-  idas_internal.hpp      idas_internal.cpp      idas_integrator.hpp      idas_integrator.cpp)
-target_link_libraries(casadi_integrator_idas casadi_sundials_common)
+casadi_library(casadi_integrator_idas
+  idas_internal.hpp      idas_internal.cpp)
+target_link_libraries(casadi_integrator_idas casadi_integrator_cvodes)
 
 # KINSOL
 casadi_library_swig(casadi_implicitfunction_kinsol 

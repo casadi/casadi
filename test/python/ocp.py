@@ -87,7 +87,7 @@ class OCPtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes", f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",False)
@@ -146,7 +146,7 @@ class OCPtests(casadiTestCase):
     f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     f.init()
     
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes", f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",False)

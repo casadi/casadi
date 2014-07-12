@@ -86,7 +86,7 @@ print j
 #! It is impossible to lambda from the last element of the residual.
 
 #! We create a DAE system solver
-I = IdasIntegrator(f)
+I = Integrator("idas", f)
 I.setOption("calc_ic",False)
 I.setOption("init_xdot",XDOT_)
   
@@ -138,7 +138,7 @@ print array(j.getOutput())
 #! $\frac{dg}{dy}$ is invertible this time.
 
 #! We create a DAE system solver
-I = IdasIntegrator(f)
+I = Integrator("idas", f)
 
 I.setOption('t0',0)
 I.setOption('tf',1)

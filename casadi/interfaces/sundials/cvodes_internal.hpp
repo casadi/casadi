@@ -23,7 +23,7 @@
 #ifndef CVODES_INTERNAL_HPP
 #define CVODES_INTERNAL_HPP
 
-#include "cvodes_integrator.hpp"
+#include <casadi/interfaces/sundials/casadi_integrator_cvodes_export.h>
 #include "sundials_internal.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 #include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
@@ -43,7 +43,6 @@ namespace casadi {
   @copydoc DAE_doc
 */
 class CASADI_INTEGRATOR_CVODES_EXPORT CVodesInternal : public SundialsInternal {
-  friend class CVodesIntegrator;
 public:
   /** \brief  Constructor */
   explicit CVodesInternal(const Function& f, const Function& g);

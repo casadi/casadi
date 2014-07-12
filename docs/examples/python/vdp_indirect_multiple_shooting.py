@@ -78,7 +78,7 @@ tf = 10.0
 num_nodes = 20
 
 # Create an integrator (CVodes)
-I = CVodesIntegrator(rhs)
+I = Integrator("cvodes", rhs)
 I.setOption("abstol",1e-8) # abs. tolerance
 I.setOption("reltol",1e-8) # rel. tolerance
 I.setOption("t0",0.0)

@@ -70,7 +70,7 @@ rhs_in = daeIn(x=vertcat((x,lam)))
 rhs = SXFunction(rhs_in,daeOut(ode=f))
 
 # Create an integrator (CVodes)
-I = CVodesIntegrator(rhs)
+I = Integrator("cvodes", rhs)
 I.setOption("abstol",1e-8) # abs. tolerance
 I.setOption("reltol",1e-8) # rel. tolerance
 I.setOption("t0",0.0)

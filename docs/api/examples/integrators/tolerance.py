@@ -40,7 +40,7 @@ tolerances = [-10,-5,-4,-3,-2,-1]
 figure()
 
 for tol in tolerances:
-  integrator = CVodesIntegrator(f)
+  integrator = Integrator("cvodes", f)
   integrator.setOption("reltol",10.0**tol)
   integrator.setOption("abstol",10.0**tol)
   integrator.init()
@@ -62,7 +62,7 @@ tolerances = logspace(-15,1,500)
 endresult=[]
 
 for tol in tolerances:
-  integrator = CVodesIntegrator(f)
+  integrator = Integrator("cvodes", f)
   integrator.setOption("reltol",tol)
   integrator.setOption("abstol",tol)
   integrator.setOption("tf",tend)

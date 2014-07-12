@@ -156,11 +156,11 @@ int main(){
       switch(integrator){
       case CVODES:
         if(problem==DAE) continue; // Skip if DAE
-        cout << endl << "== CVodesIntegrator == " << endl;
+        cout << endl << "== cvodes == " << endl;
         I = Integrator("cvodes", ffcn);
         break;
       case IDAS:
-        cout << endl << "== IdasIntegrator == " << endl;
+        cout << endl << "== idas == " << endl;
         I = Integrator("idas", ffcn);
         break;
       case RK:

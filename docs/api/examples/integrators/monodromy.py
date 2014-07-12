@@ -52,7 +52,7 @@ t = SX.sym("t")
 cf=SXFunction(controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
 cf.init()
 
-integrator = CVodesIntegrator(f)
+integrator = Integrator("cvodes", f)
 integrator.setOption("tf",tf)
 integrator.setOption("reltol",1e-10)
 integrator.setOption("abstol",1e-10)

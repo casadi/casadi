@@ -23,7 +23,7 @@
 #ifndef IDAS_INTERNAL_HPP
 #define IDAS_INTERNAL_HPP
 
-#include "idas_integrator.hpp"
+#include <casadi/interfaces/sundials/casadi_integrator_idas_export.h>
 #include "sundials_internal.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
@@ -40,10 +40,10 @@
 namespace casadi {
 
 /**
-@copydoc IdasIntegrator_doc
+* \defgroup IdasInternal_doc
+  @copydoc DAE_doc
 */
 class CASADI_INTEGRATOR_IDAS_EXPORT IdasInternal : public SundialsInternal {
-  friend class IdasIntegrator;
 
   public:
 

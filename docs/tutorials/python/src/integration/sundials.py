@@ -37,8 +37,8 @@ f  = SXFunction([vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! f(time;states;parameters)
 fmod=SXFunction(daeIn(x=f.inputExpr(0),p=f.inputExpr(1)),daeOut(ode=f.outputExpr(0)))
 fmod.setOption("name","ODE right hand side")
-#! Create the CVodesIntegrator
-integrator = CVodesIntegrator(fmod)
+#! Create the Integrator
+integrator = Integrator("cvodes", fmod)
 #! The whole series of sundials options are available for the user
 integrator.setOption("fsens_err_con",True)
 integrator.setOption("quad_err_con",True)
@@ -203,7 +203,7 @@ show()
 
 #! Symbolic intergator results
 #! ---------------------------
-#! Since CVodesIntegrator is just another Function, 
+#! Since Integrator is just another Function, 
 #! the usual CasADi rules for symbolic evaluation are active.
 #!
 #! We create an MX 'w' that contains the result of a time integration with:

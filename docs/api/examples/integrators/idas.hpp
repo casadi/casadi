@@ -1,12 +1,12 @@
 /** 
-* This example looks at the use of casadi::IdasIntegrator();
+* This example looks at the use of casadi::Integrator();
 *
 *
 * \pythonexample{integrators/idas}
 *
 * \sa
 * \code
-* casadi::IdasIntegrator();
+* casadi::Integrator();
 * \endcode
 *
 */

@@ -513,7 +513,7 @@ class typemaptests(casadiTestCase):
     f=SXFunction(daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
     f.init()
    
-    integrator = CVodesIntegrator(f)
+    integrator = Integrator("cvodes", f)
     integrator.setOption("fsens_scaling_factors",[5.0,7])
     integrator.setOption("fsens_scaling_factors",[])
     
