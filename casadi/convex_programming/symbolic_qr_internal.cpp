@@ -21,8 +21,8 @@
  */
 
 #include "symbolic_qr_internal.hpp"
-#include "../sx/sx_tools.hpp"
-#include "sx_function.hpp"
+#include "casadi/core/sx/sx_tools.hpp"
+#include "casadi/core/function/sx_function.hpp"
 
 #ifdef WITH_DL
 #include <cstdlib>
@@ -32,7 +32,7 @@ using namespace std;
 namespace casadi {
 
   extern "C"
-  int CASADI_CORE_EXPORT
+  int CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT
   casadi_register_linearsolver_symbolicqr(LinearSolverInternal::Plugin* plugin) {
     plugin->creator = SymbolicQRInternal::creator;
     plugin->name = "symbolicqr";
@@ -42,7 +42,7 @@ namespace casadi {
   }
 
   extern "C"
-  void CASADI_CORE_EXPORT casadi_load_linearsolver_symbolicqr() {
+  void CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT casadi_load_linearsolver_symbolicqr() {
     LinearSolverInternal::registerPlugin(casadi_register_linearsolver_symbolicqr);
   }
 

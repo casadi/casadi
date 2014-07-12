@@ -50,7 +50,7 @@ except:
 integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18}))
 
 integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
-#integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": CSparse}}))
+#integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": "csparse"}}))
 integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
 
 print "Will test these integrators:"
@@ -105,7 +105,7 @@ class Integrationtests(casadiTestCase):
     
     for integrator in [
          explicitRK(f,tf,4,10),
-         implicitRK(f,"newton",{"linear_solver": CSparse},tf,4,"radau",10)
+         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",10)
        ]:
       integrator.init()
       
@@ -136,7 +136,7 @@ class Integrationtests(casadiTestCase):
     tf = 1
     for integrator in [
          explicitRK(f,tf,4,500),
-         implicitRK(f,"newton",{"linear_solver": CSparse},tf,4,"radau",50)
+         implicitRK(f,"newton",{"linear_solver": "csparse"},tf,4,"radau",50)
        ]:
       integrator.init()
       
@@ -232,7 +232,7 @@ class Integrationtests(casadiTestCase):
             def itoptions(post=""):
               yield {"iterative_solver"+post: "gmres"}
               yield {"iterative_solver"+post: "bcgstab"}
-              yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : CSparse} # Bug in Sundials? Preconditioning seems to be needed
+              yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
              
             def solveroptions(post=""):
               yield {"linear_solver_type" +post: "dense" }
@@ -241,7 +241,7 @@ class Integrationtests(casadiTestCase):
               #  d.update(it)
               #  yield d
               #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
-              yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: CSparse }
+              yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
                 
             for a_options in solveroptions("B"):
               for f_options in solveroptions():
@@ -342,7 +342,7 @@ class Integrationtests(casadiTestCase):
           def itoptions(post=""):
             yield {"iterative_solver"+post: "gmres"}
             yield {"iterative_solver"+post: "bcgstab"}
-            yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : CSparse} # Bug in Sundials? Preconditioning seems to be needed
+            yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : "csparse"} # Bug in Sundials? Preconditioning seems to be needed
            
           def solveroptions(post=""):
             yield {"linear_solver_type" +post: "dense" }
@@ -351,7 +351,7 @@ class Integrationtests(casadiTestCase):
               d.update(it)
               yield d
             #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
-            yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: CSparse }
+            yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: "csparse" }
               
           for a_options in solveroptions("B"):
             for f_options in solveroptions():

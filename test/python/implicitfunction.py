@@ -28,15 +28,19 @@ from helpers import *
 
 solvers= []
 try:
-  solvers.append((KinsolSolver,{"linear_solver": CSparse,"abstol":1e-10}))
+  LinearSolver.loadPlugin("csparse")
+  solvers.append((KinsolSolver,{"linear_solver": "csparse","abstol":1e-10}))
 except:
   pass
 try:
-  solvers.append((NLPImplicitSolver,{"linear_solver": CSparse,"nlp_solver": "ipopt"}))
+  LinearSolver.loadPlugin("csparse")
+  NLPSolver.loadPlugin("ipopt")
+  solvers.append((NLPImplicitSolver,{"linear_solver": "csparse", "nlp_solver": "ipopt"}))
 except:
   pass
 try:
-  solvers.append((NewtonImplicitSolver,{"linear_solver": CSparse}))
+  LinearSolver.loadPlugin("csparse")
+  solvers.append((NewtonImplicitSolver,{"linear_solver": "csparse"}))
 except:
   pass
 
@@ -229,7 +233,7 @@ class NLPtests(casadiTestCase):
 
     # Create a implicit function instance to solve the system of equations
     ifcn = NewtonImplicitSolver(vfcn_sx)
-    ifcn.setOption("linear_solver",CSparse)
+    ifcn.setOption("linear_solver","csparse")
     ifcn.init()
 
     #ifcn = MXFunction([X0],[vertcat([X0])])

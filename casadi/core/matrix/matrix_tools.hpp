@@ -283,8 +283,8 @@ namespace casadi {
   /** \brief Solve a system of equations: A*x = b
   */
   CASADI_CORE_EXPORT Matrix<double> solve(const Matrix<double>& A, const Matrix<double>& b,
-                                              linearSolverCreator lsolver,
-                                              const Dictionary& dict = Dictionary());
+                                          const std::string& lsolver,
+                                          const Dictionary& dict = Dictionary());
 
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
@@ -293,7 +293,7 @@ namespace casadi {
   * If the matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
   *
   */
-  CASADI_CORE_EXPORT Matrix<double> pinv(const Matrix<double>& A, linearSolverCreator lsolver,
+  CASADI_CORE_EXPORT Matrix<double> pinv(const Matrix<double>& A, const std::string& lsolver,
                                              const Dictionary& dict = Dictionary());
 
   /** \brief Kronecker tensor product

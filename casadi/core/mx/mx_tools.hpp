@@ -28,7 +28,6 @@
 #include "../matrix/generic_matrix_tools.hpp"
 #include "../matrix/generic_expression_tools.hpp"
 #include "../function/linear_solver.hpp"
-#include "../function/symbolic_qr.hpp"
 
 namespace casadi {
 
@@ -401,8 +400,8 @@ namespace casadi {
   /** \brief Solve a system of equations: A*x = b
   */
   CASADI_CORE_EXPORT MX
-    solve(const MX& A, const MX& b, linearSolverCreator lsolver = SymbolicQR::creator,
-          const Dictionary& dict = Dictionary());
+  solve(const MX& A, const MX& b, const std::string& lsolver = "symbolicqr",
+        const Dictionary& dict = Dictionary());
 
   /** \brief Computes the Moore-Penrose pseudo-inverse
   *
@@ -410,7 +409,7 @@ namespace casadi {
   * If the matrix A is slender (size2<size1), mul(pinv(A), A) is unity.
   *
   */
-  CASADI_CORE_EXPORT MX pinv(const MX& A, linearSolverCreator lsolver,
+  CASADI_CORE_EXPORT MX pinv(const MX& A, const std::string& lsolver,
                                  const Dictionary& dict = Dictionary());
 
 /** @}

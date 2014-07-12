@@ -980,14 +980,14 @@ namespace casadi {
     return blockcat(blocks);
   }
 
-  MX solve(const MX& A, const MX& b, linearSolverCreator lsolver, const Dictionary& dict) {
-    LinearSolver mysolver = lsolver(A.sparsity(), b.size2());
+  MX solve(const MX& A, const MX& b, const std::string& lsolver, const Dictionary& dict) {
+    LinearSolver mysolver(lsolver,A.sparsity(), b.size2());
     mysolver.setOption(dict);
     mysolver.init();
     return mysolver.solve(A, b, false);
   }
 
-  MX pinv(const MX& A, linearSolverCreator lsolver, const Dictionary& dict) {
+  MX pinv(const MX& A, const std::string& lsolver, const Dictionary& dict) {
     if (A.size1()>=A.size2()) {
       return solve(mul(A.T(), A), A.T(), lsolver, dict);
     } else {

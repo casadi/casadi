@@ -27,9 +27,6 @@
 
 #include <casadi/core/casadi.hpp>
 #include <casadi/integration/integration_tools.hpp>
-#include <casadi/nonlinear_programming/newton_implicit_solver.hpp>
-#include <casadi/interfaces/csparse/csparse.hpp>
-#include <casadi/interfaces/sundials/cvodes_integrator.hpp>
 #include <iomanip>
 
 using namespace casadi;
@@ -132,8 +129,8 @@ int main(){
   SXFunction vfcn_sx(vfcn);
 
   // Create a implicit function instance to solve the system of equations
-  NewtonImplicitSolver ifcn(vfcn_sx);
-  ifcn.setOption("linear_solver",CSparse::creator);
+  ImplicitFunction ifcn("newton", vfcn_sx);
+  ifcn.setOption("linear_solver", "csparse");
   ifcn.init();
   vector<MX> ifcn_arg;
   ifcn_arg.push_back(MX());
@@ -169,7 +166,7 @@ int main(){
   irk_integrator.init();
 
   // Create a convensional integrator for reference
-  CVodesIntegrator ref_integrator(f);
+  Integrator ref_integrator("cvodes", f);
   ref_integrator.setOption("name","ref_integrator");
   ref_integrator.setOption("tf",tf);
   ref_integrator.init();

@@ -30,13 +30,15 @@ import time
 
 dplesolvers = []
 try:
-  dplesolvers.append((PsdIndefDpleSolver,{"linear_solver": CSparse}))
+  LinearSolver.loadPlugin("csparse")
+  dplesolvers.append((PsdIndefDpleSolver,{"linear_solver": "csparse"}))
 except:
   pass
   
   
 try:
-  dplesolvers.append((SimpleIndefDpleSolver,{"linear_solver": CSparse}))
+  LinearSolver.loadPlugin("csparse")
+  dplesolvers.append((SimpleIndefDpleSolver,{"linear_solver": "csparse"}))
 except:
   pass
   
@@ -81,7 +83,7 @@ class ControlTests(casadiTestCase):
           A_total = DMatrix.eye(n*n*K) - vertcat([AA[-n*n:,:],AA[:-n*n,:]])
           
           
-          Pf = solve(A_total,vec(Vss),CSparse)
+          Pf = solve(A_total,vec(Vss),"csparse")
           P = Pf.reshape((n,K*n))
           
           refsol = MXFunction([As,Vs],[P])

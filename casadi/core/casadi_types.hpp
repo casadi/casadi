@@ -69,9 +69,6 @@ namespace casadi {
   class CustomEvaluate;
   class CustomFunction;
 
-  /// Function pointer to a linear solver creator function
-  typedef LinearSolver (*linearSolverCreator)(const Sparsity& sparsity, int nrhs);
-
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized
   const int optimized_num_dir = 64;

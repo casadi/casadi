@@ -2311,9 +2311,9 @@ class MXtests(casadiTestCase):
 
     Ast = As.T
 
-    r= MXFunction([As,Bs],[solve(Ast,Bs,CSparse)])
+    r= MXFunction([As,Bs],[solve(Ast,Bs,"csparse")])
     r.init()
-    R= MXFunction([As,Bs],[solve(dense(Ast),Bs,CSparse)])
+    R= MXFunction([As,Bs],[solve(dense(Ast),Bs,"csparse")])
     R.init()
 
     for i in [r,R]:

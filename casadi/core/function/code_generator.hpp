@@ -32,7 +32,7 @@
 
 namespace casadi {
 
-  class CodeGenerator {
+  class CASADI_CORE_EXPORT CodeGenerator {
   public:
 
     /// Add an include file optionally using a relative path "..." instead of an absolute path <...>

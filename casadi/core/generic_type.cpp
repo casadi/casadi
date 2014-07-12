@@ -99,8 +99,6 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_STRINGVECTOR";
       case OT_DICTIONARY:
               return "OT_DICTIONARY";
-      case OT_LINEARSOLVER:
-              return "OT_LINEARSOLVER";
       case OT_DERIVATIVEGENERATOR:
               return "OT_DERIVATIVEGENERATOR";
       case OT_CALLBACK:
@@ -355,15 +353,6 @@ bool GenericType::operator!=(const GenericType& op2) const {
 
   // Different types
   return true;
-}
-
-GenericType::GenericType(linearSolverCreator ptr) : type_(OT_LINEARSOLVER) {
-  assignNode(new GenericTypeInternal<linearSolverCreator >(ptr));
-}
-
-GenericType::operator linearSolverCreator() const {
-  casadi_assert_message(is_a<linearSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<linearSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator const DerivativeGenerator &() const {

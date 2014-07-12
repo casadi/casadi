@@ -112,11 +112,11 @@ SundialsInternal::SundialsInternal(const Function& f, const Function& g)
             "Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]");
   addOption("abstolB",                     OT_REAL,             GenericType(),
             "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]");
-  addOption("linear_solver",               OT_LINEARSOLVER,     GenericType(),
+  addOption("linear_solver",               OT_STRING,     GenericType(),
             "A custom linear solver creator function");
   addOption("linear_solver_options",       OT_DICTIONARY,       GenericType(),
             "Options to be passed to the linear solver");
-  addOption("linear_solverB",              OT_LINEARSOLVER,     GenericType(),
+  addOption("linear_solverB",              OT_STRING,     GenericType(),
             "A custom linear solver creator function for backwards integration "
             "[default: equal to linear_solver]");
   addOption("linear_solver_optionsB",      OT_DICTIONARY,       GenericType(),
@@ -267,8 +267,8 @@ void SundialsInternal::init() {
 
   if (hasSetOption("linear_solver") && !jac_.isNull()) {
     // Create a linear solver
-    linearSolverCreator creator = getOption("linear_solver");
-    linsol_ = creator(jac_.output().sparsity(), 1);
+    std::string linear_solver_name = getOption("linear_solver");
+    linsol_ = LinearSolver(linear_solver_name, jac_.output().sparsity(), 1);
     // Pass options
     if (hasSetOption("linear_solver_options")) {
       linsol_.setOption(getOption("linear_solver_options"));
@@ -278,9 +278,9 @@ void SundialsInternal::init() {
 
   if ((hasSetOption("linear_solverB") || hasSetOption("linear_solver")) && !jacB_.isNull()) {
     // Create a linear solver
-    linearSolverCreator creator =
+    std::string linear_solver_name =
         hasSetOption("linear_solverB") ? getOption("linear_solverB") : getOption("linear_solver");
-    linsolB_ = creator(jacB_.output().sparsity(), 1);
+    linsolB_ = LinearSolver(linear_solver_name, jacB_.output().sparsity(), 1);
     // Pass options
     if (hasSetOption("linear_solver_optionsB")) {
       linsolB_.setOption(getOption("linear_solver_optionsB"));

@@ -24,13 +24,13 @@
 #define SYMBOLIC_QR_INTERNAL_HPP
 
 #include "symbolic_qr.hpp"
-#include "linear_solver_internal.hpp"
+#include "casadi/core/function/linear_solver_internal.hpp"
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  class CASADI_CORE_EXPORT SymbolicQRInternal : public LinearSolverInternal {
+  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQRInternal : public LinearSolverInternal {
   public:
     // Constructor
     SymbolicQRInternal(const Sparsity& sparsity, int nrhs);

@@ -44,7 +44,7 @@ namespace casadi {
     // set default options
     setOption("name", "unnamed_simple_indef_dple_solver"); // name of the function
 
-    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(),
+    addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");

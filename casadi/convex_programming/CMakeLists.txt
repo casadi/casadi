@@ -12,6 +12,9 @@ casadi_library(casadi_socpsolver_sdp
 casadi_library(casadi_stabilizedqpsolver_qp
   qp_stabilizer.cpp    qp_stabilizer.hpp    qp_stabilizer_internal.cpp      qp_stabilizer_internal.hpp)
 
+casadi_library(casadi_linearsolver_symbolicqr
+  symbolic_qr.hpp         symbolic_qr.cpp         symbolic_qr_internal.hpp         symbolic_qr_internal.cpp)
+
 if(WITH_CSPARSE)
   casadi_library(casadi_qcqpsolver_socp
     socp_qcqp_solver.cpp socp_qcqp_solver.hpp socp_qcqp_internal.cpp socp_qcqp_internal.hpp)

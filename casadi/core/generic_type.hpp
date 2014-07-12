@@ -41,7 +41,6 @@ namespace casadi {
     OT_REALVECTOR,
     OT_STRINGVECTOR,
     OT_DICTIONARY,
-    OT_LINEARSOLVER,
     OT_DERIVATIVEGENERATOR,
     OT_FUNCTION,
     OT_CALLBACK,
@@ -85,7 +84,6 @@ namespace casadi {
     GenericType(const Dictionary& dict);
 
     /// Creator functions
-    GenericType(linearSolverCreator ptr);
     GenericType(const DerivativeGenerator& c);
     GenericType(const Callback& c);
 
@@ -106,7 +104,6 @@ namespace casadi {
     operator std::vector<double>& () { return toDoubleVector();}
     operator std::map<std::string, GenericType>& ();
 
-    operator linearSolverCreator() const;
     operator const DerivativeGenerator& () const;
     operator const Callback& () const;
     #endif // SWIG

@@ -20,38 +20,15 @@
  *
  */
 
-#ifndef CASADI_HPP
-#define CASADI_HPP
+%module casadi_linearsolver_symbolicqr
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx/sx_element.hpp"
+%include "common.i"
 
-// Generic tools
-#include "polynomial.hpp"
-#include "matrix/generic_matrix_tools.hpp"
-#include "matrix/generic_expression_tools.hpp"
+%import "casadi_core.i"
 
-// Matrices
-#include "matrix/matrix.hpp"
-#include "matrix/matrix_tools.hpp"
-#include "matrix/sparsity_tools.hpp"
+#define CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT
 
-// Scalar expressions
-#include "sx/sx_tools.hpp"
-
-// Matrix expressions
-#include "mx/mx.hpp"
-#include "mx/mx_tools.hpp"
-
-// Misc functions
-#include "function/sx_function.hpp"
-#include "function/mx_function.hpp"
-#include "function/external_function.hpp"
-
-// Misc solvers
-#include "function/nlp_solver.hpp"
-#include "function/integrator.hpp"
-#include "function/implicit_function.hpp"
-
-
-#endif //CASADI_HPP
+%{
+#include "casadi/convex_programming/symbolic_qr.hpp"
+%}
+%include "casadi/convex_programming/symbolic_qr.hpp"

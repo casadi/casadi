@@ -23,7 +23,8 @@
 #ifndef SYMBOLIC_QR_HPP
 #define SYMBOLIC_QR_HPP
 
-#include "linear_solver.hpp"
+#include "casadi/core/function/linear_solver.hpp"
+#include <casadi/convex_programming/casadi_linearsolver_symbolicqr_export.h>
 
 namespace casadi {
 
@@ -36,7 +37,7 @@ namespace casadi {
       \author Joel Andersson
       \date 2013
   */
-  class CASADI_CORE_EXPORT SymbolicQR : public LinearSolver {
+  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQR : public LinearSolver {
   public:
 
     /// Default (empty) constructor

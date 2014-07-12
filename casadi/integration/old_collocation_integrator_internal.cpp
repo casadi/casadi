@@ -69,10 +69,6 @@ namespace casadi {
               "Expand the quadrature function in an SX graph");
     addOption("hotstart",                      OT_BOOLEAN,  true,
               "Initialize the trajectory at the previous solution");
-    addOption("quadrature_solver",             OT_LINEARSOLVER,  GenericType(),
-              "An linear solver to solver the quadrature equations");
-    addOption("quadrature_solver_options",     OT_DICTIONARY, GenericType(),
-              "Options to be passed to the quadrature solver");
     addOption("startup_integrator",            OT_STRING,  GenericType(),
               "An ODE/DAE integrator that can be used to generate a startup trajectory");
     addOption("startup_integrator_options",    OT_DICTIONARY, GenericType(),

@@ -25,9 +25,6 @@
 // Solvers
 #include <casadi/optimal_control/direct_multiple_shooting.hpp>
 
-// 3rd party interfaces
-#include <casadi/interfaces/csparse/csparse.hpp>
-
 bool use_old_collocation_integrator = false;
 
 using namespace casadi;
@@ -66,7 +63,7 @@ int main(){
   if(use_old_collocation_integrator){
     integrator_options["implicit_solver"] = "newton";
     Dictionary implicit_solver_options;
-    implicit_solver_options["linear_solver"] = CSparse::creator;
+    implicit_solver_options["linear_solver"] = "csparse";
     integrator_options["implicit_solver_options"] = implicit_solver_options;
   } else {
     integrator_options["abstol"]=1e-8; //abs. tolerance
