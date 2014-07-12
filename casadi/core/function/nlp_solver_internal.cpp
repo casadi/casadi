@@ -370,7 +370,7 @@ namespace casadi {
     return DMatrix();
   }
 
-  void NLPSolverInternal::setOptionsFromFile(const std::string & file){
+  void NLPSolverInternal::setOptionsFromFile(const std::string & file) {
     casadi_error("NLPSolverInternal::setOptionsFromFile not defined for class "
                  << typeid(*this).name());
   }
