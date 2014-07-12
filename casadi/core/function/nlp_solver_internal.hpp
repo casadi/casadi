@@ -150,6 +150,8 @@ namespace casadi {
     /// Infix
     static const std::string infix_;
 
+    // Get reduced Hessian
+    virtual DMatrix getReducedHessian();
   };
 
 } // namespace casadi

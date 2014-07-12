@@ -44,8 +44,4 @@ namespace casadi {
     return dynamic_cast<const IpoptInternal*>(get());
   }
 
-  DMatrix IpoptSolver::getReducedHessian() {
-    return (*this)->getReducedHessian();
-  }
-
 } // namespace casadi

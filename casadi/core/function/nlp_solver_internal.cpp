@@ -364,4 +364,11 @@ namespace casadi {
 
   const std::string NLPSolverInternal::infix_ = "nlpsolver";
 
+  DMatrix NLPSolverInternal::getReducedHessian() {
+    casadi_error("NLPSolverInternal::getReducedHessian: generateBody not defined for class "
+                 << typeid(*this).name());
+    return DMatrix();
+  }
+
+
 } // namespace casadi

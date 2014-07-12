@@ -981,7 +981,7 @@ namespace casadi {
   }
 
   MX solve(const MX& A, const MX& b, const std::string& lsolver, const Dictionary& dict) {
-    LinearSolver mysolver(lsolver,A.sparsity(), b.size2());
+    LinearSolver mysolver(lsolver, A.sparsity(), b.size2());
     mysolver.setOption(dict);
     mysolver.init();
     return mysolver.solve(A, b, false);

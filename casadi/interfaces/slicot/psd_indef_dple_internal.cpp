@@ -67,7 +67,7 @@ namespace casadi {
     setOption("pos_def", false);
     setOption("const_dim", true);
 
-    addOption("linear_solver",            OT_LINEARSOLVER, GenericType(),
+    addOption("linear_solver",            OT_STRING, GenericType(),
               "User-defined linear solver class. Needed for sensitivities.");
     addOption("linear_solver_options",    OT_DICTIONARY,   GenericType(),
               "Options to be passed to the linear solver.");
@@ -123,7 +123,7 @@ namespace casadi {
     partition_.reserve(n_);
 
     if (hasSetOption("linear_solver")) {
-      linearSolverCreator linear_solver_creator = getOption("linear_solver");
+      std::string linear_solver_name = getOption("linear_solver");
 
       // Construct linear solvers for low-order Discrete Periodic Sylvester Equations
       // I00X
@@ -164,7 +164,7 @@ namespace casadi {
 
           sp = Sparsity(np*K_, np*K_, row_ind, col);
         }
-        LinearSolver solver = linear_solver_creator(sp, 1);
+        LinearSolver solver(linear_solver_name, sp, 1);
         solver.init();
 
         dpse_solvers_[i].resize(n_*(n_+1)/2, solver);

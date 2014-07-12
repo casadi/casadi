@@ -68,10 +68,6 @@ namespace casadi {
                           * [\mathbb {R} \times \mathbb{R}^{n_g}]\f$*/
                          );  // NOLINT(whitespace/parens)
 
-    /** \brief Get the reduced Hessian.
-     * Requires a patched sIPOPT installation, see CasADi documentation. */
-    DMatrix getReducedHessian();
-
     /// Access functions of the node
     IpoptInternal* operator->();
     const IpoptInternal* operator->() const;

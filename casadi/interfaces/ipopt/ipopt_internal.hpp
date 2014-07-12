@@ -53,7 +53,7 @@ public:
   virtual void setQPOptions();
 
   // Get reduced Hessian
-  DMatrix getReducedHessian();
+  virtual DMatrix getReducedHessian();
 
   /// Exact Hessian?
   bool exact_hessian_;
