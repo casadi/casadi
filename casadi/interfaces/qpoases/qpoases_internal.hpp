@@ -24,16 +24,17 @@
 #define QPOASES_INTERNAL_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
-#include "qpoases_solver.hpp"
-
+#include <casadi/interfaces/qpoases/casadi_qpsolver_qpoases_export.h>
 #include <qpOASES.hpp>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for QPOasesSolver
+  /** \brief Interface to QPOases Solver for quadratic programming
+   * 
+   * \author Joris Gillis, Joel Andersson
+   * \date 2011
    *
-      @copydoc QPSolver_doc
    * */
 class CASADI_QPSOLVER_QPOASES_EXPORT QPOasesInternal : public QPSolverInternal {
   friend class QPOasesSolver;

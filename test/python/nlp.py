@@ -185,7 +185,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-Inf],"lbg")
       solver.setInput([Inf],"ubg")
 
-      if 'Worhp' in str(Solver):
+      if 'worhp' in str(Solver):
         with self.assertRaises(Exception):
           solver.evaluate()
         return
@@ -374,7 +374,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.getOutput("lam_g")[0],0.12149655447670,6,str(Solver))
 
       self.message(":warmstart")
-      if "Ipopt" in str(Solver):
+      if "ipopt" in str(Solver):
         oldsolver=solver
         solver = NLPSolver(Solver, nlp)
         solver.setOption(solver_options)
@@ -628,7 +628,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([1,-10],"lbx")
       solver.setInput([1,10],"ubx")
 
-      if 'Worhp' in str(Solver):
+      if 'worhp' in str(Solver):
         with self.assertRaises(Exception):
           solver.evaluate()
         return
@@ -905,7 +905,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([-10],"lbg")
       solver.setInput([10],"ubg")
 
-      if 'Worhp' in str(Solver):
+      if 'worhp' in str(Solver):
         with self.assertRaises(Exception):
           solver.evaluate()
         return
@@ -1246,7 +1246,7 @@ class NLPtests(casadiTestCase):
   @requires("SnoptSolver")
   def test_permute(self):
     for Solver, solver_options in solvers:
-      if "Snopt" not in str(Solver): continue
+      if "snopt" not in str(Solver): continue
       for permute_g in itertools.permutations(range(3)):
         for permute_x in itertools.permutations(range(4)):
           x=SX.sym("x",4)
@@ -1294,7 +1294,7 @@ class NLPtests(casadiTestCase):
   @requires("SnoptSolver")
   def test_permute2(self):
     for Solver, solver_options in solvers:
-      if "Snopt" not in str(Solver): continue
+      if "snopt" not in str(Solver): continue
       for permute_g in itertools.permutations(range(3)):
         for permute_x in itertools.permutations(range(4)):
           x=SX.sym("x",4)
@@ -1337,7 +1337,7 @@ class NLPtests(casadiTestCase):
   @requires("SnoptSolver")
   def test_permute3(self):
     for Solver, solver_options in solvers:
-      if "Snopt" not in str(Solver): continue
+      if "snopt" not in str(Solver): continue
       for permute_g in itertools.permutations(range(3)):
         for permute_x in itertools.permutations(range(4)):
           x=SX.sym("x",4)
