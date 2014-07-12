@@ -24,10 +24,7 @@
 #define WORHP_INTERNAL_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
-#include "worhp_solver.hpp"
-
-
-
+#include <casadi/interfaces/worhp/casadi_nlpsolver_worhp_export.h>
 
 // GCC_VERSION is defined in 'worhp.h'
 #ifdef GCC_VERSION

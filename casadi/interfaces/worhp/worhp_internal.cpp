@@ -473,14 +473,14 @@ namespace casadi {
 
     for (int i=0;i<nx_;++i) {
       casadi_assert_message(lbx.at(i)!=ubx.at(i),
-      "WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX."
+      "WorhpInternal::evaluate: Worhp cannot handle the case when LBX == UBX."
       "You have that case at non-zero " << i << " , which has value " << ubx.at(i) << "."
       "Reformulate your problem by using a parameter for the corresponding variable.");
     }
 
     for (int i=0;i<lbg.size();++i) {
       casadi_assert_message(!(lbg.at(i)==-inf && ubg.at(i) == inf),
-      "WorhpSolver::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
+      "WorhpInternal::evaluate: Worhp cannot handle the case when both LBG and UBG are infinite."
       "You have that case at non-zero " << i << "."
       "Reformulate your problem eliminating the corresponding constraint.");
     }

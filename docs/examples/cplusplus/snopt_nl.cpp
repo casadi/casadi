@@ -20,7 +20,6 @@
  *
  */
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/snopt/snopt_solver.hpp>
 #include <casadi/nonlinear_programming/symbolic_nlp.hpp>
 
 /**
