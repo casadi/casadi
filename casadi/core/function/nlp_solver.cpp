@@ -199,4 +199,8 @@ namespace casadi {
     return (*this)->getReducedHessian();
   }
 
+  void NLPSolver::setOptionsFromFile(const std::string & file) {
+    (*this)->setOptionsFromFile(file);
+  }
+
 } // namespace casadi

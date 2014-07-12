@@ -45,8 +45,4 @@ namespace casadi {
     return dynamic_cast<const SnoptInternal*>(get());
   }
 
-  void SnoptSolver::setOptionsFromFile(const std::string & file) {
-    dynamic_cast<SnoptInternal*>(get())->setOptionsFromFile(file);
-  }
-
 } // namespace casadi

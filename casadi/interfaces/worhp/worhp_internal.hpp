@@ -77,7 +77,7 @@ namespace casadi {
     virtual void setQPOptions();
 
     /// Read options from worhp parameter xml
-    void setOptionsFromFile(const std::string & file);
+    virtual void setOptionsFromFile(const std::string & file);
 
     /// Exact Hessian?
     bool exact_hessian_;

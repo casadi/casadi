@@ -152,6 +152,9 @@ namespace casadi {
 
     // Get reduced Hessian
     virtual DMatrix getReducedHessian();
+
+    /// Read options from parameter xml
+    virtual void setOptionsFromFile(const std::string & file);
   };
 
 } // namespace casadi

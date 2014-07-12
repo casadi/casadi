@@ -247,6 +247,9 @@ namespace casadi {
     /** \brief Get the reduced Hessian.
      * Requires a patched sIPOPT installation, see CasADi documentation. */
     DMatrix getReducedHessian();
+
+    /// Read options from parameter xml
+    void setOptionsFromFile(const std::string & file);
   };
 
 } // namespace casadi
