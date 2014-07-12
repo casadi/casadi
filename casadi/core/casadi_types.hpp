@@ -72,9 +72,6 @@ namespace casadi {
   /// Function pointer to a linear solver creator function
   typedef LinearSolver (*linearSolverCreator)(const Sparsity& sparsity, int nrhs);
 
-  /// Function pointer to a LP solver creator function
-  typedef LPSolver (*LPSolverCreator)(const LPStructure& st);
-
   /// Function pointer to a QP solver creator function
   typedef QPSolver (*QPSolverCreator)(const QPStructure& st);
 

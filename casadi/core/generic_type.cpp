@@ -101,8 +101,6 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_DICTIONARY";
       case OT_LINEARSOLVER:
               return "OT_LINEARSOLVER";
-      case OT_LPSOLVER:
-              return "OT_LPSOLVER";
       case OT_QPSOLVER:
               return "OT_QPSOLVER";
       case OT_STABILIZEDQPSOLVER:
@@ -385,10 +383,6 @@ GenericType::GenericType(StabilizedQPSolverCreator ptr) : type_(OT_STABILIZEDQPS
   assignNode(new GenericTypeInternal<StabilizedQPSolverCreator>(ptr));
 }
 
-GenericType::GenericType(LPSolverCreator ptr) : type_(OT_LPSOLVER) {
-  assignNode(new GenericTypeInternal<LPSolverCreator>(ptr));
-}
-
 GenericType::GenericType(SDPSolverCreator ptr) : type_(OT_SDPSOLVER) {
   assignNode(new GenericTypeInternal<SDPSolverCreator>(ptr));
 }
@@ -407,11 +401,6 @@ GenericType::GenericType(QCQPSolverCreator ptr) : type_(OT_QCQPSOLVER) {
 
 GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
-}
-
-GenericType::operator LPSolverCreator() const {
-  casadi_assert_message(is_a<LPSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<LPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator SDPSolverCreator() const {

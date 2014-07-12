@@ -41,7 +41,6 @@ namespace casadi {
     OT_REALVECTOR,
     OT_STRINGVECTOR,
     OT_DICTIONARY,
-    OT_LPSOLVER,
     OT_LINEARSOLVER,
     OT_QPSOLVER,
     OT_STABILIZEDQPSOLVER,
@@ -94,7 +93,6 @@ namespace casadi {
 
     /// Creator functions
     GenericType(linearSolverCreator ptr);
-    GenericType(LPSolverCreator ptr);
     GenericType(QPSolverCreator ptr);
     GenericType(StabilizedQPSolverCreator ptr);
     GenericType(SOCPSolverCreator ptr);
@@ -123,7 +121,6 @@ namespace casadi {
     operator std::map<std::string, GenericType>& ();
 
     operator linearSolverCreator() const;
-    operator LPSolverCreator() const;
     operator QPSolverCreator() const;
     operator StabilizedQPSolverCreator() const;
     operator SDPSolverCreator() const;
