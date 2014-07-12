@@ -80,7 +80,7 @@ int main(){
   SXFunction nlp(nlpIn("x",u),nlpOut("f",f,"g",g));
 
   // Allocate an NLP solver
-  SnoptSolver solver(nlp);
+  NLPSolver solver("snopt", nlp);
 
   // initialize the solver
   solver.init();

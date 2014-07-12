@@ -47,7 +47,7 @@ int main(int argc, char **argv){
   SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
 
   // Allocate NLP solver
-  SnoptSolver nlp_solver(nlp);
+  NLPSolver nlp_solver("snopt", nlp);
     
   // Set options
   // nlp_solver.setOption("detect_linear",true);

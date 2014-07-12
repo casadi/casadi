@@ -51,7 +51,8 @@ def addExtra(metadata):
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
   try:
-    i = IpoptSolver(f)
+    NLPSolver.loadPlugin("ipopt")
+    i = NLPSolver("ipopt", f)
     extra(metadata,i,"IpoptInternal")
   except Exception as e:
     print e 
@@ -60,7 +61,8 @@ def addExtra(metadata):
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
   try:
-    i = WorhpSolver(f)
+    NLPSolver.loadPlugin("worhp")
+    i = NLPSolver("worhp", f)
     extra(metadata,i,"WorhpInternal")
   except Exception as e:
     print e
@@ -69,7 +71,8 @@ def addExtra(metadata):
   f = SXFunction(nlpIn(x=x),nlpOut(f=x**2))
   f.init()
   try:
-    i = SnoptSolver(f)
+    NLPSolver.loadPlugin("snopt")
+    i = NLPSolver("snopt", f)
     extra(metadata,i,"SnoptInternal")
   except Exception as e:
     print e
