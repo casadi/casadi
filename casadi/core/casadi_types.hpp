@@ -78,18 +78,6 @@ namespace casadi {
   /// Function pointer to a Stabilized QP solver creator function
   typedef StabilizedQPSolver (*StabilizedQPSolverCreator)(const QPStructure& st);
 
-  /// Function pointer to a QCQP solver creator function
-  typedef QCQPSolver (*QCQPSolverCreator)(const QCQPStructure& st);
-
-  /// Function pointer to an SDP solver creator function
-  typedef SDPSolver (*SDPSolverCreator)(const SDPStructure& st);
-
-  /// Function pointer to an SDQP solver creator function
-  typedef SDQPSolver (*SDQPSolverCreator)(const SDQPStructure& st);
-
-  /// Function pointer to an SOCP solver creator function
-  typedef SOCPSolver (*SOCPSolverCreator)(const SOCPStructure& st);
-
   /// Function pointer to an implicit function creator
   typedef ImplicitFunction (*implicitFunctionCreator)(const Function& f, const Function& jac,
                                                       const LinearSolver& linsol);

@@ -105,15 +105,7 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_QPSOLVER";
       case OT_STABILIZEDQPSOLVER:
               return "OT_STABILIZEDQPSOLVER";
-      case OT_QCQPSOLVER:
-              return "OT_QCQPSOLVER";
-      case OT_SOCPSOLVER:
-              return "OT_SOCPSOLVER";
-      case OT_SDPSOLVER:
-              return "OT_SDPSOLVER";
-      case OT_SDQPSOLVER:
-              return "OT_SDQPSOLVER";
-    case OT_DERIVATIVEGENERATOR:
+      case OT_DERIVATIVEGENERATOR:
               return "OT_DERIVATIVEGENERATOR";
       case OT_IMPLICITFUNCTION:
               return "OT_IMPLICITFUNCTION";
@@ -383,44 +375,8 @@ GenericType::GenericType(StabilizedQPSolverCreator ptr) : type_(OT_STABILIZEDQPS
   assignNode(new GenericTypeInternal<StabilizedQPSolverCreator>(ptr));
 }
 
-GenericType::GenericType(SDPSolverCreator ptr) : type_(OT_SDPSOLVER) {
-  assignNode(new GenericTypeInternal<SDPSolverCreator>(ptr));
-}
-
-GenericType::GenericType(SDQPSolverCreator ptr) : type_(OT_SDQPSOLVER) {
-  assignNode(new GenericTypeInternal<SDQPSolverCreator>(ptr));
-}
-
-GenericType::GenericType(SOCPSolverCreator ptr) : type_(OT_SOCPSOLVER) {
-  assignNode(new GenericTypeInternal<SOCPSolverCreator>(ptr));
-}
-
-GenericType::GenericType(QCQPSolverCreator ptr) : type_(OT_QCQPSOLVER) {
-  assignNode(new GenericTypeInternal<QCQPSolverCreator>(ptr));
-}
-
 GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
   assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
-}
-
-GenericType::operator SDPSolverCreator() const {
-  casadi_assert_message(is_a<SDPSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<SDPSolverCreator>*>(get())->d_;
-}
-
-GenericType::operator SDQPSolverCreator() const {
-  casadi_assert_message(is_a<SDQPSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<SDQPSolverCreator>*>(get())->d_;
-}
-
-GenericType::operator SOCPSolverCreator() const {
-  casadi_assert_message(is_a<SOCPSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<SOCPSolverCreator>*>(get())->d_;
-}
-
-GenericType::operator QCQPSolverCreator() const {
-  casadi_assert_message(is_a<QCQPSolverCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<QCQPSolverCreator>*>(get())->d_;
 }
 
 GenericType::operator linearSolverCreator() const {

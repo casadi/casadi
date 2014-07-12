@@ -36,7 +36,8 @@ except:
 
 sdqpsolvers = []
 try:
-  sdqpsolvers.append((SDPSDQPSolver,{"sdp_solver": DSDPSolver}))
+  SDPSolver.loadPlugin("dsdp")
+  sdqpsolvers.append((SDPSDQPSolver,{"sdp_solver": "dsdp"}))
 except:
   pass
   

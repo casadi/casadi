@@ -28,7 +28,8 @@ from helpers import *
 
 qcqpsolvers = []
 try:
-  qcqpsolvers.append((SOCPQCQPSolver,{"socp_solver": SDPSOCPSolver, "socp_solver_options": {"sdp_solver": DSDPSolver} },False))
+  SDPSolver.loadPlugin("dsdp")
+  qcqpsolvers.append((SOCPQCQPSolver,{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
 except:
   pass
 

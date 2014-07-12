@@ -35,7 +35,7 @@ namespace casadi {
   // Constructor
   SDQPSolverInternal::SDQPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
 
-    addOption("sdp_solver",       OT_SDPSOLVER, GenericType(),
+    addOption("sdp_solver",       OT_STRING, GenericType(),
               "The SDQPSolver used to solve the SDPs.");
     addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the SDPSOlver");

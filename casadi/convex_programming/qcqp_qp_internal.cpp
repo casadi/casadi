@@ -53,7 +53,7 @@ namespace casadi {
 
   QCQPQPInternal::QCQPQPInternal(const std::vector<Sparsity> &st) : QPSolverInternal(st) {
 
-    addOption("qcqp_solver",       OT_QCQPSOLVER, GenericType(),
+    addOption("qcqp_solver",       OT_STRING, GenericType(),
               "The QCQPSolver used to solve the QPs.");
     addOption("qcqp_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the QCQPSOlver");
@@ -94,11 +94,11 @@ namespace casadi {
     QPSolverInternal::init();
 
     // Create an qcqpsolver instance
-    QCQPSolverCreator qcqpsolver_creator = getOption("qcqp_solver");
-    qcqpsolver_ = qcqpsolver_creator(qcqpStruct("h", input(QP_SOLVER_H).sparsity(),
-                                                "p", Sparsity::sparse(n_, 0),
-                                                "a", input(QP_SOLVER_A).sparsity()));
-
+    std::string qcqpsolver_name = getOption("qcqp_solver");
+    qcqpsolver_ = QCQPSolver(qcqpsolver_name,
+                             qcqpStruct("h", input(QP_SOLVER_H).sparsity(),
+                                        "p", Sparsity::sparse(n_, 0),
+                                        "a", input(QP_SOLVER_A).sparsity()));
     qcqpsolver_.setQPOptions();
     if (hasSetOption("qcqp_solver_options")) {
       qcqpsolver_.setOption(getOption("qcqp_solver_options"));

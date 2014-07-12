@@ -47,7 +47,7 @@ namespace casadi {
   }
 
   SDPSDQPInternal::SDPSDQPInternal(const std::vector<Sparsity> &st) : SDQPSolverInternal(st) {
-    addOption("sdp_solver",            OT_SDPSOLVER, GenericType(),
+    addOption("sdp_solver",            OT_STRING, GenericType(),
               "The SDPSolver used to solve the SDQPs.");
     addOption("sdp_solver_options",    OT_DICTIONARY, GenericType(),
               "Options to be passed to the SDPSOlver");
@@ -107,11 +107,12 @@ namespace casadi {
     mapping_.init();
 
     // Create an sdpsolver instance
-    SDPSolverCreator sdpsolver_creator = getOption("sdp_solver");
-    sdpsolver_ = sdpsolver_creator(
-      sdpStruct("g", mapping_.output("g").sparsity(),
-                "f", mapping_.output("f").sparsity(),
-                "a", horzcat(input(SDQP_SOLVER_A).sparsity(), Sparsity::sparse(nc_, 1))));
+    std::string sdpsolver_name = getOption("sdp_solver");
+    sdpsolver_ = SDPSolver(sdpsolver_name,
+                           sdpStruct("g", mapping_.output("g").sparsity(),
+                                     "f", mapping_.output("f").sparsity(),
+                                     "a", horzcat(input(SDQP_SOLVER_A).sparsity(),
+                                                  Sparsity::sparse(nc_, 1))));
 
     if (hasSetOption("sdp_solver_options")) {
       sdpsolver_.setOption(getOption("sdp_solver_options"));

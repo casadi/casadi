@@ -44,10 +44,6 @@ namespace casadi {
     OT_LINEARSOLVER,
     OT_QPSOLVER,
     OT_STABILIZEDQPSOLVER,
-    OT_SOCPSOLVER,
-    OT_QCQPSOLVER,
-    OT_SDPSOLVER,
-    OT_SDQPSOLVER,
     OT_IMPLICITFUNCTION,
     OT_DERIVATIVEGENERATOR,
     OT_FUNCTION,
@@ -95,10 +91,6 @@ namespace casadi {
     GenericType(linearSolverCreator ptr);
     GenericType(QPSolverCreator ptr);
     GenericType(StabilizedQPSolverCreator ptr);
-    GenericType(SOCPSolverCreator ptr);
-    GenericType(SDPSolverCreator ptr);
-    GenericType(SDQPSolverCreator ptr);
-    GenericType(QCQPSolverCreator ptr);
     GenericType(implicitFunctionCreator ptr);
     GenericType(const DerivativeGenerator& c);
     GenericType(const Callback& c);
@@ -123,10 +115,6 @@ namespace casadi {
     operator linearSolverCreator() const;
     operator QPSolverCreator() const;
     operator StabilizedQPSolverCreator() const;
-    operator SDPSolverCreator() const;
-    operator SDQPSolverCreator() const;
-    operator SOCPSolverCreator() const;
-    operator QCQPSolverCreator() const;
     operator implicitFunctionCreator() const;
     operator const DerivativeGenerator& () const;
     operator const Callback& () const;
