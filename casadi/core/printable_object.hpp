@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef PRINTABLE_OBJECT_HPP
-#define PRINTABLE_OBJECT_HPP
+#ifndef CASADI_PRINTABLE_OBJECT_HPP
+#define CASADI_PRINTABLE_OBJECT_HPP
 
 #include <iostream>
 #include <string>
@@ -76,5 +76,5 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // PRINTABLE_OBJECT_HPP
+#endif // CASADI_PRINTABLE_OBJECT_HPP
 

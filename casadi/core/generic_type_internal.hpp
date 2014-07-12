@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GENERIC_TYPE_INTERNAL_HPP
-#define GENERIC_TYPE_INTERNAL_HPP
+#ifndef CASADI_GENERIC_TYPE_INTERNAL_HPP
+#define CASADI_GENERIC_TYPE_INTERNAL_HPP
 
 #include "generic_type.hpp"
 #include "std_vector_tools.hpp"
@@ -51,4 +51,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // GENERIC_TYPE_INTERNAL_HPP
+#endif // CASADI_GENERIC_TYPE_INTERNAL_HPP

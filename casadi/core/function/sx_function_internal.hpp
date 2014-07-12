@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SX_FUNCTION_INTERNAL_HPP
-#define SX_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_SX_FUNCTION_INTERNAL_HPP
+#define CASADI_SX_FUNCTION_INTERNAL_HPP
 
 #include "sx_function.hpp"
 #include "x_function_internal.hpp"
@@ -231,4 +231,4 @@ class CASADI_CORE_EXPORT SXFunctionInternal :
 } // namespace casadi
 
 /// \endcond
-#endif // SX_FUNCTION_INTERNAL_HPP
+#endif // CASADI_SX_FUNCTION_INTERNAL_HPP

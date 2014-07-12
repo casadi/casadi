@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SUBASSIGN_HPP
-#define SUBASSIGN_HPP
+#ifndef CASADI_SUBASSIGN_HPP
+#define CASADI_SUBASSIGN_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -81,4 +81,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SUBASSIGN_HPP
+#endif // CASADI_SUBASSIGN_HPP

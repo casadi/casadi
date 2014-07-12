@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MULTIPLICATION_HPP
-#define MULTIPLICATION_HPP
+#ifndef CASADI_MULTIPLICATION_HPP
+#define CASADI_MULTIPLICATION_HPP
 
 #include "mx_node.hpp"
 
@@ -117,4 +117,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // MULTIPLICATION_HPP
+#endif // CASADI_MULTIPLICATION_HPP

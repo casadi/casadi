@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SX_NODE_HPP
-#define SX_NODE_HPP
+#ifndef CASADI_SX_NODE_HPP
+#define CASADI_SX_NODE_HPP
 
 #include <iostream>
 #include <string>
@@ -126,4 +126,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // SX_NODE_HPP
+#endif // CASADI_SX_NODE_HPP

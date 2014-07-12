@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IMPLICIT_FUNCTION_HPP
-#define IMPLICIT_FUNCTION_HPP
+#ifndef CASADI_IMPLICIT_FUNCTION_HPP
+#define CASADI_IMPLICIT_FUNCTION_HPP
 
 #include "function.hpp"
 #include "linear_solver.hpp"
@@ -100,5 +100,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //IMPLICIT_FUNCTION_HPP
+#endif // CASADI_IMPLICIT_FUNCTION_HPP
 

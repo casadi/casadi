@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SET_SPARSE_HPP
-#define SET_SPARSE_HPP
+#ifndef CASADI_SET_SPARSE_HPP
+#define CASADI_SET_SPARSE_HPP
 
 #include "mx_node.hpp"
 /// \cond INTERNAL
@@ -77,4 +77,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // SET_SPARSE_HPP
+#endif // CASADI_SET_SPARSE_HPP

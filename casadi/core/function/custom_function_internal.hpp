@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CUSTOM_FUNCTION_INTERNAL_HPP
-#define CUSTOM_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_CUSTOM_FUNCTION_INTERNAL_HPP
+#define CASADI_CUSTOM_FUNCTION_INTERNAL_HPP
 
 #include "custom_function.hpp"
 #include "function_internal.hpp"
@@ -70,4 +70,4 @@ class CASADI_CORE_EXPORT CustomFunctionInternal : public FunctionInternal {
 } // namespace casadi
 /// \endcond
 
-#endif // CUSTOM_FUNCTION_INTERNAL_HPP
+#endif // CASADI_CUSTOM_FUNCTION_INTERNAL_HPP

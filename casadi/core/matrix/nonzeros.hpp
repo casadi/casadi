@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NONZEROS_HPP
-#define NONZEROS_HPP
+#ifndef CASADI_NONZEROS_HPP
+#define CASADI_NONZEROS_HPP
 
 namespace casadi {
 
@@ -110,4 +110,4 @@ template class NonZeros< Mt , Slice >;
 } // namespace casadi
 
 
-#endif // NONZEROS_HPP
+#endif // CASADI_NONZEROS_HPP

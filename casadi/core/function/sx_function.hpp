@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SX_FUNCTION_HPP
-#define SX_FUNCTION_HPP
+#ifndef CASADI_SX_FUNCTION_HPP
+#define CASADI_SX_FUNCTION_HPP
 
 #include "function.hpp"
 
@@ -214,4 +214,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SX_FUNCTION_HPP
+#endif // CASADI_SX_FUNCTION_HPP

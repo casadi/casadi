@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MX_NODE_HPP
-#define MX_NODE_HPP
+#ifndef CASADI_MX_NODE_HPP
+#define CASADI_MX_NODE_HPP
 
 #include "mx.hpp"
 #include "../sx/sx_element.hpp"
@@ -405,4 +405,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // MX_NODE_HPP
+#endif // CASADI_MX_NODE_HPP

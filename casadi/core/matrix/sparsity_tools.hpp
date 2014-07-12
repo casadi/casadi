@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SPARSITY_TOOLS_HPP
-#define SPARSITY_TOOLS_HPP
+#ifndef CASADI_SPARSITY_TOOLS_HPP
+#define CASADI_SPARSITY_TOOLS_HPP
 
 #include "sparsity.hpp"
 
@@ -91,4 +91,4 @@ namespace casadi {
   */
 } // namespace casadi
 
-#endif // SPARSITY_TOOLS_HPP
+#endif // CASADI_SPARSITY_TOOLS_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GENERIC_EXPRESSION_HPP
-#define GENERIC_EXPRESSION_HPP
+#ifndef CASADI_GENERIC_EXPRESSION_HPP
+#define CASADI_GENERIC_EXPRESSION_HPP
 
 #include "../casadi_math.hpp"
 
@@ -150,4 +150,4 @@ class CASADI_CORE_EXPORT GenericExpression {
 
 } // namespace casadi
 
-#endif // GENERIC_EXPRESSION_HPP
+#endif // CASADI_GENERIC_EXPRESSION_HPP

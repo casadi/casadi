@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IO_INTERFACE_HPP
-#define IO_INTERFACE_HPP
+#ifndef CASADI_IO_INTERFACE_HPP
+#define CASADI_IO_INTERFACE_HPP
 
 #include "../sx/sx_element.hpp"
 #include "../mx/mx.hpp"
@@ -382,4 +382,4 @@ GETTERS(Matrix<double>&)
 } // namespace casadi
 
 
-#endif // IO_INTERFACE_HPP
+#endif // CASADI_IO_INTERFACE_HPP

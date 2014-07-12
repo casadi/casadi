@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef PLUGIN_INTERFACE_HPP
-#define PLUGIN_INTERFACE_HPP
+#ifndef CASADI_PLUGIN_INTERFACE_HPP
+#define CASADI_PLUGIN_INTERFACE_HPP
 
 #include "../function/function_internal.hpp"
 
@@ -158,4 +158,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // PLUGIN_INTERFACE_HPP
+#endif // CASADI_PLUGIN_INTERFACE_HPP

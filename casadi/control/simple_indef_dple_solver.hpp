@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SIMPLE_INDEF_DPLE_SOLVER_HPP
-#define SIMPLE_INDEF_DPLE_SOLVER_HPP
+#ifndef CASADI_SIMPLE_INDEF_DPLE_SOLVER_HPP
+#define CASADI_SIMPLE_INDEF_DPLE_SOLVER_HPP
 
 #include "dple_solver.hpp"
 
@@ -80,4 +80,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // DPLE_SOLVER_HPP
+#endif // CASADI_DPLE_SOLVER_HPP

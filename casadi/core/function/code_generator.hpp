@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CODE_GENERATOR_HPP
-#define CODE_GENERATOR_HPP
+#ifndef CASADI_CODE_GENERATOR_HPP
+#define CASADI_CODE_GENERATOR_HPP
 
 #include "function.hpp"
 #include <sstream>
@@ -153,5 +153,5 @@ namespace casadi {
 
 /// \endcond
 
-#endif // CODE_GENERATOR_HPP
+#endif // CASADI_CODE_GENERATOR_HPP
 

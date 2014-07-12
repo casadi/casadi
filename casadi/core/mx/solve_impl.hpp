@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SOLVE_IMPL_HPP
-#define SOLVE_IMPL_HPP
+#ifndef CASADI_SOLVE_IMPL_HPP
+#define CASADI_SOLVE_IMPL_HPP
 
 #include "solve.hpp"
 #include "../function/linear_solver_internal.hpp"
@@ -100,5 +100,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SOLVE_IMPL_HPP
+#endif // CASADI_SOLVE_IMPL_HPP
 

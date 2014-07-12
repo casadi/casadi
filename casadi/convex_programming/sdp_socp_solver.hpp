@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SDP_SOCP_SOLVER_HPP
-#define SDP_SOCP_SOLVER_HPP
+#ifndef CASADI_SDP_SOCP_SOLVER_HPP
+#define CASADI_SDP_SOCP_SOLVER_HPP
 
 #include "casadi/core/function/socp_solver.hpp"
 #include <casadi/convex_programming/casadi_socpsolver_sdp_export.h>
@@ -75,5 +75,5 @@ public:
 
 } // namespace casadi
 
-#endif //SDP_SOCP_SOLVER_HPP
+#endif // CASADI_SDP_SOCP_SOLVER_HPP
 

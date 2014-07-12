@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SOCP_QCQP_SOLVER_HPP
-#define SOCP_QCQP_SOLVER_HPP
+#ifndef CASADI_SOCP_QCQP_SOLVER_HPP
+#define CASADI_SOCP_QCQP_SOLVER_HPP
 
 #include "casadi/core/function/qcqp_solver.hpp"
 #include <casadi/convex_programming/casadi_qcqpsolver_socp_export.h>
@@ -104,4 +104,4 @@ public:
 
 } // namespace casadi
 
-#endif //SOCP_QCQP_SOLVER_HPP
+#endif // CASADI_SOCP_QCQP_SOLVER_HPP

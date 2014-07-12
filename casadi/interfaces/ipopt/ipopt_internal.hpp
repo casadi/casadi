@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IPOPT_INTERNAL_HPP
-#define IPOPT_INTERNAL_HPP
+#ifndef CASADI_IPOPT_INTERNAL_HPP
+#define CASADI_IPOPT_INTERNAL_HPP
 
 #include <casadi/interfaces/ipopt/casadi_nlpsolver_ipopt_export.h>
 #include "casadi/core/function/nlp_solver_internal.hpp"
@@ -146,4 +146,4 @@ public:
 } // namespace casadi
 /// \endcond
 
-#endif //IPOPT_INTERNAL_HPP
+#endif // CASADI_IPOPT_INTERNAL_HPP

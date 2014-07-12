@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SIMPLE_INDEF_DPLE_INTERNAL_HPP
-#define SIMPLE_INDEF_DPLE_INTERNAL_HPP
+#ifndef CASADI_SIMPLE_INDEF_DPLE_INTERNAL_HPP
+#define CASADI_SIMPLE_INDEF_DPLE_INTERNAL_HPP
 
 #include "simple_indef_dple_solver.hpp"
 #include "dple_internal.hpp"
@@ -82,4 +82,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif // SIMPLE_INDEF_DPLE_INTERNAL_HPP
+#endif // CASADI_SIMPLE_INDEF_DPLE_INTERNAL_HPP

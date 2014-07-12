@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef KNITRO_INTERNAL_HPP
-#define KNITRO_INTERNAL_HPP
+#ifndef CASADI_KNITRO_INTERNAL_HPP
+#define CASADI_KNITRO_INTERNAL_HPP
 
 #include <casadi/interfaces/knitro/casadi_nlpsolver_knitro_export.h>
 #include <knitro.h>
@@ -75,4 +75,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif //KNITRO_INTERNAL_HPP
+#endif // CASADI_KNITRO_INTERNAL_HPP

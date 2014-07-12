@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CONCAT_HPP
-#define CONCAT_HPP
+#ifndef CASADI_CONCAT_HPP
+#define CASADI_CONCAT_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -129,4 +129,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CONCAT_HPP
+#endif // CASADI_CONCAT_HPP

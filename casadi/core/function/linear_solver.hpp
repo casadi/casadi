@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef LINEAR_SOLVER_HPP
-#define LINEAR_SOLVER_HPP
+#ifndef CASADI_LINEAR_SOLVER_HPP
+#define CASADI_LINEAR_SOLVER_HPP
 
 #include "function.hpp"
 
@@ -117,5 +117,5 @@ enum LinsolOutput {
 
 } // namespace casadi
 
-#endif //LINEAR_SOLVER_HPP
+#endif // CASADI_LINEAR_SOLVER_HPP
 

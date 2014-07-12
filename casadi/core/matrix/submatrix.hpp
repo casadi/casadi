@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SUBMATRIX_HPP
-#define SUBMATRIX_HPP
+#ifndef CASADI_SUBMATRIX_HPP
+#define CASADI_SUBMATRIX_HPP
 
 namespace casadi {
 
@@ -121,4 +121,4 @@ template class SubMatrix< Mt , Sparsity , int >;
 } // namespace casadi
 
 
-#endif // SUBMATRIX_HPP
+#endif // CASADI_SUBMATRIX_HPP

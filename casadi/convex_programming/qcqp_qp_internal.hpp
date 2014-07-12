@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef QCQP_QP_INTERNAL_HPP
-#define QCQP_QP_INTERNAL_HPP
+#ifndef CASADI_QCQP_QP_INTERNAL_HPP
+#define CASADI_QCQP_QP_INTERNAL_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include "casadi/core/function/qcqp_solver.hpp"
@@ -64,5 +64,5 @@ public:
 
 } // namespace casadi
 /// \endcond
-#endif //QCQP_QP_INTERNAL_HPP
+#endif // CASADI_QCQP_QP_INTERNAL_HPP
 

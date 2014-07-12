@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SX_ELEMENT_HPP
-#define SX_ELEMENT_HPP
+#ifndef CASADI_SX_ELEMENT_HPP
+#define CASADI_SX_ELEMENT_HPP
 
 // exception class
 #include "../casadi_exception.hpp"
@@ -423,4 +423,4 @@ namespace std {
 
 #endif // SWIG
 
-#endif // SX_ELEMENT_HPP
+#endif // CASADI_SX_ELEMENT_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IO_SCHEME_HPP
-#define IO_SCHEME_HPP
+#ifndef CASADI_IO_SCHEME_HPP
+#define CASADI_IO_SCHEME_HPP
 
 #include "../shared_object.hpp"
 #include "schemes_metadata.hpp"
@@ -239,4 +239,4 @@ class CASADI_CORE_EXPORT IOScheme : public SharedObject {
 
 } // namespace casadi
 
-#endif // IO_SCHEME_HPP
+#endif // CASADI_IO_SCHEME_HPP

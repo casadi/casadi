@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GENERIC_TYPE_HPP
-#define GENERIC_TYPE_HPP
+#ifndef CASADI_GENERIC_TYPE_HPP
+#define CASADI_GENERIC_TYPE_HPP
 
 #include "shared_object.hpp"
 #include "casadi_types.hpp"
@@ -218,4 +218,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // GENERIC_TYPE_HPP
+#endif // CASADI_GENERIC_TYPE_HPP

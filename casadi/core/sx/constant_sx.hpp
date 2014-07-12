@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CONSTANT_SX_HPP
-#define CONSTANT_SX_HPP
+#ifndef CASADI_CONSTANT_SX_HPP
+#define CASADI_CONSTANT_SX_HPP
 
 #include "sx_node.hpp"
 #include <cassert>
@@ -325,4 +325,4 @@ public:
 } // namespace casadi
 /// \endcond
 
-#endif // CONSTANT_SX_HPP
+#endif // CASADI_CONSTANT_SX_HPP

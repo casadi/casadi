@@ -19,8 +19,8 @@
  *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef CPLEX_SOLVER_HPP
-#define CPLEX_SOLVER_HPP
+#ifndef CASADI_CPLEX_SOLVER_HPP
+#define CASADI_CPLEX_SOLVER_HPP
 
 #include "casadi/core/function/qp_solver.hpp"
 #include <casadi/interfaces/cplex/casadi_qpsolver_cplex_export.h>
@@ -67,4 +67,4 @@ public:
 
 } // end namespace casadi
 
-#endif //CPLEX_SOLVER_HPP
+#endif // CASADI_CPLEX_SOLVER_HPP

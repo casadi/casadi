@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CUSTOM_FUNCTION_HPP
-#define CUSTOM_FUNCTION_HPP
+#ifndef CASADI_CUSTOM_FUNCTION_HPP
+#define CASADI_CUSTOM_FUNCTION_HPP
 
 #include "function.hpp"
 #include <string>
@@ -84,4 +84,4 @@ public:
 } // namespace casadi
 
 
-#endif // CUSTOM_FUNCTION_HPP
+#endif // CASADI_CUSTOM_FUNCTION_HPP

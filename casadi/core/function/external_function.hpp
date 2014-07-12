@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef EXTERNAL_FUNCTION_HPP
-#define EXTERNAL_FUNCTION_HPP
+#ifndef CASADI_EXTERNAL_FUNCTION_HPP
+#define CASADI_EXTERNAL_FUNCTION_HPP
 
 #include "function.hpp"
 #include <string>
@@ -61,4 +61,4 @@ public:
 } // namespace casadi
 
 
-#endif // EXTERNAL_FUNCTION_HPP
+#endif // CASADI_EXTERNAL_FUNCTION_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef BINARY_SX_HPP
-#define BINARY_SX_HPP
+#ifndef CASADI_BINARY_SX_HPP
+#define CASADI_BINARY_SX_HPP
 
 #include "sx_node.hpp"
 #include <stack>
@@ -181,4 +181,4 @@ class CASADI_CORE_EXPORT BinarySX : public SXNode {
 } // namespace casadi
 /// \endcond
 
-#endif // BINARY_SX_HPP
+#endif // CASADI_BINARY_SX_HPP

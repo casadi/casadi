@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef INTEGRATOR_INTERNAL_HPP
-#define INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_INTEGRATOR_INTERNAL_HPP
+#define CASADI_INTEGRATOR_INTERNAL_HPP
 
 #include "integrator.hpp"
 #include "function_internal.hpp"
@@ -172,4 +172,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_INTEGRATOR_INTERNAL_HPP

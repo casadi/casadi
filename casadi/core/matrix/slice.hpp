@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SLICE_HPP
-#define SLICE_HPP
+#ifndef CASADI_SLICE_HPP
+#define CASADI_SLICE_HPP
 
 #include <vector>
 #include "../casadi_exception.hpp"
@@ -122,4 +122,4 @@ namespace casadi {
 %template(Pair_Slice_Slice) std::pair<casadi::Slice, casadi::Slice>;
 #endif // SWIG
 
-#endif // SLICE_HPP
+#endif // CASADI_SLICE_HPP

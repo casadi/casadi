@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef BINARY_MX_HPP
-#define BINARY_MX_HPP
+#ifndef CASADI_BINARY_MX_HPP
+#define CASADI_BINARY_MX_HPP
 
 #include "mx_node.hpp"
 
@@ -110,4 +110,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // BINARY_MX_HPP
+#endif // CASADI_BINARY_MX_HPP

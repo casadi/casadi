@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SIMPLE_HOMOTOPY_NLP_SOLVER_HPP
-#define SIMPLE_HOMOTOPY_NLP_SOLVER_HPP
+#ifndef CASADI_SIMPLE_HOMOTOPY_NLP_SOLVER_HPP
+#define CASADI_SIMPLE_HOMOTOPY_NLP_SOLVER_HPP
 
 #include "casadi/core/function/homotopy_nlp_solver.hpp"
 #include <casadi/nonlinear_programming/casadi_homotopynlpsolver_simple_export.h>
@@ -69,4 +69,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //SIMPLE_HOMOTOPY_NLP_SOLVER_HPP
+#endif // CASADI_SIMPLE_HOMOTOPY_NLP_SOLVER_HPP

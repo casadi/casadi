@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_MATH_HPP
-#define CASADI_MATH_HPP
+#ifndef CASADI_CASADI_MATH_HPP
+#define CASADI_CASADI_MATH_HPP
 
 #include "casadi_calculus.hpp"
 
@@ -526,4 +526,4 @@ inline void casadi_math<T>::printPost(unsigned char op, std::ostream &stream) {
 
 /// \endcond
 
-#endif //CASADI_MATH_HPP
+#endif // CASADI_CASADI_MATH_HPP

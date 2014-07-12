@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef EXTERNAL_FUNCTION_INTERNAL_HPP
-#define EXTERNAL_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_EXTERNAL_FUNCTION_INTERNAL_HPP
+#define CASADI_EXTERNAL_FUNCTION_INTERNAL_HPP
 
 #include "external_function.hpp"
 #include "function_internal.hpp"
@@ -92,4 +92,4 @@ class CASADI_CORE_EXPORT ExternalFunctionInternal : public FunctionInternal {
 } // namespace casadi
 /// \endcond
 
-#endif // EXTERNAL_FUNCTION_INTERNAL_HPP
+#endif // CASADI_EXTERNAL_FUNCTION_INTERNAL_HPP

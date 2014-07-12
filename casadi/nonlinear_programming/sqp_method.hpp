@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SQP_METHOD_HPP
-#define SQP_METHOD_HPP
+#ifndef CASADI_SQP_METHOD_HPP
+#define CASADI_SQP_METHOD_HPP
 
 #include "casadi/core/function/nlp_solver.hpp"
 
@@ -94,4 +94,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //SQP_METHOD_HPP
+#endif // CASADI_SQP_METHOD_HPP

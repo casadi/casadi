@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CSPARSE_HPP
-#define CSPARSE_HPP
+#ifndef CASADI_CSPARSE_HPP
+#define CASADI_CSPARSE_HPP
 
 #include "casadi/core/function/linear_solver.hpp"
 #include <casadi/interfaces/csparse/casadi_linearsolver_csparse_export.h>
@@ -82,5 +82,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //CSPARSE_HPP
+#endif // CASADI_CSPARSE_HPP
 

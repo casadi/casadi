@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MATRIX_IMPL_HPP
-#define MATRIX_IMPL_HPP
+#ifndef CASADI_MATRIX_IMPL_HPP
+#define CASADI_MATRIX_IMPL_HPP
 
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
@@ -2249,5 +2249,5 @@ namespace casadi {
 
 /// \endcond
 
-#endif // MATRIX_IMPL_HPP
+#endif // CASADI_MATRIX_IMPL_HPP
 

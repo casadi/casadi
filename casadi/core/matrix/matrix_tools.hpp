@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MATRIX_TOOLS_HPP
-#define MATRIX_TOOLS_HPP
+#ifndef CASADI_MATRIX_TOOLS_HPP
+#define CASADI_MATRIX_TOOLS_HPP
 
 #include "matrix.hpp"
 #include <algorithm>
@@ -1267,4 +1267,4 @@ namespace casadi {
   MTT_INST(DataType, dense)
 #endif //SWIGOCTAVE
 
-#endif // MATRIX_TOOLS_HPP
+#endif // CASADI_MATRIX_TOOLS_HPP

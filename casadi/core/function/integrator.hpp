@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef INTEGRATOR_HPP
-#define INTEGRATOR_HPP
+#ifndef CASADI_INTEGRATOR_HPP
+#define CASADI_INTEGRATOR_HPP
 
 #include "function.hpp"
 #include "linear_solver.hpp"
@@ -229,4 +229,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //INTEGRATOR_HPP
+#endif // CASADI_INTEGRATOR_HPP

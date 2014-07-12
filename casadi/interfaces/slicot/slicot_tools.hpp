@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SLICOT_TOOLS_HPP
-#define SLICOT_TOOLS_HPP
+#ifndef CASADI_SLICOT_TOOLS_HPP
+#define CASADI_SLICOT_TOOLS_HPP
 
 #include "../../core/matrix/matrix.hpp"
 #include <casadi/interfaces/slicot/casadi_slicot_interface_export.h>
@@ -81,4 +81,4 @@ CASADI_SLICOT_INTERFACE_EXPORT void slicot_periodic_schur(
 
 } // namespace casadi
 
-#endif // SLICOT_TOOLS_HPP
+#endif // CASADI_SLICOT_TOOLS_HPP

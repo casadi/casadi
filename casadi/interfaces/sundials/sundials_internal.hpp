@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SUNDIALS_INTERNAL_HPP
-#define SUNDIALS_INTERNAL_HPP
+#ifndef CASADI_SUNDIALS_INTERNAL_HPP
+#define CASADI_SUNDIALS_INTERNAL_HPP
 
 #include <casadi/interfaces/sundials/casadi_sundials_common_export.h>
 #include "casadi/core/function/integrator_internal.hpp"
@@ -112,4 +112,4 @@ public:
 } // namespace casadi
 
 /// \endcond
-#endif // SUNDIALS_INTERNAL_HPP
+#endif // CASADI_SUNDIALS_INTERNAL_HPP

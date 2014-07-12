@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SDP_SOLVER_HPP
-#define SDP_SOLVER_HPP
+#ifndef CASADI_SDP_SOLVER_HPP
+#define CASADI_SDP_SOLVER_HPP
 
 #include "function.hpp"
 
@@ -197,4 +197,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SDP_SOLVER_HPP
+#endif // CASADI_SDP_SOLVER_HPP

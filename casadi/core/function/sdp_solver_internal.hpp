@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SDP_SOLVER_INTERNAL_HPP
-#define SDP_SOLVER_INTERNAL_HPP
+#ifndef CASADI_SDP_SOLVER_INTERNAL_HPP
+#define CASADI_SDP_SOLVER_INTERNAL_HPP
 
 #include "sdp_solver.hpp"
 #include "function_internal.hpp"
@@ -123,5 +123,5 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif //SDP_SOLVER_INTERNAL_HPP
+#endif // CASADI_SDP_SOLVER_INTERNAL_HPP
 

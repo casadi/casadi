@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef QP_LP_SOLVER_HPP
-#define QP_LP_SOLVER_HPP
+#ifndef CASADI_QP_LP_SOLVER_HPP
+#define CASADI_QP_LP_SOLVER_HPP
 
 #include "casadi/core/function/lp_solver.hpp"
 
@@ -77,5 +77,5 @@ public:
 
 } // namespace casadi
 
-#endif //QP_LP_SOLVER_HPP
+#endif // CASADI_QP_LP_SOLVER_HPP
 

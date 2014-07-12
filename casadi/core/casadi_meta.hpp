@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_META_HPP
-#define CASADI_META_HPP
+#ifndef CASADI_CASADI_META_HPP
+#define CASADI_CASADI_META_HPP
 
 #include <string>
 #include "casadi_common.hpp"
@@ -91,4 +91,4 @@ namespace casadi {
 
 }  // namespace casadi
 
-#endif //CASADI_META_HPP
+#endif // CASADI_CASADI_META_HPP

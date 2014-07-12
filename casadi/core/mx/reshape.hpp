@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RESHAPE_HPP
-#define RESHAPE_HPP
+#ifndef CASADI_RESHAPE_HPP
+#define CASADI_RESHAPE_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -90,4 +90,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // RESHAPE_HPP
+#endif // CASADI_RESHAPE_HPP

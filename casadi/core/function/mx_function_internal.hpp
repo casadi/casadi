@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MX_FUNCTION_INTERNAL_HPP
-#define MX_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_MX_FUNCTION_INTERNAL_HPP
+#define CASADI_MX_FUNCTION_INTERNAL_HPP
 
 #include <set>
 #include <map>
@@ -157,5 +157,5 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // MX_FUNCTION_INTERNAL_HPP
+#endif // CASADI_MX_FUNCTION_INTERNAL_HPP
 

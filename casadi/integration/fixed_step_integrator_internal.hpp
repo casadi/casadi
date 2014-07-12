@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef FIXED_STEP_INTEGRATOR_INTERNAL_HPP
-#define FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#define CASADI_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
 #include "casadi/core/function/integrator_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
@@ -102,4 +102,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif //FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_FIXED_STEP_INTEGRATOR_INTERNAL_HPP

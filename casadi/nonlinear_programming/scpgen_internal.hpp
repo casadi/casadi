@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SCPGEN_INTERNAL_HPP
-#define SCPGEN_INTERNAL_HPP
+#ifndef CASADI_SCPGEN_INTERNAL_HPP
+#define CASADI_SCPGEN_INTERNAL_HPP
 
 #include "scpgen.hpp"
 #include "casadi/core/function/nlp_solver_internal.hpp"
@@ -226,4 +226,4 @@ public:
 
 /// \endcond
 
-#endif //SCPGEN_INTERNAL_HPP
+#endif // CASADI_SCPGEN_INTERNAL_HPP

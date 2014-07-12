@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CSPARSE_INTERNAL_HPP
-#define CSPARSE_INTERNAL_HPP
+#ifndef CASADI_CSPARSE_INTERNAL_HPP
+#define CASADI_CSPARSE_INTERNAL_HPP
 
 /// \cond INTERNAL
 
@@ -87,5 +87,5 @@ namespace casadi {
 
 /// \endcond
 
-#endif //CSPARSE_INTERNAL_HPP
+#endif // CASADI_CSPARSE_INTERNAL_HPP
 

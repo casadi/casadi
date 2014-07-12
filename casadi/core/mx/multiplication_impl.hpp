@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MULTIPLICATION_IMPL_HPP
-#define MULTIPLICATION_IMPL_HPP
+#ifndef CASADI_MULTIPLICATION_IMPL_HPP
+#define CASADI_MULTIPLICATION_IMPL_HPP
 
 #include "multiplication.hpp"
 #include "../matrix/matrix_tools.hpp"
@@ -186,4 +186,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // MULTIPLICATION_IMPL_HPP
+#endif // CASADI_MULTIPLICATION_IMPL_HPP

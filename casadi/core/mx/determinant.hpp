@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DETERMINANT_HPP
-#define DETERMINANT_HPP
+#ifndef CASADI_DETERMINANT_HPP
+#define CASADI_DETERMINANT_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -62,4 +62,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // DETERMINANT_HPP
+#endif // CASADI_DETERMINANT_HPP

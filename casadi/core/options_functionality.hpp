@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef OPTIONS_FUNCTIONALITY_HPP
-#define OPTIONS_FUNCTIONALITY_HPP
+#ifndef CASADI_OPTIONS_FUNCTIONALITY_HPP
+#define CASADI_OPTIONS_FUNCTIONALITY_HPP
 
 #include "generic_type.hpp"
 #include "shared_object.hpp"

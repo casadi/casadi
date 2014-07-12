@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef STABILIZED_QP_HPP
-#define STABILIZED_QP_HPP
+#ifndef CASADI_STABILIZED_QP_HPP
+#define CASADI_STABILIZED_QP_HPP
 
 #include "function.hpp"
 #include "qp_solver.hpp"
@@ -124,5 +124,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // STABILIZED_QP_HPP
+#endif // CASADI_STABILIZED_QP_HPP
 

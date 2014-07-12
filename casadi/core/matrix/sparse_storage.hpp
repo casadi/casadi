@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SPARSE_STORAGE_HPP
-#define SPARSE_STORAGE_HPP
+#ifndef CASADI_SPARSE_STORAGE_HPP
+#define CASADI_SPARSE_STORAGE_HPP
 
 #include <vector>
 #include <typeinfo>
@@ -215,4 +215,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SPARSE_STORAGE_HPP
+#endif // CASADI_SPARSE_STORAGE_HPP

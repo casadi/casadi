@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NEWTON_IMPLICIT_INTERNAL_HPP
-#define NEWTON_IMPLICIT_INTERNAL_HPP
+#ifndef CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
+#define CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
 
 #include "newton_implicit_solver.hpp"
 #include "casadi/core/function/implicit_function_internal.hpp"
@@ -78,4 +78,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif //NEWTON_IMPLICIT_INTERNAL_HPP
+#endif // CASADI_NEWTON_IMPLICIT_INTERNAL_HPP

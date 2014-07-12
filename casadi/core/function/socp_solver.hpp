@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SOCP_SOLVER_HPP
-#define SOCP_SOLVER_HPP
+#ifndef CASADI_SOCP_SOLVER_HPP
+#define CASADI_SOCP_SOLVER_HPP
 
 #include "function.hpp"
 
@@ -138,4 +138,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SOCP_SOLVER_HPP
+#endif // CASADI_SOCP_SOLVER_HPP

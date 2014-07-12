@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_EXCEPTION_HPP
-#define CASADI_EXCEPTION_HPP
+#ifndef CASADI_CASADI_EXCEPTION_HPP
+#define CASADI_CASADI_EXCEPTION_HPP
 
 #include <exception>
 #include <string>
@@ -165,4 +165,4 @@ std::cerr << "CasADi warning: \"" << msg << "\" issued " CASADI_ASSERT_WHERE ". 
 
 } // namespace casadi
 
-#endif // CASADI_EXCEPTION_HPP
+#endif // CASADI_CASADI_EXCEPTION_HPP

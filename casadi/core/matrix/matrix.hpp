@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef CASADI_MATRIX_HPP
+#define CASADI_MATRIX_HPP
 
 #include <vector>
 #include <typeinfo>
@@ -934,4 +934,4 @@ namespace casadi {
 #include "matrix_impl.hpp"
 #endif
 
-#endif // MATRIX_HPP
+#endif // CASADI_MATRIX_HPP

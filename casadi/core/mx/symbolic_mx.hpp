@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SYMBOLIC_MX_HPP
-#define SYMBOLIC_MX_HPP
+#ifndef CASADI_SYMBOLIC_MX_HPP
+#define CASADI_SYMBOLIC_MX_HPP
 
 #include "mx_node.hpp"
 
@@ -82,4 +82,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // SYMBOLIC_MX_HPP
+#endif // CASADI_SYMBOLIC_MX_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef OLD_COLLOCATION_INTEGRATOR_HPP
-#define OLD_COLLOCATION_INTEGRATOR_HPP
+#ifndef CASADI_OLD_COLLOCATION_INTEGRATOR_HPP
+#define CASADI_OLD_COLLOCATION_INTEGRATOR_HPP
 
 #include "casadi/core/function/integrator.hpp"
 #include <casadi/integration/casadi_integrator_oldcollocation_export.h>
@@ -78,4 +78,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //OLD_COLLOCATION_INTEGRATOR_HPP
+#endif // CASADI_OLD_COLLOCATION_INTEGRATOR_HPP

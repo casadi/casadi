@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SPARSITY_HPP
-#define SPARSITY_HPP
+#ifndef CASADI_SPARSITY_HPP
+#define CASADI_SPARSITY_HPP
 
 #include "../shared_object.hpp"
 #include "../casadi_types.hpp"
@@ -941,4 +941,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SPARSITY_HPP
+#endif // CASADI_SPARSITY_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NLP_IMPLICIT_INTERNAL_HPP
-#define NLP_IMPLICIT_INTERNAL_HPP
+#ifndef CASADI_NLP_IMPLICIT_INTERNAL_HPP
+#define CASADI_NLP_IMPLICIT_INTERNAL_HPP
 
 #include "nlp_implicit_solver.hpp"
 #include "casadi/core/function/implicit_function_internal.hpp"
@@ -74,4 +74,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif //NLP_IMPLICIT_INTERNAL_HPP
+#endif // CASADI_NLP_IMPLICIT_INTERNAL_HPP

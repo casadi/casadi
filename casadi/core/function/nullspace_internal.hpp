@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NULLSPACE_INTERNAL_HPP
-#define NULLSPACE_INTERNAL_HPP
+#ifndef CASADI_NULLSPACE_INTERNAL_HPP
+#define CASADI_NULLSPACE_INTERNAL_HPP
 
 #include "nullspace.hpp"
 #include "function_internal.hpp"
@@ -71,4 +71,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // NULLSPACE_INTERNAL_HPP
+#endif // CASADI_NULLSPACE_INTERNAL_HPP

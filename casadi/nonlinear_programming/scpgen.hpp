@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SCPGEN_HPP
-#define SCPGEN_HPP
+#ifndef CASADI_SCPGEN_HPP
+#define CASADI_SCPGEN_HPP
 
 #include "casadi/core/function/nlp_solver.hpp"
 
@@ -72,4 +72,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //SCPGEN_HPP
+#endif // CASADI_SCPGEN_HPP

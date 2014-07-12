@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DSDP_INTERNAL_HPP
-#define DSDP_INTERNAL_HPP
+#ifndef CASADI_DSDP_INTERNAL_HPP
+#define CASADI_DSDP_INTERNAL_HPP
 
 #include "casadi/core/function/sdp_solver_internal.hpp"
 #include <casadi/interfaces/dsdp/casadi_sdpsolver_dsdp_export.h>
@@ -90,4 +90,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif //DSDP_INTERNAL_HPP
+#endif // CASADI_DSDP_INTERNAL_HPP

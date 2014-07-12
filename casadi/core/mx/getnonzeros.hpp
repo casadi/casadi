@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GETNONZEROS_HPP
-#define GETNONZEROS_HPP
+#ifndef CASADI_GETNONZEROS_HPP
+#define CASADI_GETNONZEROS_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -206,4 +206,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // GETNONZEROS_HPP
+#endif // CASADI_GETNONZEROS_HPP

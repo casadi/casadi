@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SETNONZEROS_IMPL_HPP
-#define SETNONZEROS_IMPL_HPP
+#ifndef CASADI_SETNONZEROS_IMPL_HPP
+#define CASADI_SETNONZEROS_IMPL_HPP
 
 #include "setnonzeros.hpp"
 #include "../std_vector_tools.hpp"
@@ -676,4 +676,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SETNONZEROS_IMPL_HPP
+#endif // CASADI_SETNONZEROS_IMPL_HPP

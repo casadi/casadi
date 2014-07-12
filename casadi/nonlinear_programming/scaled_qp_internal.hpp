@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NLP_QP_SOLVER_HPP
-#define NLP_QP_SOLVER_HPP
+#ifndef CASADI_NLP_QP_SOLVER_HPP
+#define CASADI_NLP_QP_SOLVER_HPP
 
 #include "casadi/core/fx/qp_solver.hpp"
 
@@ -72,5 +72,5 @@ public:
 
 } // namespace casadi
 /// \endcond
-#endif //NLP_QP_SOLVER_HPP
+#endif // CASADI_NLP_QP_SOLVER_HPP
 

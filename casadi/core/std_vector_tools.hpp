@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef STD_VECTOR_TOOLS_HPP
-#define STD_VECTOR_TOOLS_HPP
+#ifndef CASADI_STD_VECTOR_TOOLS_HPP
+#define CASADI_STD_VECTOR_TOOLS_HPP
 
 
 #include <iostream>
@@ -741,4 +741,4 @@ VTT_INST(T, isRegular) \
 
 #endif //SWIG
 
-#endif // STD_VECTOR_TOOLS_HPP
+#endif // CASADI_STD_VECTOR_TOOLS_HPP

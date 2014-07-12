@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef LP_INTERNAL_HPP
-#define LP_INTERNAL_HPP
+#ifndef CASADI_LP_INTERNAL_HPP
+#define CASADI_LP_INTERNAL_HPP
 
 #include "lp_solver.hpp"
 #include "function_internal.hpp"
@@ -80,5 +80,5 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif //LP_INTERNAL_HPP
+#endif // CASADI_LP_INTERNAL_HPP
 

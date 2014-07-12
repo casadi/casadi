@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NEWTON_IMPLICIT_SOLVER_HPP
-#define NEWTON_IMPLICIT_SOLVER_HPP
+#ifndef CASADI_NEWTON_IMPLICIT_SOLVER_HPP
+#define CASADI_NEWTON_IMPLICIT_SOLVER_HPP
 
 #include "casadi/core/function/implicit_function.hpp"
 #include <casadi/nonlinear_programming/casadi_implicitfunction_newton_export.h>
@@ -73,4 +73,4 @@ public:
 
 } // namespace casadi
 
-#endif //NEWTON_IMPLICIT_SOLVER_HPP
+#endif // CASADI_NEWTON_IMPLICIT_SOLVER_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SUBREF_HPP
-#define SUBREF_HPP
+#ifndef CASADI_SUBREF_HPP
+#define CASADI_SUBREF_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -82,4 +82,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SUBREF_HPP
+#endif // CASADI_SUBREF_HPP

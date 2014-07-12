@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SYMBOLIC_QR_INTERNAL_HPP
-#define SYMBOLIC_QR_INTERNAL_HPP
+#ifndef CASADI_SYMBOLIC_QR_INTERNAL_HPP
+#define CASADI_SYMBOLIC_QR_INTERNAL_HPP
 
 #include "symbolic_qr.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
@@ -81,5 +81,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif //SYMBOLIC_QR_INTERNAL_HPP
+#endif // CASADI_SYMBOLIC_QR_INTERNAL_HPP
 

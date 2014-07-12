@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MX_FUNCTION_HPP
-#define MX_FUNCTION_HPP
+#ifndef CASADI_MX_FUNCTION_HPP
+#define CASADI_MX_FUNCTION_HPP
 
 #include <set>
 #include <iostream>
@@ -194,5 +194,5 @@ public:
 } // namespace casadi
 
 
-#endif // MX_FUNCTION_HPP
+#endif // CASADI_MX_FUNCTION_HPP
 

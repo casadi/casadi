@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef FUNCTOR_HPP
-#define FUNCTOR_HPP
+#ifndef CASADI_FUNCTOR_HPP
+#define CASADI_FUNCTOR_HPP
 
 #include "casadi_types.hpp"
 
@@ -129,4 +129,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // FUNCTOR_HPP
+#endif // CASADI_FUNCTOR_HPP

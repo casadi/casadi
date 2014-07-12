@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IPOPT_NLP_HPP
-#define IPOPT_NLP_HPP
+#ifndef CASADI_IPOPT_NLP_HPP
+#define CASADI_IPOPT_NLP_HPP
 
 #include <IpTNLP.hpp>
 #include <IpIpoptCalculatedQuantities.hpp>

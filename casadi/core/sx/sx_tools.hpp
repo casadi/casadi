@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SX_TOOLS_HPP
-#define SX_TOOLS_HPP
+#ifndef CASADI_SX_TOOLS_HPP
+#define CASADI_SX_TOOLS_HPP
 
 #include "sx_element.hpp"
 #include "../matrix/matrix_tools.hpp"
@@ -371,4 +371,4 @@ namespace casadi {
 
 
 
-#endif // SX_TOOLS_HPP
+#endif // CASADI_SX_TOOLS_HPP

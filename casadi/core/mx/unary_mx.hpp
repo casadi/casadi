@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef UNARY_MX_HPP
-#define UNARY_MX_HPP
+#ifndef CASADI_UNARY_MX_HPP
+#define CASADI_UNARY_MX_HPP
 
 #include "mx_node.hpp"
 /// \cond INTERNAL
@@ -91,4 +91,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // UNARY_MX_HPP
+#endif // CASADI_UNARY_MX_HPP

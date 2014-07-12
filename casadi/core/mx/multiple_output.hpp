@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MULTIPLE_OUTPUT_HPP
-#define MULTIPLE_OUTPUT_HPP
+#ifndef CASADI_MULTIPLE_OUTPUT_HPP
+#define CASADI_MULTIPLE_OUTPUT_HPP
 
 #include "mx_node.hpp"
 #include "../function/function.hpp"
@@ -105,4 +105,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // MULTIPLE_OUTPUT_HPP
+#endif // CASADI_MULTIPLE_OUTPUT_HPP

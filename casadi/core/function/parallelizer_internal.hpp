@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef PARALLELIZER_INTERNAL_HPP
-#define PARALLELIZER_INTERNAL_HPP
+#ifndef CASADI_PARALLELIZER_INTERNAL_HPP
+#define CASADI_PARALLELIZER_INTERNAL_HPP
 
 #include <vector>
 #include "parallelizer.hpp"
@@ -114,5 +114,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // PARALLELIZER_INTERNAL_HPP
+#endif // CASADI_PARALLELIZER_INTERNAL_HPP
 

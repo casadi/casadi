@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SOCP_SOLVER_INTERNAL_HPP
-#define SOCP_SOLVER_INTERNAL_HPP
+#ifndef CASADI_SOCP_SOLVER_INTERNAL_HPP
+#define CASADI_SOCP_SOLVER_INTERNAL_HPP
 
 #include "socp_solver.hpp"
 #include "function_internal.hpp"
@@ -96,5 +96,5 @@ namespace casadi {
 
 /// \endcond
 
-#endif //SOCP_SOLVER_INTERNAL_HPP
+#endif // CASADI_SOCP_SOLVER_INTERNAL_HPP
 

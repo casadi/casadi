@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CONTROLSIMULATOR_HPP
-#define CONTROLSIMULATOR_HPP
+#ifndef CASADI_CONTROLSIMULATOR_HPP
+#define CASADI_CONTROLSIMULATOR_HPP
 
 #include "integrator.hpp"
 
@@ -147,4 +147,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //CONTROLSIMULATOR_HPP
+#endif // CASADI_CONTROLSIMULATOR_HPP

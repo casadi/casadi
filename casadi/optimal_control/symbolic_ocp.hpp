@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SYMBOLIC_OCP_HPP
-#define SYMBOLIC_OCP_HPP
+#ifndef CASADI_SYMBOLIC_OCP_HPP
+#define CASADI_SYMBOLIC_OCP_HPP
 
 #include "variable.hpp"
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
@@ -465,4 +465,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //SYMBOLIC_OCP_HPP
+#endif // CASADI_SYMBOLIC_OCP_HPP

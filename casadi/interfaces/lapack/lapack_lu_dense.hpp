@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef LAPACK_LU_DENSE_HPP
-#define LAPACK_LU_DENSE_HPP
+#ifndef CASADI_LAPACK_LU_DENSE_HPP
+#define CASADI_LAPACK_LU_DENSE_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linearsolver_lapacklu_export.h>
@@ -125,4 +125,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //LAPACK_LU_DENSE_HPP
+#endif // CASADI_LAPACK_LU_DENSE_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SDQP_SOLVER_INTERNAL_HPP
-#define SDQP_SOLVER_INTERNAL_HPP
+#ifndef CASADI_SDQP_SOLVER_INTERNAL_HPP
+#define CASADI_SDQP_SOLVER_INTERNAL_HPP
 
 #include "sdqp_solver.hpp"
 #include "function_internal.hpp"
@@ -90,5 +90,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif //SDQP_SOLVER_INTERNAL_HPP
+#endif // CASADI_SDQP_SOLVER_INTERNAL_HPP
 

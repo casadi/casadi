@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NLP_SOLVER_HPP
-#define NLP_SOLVER_HPP
+#ifndef CASADI_NLP_SOLVER_HPP
+#define CASADI_NLP_SOLVER_HPP
 
 #include "function.hpp"
 
@@ -254,5 +254,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // NLP_SOLVER_HPP
+#endif // CASADI_NLP_SOLVER_HPP
 

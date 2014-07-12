@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef PROFILING_HPP
-#define PROFILING_HPP
+#ifndef CASADI_PROFILING_HPP
+#define CASADI_PROFILING_HPP
 
 #include <fstream>
 #include <cstring>
@@ -228,4 +228,4 @@ void profileWriteSourceLine(std::ofstream &f, T *a, int line_number,
 /// \endcond
 } // namespace casadi
 
-#endif //PROFILING_HPP
+#endif // CASADI_PROFILING_HPP

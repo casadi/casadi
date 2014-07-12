@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_TYPES_HPP
-#define CASADI_TYPES_HPP
+#ifndef CASADI_CASADI_TYPES_HPP
+#define CASADI_CASADI_TYPES_HPP
 
 #include <climits>
 #include <cassert>
@@ -92,5 +92,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // CASADI_TYPES_HPP
+#endif // CASADI_CASADI_TYPES_HPP
 

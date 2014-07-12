@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_HPP
-#define CASADI_HPP
+#ifndef CASADI_CASADI_HPP
+#define CASADI_CASADI_HPP
 
 // Scalar expressions (why do I need to put it up here?)
 #include "sx/sx_element.hpp"
@@ -54,4 +54,4 @@
 #include "function/implicit_function.hpp"
 
 
-#endif //CASADI_HPP
+#endif // CASADI_CASADI_HPP

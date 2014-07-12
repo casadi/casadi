@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DIRECT_COLLOCATION_HPP
-#define DIRECT_COLLOCATION_HPP
+#ifndef CASADI_DIRECT_COLLOCATION_HPP
+#define CASADI_DIRECT_COLLOCATION_HPP
 
 #include "casadi/core/function/ocp_solver.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
@@ -77,4 +77,4 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocation : public OCPSolver {
 
 } // namespace casadi
 
-#endif // DIRECT_COLLOCATION_HPP
+#endif // CASADI_DIRECT_COLLOCATION_HPP

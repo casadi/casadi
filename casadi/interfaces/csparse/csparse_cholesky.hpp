@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CSPARSE_CHOLESKY_HPP
-#define CSPARSE_CHOLESKY_HPP
+#ifndef CASADI_CSPARSE_CHOLESKY_HPP
+#define CASADI_CSPARSE_CHOLESKY_HPP
 
 #include "casadi/core/function/linear_solver.hpp"
 #include <casadi/interfaces/csparse/casadi_linearsolver_csparsecholesky_export.h>
@@ -98,4 +98,4 @@ public:
 
 } // namespace casadi
 
-#endif //CSPARSE_CHOLESKY_HPP
+#endif // CASADI_CSPARSE_CHOLESKY_HPP

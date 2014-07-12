@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef WORHP_INTERNAL_HPP
-#define WORHP_INTERNAL_HPP
+#ifndef CASADI_WORHP_INTERNAL_HPP
+#define CASADI_WORHP_INTERNAL_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include <casadi/interfaces/worhp/casadi_nlpsolver_worhp_export.h>
@@ -127,4 +127,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif //WORHP_INTERNAL_HPP
+#endif // CASADI_WORHP_INTERNAL_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef VARIABLE_HPP
-#define VARIABLE_HPP
+#ifndef CASADI_VARIABLE_HPP
+#define CASADI_VARIABLE_HPP
 
 #include <iostream>
 #include "casadi/core/function/sx_function.hpp"
@@ -159,5 +159,5 @@ namespace casadi {
   };
 } // namespace casadi
 
-#endif // VARIABLE_HPP
+#endif // CASADI_VARIABLE_HPP
 

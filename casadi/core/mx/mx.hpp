@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MX_HPP
-#define MX_HPP
+#ifndef CASADI_MX_HPP
+#define CASADI_MX_HPP
 #include "../shared_object.hpp"
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"
@@ -593,4 +593,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // MX_HPP
+#endif // CASADI_MX_HPP

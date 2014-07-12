@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SIMULATOR_HPP
-#define SIMULATOR_HPP
+#ifndef CASADI_SIMULATOR_HPP
+#define CASADI_SIMULATOR_HPP
 
 #include "integrator.hpp"
 
@@ -79,4 +79,4 @@ public:
 
 } // namespace casadi
 
-#endif //SIMULATOR_HPP
+#endif // CASADI_SIMULATOR_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
-#define IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#define CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
 #include "fixed_step_integrator_internal.hpp"
 #include "casadi/core/function/implicit_function.hpp"
@@ -64,4 +64,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif //IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP

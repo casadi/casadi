@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef KINSOL_INTERNAL_HPP
-#define KINSOL_INTERNAL_HPP
+#ifndef CASADI_KINSOL_INTERNAL_HPP
+#define CASADI_KINSOL_INTERNAL_HPP
 
 #include "kinsol_solver.hpp"
 #include "casadi/core/function/implicit_function_internal.hpp"
@@ -143,5 +143,5 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif //KINSOL_INTERNAL_HPP
+#endif // CASADI_KINSOL_INTERNAL_HPP
 

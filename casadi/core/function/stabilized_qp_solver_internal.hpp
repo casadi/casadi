@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef STABILIZED_QP_INTERNAL_HPP
-#define STABILIZED_QP_INTERNAL_HPP
+#ifndef CASADI_STABILIZED_QP_INTERNAL_HPP
+#define CASADI_STABILIZED_QP_INTERNAL_HPP
 
 #include "stabilized_qp_solver.hpp"
 #include "function_internal.hpp"
@@ -86,5 +86,5 @@ namespace casadi {
 
 
 /// \endcond
-#endif //STABILIZED_QP_INTERNAL_HPP
+#endif // CASADI_STABILIZED_QP_INTERNAL_HPP
 

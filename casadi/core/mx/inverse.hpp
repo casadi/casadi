@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef INVERSE_HPP
-#define INVERSE_HPP
+#ifndef CASADI_INVERSE_HPP
+#define CASADI_INVERSE_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -62,4 +62,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // INVERSE_HPP
+#endif // CASADI_INVERSE_HPP

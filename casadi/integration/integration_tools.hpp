@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef INTEGRATION_TOOLS_HPP
-#define INTEGRATION_TOOLS_HPP
+#ifndef CASADI_INTEGRATION_TOOLS_HPP
+#define CASADI_INTEGRATION_TOOLS_HPP
 
 #include <vector>
 #include <algorithm>
@@ -124,4 +124,4 @@ extern const long double** collocation_points[2];
 
 } // namespace casadi
 
-#endif // INTEGRATION_TOOLS_HPP
+#endif // CASADI_INTEGRATION_TOOLS_HPP

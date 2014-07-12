@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef KINSOL_SOLVER_HPP
-#define KINSOL_SOLVER_HPP
+#ifndef CASADI_KINSOL_SOLVER_HPP
+#define CASADI_KINSOL_SOLVER_HPP
 
 #include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/function/linear_solver.hpp"
@@ -90,5 +90,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //KINSOL_SOLVER_HPP
+#endif // CASADI_KINSOL_SOLVER_HPP
 

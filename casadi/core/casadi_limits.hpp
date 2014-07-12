@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_LIMITS_HPP
-#define CASADI_LIMITS_HPP
+#ifndef CASADI_CASADI_LIMITS_HPP
+#define CASADI_CASADI_LIMITS_HPP
 
 #include <cmath>
 #include <limits>
@@ -61,4 +61,4 @@ class CASADI_CORE_EXPORT casadi_limits {
 };
 
 } // namespace casadi
-#endif // CASADI_LIMITS_HPP
+#endif // CASADI_CASADI_LIMITS_HPP

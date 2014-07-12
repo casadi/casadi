@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef OOQP_SOLVER_HPP
-#define OOQP_SOLVER_HPP
+#ifndef CASADI_OOQP_SOLVER_HPP
+#define CASADI_OOQP_SOLVER_HPP
 
 #include "casadi/core/function/qp_solver.hpp"
 #include <casadi/interfaces/ooqp/casadi_qpsolver_ooqp_export.h>
@@ -74,5 +74,5 @@ public:
 
 } // namespace casadi
 
-#endif //OOQP_SOLVER_HPP
+#endif // CASADI_OOQP_SOLVER_HPP
 

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SPARSITY_INTERNAL_HPP
-#define SPARSITY_INTERNAL_HPP
+#ifndef CASADI_SPARSITY_INTERNAL_HPP
+#define CASADI_SPARSITY_INTERNAL_HPP
 
 #include "sparsity.hpp"
 /// \cond INTERNAL
@@ -401,4 +401,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // SPARSITY_INTERNAL_HPP
+#endif // CASADI_SPARSITY_INTERNAL_HPP

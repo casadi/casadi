@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef OCP_SOLVER_INTERNAL_HPP
-#define OCP_SOLVER_INTERNAL_HPP
+#ifndef CASADI_OCP_SOLVER_INTERNAL_HPP
+#define CASADI_OCP_SOLVER_INTERNAL_HPP
 
 #include <vector>
 #include "ocp_solver.hpp"
@@ -109,5 +109,5 @@ class CASADI_CORE_EXPORT OCPSolverInternal : public FunctionInternal {
 } // namespace casadi
 
 /// \endcond
-#endif // OCP_SOLVER_INTERNAL_HPP
+#endif // CASADI_OCP_SOLVER_INTERNAL_HPP
 

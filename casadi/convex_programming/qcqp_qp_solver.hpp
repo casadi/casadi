@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef QCQP_QP_SOLVER_HPP
-#define QCQP_QP_SOLVER_HPP
+#ifndef CASADI_QCQP_QP_SOLVER_HPP
+#define CASADI_QCQP_QP_SOLVER_HPP
 
 #include "casadi/core/function/qp_solver.hpp"
 #include <casadi/convex_programming/casadi_qpsolver_qcqp_export.h>
@@ -76,5 +76,5 @@ public:
 
 } // namespace casadi
 
-#endif //QCQP_QP_SOLVER_HPP
+#endif // CASADI_QCQP_QP_SOLVER_HPP
 

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IO_SCHEME_INTERNAL_HPP
-#define IO_SCHEME_INTERNAL_HPP
+#ifndef CASADI_IO_SCHEME_INTERNAL_HPP
+#define CASADI_IO_SCHEME_INTERNAL_HPP
 
 #include "io_scheme.hpp"
 #include "../casadi_exception.hpp"
@@ -155,4 +155,4 @@ class CASADI_CORE_EXPORT IOSchemeCustomInternal : public IOSchemeInternal {
 } // namespace casadi
 /// \endcond
 
-#endif // IO_SCHEME_INTERNAL_HPP
+#endif // CASADI_IO_SCHEME_INTERNAL_HPP

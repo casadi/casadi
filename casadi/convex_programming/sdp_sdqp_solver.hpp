@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SDP_SDQP_SOLVER_HPP
-#define SDP_SDQP_SOLVER_HPP
+#ifndef CASADI_SDP_SDQP_SOLVER_HPP
+#define CASADI_SDP_SDQP_SOLVER_HPP
 
 #include "casadi/core/function/sdqp_solver.hpp"
 #include <casadi/convex_programming/casadi_sdqpsolver_sdp_export.h>
@@ -84,4 +84,4 @@ public:
 
 } // namespace casadi
 
-#endif //SDP_SDQP_SOLVER_HPP
+#endif // CASADI_SDP_SDQP_SOLVER_HPP

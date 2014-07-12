@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IDAS_INTERNAL_HPP
-#define IDAS_INTERNAL_HPP
+#ifndef CASADI_IDAS_INTERNAL_HPP
+#define CASADI_IDAS_INTERNAL_HPP
 
 #include <casadi/interfaces/sundials/casadi_integrator_idas_export.h>
 #include "sundials_internal.hpp"
@@ -304,5 +304,5 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInternal : public SundialsInternal {
 } // namespace casadi
 
 /// \endcond
-#endif //IDAS_INTERNAL_HPP
+#endif // CASADI_IDAS_INTERNAL_HPP
 

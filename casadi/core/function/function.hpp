@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef FUNCTION_HPP
-#define FUNCTION_HPP
+#ifndef CASADI_FUNCTION_HPP
+#define CASADI_FUNCTION_HPP
 
 #include "io_interface.hpp"
 
@@ -454,4 +454,4 @@ NOTE: Does _not_ take ownership, only weak references to the derivatives are kep
 #endif // SWIG
 
 
-#endif // FUNCTION_HPP
+#endif // CASADI_FUNCTION_HPP

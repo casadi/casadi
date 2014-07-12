@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_OPTIONS_HPP
-#define CASADI_OPTIONS_HPP
+#ifndef CASADI_CASADI_OPTIONS_HPP
+#define CASADI_CASADI_OPTIONS_HPP
 
 #include <iostream>
 #include <fstream>
@@ -106,4 +106,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //CASADI_OPTIONS_HPP
+#endif // CASADI_CASADI_OPTIONS_HPP

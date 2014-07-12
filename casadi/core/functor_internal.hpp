@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef FUNCTOR_INTERNAL_HPP
-#define FUNCTOR_INTERNAL_HPP
+#ifndef CASADI_FUNCTOR_INTERNAL_HPP
+#define CASADI_FUNCTOR_INTERNAL_HPP
 
 #include "functor.hpp"
 /// \cond INTERNAL
@@ -91,4 +91,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // FUNCTOR_INTERNAL_HPP
+#endif // CASADI_FUNCTOR_INTERNAL_HPP

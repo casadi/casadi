@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SPARSE_STORAGE_IMPL_HPP
-#define SPARSE_STORAGE_IMPL_HPP
+#ifndef CASADI_SPARSE_STORAGE_IMPL_HPP
+#define CASADI_SPARSE_STORAGE_IMPL_HPP
 
 /// \cond INTERNAL
 
@@ -177,4 +177,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // SPARSE_STORAGE_IMPL_HPP
+#endif // CASADI_SPARSE_STORAGE_IMPL_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP
-#define DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP
+#ifndef CASADI_DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP
+#define CASADI_DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP
 
 #include "direct_multiple_shooting.hpp"
 #include "casadi/core/function/ocp_solver_internal.hpp"
@@ -82,4 +82,4 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShootingInternal : public OCPS
 } // namespace casadi
 /// \endcond
 
-#endif // DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP
+#endif // CASADI_DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP

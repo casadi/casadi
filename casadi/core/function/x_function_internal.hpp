@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef X_FUNCTION_INTERNAL_HPP
-#define X_FUNCTION_INTERNAL_HPP
+#ifndef CASADI_X_FUNCTION_INTERNAL_HPP
+#define CASADI_X_FUNCTION_INTERNAL_HPP
 
 #include <stack>
 #include "function_internal.hpp"
@@ -1090,4 +1090,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // X_FUNCTION_INTERNAL_HPP
+#endif // CASADI_X_FUNCTION_INTERNAL_HPP

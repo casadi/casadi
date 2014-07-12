@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef TRANSPOSE_HPP
-#define TRANSPOSE_HPP
+#ifndef CASADI_TRANSPOSE_HPP
+#define CASADI_TRANSPOSE_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -135,4 +135,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // TRANSPOSE_HPP
+#endif // CASADI_TRANSPOSE_HPP

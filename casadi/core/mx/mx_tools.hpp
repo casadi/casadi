@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MX_TOOLS_HPP
-#define MX_TOOLS_HPP
+#ifndef CASADI_MX_TOOLS_HPP
+#define CASADI_MX_TOOLS_HPP
 
 #include "mx.hpp"
 
@@ -424,4 +424,4 @@ namespace casadi {
 
 
 
-#endif // MX_TOOLS_HPP
+#endif // CASADI_MX_TOOLS_HPP

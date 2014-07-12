@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SHARED_OBJECT_HPP
-#define SHARED_OBJECT_HPP
+#ifndef CASADI_SHARED_OBJECT_HPP
+#define CASADI_SHARED_OBJECT_HPP
 
 #include "printable_object.hpp"
 #include "casadi_exception.hpp"
@@ -385,5 +385,5 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // SHARED_OBJECT_HPP
+#endif // CASADI_SHARED_OBJECT_HPP
 

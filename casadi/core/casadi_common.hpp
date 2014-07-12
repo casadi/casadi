@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_COMMON_HPP
-#define CASADI_COMMON_HPP
+#ifndef CASADI_CASADI_COMMON_HPP
+#define CASADI_CASADI_COMMON_HPP
 
 #include <casadi/core/casadi_core_export.h>
 
@@ -33,5 +33,5 @@
 #define casadi_core_implementation
 #endif
 
-#endif // CASADI_COMMON_HPP
+#endif // CASADI_CASADI_COMMON_HPP
 

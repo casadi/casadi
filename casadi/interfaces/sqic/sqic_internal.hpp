@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SQIC_INTERNAL_HPP
-#define SQIC_INTERNAL_HPP
+#ifndef CASADI_SQIC_INTERNAL_HPP
+#define CASADI_SQIC_INTERNAL_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include "sqic_solver.hpp"
@@ -106,5 +106,5 @@ public:
 } // namespace casadi
 
 /// \endcond
-#endif //SQIC_INTERNAL_HPP
+#endif // CASADI_SQIC_INTERNAL_HPP
 

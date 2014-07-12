@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef POLYNOMIAL_HPP
-#define POLYNOMIAL_HPP
+#ifndef CASADI_POLYNOMIAL_HPP
+#define CASADI_POLYNOMIAL_HPP
 
 # include "printable_object.hpp"
 
@@ -119,5 +119,5 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // POLYNOMIAL_HPP
+#endif // CASADI_POLYNOMIAL_HPP
 

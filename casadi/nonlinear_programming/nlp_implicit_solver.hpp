@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NLP_IMPLICIT_SOLVER_HPP
-#define NLP_IMPLICIT_SOLVER_HPP
+#ifndef CASADI_NLP_IMPLICIT_SOLVER_HPP
+#define CASADI_NLP_IMPLICIT_SOLVER_HPP
 
 #include "casadi/core/function/implicit_function.hpp"
 #include <casadi/nonlinear_programming/casadi_implicitfunction_nlp_export.h>
@@ -75,5 +75,5 @@ public:
 
 } // namespace casadi
 
-#endif //NLP_IMPLICIT_SOLVER_HPP
+#endif // CASADI_NLP_IMPLICIT_SOLVER_HPP
 

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GENERIC_EXPRESSION_TOOLS_HPP
-#define GENERIC_EXPRESSION_TOOLS_HPP
+#ifndef CASADI_GENERIC_EXPRESSION_TOOLS_HPP
+#define CASADI_GENERIC_EXPRESSION_TOOLS_HPP
 
 #include "../casadi_math.hpp"
 
@@ -58,4 +58,4 @@ GET_INST(DataType, logic_not) \
 
 #endif //SWIG
 
-#endif // GENERIC_EXPRESSION_TOOLS_HPP
+#endif // CASADI_GENERIC_EXPRESSION_TOOLS_HPP

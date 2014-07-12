@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IO_SCHEME_VECTOR_HPP
-#define IO_SCHEME_VECTOR_HPP
+#ifndef CASADI_IO_SCHEME_VECTOR_HPP
+#define CASADI_IO_SCHEME_VECTOR_HPP
 
 #include "schemes_metadata.hpp"
 #include "io_scheme.hpp"
@@ -86,4 +86,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // IO_SCHEME_VECTOR_HPP
+#endif // CASADI_IO_SCHEME_VECTOR_HPP

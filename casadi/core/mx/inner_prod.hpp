@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef INNER_PROD_HPP
-#define INNER_PROD_HPP
+#ifndef CASADI_INNER_PROD_HPP
+#define CASADI_INNER_PROD_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -81,4 +81,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // INNER_PROD_HPP
+#endif // CASADI_INNER_PROD_HPP

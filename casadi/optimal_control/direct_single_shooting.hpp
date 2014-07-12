@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DIRECT_SINGLE_SHOOTING_HPP
-#define DIRECT_SINGLE_SHOOTING_HPP
+#ifndef CASADI_DIRECT_SINGLE_SHOOTING_HPP
+#define CASADI_DIRECT_SINGLE_SHOOTING_HPP
 
 #include "casadi/core/function/ocp_solver.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
@@ -106,4 +106,4 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectSingleShooting : public OCPSolver {
 
 } // namespace casadi
 
-#endif // DIRECT_SINGLE_SHOOTING_HPP
+#endif // CASADI_DIRECT_SINGLE_SHOOTING_HPP

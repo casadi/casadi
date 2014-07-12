@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef ASSERTION_HPP
-#define ASSERTION_HPP
+#ifndef CASADI_ASSERTION_HPP
+#define CASADI_ASSERTION_HPP
 
 #include "mx_node.hpp"
 #include <map>
@@ -76,4 +76,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // ASSERTION_HPP
+#endif // CASADI_ASSERTION_HPP

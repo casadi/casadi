@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SNOPT_INTERNAL_HPP
-#define SNOPT_INTERNAL_HPP
+#ifndef CASADI_SNOPT_INTERNAL_HPP
+#define CASADI_SNOPT_INTERNAL_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
@@ -196,4 +196,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif //SNOPT_INTERNAL_HPP
+#endif // CASADI_SNOPT_INTERNAL_HPP

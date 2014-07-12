@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef LP_SOLVER_HPP
-#define LP_SOLVER_HPP
+#ifndef CASADI_LP_SOLVER_HPP
+#define CASADI_LP_SOLVER_HPP
 
 #include "function.hpp"
 
@@ -124,5 +124,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // LP_SOLVER_HPP
+#endif // CASADI_LP_SOLVER_HPP
 

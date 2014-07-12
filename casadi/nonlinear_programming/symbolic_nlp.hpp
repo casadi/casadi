@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SYMBOLIC_NLP_HPP
-#define SYMBOLIC_NLP_HPP
+#ifndef CASADI_SYMBOLIC_NLP_HPP
+#define CASADI_SYMBOLIC_NLP_HPP
 
 #include <casadi/core/casadi.hpp>
 
@@ -92,4 +92,4 @@ class CASADI_NONLINEAR_PROGRAMMING_EXPORT SymbolicNLP : public PrintableObject {
 
 } // namespace casadi
 
-#endif //SYMBOLIC_NLP_HPP
+#endif // CASADI_SYMBOLIC_NLP_HPP

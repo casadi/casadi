@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CONSTANT_MX_HPP
-#define CONSTANT_MX_HPP
+#ifndef CASADI_CONSTANT_MX_HPP
+#define CASADI_CONSTANT_MX_HPP
 
 #include "mx_node.hpp"
 #include <iomanip>
@@ -540,4 +540,4 @@ namespace casadi {
 /// \endcond
 
 
-#endif // CONSTANT_MX_HPP
+#endif // CASADI_CONSTANT_MX_HPP

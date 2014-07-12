@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NLP_SOLVER_INTERNAL_HPP
-#define NLP_SOLVER_INTERNAL_HPP
+#ifndef CASADI_NLP_SOLVER_INTERNAL_HPP
+#define CASADI_NLP_SOLVER_INTERNAL_HPP
 
 #include "nlp_solver.hpp"
 #include "function_internal.hpp"
@@ -159,4 +159,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif //NLP_SOLVER_INTERNAL_HPP
+#endif // CASADI_NLP_SOLVER_INTERNAL_HPP

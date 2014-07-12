@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef PSD_INDEF_DPLE_SOLVER_HPP
-#define PSD_INDEF_DPLE_SOLVER_HPP
+#ifndef CASADI_PSD_INDEF_DPLE_SOLVER_HPP
+#define CASADI_PSD_INDEF_DPLE_SOLVER_HPP
 
 #include "../../control/dple_solver.hpp"
 #include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
@@ -78,4 +78,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // DPLE_SOLVER_HPP
+#endif // CASADI_DPLE_SOLVER_HPP

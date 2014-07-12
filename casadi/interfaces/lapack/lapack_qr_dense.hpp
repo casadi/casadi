@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef LAPACK_QR_DENSE_HPP
-#define LAPACK_QR_DENSE_HPP
+#ifndef CASADI_LAPACK_QR_DENSE_HPP
+#define CASADI_LAPACK_QR_DENSE_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linearsolver_lapackqr_export.h>
@@ -105,4 +105,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //LAPACK_QR_DENSE_HPP
+#endif // CASADI_LAPACK_QR_DENSE_HPP

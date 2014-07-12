@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GENERIC_MATRIX_HPP
-#define GENERIC_MATRIX_HPP
+#ifndef CASADI_GENERIC_MATRIX_HPP
+#define CASADI_GENERIC_MATRIX_HPP
 
 #include "slice.hpp"
 #include "submatrix.hpp"
@@ -386,4 +386,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // GENERIC_MATRIX_HPP
+#endif // CASADI_GENERIC_MATRIX_HPP

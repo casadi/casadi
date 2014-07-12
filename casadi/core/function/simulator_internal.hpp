@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SIMULATOR_INTERNAL_HPP
-#define SIMULATOR_INTERNAL_HPP
+#ifndef CASADI_SIMULATOR_INTERNAL_HPP
+#define CASADI_SIMULATOR_INTERNAL_HPP
 
 #include "simulator.hpp"
 #include "function_internal.hpp"
@@ -72,4 +72,4 @@ namespace casadi {
 } // namespace casadi
 
 /// \endcond
-#endif // SIMULATOR_INTERNAL_HPP
+#endif // CASADI_SIMULATOR_INTERNAL_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CONTROLSIMULATOR_INTERNAL_HPP
-#define CONTROLSIMULATOR_INTERNAL_HPP
+#ifndef CASADI_CONTROLSIMULATOR_INTERNAL_HPP
+#define CASADI_CONTROLSIMULATOR_INTERNAL_HPP
 
 #include "control_simulator.hpp"
 #include "simulator.hpp"
@@ -109,4 +109,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#endif // CONTROLSIMULATOR_INTERNAL_HPP
+#endif // CASADI_CONTROLSIMULATOR_INTERNAL_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DPLE_SOLVER_HPP
-#define DPLE_SOLVER_HPP
+#ifndef CASADI_DPLE_SOLVER_HPP
+#define CASADI_DPLE_SOLVER_HPP
 
 #include "../core/function/function.hpp"
 
@@ -100,4 +100,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // DPLE_SOLVER_HPP
+#endif // CASADI_DPLE_SOLVER_HPP

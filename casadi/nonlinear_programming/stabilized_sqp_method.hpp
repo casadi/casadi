@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef STABILIZED_SQP_METHOD_HPP
-#define STABILIZED_SQP_METHOD_HPP
+#ifndef CASADI_STABILIZED_SQP_METHOD_HPP
+#define CASADI_STABILIZED_SQP_METHOD_HPP
 
 #include "casadi/core/function/nlp_solver.hpp"
 
@@ -72,4 +72,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //STABILIZED_SQP_METHOD_HPP
+#endif // CASADI_STABILIZED_SQP_METHOD_HPP

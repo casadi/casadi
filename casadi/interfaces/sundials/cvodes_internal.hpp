@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CVODES_INTERNAL_HPP
-#define CVODES_INTERNAL_HPP
+#ifndef CASADI_CVODES_INTERNAL_HPP
+#define CASADI_CVODES_INTERNAL_HPP
 
 #include <casadi/interfaces/sundials/casadi_integrator_cvodes_export.h>
 #include "sundials_internal.hpp"
@@ -284,5 +284,5 @@ public:
 } // namespace casadi
 
 /// \endcond
-#endif //CVODES_INTERNAL_HPP
+#endif // CASADI_CVODES_INTERNAL_HPP
 

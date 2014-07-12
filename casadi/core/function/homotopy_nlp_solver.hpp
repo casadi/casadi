@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef HOMOTOPY_NLP_SOLVER_HPP
-#define HOMOTOPY_NLP_SOLVER_HPP
+#ifndef CASADI_HOMOTOPY_NLP_SOLVER_HPP
+#define CASADI_HOMOTOPY_NLP_SOLVER_HPP
 
 #include "function.hpp"
 
@@ -90,5 +90,5 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // HOMOTOPY_NLP_SOLVER_HPP
+#endif // CASADI_HOMOTOPY_NLP_SOLVER_HPP
 

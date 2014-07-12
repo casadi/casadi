@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NORM_HPP
-#define NORM_HPP
+#ifndef CASADI_NORM_HPP
+#define CASADI_NORM_HPP
 
 #include "mx_node.hpp"
 
@@ -160,4 +160,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // NORM_HPP
+#endif // CASADI_NORM_HPP

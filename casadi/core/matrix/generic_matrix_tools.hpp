@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef GENERIC_MATRIX_TOOLS_HPP
-#define GENERIC_MATRIX_TOOLS_HPP
+#ifndef CASADI_GENERIC_MATRIX_TOOLS_HPP
+#define CASADI_GENERIC_MATRIX_TOOLS_HPP
 
 #include "slice.hpp"
 #include "submatrix.hpp"
@@ -192,4 +192,4 @@ GMTT_INST(MatType, linspace)
 
 #endif //SWIG
 
-#endif // GENERIC_MATRIX_TOOLS_HPP
+#endif // CASADI_GENERIC_MATRIX_TOOLS_HPP

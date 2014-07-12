@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef XML_NODE_HPP
-#define XML_NODE_HPP
+#ifndef CASADI_XML_NODE_HPP
+#define CASADI_XML_NODE_HPP
 
 #include <string>
 #include <vector>
@@ -140,4 +140,4 @@ public:
 } // namespace casadi
 /// \endcond
 
-#endif //XML_NODE_HPP
+#endif // CASADI_XML_NODE_HPP

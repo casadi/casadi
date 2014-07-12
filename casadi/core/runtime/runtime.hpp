@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CASADI_RUNTIME_HPP
-#define CASADI_RUNTIME_HPP
+#ifndef CASADI_CASADI_RUNTIME_HPP
+#define CASADI_CASADI_RUNTIME_HPP
 
 
 #include <math.h>
@@ -295,4 +295,4 @@ namespace casadi {
 
 /// \endcond
 
-#endif // CASADI_RUNTIME_HPP
+#endif // CASADI_CASADI_RUNTIME_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RK_INTEGRATOR_HPP
-#define RK_INTEGRATOR_HPP
+#ifndef CASADI_RK_INTEGRATOR_HPP
+#define CASADI_RK_INTEGRATOR_HPP
 
 #include "casadi/core/function/integrator.hpp"
 #include <casadi/integration/casadi_integrator_rk_export.h>
@@ -75,4 +75,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //RK_INTEGRATOR_HPP
+#endif // CASADI_RK_INTEGRATOR_HPP

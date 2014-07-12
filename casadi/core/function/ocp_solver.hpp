@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef OCP_SOLVER_HPP
-#define OCP_SOLVER_HPP
+#ifndef CASADI_OCP_SOLVER_HPP
+#define CASADI_OCP_SOLVER_HPP
 
 #include <vector>
 
@@ -133,5 +133,5 @@ enum OCPOutput {
 } // namespace casadi
 
 
-#endif // OCP_SOLVER_HPP
+#endif // CASADI_OCP_SOLVER_HPP
 

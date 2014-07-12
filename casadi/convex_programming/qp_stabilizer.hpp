@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef QP_STABILIZER_HPP
-#define QP_STABILIZER_HPP
+#ifndef CASADI_QP_STABILIZER_HPP
+#define CASADI_QP_STABILIZER_HPP
 
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 #include <casadi/convex_programming/casadi_stabilizedqpsolver_qp_export.h>
@@ -76,5 +76,5 @@ public:
 
 } // namespace casadi
 
-#endif //QP_STABILIZER_HPP
+#endif // CASADI_QP_STABILIZER_HPP
 

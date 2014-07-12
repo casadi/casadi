@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef NULLSPACE_HPP
-#define NULLSPACE_HPP
+#ifndef CASADI_NULLSPACE_HPP
+#define CASADI_NULLSPACE_HPP
 
 #include "function.hpp"
 
@@ -69,4 +69,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif //NULLSPACE_HPP
+#endif // CASADI_NULLSPACE_HPP

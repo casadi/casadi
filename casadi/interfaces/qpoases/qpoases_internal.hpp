@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef QPOASES_INTERNAL_HPP
-#define QPOASES_INTERNAL_HPP
+#ifndef CASADI_QPOASES_INTERNAL_HPP
+#define CASADI_QPOASES_INTERNAL_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include <casadi/interfaces/qpoases/casadi_qpsolver_qpoases_export.h>
@@ -103,4 +103,4 @@ public:
 } // namespace casadi
 
 /// \endcond
-#endif //QPOASES_INTERNAL_HPP
+#endif // CASADI_QPOASES_INTERNAL_HPP

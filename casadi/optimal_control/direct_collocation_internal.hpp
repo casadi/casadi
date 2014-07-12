@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef DIRECT_COLLOCATION_INTERNAL_HPP
-#define DIRECT_COLLOCATION_INTERNAL_HPP
+#ifndef CASADI_DIRECT_COLLOCATION_INTERNAL_HPP
+#define CASADI_DIRECT_COLLOCATION_INTERNAL_HPP
 
 #include "direct_collocation.hpp"
 #include "casadi/core/function/ocp_solver_internal.hpp"
@@ -82,4 +82,4 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolver
 } // namespace casadi
 /// \endcond
 
-#endif // DIRECT_COLLOCATION_INTERNAL_HPP
+#endif // CASADI_DIRECT_COLLOCATION_INTERNAL_HPP

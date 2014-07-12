@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SDP_SOCP_INTERNAL_HPP
-#define SDP_SOCP_INTERNAL_HPP
+#ifndef CASADI_SDP_SOCP_INTERNAL_HPP
+#define CASADI_SDP_SOCP_INTERNAL_HPP
 
 #include "casadi/core/function/socp_solver_internal.hpp"
 #include "casadi/core/function/sdp_solver.hpp"
@@ -67,5 +67,5 @@ public:
 
 } // namespace casadi
 /// \endcond
-#endif //SDP_SOCP_INTERNAL_HPP
+#endif // CASADI_SDP_SOCP_INTERNAL_HPP
 

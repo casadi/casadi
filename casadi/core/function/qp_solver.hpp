@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef QP_SOLVER_HPP
-#define QP_SOLVER_HPP
+#ifndef CASADI_QP_SOLVER_HPP
+#define CASADI_QP_SOLVER_HPP
 
 #include "function.hpp"
 
@@ -145,4 +145,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // QP_SOLVER_HPP
+#endif // CASADI_QP_SOLVER_HPP

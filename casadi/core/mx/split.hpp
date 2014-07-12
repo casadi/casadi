@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SPLIT_HPP
-#define SPLIT_HPP
+#ifndef CASADI_SPLIT_HPP
+#define CASADI_SPLIT_HPP
 
 #include "multiple_output.hpp"
 #include <map>
@@ -137,4 +137,4 @@ namespace casadi {
 
 } // namespace casadi
 
-#endif // SPLIT_HPP
+#endif // CASADI_SPLIT_HPP

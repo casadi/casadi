@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SOLVE_HPP
-#define SOLVE_HPP
+#ifndef CASADI_SOLVE_HPP
+#define CASADI_SOLVE_HPP
 
 #include "mx_node.hpp"
 #include "../function/linear_solver.hpp"
@@ -99,4 +99,4 @@ namespace casadi {
 } // namespace casadi
 
 
-#endif // SOLVE_HPP
+#endif // CASADI_SOLVE_HPP

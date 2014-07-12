@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef RK_INTEGRATOR_INTERNAL_HPP
-#define RK_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_RK_INTEGRATOR_INTERNAL_HPP
+#define CASADI_RK_INTEGRATOR_INTERNAL_HPP
 
 #include "rk_integrator.hpp"
 #include "fixed_step_integrator_internal.hpp"
@@ -62,4 +62,4 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
-#endif //RK_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_RK_INTEGRATOR_INTERNAL_HPP

@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SQP_INTERNAL_HPP
-#define SQP_INTERNAL_HPP
+#ifndef CASADI_SQP_INTERNAL_HPP
+#define CASADI_SQP_INTERNAL_HPP
 
 #include "sqp_method.hpp"
 #include "casadi/core/function/nlp_solver_internal.hpp"
@@ -192,4 +192,4 @@ public:
 
 } // namespace casadi
 /// \endcond
-#endif //SQP_INTERNAL_HPP
+#endif // CASADI_SQP_INTERNAL_HPP
