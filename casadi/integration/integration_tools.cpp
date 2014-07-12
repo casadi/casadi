@@ -230,7 +230,7 @@ namespace casadi {
 
   }
 
-  Function implicitRK(Function& f, implicitFunctionCreator impl, const Dictionary& impl_options,
+  Function implicitRK(Function& f, const std::string& impl, const Dictionary& impl_options,
                       const MX& tf, int order, const std::string& scheme, int ne) {
     casadi_assert_message(ne>=1, "Parameter ne (number of elements must be at least 1), "
                           "but got " << ne << ".");
@@ -333,7 +333,7 @@ namespace casadi {
     }
 
     // Create a implicit function instance to solve the system of equations
-    ImplicitFunction ifcn = impl(vfcn, Function(), LinearSolver());
+    ImplicitFunction ifcn(impl, vfcn, Function(), LinearSolver());
     ifcn.setOption(impl_options);
     ifcn.init();
 

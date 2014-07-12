@@ -47,10 +47,10 @@ try:
 except:
   pass
 
-integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18}))
+integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18}))
 
-integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
-#integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": CSparse}}))
+integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":"kinsol","number_of_finite_elements": 18,"startup_integrator":"cvodes"}))
+#integrators.append((OldCollocationIntegrator,["dae","ode"],{"implicit_solver":"nlp","number_of_finite_elements": 100,"startup_integrator":"cvodes","implicit_solver_options": {"nlp_solver": "ipopt","linear_solver_creator": CSparse}}))
 integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
 
 print "Will test these integrators:"
@@ -105,7 +105,7 @@ class Integrationtests(casadiTestCase):
     
     for integrator in [
          explicitRK(f,tf,4,10),
-         implicitRK(f,NewtonImplicitSolver,{"linear_solver": CSparse},tf,4,"radau",10)
+         implicitRK(f,"newton",{"linear_solver": CSparse},tf,4,"radau",10)
        ]:
       integrator.init()
       
@@ -136,7 +136,7 @@ class Integrationtests(casadiTestCase):
     tf = 1
     for integrator in [
          explicitRK(f,tf,4,500),
-         implicitRK(f,NewtonImplicitSolver,{"linear_solver": CSparse},tf,4,"radau",50)
+         implicitRK(f,"newton",{"linear_solver": CSparse},tf,4,"radau",50)
        ]:
       integrator.init()
       

@@ -78,11 +78,6 @@ namespace casadi {
   /// Function pointer to a Stabilized QP solver creator function
   typedef StabilizedQPSolver (*StabilizedQPSolverCreator)(const QPStructure& st);
 
-  /// Function pointer to an implicit function creator
-  typedef ImplicitFunction (*implicitFunctionCreator)(const Function& f, const Function& jac,
-                                                      const LinearSolver& linsol);
-
-
 #ifndef SWIG
   // The number of derivative directions for which the tool has been optimized
   const int optimized_num_dir = 64;

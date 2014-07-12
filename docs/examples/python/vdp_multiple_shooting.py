@@ -44,7 +44,7 @@ if coll:
   integrator.setOption("number_of_finite_elements",5)
   integrator.setOption("interpolation_order",5)
   integrator.setOption("collocation_scheme","legendre")
-  integrator.setOption("implicit_solver",KinsolSolver)
+  integrator.setOption("implicit_solver","kinsol")
   integrator.setOption("implicit_solver_options",\
     {'linear_solver' : CSparse})
   integrator.setOption("expand_f",True)

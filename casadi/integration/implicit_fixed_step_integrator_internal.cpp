@@ -34,7 +34,7 @@ namespace casadi {
   ImplicitFixedStepIntegratorInternal::ImplicitFixedStepIntegratorInternal(const Function& f,
                                                                            const Function& g)
       : FixedStepIntegratorInternal(f, g) {
-    addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(),
+    addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the NLP Solver");
@@ -55,10 +55,10 @@ namespace casadi {
     FixedStepIntegratorInternal::init();
 
     // Get the NLP creator function
-    implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
+    std::string implicit_function_name = getOption("implicit_solver");
 
     // Allocate an NLP solver
-    implicit_solver_ = implicit_function_creator(F_, Function(), LinearSolver());
+    implicit_solver_ = ImplicitFunction(implicit_function_name, F_, Function(), LinearSolver());
     implicit_solver_.setOption("name", string(getOption("name")) + "_implicit_solver");
     implicit_solver_.setOption("implicit_input", DAE_Z);
     implicit_solver_.setOption("implicit_output", DAE_ALG);
@@ -76,11 +76,11 @@ namespace casadi {
     if (nRZ_>0) {
 
       // Get the NLP creator function
-      implicitFunctionCreator backward_implicit_function_creator = getOption("implicit_solver");
+      std::string backward_implicit_function_name = getOption("implicit_solver");
 
       // Allocate an NLP solver
-      backward_implicit_solver_ =
-          backward_implicit_function_creator(G_, Function(), LinearSolver());
+      backward_implicit_solver_ = ImplicitFunction(backward_implicit_function_name,
+                                                   G_, Function(), LinearSolver());
       backward_implicit_solver_.setOption("name",
                                           string(getOption("name")) + "_backward_implicit_solver");
       backward_implicit_solver_.setOption("implicit_input", RDAE_RZ);

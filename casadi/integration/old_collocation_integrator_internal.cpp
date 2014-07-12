@@ -59,7 +59,7 @@ namespace casadi {
               "Order of the interpolating polynomials");
     addOption("collocation_scheme",            OT_STRING,  "radau",
               "Collocation scheme", "radau|legendre");
-    addOption("implicit_solver",               OT_IMPLICITFUNCTION,  GenericType(),
+    addOption("implicit_solver",               OT_STRING,  GenericType(),
               "An implicit function solver");
     addOption("implicit_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the implicit solver");
@@ -376,10 +376,11 @@ namespace casadi {
     }
 
     // Get the root-finding solver creator function
-    implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
+    std::string implicit_function_name = getOption("implicit_solver");
 
     // Allocate a root-finding solver
-    implicit_solver_ = implicit_function_creator(ifcn, Function(), LinearSolver());
+    implicit_solver_ = ImplicitFunction(implicit_function_name,
+                                        ifcn, Function(), LinearSolver());
     std::stringstream ss_implicit_solver;
     ss_implicit_solver << "collocation_implicitsolver_" << getOption("name");
     implicit_solver_.setOption("name", ss_implicit_solver.str());

@@ -97,18 +97,18 @@ g = lam_f
 rfp = MXFunction([l_init],[g])
 
 # Select a solver for the root-finding problem
-Solver = NLPImplicitSolver
-#Solver = NewtonImplicitSolver
-#Solver = KinsolSolver
+Solver = "nlp"
+#Solver = "newton"
+#Solver = "kinsol"
 
 # Allocate an implict solver
-solver = Solver(rfp)
-if Solver==NLPImplicitSolver:
+solver = ImplicitFunction(Solver, rfp)
+if Solver=="nlp":
     solver.setOption("nlp_solver", "ipopt")
     solver.setOption("nlp_solver_options",{"hessian_approximation":"limited-memory"})
-elif Solver==NewtonImplicitSolver:
+elif Solver=="newton":
     solver.setOption("linear_solver",CSparse)
-elif Solver==KinsolSolver:
+elif Solver=="kinsol":
     solver.setOption("linear_solver_type","user_defined")
     solver.setOption("linear_solver",CSparse)
     solver.setOption("max_iter",1000)

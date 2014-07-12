@@ -107,8 +107,6 @@ std::string GenericType::get_type_description(const opt_type &type) {
               return "OT_STABILIZEDQPSOLVER";
       case OT_DERIVATIVEGENERATOR:
               return "OT_DERIVATIVEGENERATOR";
-      case OT_IMPLICITFUNCTION:
-              return "OT_IMPLICITFUNCTION";
       case OT_CALLBACK:
               return "OT_CALLBACK";
       case OT_FUNCTION:
@@ -375,10 +373,6 @@ GenericType::GenericType(StabilizedQPSolverCreator ptr) : type_(OT_STABILIZEDQPS
   assignNode(new GenericTypeInternal<StabilizedQPSolverCreator>(ptr));
 }
 
-GenericType::GenericType(implicitFunctionCreator ptr) : type_(OT_IMPLICITFUNCTION) {
-  assignNode(new GenericTypeInternal<implicitFunctionCreator>(ptr));
-}
-
 GenericType::operator linearSolverCreator() const {
   casadi_assert_message(is_a<linearSolverCreator>(), "type mismatch");
   return static_cast<const GenericTypeInternal<linearSolverCreator>*>(get())->d_;
@@ -394,12 +388,7 @@ GenericType::operator StabilizedQPSolverCreator() const {
   return static_cast<const GenericTypeInternal<StabilizedQPSolverCreator>*>(get())->d_;
 }
 
-GenericType::operator implicitFunctionCreator() const {
-  casadi_assert_message(is_a<implicitFunctionCreator>(), "type mismatch");
-  return static_cast<const GenericTypeInternal<implicitFunctionCreator>*>(get())->d_;
-}
-
-  GenericType::operator const DerivativeGenerator &() const {
+GenericType::operator const DerivativeGenerator &() const {
     casadi_assert_message(is_a<DerivativeGenerator>(), "type mismatch");
     return static_cast<const GenericTypeInternal<DerivativeGenerator>*>(get())->d_;
   }

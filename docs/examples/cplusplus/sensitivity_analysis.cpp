@@ -21,7 +21,6 @@
  */
 
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/sundials/kinsol_solver.hpp>
 #include <casadi/interfaces/csparse/csparse.hpp>
 
 #include <iostream>
@@ -33,6 +32,7 @@ extern "C" void casadi_load_integrator_idas();
 extern "C" void casadi_load_integrator_rk();
 extern "C" void casadi_load_integrator_collocation();
 extern "C" void casadi_load_integrator_oldcollocation();
+extern "C" void casadi_load_implicitfunction_kinsol();
 
 using namespace std;
 using namespace casadi;
@@ -124,6 +124,7 @@ int main(){
   casadi_load_integrator_rk();
   casadi_load_integrator_collocation();
   casadi_load_integrator_oldcollocation();
+  casadi_load_implicitfunction_kinsol();
 
   // For all problems
   enum Problems{ODE,DAE,NUM_PROBLEMS};
@@ -171,7 +172,7 @@ int main(){
         I = Integrator("collocation", ffcn);
 
         // Set collocation integrator specific options
-        I.setOption("implicit_solver",KinsolSolver::creator);
+        I.setOption("implicit_solver","kinsol");
         I.setOption("collocation_scheme","legendre");
 
         {
@@ -187,7 +188,7 @@ int main(){
         // Set collocation integrator specific options
         I.setOption("expand_f",true);
         I.setOption("collocation_scheme","legendre");
-        I.setOption("implicit_solver",KinsolSolver::creator);
+        I.setOption("implicit_solver", "kinsol");
         {
           Dictionary kinsol_options;
           kinsol_options["linear_solver"] = CSparse::creator;
