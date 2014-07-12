@@ -621,7 +621,6 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 #include "casadi/core/function/sx_function.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/linear_solver.hpp"
-#include "casadi/core/function/symbolic_qr.hpp"
 #include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/function/integrator.hpp"
 #include "casadi/core/function/simulator.hpp"
