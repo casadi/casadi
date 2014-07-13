@@ -9,9 +9,7 @@ casadi_library_swig(casadi_integration
 )
 
 # Explicit Runge-Kutta integrator
-casadi_library_swig(casadi_integrator_rk
-  rk_integrator.hpp
-  rk_integrator.cpp
+casadi_library(casadi_integrator_rk
   rk_integrator_internal.hpp
   rk_integrator_internal.cpp)
 target_link_libraries(casadi_integrator_rk casadi_integration)

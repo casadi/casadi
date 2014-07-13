@@ -23,12 +23,20 @@
 #ifndef CASADI_RK_INTEGRATOR_INTERNAL_HPP
 #define CASADI_RK_INTEGRATOR_INTERNAL_HPP
 
-#include "rk_integrator.hpp"
 #include "fixed_step_integrator_internal.hpp"
+#include <casadi/integration/casadi_integrator_rk_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
+  /** \brief Fixed-step explicit Runge-Kutta integrator for ODEs
+      Currently implements RK4.
+
+      The method is still under development
+
+      \author Joel Andersson
+      \date 2011-2014
+  */
   class CASADI_INTEGRATOR_RK_EXPORT RKIntegratorInternal : public FixedStepIntegratorInternal {
   public:
 
@@ -61,5 +69,6 @@ namespace casadi {
   };
 
 } // namespace casadi
+
 /// \endcond
 #endif // CASADI_RK_INTEGRATOR_INTERNAL_HPP
