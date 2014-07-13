@@ -23,35 +23,42 @@
 #ifndef CASADI_SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP
 #define CASADI_SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP
 
-#include "simple_homotopy_nlp_solver.hpp"
 #include "casadi/core/function/homotopy_nlp_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
+
+#include <casadi/nonlinear_programming/casadi_homotopynlpsolver_simple_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-class CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
-SimpleHomotopyNLPInternal : public HomotopyNLPInternal {
+  /** 
+      \brief Solving an NLP homotopy with regular NLP solvers
 
-public:
-  explicit SimpleHomotopyNLPInternal(const Function& hnlp);
-  virtual ~SimpleHomotopyNLPInternal();
-  virtual SimpleHomotopyNLPInternal* clone() const { return new SimpleHomotopyNLPInternal(*this);}
+      \author Joris Gillis
+      \date 2014
+  */
+  class CASADI_HOMOTOPYNLPSOLVER_SIMPLE_EXPORT
+  SimpleHomotopyNLPInternal : public HomotopyNLPInternal {
 
-  /** \brief  Create a new Homotopy NLP Solver */
-  static HomotopyNLPInternal* creator(const Function& hnlp)
-  { return new SimpleHomotopyNLPInternal(hnlp);}
+  public:
+    explicit SimpleHomotopyNLPInternal(const Function& hnlp);
+    virtual ~SimpleHomotopyNLPInternal();
+    virtual SimpleHomotopyNLPInternal* clone() const { return new SimpleHomotopyNLPInternal(*this);}
 
-  virtual void init();
-  virtual void evaluate();
+    /** \brief  Create a new Homotopy NLP Solver */
+    static HomotopyNLPInternal* creator(const Function& hnlp)
+    { return new SimpleHomotopyNLPInternal(hnlp);}
 
-  NLPSolver nlpsolver_;
+    virtual void init();
+    virtual void evaluate();
 
-  /// Take this many steps to go from tau=0 to tau=1
-  int num_steps_;
+    NLPSolver nlpsolver_;
 
-};
-/// \endcond
+    /// Take this many steps to go from tau=0 to tau=1
+    int num_steps_;
+
+  };
+  /// \endcond
 } // namespace casadi
 
 #endif // CASADI_SIMPLE_HOMOTOPY_NLP_INTERNAL_HPP

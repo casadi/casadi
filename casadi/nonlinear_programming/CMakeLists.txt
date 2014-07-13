@@ -9,8 +9,7 @@ casadi_library(casadi_implicitfunction_nlp
 casadi_library(casadi_implicitfunction_newton
   newton_implicit_internal.hpp newton_implicit_internal.cpp)
 
-casadi_library_swig(casadi_homotopynlpsolver_simple
-  simple_homotopy_nlp_solver.hpp simple_homotopy_nlp_solver.cpp
+casadi_library(casadi_homotopynlpsolver_simple
   simple_homotopy_nlp_internal.hpp simple_homotopy_nlp_internal.cpp)
 
 # SQPMethod -  A basic SQP method
