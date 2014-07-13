@@ -23,15 +23,26 @@
 #ifndef CASADI_OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
 #define CASADI_OLD_COLLOCATION_INTEGRATOR_INTERNAL_HPP
 
-#include "old_collocation_integrator.hpp"
 #include "casadi/core/function/integrator_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/implicit_function.hpp"
 #include "integration_tools.hpp"
+#include <casadi/integration/casadi_integrator_oldcollocation_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
+  /**
+     \brief Collocation integrator
+     ODE/DAE integrator based on collocation
+
+     The method is still under development
+
+     @copydoc DAE_doc
+
+     \author Joel Andersson
+     \date 2011
+  */
   class CASADI_INTEGRATOR_OLDCOLLOCATION_EXPORT
   OldCollocationIntegratorInternal : public IntegratorInternal {
 

@@ -21,9 +21,7 @@ casadi_library(casadi_integrator_collocation
 target_link_libraries(casadi_integrator_collocation casadi_integration)
 
 # Old (all-at-once) collocation integrator
-casadi_library_swig(casadi_integrator_oldcollocation
-  old_collocation_integrator.hpp
-  old_collocation_integrator.cpp
+casadi_library(casadi_integrator_oldcollocation
   old_collocation_integrator_internal.hpp
   old_collocation_integrator_internal.cpp)
 target_link_libraries(casadi_integrator_oldcollocation casadi_integration)
