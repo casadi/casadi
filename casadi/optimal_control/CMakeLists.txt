@@ -10,10 +10,7 @@ set(OPTIMAL_CONTROL
 )
 
 casadi_library_swig(casadi_optimal_control ${OPTIMAL_CONTROL})
-
-target_link_libraries(casadi_optimal_control
-  casadi_integration
-  ${TINYXML_LIBRARIES})
+target_link_libraries(casadi_optimal_control ${TINYXML_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/optimal_control

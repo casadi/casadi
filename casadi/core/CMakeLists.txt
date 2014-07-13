@@ -112,6 +112,9 @@ set(CASADI_SRCS
   function/code_generator.hpp      function/code_generator.cpp
   function/nullspace.hpp           function/nullspace.cpp           function/nullspace_internal.hpp           function/nullspace_internal.cpp
 
+  # MISC useful stuff
+  misc/integration_tools.hpp       misc/integration_tools.cpp
+
   # User include class with the most essential includes
   casadi.hpp
 

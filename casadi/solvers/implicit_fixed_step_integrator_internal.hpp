@@ -20,55 +20,49 @@
  *
  */
 
-#ifndef CASADI_RK_INTEGRATOR_INTERNAL_HPP
-#define CASADI_RK_INTEGRATOR_INTERNAL_HPP
+#ifndef CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
+#define CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP
 
 #include "fixed_step_integrator_internal.hpp"
-#include <casadi/integration/casadi_integrator_rk_export.h>
+#include "casadi/core/function/implicit_function.hpp"
+#include <casadi/solvers/casadi_integrator_collocation_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Fixed-step explicit Runge-Kutta integrator for ODEs
-      Currently implements RK4.
-
-      The method is still under development
-
-      \author Joel Andersson
-      \date 2011-2014
-  */
-  class CASADI_INTEGRATOR_RK_EXPORT RKIntegratorInternal : public FixedStepIntegratorInternal {
+  class CASADI_INTEGRATOR_COLLOCATION_EXPORT ImplicitFixedStepIntegratorInternal
+      : public FixedStepIntegratorInternal {
   public:
 
     /// Constructor
-    explicit RKIntegratorInternal(const Function& f, const Function& g);
+    explicit ImplicitFixedStepIntegratorInternal(const Function& f, const Function& g);
 
     /// Deep copy data members
     virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /// Clone
-    virtual RKIntegratorInternal* clone() const { return new RKIntegratorInternal(*this);}
+    virtual ImplicitFixedStepIntegratorInternal* clone() const = 0;
 
     /// Create a new integrator
-    virtual RKIntegratorInternal* create(const Function& f, const Function& g) const
-    { return new RKIntegratorInternal(f, g);}
-
-    /** \brief  Create a new integrator */
-    static IntegratorInternal* creator(const Function& f, const Function& g)
-    { return new RKIntegratorInternal(f, g);}
+    virtual ImplicitFixedStepIntegratorInternal* create(const Function& f,
+                                                        const Function& g) const = 0;
 
     /// Destructor
-    virtual ~RKIntegratorInternal();
+    virtual ~ImplicitFixedStepIntegratorInternal();
 
     /// Initialize stage
     virtual void init();
 
-    /// Setup F and G
-    virtual void setupFG();
+    /// Get explicit dynamics
+    virtual Function& getExplicit() { return implicit_solver_;}
 
+    /// Get explicit dynamics (backward problem)
+    virtual Function& getExplicitB() { return backward_implicit_solver_;}
+
+    // Implicit function solver
+    ImplicitFunction implicit_solver_, backward_implicit_solver_;
   };
 
 } // namespace casadi
-
 /// \endcond
-#endif // CASADI_RK_INTEGRATOR_INTERNAL_HPP
+#endif // CASADI_IMPLICIT_FIXED_STEP_INTEGRATOR_INTERNAL_HPP

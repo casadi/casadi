@@ -1083,7 +1083,7 @@ namespace casadi {
     PsdIndefDpleInternal* node = new PsdIndefDpleInternal(A_, V_, nfwd, nadj);
     node->setOption(dictionary());
 
-    PsdIndefDpleSolver ret;
+    DpleSolver ret;
     ret.assignNode(node);
 
     return ret;

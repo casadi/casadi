@@ -1,28 +1,36 @@
 cmake_minimum_required(VERSION 2.6)
 
-casadi_library(casadi_lpsolver_qp
-  qp_lp_internal.cpp     qp_lp_internal.hpp)
+# Explicit Runge-Kutta integrator
+casadi_library(casadi_integrator_rk
+  fixed_step_integrator_internal.hpp
+  fixed_step_integrator_internal.cpp
+  rk_integrator_internal.hpp
+  rk_integrator_internal.cpp)
 
-casadi_library(casadi_qpsolver_qcqp
-  qcqp_qp_internal.cpp   qcqp_qp_internal.hpp)
+# Collocation integrator
+casadi_library(casadi_integrator_collocation
+  implicit_fixed_step_integrator_internal.hpp
+  implicit_fixed_step_integrator_internal.cpp
+  collocation_integrator_internal.hpp
+  collocation_integrator_internal.cpp)
+target_link_libraries(casadi_integrator_collocation casadi_integrator_rk)
 
-casadi_library(casadi_socpsolver_sdp
-  sdp_socp_internal.cpp  sdp_socp_internal.hpp)
+# Old (all-at-once) collocation integrator
+casadi_library(casadi_integrator_oldcollocation
+  old_collocation_integrator_internal.hpp
+  old_collocation_integrator_internal.cpp)
 
-casadi_library(casadi_stabilizedqpsolver_qp
-  qp_stabilizer_internal.cpp      qp_stabilizer_internal.hpp)
-
-casadi_library(casadi_linearsolver_symbolicqr
-  symbolic_qr_internal.hpp         symbolic_qr_internal.cpp)
-
+# Reformulations
+casadi_library(casadi_lpsolver_qp   qp_lp_internal.cpp   qp_lp_internal.hpp)
+casadi_library(casadi_qpsolver_qcqp   qcqp_qp_internal.cpp   qcqp_qp_internal.hpp)
+casadi_library(casadi_socpsolver_sdp   sdp_socp_internal.cpp   sdp_socp_internal.hpp)
+casadi_library(casadi_stabilizedqpsolver_qp   qp_stabilizer_internal.cpp   qp_stabilizer_internal.hpp)
+casadi_library(casadi_linearsolver_symbolicqr   symbolic_qr_internal.hpp   symbolic_qr_internal.cpp)
 if(WITH_CSPARSE)
-  casadi_library(casadi_qcqpsolver_socp
-    socp_qcqp_internal.cpp socp_qcqp_internal.hpp)
-  target_link_libraries(casadi_qcqpsolver_socp casadi_linearsolver_csparsecholesky)
-
-  casadi_library(casadi_sdqpsolver_sdp
-    sdp_sdqp_internal.cpp  sdp_sdqp_internal.hpp)
-  target_link_libraries(casadi_sdqpsolver_sdp casadi_linearsolver_csparsecholesky)
+  casadi_library(casadi_qcqpsolver_socp   socp_qcqp_internal.cpp   socp_qcqp_internal.hpp)
+  target_link_libraries(casadi_qcqpsolver_socp   casadi_linearsolver_csparsecholesky)
+  casadi_library(casadi_sdqpsolver_sdp   sdp_sdqp_internal.cpp    sdp_sdqp_internal.hpp)
+  target_link_libraries(casadi_sdqpsolver_sdp   casadi_linearsolver_csparsecholesky)
 endif()
 
 install(DIRECTORY ./

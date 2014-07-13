@@ -95,8 +95,7 @@ endif()
 # CSTR multiple shooting
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(cstr cstr.cpp)
-  target_link_libraries(cstr
-    casadi_integrator_idas casadi_nlpsolver_ipopt casadi_optimal_control casadi_integration casadi_linearsolver_csparse)
+  target_link_libraries(cstr casadi_optimal_control)
 endif()
 
 # CSparse via CasADi
@@ -150,6 +149,6 @@ endif()
 if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(implicit_runge-kutta implicit_runge-kutta.cpp)
   target_link_libraries(implicit_runge-kutta
-    casadi_nonlinear_programming casadi_integration casadi_integrator_cvodes casadi_linearsolver_csparse
+    casadi_nonlinear_programming casadi_integrator_cvodes casadi_linearsolver_csparse
     casadi_implicitfunction_newton casadi_qpsolver_nlp)
 endif()

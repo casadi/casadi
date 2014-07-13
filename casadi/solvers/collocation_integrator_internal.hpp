@@ -26,8 +26,7 @@
 #include "implicit_fixed_step_integrator_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/implicit_function.hpp"
-#include "integration_tools.hpp"
-#include <casadi/integration/casadi_integrator_collocation_export.h>
+#include "casadi/core/misc/integration_tools.hpp"
 
 /// \cond INTERNAL
 namespace casadi {

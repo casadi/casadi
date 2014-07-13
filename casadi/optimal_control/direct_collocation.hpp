@@ -25,7 +25,7 @@
 
 #include "casadi/core/function/ocp_solver.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
-#include "casadi/integration/integration_tools.hpp"
+#include "casadi/core/misc/integration_tools.hpp"
 
 #include <casadi/optimal_control/casadi_optimal_control_export.h>
 

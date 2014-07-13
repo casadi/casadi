@@ -28,7 +28,6 @@
 #include "casadi/core/function/parallelizer.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/sx_function.hpp"
-#include "casadi/integration/integration_tools.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
