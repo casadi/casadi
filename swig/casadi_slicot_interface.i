@@ -30,7 +30,6 @@
 
 %{
 #include "casadi/control/dple_solver.hpp"
-#include "casadi/control/simple_indef_dple_solver.hpp"
 #include "casadi/interfaces/slicot/slicot_tools.hpp"
 %}
 
