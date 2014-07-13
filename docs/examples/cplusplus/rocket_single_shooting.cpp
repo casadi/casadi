@@ -22,8 +22,6 @@
 
 #include <iostream>
 #include <casadi/core/casadi.hpp>
-#include <casadi/nonlinear_programming/nlp_qp_solver.hpp>
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
 
 using namespace casadi;
 using namespace std;
