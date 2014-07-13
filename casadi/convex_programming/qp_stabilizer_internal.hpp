@@ -26,16 +26,18 @@
 #include "casadi/core/function/stabilized_qp_solver_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 
-#include "qp_stabilizer.hpp"
+#include <casadi/convex_programming/casadi_stabilizedqpsolver_qp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for QPStabilizerInternal
-   *
-   @copydoc StabilizedQPSolver_doc
-   * */
-  class CASADI_STABILIZEDQPSOLVER_QP_EXPORT QPStabilizerInternal : public StabilizedQPSolverInternal {
+  /** \brief Solved a stabilized QP using a standard QP solver
+
+      \author Joris Gillis
+      \date 2013
+  */
+  class CASADI_STABILIZEDQPSOLVER_QP_EXPORT QPStabilizerInternal
+    : public StabilizedQPSolverInternal {
     friend class QPStabilizer;
   public:
 

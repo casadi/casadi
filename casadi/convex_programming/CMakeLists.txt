@@ -9,8 +9,8 @@ casadi_library(casadi_qpsolver_qcqp
 casadi_library(casadi_socpsolver_sdp
   sdp_socp_internal.cpp  sdp_socp_internal.hpp)
 
-casadi_library_swig(casadi_stabilizedqpsolver_qp
-  qp_stabilizer.cpp    qp_stabilizer.hpp    qp_stabilizer_internal.cpp      qp_stabilizer_internal.hpp)
+casadi_library(casadi_stabilizedqpsolver_qp
+  qp_stabilizer_internal.cpp      qp_stabilizer_internal.hpp)
 
 casadi_library_swig(casadi_linearsolver_symbolicqr
   symbolic_qr.hpp         symbolic_qr.cpp         symbolic_qr_internal.hpp         symbolic_qr_internal.cpp)
