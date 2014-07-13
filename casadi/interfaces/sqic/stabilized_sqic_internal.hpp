@@ -24,7 +24,7 @@
 #define CASADI_STABILIZED_SQIC_INTERNAL_HPP
 
 #include "casadi/core/function/stabilized_qp_solver_internal.hpp"
-#include <casadi/interfaces/sqic/casadi_stabilizedsqpsolver_sqic_export.h>
+#include <casadi/interfaces/sqic/casadi_stabilizedqpsolver_sqic_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
