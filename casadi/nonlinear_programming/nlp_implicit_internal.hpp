@@ -23,18 +23,22 @@
 #ifndef CASADI_NLP_IMPLICIT_INTERNAL_HPP
 #define CASADI_NLP_IMPLICIT_INTERNAL_HPP
 
-#include "nlp_implicit_solver.hpp"
 #include "casadi/core/function/implicit_function_internal.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
+#include <casadi/nonlinear_programming/casadi_implicitfunction_nlp_export.h>
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for NLPImplicitInternal
-   *
+  /** \brief Use an NLPSolver as ImplicitFunction solver
+
    @copydoc ImplicitFunction_doc
-   * */
+
+   \author Joris Gillis
+   \date 2012
+  */
   class CASADI_IMPLICITFUNCTION_NLP_EXPORT NLPImplicitInternal : public ImplicitFunctionInternal {
     friend class NLPImplicitSolver;
   public:
