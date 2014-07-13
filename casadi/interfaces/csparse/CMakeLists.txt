@@ -1,16 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 include_directories(${CSPARSE_INCLUDE_DIR})
 
-casadi_library_swig(casadi_linearsolver_csparse
-  csparse.hpp
-  csparse.cpp
+casadi_library(casadi_linearsolver_csparse
   csparse_internal.hpp
   csparse_internal.cpp)
 target_link_libraries(casadi_linearsolver_csparse ${CSPARSE_LIBRARIES})
 
-casadi_library_swig(casadi_linearsolver_csparsecholesky
-  csparse_cholesky.hpp
-  csparse_cholesky.cpp
+casadi_library(casadi_linearsolver_csparsecholesky
   csparse_cholesky_internal.hpp
   csparse_cholesky_internal.cpp)
 target_link_libraries(casadi_linearsolver_csparsecholesky ${CSPARSE_LIBRARIES})

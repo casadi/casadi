@@ -25,7 +25,7 @@
 
 #include "casadi/core/function/sdqp_solver_internal.hpp"
 #include "casadi/core/function/sdp_solver.hpp"
-#include "casadi/interfaces/csparse/csparse_cholesky.hpp"
+#include "casadi/core/function/linear_solver.hpp"
 
 #include <casadi/solvers/casadi_sdqpsolver_sdp_export.h>
 
@@ -78,7 +78,7 @@ namespace casadi {
     SDPSolver sdpsolver_;
 
     /// Cholesky Decomposition
-    CSparseCholesky cholesky_;
+    LinearSolver cholesky_;
 
     /// Mapping
     Function mapping_;

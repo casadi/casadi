@@ -26,7 +26,6 @@ Joel Andersson, K.U. Leuven, 2010
 */
 
 #include "casadi/core/casadi.hpp"
-#include "casadi/interfaces/csparse/csparse.hpp"
 
 using namespace casadi;
 using namespace std;
@@ -49,7 +48,7 @@ int main(int argc, char *argv[])
   Sparsity spA(nrow,ncol,colind,row);
   
   // Create a solver instance
-  CSparse linear_solver(spA);
+  LinearSolver linear_solver("csparse", spA);
     
   // Initialize
   linear_solver.init();

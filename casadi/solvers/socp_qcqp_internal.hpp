@@ -25,7 +25,7 @@
 
 #include "casadi/core/function/qcqp_solver_internal.hpp"
 #include "casadi/core/function/socp_solver.hpp"
-#include "casadi/interfaces/csparse/csparse_cholesky.hpp"
+#include "casadi/core/function/linear_solver.hpp"
 #include <casadi/solvers/casadi_qcqpsolver_socp_export.h>
 
 /// \cond INTERNAL
@@ -89,7 +89,7 @@ namespace casadi {
 
   protected:
     SOCPSolver socpsolver_;
-    std::vector<CSparseCholesky> cholesky_;
+    std::vector<LinearSolver> cholesky_;
   };
   /// \endcond
 } // namespace casadi

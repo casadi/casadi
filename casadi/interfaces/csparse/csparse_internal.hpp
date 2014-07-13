@@ -24,19 +24,33 @@
 #define CASADI_CSPARSE_INTERNAL_HPP
 
 /// \cond INTERNAL
-
 extern "C" {
 #include "external_packages/CSparse/Include/cs.h"
 }
-
-#include "csparse.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
+#include <casadi/interfaces/csparse/casadi_linearsolver_csparse_export.h>
 
 namespace casadi {
 
-  /**
-     @copydoc LinearSolver_doc
-  */
+  /** \brief  LinearSolver with CSparse Interface
+   *
+   @copydoc LinearSolver_doc
+   *
+   * CSparse is an casadi::Function mapping from 2 inputs
+   * [ A (matrix), b (vector)] to one output [x (vector)].
+   *
+   * The usual procedure to use CSparse is: \n
+   *  -# init()
+   *  -# set the first input (A)
+   *  -# prepare()
+   *  -# set the second input (b)
+   *  -# solve()
+   *  -# Repeat steps 4 and 5 to work with other b vectors.
+   *
+   * The method evaluate() combines the prepare() and solve()
+   * step and is therefore more expensive if A is invariant.
+   *
+   */
   class CASADI_LINEARSOLVER_CSPARSE_EXPORT CSparseInternal : public LinearSolverInternal {
   public:
 
@@ -88,4 +102,3 @@ namespace casadi {
 /// \endcond
 
 #endif // CASADI_CSPARSE_INTERNAL_HPP
-

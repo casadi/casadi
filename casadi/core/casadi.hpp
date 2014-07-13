@@ -49,6 +49,7 @@
 #include "function/external_function.hpp"
 
 // Misc solvers
+#include "function/linear_solver.hpp"
 #include "function/nlp_solver.hpp"
 #include "function/integrator.hpp"
 #include "function/implicit_function.hpp"

@@ -175,10 +175,10 @@ namespace casadi {
     std::vector<Sparsity> socp_g;
 
     // Allocate Cholesky solvers
-    cholesky_.push_back(CSparseCholesky(st_[QCQP_STRUCT_H]));
+    cholesky_.push_back(LinearSolver("csparsecholesky", st_[QCQP_STRUCT_H]));
     for (int i=0;i<nq_;++i) {
       cholesky_.push_back(
-                          CSparseCholesky(DMatrix(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity()));
+                          LinearSolver("csparsecholesky", DMatrix(st_[QCQP_STRUCT_P])(range(i*n_, (i+1)*n_), ALL).sparsity()));
     }
 
     for (int i=0;i<nq_+1;++i) {
