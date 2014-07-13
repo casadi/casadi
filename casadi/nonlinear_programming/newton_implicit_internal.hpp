@@ -23,18 +23,22 @@
 #ifndef CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
 #define CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
 
-#include "newton_implicit_solver.hpp"
 #include "casadi/core/function/implicit_function_internal.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
+#include <casadi/nonlinear_programming/casadi_implicitfunction_newton_export.h>
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for NewtonImplicitInternal
-   *
-   @copydoc ImplicitFunction_doc
-   * */
+  /** \brief Implements simple newton iterations to solve an implicit function.
+
+      @copydoc ImplicitFunction_doc
+   
+      \author Joris Gillis
+      \date 2012
+  */
   class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT NewtonImplicitInternal
       : public ImplicitFunctionInternal {
     friend class NewtonImplicitSolver;

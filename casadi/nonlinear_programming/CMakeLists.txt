@@ -6,8 +6,7 @@ casadi_library(casadi_qpsolver_nlp
 casadi_library(casadi_implicitfunction_nlp
   nlp_implicit_internal.hpp nlp_implicit_internal.cpp)
 
-casadi_library_swig(casadi_implicitfunction_newton
-  newton_implicit_solver.hpp newton_implicit_solver.cpp
+casadi_library(casadi_implicitfunction_newton
   newton_implicit_internal.hpp newton_implicit_internal.cpp)
 
 casadi_library_swig(casadi_homotopynlpsolver_simple
