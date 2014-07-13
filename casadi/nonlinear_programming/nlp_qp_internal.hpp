@@ -26,17 +26,19 @@
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
 
-#include "nlp_qp_solver.hpp"
+#include <casadi/nonlinear_programming/casadi_qpsolver_nlp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for NLPQPInternal
-   *
-      @copydoc QPSolver_doc
-   * */
+  /** \brief Solve QPs using an NLP solver
+
+   @copydoc QPSolver_doc
+
+   \author Joris Gillis
+   \date 2011
+  */
 class CASADI_QPSOLVER_NLP_EXPORT NLPQPInternal : public QPSolverInternal {
-  friend class NLPQPSolver;
 public:
   /** \brief  Constructor */
   explicit NLPQPInternal();

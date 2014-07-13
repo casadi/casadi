@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-casadi_library_swig(casadi_qpsolver_nlp
-  nlp_qp_solver.hpp         nlp_qp_solver.cpp
+casadi_library(casadi_qpsolver_nlp
   nlp_qp_internal.hpp       nlp_qp_internal.cpp)
 
 casadi_library_swig(casadi_implicitfunction_nlp
