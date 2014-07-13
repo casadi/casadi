@@ -13,8 +13,8 @@ casadi_library(casadi_qpsolver_sqic
   ${resource_file})
 
 casadi_library(casadi_stabilizedqpsolver_sqic
-  stabilized_sqic_solver.hpp
-  stabilized_sqic_solver.cpp)
+  stabilized_sqic_internal.hpp
+  stabilized_sqic_internal.cpp)
 target_link_libraries(casadi_stabilizedqpsolver_sqic casadi_qpsolver_sqic)
 
 if(ENABLE_STATIC)

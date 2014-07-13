@@ -31,6 +31,7 @@ import time
 dplesolvers = []
 try:
   LinearSolver.loadPlugin("csparse")
+  DpleSolver.loadPlugin("slicot")
   dplesolvers.append((PsdIndefDpleSolver,{"linear_solver": "csparse"}))
 except:
   pass

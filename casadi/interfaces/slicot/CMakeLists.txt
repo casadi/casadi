@@ -6,8 +6,6 @@ casadi_library_swig(casadi_slicot_interface
 target_link_libraries(casadi_slicot_interface casadi_control ${SLICOT_LIBRARIES})
 
 casadi_library_swig(casadi_dplesolver_slicot
-  psd_indef_dple_solver.hpp
-  psd_indef_dple_solver.cpp
   psd_indef_dple_internal.hpp
   psd_indef_dple_internal.cpp)
 target_link_libraries(casadi_dplesolver_slicot casadi_slicot_interface casadi_control ${SLICOT_LIBRARIES})

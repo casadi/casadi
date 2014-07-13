@@ -23,17 +23,23 @@
 #ifndef CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
 #define CASADI_PSD_INDEF_DPLE_INTERNAL_HPP
 
-#include "psd_indef_dple_solver.hpp"
 #include "../../control/dple_internal.hpp"
+#include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal storage for DpleSolver related data
+  /** \brief An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
+   *
+   * @copydoc DPLE_doc
+   
+       Uses Periodic Schur Decomposition ('psd') and does not assume positive definiteness.
+       Based on Periodic Lyapunov equations: some applications and new algorithms.
+       Int. J. Control, vol. 67, pp. 69-87, 1997.
 
-      @copydoc DPLE_doc
-     \author Joris Gillis
+       \author Joris Gillis
       \date 2014
+
   */
   class CASADI_DPLESOLVER_SLICOT_EXPORT PsdIndefDpleInternal : public DpleInternal {
   public:
