@@ -20,7 +20,7 @@
 *
 */
 #include <casadi/core/casadi.hpp>
-#include <casadi/nonlinear_programming/symbolic_nlp.hpp>
+#include <casadi/core/misc/symbolic_nlp.hpp>
 
 extern "C" void casadi_load_nlpsolver_sqpmethod();
  

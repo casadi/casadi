@@ -23,10 +23,10 @@ endif()
 if(SNOPT_FOUND)
   add_executable(snopt_nl snopt_nl.cpp)
   target_link_libraries(snopt_nl
-    casadi_nlpsolver_snopt casadi_nonlinear_programming ${SNOPT_LIBRARIES})
+    casadi_nlpsolver_snopt)
 
   add_executable(rocket_snopt rocket_snopt.cpp)
-  target_link_libraries(rocket_snopt casadi_nlpsolver_snopt casadi_nonlinear_programming ${SNOPT_LIBRARIES})
+  target_link_libraries(rocket_snopt casadi_nlpsolver_snopt)
 endif()
 
 # Rocket solved with MX + SX
@@ -39,7 +39,7 @@ endif()
 if(IPOPT_FOUND)
   add_executable(ipopt_nl ipopt_nl.cpp)
   target_link_libraries(ipopt_nl
-    casadi_nlpsolver_ipopt casadi_nonlinear_programming)
+    casadi_nlpsolver_ipopt)
 
   add_executable(sqpmethod_nl sqpmethod_nl.cpp)
   target_link_libraries(sqpmethod_nl
@@ -50,7 +50,6 @@ endif()
 if(SQIC_FOUND AND IPOPT_FOUND)
   add_executable(stabilized_sqpmethod_nl stabilized_sqpmethod_nl.cpp)
   target_link_libraries(stabilized_sqpmethod_nl
-    casadi_nonlinear_programming
     casadi_stabilizedqpsolver_qp)
 endif()
 
@@ -58,14 +57,14 @@ endif()
 if(WORHP_FOUND AND IPOPT_FOUND)
   add_executable(worhp_nl worhp_nl.cpp)
   target_link_libraries(worhp_nl
-    casadi_nlpsolver_worhp casadi_nonlinear_programming)
+    casadi_nlpsolver_worhp)
 endif()
 
 # Parse AMPL models and solve with KNITRO
 if(KNITRO_FOUND)
   add_executable(knitro_nl knitro_nl.cpp)
   target_link_libraries(knitro_nl
-    casadi_nlpsolver_knitro casadi_nonlinear_programming)
+    casadi_nlpsolver_knitro)
 endif()
 
 # rocket example using sundials and ipopt
@@ -81,7 +80,7 @@ if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
   target_link_libraries(vdp_multiple_shooting
     casadi_integrator_cvodes casadi_nlpsolver_ipopt  casadi_linearsolver_csparse
-    casadi_optimal_control casadi_integrator_oldcollocation casadi_nonlinear_programming
+    casadi_optimal_control casadi_integrator_oldcollocation
     casadi_implicitfunction_newton)
 endif()
 
@@ -149,6 +148,6 @@ endif()
 if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(implicit_runge-kutta implicit_runge-kutta.cpp)
   target_link_libraries(implicit_runge-kutta
-    casadi_nonlinear_programming casadi_integrator_cvodes casadi_linearsolver_csparse
+    casadi_integrator_cvodes casadi_linearsolver_csparse
     casadi_implicitfunction_newton casadi_qpsolver_nlp)
 endif()
