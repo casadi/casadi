@@ -23,14 +23,21 @@
 #ifndef CASADI_SYMBOLIC_QR_INTERNAL_HPP
 #define CASADI_SYMBOLIC_QR_INTERNAL_HPP
 
-#include "symbolic_qr.hpp"
 #include "casadi/core/function/linear_solver_internal.hpp"
+#include <casadi/convex_programming/casadi_linearsolver_symbolicqr_export.h>
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQRInternal : public LinearSolverInternal {
+  /** \brief  LinearSolver based on QR factorization with sparsity pattern based reordering
+      _without_ partial pivoting
+      @copydoc LinearSolver_doc
+      \author Joel Andersson
+      \date 2013
+  */
+  class CASADI_LINEARSOLVER_SYMBOLICQR_EXPORT SymbolicQRInternal
+    : public LinearSolverInternal {
   public:
     // Constructor
     SymbolicQRInternal(const Sparsity& sparsity, int nrhs);
