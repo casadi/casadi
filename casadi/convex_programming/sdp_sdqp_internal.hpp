@@ -27,15 +27,27 @@
 #include "casadi/core/function/sdp_solver.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 
-#include "sdp_sdqp_solver.hpp"
+#include <casadi/convex_programming/casadi_sdqpsolver_sdp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for SDPSDQPInternal
+  /** \brief SDP SDQP Solver for quadratic programming
+   *
+   *  Note: this implementation relies on Cholesky decomposition:
+   *        <tt>Chol(H) = L ->  H = LL'</tt> with L lower triangular
+   *   This requires Pi, H to be positive definite. Positive semi-definite is not sufficient.
+   *    Notably, H==0  will not work.
+   *
+   *  A better implementation would rely on matrix square root,
+   *  but we need singular value decomposition to implement that.
+   *
    *
    @copydoc SDQPSolver_doc
-   * */
+
+   \author Joris Gillis
+   \date 2013
+  */
   class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPInternal : public SDQPSolverInternal {
     friend class SDPSDQPSolver;
   public:
@@ -73,6 +85,6 @@ namespace casadi {
   };
 
 } // namespace casadi
+
 /// \endcond
 #endif // CASADI_SDP_SDQP_INTERNAL_HPP
-

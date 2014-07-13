@@ -26,36 +26,39 @@
 #include "casadi/core/function/socp_solver_internal.hpp"
 #include "casadi/core/function/sdp_solver.hpp"
 
-#include "sdp_socp_solver.hpp"
+#include <casadi/convex_programming/casadi_socpsolver_sdp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for SDPSOCPInternal
-   *
-      @copydoc LPSolver_doc
-   * */
-class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
-  friend class SDPSOCPSolver;
-public:
+  /** \brief SOCP Solver for quadratic programming
 
-  /** \brief  Create a new Solver */
-  explicit SDPSOCPInternal(const std::vector<Sparsity> &st);
+      @copydoc SOCPSolver_doc
 
-  /** \brief  Destructor */
-  virtual ~SDPSOCPInternal();
+      \author Joris Gillis
+      \date 2013
+  */
+  class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
+    friend class SDPSOCPSolver;
+  public:
 
-  /** \brief  Clone */
-  virtual SDPSOCPInternal* clone() const;
+    /** \brief  Create a new Solver */
+    explicit SDPSOCPInternal(const std::vector<Sparsity> &st);
+
+    /** \brief  Destructor */
+    virtual ~SDPSOCPInternal();
+
+    /** \brief  Clone */
+    virtual SDPSOCPInternal* clone() const;
   
-  /** \brief  Create a new SOCP Solver */
-  static SOCPSolverInternal* creator(const SOCPStructure& st)
-  { return new SDPSOCPInternal(st);}
+    /** \brief  Create a new SOCP Solver */
+    static SOCPSolverInternal* creator(const SOCPStructure& st)
+    { return new SDPSOCPInternal(st);}
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
 
-  virtual void evaluate();
+    virtual void evaluate();
 
   protected:
     SDPSolver sdpsolver_;
@@ -63,9 +66,9 @@ public:
     /// Mapping from G, H, E, F to P, G
     Function mapping_;
 
-};
+  };
 
 } // namespace casadi
+
 /// \endcond
 #endif // CASADI_SDP_SOCP_INTERNAL_HPP
-

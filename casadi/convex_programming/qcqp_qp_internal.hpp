@@ -25,44 +25,44 @@
 
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include "casadi/core/function/qcqp_solver.hpp"
-
-#include "qcqp_qp_solver.hpp"
+#include <casadi/convex_programming/casadi_qpsolver_qcqp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for QCQPQPInternal
-   *
+  /** \brief Use a QCQP solver to solve q QP
+
       @copydoc QPSolver_doc
-   * */
-class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QPSolverInternal {
-  friend class QCQPQPSolver;
-public:
 
-  /** \brief  Create a new Solver */
-  explicit QCQPQPInternal(const std::vector<Sparsity> &st);
+      \author Joris Gillis
+      \date 2013
+  */
+  class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QPSolverInternal {
+  public:
 
-  /** \brief  Destructor */
-  virtual ~QCQPQPInternal();
+    /** \brief  Create a new Solver */
+    explicit QCQPQPInternal(const std::vector<Sparsity> &st);
 
-  /** \brief  Clone */
-  virtual QCQPQPInternal* clone() const;
+    /** \brief  Destructor */
+    virtual ~QCQPQPInternal();
 
-  /** \brief  Create a new QP Solver */
-  static QPSolverInternal* creator(const QPStructure& st)
-  { return new QCQPQPInternal(st);}
+    /** \brief  Clone */
+    virtual QCQPQPInternal* clone() const;
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Create a new QP Solver */
+    static QPSolverInternal* creator(const QPStructure& st)
+    { return new QCQPQPInternal(st);}
 
-  virtual void evaluate();
+    /** \brief  Initialize */
+    virtual void init();
+
+    virtual void evaluate();
 
   protected:
     QCQPSolver qcqpsolver_;
 
-};
+  };
 
 } // namespace casadi
 /// \endcond
 #endif // CASADI_QCQP_QP_INTERNAL_HPP
-

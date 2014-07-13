@@ -26,15 +26,18 @@
 #include "casadi/core/function/lp_internal.hpp"
 #include "casadi/core/function/qp_solver.hpp"
 
-#include "qp_lp_solver.hpp"
+#include <casadi/convex_programming/casadi_lpsolver_qp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for QPLPInternal
-   *
-      @copydoc LPSolver_doc
-   * */
+  /** \brief Solve LPs using a QP Solver
+
+   @copydoc LPSolver_doc
+
+   \author Joris Gillis
+   \date 2013
+  */
 class CASADI_LPSOLVER_QP_EXPORT QPLPInternal : public LPSolverInternal {
   friend class QPLPSolver;
 public:

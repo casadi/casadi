@@ -26,44 +26,72 @@
 #include "casadi/core/function/qcqp_solver_internal.hpp"
 #include "casadi/core/function/socp_solver.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
-
-#include "socp_qcqp_solver.hpp"
+#include <casadi/convex_programming/casadi_qcqpsolver_socp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Internal class for SOCPQCQPInternal
+  /** \brief SOCP QCQP Solver for quadratic programming
    *
-      @copydoc QCQPSolver_doc
-   * */
-class CASADI_QCQPSOLVER_SOCP_EXPORT SOCPQCQPInternal : public QCQPSolverInternal {
-  friend class SOCPQCQPSolver;
-public:
+   *  Note: this implementation relies on Cholesky decomposition:
+   *        <tt>Chol(H) = L ->  H = LL'</tt> with L lower triangular
+   *   This requires Pi, H to be positive definite. Positive semi-definite is not sufficient.
+   *    Notably, H==0  will not work.
+   *
+   *  A better implementation would rely on matrix square root, but we need
+   *  singular value decomposition to implement that.
+   *
+   *
+   * This implementation makes use of the epigraph reformulation:
+   * \verbatim 
+   *  min f(x)
+   *    x
+   *
+   *   min  t
+   *    x, t  f(x) <= t
+   * \endverbatim
+   *
+   *  This implementation makes use of the following identity:
+   * \verbatim
+   *  || Gx+h||_2 <= e'x + f
+   *
+   *  x'(G'G - ee')x + (2 h'G - 2 f e') x + h'h - f <= 0
+   * \endverbatim
+   *    where we put e = [0 0 ... 1]  for the quadratic constraint
+   *    arising from the epigraph reformulation and e==0 for all other 
+   *    quadratic constraints.
 
-  /** \brief  Create a new Solver */
-  explicit SOCPQCQPInternal(const std::vector<Sparsity> &st);
+   @copydoc QCQPSolver_doc
 
-  /** \brief  Destructor */
-  virtual ~SOCPQCQPInternal();
+   \author Joris Gillis
+   \date 2013
+  */
+  class CASADI_QCQPSOLVER_SOCP_EXPORT SOCPQCQPInternal : public QCQPSolverInternal {
+  public:
 
-  /** \brief  Clone */
-  virtual SOCPQCQPInternal* clone() const;
+    /** \brief  Create a new Solver */
+    explicit SOCPQCQPInternal(const std::vector<Sparsity> &st);
 
-  /** \brief  Create a new QP Solver */
-  static QCQPSolverInternal* creator(const QCQPStructure& st)
-  { return new SOCPQCQPInternal(st);}
+    /** \brief  Destructor */
+    virtual ~SOCPQCQPInternal();
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Clone */
+    virtual SOCPQCQPInternal* clone() const;
 
-  virtual void evaluate();
+    /** \brief  Create a new QP Solver */
+    static QCQPSolverInternal* creator(const QCQPStructure& st)
+    { return new SOCPQCQPInternal(st);}
+
+    /** \brief  Initialize */
+    virtual void init();
+
+    virtual void evaluate();
 
   protected:
     SOCPSolver socpsolver_;
     std::vector<CSparseCholesky> cholesky_;
-};
-/// \endcond
+  };
+  /// \endcond
 } // namespace casadi
 
 #endif // CASADI_SOCP_QCQP_INTERNAL_HPP
-
