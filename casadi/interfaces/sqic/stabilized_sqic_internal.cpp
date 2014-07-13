@@ -34,7 +34,7 @@
 
 using namespace std;
 namespace casadi {
-  
+
   extern "C"
   int CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT
   casadi_register_stabilizedqpsolver_sqic(StabilizedQPSolverInternal::Plugin* plugin) {
@@ -103,7 +103,8 @@ namespace casadi {
 
     int m = nc_+1;
 
-    sqicSolveStabilized(&output(QP_SOLVER_COST).data()[0], &input(STABILIZED_QP_SOLVER_MU).data()[0],
+    sqicSolveStabilized(&output(QP_SOLVER_COST).data()[0],
+                        &input(STABILIZED_QP_SOLVER_MU).data()[0],
                         &m, &piE_[0]);
 
     std::copy(x_.begin(), x_.begin()+n_, output(QP_SOLVER_X).begin());
