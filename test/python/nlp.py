@@ -855,7 +855,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0, 3],"lbg")
       solver.setInput([0, 3],"ubg")
       solver.evaluate()
-      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],4 if "SQIC" in str(solver_options) else 10,"IPOPT")
+      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],4 if "sqic" in str(solver_options) else 10,"IPOPT")
 
   def testIPOPTdegc(self):
     self.message("degenerate optimization IPOPT, overconstrained")
@@ -878,7 +878,7 @@ class NLPtests(casadiTestCase):
       solver.setInput([0, 3, 10],"ubg")
       solver.evaluate()
       # todo: catch error when set([0, 3 , 5]) two times
-      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],4 if "SQIC" in str(solver_options) else 10,"IPOPT")
+      self.assertAlmostEqual(solver.getOutput("x")[0],solver.getOutput("x")[1],4 if "sqic" in str(solver_options) else 10,"IPOPT")
       
   def testXfreeChange(self):
     self.message("Change in X settings")

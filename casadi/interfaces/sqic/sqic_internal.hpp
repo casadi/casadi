@@ -24,38 +24,43 @@
 #define CASADI_SQIC_INTERNAL_HPP
 
 #include "casadi/core/function/qp_solver_internal.hpp"
-#include "sqic_solver.hpp"
+#include <casadi/interfaces/sqic/casadi_qpsolver_sqic_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-/** \brief Internal class for SQICSolver
- *
-    @copydoc QPSolver_doc
- * */
-class CASADI_SQIC_INTERFACE_EXPORT SQICInternal : public QPSolverInternal {
-  friend class SQICSolver;
+  /**  \brief Interface to the SQIC solver for quadratic programming
 
-public:
-  /** \brief  Constructor */
-  explicit SQICInternal();
+       @copydoc QPSolver_doc
+       \author Joris Gillis
+       \date 2013
 
-  /** \brief  Clone */
-  virtual SQICInternal* clone() const;
+  */
+  class CASADI_QPSOLVER_SQIC_EXPORT SQICInternal : public QPSolverInternal {
+  public:
+    /** \brief  Constructor */
+    explicit SQICInternal();
 
-  /** \brief  Create a new Solver */
-  explicit SQICInternal(const std::vector<Sparsity>& st);
+    /** \brief  Clone */
+    virtual SQICInternal* clone() const;
 
-  /** \brief  Destructor */
-  virtual ~SQICInternal();
+    /** \brief  Create a new QP Solver */
+    static QPSolverInternal* creator(const QPStructure& st)
+    { return new SQICInternal(st);}
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Create a new Solver */
+    explicit SQICInternal(const std::vector<Sparsity>& st);
 
-  /** \brief Generate native code for debugging */
-  virtual void generateNativeCode(std::ostream& file) const;
+    /** \brief  Destructor */
+    virtual ~SQICInternal();
 
-  virtual void evaluate();
+    /** \brief  Initialize */
+    virtual void init();
+
+    /** \brief Generate native code for debugging */
+    virtual void generateNativeCode(std::ostream& file) const;
+
+    virtual void evaluate();
 
     /// Throw error
     static void sqic_error(const std::string& module, int flag);
@@ -98,13 +103,10 @@ public:
 
     /// SQIC inf
     double inf_;
-
-
-};
+  };
 
 
 } // namespace casadi
 
 /// \endcond
 #endif // CASADI_SQIC_INTERNAL_HPP
-

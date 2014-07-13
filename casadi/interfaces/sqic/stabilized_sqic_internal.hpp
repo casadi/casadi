@@ -24,40 +24,37 @@
 #define CASADI_STABILIZED_SQIC_INTERNAL_HPP
 
 #include "casadi/core/function/stabilized_qp_solver_internal.hpp"
-#include "stabilized_sqic_solver.hpp"
+#include <casadi/interfaces/sqic/casadi_stabilizedsqpsolver_sqic_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-/** \brief Internal class for StabilizedSQICSolver
- *
-    @copydoc StabilizedQPSolver_doc
- * */
-class CASADI_SQIC_INTERFACE_EXPORT StabilizedSQICInternal : public StabilizedQPSolverInternal {
-  friend class StabilizedSQICSolver;
+  class CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT StabilizedSQICInternal
+    : public StabilizedQPSolverInternal {
+  public:
+    /** \brief  Constructor */
+    explicit StabilizedSQICInternal();
 
-public:
-  /** \brief  Constructor */
-  explicit StabilizedSQICInternal();
+    /** \brief  Clone */
+    virtual StabilizedSQICInternal* clone() const;
 
-  /** \brief  Clone */
-  virtual StabilizedSQICInternal* clone() const;
+    /** \brief  Create a new QP Solver */
+    static StabilizedQPSolverInternal* creator(const QPStructure& st)
+    { return new StabilizedSQICInternal(st);}
 
-  /** \brief  Create a new Solver */
-  explicit StabilizedSQICInternal(const std::vector<Sparsity>& st);
+    /** \brief  Create a new Solver */
+    explicit StabilizedSQICInternal(const std::vector<Sparsity>& st);
 
-  /** \brief  Destructor */
-  virtual ~StabilizedSQICInternal();
+    /** \brief  Destructor */
+    virtual ~StabilizedSQICInternal();
 
-  /** \brief  Initialize */
-  virtual void init();
+    /** \brief  Initialize */
+    virtual void init();
 
-  /** \brief Generate native code for debugging */
-  virtual void generateNativeCode(std::ostream& file) const;
+    /** \brief Generate native code for debugging */
+    virtual void generateNativeCode(std::ostream& file) const;
 
-
-
-  virtual void evaluate();
+    virtual void evaluate();
 
     /// Throw error
     static void sqic_error(const std::string& module, int flag);
@@ -103,12 +100,8 @@ public:
     /// SQIC inf
     double inf_;
 
-
-};
-
-
+  };
 } // namespace casadi
 
 /// \endcond
 #endif // CASADI_STABILIZED_SQIC_INTERNAL_HPP
-

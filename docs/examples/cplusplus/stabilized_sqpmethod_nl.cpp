@@ -20,14 +20,7 @@
 *
 */
 #include <casadi/core/casadi.hpp>
-#include <casadi/interfaces/sqic/sqic_solver.hpp>
-#include <casadi/interfaces/sqic/stabilized_sqic_solver.hpp>
-#include <casadi/interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/nonlinear_programming/stabilized_sqp_method.hpp>
-#include <casadi/convex_programming/qp_stabilizer.hpp>
-#include <casadi/nonlinear_programming/nlp_qp_solver.hpp>
-#include <casadi/nonlinear_programming/symbolic_nlp.hpp>
- 
+#include <casadi/nonlinear_programming/symbolic_nlp.hpp> 
 /**
  * This example demonstrates how NL-files, which can be generated
  * by AMPl or Pyomo, can be imported in CasADi and solved using
@@ -36,8 +29,7 @@
  \author Joel Andersson, Vyacheslav Kungurtsev
  \date 2013
 */
- 
- 
+
 using namespace casadi;
  
 int main(int argc, char **argv){
@@ -53,7 +45,7 @@ int main(int argc, char **argv){
   SXFunction nlp(nlpIn("x",nl.x),nlpOut("f",nl.f,"g",nl.g));
  
   // Allocate NLP solver
-  StabilizedSQPMethod nlp_solver(nlp);
+  NLPSolver nlp_solver("stabilizedsqp", nlp);
 
   // Set options
   // nlp_solver.setOption("max_iter",10);
@@ -64,22 +56,22 @@ int main(int argc, char **argv){
 
   /// Unstabilized SQIC Solver
   
-  nlp_solver.setOption("stabilized_qp_solver",QPStabilizer::creator);
+  nlp_solver.setOption("stabilized_qp_solver","qp");
   Dictionary stabilized_qp_solver_options;
-  stabilized_qp_solver_options["qp_solver"] = SQICSolver::creator;
+  stabilized_qp_solver_options["qp_solver"] = "sqic";
   nlp_solver.setOption("stabilized_qp_solver_options",stabilized_qp_solver_options);
   
   /// Stabilized SQIC Solver
   
-  //nlp_solver.setOption("stabilized_qp_solver",StabilizedSQICSolver::creator);
+  //nlp_solver.setOption("stabilized_qp_solver","sqic");
   
   /// Ipopt QP Solver 
   
     
   /**
-  nlp_solver.setOption("stabilized_qp_solver",QPStabilizer::creator);
+  nlp_solver.setOption("stabilized_qp_solver","qp");
   Dictionary stabilized_qp_solver_options;
-  stabilized_qp_solver_options["qp_solver"] = NLPQPSolver::creator;
+  stabilized_qp_solver_options["qp_solver"] = "nlp";
   Dictionary qp_solver_options;
   qp_solver_options["nlp_solver"]= "ipopt";
   Dictionary nlp_solver_options;
