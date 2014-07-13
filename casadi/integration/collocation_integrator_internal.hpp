@@ -23,15 +23,26 @@
 #ifndef CASADI_COLLOCATION_INTEGRATOR_INTERNAL_HPP
 #define CASADI_COLLOCATION_INTEGRATOR_INTERNAL_HPP
 
-#include "collocation_integrator.hpp"
 #include "implicit_fixed_step_integrator_internal.hpp"
 #include "casadi/core/function/mx_function.hpp"
 #include "casadi/core/function/implicit_function.hpp"
 #include "integration_tools.hpp"
+#include <casadi/integration/casadi_integrator_collocation_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
+  /**
+     \brief Fixed-step implicit Runge-Kutta integrator
+     ODE/DAE integrator based on collocation schemes
+
+     The method is still under development
+
+     @copydoc DAE_doc
+
+     \author Joel Andersson
+     \date 2014
+  */
   class CASADI_INTEGRATOR_COLLOCATION_EXPORT CollocationIntegratorInternal :
         public ImplicitFixedStepIntegratorInternal {
   public:

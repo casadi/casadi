@@ -15,9 +15,7 @@ casadi_library(casadi_integrator_rk
 target_link_libraries(casadi_integrator_rk casadi_integration)
 
 # Collocation integrator
-casadi_library_swig(casadi_integrator_collocation
-  collocation_integrator.hpp
-  collocation_integrator.cpp
+casadi_library(casadi_integrator_collocation
   collocation_integrator_internal.hpp
   collocation_integrator_internal.cpp)
 target_link_libraries(casadi_integrator_collocation casadi_integration)
