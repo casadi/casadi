@@ -388,5 +388,22 @@ namespace casadi {
 
   const std::string LinearSolverInternal::infix_ = "linearsolver";
 
+  void LinearSolverInternal::solveL(double* x, int nrhs, bool transpose) {
+    casadi_error("LinearSolverInternal::solveL not defined for class "
+                 << typeid(*this).name());
+  }
+
+  Sparsity LinearSolverInternal::getFactorizationSparsity(bool transpose) const {
+    casadi_error("LinearSolverInternal::getFactorizationSparsity not defined for class "
+                 << typeid(*this).name());
+    return Sparsity();
+  }
+
+  DMatrix LinearSolverInternal::getFactorization(bool transpose) const {
+    casadi_error("LinearSolverInternal::getFactorization not defined for class "
+                 << typeid(*this).name());
+    return DMatrix();
+  }
+
 } // namespace casadi
 

@@ -85,8 +85,16 @@ namespace casadi {
     LinearSolverInternal::loadPlugin(name);
   }
 
+  Sparsity LinearSolver::getFactorizationSparsity(bool transpose) const {
+    return (*this)->getFactorizationSparsity(transpose);
+  }
+
+  DMatrix LinearSolver::getFactorization(bool transpose) const {
+    return (*this)->getFactorization(transpose);
+  }
+
+  void LinearSolver::solveL(double* x, int nrhs, bool transpose) {
+    return (*this)->solveL(x, nrhs, transpose);
+  }
+
 } // namespace casadi
-
-
-
-

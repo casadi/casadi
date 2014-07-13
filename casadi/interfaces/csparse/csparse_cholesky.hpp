@@ -76,15 +76,6 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /// Solve the system of equations <tt>Lx = b</tt>
-  void solveL(double* x, int nrhs, bool transpose);
-
-  /// Obtain a symbolic Cholesky factorization
-  Sparsity getFactorizationSparsity(bool transpose=false) const;
-
-  /// Obtain a numeric Cholesky factorization
-  DMatrix getFactorization(bool transpose=false) const;
-
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");

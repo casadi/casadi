@@ -44,16 +44,4 @@ namespace casadi {
     return dynamic_cast<const CSparseCholeskyInternal*>(get())!=0;
   }
 
-  Sparsity CSparseCholesky::getFactorizationSparsity(bool transpose) const {
-    return (*this)->getFactorizationSparsity(transpose);
-  }
-
-  DMatrix CSparseCholesky::getFactorization(bool transpose) const {
-    return (*this)->getFactorization(transpose);
-  }
-
-  void CSparseCholesky::solveL(double* x, int nrhs, bool transpose) {
-    return (*this)->solveL(x, nrhs, transpose);
-  }
-
 } // namespace casadi

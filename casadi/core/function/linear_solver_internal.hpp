@@ -86,6 +86,16 @@ namespace casadi {
     void spSolve(DMatrix& X, const DMatrix& B, bool transpose) const;
     ///@}
 
+
+    /// Solve the system of equations <tt>Lx = b</tt>
+    virtual void solveL(double* x, int nrhs, bool transpose);
+
+    /// Obtain a symbolic Cholesky factorization
+    virtual Sparsity getFactorizationSparsity(bool transpose) const;
+
+    /// Obtain a numeric Cholesky factorization
+    virtual DMatrix getFactorization(bool transpose) const;
+
     /// Dulmage-Mendelsohn decomposition
     std::vector<int> rowperm_, colperm_, rowblock_, colblock_;
 

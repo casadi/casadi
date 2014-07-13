@@ -63,13 +63,13 @@ namespace casadi {
     virtual void solve(double* x, int nrhs, bool transpose);
 
     // Solve the system of equations <tt>Lx = b</tt>
-    void solveL(double* x, int nrhs, bool transpose);
+    virtual void solveL(double* x, int nrhs, bool transpose);
 
     /// Obtain a symbolic Cholesky factorization
-    Sparsity getFactorizationSparsity(bool transpose=false) const;
+    virtual Sparsity getFactorizationSparsity(bool transpose) const;
 
     /// Obtain a numeric Cholesky factorization
-    DMatrix getFactorization(bool transpose=false) const;
+    virtual DMatrix getFactorization(bool transpose) const;
 
     // Clone
     virtual CSparseCholeskyInternal* clone() const;

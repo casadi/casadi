@@ -37,19 +37,19 @@
 
 namespace casadi {
 
-/// Input arguments of a linear solver [linsolIn]
-enum LinsolInput {
-  /// The square matrix A: sparse, (n x n). [A]
-  LINSOL_A,
-  /// The right-hand-side matrix b: dense,  (n x m) [B]
-  LINSOL_B,
-  LINSOL_NUM_IN};
+  /// Input arguments of a linear solver [linsolIn]
+  enum LinsolInput {
+    /// The square matrix A: sparse, (n x n). [A]
+    LINSOL_A,
+    /// The right-hand-side matrix b: dense,  (n x m) [B]
+    LINSOL_B,
+    LINSOL_NUM_IN};
 
-/// Output arguments of a linear solver [linsolOut]
-enum LinsolOutput {
-  /// Solution to the linear system of equations [X]
-  LINSOL_X,
-  LINSOL_NUM_OUT};
+  /// Output arguments of a linear solver [linsolOut]
+  enum LinsolOutput {
+    /// Solution to the linear system of equations [X]
+    LINSOL_X,
+    LINSOL_NUM_OUT};
 
   // Forward declaration of internal class
   class LinearSolverInternal;
@@ -88,7 +88,7 @@ enum LinsolOutput {
     /// Solve the system of equations, internal vector
     void solve(bool transpose=false);
 
-/// \cond INTERNAL
+    /// \cond INTERNAL
 #ifndef SWIG
     /// Solve the factorized system of equations
     void solve(double* x, int nrhs=1, bool transpose=false);
@@ -100,13 +100,28 @@ enum LinsolOutput {
     ///@}
 
 #endif // SWIG
-/// \endcond
+    /// \endcond
 
     /// Create a solve node
     MX solve(const MX& A, const MX& B, bool transpose=false);
 
     /// Check if prepared
     bool prepared() const;
+
+    /** \brief Solve the system of equations <tt>Lx = b</tt>
+        Only when a Cholesky factorization is available
+    */
+    void solveL(double* x, int nrhs, bool transpose);
+
+    /** \brief Obtain a symbolic Cholesky factorization
+        Only for Cholesky solvers
+    */
+    Sparsity getFactorizationSparsity(bool transpose=false) const;
+
+    /** \brief Obtain a numeric Cholesky factorization
+        Only for Cholesky solvers
+     */
+    DMatrix getFactorization(bool transpose=false) const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
