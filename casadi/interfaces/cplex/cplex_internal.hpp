@@ -22,9 +22,9 @@
 #ifndef CASADI_CPLEX_INTERNAL_HPP
 #define CASADI_CPLEX_INTERNAL_HPP
 
-#include "ilcplex/cplex.h"
 #include "casadi/core/function/qp_solver_internal.hpp"
-#include "cplex_solver.hpp"
+#include <casadi/interfaces/cplex/casadi_qpsolver_cplex_export.h>
+#include "ilcplex/cplex.h"
 
 #include <string>
 
@@ -32,11 +32,12 @@
 
 namespace casadi {
 
-  /** Internal class for CplexSolver
+  /** \brief Interface to Cplex solver for sparse Quadratic Programs
       @copydoc QPSolver_doc
+      \author Attila Kozma, Joel Andersson
+      \date 2012
   */
   class CASADI_QPSOLVER_CPLEX_EXPORT CplexInternal : public QPSolverInternal {
-    friend class CplexSolver;
   public:
     /** \brief Default constructor */
     explicit CplexInternal();
