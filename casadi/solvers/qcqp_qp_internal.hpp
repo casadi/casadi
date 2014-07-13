@@ -20,40 +20,38 @@
  *
  */
 
-#ifndef CASADI_SDP_SOCP_INTERNAL_HPP
-#define CASADI_SDP_SOCP_INTERNAL_HPP
+#ifndef CASADI_QCQP_QP_INTERNAL_HPP
+#define CASADI_QCQP_QP_INTERNAL_HPP
 
-#include "casadi/core/function/socp_solver_internal.hpp"
-#include "casadi/core/function/sdp_solver.hpp"
-
-#include <casadi/convex_programming/casadi_socpsolver_sdp_export.h>
+#include "casadi/core/function/qp_solver_internal.hpp"
+#include "casadi/core/function/qcqp_solver.hpp"
+#include <casadi/solvers/casadi_qpsolver_qcqp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief SOCP Solver for quadratic programming
+  /** \brief Use a QCQP solver to solve q QP
 
-      @copydoc SOCPSolver_doc
+      @copydoc QPSolver_doc
 
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
-    friend class SDPSOCPSolver;
+  class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QPSolverInternal {
   public:
 
     /** \brief  Create a new Solver */
-    explicit SDPSOCPInternal(const std::vector<Sparsity> &st);
+    explicit QCQPQPInternal(const std::vector<Sparsity> &st);
 
     /** \brief  Destructor */
-    virtual ~SDPSOCPInternal();
+    virtual ~QCQPQPInternal();
 
     /** \brief  Clone */
-    virtual SDPSOCPInternal* clone() const;
-  
-    /** \brief  Create a new SOCP Solver */
-    static SOCPSolverInternal* creator(const SOCPStructure& st)
-    { return new SDPSOCPInternal(st);}
+    virtual QCQPQPInternal* clone() const;
+
+    /** \brief  Create a new QP Solver */
+    static QPSolverInternal* creator(const QPStructure& st)
+    { return new QCQPQPInternal(st);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -61,14 +59,10 @@ namespace casadi {
     virtual void evaluate();
 
   protected:
-    SDPSolver sdpsolver_;
-
-    /// Mapping from G, H, E, F to P, G
-    Function mapping_;
+    QCQPSolver qcqpsolver_;
 
   };
 
 } // namespace casadi
-
 /// \endcond
-#endif // CASADI_SDP_SOCP_INTERNAL_HPP
+#endif // CASADI_QCQP_QP_INTERNAL_HPP

@@ -20,49 +20,53 @@
  *
  */
 
-#ifndef CASADI_QCQP_QP_INTERNAL_HPP
-#define CASADI_QCQP_QP_INTERNAL_HPP
+#ifndef CASADI_QP_LP_INTERNAL_HPP
+#define CASADI_QP_LP_INTERNAL_HPP
 
-#include "casadi/core/function/qp_solver_internal.hpp"
-#include "casadi/core/function/qcqp_solver.hpp"
-#include <casadi/convex_programming/casadi_qpsolver_qcqp_export.h>
+#include "casadi/core/function/lp_internal.hpp"
+#include "casadi/core/function/qp_solver.hpp"
+
+#include <casadi/solvers/casadi_lpsolver_qp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Use a QCQP solver to solve q QP
+  /** \brief Solve LPs using a QP Solver
 
-      @copydoc QPSolver_doc
+   @copydoc LPSolver_doc
 
-      \author Joris Gillis
-      \date 2013
+   \author Joris Gillis
+   \date 2013
   */
-  class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QPSolverInternal {
-  public:
+class CASADI_LPSOLVER_QP_EXPORT QPLPInternal : public LPSolverInternal {
+  friend class QPLPSolver;
+public:
 
-    /** \brief  Create a new Solver */
-    explicit QCQPQPInternal(const std::vector<Sparsity> &st);
+  /** \brief  Create a new Solver */
+  explicit QPLPInternal(const std::vector<Sparsity> &st);
 
-    /** \brief  Destructor */
-    virtual ~QCQPQPInternal();
+  /** \brief  Destructor */
+  virtual ~QPLPInternal();
 
-    /** \brief  Clone */
-    virtual QCQPQPInternal* clone() const;
+  /** \brief  Clone */
+  virtual QPLPInternal* clone() const;
 
-    /** \brief  Create a new QP Solver */
-    static QPSolverInternal* creator(const QPStructure& st)
-    { return new QCQPQPInternal(st);}
+  /** \brief  Create a new QP Solver */
+  static LPSolverInternal* creator(const LPStructure& st)
+  { return new QPLPInternal(st);}
 
-    /** \brief  Initialize */
-    virtual void init();
+  /** \brief  Initialize */
+  virtual void init();
 
-    virtual void evaluate();
+  virtual void evaluate();
 
   protected:
-    QCQPSolver qcqpsolver_;
+    QPSolver qpsolver_;
 
-  };
+};
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_QCQP_QP_INTERNAL_HPP
+
+#endif // CASADI_QP_LP_INTERNAL_HPP
+

@@ -26,6 +26,6 @@ if(WITH_CSPARSE)
 endif()
 
 install(DIRECTORY ./
-  DESTINATION include/casadi/convex_programming
+  DESTINATION include/casadi/solvers
   FILES_MATCHING PATTERN "*.hpp"
   PATTERN ".svn" EXCLUDE)

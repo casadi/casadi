@@ -26,7 +26,7 @@
 #include "casadi/core/function/qcqp_solver_internal.hpp"
 #include "casadi/core/function/socp_solver.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
-#include <casadi/convex_programming/casadi_qcqpsolver_socp_export.h>
+#include <casadi/solvers/casadi_qcqpsolver_socp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {

@@ -27,7 +27,7 @@
 #include "casadi/core/function/sdp_solver.hpp"
 #include "casadi/interfaces/csparse/csparse_cholesky.hpp"
 
-#include <casadi/convex_programming/casadi_sdqpsolver_sdp_export.h>
+#include <casadi/solvers/casadi_sdqpsolver_sdp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {

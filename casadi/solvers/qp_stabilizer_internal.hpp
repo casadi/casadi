@@ -26,7 +26,7 @@
 #include "casadi/core/function/stabilized_qp_solver_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 
-#include <casadi/convex_programming/casadi_stabilizedqpsolver_qp_export.h>
+#include <casadi/solvers/casadi_stabilizedqpsolver_qp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {

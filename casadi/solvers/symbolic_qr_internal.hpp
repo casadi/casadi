@@ -24,7 +24,7 @@
 #define CASADI_SYMBOLIC_QR_INTERNAL_HPP
 
 #include "casadi/core/function/linear_solver_internal.hpp"
-#include <casadi/convex_programming/casadi_linearsolver_symbolicqr_export.h>
+#include <casadi/solvers/casadi_linearsolver_symbolicqr_export.h>
 
 /// \cond INTERNAL
 
