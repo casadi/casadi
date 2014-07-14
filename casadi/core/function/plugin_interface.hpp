@@ -101,7 +101,7 @@ namespace casadi {
     casadi_assert_message(handle!=0, "PluginInterface::loadPlugin: Cannot open function: "
                         << lib << ". error code (WIN32): "<< GetLastError());
 
-    reg = (RegFcn)GetProcAddress(handle_, TEXT(regName.c_str()));
+    reg = (RegFcn)GetProcAddress(handle, TEXT(regName.c_str()));
     if (reg==0) throw CasadiException("PluginInterface::loadPlugin: no \"" + regName + "\" found");
 #else // _WIN32
   handle  = dlopen(lib.c_str(), RTLD_LAZY);
