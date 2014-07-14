@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
-casadi_library_swig(casadi_control
+casadi_library(casadi_control
   dple_solver.hpp
   dple_solver.cpp
   dple_internal.hpp
   dple_internal.cpp)
+set_property(GLOBAL APPEND PROPERTY CASADI_MODULES casadi_control)
 
 casadi_library(casadi_dplesolver_simple
   simple_indef_dple_internal.hpp

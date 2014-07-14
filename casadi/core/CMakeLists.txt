@@ -125,7 +125,8 @@ set(CASADI_SRCS
 
 set_source_files_properties( ${RUNTIME_EMBEDDED_SRC} PROPERTIES GENERATED TRUE )
 
-casadi_library_swig(casadi_core ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
+casadi_library(casadi_core ${CASADI_SRCS} ${RUNTIME_EMBEDDED_SRC})
+set_property(GLOBAL APPEND PROPERTY CASADI_MODULES casadi_core)
 
 add_dependencies(casadi_core casadi_runtime_embedded)
 
