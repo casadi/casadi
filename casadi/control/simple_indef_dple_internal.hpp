@@ -63,6 +63,11 @@ namespace casadi {
                                             const std::vector< Sparsity > &V) const {
         return new SimpleIndefDpleInternal(A, V);}
 
+    /** \brief  Create a new DPLE Solver */
+    static DpleInternal* creator(const std::vector< Sparsity >& A,
+                                 const std::vector< Sparsity >& V)
+    { return new SimpleIndefDpleInternal(A, V);}
+
     /** \brief  Print solver statistics */
     virtual void printStats(std::ostream &stream) const {}
 

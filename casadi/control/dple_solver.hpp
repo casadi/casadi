@@ -83,6 +83,11 @@ namespace casadi {
     /// Clone
     DpleSolver clone() const;
 
+    /// DpleSolver solver factory
+    DpleSolver(const std::string& name,
+               const std::vector< Sparsity > & A,
+               const std::vector< Sparsity > & V);
+
     /// Print solver statistics
     void printStats(std::ostream &stream=std::cout) const;
 

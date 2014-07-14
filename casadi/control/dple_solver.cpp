@@ -61,5 +61,11 @@ namespace casadi {
     return DpleInternal::getPlugin(name).doc;
   }
 
+  DpleSolver::DpleSolver(const std::string& name,
+                         const std::vector< Sparsity > & A,
+                         const std::vector< Sparsity > &V) {
+    assignNode(DpleInternal::getPlugin(name).creator(A, V));
+  }
+
 } // namespace casadi
 

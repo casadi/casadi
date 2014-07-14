@@ -32,14 +32,14 @@ dplesolvers = []
 try:
   LinearSolver.loadPlugin("csparse")
   DpleSolver.loadPlugin("slicot")
-  dplesolvers.append((PsdIndefDpleSolver,{"linear_solver": "csparse"}))
+  dplesolvers.append(("slicot",{"linear_solver": "csparse"}))
 except:
   pass
   
   
 try:
   LinearSolver.loadPlugin("csparse")
-  dplesolvers.append((SimpleIndefDpleSolver,{"linear_solver": "csparse"}))
+  dplesolvers.append(("simple",{"linear_solver": "csparse"}))
 except:
   pass
   
@@ -61,7 +61,7 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = Solver([Sparsity.dense(n,n) for i in range(K)],[Sparsity.dense(n,n) for i in range(K)])
+          solver = DpleSolver(Solver,[Sparsity.dense(n,n) for i in range(K)],[Sparsity.dense(n,n) for i in range(K)])
           solver.setOption(options)
           solver.init()
           solver.setInput(horzcat(A_),DPLE_A)
@@ -125,7 +125,7 @@ class ControlTests(casadiTestCase):
           V_ = [mul(v,v.T) for v in [DMatrix(numpy.random.random((n,n))) for i in range(K)]]
           
           
-          solver = Solver([Sparsity.dense(n,n) for i in range(K)],[Sparsity.dense(n,n) for i in range(K)])
+          solver = DpleSolver(Solver,[Sparsity.dense(n,n) for i in range(K)],[Sparsity.dense(n,n) for i in range(K)])
           solver.setOption(options)
           solver.init()
           solver.setInput(horzcat(A_),DPLE_A)
