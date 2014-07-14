@@ -559,3 +559,16 @@
    ...
    fun:PyImport_ImportModuleLevel
 }
+
+{
+   No idea what this is
+   Memcheck:Addr4
+   fun:_PyString_Resize
+   fun:assemble.35298
+   fun:compiler_body.35590
+   fun:compiler_body.35590
+   fun:PyAST_Compile
+   fun:run_mod.42573.2971
+   fun:PyRun_FileExFlags
+   fun:PyRun_SimpleFileExFlags
+}
