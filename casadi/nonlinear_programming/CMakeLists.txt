@@ -21,8 +21,8 @@ casadi_library(casadi_nlpsolver_scpgen
   scpgen_internal.hpp       scpgen_internal.cpp)
 
 # StabilizedSQP -  An implementation of Stabilized SQP
-casadi_library_swig(casadi_nlpsolver_stabilizedsqp
-  stabilized_sqp_method.hpp          stabilized_sqp_method.cpp          stabilized_sqp_internal.hpp          stabilized_sqp_internal.cpp)
+casadi_library(casadi_nlpsolver_stabilizedsqp
+  stabilized_sqp_internal.hpp          stabilized_sqp_internal.cpp)
 
 install(DIRECTORY ./
   DESTINATION include/casadi/nonlinear_programming
