@@ -256,7 +256,7 @@ class QPSolverTests(casadiTestCase):
 
       solver.setInput(5,"ubx")
 
-      if "Worhp" in str(qp_options):
+      if "worhp" in str(qp_options):
         with self.assertRaises(Exception):
           solver.evaluate()
         return
@@ -388,7 +388,7 @@ class QPSolverTests(casadiTestCase):
       solver.setInput(UBX,"ubx")
       solver.setInput(LBA,"lba")
       solver.setInput(UBA,"uba")
-      if 'Worhp' in str(qp_options):
+      if 'worhp' in str(qp_options):
         with self.assertRaises(Exception):
           solver.evaluate()
         return
