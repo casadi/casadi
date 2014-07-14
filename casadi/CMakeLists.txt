@@ -43,7 +43,6 @@ endmacro()
 
 add_subdirectory(core)  # needed by all except external_packages
 add_subdirectory(interfaces)             # needs external_packages
-add_subdirectory(nonlinear_programming)  # needs interfaces
 add_subdirectory(solvers)                # needs interfaces
 add_subdirectory(optimal_control)        # needs external_packages
 add_subdirectory(control)

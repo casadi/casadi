@@ -20,39 +20,33 @@
  *
  */
 
-#ifndef CASADI_STABILIZED_SQP_INTERNAL_HPP
-#define CASADI_STABILIZED_SQP_INTERNAL_HPP
+#ifndef CASADI_SQP_INTERNAL_HPP
+#define CASADI_SQP_INTERNAL_HPP
 
 #include "casadi/core/function/nlp_solver_internal.hpp"
-#include "casadi/core/function/stabilized_qp_solver.hpp"
+#include "casadi/core/function/qp_solver.hpp"
 #include <deque>
 
-#include <casadi/nonlinear_programming/casadi_nlpsolver_stabilizedsqp_export.h>
+#include <casadi/solvers/casadi_nlpsolver_sqpmethod_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /**
-     \brief Stabilized Sequential Quadratic Programming method.
-
-     \author Slava Kung
-     \date 2013
-  */
-  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSQPInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_SQPMETHOD_EXPORT SQPInternal : public NLPSolverInternal {
   public:
-    explicit StabilizedSQPInternal(const Function& nlp);
-    virtual ~StabilizedSQPInternal();
-    virtual StabilizedSQPInternal* clone() const { return new StabilizedSQPInternal(*this);}
+    explicit SQPInternal(const Function& nlp);
+    virtual ~SQPInternal();
+    virtual SQPInternal* clone() const { return new SQPInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
     static NLPSolverInternal* creator(const Function& nlp)
-    { return new StabilizedSQPInternal(nlp);}
+    { return new SQPInternal(nlp);}
 
     virtual void init();
     virtual void evaluate();
 
-    /// Stabilized QP solver for the subproblems
-    StabilizedQPSolver stabilized_qp_solver_;
+    /// QP solver for the subproblems
+    QPSolver qp_solver_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -77,62 +71,31 @@ namespace casadi {
     double beta_;
     int max_iter_ls_;
     int merit_memsize_;
-    double sigmaMax_;
-    double dvMax_;
-    double alphaMin_;
     ///@}
 
     /// Hessian regularization
     double reg_;
 
-    double eps_active_;
-    double muH_;
-
-    // Merit function parameters
-    double nu_;
-    double muR_;
-    double muLS;
-    double Merit_, Merit_cand_, Merit_mu_, Merit_mu_cand_;
-
-    // Optimality measure and adjustment parameters
-    double tau_;
-    double phiWeight_;
-    double yMax_;
-    double phiComb_;
-    double phiMaxO_, phiMaxV_, phiV_, phiO_;
-
-    // Trust Region parameters
-    double TRDelta_, TReta1_, TReta2_, gamma1_, gamma2_, gamma3_;
-    double rhoap_, rhoap_mu_;
-    int TRsuccess_;
-
-    /// Access StabilizedQPSolver
-    const StabilizedQPSolver getStabilizedQPSolver() const { return stabilized_qp_solver_;}
+    /// Access QPSolver
+    const QPSolver getQPSolver() const { return qp_solver_;}
 
     /// Lagrange multipliers of the NLP
-    std::vector<double> mu_, mu_x_, mu_e_, pi_, pi2_;
-    double ymax;
-
-    /// gradient of the merit function
-    std::vector<double> gradm_, gradms_;
+    std::vector<double> mu_, mu_x_;
 
     /// Current cost function value
-    double fk_, fk_cand_;
-
-    /// Norms and scaling
-    double normc_, normcs_, normJ_, normgf_, scaleglag_, scaleg_, normc_cand_, normcs_cand_;
+    double fk_;
 
     /// Current and previous linearization point and candidate
-    std::vector<double> x_, x_old_, x_cand_, mu_cand_, s_, s_cand_, v_, xtmp_;
+    std::vector<double> x_, x_old_, x_cand_;
 
     /// Lagrange gradient in the next iterate
-    std::vector<double> gLag_, gLag_old_, dualpen_;
+    std::vector<double> gLag_, gLag_old_;
 
     /// Constraint function value
-    std::vector<double> gk_, QPgk_, gsk_, gk_cand_, gsk_cand_;
+    std::vector<double> gk_, gk_cand_;
 
     /// Gradient of the objective function
-    std::vector<double> gf_, QPgf_;
+    std::vector<double> gf_;
 
     /// BFGS update function
     enum BFGSMdoe { BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN};
@@ -142,16 +105,16 @@ namespace casadi {
     DMatrix B_init_;
 
     /// Current Hessian approximation
-    DMatrix Bk_, QPBk_;
+    DMatrix Bk_;
 
     // Current Jacobian
-    DMatrix Jk_, QPJk_;
+    DMatrix Jk_;
 
     // Bounds of the QP
     std::vector<double> qp_LBA_, qp_UBA_, qp_LBX_, qp_UBX_;
 
     // QP solution
-    std::vector<double> dx_, qp_DUAL_X_, qp_DUAL_A_, ds_, dy_, dv_;
+    std::vector<double> dx_, qp_DUAL_X_, qp_DUAL_A_;
 
     /// Regularization
     bool regularize_;
@@ -164,8 +127,7 @@ namespace casadi {
 
     /// Print iteration
     void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf,
-                        double dx_norm, double reg, double TRdelta, int ls_trials,
-                        bool ls_success, char info);
+                        double dx_norm, double reg, int ls_trials, bool ls_success);
 
     // Reset the Hessian or Hessian approximation
     void reset_h();
@@ -195,32 +157,39 @@ namespace casadi {
     // Solve the QP subproblem
     virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
                           const std::vector<double>& lbx, const std::vector<double>& ubx,
-                          const Matrix<double>& A,
-                          const std::vector<double>& lbA, const std::vector<double>& ubA,
+                          const Matrix<double>& A, const std::vector<double>& lbA,
+                          const std::vector<double>& ubA,
                           std::vector<double>& x_opt, std::vector<double>& lambda_x_opt,
-                          std::vector<double>& lambda_A_opt, double muR,
-                          const std::vector<double> & mu, const std::vector<double> & muE);
+                          std::vector<double>& lambda_A_opt);
 
     // Calculate the L1-norm of the primal infeasibility
-    double primalInfeasibility(const std::vector<double>& x,
-                               const std::vector<double>& lbx, const std::vector<double>& ubx,
-                               const std::vector<double>& g,
-                               const std::vector<double>& lbg, const std::vector<double>& ubg);
+    double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx,
+                               const std::vector<double>& ubx,
+                               const std::vector<double>& g, const std::vector<double>& lbg,
+                               const std::vector<double>& ubg);
 
     /// Calculates <tt>inner_prod(x, mul(A, x))</tt>
     static double quad_form(const std::vector<double>& x, const DMatrix& A);
 
-    /// Calculate the merit function gradient
-    void meritfg();
-    /// Matrix transpose and vector
-    void mat_vectran(const std::vector<double>& x, const DMatrix& A, std::vector<double>& y);
-    void mat_vec(const std::vector<double>& x, const DMatrix& A, std::vector<double>& y);
+    // Accumulated time since last reset:
+    double t_eval_f_; // time spent in eval_f
+    double t_eval_grad_f_; // time spent in eval_grad_f
+    double t_eval_g_; // time spent in eval_g
+    double t_eval_jac_g_; // time spent in eval_jac_g
+    double t_eval_h_; // time spent in eval_h
+    double t_callback_fun_;  // time spent in callback function
+    double t_callback_prepare_; // time spent in callback preparation
+    double t_mainloop_; // time spent in the main loop of the solver
 
-    /// Calculate 1-norm of a matrix
-    double norm1matrix(const DMatrix& A);
+    // Accumulated counts since last reset:
+    int n_eval_f_; // number of calls to eval_f
+    int n_eval_grad_f_; // number of calls to eval_grad_f
+    int n_eval_g_; // number of calls to eval_g
+    int n_eval_jac_g_; // number of calls to eval_jac_g
+    int n_eval_h_; // number of calls to eval_h
 
   };
-  /// \endcond
-} // namespace casadi
 
-#endif // CASADI_STABILIZED_SQP_INTERNAL_HPP
+} // namespace casadi
+/// \endcond
+#endif // CASADI_SQP_INTERNAL_HPP

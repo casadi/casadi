@@ -20,8 +20,8 @@
 *
 */
 #include <casadi/core/casadi.hpp>
-#include <casadi/nonlinear_programming/symbolic_nlp.hpp>
- 
+#include <casadi/core/misc/symbolic_nlp.hpp>
+
 /**
 * This example demonstrates how NL-files, which can be generated
 * by AMPl or Pyomo, can be imported in CasADi and solved using

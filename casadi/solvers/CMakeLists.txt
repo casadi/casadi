@@ -20,7 +20,24 @@ casadi_library(casadi_integrator_oldcollocation
   old_collocation_integrator_internal.hpp
   old_collocation_integrator_internal.cpp)
 
+casadi_library(casadi_implicitfunction_newton
+  newton_implicit_internal.hpp   newton_implicit_internal.cpp)
+
+casadi_library(casadi_homotopynlpsolver_simple
+   simple_homotopy_nlp_internal.hpp   simple_homotopy_nlp_internal.cpp)
+
+# SQPMethod -  A basic SQP method
+casadi_library(casadi_nlpsolver_sqpmethod   sqp_internal.hpp   sqp_internal.cpp)
+
+# SCPgen -  An implementation of Lifted Newton SQP
+casadi_library(casadi_nlpsolver_scpgen   scpgen_internal.hpp   scpgen_internal.cpp)
+
+# StabilizedSQP -  An implementation of Stabilized SQP
+casadi_library(casadi_nlpsolver_stabilizedsqp   stabilized_sqp_internal.hpp   stabilized_sqp_internal.cpp)
+
 # Reformulations
+casadi_library(casadi_qpsolver_nlp nlp_qp_internal.hpp   nlp_qp_internal.cpp)
+casadi_library(casadi_implicitfunction_nlp   nlp_implicit_internal.hpp   nlp_implicit_internal.cpp)
 casadi_library(casadi_lpsolver_qp   qp_lp_internal.cpp   qp_lp_internal.hpp)
 casadi_library(casadi_qpsolver_qcqp   qcqp_qp_internal.cpp   qcqp_qp_internal.hpp)
 casadi_library(casadi_socpsolver_sdp   sdp_socp_internal.cpp   sdp_socp_internal.hpp)

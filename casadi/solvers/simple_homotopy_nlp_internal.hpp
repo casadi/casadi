@@ -26,7 +26,7 @@
 #include "casadi/core/function/homotopy_nlp_internal.hpp"
 #include "casadi/core/function/stabilized_qp_solver.hpp"
 
-#include <casadi/nonlinear_programming/casadi_homotopynlpsolver_simple_export.h>
+#include <casadi/solvers/casadi_homotopynlpsolver_simple_export.h>
 
 /// \cond INTERNAL
 namespace casadi {

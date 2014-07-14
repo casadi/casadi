@@ -26,7 +26,7 @@
 #include "casadi/core/function/nlp_solver_internal.hpp"
 #include "casadi/core/function/qp_solver.hpp"
 
-#include <casadi/nonlinear_programming/casadi_nlpsolver_scpgen_export.h>
+#include <casadi/solvers/casadi_nlpsolver_scpgen_export.h>
 
 #include <deque>
 

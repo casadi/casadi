@@ -26,7 +26,7 @@
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
 
-#include <casadi/nonlinear_programming/casadi_qpsolver_nlp_export.h>
+#include <casadi/solvers/casadi_qpsolver_nlp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {

@@ -20,48 +20,50 @@
  *
  */
 
-#ifndef CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
-#define CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
+#ifndef CASADI_NLP_IMPLICIT_INTERNAL_HPP
+#define CASADI_NLP_IMPLICIT_INTERNAL_HPP
 
 #include "casadi/core/function/implicit_function_internal.hpp"
 #include "casadi/core/function/nlp_solver.hpp"
 #include "casadi/core/function/linear_solver.hpp"
 
-#include <casadi/nonlinear_programming/casadi_implicitfunction_newton_export.h>
+#include <casadi/solvers/casadi_implicitfunction_nlp_export.h>
 
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Implements simple newton iterations to solve an implicit function.
+  /** \brief Use an NLPSolver as ImplicitFunction solver
 
-      @copydoc ImplicitFunction_doc
-   
-      \author Joris Gillis
-      \date 2012
+   @copydoc ImplicitFunction_doc
+
+   \author Joris Gillis
+   \date 2012
   */
-  class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT NewtonImplicitInternal
-      : public ImplicitFunctionInternal {
-    friend class NewtonImplicitSolver;
+  class CASADI_IMPLICITFUNCTION_NLP_EXPORT NLPImplicitInternal : public ImplicitFunctionInternal {
+    friend class NLPImplicitSolver;
   public:
     /** \brief  Constructor */
-    explicit NewtonImplicitInternal(const Function& f, const Function& jac,
-                                    const LinearSolver& linsol);
+    explicit NLPImplicitInternal(const Function& f, const Function& jac,
+                                 const LinearSolver& linsol);
 
     /** \brief  Destructor */
-    virtual ~NewtonImplicitInternal();
+    virtual ~NLPImplicitInternal();
 
     /** \brief  Clone */
-    virtual NewtonImplicitInternal* clone() const { return new NewtonImplicitInternal(*this);}
+    virtual NLPImplicitInternal* clone() const { return new NLPImplicitInternal(*this);}
+
+    /** \brief  Deep copy data members */
+    virtual void deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied);
 
     /** \brief  Create a new ImplicitFunctionInternal */
-    virtual ImplicitFunctionInternal* create(const Function& f, const Function& jac,
-                                             const LinearSolver& linsol) const
-    { return new NewtonImplicitInternal(f, jac, linsol);}
+    virtual NLPImplicitInternal* create(const Function& f, const Function& jac,
+                                        const LinearSolver& linsol) const
+    { return new NLPImplicitInternal(f, jac, linsol);}
 
     /** \brief  Create a new ImplicitFunction */
     static ImplicitFunctionInternal* creator(const Function& f, const Function& jac,
                                              const LinearSolver& linsol)
-    { return new NewtonImplicitInternal(f, jac, linsol);}
+    { return new NLPImplicitInternal(f, jac, linsol);}
 
     /** \brief  Initialize */
     virtual void init();
@@ -69,17 +71,11 @@ namespace casadi {
     /** \brief  Solve the nonlinear system of equations */
     virtual void solveNonLinear();
 
-  protected:
-    /// Maximum number of Newton iterations
-    int max_iter_;
+    // NLP solver instance
+    NLPSolver nlp_solver_;
 
-    /// Absolute tolerance that should be met on residual
-    double abstol_;
-
-    /// Absolute tolerance that should be met on step
-    double abstolStep_;
   };
 
 } // namespace casadi
 /// \endcond
-#endif // CASADI_NEWTON_IMPLICIT_INTERNAL_HPP
+#endif // CASADI_NLP_IMPLICIT_INTERNAL_HPP
