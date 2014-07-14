@@ -48,7 +48,7 @@ print "Expanded expression = ", fSX.outputExpr(0)
 #! Not all MX graphs can be expanded.
 #! Here is an example of a situation where it will not work.
 #!
-linear_solver = CSparse(x.sparsity())
+linear_solver = LinearSolver("csparse", x.sparsity())
 linear_solver.init()
 g = linear_solver.solve(x,y)
 G = MXFunction([x,y],[g])

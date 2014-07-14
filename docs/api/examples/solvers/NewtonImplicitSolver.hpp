@@ -6,7 +6,7 @@
 *
 * \sa
 * \code
-* casadi::NewtonImplicit();
+* casadi::ImplicitFunction();
 * \endcode
 *
 */

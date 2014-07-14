@@ -6,9 +6,7 @@
 *
 * \sa
 * \code
-* casadi::LapackLUDense;
-* casadi::LapackQRDense;
-* casadi::CSparse;
+* casadi::LinearSolver;
 * \endcode
 *
 */

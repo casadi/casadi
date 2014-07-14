@@ -25,7 +25,7 @@ from casadi import *
 from numpy import *
 from pylab import *
 
-#! We will investigate the working of NewtonImplicitSolver with the help of the parametrically exited Duffing equation.
+#! We will investigate the working of ImplicitFunction with the help of the parametrically exited Duffing equation.
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$. \\
 #$
@@ -59,9 +59,9 @@ params_ = [0.1,0.1,alpha_,k_,sigma_]
 
 #! We create a NewtonImplicitSolver instance
 f=SXFunction([vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
-s=NewtonImplicitSolver(f)
+s=ImplicitFunction("newton", f)
 s.setOption("abstol",1e-14)
-s.setOption("linear_solver",CSparse)
+s.setOption("linear_solver","csparse")
 s.init()
 s.setInput(params_,1)
 
