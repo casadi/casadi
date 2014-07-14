@@ -94,30 +94,29 @@ namespace casadi {
       + Derived::infix_ + "_" + name + SHARED_LIBRARY_SUFFIX;
 
     // Load the dll
-    void* handle;
     std::string regName = "casadi_register_" + Derived::infix_ + "_" + name;
 #ifdef _WIN32
-    handle = LoadLibrary(TEXT(lib.c_str()));
+    HINSTANCE handle = LoadLibrary(TEXT(lib.c_str()));
     casadi_assert_message(handle!=0, "PluginInterface::loadPlugin: Cannot open function: "
                         << lib << ". error code (WIN32): "<< GetLastError());
 
     reg = (RegFcn)GetProcAddress(handle, TEXT(regName.c_str()));
     if (reg==0) throw CasadiException("PluginInterface::loadPlugin: no \"" + regName + "\" found");
 #else // _WIN32
-  handle  = dlopen(lib.c_str(), RTLD_LAZY);
-  casadi_assert_message(handle!=0, "PluginInterface::loadPlugin: Cannot open function: "
-                        << lib << ". error code: "<< dlerror());
+    void* handle  = dlopen(lib.c_str(), RTLD_LAZY);
+    casadi_assert_message(handle!=0, "PluginInterface::loadPlugin: Cannot open function: "
+                          << lib << ". error code: "<< dlerror());
+    // reset error
+    dlerror();
 
-  // reset error
-  dlerror();
-
-  // Load creator
-  reg = (RegFcn)dlsym(handle, regName.c_str());
-  if (dlerror()) throw CasadiException("PluginInterface::loadPlugin: no \"" + regName + "\" found");
+    // Load creator
+    reg = (RegFcn)dlsym(handle, regName.c_str());
+    if (dlerror())
+      throw CasadiException("PluginInterface::loadPlugin: no \""+regName+"\" found");
 #endif // _WIN32
 
     // Register the plugin
-  registerPlugin(reg);
+    registerPlugin(reg);
 #endif // WITH_DL
   }
 
