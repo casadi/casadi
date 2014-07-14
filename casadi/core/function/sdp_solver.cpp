@@ -52,4 +52,8 @@ namespace casadi {
     SDPSolverInternal::loadPlugin(name);
   }
 
+  std::string SDPSolver::doc(const std::string& name) {
+    return SDPSolverInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi

@@ -85,6 +85,10 @@ namespace casadi {
     LinearSolverInternal::loadPlugin(name);
   }
 
+  std::string LinearSolver::doc(const std::string& name) {
+    return LinearSolverInternal::getPlugin(name).doc;
+  }
+
   Sparsity LinearSolver::getFactorizationSparsity(bool transpose) const {
     return (*this)->getFactorizationSparsity(transpose);
   }

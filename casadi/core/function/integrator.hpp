@@ -215,6 +215,9 @@ namespace casadi {
     /// Load a plugin dynamically
     static void loadPlugin(const std::string& name);
 
+    /// Get solver specific documentation
+    static std::string doc(const std::string& name);
+
     /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
      *    and \a nadj adjoint sensitivities
      */

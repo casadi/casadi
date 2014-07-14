@@ -65,5 +65,9 @@ namespace casadi {
     ImplicitFunctionInternal::loadPlugin(name);
   }
 
+  std::string ImplicitFunction::doc(const std::string& name) {
+    return ImplicitFunctionInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi
 

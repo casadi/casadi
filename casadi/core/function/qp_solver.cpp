@@ -64,6 +64,10 @@ namespace casadi {
     QPSolverInternal::loadPlugin(name);
   }
 
+  std::string QPSolver::doc(const std::string& name) {
+    return QPSolverInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi
 
 

@@ -47,5 +47,9 @@ namespace casadi {
     HomotopyNLPInternal::loadPlugin(name);
   }
 
+  std::string HomotopyNLPSolver::doc(const std::string& name) {
+    return HomotopyNLPInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi
 

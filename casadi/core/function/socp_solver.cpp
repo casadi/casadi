@@ -48,4 +48,8 @@ namespace casadi {
     SOCPSolverInternal::loadPlugin(name);
   }
 
+  std::string SOCPSolver::doc(const std::string& name) {
+    return SOCPSolverInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi

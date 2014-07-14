@@ -58,4 +58,8 @@ namespace casadi {
     StabilizedQPSolverInternal::loadPlugin(name);
   }
 
+  std::string StabilizedQPSolver::doc(const std::string& name) {
+    return StabilizedQPSolverInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi

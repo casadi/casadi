@@ -52,4 +52,8 @@ namespace casadi {
     SDQPSolverInternal::loadPlugin(name);
   }
 
+  std::string SDQPSolver::doc(const std::string& name) {
+    return SDQPSolverInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi

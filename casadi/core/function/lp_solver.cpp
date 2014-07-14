@@ -48,4 +48,8 @@ namespace casadi {
     LPSolverInternal::loadPlugin(name);
   }
 
+  std::string LPSolver::doc(const std::string& name) {
+    return LPSolverInternal::getPlugin(name).doc;
+  }
+
 } // namespace casadi

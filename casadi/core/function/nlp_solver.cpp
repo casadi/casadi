@@ -195,6 +195,10 @@ namespace casadi {
     NLPSolverInternal::loadPlugin(name);
   }
 
+  std::string NLPSolver::doc(const std::string& name) {
+    return NLPSolverInternal::getPlugin(name).doc;
+  }
+
   DMatrix NLPSolver::getReducedHessian() {
     return (*this)->getReducedHessian();
   }

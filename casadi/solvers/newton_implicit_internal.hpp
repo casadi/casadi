@@ -41,7 +41,6 @@ namespace casadi {
   */
   class CASADI_IMPLICITFUNCTION_NEWTON_EXPORT NewtonImplicitInternal
       : public ImplicitFunctionInternal {
-    friend class NewtonImplicitSolver;
   public:
     /** \brief  Constructor */
     explicit NewtonImplicitInternal(const Function& f, const Function& jac,

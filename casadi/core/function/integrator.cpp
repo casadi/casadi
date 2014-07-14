@@ -85,6 +85,10 @@ namespace casadi {
     IntegratorInternal::loadPlugin(name);
   }
 
+  std::string Integrator::doc(const std::string& name) {
+    return IntegratorInternal::getPlugin(name).doc;
+  }
+
   void Integrator::setStopTime(double tf) {
     (*this)->setStopTime(tf);
   }
