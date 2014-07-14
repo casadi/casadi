@@ -94,11 +94,7 @@ else()
 endif()
   
 # Options:
-if(WIN32)
-  option(WITH_DL "Enable dynamic loading of functions" OFF)
-else()
-  option(WITH_DL "Enable dynamic loading of functions" ON)
-endif()
+option(WITH_DL "Enable dynamic loading of functions" ON)
 option(WITH_DOC "Enable documentation generation" OFF)
 option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
 
