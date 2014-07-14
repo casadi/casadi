@@ -115,7 +115,7 @@ class ControlTests(casadiTestCase):
   def test_dple_large(self):
     
     for Solver, options in dplesolvers:
-      if "Simple" in str(Solver): continue
+      if "simple" in str(Solver): continue
       for K in ([1,2,3,4,5] if args.run_slow else [1,2,3]):
         for n in ([2,3,4,8,16,32] if args.run_slow else [2,3,4]):
           numpy.random.seed(1)
