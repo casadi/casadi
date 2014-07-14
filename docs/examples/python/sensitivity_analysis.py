@@ -116,7 +116,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     I.setOption("tf",tf)
     if MyIntegrator in ("collocation","oldcollocation"):
       I.setOption("implicit_solver","kinsol")
-      I.setOption("implicit_solver_options",{"linear_solver":CSparse})
+      I.setOption("implicit_solver_options",{"linear_solver":"csparse"})
       if MyIntegrator=="oldcollocation": I.setOption("expand_f",True)
     I.init()
 
