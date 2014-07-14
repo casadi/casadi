@@ -13,8 +13,8 @@ casadi_library(casadi_homotopynlpsolver_simple
   simple_homotopy_nlp_internal.hpp simple_homotopy_nlp_internal.cpp)
 
 # SQPMethod -  A basic SQP method
-casadi_library_swig(casadi_nlpsolver_sqpmethod
-  sqp_method.hpp          sqp_method.cpp          sqp_internal.hpp          sqp_internal.cpp)
+casadi_library(casadi_nlpsolver_sqpmethod
+  sqp_internal.hpp          sqp_internal.cpp)
 
 # SCPgen -  An implementation of Lifted Newton SQP
 casadi_library_swig(casadi_nlpsolver_scpgen
