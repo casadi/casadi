@@ -17,8 +17,8 @@ casadi_library(casadi_nlpsolver_sqpmethod
   sqp_internal.hpp          sqp_internal.cpp)
 
 # SCPgen -  An implementation of Lifted Newton SQP
-casadi_library_swig(casadi_nlpsolver_scpgen
-  scpgen.hpp              scpgen.cpp              scpgen_internal.hpp       scpgen_internal.cpp)
+casadi_library(casadi_nlpsolver_scpgen
+  scpgen_internal.hpp       scpgen_internal.cpp)
 
 # StabilizedSQP -  An implementation of Stabilized SQP
 casadi_library_swig(casadi_nlpsolver_stabilizedsqp
