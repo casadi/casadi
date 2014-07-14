@@ -28,6 +28,7 @@
 
 #ifdef WITH_DL
 #ifdef _WIN32 // also for 64-bit
+#define NOMINMAX
 #include <windows.h>
 #else // _WIN32
 #include <dlfcn.h>
