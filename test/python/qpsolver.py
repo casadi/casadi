@@ -336,7 +336,7 @@ class QPSolverTests(casadiTestCase):
       self.message("general_nonconvex: " + str(qpsolver))
       if not("cplex" in str(qpsolver)):
         continue
-      solver = qpsolver(qpStruct(h=H.sparsity(),a=A.sparsity()))
+      solver = QPSolver(qpsolver, qpStruct(h=H.sparsity(),a=A.sparsity()))
       
       for key, val in options.iteritems():
         if solver.hasOption(key):
