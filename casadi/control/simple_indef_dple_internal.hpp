@@ -41,7 +41,7 @@ namespace casadi {
       \date 2014
 
   */
-  class CASADI_CONTROL_EXPORT SimpleIndefDpleInternal : public DpleInternal {
+  class CASADI_DPLESOLVER_SIMPLE_EXPORT SimpleIndefDpleInternal : public DpleInternal {
   public:
     /** \brief  Constructor
      *  \param[in] A  List of sparsities of A_i
