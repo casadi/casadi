@@ -447,6 +447,15 @@
 </table>
 */
 /// \cond INTERNAL
+/** \class casadi::ImplicitFixedStepIntegratorInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/// \cond INTERNAL
 /** \class casadi::RKIntegratorInternal
 \n
 \par
@@ -632,15 +641,6 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::SymbolicQRInternal
-\n
-\par
-@copydoc scheme_LinsolInput
-<br/>
-@copydoc scheme_LinsolOutput
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::QPStabilizerInternal
 \n
 \par
@@ -724,6 +724,15 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::SymbolicQRInternal
+\n
+\par
+@copydoc scheme_LinsolInput
+<br/>
+@copydoc scheme_LinsolOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -836,15 +845,6 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::SundialsInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::DpleInternal
 \n
 \par
@@ -860,15 +860,6 @@
 <br/>
 @copydoc scheme_DPLEOutput
 */
-/// \cond INTERNAL
-/** \class casadi::WorhpInternal
-\n
-\par
-@copydoc scheme_NLPSolverInput
-<br/>
-@copydoc scheme_NLPSolverOutput
-*/
-/// \endcond
 /// \cond INTERNAL
 /** \class casadi::CSparseInternal
 \n
@@ -912,6 +903,15 @@
 <br/>
 @copydoc scheme_SDPOutput
 */
+/// \cond INTERNAL
+/** \class casadi::WorhpInternal
+\n
+\par
+@copydoc scheme_NLPSolverInput
+<br/>
+@copydoc scheme_NLPSolverOutput
+*/
+/// \endcond
 /// \cond INTERNAL
 /** \class casadi::SCPgenInternal
 \n
@@ -1022,7 +1022,7 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::ImplicitFixedStepIntegratorInternal
+/** \class casadi::SundialsInternal
 \n
 \par
 @copydoc scheme_IntegratorInput

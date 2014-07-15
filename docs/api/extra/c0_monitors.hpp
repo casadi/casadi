@@ -158,23 +158,6 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::WorhpInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_f</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_g</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_grad_f</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_h</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>eval_jac_g</td><td>casadi::WorhpInternal</td></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-</table>
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::FunctionInternal
 \n
 \par
@@ -196,6 +179,23 @@
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
 </table>
 */
+/// \cond INTERNAL
+/** \class casadi::WorhpInternal
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>eval_g</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>eval_grad_f</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>eval_h</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>eval_jac_g</td><td>casadi::WorhpInternal</td></tr>
+<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
 /// \cond INTERNAL
 /** \class casadi::SCPgenInternal
 \n

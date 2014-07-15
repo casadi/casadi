@@ -183,6 +183,17 @@
 */
 /// \endcond
 /// \cond INTERNAL
+/** \class casadi::NLPQPInternal
+\n
+\par
+<a name='stats'></a><table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>nlp_solver_stats</td><td>casadi::NLPQPInternal</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
 /** \class casadi::WorhpInternal
 \n
 \par
@@ -207,17 +218,6 @@
 <tr><td>t_eval_h</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>t_eval_jac_g</td><td>casadi::WorhpInternal</td></tr>
 <tr><td>t_mainloop</td><td>casadi::WorhpInternal</td></tr>
-</table>
-*/
-/// \endcond
-/// \cond INTERNAL
-/** \class casadi::NLPQPInternal
-\n
-\par
-<a name='stats'></a><table>
-<caption>List of available stats</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>nlp_solver_stats</td><td>casadi::NLPQPInternal</td></tr>
 </table>
 */
 /// \endcond
