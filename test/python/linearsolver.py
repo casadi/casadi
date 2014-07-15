@@ -29,21 +29,25 @@ import random
 
 lsolvers = []
 try:
+  LinearSolver.loadPlugin("csparse")
   lsolvers.append(("csparse",{}))
 except:
   pass
   
 try:
+  LinearSolver.loadPlugin("lapacklu")
   lsolvers.append(("lapacklu",{}))
 except:
   pass
   
 try:
+  LinearSolver.loadPlugin("lapackqr")
   lsolvers.append(("lapackqr",{}))
 except:
   pass
   
 try:
+  LinearSolver.loadPlugin("symbolicqr")
   lsolvers.append(("symbolicqr",{}))
 except:
   pass

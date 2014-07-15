@@ -29,6 +29,7 @@ from helpers import *
 
 sdpsolvers = []
 try:
+  SDPSolver.loadPlugin("dsdp")
   sdpsolvers.append(("dsdp",{}))
 except:
   pass

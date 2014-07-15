@@ -39,6 +39,7 @@ except:
   
 try:
   LinearSolver.loadPlugin("csparse")
+  DpleSolver.loadPlugin("simple")
   dplesolvers.append(("simple",{"linear_solver": "csparse"}))
 except:
   pass
