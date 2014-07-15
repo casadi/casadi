@@ -1,0 +1,3 @@
+usr/lib/libcasadi_nlpsolver_ipopt.so
+usr/lib/pkgconfig/casadi_nlpsolver_ipopt.pc
+usr/include/casadi/interfaces/ipopt/*

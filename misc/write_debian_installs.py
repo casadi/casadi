@@ -33,17 +33,14 @@ if __name__=='__main__':
     stuff = {}
     stuff['core'] = {'dir': 'core'}
     stuff['control'] = {'dir': 'control'}
-    #stuff['convex-programming'] = {'dir': 'convex_programming'}
-    #stuff['csparse-interface'] = {'dir': 'interfaces/csparse_interface'}
-    #stuff['dsdp-interface'] = {'dir': 'interfaces/dsdp_interface'}
-    stuff['integration'] = {'dir': 'integration'}
-    stuff['ipopt-interface'] = {'dir': 'interfaces/ipopt'}
-    #stuff['lapack-interface'] = {'dir': 'interfaces/lapack'}
-    stuff['nonlinear-programming'] = {'dir': 'nonlinear_programming'}
     #stuff['optimal-control'] = {'dir': 'optimal_control'}
-    #stuff['qpoases-interface'] = {'dir': 'interfaces/qpoases'}
-    stuff['snopt-interface'] = {'dir': 'interfaces/snopt'}
-    #stuff['sundials-interface'] = {'dir': 'interfaces/sundials'}
+    #stuff['linearsolver-csparse'] = {'dir': 'interfaces/csparse'}
+    #stuff['linearsolver-lapack'] = {'dir': 'interfaces/lapack'}
+    #stuff['qpsolver-qpoases'] = {'dir': 'interfaces/qpoases'}
+    stuff['nlpsolver-snopt'] = {'dir': 'interfaces/snopt'}
+    stuff['nlpsolver-ipopt'] = {'dir': 'interfaces/ipopt'}
+    #stuff['sdpsolver-dsdp'] = {'dir': 'interfaces/dsdp'}
+    #stuff['integrator-sundials'] = {'dir': 'interfaces/sundials'}
 
     # extra module-specific customization
     stuff['core']['desc_short'] = 'numerical optimization and algorithmic differentiation framework'
@@ -53,7 +50,7 @@ if __name__=='__main__':
  .
 ''' + casadi_long
 
-    stuff['ipopt-interface']['libdeps'] = ['coinor-libipopt1']
+    stuff['nlpsolver-ipopt']['libdeps'] = ['coinor-libipopt1']
 
     # (end of customization, should need to edit no further)
 
