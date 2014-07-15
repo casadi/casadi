@@ -2782,6 +2782,9 @@
 %exception  casadi::blockmatrix(SX array[n][m]) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception  casadi::casadi_load_linearsolver_csparsecholesky() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception  casadi::ceil(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -3037,10 +3040,10 @@
 %exception  casadi::sinh(const T &x) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &dwork, std::vector< double > &eig_real, std::vector< double > &eig_imag) {
+%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &dwork, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag) {
+%exception  casadi::slicot_periodic_schur(int n, int K, const std::vector< double > &a, std::vector< double > &t, std::vector< double > &z, std::vector< double > &eig_real, std::vector< double > &eig_imag, double num_zero) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception  casadi::sort(const std::vector< T > &values, std::vector< T > &sorted_values, std::vector< int > &indices, bool invert_indices=false) {
