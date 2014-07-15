@@ -36,8 +36,10 @@ using namespace std;
 namespace casadi {
 
   DpleInternal::DpleInternal(const std::vector< Sparsity > & A,
-                             const std::vector< Sparsity > &V, int nfwd, int nadj) :
-      A_(A), V_(V), nfwd_(nfwd), nadj_(nadj) {
+                             const std::vector< Sparsity > &V,
+                             int nrhs,
+                             bool transp) :
+      A_(A), V_(V), nrhs_(nrhs), transp_(transp) {
 
     // set default options
     setOption("name", "unnamed_dple_solver"); // name of the function
@@ -50,7 +52,7 @@ namespace casadi {
               "has eigenvalues greater than 1-eps_unstable");
     addOption("eps_unstable", OT_REAL, 1e-4, "A margin for unstability detection");
 
-    if (nfwd_==0 && nadj_==0) {
+    if (nrhs_==1) {
       input_.scheme = SCHEME_DPLEInput;
       output_.scheme = SCHEME_DPLEOutput;
     }
@@ -91,22 +93,19 @@ namespace casadi {
     }
 
     // Allocate inputs
-    setNumInputs(DPLE_NUM_IN*(1+nfwd_) + DPLE_NUM_OUT*nadj_);
+    setNumInputs(1+nrhs_);
 
-    for (int i=0;i<nfwd_+1;++i) {
-      if (const_dim_) {
-        input(DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(horzcat(A_));
-        input(DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(horzcat(V_));
-      } else {
-        input(DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(blkdiag(A_));
-        input(DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(blkdiag(V_));
-      }
+    if (const_dim_) {
+      input(0)  = DMatrix::zeros(horzcat(A_));
+    } else {
+      input(0)  = DMatrix::zeros(blkdiag(A_));
     }
-    for (int i=0;i<nadj_;++i) {
+
+    for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
-        input(DPLE_NUM_IN*(1+nfwd_)+DPLE_NUM_OUT*i+DPLE_P)  = DMatrix::zeros(horzcat(A_));
+        input(1+i)  = DMatrix::zeros(horzcat(V_));
       } else {
-        input(DPLE_NUM_IN*(1+nfwd_)+DPLE_NUM_OUT*i+DPLE_P)  = DMatrix::zeros(blkdiag(A_));
+        input(1+i)  = DMatrix::zeros(blkdiag(V_));
       }
     }
 
@@ -115,21 +114,12 @@ namespace casadi {
     for (int k=0;k<K_;++k) {
       P.push_back(Sparsity::dense(V_[k].size1(), V_[k].size1()));
     }
-    setNumOutputs(DPLE_NUM_OUT*(1+nfwd_) + DPLE_NUM_IN*nadj_);
-    for (int i=0;i<nfwd_+1;++i) {
+    setNumOutputs(nrhs_);
+    for (int i=0;i<nrhs_;++i) {
       if (const_dim_) {
-        output(DPLE_NUM_OUT*i+DPLE_P) = DMatrix::zeros(horzcat(P));
+        output(i) = DMatrix::zeros(horzcat(P));
       } else {
-        output(DPLE_NUM_OUT*i+DPLE_P) = DMatrix::zeros(blkdiag(P));
-      }
-    }
-    for (int i=0;i<nadj_;++i) {
-      if (const_dim_) {
-        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(horzcat(A_));
-        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(horzcat(V_));
-      } else {
-        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_A)  = DMatrix::zeros(blkdiag(A_));
-        output(DPLE_NUM_OUT*(nfwd_+1)+DPLE_NUM_IN*i+DPLE_V)  = DMatrix::zeros(blkdiag(V_));
+        output(i) = DMatrix::zeros(blkdiag(P));
       }
     }
 

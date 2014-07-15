@@ -48,7 +48,7 @@ namespace casadi {
      *  \param[in] V  List of sparsities of V_i
      */
     PsdIndefDpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V,
-                         int nwfd=0, int nadj=0);
+                         int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
     virtual ~PsdIndefDpleInternal();
@@ -95,9 +95,6 @@ namespace casadi {
 
     /// Schur form multiplier data
     std::vector<double> X_;
-
-    /// Schur form multiplier data
-    std::vector<double> dX_;
 
     // Schur form multiplier data
     std::vector<double> Xbar_;

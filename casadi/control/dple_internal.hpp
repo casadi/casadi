@@ -47,7 +47,7 @@ namespace casadi {
      *  \param[in] V  List of sparsities of V_i
      */
     DpleInternal(const std::vector< Sparsity > & A, const std::vector< Sparsity > &V,
-                 int nfwd=0, int nadj=0);
+                 int nrhs=1, bool transp=false);
 
     /** \brief  Destructor */
     virtual ~DpleInternal()=0;
@@ -97,11 +97,11 @@ namespace casadi {
     /// Margin for instability detection
     double eps_unstable_;
 
-    /// Number of forward derivatives
-    int nfwd_;
+    /// Number of right hand sides
+    int nrhs_;
 
-    /// Number of adjoint derivatives
-    int nadj_;
+    /// Tranpose the system?
+    bool transp_;
 
     // Creator function for internal class
     typedef DpleInternal* (*Creator)(const std::vector< Sparsity >& A,
