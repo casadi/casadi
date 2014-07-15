@@ -74631,7 +74631,7 @@ object (Note: default is a shallow copy!)
 
 >  Matrix< double > casadi::solve(const Matrix< double > &A, const Matrix< double > &b, const std::string &lsolver, const Dictionary &dict=Dictionary())
 
->  MX casadi::solve(const MX &A, const MX &b, const std::string &lsolver="symbolicqr", const Dictionary &dict=Dictionary())
+>  MX casadi::solve(const MX &A, const MX &b, const std::string &lsolver=\"symbolicqr\", const Dictionary &dict=Dictionary())
 ------------------------------------------------------------------------
 
 Solve a system of equations: A*x = b.

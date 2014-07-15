@@ -371,7 +371,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
             self.add_text_original(["%feature(\"docstring\") ",k , " \"\n"])
             for (origin,pieces) in grouped_list:
               if len(u"".join(pieces).rstrip())>0:
-                self.add_text_original(["\n"]+["\n>  " + o + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
+                self.add_text_original(["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
             self.add_text_original(["\";\n","\n"])
             
 def convert(input, output,  include_function_definition=True, quiet=False,internal=None,deprecated=None,merge=False):
