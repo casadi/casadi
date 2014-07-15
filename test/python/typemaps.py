@@ -502,7 +502,7 @@ class typemaptests(casadiTestCase):
     #self.assertEqual(f.getOption("monitor")[0],"foo")
     #f.setOption("monitor",[])
     
-  @requires("CVodesIntegrator")
+  @requiresPlugin(Integrator,"cvodes")
   def testGenericType2bis(self):
   
     t=SXElement.sym("t")
@@ -524,7 +524,7 @@ class typemaptests(casadiTestCase):
     
     self.assertTrue(is_differential_gentype.isIntVector())
 
-  @requires("IpoptSolver")
+  @requiresPlugin(NLPSolver,"ipopt")
   def testGenericTypeBoolean(self):
     x=SXElement.sym("x")
 

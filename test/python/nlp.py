@@ -1243,7 +1243,7 @@ class NLPtests(casadiTestCase):
       solver = NLPSolver("ipopt", nlp)
       solver.init() 
       
-  @requires("SnoptSolver")
+  @requiresPlugin(NLPSolver,"snopt")
   def test_permute(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
@@ -1258,7 +1258,7 @@ class NLPtests(casadiTestCase):
           F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
           F.init()
           
-          solver = Solver(F)
+          solver = NLPSolver(Solver,F)
           solver.setOption(solver_options)
           solver.init()
           
@@ -1291,7 +1291,7 @@ class NLPtests(casadiTestCase):
           self.checkarray(solver.getOutput("lam_g"),DMatrix([1.9000124997534527e+01,-5,0])[permute_g],digits=7)
           self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.5085524702939])[permute_g],digits=7)
 
-  @requires("SnoptSolver")
+  @requiresPlugin(NLPSolver,"snopt")
   def test_permute2(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
@@ -1306,7 +1306,7 @@ class NLPtests(casadiTestCase):
           F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
           F.init()
           
-          solver = Solver(F)
+          solver = NLPSolver(Solver,F)
           solver.setOption(solver_options)
           solver.init()
 
@@ -1334,7 +1334,7 @@ class NLPtests(casadiTestCase):
           self.checkarray(solver.getOutput("lam_g"),DMatrix([0,0,0])[permute_g],digits=3)
           #self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.50855])[permute_g])
 
-  @requires("SnoptSolver")
+  @requiresPlugin(NLPSolver,"snopt")
   def test_permute3(self):
     for Solver, solver_options in solvers:
       if "snopt" not in str(Solver): continue
@@ -1349,7 +1349,7 @@ class NLPtests(casadiTestCase):
           F= SXFunction(nlpIn(x=x),nlpOut(f=f,g=vertcat(g)[permute_g]))
           F.init()
           
-          solver = Solver(F)
+          solver = NLPSolver(Solver,F)
           solver.setOption(solver_options)
           solver.init()
           
@@ -1376,7 +1376,7 @@ class NLPtests(casadiTestCase):
           self.checkarray(solver.getOutput("lam_g"),DMatrix([-8.0593503860219973e-01,6.52750754744e-10,-0.298516240384])[permute_g],failmessage=str(permute_x)+str(permute_g),digits=8)
           #self.checkarray(solver.getOutput("g"),DMatrix([2,4,5.50855])[permute_g])
         
-  @requires("SnoptSolver")
+  @requiresPlugin(NLPSolver,"snopt")
   def test_classifications(self):      
     x=SX.sym("x")
     y=SX.sym("y")

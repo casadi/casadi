@@ -27,7 +27,7 @@ from types import *
 from helpers import *
 
 class OCPtests(casadiTestCase):
-  @requires("IpoptSolver")
+  @requiresPlugin(NLPSolver,"ipopt")
   def testdiscrete(self):
     self.message("Linear-quadratic problem, discrete, using IPOPT")
     # inspired by www.cs.umsl.edu/~janikow/publications/1992/GAforOpt/text.pdf
@@ -71,7 +71,7 @@ class OCPtests(casadiTestCase):
     exact_sol=K * x0**2
     self.assertAlmostEqual(ocp_sol,exact_sol,10,"Linear-quadratic problem solution using IPOPT")
 
-  @requires("IpoptSolver")
+  @requiresPlugin(NLPSolver,"ipopt")
   def test_singleshooting(self):
     self.message("Single shooting")
     p0 = 0.2
@@ -130,7 +130,7 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[1],0,8,"Constraint is supposed to be unactive")
 
-  @requires("IpoptSolver")
+  @requiresPlugin(NLPSolver,"ipopt")
   def test_singleshooting2(self):
     self.message("Single shooting 2")
     p0 = 0.2
@@ -251,7 +251,7 @@ class OCPtests(casadiTestCase):
     
     mystates = []
 
-  @requires("IpoptSolver")
+  @requiresPlugin(NLPSolver,"ipopt")
   def testMSclass_prim(self):
     self.message("CasADi multiple shooting class")
     
@@ -325,7 +325,7 @@ class OCPtests(casadiTestCase):
     for i in [OCP_LBH,OCP_UBH]:
       self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
 
-  @requires("IpoptSolver")
+  @requiresPlugin(NLPSolver,"ipopt")
   def testMSclassSimple(self):
     self.message("CasADi multiple shooting class: simple example")
     """

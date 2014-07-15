@@ -221,7 +221,7 @@ class Misctests(casadiTestCase):
     self.assertEqual(g.getInput(0),2)
     self.assertEqual(g.getOutput(),0)
 
-  @requires("ipopt")
+  @requiresPlugin(NLPSolver,"ipopt")
   def test_options_introspection(self):
     self.message("options introspection")
     x=SX.sym("x")

@@ -2281,7 +2281,7 @@ class MXtests(casadiTestCase):
     self.checkarray(f.getOutput(3),A)
     self.checkarray(f.getOutput(4),A)
       
-  @requires("CSparse")
+  @requiresPlugin(LinearSolver,"csparse")
   def test_bizarre_bug(self):
 
     A = [[-26.9091,00,00,1,00,00,00,00,00,00,00,00,00,00,00],

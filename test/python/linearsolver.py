@@ -402,7 +402,7 @@ class LinearSolverTests(casadiTestCase):
           self.checkfunction(solversx,solution,digits_sens = 7)
         
 
-  @requires("CSparseCholesky")
+  @requiresPlugin(LinearSolver,"csparsecholesky")
   def test_cholesky(self):
     numpy.random.seed(0)
     n = 10
@@ -413,7 +413,7 @@ class LinearSolverTests(casadiTestCase):
     
     M.sparsity().spy()
 
-    S = CSparseCholesky(M.sparsity())
+    S = LinearSolver("csparsecholesky",M.sparsity())
     
     S.init()
     S.setInput(M)
@@ -433,7 +433,7 @@ class LinearSolverTests(casadiTestCase):
     self.checkarray(mul(M,C),b)
     
 
-  @requires("CSparseCholesky")
+  @requiresPlugin(LinearSolver,"csparsecholesky")
   def test_cholesky2(self):
     numpy.random.seed(0)
     n = 10
@@ -441,7 +441,7 @@ class LinearSolverTests(casadiTestCase):
     M = mul(L,L.T)
 
     print L
-    S = CSparseCholesky(M.sparsity())
+    S = LinearSolver("csparsecholesky",M.sparsity())
     
 
     S.init()
