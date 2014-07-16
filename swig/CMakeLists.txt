@@ -85,7 +85,7 @@ foreach(my_module ${CASADI_MODULES})
 swig_add_module(${my_module} python ${my_module}.i)
 swig_link_libraries(${my_module} ${PYTHON_LIBRARIES} ${my_module})
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign")
+set_target_properties(_${my_module} PROPERTIES COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-delete-non-virtual-dtor -Wno-self-assign -Wno-maybe-uninitialized")
 endif()
 endforeach()
 
