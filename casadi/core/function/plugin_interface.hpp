@@ -104,7 +104,11 @@ namespace casadi {
     reg = (RegFcn)GetProcAddress(handle, TEXT(regName.c_str()));
     if (reg==0) throw CasadiException("PluginInterface::loadPlugin: no \"" + regName + "\" found");
 #else // _WIN32
-    void* handle  = dlopen(lib.c_str(), RTLD_LAZY);
+    void* handle;
+    if (name == "ipopt")
+        handle  = dlopen(lib.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+    else
+        handle  = dlopen(lib.c_str(), RTLD_LAZY);
     casadi_assert_message(handle!=0, "PluginInterface::loadPlugin: Cannot open function: "
                           << lib << ". error code: "<< dlerror());
     // reset error
