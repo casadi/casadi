@@ -43,13 +43,13 @@ namespace casadi {
    *  but we need singular value decomposition to implement that.
    *
    *
-   @copydoc SDQPSolver_doc
+   @copydoc SdqpSolver_doc
 
    \author Joris Gillis
    \date 2013
   */
-  class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPInternal : public SDQPSolverInternal {
-    friend class SDPSDQPSolver;
+  class CASADI_SDQPSOLVER_SDP_EXPORT SDPSDQPInternal : public SdqpSolverInternal {
+    friend class SDPSdqpSolver;
   public:
 
     /** \brief Constructor */
@@ -59,7 +59,7 @@ namespace casadi {
     virtual SDPSDQPInternal* clone() const { return new SDPSDQPInternal(*this);}
 
     /** \brief  Create a new SDQP Solver */
-    static SDQPSolverInternal* creator(const SDQPStructure& st)
+    static SdqpSolverInternal* creator(const SDQPStructure& st)
     { return new SDPSDQPInternal(st);}
 
     /// Deep copy data members

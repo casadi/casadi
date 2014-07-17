@@ -616,7 +616,7 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::SDQPSolverInternal
+/** \class casadi::SdqpSolverInternal
 \n
 \par
 @copydoc scheme_SDQPInput
@@ -624,7 +624,7 @@
 @copydoc scheme_SDQPOutput
 */
 /// \endcond
-/** \class casadi::SDQPSolver
+/** \class casadi::SdqpSolver
 \n
 \par
 @copydoc scheme_SDQPInput

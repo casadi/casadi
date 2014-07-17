@@ -57093,7 +57093,7 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 
-// File: classcasadi_1_1SDQPSolver.xml
+// File: classcasadi_1_1SdqpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -57381,13 +57381,13 @@ const  " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::SDQPSolver::SDQPSolver() "
+%feature("docstring") casadi::SdqpSolver::SdqpSolver() "
 
 Default constructor.
 
 ";
 
-%feature("docstring") casadi::SDQPSolver::SDQPSolver(const std::string
+%feature("docstring") casadi::SdqpSolver::SdqpSolver(const std::string
 &name, const SDQPStructure &st) "
 
 Constructor.
@@ -57405,7 +57405,7 @@ const  " [INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring")  casadi::SDQPSolver::setSOCQPOptions() "
+%feature("docstring")  casadi::SdqpSolver::setSOCQPOptions() "
 
 Set options that make the SDQP solver more suitable for solving SOCPs.
 
@@ -57449,9 +57449,9 @@ Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::SDQPSolver "
+%feature("docstring") casadi::SdqpSolver "
 
-SDQPSolver.
+SdqpSolver.
 
 Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
@@ -57594,7 +57594,7 @@ Joel Andersson
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sdp_solver   | OT_STRING    | GenericType( | The          | casadi::SDQP |
-|              |              | )            | SDQPSolver   | SolverIntern |
+|              |              | )            | SdqpSolver   | SolverIntern |
 |              |              |              | used to      | al           |
 |              |              |              | solve the    |              |
 |              |              |              | SDPs.        |              |
@@ -58440,7 +58440,7 @@ Set the number of function inputs.
 
 ";
 
-%feature("docstring")  casadi::SDQPSolver::checkNode() const  "
+%feature("docstring")  casadi::SdqpSolver::checkNode() const  "
 
 Check if the node is pointing to the right type of object.
 
@@ -76852,7 +76852,7 @@ Check if the vector is strictly monotone.
 ";
 
 %feature("docstring")
-casadi::casadi_register_sdqpsolver_sdp(SDQPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_sdqpsolver_sdp(SdqpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::isRegular(const std::vector< T > &v) "
@@ -80847,7 +80847,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__SdpSolver__doc.xml
 
 
-// File: group__SDQPSolver__doc.xml
+// File: group__SdqpSolver__doc.xml
 
 
 // File: group__SOCPSolver__doc.xml

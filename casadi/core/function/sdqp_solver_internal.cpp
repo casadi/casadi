@@ -33,10 +33,10 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  SDQPSolverInternal::SDQPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  SdqpSolverInternal::SdqpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
 
     addOption("sdp_solver",       OT_STRING, GenericType(),
-              "The SDQPSolver used to solve the SDPs.");
+              "The SdqpSolver used to solve the SDPs.");
     addOption("sdp_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the SDPSOlver");
 
@@ -48,10 +48,10 @@ namespace casadi {
     const Sparsity& H = st_[SDQP_STRUCT_H];
 
     casadi_assert_message(G==G.transpose(),
-                          "SDQPSolverInternal: Supplied G sparsity must symmetric but got "
+                          "SdqpSolverInternal: Supplied G sparsity must symmetric but got "
                           << G.dimString());
     casadi_assert_message(H==H.transpose(),
-                          "SDQPSolverInternal: Supplied H sparsity must symmetric but got "
+                          "SdqpSolverInternal: Supplied H sparsity must symmetric but got "
                           << H.dimString());
 
     m_ = G.size1();
@@ -60,15 +60,15 @@ namespace casadi {
     n_ = H.size1();
 
     casadi_assert_message(F.size1()==m_,
-                          "SDQPSolverInternal: Supplied F sparsity: number of rows ("
+                          "SdqpSolverInternal: Supplied F sparsity: number of rows ("
                           << F.size1() <<  ")  must match m (" << m_ << ")");
 
     casadi_assert_message(A.size2()==n_,
-                          "SDQPSolverInternal: Supplied A sparsity: number of columns ("
+                          "SdqpSolverInternal: Supplied A sparsity: number of columns ("
                           << A.size2() <<  ")  must match n (" << n_ << ")");
 
     casadi_assert_message(F.size2()%n_==0,
-                          "SDQPSolverInternal: Supplied F sparsity: number of cols ("
+                          "SdqpSolverInternal: Supplied F sparsity: number of cols ("
                           << F.size2() <<  ")  must be an integer multiple of n ("
                           << n_ << "), but got remainder " << F.size2()%n_);
 
@@ -87,7 +87,7 @@ namespace casadi {
     for (int i=0;i<n_;i++) {
       Sparsity s = input(SDQP_SOLVER_F)(ALL, Slice(i*m_, (i+1)*m_)).sparsity();
       casadi_assert_message(s==s.transpose(),
-                            "SDQPSolverInternal: Each supplied Fi must be symmetric. "
+                            "SdqpSolverInternal: Each supplied Fi must be symmetric. "
                             "But got " << s.dimString() <<  " for i = " << i << ".");
     }
 
@@ -96,16 +96,16 @@ namespace casadi {
 
   }
 
-  void SDQPSolverInternal::init() {
+  void SdqpSolverInternal::init() {
     // Call the init method of the base class
     FunctionInternal::init();
 
   }
 
-  SDQPSolverInternal::~SDQPSolverInternal() {
+  SdqpSolverInternal::~SdqpSolverInternal() {
   }
 
-  void SDQPSolverInternal::printProblem(std::ostream &stream) const {
+  void SdqpSolverInternal::printProblem(std::ostream &stream) const {
     stream << "SDQP Problem statement -- start" << std::endl;
 
     stream << "h: "<< std::endl;  input(SDQP_SOLVER_H).printDense(stream);
@@ -121,17 +121,17 @@ namespace casadi {
     stream << "SDQP Problem statement -- end" << std::endl;
   }
 
-  void SDQPSolverInternal::evaluate() {
-    throw CasadiException("SDQPSolverInternal::evaluate: Not implemented");
+  void SdqpSolverInternal::evaluate() {
+    throw CasadiException("SdqpSolverInternal::evaluate: Not implemented");
   }
 
-  void SDQPSolverInternal::solve() {
-    throw CasadiException("SDQPSolverInternal::solve: Not implemented");
+  void SdqpSolverInternal::solve() {
+    throw CasadiException("SdqpSolverInternal::solve: Not implemented");
   }
 
-  std::map<std::string, SDQPSolverInternal::Plugin> SDQPSolverInternal::solvers_;
+  std::map<std::string, SdqpSolverInternal::Plugin> SdqpSolverInternal::solvers_;
 
-  const std::string SDQPSolverInternal::infix_ = "sdqpsolver";
+  const std::string SdqpSolverInternal::infix_ = "sdqpsolver";
 
 
 } // namespace casadi

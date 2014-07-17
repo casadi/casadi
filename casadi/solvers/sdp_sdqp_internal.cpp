@@ -33,7 +33,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_SDQPSOLVER_SDP_EXPORT
-  casadi_register_sdqpsolver_sdp(SDQPSolverInternal::Plugin* plugin) {
+  casadi_register_sdqpsolver_sdp(SdqpSolverInternal::Plugin* plugin) {
     plugin->creator = SDPSDQPInternal::creator;
     plugin->name = "sdp";
     plugin->doc = "sdp docs not available";
@@ -43,10 +43,10 @@ namespace casadi {
 
   extern "C"
   void CASADI_SDQPSOLVER_SDP_EXPORT casadi_load_sdqpsolver_sdp() {
-    SDQPSolverInternal::registerPlugin(casadi_register_sdqpsolver_sdp);
+    SdqpSolverInternal::registerPlugin(casadi_register_sdqpsolver_sdp);
   }
 
-  SDPSDQPInternal::SDPSDQPInternal(const std::vector<Sparsity> &st) : SDQPSolverInternal(st) {
+  SDPSDQPInternal::SDPSDQPInternal(const std::vector<Sparsity> &st) : SdqpSolverInternal(st) {
     addOption("sdp_solver",            OT_STRING, GenericType(),
               "The SdpSolver used to solve the SDQPs.");
     addOption("sdp_solver_options",    OT_DICTIONARY, GenericType(),
@@ -57,7 +57,7 @@ namespace casadi {
   }
 
   void SDPSDQPInternal::deepCopyMembers(std::map<SharedObjectNode*, SharedObject>& already_copied) {
-    SDQPSolverInternal::deepCopyMembers(already_copied);
+    SdqpSolverInternal::deepCopyMembers(already_copied);
     sdpsolver_ = deepcopy(sdpsolver_, already_copied);
     cholesky_ = deepcopy(cholesky_, already_copied);
     mapping_ = deepcopy(mapping_, already_copied);
@@ -65,7 +65,7 @@ namespace casadi {
 
   void SDPSDQPInternal::init() {
     // Initialize the base classes
-    SDQPSolverInternal::init();
+    SdqpSolverInternal::init();
 
     cholesky_ = LinearSolver("csparsecholesky", st_[SDQP_STRUCT_H]);
     cholesky_.init();

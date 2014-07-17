@@ -645,7 +645,7 @@ class SDPtests(casadiTestCase):
     F = horzcat(Fi)
     G = DMatrix([[0,-2],[-2,0]])
     for sdqpsolver, sdqp_options in sdqpsolvers:
-      sdqp = SDQPSolver(sdqpsolver,sdqpStruct(h=h.sparsity(),a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdqp = SdqpSolver(sdqpsolver,sdqpStruct(h=h.sparsity(),a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdqp.setOption(sdqp_options)
       sdqp.init()
       sdqp.setInput(G,"g")
@@ -691,7 +691,7 @@ class SDPtests(casadiTestCase):
     F = horzcat(Fi)
     G = DMatrix([[0,-2],[-2,0]])
     for sdqpsolver, sdqp_options in sdqpsolvers:
-      sdqp = SDQPSolver(sdqpsolver,sdqpStruct(h=h.sparsity(),a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdqp = SdqpSolver(sdqpsolver,sdqpStruct(h=h.sparsity(),a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdqp.setOption(sdqp_options)
       sdqp.init()
       sdqp.setInput(G,"g")

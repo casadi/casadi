@@ -61,7 +61,7 @@ namespace casadi {
   class LPSolver;
   class SdpSolver;
   class SOCPSolver;
-  class SDQPSolver;
+  class SdqpSolver;
   class ImplicitFunction;
 
   class DerivativeGenerator;

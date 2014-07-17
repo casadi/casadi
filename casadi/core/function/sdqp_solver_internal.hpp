@@ -33,15 +33,15 @@ namespace casadi {
 
   /// Internal class
   class CASADI_CORE_EXPORT
-  SDQPSolverInternal : public FunctionInternal,
-                       public PluginInterface<SDQPSolverInternal> {
+  SdqpSolverInternal : public FunctionInternal,
+                       public PluginInterface<SdqpSolverInternal> {
   public:
 
     // Constructor
-    SDQPSolverInternal(const std::vector<Sparsity>& st);
+    SdqpSolverInternal(const std::vector<Sparsity>& st);
 
     // Destructor
-    virtual ~SDQPSolverInternal() = 0;
+    virtual ~SdqpSolverInternal() = 0;
 
     // Initialize
     virtual void init();
@@ -59,7 +59,7 @@ namespace casadi {
     void printProblem(std::ostream &stream=std::cout) const;
 
     // Creator function for internal class
-    typedef SDQPSolverInternal* (*Creator)(const SDQPStructure& st);
+    typedef SdqpSolverInternal* (*Creator)(const SDQPStructure& st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;
