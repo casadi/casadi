@@ -39,6 +39,8 @@ macro(casadi_library name)
   set(LINT_TARGETS ${LINT_TARGETS} "lint_${name}" PARENT_SCOPE)
   add_spell_check_target(${name} "${ARGN}")
   set(SPELL_TARGETS ${SPELL_TARGETS} "spell_${name}" PARENT_SCOPE)
+
+  set_property(GLOBAL APPEND PROPERTY CASADI_MODULES ${name})
 endmacro()
 
 add_subdirectory(core)  # needed by all except external_packages
@@ -58,8 +60,10 @@ add_custom_target(spell
   VERBATIM)
 
 get_property(CASADI_MODULES GLOBAL PROPERTY CASADI_MODULES)
+get_property(CASADI_SWIG_MODULES GLOBAL PROPERTY CASADI_SWIG_MODULES)
 
 set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)
+set(CASADI_SWIG_MODULES ${CASADI_SWIG_MODULES} PARENT_SCOPE)
 
 foreach(name ${CASADI_MODULES})
   set(PC_NAME "${name}")

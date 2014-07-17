@@ -72,7 +72,7 @@ set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-DPy_USING_UNICODE")
 set(USE_SWIG_FLAGS_python ${USE_SWIG_FLAGS_python} "-noproxydel")
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DSWIG_TYPE_TABLE=${CASADI_SWIG_MAIN_MODULE}")
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
 set_source_files_properties(${my_module}.i  PROPERTIES  CPLUSPLUS ON)
 endforeach()
 set_source_files_properties(${CASADI_SWIG_MAIN_MODULE}.i  PROPERTIES SWIG_FLAGS "-DSWIG_MAIN_MODULE")
@@ -81,7 +81,7 @@ set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "${CASADI_SWIG_FLAGS}")
 set(USE_SWIG_FLAGS ${USE_SWIG_FLAGS} "-fvirtual")
 
 # PYTHON interface
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
 swig_add_module(${my_module} python ${my_module}.i)
 swig_link_libraries(${my_module} ${PYTHON_LIBRARIES} ${my_module})
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -100,7 +100,7 @@ if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
   endif()
 endif()
 
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
   set(CASADI_PYTHON_LIBRARY_${my_module} ${SWIG_MODULE_${my_module}_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
 endforeach()
 
@@ -109,12 +109,12 @@ make_directory(${PROJECT_BINARY_DIR}/python/casadi)
 # adding some extra commands to the target _casadi which is declared automatically when constructing a swig-python interface
 
 set(modules_python)
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
   list(APPEND modules_python _${my_module})
 endforeach()
 add_custom_target(_python_modules DEPENDS ${modules_python}) # the python interface is created with the command "make python"
 set(modules_json)
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
   list(APPEND modules_json ${my_module}_json)
 endforeach()
 add_custom_target(_json_modules DEPENDS ${modules_json}) # the json interface is created with the command "make json"
@@ -128,16 +128,16 @@ add_custom_command(
 
 # workaround for Visual Studio! The default way is not general enough and should be changed!
 if(MSVC)
-  foreach(my_module ${CASADI_MODULES})
+  foreach(my_module ${CASADI_SWIG_MODULES})
   set(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_${my_module}})
   endforeach()
 else()
-  foreach(my_module ${CASADI_MODULES})
+  foreach(my_module ${CASADI_SWIG_MODULES})
   set(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_${my_module}})
   endforeach()
 endif()
 
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
 add_custom_command(
   TARGET _${my_module}
   COMMAND ${CMAKE_COMMAND}
@@ -181,7 +181,7 @@ endif()
 
 # Construct a dynamic loader for python
 file(WRITE "${PROJECT_BINARY_DIR}/python/casadi/casadi.py" "failed_modules={}\nloaded_modules=[]\n")
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
 file(APPEND "${PROJECT_BINARY_DIR}/python/casadi/casadi.py"
 "try:\n"
 "  from ${my_module} import *\n"
@@ -226,7 +226,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/python/__init__.py
   DESTINATION "${PYTHON_PREFIX}/casadi"
   COMPONENT install_python
 )
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
   install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.py
     DESTINATION "${PYTHON_PREFIX}/casadi"
     COMPONENT install_python
@@ -240,16 +240,16 @@ COMMAND ${CMAKE_COMMAND}
   -D CMAKE_INSTALL_PREFIX="${PYTHON_PREFIX}"
   -P cmake_install.cmake
 )
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
 add_dependencies(install_python DEPENDS _${my_module})
 endforeach()
 
 # json interface
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
   swig_add_module_xml(${my_module}_xml ${my_module}.i)
 endforeach()
 
-foreach(my_module ${CASADI_MODULES})
+foreach(my_module ${CASADI_SWIG_MODULES})
 add_custom_target(${my_module}_json
   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml ${my_module}
   COMMAND ${CMAKE_COMMAND} -E remove ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml
@@ -257,7 +257,7 @@ add_custom_target(${my_module}_json
 add_dependencies(${my_module}_json ${my_module}_xml DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/json/generate.py ${PROJECT_BINARY_DIR}/swig/${my_module}XML_wrap.xml)
 endforeach()
 
-#foreach(my_module ${CASADI_MODULES})
+#foreach(my_module ${CASADI_SWIG_MODULES})
 #install(FILES ${PROJECT_BINARY_DIR}/swig/${my_module}.json
 #  DESTINATION share/casadi
 #  COMPONENT componentjson

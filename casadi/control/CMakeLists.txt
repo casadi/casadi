@@ -4,7 +4,7 @@ casadi_library(casadi_control
   dple_solver.cpp
   dple_internal.hpp
   dple_internal.cpp)
-set_property(GLOBAL APPEND PROPERTY CASADI_MODULES casadi_control)
+set_property(GLOBAL APPEND PROPERTY CASADI_SWIG_MODULES casadi_control)
 
 casadi_library(casadi_dplesolver_simple
   simple_indef_dple_internal.hpp

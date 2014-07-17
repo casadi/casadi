@@ -4,7 +4,7 @@ casadi_library(casadi_slicot_interface
   slicot_tools.hpp
   slicot_tools.cpp)
 target_link_libraries(casadi_slicot_interface casadi_control ${SLICOT_LIBRARIES})
-set_property(GLOBAL APPEND PROPERTY CASADI_MODULES casadi_slicot_interface)
+set_property(GLOBAL APPEND PROPERTY CASADI_SWIG_MODULES casadi_slicot_interface)
 
 casadi_library(casadi_dplesolver_slicot
   psd_indef_dple_internal.hpp
