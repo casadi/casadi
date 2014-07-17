@@ -25,7 +25,7 @@
 
 #include "function.hpp"
 
-/** \defgroup QCQPSolver_doc
+/** \defgroup QcqpSolver_doc
 
     Solves the following strictly convex problem:
 
@@ -56,7 +56,7 @@
 namespace casadi {
 
   /// Input arguments of a QP problem [qcqpIn]
-  enum QCQPSolverInput {
+  enum QcqpSolverInput {
     /// The square matrix H: sparse, (n x n). Only the lower triangular part is actually used.
     /// The matrix is assumed to be symmetrical. [h]
     QCQP_SOLVER_H,
@@ -86,7 +86,7 @@ namespace casadi {
     QCQP_SOLVER_NUM_IN};
 
   /// Output arguments of an QP Solver [qcqpOut]
-  enum QCQPSolverOutput {
+  enum QcqpSolverOutput {
     /// The primal solution [x]
     QCQP_SOLVER_X,
     /// The optimal cost [cost]
@@ -111,31 +111,31 @@ namespace casadi {
     QCQP_STRUCT_NUM};
 
   // Forward declaration of internal class
-  class QCQPSolverInternal;
+  class QcqpSolverInternal;
 
-  /** \brief QCQPSolver
+  /** \brief QcqpSolver
 
 
-      @copydoc QCQPSolver_doc
+      @copydoc QcqpSolver_doc
 
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT QCQPSolver : public Function {
+  class CASADI_CORE_EXPORT QcqpSolver : public Function {
   public:
 
     /// Default constructor
-    QCQPSolver();
+    QcqpSolver();
 
     /** \brief Constructor
      *  \param st Problem structure
      *  \copydoc scheme_QCQPStruct
      */
-    QCQPSolver(const std::string& name, const QCQPStructure& st);
+    QcqpSolver(const std::string& name, const QCQPStructure& st);
 
     /// Access functions of the node
-    QCQPSolverInternal* operator->();
-    const QCQPSolverInternal* operator->() const;
+    QcqpSolverInternal* operator->();
+    const QcqpSolverInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

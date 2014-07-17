@@ -1159,7 +1159,7 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::QCQPSolverInternal
+/** \class casadi::QcqpSolverInternal
 \n
 \par
 <a name='options'></a><table>
@@ -1177,7 +1177,7 @@
 </table>
 */
 /// \endcond
-/** \class casadi::QCQPSolver
+/** \class casadi::QcqpSolver
 \n
 \par
 <a name='options'></a><table>
@@ -2799,7 +2799,7 @@
 <tr><td>inputs_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when the numerical values of the inputs don't make sense</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>casadi::OptionsFunctionalityNode</td></tr>
-<tr><td>qcqp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QCQPSolver used to solve the QPs.</td><td>casadi::QCQPQPInternal</td></tr>
+<tr><td>qcqp_solver</td><td>OT_STRING</td><td>GenericType()</td><td>The QcqpSolver used to solve the QPs.</td><td>casadi::QCQPQPInternal</td></tr>
 <tr><td>qcqp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QCQPSOlver</td><td>casadi::QCQPQPInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>

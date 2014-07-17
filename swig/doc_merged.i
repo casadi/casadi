@@ -40360,36 +40360,36 @@ Access input/output scheme.
 ";
 
 
-// File: classcasadi_1_1QCQPSolver.xml
+// File: classcasadi_1_1QcqpSolver.xml
 
 
 /*  Simple Getters & Setters  */
 
 /*  Advanced Getters  */
 
-/*  Option Functionality  */ %feature("docstring") casadi::QCQPSolver::repr
+/*  Option Functionality  */ %feature("docstring") casadi::QcqpSolver::repr
 " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::assertInit "[INTERNAL]  Assert
+%feature("docstring") casadi::QcqpSolver::assertInit "[INTERNAL]  Assert
 that it is initialized
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setNumInputs "
+%feature("docstring") casadi::QcqpSolver::setNumInputs "
 
 Set the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::hasSetOption "
+%feature("docstring") casadi::QcqpSolver::hasSetOption "
 
 check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setOutput "
+%feature("docstring") casadi::QcqpSolver::setOutput "
 
 >  void casadi::IOInterface< Function  >::setOutput(T val, int oind=0)
 ------------------------------------------------------------------------
@@ -40419,23 +40419,23 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::checkInputs "[INTERNAL]  Check if
+%feature("docstring") casadi::QcqpSolver::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getRepresentation "
+%feature("docstring") casadi::QcqpSolver::getRepresentation "
 
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::outputScheme "[INTERNAL]  Access
+%feature("docstring") casadi::QcqpSolver::outputScheme "[INTERNAL]  Access
 input/output scheme.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::outputS "
+%feature("docstring") casadi::QcqpSolver::outputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::outputS(int i)
 ------------------------------------------------------------------------
@@ -40449,12 +40449,12 @@ Const access an output.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setOptionByEnumValue "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::setOptionByEnumValue "[INTERNAL]
 Set a certain option by giving an enum value.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOptionNames "
+%feature("docstring") casadi::QcqpSolver::getOptionNames "
 
 INTERNAL.
 
@@ -40462,48 +40462,48 @@ Get a list of all option names
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOptionAllowedIndex "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::getOptionAllowedIndex "[INTERNAL]
 Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getNumInputNonzeros "
+%feature("docstring") casadi::QcqpSolver::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::hasOption "
+%feature("docstring") casadi::QcqpSolver::hasOption "
 
 check if there is an option str
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOption "
+%feature("docstring") casadi::QcqpSolver::getOption "
 
 get an option value
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getStats "
+%feature("docstring") casadi::QcqpSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::isInit "
+%feature("docstring") casadi::QcqpSolver::isInit "
 
 Is initialized?
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOptionType "
+%feature("docstring") casadi::QcqpSolver::getOptionType "
 
 Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setJacobian "
+%feature("docstring") casadi::QcqpSolver::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
@@ -40511,7 +40511,7 @@ internally
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::jacobian "
+%feature("docstring") casadi::QcqpSolver::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
 
@@ -40533,19 +40533,19 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOptionDescription "
+%feature("docstring") casadi::QcqpSolver::getOptionDescription "
 
 Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOptionTypeName "
+%feature("docstring") casadi::QcqpSolver::getOptionTypeName "
 
 Get the type name of a certain option.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::init "
+%feature("docstring") casadi::QcqpSolver::init "
 
 Initialize or re-initialize the object:
 
@@ -40553,25 +40553,25 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::call "
+%feature("docstring") casadi::QcqpSolver::call "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::evaluate "
+%feature("docstring") casadi::QcqpSolver::evaluate "
 
 Evaluate.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getNumInputElements "
+%feature("docstring") casadi::QcqpSolver::getNumInputElements "
 
 Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::symbolicInputSX "
+%feature("docstring") casadi::QcqpSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
@@ -40580,7 +40580,7 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::inputSchemeEntry "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::inputSchemeEntry "[INTERNAL]
 Find the index for a string describing a particular entry of an input
 scheme.
 
@@ -40589,19 +40589,19 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::removeMonitor "
+%feature("docstring") casadi::QcqpSolver::removeMonitor "
 
 Remove modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOptionAllowed "
+%feature("docstring") casadi::QcqpSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setDerivative "
+%feature("docstring") casadi::QcqpSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -40611,12 +40611,12 @@ kept internally
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::swap "[INTERNAL]  Swap content
+%feature("docstring") casadi::QcqpSolver::swap "[INTERNAL]  Swap content
 with another instance.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getInput "
+%feature("docstring") casadi::QcqpSolver::getInput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getInput(int iind=0) const
 ------------------------------------------------------------------------
@@ -40664,13 +40664,13 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::jacSparsity "
+%feature("docstring") casadi::QcqpSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::get "
+%feature("docstring") casadi::QcqpSolver::get "
 
 >  const SharedObjectNode * casadi::SharedObject::get() const 
 ------------------------------------------------------------------------
@@ -40684,7 +40684,7 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::tangent "
+%feature("docstring") casadi::QcqpSolver::tangent "
 
 Generate a tangent function of output oind with respect to input iind.
 
@@ -40700,7 +40700,7 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::derivative "
+%feature("docstring") casadi::QcqpSolver::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -40722,12 +40722,12 @@ returned.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::input_struct "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::input_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::inputS "
+%feature("docstring") casadi::QcqpSolver::inputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::inputS(int i)
 ------------------------------------------------------------------------
@@ -40741,30 +40741,30 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getInputScheme "
+%feature("docstring") casadi::QcqpSolver::getInputScheme "
 
 Get input scheme.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::weak "[INTERNAL]  Get a weak
+%feature("docstring") casadi::QcqpSolver::weak "[INTERNAL]  Get a weak
 reference to the object.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setInputScheme "
+%feature("docstring") casadi::QcqpSolver::setInputScheme "
 
 Set input scheme.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setQPOptions "
+%feature("docstring") casadi::QcqpSolver::setQPOptions "
 
 Set options that make the QP solver more suitable for solving LPs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setOption "
+%feature("docstring") casadi::QcqpSolver::setOption "
 
 >  void casadi::OptionsFunctionality::setOption(const std::string &str, const GenericType &val)
 ------------------------------------------------------------------------
@@ -40786,7 +40786,7 @@ changes, the init function should be called again.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::generateCode "
+%feature("docstring") casadi::QcqpSolver::generateCode "
 
 >  void casadi::Function::generateCode(const std::string &filename)
 ------------------------------------------------------------------------
@@ -40802,13 +40802,13 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::dictionary "
+%feature("docstring") casadi::QcqpSolver::dictionary "
 
 Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOutput "
+%feature("docstring") casadi::QcqpSolver::getOutput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getOutput(int oind=0) const
 ------------------------------------------------------------------------
@@ -40856,13 +40856,13 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::isNull "
+%feature("docstring") casadi::QcqpSolver::isNull "
 
 Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::symbolicInput "
+%feature("docstring") casadi::QcqpSolver::symbolicInput "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -40870,29 +40870,29 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOutputScheme "
+%feature("docstring") casadi::QcqpSolver::getOutputScheme "
 
 Get output scheme.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getCount "[INTERNAL]  Get the
+%feature("docstring") casadi::QcqpSolver::getCount "[INTERNAL]  Get the
 reference count.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+%feature("docstring") casadi::QcqpSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getNumOutputElements "
+%feature("docstring") casadi::QcqpSolver::getNumOutputElements "
 
 Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::outputSchemeEntry "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::outputSchemeEntry "[INTERNAL]
 Find the index for a string describing a particular entry of an output
 scheme.
 
@@ -40901,14 +40901,14 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::QCQPSolver "
+%feature("docstring") casadi::QcqpSolver::QcqpSolver "
 
->  casadi::QCQPSolver::QCQPSolver()
+>  casadi::QcqpSolver::QcqpSolver()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  casadi::QCQPSolver::QCQPSolver(const std::string &name, const QCQPStructure &st)
+>  casadi::QcqpSolver::QcqpSolver(const std::string &name, const QCQPStructure &st)
 ------------------------------------------------------------------------
 
 Constructor.
@@ -40920,29 +40920,29 @@ st:  Problem structure
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getNumInputs "
+%feature("docstring") casadi::QcqpSolver::getNumInputs "
 
 Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::clone "[INTERNAL]  Deep copy.
+%feature("docstring") casadi::QcqpSolver::clone "[INTERNAL]  Deep copy.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::checkNode "
+%feature("docstring") casadi::QcqpSolver::checkNode "
 
 Check if the node is pointing to the right type of object.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setOutputScheme "
+%feature("docstring") casadi::QcqpSolver::setOutputScheme "
 
 Set output scheme.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setInput "
+%feature("docstring") casadi::QcqpSolver::setInput "
 
 >  void casadi::IOInterface< Function  >::setInput(T val, int iind=0)
 ------------------------------------------------------------------------
@@ -40972,13 +40972,13 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setNumOutputs "
+%feature("docstring") casadi::QcqpSolver::setNumOutputs "
 
 Set the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::callDerivative "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::callDerivative "[INTERNAL]
 Evaluate the function symbolically or numerically with directional
 derivatives The first two arguments are the nondifferentiated inputs and
 results of the evaluation, the next two arguments are a set of forward
@@ -40990,7 +40990,7 @@ adjoint directions.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::callParallel "
+%feature("docstring") casadi::QcqpSolver::callParallel "
 
 Evaluate symbolically in parallel (matrix graph)
 
@@ -41001,13 +41001,13 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getNumOutputs "
+%feature("docstring") casadi::QcqpSolver::getNumOutputs "
 
 Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::spEvaluate "[INTERNAL]  Propagate
+%feature("docstring") casadi::QcqpSolver::spEvaluate "[INTERNAL]  Propagate
 the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
@@ -41015,13 +41015,13 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setJacSparsity "
+%feature("docstring") casadi::QcqpSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::input "
+%feature("docstring") casadi::QcqpSolver::input "
 
 [UNSAFE] Obtain reference to inputs  getInput, setInput
 
@@ -41029,13 +41029,13 @@ Access input argument
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getStat "
+%feature("docstring") casadi::QcqpSolver::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::gradient "
+%feature("docstring") casadi::QcqpSolver::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
 
@@ -41051,25 +41051,25 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::spInit "[INTERNAL]  Reset the
+%feature("docstring") casadi::QcqpSolver::spInit "[INTERNAL]  Reset the
 sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::addMonitor "
+%feature("docstring") casadi::QcqpSolver::addMonitor "
 
 Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::print "[INTERNAL]  Print a
+%feature("docstring") casadi::QcqpSolver::print "[INTERNAL]  Print a
 description of the object.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::output "
+%feature("docstring") casadi::QcqpSolver::output "
 
 [UNSAFE] Obtain reference to outputs  getOutput, getOutput
 
@@ -41077,7 +41077,7 @@ Access output argument
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::hessian "
+%feature("docstring") casadi::QcqpSolver::hessian "
 
 Generate a Hessian function of output oind with respect to input iind.
 
@@ -41093,13 +41093,13 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getNumOutputNonzeros "
+%feature("docstring") casadi::QcqpSolver::getNumOutputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::setFullJacobian "
+%feature("docstring") casadi::QcqpSolver::setFullJacobian "
 
 Set the Jacobian of all the input nonzeros with respect to all output
 nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
@@ -41107,23 +41107,23 @@ are kept internally
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::printPtr "[INTERNAL]  Print the
+%feature("docstring") casadi::QcqpSolver::printPtr "[INTERNAL]  Print the
 pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getDescription "
+%feature("docstring") casadi::QcqpSolver::getDescription "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::output_struct "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::output_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::schemeEntry "[INTERNAL]  Find the
+%feature("docstring") casadi::QcqpSolver::schemeEntry "[INTERNAL]  Find the
 index for a string describing a particular entry of a scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -41131,40 +41131,40 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::spCanEvaluate "[INTERNAL]  Is the
+%feature("docstring") casadi::QcqpSolver::spCanEvaluate "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::assignNode "[INTERNAL]  Assign
+%feature("docstring") casadi::QcqpSolver::assignNode "[INTERNAL]  Assign
 the node to a node class pointer (or null)
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getSanitizedName "
+%feature("docstring") casadi::QcqpSolver::getSanitizedName "
 
 get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::copyOptions "
+%feature("docstring") casadi::QcqpSolver::copyOptions "
 
 Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::fullJacobian "
+%feature("docstring") casadi::QcqpSolver::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
 
 ";
 
-%feature("docstring") casadi::QCQPSolver "
+%feature("docstring") casadi::QcqpSolver "
 
-QCQPSolver.
+QcqpSolver.
 
 Solves the following strictly convex problem:
 
@@ -41178,7 +41178,7 @@ If H, Pi is not positive-definite, the solver should throw an error.
 
 Joris Gillis
 
->Input scheme: casadi::QCQPSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
+>Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -41226,7 +41226,7 @@ Joris Gillis
 | QCQP_SOLVER_LAM_X0     | lam_x0                 | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QCQPSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
+>Output scheme: casadi::QcqpSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -41333,12 +41333,12 @@ Diagrams
 
 C++ includes: qcqp_solver.hpp ";
 
-%feature("docstring") casadi::QCQPSolver::getOptionEnumValue "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::makeUnique "
+%feature("docstring") casadi::QcqpSolver::makeUnique "
 
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
@@ -41355,7 +41355,7 @@ SWIGINTERNAL
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::getOptionDefault "
+%feature("docstring") casadi::QcqpSolver::getOptionDefault "
 
 INTERNAL.
 
@@ -41363,18 +41363,18 @@ Get the default of a certain option
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::printOptions "
+%feature("docstring") casadi::QcqpSolver::printOptions "
 
 Print options to a stream.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::inputScheme "[INTERNAL]  Access
+%feature("docstring") casadi::QcqpSolver::inputScheme "[INTERNAL]  Access
 input/output scheme.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::assignNodeNoCount "[INTERNAL]
+%feature("docstring") casadi::QcqpSolver::assignNodeNoCount "[INTERNAL]
 Assign the node to a node class pointer without reference counting.
 
 improper use will cause memory leaks!
@@ -41382,74 +41382,74 @@ improper use will cause memory leaks!
 ";
 
 
-// File: classcasadi_1_1QCQPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+// File: classcasadi_1_1QcqpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")
-casadi::QCQPSolverInputIOSchemeVector::QCQPSolverInputIOSchemeVector "[INTERNAL] ";
+casadi::QcqpSolverInputIOSchemeVector::QcqpSolverInputIOSchemeVector "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::vector "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::vector "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::getDescription
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::getDescription
 "[INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'QCQPSolverInput'
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'QcqpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")
-casadi::QCQPSolverInputIOSchemeVector::getRepresentation "[INTERNAL]
+casadi::QcqpSolverInputIOSchemeVector::getRepresentation "[INTERNAL]
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
 
 ";
 
 
-// File: classcasadi_1_1QCQPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'QCQPSolverOutput'
+// File: classcasadi_1_1QcqpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'QcqpSolverOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
 
 ";
 
 %feature("docstring")
-casadi::QCQPSolverOutputIOSchemeVector::getRepresentation "[INTERNAL]
+casadi::QcqpSolverOutputIOSchemeVector::getRepresentation "[INTERNAL]
 Return a string with a representation (for SWIG)
 
 ";
 
 %feature("docstring")
-casadi::QCQPSolverOutputIOSchemeVector::QCQPSolverOutputIOSchemeVector "[INTERNAL] ";
+casadi::QcqpSolverOutputIOSchemeVector::QcqpSolverOutputIOSchemeVector "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::getDescription
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::getDescription
 "[INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::vector "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::vector "[INTERNAL] ";
 
 
 // File: classcasadi_1_1QCQPStructIOSchemeVector.xml
@@ -62002,12 +62002,12 @@ with x and y vectors
 
 %feature("docstring") casadi::qcqpOut "
 
->  QCQPSolverOutputIOSchemeVector<M> casadi::qcqpOut(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M())
+>  QcqpSolverOutputIOSchemeVector<M> casadi::qcqpOut(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M())
 ------------------------------------------------------------------------
 
 Output arguments of an QP Solver
 
->Output scheme: casadi::QCQPSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
+>Output scheme: casadi::QcqpSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -62559,12 +62559,12 @@ it at which expansion should stop.
 
 %feature("docstring") casadi::qcqpIn "
 
->  QCQPSolverInputIOSchemeVector<M> casadi::qcqpIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M(), const std::string &arg_s6=\"\", const M &arg_m6=M(), const std::string &arg_s7=\"\", const M &arg_m7=M(), const std::string &arg_s8=\"\", const M &arg_m8=M(), const std::string &arg_s9=\"\", const M &arg_m9=M(), const std::string &arg_s10=\"\", const M &arg_m10=M(), const std::string &arg_s11=\"\", const M &arg_m11=M())
+>  QcqpSolverInputIOSchemeVector<M> casadi::qcqpIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M(), const std::string &arg_s6=\"\", const M &arg_m6=M(), const std::string &arg_s7=\"\", const M &arg_m7=M(), const std::string &arg_s8=\"\", const M &arg_m8=M(), const std::string &arg_s9=\"\", const M &arg_m9=M(), const std::string &arg_s10=\"\", const M &arg_m10=M(), const std::string &arg_s11=\"\", const M &arg_m11=M())
 ------------------------------------------------------------------------
 
 Input arguments of a QP problem
 
->Input scheme: casadi::QCQPSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
+>Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -66495,7 +66495,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__Nullspace__doc.xml
 
 
-// File: group__QCQPSolver__doc.xml
+// File: group__QcqpSolver__doc.xml
 
 
 // File: group__QPSolver__doc.xml
@@ -66519,7 +66519,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__IntegratorOutput.xml
 
 
-// File: group__scheme__QCQPSolverInput.xml
+// File: group__scheme__QcqpSolverInput.xml
 
 
 // File: group__scheme__HessLagOutput.xml
@@ -66582,7 +66582,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__OCPInput.xml
 
 
-// File: group__scheme__QCQPSolverOutput.xml
+// File: group__scheme__QcqpSolverOutput.xml
 
 
 // File: group__scheme__MayerInput.xml

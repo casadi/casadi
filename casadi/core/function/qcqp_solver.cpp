@@ -25,35 +25,35 @@
 using namespace std;
 namespace casadi {
 
-  QCQPSolver::QCQPSolver() {
+  QcqpSolver::QcqpSolver() {
   }
 
-  QCQPSolverInternal* QCQPSolver::operator->() {
-    return static_cast<QCQPSolverInternal*>(Function::operator->());
+  QcqpSolverInternal* QcqpSolver::operator->() {
+    return static_cast<QcqpSolverInternal*>(Function::operator->());
   }
 
-  const QCQPSolverInternal* QCQPSolver::operator->() const {
-    return static_cast<const QCQPSolverInternal*>(Function::operator->());
+  const QcqpSolverInternal* QcqpSolver::operator->() const {
+    return static_cast<const QcqpSolverInternal*>(Function::operator->());
   }
 
-  bool QCQPSolver::checkNode() const {
-    return dynamic_cast<const QCQPSolverInternal*>(get())!=0;
+  bool QcqpSolver::checkNode() const {
+    return dynamic_cast<const QcqpSolverInternal*>(get())!=0;
   }
 
-  void QCQPSolver::setQPOptions() {
+  void QcqpSolver::setQPOptions() {
     (*this)->setQPOptions();
   }
 
-  QCQPSolver::QCQPSolver(const std::string& name, const QCQPStructure& st) {
-    assignNode(QCQPSolverInternal::getPlugin(name).creator(st));
+  QcqpSolver::QcqpSolver(const std::string& name, const QCQPStructure& st) {
+    assignNode(QcqpSolverInternal::getPlugin(name).creator(st));
   }
 
-  void QCQPSolver::loadPlugin(const std::string& name) {
-    QCQPSolverInternal::loadPlugin(name);
+  void QcqpSolver::loadPlugin(const std::string& name) {
+    QcqpSolverInternal::loadPlugin(name);
   }
 
-  std::string QCQPSolver::doc(const std::string& name) {
-    return QCQPSolverInternal::getPlugin(name).doc;
+  std::string QcqpSolver::doc(const std::string& name) {
+    return QcqpSolverInternal::getPlugin(name).doc;
   }
 
 } // namespace casadi

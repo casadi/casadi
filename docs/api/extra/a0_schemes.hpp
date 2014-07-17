@@ -10,9 +10,9 @@
 <tr><td>INTEGRATOR_RZF</td><td>rzf</td><td>Backward algebraic variable at the initial time .</td></tr>
 </table>
 */
-/** \defgroup scheme_QCQPSolverInput
+/** \defgroup scheme_QcqpSolverInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::QCQPSolverInput  (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]</caption>
+<caption>Input scheme: casadi::QcqpSolverInput  (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>QCQP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
 <tr><td>QCQP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
@@ -261,9 +261,9 @@
 <tr><td>OCP_UBG</td><td>ubg</td><td>Upper bound for the coupling constraints .</td></tr>
 </table>
 */
-/** \defgroup scheme_QCQPSolverOutput
+/** \defgroup scheme_QcqpSolverOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::QCQPSolverOutput  (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]</caption>
+<caption>Output scheme: casadi::QcqpSolverOutput  (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>QCQP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
 <tr><td>QCQP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
@@ -573,9 +573,9 @@
 /** \class casadi::SOCPQCQPInternal
 \n
 \par
-@copydoc scheme_QCQPSolverInput
+@copydoc scheme_QcqpSolverInput
 <br/>
-@copydoc scheme_QCQPSolverOutput
+@copydoc scheme_QcqpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -745,20 +745,20 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::QCQPSolverInternal
+/** \class casadi::QcqpSolverInternal
 \n
 \par
-@copydoc scheme_QCQPSolverInput
+@copydoc scheme_QcqpSolverInput
 <br/>
-@copydoc scheme_QCQPSolverOutput
+@copydoc scheme_QcqpSolverOutput
 */
 /// \endcond
-/** \class casadi::QCQPSolver
+/** \class casadi::QcqpSolver
 \n
 \par
-@copydoc scheme_QCQPSolverInput
+@copydoc scheme_QcqpSolverInput
 <br/>
-@copydoc scheme_QCQPSolverOutput
+@copydoc scheme_QcqpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::QPSolverInternal

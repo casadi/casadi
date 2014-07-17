@@ -29,12 +29,12 @@ from helpers import *
 qcqpsolvers = []
 try:
   SDPSolver.loadPlugin("dsdp")
-  qcqpsolvers.append((SOCPQCQPSolver,{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
+  qcqpsolvers.append((SOCPQcqpSolver,{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
 except:
   pass
 
 
-class QCQPSolverTests(casadiTestCase):
+class QcqpSolverTests(casadiTestCase):
 
   def testboundsviol(self):
     H = 1e-6*DMatrix([[1,0],[0,1]])

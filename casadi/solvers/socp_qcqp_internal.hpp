@@ -61,12 +61,12 @@ namespace casadi {
    *    arising from the epigraph reformulation and e==0 for all other 
    *    quadratic constraints.
 
-   @copydoc QCQPSolver_doc
+   @copydoc QcqpSolver_doc
 
    \author Joris Gillis
    \date 2013
   */
-  class CASADI_QCQPSOLVER_SOCP_EXPORT SOCPQCQPInternal : public QCQPSolverInternal {
+  class CASADI_QCQPSOLVER_SOCP_EXPORT SOCPQCQPInternal : public QcqpSolverInternal {
   public:
 
     /** \brief  Create a new Solver */
@@ -79,7 +79,7 @@ namespace casadi {
     virtual SOCPQCQPInternal* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static QCQPSolverInternal* creator(const QCQPStructure& st)
+    static QcqpSolverInternal* creator(const QCQPStructure& st)
     { return new SOCPQCQPInternal(st);}
 
     /** \brief  Initialize */

@@ -59,7 +59,7 @@ namespace casadi {
     virtual void evaluate();
 
   protected:
-    QCQPSolver qcqpsolver_;
+    QcqpSolver qcqpsolver_;
 
   };
 

@@ -3334,10 +3334,10 @@
 %exception casadi::OutputNode::OutputNode(const MX &parent, int oind) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::QCQPSolverInputIOSchemeVector< M >::QCQPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QcqpSolverInputIOSchemeVector< M >::QcqpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::QCQPSolverOutputIOSchemeVector< M >::QCQPSolverOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QcqpSolverOutputIOSchemeVector< M >::QcqpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::QCQPStructIOSchemeVector< T >::QCQPStructIOSchemeVector(const std::vector< M > &t) {

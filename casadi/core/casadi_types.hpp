@@ -57,7 +57,7 @@ namespace casadi {
   class Integrator;
   class QPSolver;
   class StabilizedQPSolver;
-  class QCQPSolver;
+  class QcqpSolver;
   class LPSolver;
   class SDPSolver;
   class SOCPSolver;

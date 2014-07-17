@@ -50002,7 +50002,7 @@ input/output scheme.
 ";
 
 
-// File: classcasadi_1_1QCQPSolver.xml
+// File: classcasadi_1_1QcqpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -50573,7 +50573,7 @@ Set input scheme.
 
 ";
 
-%feature("docstring")  casadi::QCQPSolver::setQPOptions() "
+%feature("docstring")  casadi::QcqpSolver::setQPOptions() "
 
 Set options that make the QP solver more suitable for solving LPs.
 
@@ -50722,13 +50722,13 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::QCQPSolver() "
+%feature("docstring") casadi::QcqpSolver::QcqpSolver() "
 
 Default constructor.
 
 ";
 
-%feature("docstring") casadi::QCQPSolver::QCQPSolver(const std::string
+%feature("docstring") casadi::QcqpSolver::QcqpSolver(const std::string
 &name, const QCQPStructure &st) "
 
 Constructor.
@@ -50752,7 +50752,7 @@ Deep copy.
 
 ";
 
-%feature("docstring")  casadi::QCQPSolver::checkNode() const  "
+%feature("docstring")  casadi::QcqpSolver::checkNode() const  "
 
 Check if the node is pointing to the right type of object.
 
@@ -51210,9 +51210,9 @@ the output elements).
 
 ";
 
-%feature("docstring") casadi::QCQPSolver "
+%feature("docstring") casadi::QcqpSolver "
 
-QCQPSolver.
+QcqpSolver.
 
 Solves the following strictly convex problem:
 
@@ -51226,7 +51226,7 @@ If H, Pi is not positive-definite, the solver should throw an error.
 
 Joris Gillis
 
->Input scheme: casadi::QCQPSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
+>Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -51274,7 +51274,7 @@ Joris Gillis
 | QCQP_SOLVER_LAM_X0     | lam_x0                 | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QCQPSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
+>Output scheme: casadi::QcqpSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -51439,15 +51439,15 @@ improper use will cause memory leaks!
 ";
 
 
-// File: classcasadi_1_1QCQPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+// File: classcasadi_1_1QcqpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector< M
->::QCQPSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector< M
+>::QcqpSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
@@ -51462,8 +51462,8 @@ improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::QCQPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'QCQPSolverInput'
+%feature("docstring") casadi::QcqpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'QcqpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -51478,15 +51478,15 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 
-// File: classcasadi_1_1QCQPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'QCQPSolverOutput'
+// File: classcasadi_1_1QcqpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'QcqpSolverOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a description of the object.
@@ -51498,8 +51498,8 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector< M
->::QCQPSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector< M
+>::QcqpSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::PrintableObject::getDescription() const  "
 [INTERNAL]  Return a string with a description (for SWIG)
@@ -51511,7 +51511,7 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring") casadi::QCQPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::QcqpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
@@ -75777,7 +75777,7 @@ const M &arg_m3=M()) "
 
 Output arguments of an QP Solver
 
->Output scheme: casadi::QCQPSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
+>Output scheme: casadi::QcqpSolverOutput (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76447,7 +76447,7 @@ const M &arg_m10=M(), const std::string &arg_s11="", const M &arg_m11=M()) "
 
 Input arguments of a QP problem
 
->Input scheme: casadi::QCQPSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
+>Input scheme: casadi::QcqpSolverInput (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78516,7 +78516,7 @@ casadi::casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin
 *plugin) " ";
 
 %feature("docstring")
-casadi::casadi_register_qcqpsolver_socp(QCQPSolverInternal::Plugin *plugin)
+casadi::casadi_register_qcqpsolver_socp(QcqpSolverInternal::Plugin *plugin)
 " ";
 
 %feature("docstring")  casadi::ceil(const T &x) " [INTERNAL]  Pre-C99
@@ -80838,7 +80838,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__Nullspace__doc.xml
 
 
-// File: group__QCQPSolver__doc.xml
+// File: group__QcqpSolver__doc.xml
 
 
 // File: group__QPSolver__doc.xml
@@ -80862,7 +80862,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__IntegratorOutput.xml
 
 
-// File: group__scheme__QCQPSolverInput.xml
+// File: group__scheme__QcqpSolverInput.xml
 
 
 // File: group__scheme__HessLagOutput.xml
@@ -80925,7 +80925,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__OCPInput.xml
 
 
-// File: group__scheme__QCQPSolverOutput.xml
+// File: group__scheme__QcqpSolverOutput.xml
 
 
 // File: group__scheme__MayerInput.xml
