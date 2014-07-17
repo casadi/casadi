@@ -25137,7 +25137,7 @@ Print a representation of the object.
 %feature("docstring") casadi::LinsolOutputIOSchemeVector::vector "[INTERNAL] ";
 
 
-// File: classcasadi_1_1LPSolver.xml
+// File: classcasadi_1_1LpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -25145,13 +25145,13 @@ Print a representation of the object.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::LPSolver::hasOption "
+casadi::LpSolver::hasOption "
 
 check if there is an option str
 
 ";
 
-%feature("docstring") casadi::LPSolver::jacobian "
+%feature("docstring") casadi::LpSolver::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
 
@@ -25173,7 +25173,7 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getInput "
+%feature("docstring") casadi::LpSolver::getInput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getInput(int iind=0) const
 ------------------------------------------------------------------------
@@ -25221,35 +25221,35 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getNumInputNonzeros "
+%feature("docstring") casadi::LpSolver::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::call "
+%feature("docstring") casadi::LpSolver::call "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getSanitizedName "
+%feature("docstring") casadi::LpSolver::getSanitizedName "
 
 get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring") casadi::LPSolver::setOptionByEnumValue "[INTERNAL]
+%feature("docstring") casadi::LpSolver::setOptionByEnumValue "[INTERNAL]
 Set a certain option by giving an enum value.
 
 ";
 
-%feature("docstring") casadi::LPSolver::inputScheme "[INTERNAL]  Access
+%feature("docstring") casadi::LpSolver::inputScheme "[INTERNAL]  Access
 input/output scheme.
 
 ";
 
-%feature("docstring") casadi::LPSolver::generateCode "
+%feature("docstring") casadi::LpSolver::generateCode "
 
 >  void casadi::Function::generateCode(const std::string &filename)
 ------------------------------------------------------------------------
@@ -25265,24 +25265,24 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setJacSparsity "
+%feature("docstring") casadi::LpSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOptionType "
+%feature("docstring") casadi::LpSolver::getOptionType "
 
 Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::LPSolver::checkInputs "[INTERNAL]  Check if
+%feature("docstring") casadi::LpSolver::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setFullJacobian "
+%feature("docstring") casadi::LpSolver::setFullJacobian "
 
 Set the Jacobian of all the input nonzeros with respect to all output
 nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
@@ -25290,25 +25290,25 @@ are kept internally
 
 ";
 
-%feature("docstring") casadi::LPSolver::dictionary "
+%feature("docstring") casadi::LpSolver::dictionary "
 
 Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::LPSolver::isNull "
+%feature("docstring") casadi::LpSolver::isNull "
 
 Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::LPSolver::hasSetOption "
+%feature("docstring") casadi::LpSolver::hasSetOption "
 
 check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::LPSolver::spEvaluate "[INTERNAL]  Propagate
+%feature("docstring") casadi::LpSolver::spEvaluate "[INTERNAL]  Propagate
 the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
@@ -25316,13 +25316,13 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::LPSolver::evaluate "
+%feature("docstring") casadi::LpSolver::evaluate "
 
 Evaluate.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOptionNames "
+%feature("docstring") casadi::LpSolver::getOptionNames "
 
 INTERNAL.
 
@@ -25330,7 +25330,7 @@ Get a list of all option names
 
 ";
 
-%feature("docstring") casadi::LPSolver::outputS "
+%feature("docstring") casadi::LpSolver::outputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::outputS(int i)
 ------------------------------------------------------------------------
@@ -25344,13 +25344,13 @@ Const access an output.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getNumOutputElements "
+%feature("docstring") casadi::LpSolver::getNumOutputElements "
 
 Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setOption "
+%feature("docstring") casadi::LpSolver::setOption "
 
 >  void casadi::OptionsFunctionality::setOption(const std::string &str, const GenericType &val)
 ------------------------------------------------------------------------
@@ -25372,18 +25372,18 @@ changes, the init function should be called again.
 
 ";
 
-%feature("docstring") casadi::LPSolver::printPtr "[INTERNAL]  Print the
+%feature("docstring") casadi::LpSolver::printPtr "[INTERNAL]  Print the
 pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::LPSolver::checkNode "
+%feature("docstring") casadi::LpSolver::checkNode "
 
 Check if the node is pointing to the right type of object.
 
 ";
 
-%feature("docstring") casadi::LPSolver::output "
+%feature("docstring") casadi::LpSolver::output "
 
 [UNSAFE] Obtain reference to outputs  getOutput, getOutput
 
@@ -25391,31 +25391,31 @@ Access output argument
 
 ";
 
-%feature("docstring") casadi::LPSolver::addMonitor "
+%feature("docstring") casadi::LpSolver::addMonitor "
 
 Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getNumInputElements "
+%feature("docstring") casadi::LpSolver::getNumInputElements "
 
 Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::spCanEvaluate "[INTERNAL]  Is the
+%feature("docstring") casadi::LpSolver::spCanEvaluate "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::LPSolver::repr "[INTERNAL]  Print a
+%feature("docstring") casadi::LpSolver::repr "[INTERNAL]  Print a
 representation of the object.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOutput "
+%feature("docstring") casadi::LpSolver::getOutput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getOutput(int oind=0) const
 ------------------------------------------------------------------------
@@ -25463,7 +25463,7 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::LPSolver::callParallel "
+%feature("docstring") casadi::LpSolver::callParallel "
 
 Evaluate symbolically in parallel (matrix graph)
 
@@ -25474,12 +25474,12 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring") casadi::LPSolver::output_struct "[INTERNAL]
+%feature("docstring") casadi::LpSolver::output_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::LPSolver::symbolicInputSX "
+%feature("docstring") casadi::LpSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
@@ -25488,36 +25488,36 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::LPSolver::swap "[INTERNAL]  Swap content with
+%feature("docstring") casadi::LpSolver::swap "[INTERNAL]  Swap content with
 another instance.
 
 ";
 
-%feature("docstring") casadi::LPSolver::spInit "[INTERNAL]  Reset the
+%feature("docstring") casadi::LpSolver::spInit "[INTERNAL]  Reset the
 sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::LPSolver::setInputScheme "
+%feature("docstring") casadi::LpSolver::setInputScheme "
 
 Set input scheme.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOptionAllowedIndex "[INTERNAL]
+%feature("docstring") casadi::LpSolver::getOptionAllowedIndex "[INTERNAL]
 Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getRepresentation "
+%feature("docstring") casadi::LpSolver::getRepresentation "
 
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::LPSolver::get "
+%feature("docstring") casadi::LpSolver::get "
 
 >  const SharedObjectNode * casadi::SharedObject::get() const 
 ------------------------------------------------------------------------
@@ -25531,25 +25531,25 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::LPSolver::isInit "
+%feature("docstring") casadi::LpSolver::isInit "
 
 Is initialized?
 
 ";
 
-%feature("docstring") casadi::LPSolver::getInputScheme "
+%feature("docstring") casadi::LpSolver::getInputScheme "
 
 Get input scheme.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setOutputScheme "
+%feature("docstring") casadi::LpSolver::setOutputScheme "
 
 Set output scheme.
 
 ";
 
-%feature("docstring") casadi::LPSolver::schemeEntry "[INTERNAL]  Find the
+%feature("docstring") casadi::LpSolver::schemeEntry "[INTERNAL]  Find the
 index for a string describing a particular entry of a scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -25557,11 +25557,11 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::LPSolver::clone "[INTERNAL]  Deep copy.
+%feature("docstring") casadi::LpSolver::clone "[INTERNAL]  Deep copy.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setJacobian "
+%feature("docstring") casadi::LpSolver::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
@@ -25569,25 +25569,25 @@ internally
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOptionAllowed "
+%feature("docstring") casadi::LpSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::LPSolver::removeMonitor "
+%feature("docstring") casadi::LpSolver::removeMonitor "
 
 Remove modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::LPSolver::jacSparsity "
+%feature("docstring") casadi::LpSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::LPSolver::makeUnique "
+%feature("docstring") casadi::LpSolver::makeUnique "
 
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
@@ -25604,7 +25604,7 @@ SWIGINTERNAL
 
 ";
 
-%feature("docstring") casadi::LPSolver::setOutput "
+%feature("docstring") casadi::LpSolver::setOutput "
 
 >  void casadi::IOInterface< Function  >::setOutput(T val, int oind=0)
 ------------------------------------------------------------------------
@@ -25634,12 +25634,12 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setOptionByAllowedIndex "[INTERNAL]
+%feature("docstring") casadi::LpSolver::setOptionByAllowedIndex "[INTERNAL]
 Set a certain option by giving its index into the allowed values.
 
 ";
 
-%feature("docstring") casadi::LPSolver::callDerivative "[INTERNAL]
+%feature("docstring") casadi::LpSolver::callDerivative "[INTERNAL]
 Evaluate the function symbolically or numerically with directional
 derivatives The first two arguments are the nondifferentiated inputs and
 results of the evaluation, the next two arguments are a set of forward
@@ -25651,7 +25651,7 @@ adjoint directions.
 
 ";
 
-%feature("docstring") casadi::LPSolver::gradient "
+%feature("docstring") casadi::LpSolver::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
 
@@ -25667,7 +25667,7 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setDerivative "
+%feature("docstring") casadi::LpSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -25677,40 +25677,40 @@ kept internally
 
 ";
 
-%feature("docstring") casadi::LPSolver::weak "[INTERNAL]  Get a weak
+%feature("docstring") casadi::LpSolver::weak "[INTERNAL]  Get a weak
 reference to the object.
 
 ";
 
-%feature("docstring") casadi::LPSolver::printOptions "
+%feature("docstring") casadi::LpSolver::printOptions "
 
 Print options to a stream.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setNumOutputs "
+%feature("docstring") casadi::LpSolver::setNumOutputs "
 
 Set the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOptionEnumValue "[INTERNAL]  Get
+%feature("docstring") casadi::LpSolver::getOptionEnumValue "[INTERNAL]  Get
 the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setNumInputs "
+%feature("docstring") casadi::LpSolver::setNumInputs "
 
 Set the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getCount "[INTERNAL]  Get the
+%feature("docstring") casadi::LpSolver::getCount "[INTERNAL]  Get the
 reference count.
 
 ";
 
-%feature("docstring") casadi::LPSolver::inputSchemeEntry "[INTERNAL]  Find
+%feature("docstring") casadi::LpSolver::inputSchemeEntry "[INTERNAL]  Find
 the index for a string describing a particular entry of an input scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -25718,7 +25718,7 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::LPSolver::derivative "
+%feature("docstring") casadi::LpSolver::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -25740,14 +25740,14 @@ returned.
 
 ";
 
-%feature("docstring") casadi::LPSolver::fullJacobian "
+%feature("docstring") casadi::LpSolver::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
 
 ";
 
-%feature("docstring") casadi::LPSolver::tangent "
+%feature("docstring") casadi::LpSolver::tangent "
 
 Generate a tangent function of output oind with respect to input iind.
 
@@ -25763,7 +25763,7 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::LPSolver::init "
+%feature("docstring") casadi::LpSolver::init "
 
 Initialize or re-initialize the object:
 
@@ -25771,54 +25771,54 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOptionDescription "
+%feature("docstring") casadi::LpSolver::getOptionDescription "
 
 Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOptionTypeName "
+%feature("docstring") casadi::LpSolver::getOptionTypeName "
 
 Get the type name of a certain option.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getDescription "
+%feature("docstring") casadi::LpSolver::getDescription "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::LPSolver::assignNode "[INTERNAL]  Assign the
+%feature("docstring") casadi::LpSolver::assignNode "[INTERNAL]  Assign the
 node to a node class pointer (or null)
 
 ";
 
-%feature("docstring") casadi::LPSolver::assertInit "[INTERNAL]  Assert that
+%feature("docstring") casadi::LpSolver::assertInit "[INTERNAL]  Assert that
 it is initialized
 
 ";
 
-%feature("docstring") casadi::LPSolver::assignNodeNoCount "[INTERNAL]
+%feature("docstring") casadi::LpSolver::assignNodeNoCount "[INTERNAL]
 Assign the node to a node class pointer without reference counting.
 
 improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::LPSolver::getNumOutputNonzeros "
+%feature("docstring") casadi::LpSolver::getNumOutputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::copyOptions "
+%feature("docstring") casadi::LpSolver::copyOptions "
 
 Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::LPSolver::setInput "
+%feature("docstring") casadi::LpSolver::setInput "
 
 >  void casadi::IOInterface< Function  >::setInput(T val, int iind=0)
 ------------------------------------------------------------------------
@@ -25848,13 +25848,13 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getStats "
+%feature("docstring") casadi::LpSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOptionDefault "
+%feature("docstring") casadi::LpSolver::getOptionDefault "
 
 INTERNAL.
 
@@ -25862,12 +25862,12 @@ Get the default of a certain option
 
 ";
 
-%feature("docstring") casadi::LPSolver::print "[INTERNAL]  Print a
+%feature("docstring") casadi::LpSolver::print "[INTERNAL]  Print a
 description of the object.
 
 ";
 
-%feature("docstring") casadi::LPSolver::input "
+%feature("docstring") casadi::LpSolver::input "
 
 [UNSAFE] Obtain reference to inputs  getInput, setInput
 
@@ -25875,13 +25875,13 @@ Access input argument
 
 ";
 
-%feature("docstring") casadi::LPSolver::getNumInputs "
+%feature("docstring") casadi::LpSolver::getNumInputs "
 
 Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::symbolicInput "
+%feature("docstring") casadi::LpSolver::symbolicInput "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -25889,13 +25889,13 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOption "
+%feature("docstring") casadi::LpSolver::getOption "
 
 get an option value
 
 ";
 
-%feature("docstring") casadi::LPSolver::hessian "
+%feature("docstring") casadi::LpSolver::hessian "
 
 Generate a Hessian function of output oind with respect to input iind.
 
@@ -25911,13 +25911,13 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getOutputScheme "
+%feature("docstring") casadi::LpSolver::getOutputScheme "
 
 Get output scheme.
 
 ";
 
-%feature("docstring") casadi::LPSolver::outputSchemeEntry "[INTERNAL]  Find
+%feature("docstring") casadi::LpSolver::outputSchemeEntry "[INTERNAL]  Find
 the index for a string describing a particular entry of an output scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -25925,9 +25925,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::LPSolver "
+%feature("docstring") casadi::LpSolver "
 
-LPSolver.
+LpSolver.
 
 Solves the following linear problem:
 
@@ -25938,7 +25938,7 @@ number of constraints (A)
 
 Joris Gillis
 
->Input scheme: casadi::LPSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
+>Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -25959,7 +25959,7 @@ Joris Gillis
 | LP_SOLVER_UBX          | ubx                    | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::LPSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
+>Output scheme: casadi::LpSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -26066,18 +26066,18 @@ Diagrams
 
 C++ includes: lp_solver.hpp ";
 
-%feature("docstring") casadi::LPSolver::getStat "
+%feature("docstring") casadi::LpSolver::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::LPSolver::input_struct "[INTERNAL]
+%feature("docstring") casadi::LpSolver::input_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::LPSolver::inputS "
+%feature("docstring") casadi::LpSolver::inputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::inputS(int i)
 ------------------------------------------------------------------------
@@ -26091,25 +26091,25 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::LPSolver::outputScheme "[INTERNAL]  Access
+%feature("docstring") casadi::LpSolver::outputScheme "[INTERNAL]  Access
 input/output scheme.
 
 ";
 
-%feature("docstring") casadi::LPSolver::getNumOutputs "
+%feature("docstring") casadi::LpSolver::getNumOutputs "
 
 Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::LPSolver "
+%feature("docstring") casadi::LpSolver::LpSolver "
 
->  casadi::LPSolver::LPSolver()
+>  casadi::LpSolver::LpSolver()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  casadi::LPSolver::LPSolver(const std::string &name, const LPStructure &st)
+>  casadi::LpSolver::LpSolver(const std::string &name, const LPStructure &st)
 ------------------------------------------------------------------------
 
 Constructor.
@@ -26122,72 +26122,72 @@ st:  Problem structure
 ";
 
 
-// File: classcasadi_1_1LPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+// File: classcasadi_1_1LpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")
-casadi::LPSolverInputIOSchemeVector::LPSolverInputIOSchemeVector "[INTERNAL] ";
+casadi::LpSolverInputIOSchemeVector::LpSolverInputIOSchemeVector "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
-
-";
-
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::getRepresentation
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
+
+";
+
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::getRepresentation
 "[INTERNAL]  Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::repr "[INTERNAL]
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::repr "[INTERNAL]
 Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::vector "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::vector "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'LPSolverInput'
-
-C++ includes: schemes_helpers.hpp ";
-
-
-// File: classcasadi_1_1LPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
-
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'LPSolverOutput'
+%feature("docstring") casadi::LpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'LpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
+
+// File: classcasadi_1_1LpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'LpSolverOutput'
+
+C++ includes: schemes_helpers.hpp ";
+
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
 
 ";
 
 %feature("docstring")
-casadi::LPSolverOutputIOSchemeVector::getRepresentation "[INTERNAL]  Return
+casadi::LpSolverOutputIOSchemeVector::getRepresentation "[INTERNAL]  Return
 a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
 
 ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")
-casadi::LPSolverOutputIOSchemeVector::LPSolverOutputIOSchemeVector "[INTERNAL] ";
+casadi::LpSolverOutputIOSchemeVector::LpSolverOutputIOSchemeVector "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::vector "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::vector "[INTERNAL] ";
 
 
 // File: classcasadi_1_1LPStructIOSchemeVector.xml
@@ -63941,12 +63941,12 @@ Input arguments of a SOCP problem
 
 %feature("docstring") casadi::lpOut "
 
->  LPSolverOutputIOSchemeVector<M> casadi::lpOut(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M())
+>  LpSolverOutputIOSchemeVector<M> casadi::lpOut(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M())
 ------------------------------------------------------------------------
 
 Output arguments of an LP Solver
 
->Output scheme: casadi::LPSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
+>Output scheme: casadi::LpSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -64006,12 +64006,12 @@ Obtain the structural rank of a sparsity-pattern.
 
 %feature("docstring") casadi::lpIn "
 
->  LPSolverInputIOSchemeVector<M> casadi::lpIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M())
+>  LpSolverInputIOSchemeVector<M> casadi::lpIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M())
 ------------------------------------------------------------------------
 
 Input arguments of a LP problem
 
->Input scheme: casadi::LPSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
+>Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -66486,7 +66486,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__LinearSolver__doc.xml
 
 
-// File: group__LPSolver__doc.xml
+// File: group__LpSolver__doc.xml
 
 
 // File: group__NlpSolver__doc.xml
@@ -66537,7 +66537,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__SDPInput.xml
 
 
-// File: group__scheme__LPSolverInput.xml
+// File: group__scheme__LpSolverInput.xml
 
 
 // File: group__scheme__RDAEInput.xml
@@ -66570,7 +66570,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__GradFInput.xml
 
 
-// File: group__scheme__LPSolverOutput.xml
+// File: group__scheme__LpSolverOutput.xml
 
 
 // File: group__scheme__GradFOutput.xml

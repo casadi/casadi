@@ -30743,7 +30743,7 @@ C++ includes: schemes_helpers.hpp ";
 [INTERNAL] ";
 
 
-// File: classcasadi_1_1LPSolver.xml
+// File: classcasadi_1_1LpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -31101,7 +31101,7 @@ class
 
 ";
 
-%feature("docstring")  casadi::LPSolver::checkNode() const  "
+%feature("docstring")  casadi::LpSolver::checkNode() const  "
 
 Check if the node is pointing to the right type of object.
 
@@ -31939,9 +31939,9 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::LPSolver "
+%feature("docstring") casadi::LpSolver "
 
-LPSolver.
+LpSolver.
 
 Solves the following linear problem:
 
@@ -31952,7 +31952,7 @@ number of constraints (A)
 
 Joris Gillis
 
->Input scheme: casadi::LPSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
+>Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -31973,7 +31973,7 @@ Joris Gillis
 | LP_SOLVER_UBX          | ubx                    | dense, (n x 1)         |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::LPSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
+>Output scheme: casadi::LpSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -32124,13 +32124,13 @@ Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::LPSolver::LPSolver() "
+%feature("docstring") casadi::LpSolver::LpSolver() "
 
 Default constructor.
 
 ";
 
-%feature("docstring") casadi::LPSolver::LPSolver(const std::string &name,
+%feature("docstring") casadi::LpSolver::LpSolver(const std::string &name,
 const LPStructure &st) "
 
 Constructor.
@@ -32143,15 +32143,15 @@ st:  Problem structure
 ";
 
 
-// File: classcasadi_1_1LPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+// File: classcasadi_1_1LpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector< M
->::LPSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::LpSolverInputIOSchemeVector< M
+>::LpSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a description of the object.
@@ -32176,19 +32176,19 @@ st:  Problem structure
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'LPSolverInput'
+%feature("docstring") casadi::LpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'LpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
 
-// File: classcasadi_1_1LPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+// File: classcasadi_1_1LpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'LPSolverOutput'
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'LpSolverOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -32212,10 +32212,10 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring") casadi::LPSolverOutputIOSchemeVector< M
->::LPSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::LpSolverOutputIOSchemeVector< M
+>::LpSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
@@ -76581,7 +76581,7 @@ elementary functions from the 'math.h' ('cmath') header.
 ";
 
 %feature("docstring")
-casadi::casadi_register_lpsolver_qp(LPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_lpsolver_qp(LpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::copysign(const T &x, const T &y) " [INTERNAL]
 copysign function
@@ -78060,7 +78060,7 @@ const M &arg_m3=M()) "
 
 Output arguments of an LP Solver
 
->Output scheme: casadi::LPSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
+>Output scheme: casadi::LpSolverOutput (LP_SOLVER_NUM_OUT = 5) [lpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -78134,7 +78134,7 @@ const std::string &arg_s5="", const M &arg_m5=M()) "
 
 Input arguments of a LP problem
 
->Input scheme: casadi::LPSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
+>Input scheme: casadi::LpSolverInput (LP_SOLVER_NUM_IN = 7) [lpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -80829,7 +80829,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__LinearSolver__doc.xml
 
 
-// File: group__LPSolver__doc.xml
+// File: group__LpSolver__doc.xml
 
 
 // File: group__NlpSolver__doc.xml
@@ -80880,7 +80880,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__SDPInput.xml
 
 
-// File: group__scheme__LPSolverInput.xml
+// File: group__scheme__LpSolverInput.xml
 
 
 // File: group__scheme__RDAEInput.xml
@@ -80913,7 +80913,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__GradFInput.xml
 
 
-// File: group__scheme__LPSolverOutput.xml
+// File: group__scheme__LpSolverOutput.xml
 
 
 // File: group__scheme__GradFOutput.xml

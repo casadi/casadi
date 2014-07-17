@@ -33,15 +33,15 @@ namespace casadi {
 
   /// Internal class
   class CASADI_CORE_EXPORT
-  LPSolverInternal : public FunctionInternal,
-                     public PluginInterface<LPSolverInternal> {
+  LpSolverInternal : public FunctionInternal,
+                     public PluginInterface<LpSolverInternal> {
   public:
 
     // Constructor
-    LPSolverInternal(const std::vector<Sparsity> &st);
+    LpSolverInternal(const std::vector<Sparsity> &st);
 
     // Destructor
-    virtual ~LPSolverInternal() = 0;
+    virtual ~LpSolverInternal() = 0;
 
     // Initialize
     virtual void init();
@@ -56,7 +56,7 @@ namespace casadi {
     virtual void checkInputs() const;
 
     // Creator function for internal class
-    typedef LPSolverInternal* (*Creator)(const LPStructure& st);
+    typedef LpSolverInternal* (*Creator)(const LPStructure& st);
 
     /// Collection of solvers
     static std::map<std::string, Plugin> solvers_;

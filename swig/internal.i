@@ -3217,10 +3217,10 @@
 %exception casadi::JacGOutputIOSchemeVector< M >::JacGOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::LPSolverInputIOSchemeVector< M >::LPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::LpSolverInputIOSchemeVector< M >::LpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::LPSolverOutputIOSchemeVector< M >::LPSolverOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::LpSolverOutputIOSchemeVector< M >::LpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::LPStructIOSchemeVector< T >::LPStructIOSchemeVector(const std::vector< M > &t) {

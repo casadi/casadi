@@ -26,7 +26,7 @@
 #include "function.hpp"
 
 
-/** \defgroup LPSolver_doc
+/** \defgroup LpSolver_doc
 
     Solves the following linear problem:
 
@@ -55,7 +55,7 @@
 namespace casadi {
 
   /// Input arguments of a LP problem [lpIn]
-  enum LPSolverInput {
+  enum LpSolverInput {
     /// The vector c: dense (n x 1) [c]
     LP_SOLVER_C,
     /// The matrix A: sparse, (nc x n) - product with x must be dense. [a]
@@ -71,7 +71,7 @@ namespace casadi {
     LP_SOLVER_NUM_IN};
 
   /// Output arguments of an LP Solver [lpOut]
-  enum LPSolverOutput {
+  enum LpSolverOutput {
     /// The primal solution [x]
     LP_SOLVER_X,
     /// The optimal cost [cost]
@@ -89,31 +89,31 @@ namespace casadi {
     LP_STRUCT_NUM};
 
   // Forward declaration of internal class
-  class LPSolverInternal;
+  class LpSolverInternal;
 
-  /** \brief LPSolver
+  /** \brief LpSolver
 
 
-      @copydoc LPSolver_doc
+      @copydoc LpSolver_doc
 
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT LPSolver : public Function {
+  class CASADI_CORE_EXPORT LpSolver : public Function {
   public:
 
     /// Default constructor
-    LPSolver();
+    LpSolver();
 
     /** \brief Constructor
      *  \param st Problem structure
      *  \copydoc scheme_LPStruct
      */
-    LPSolver(const std::string& name, const LPStructure& st);
+    LpSolver(const std::string& name, const LPStructure& st);
 
     /// Access functions of the node
-    LPSolverInternal* operator->();
-    const LPSolverInternal* operator->() const;
+    LpSolverInternal* operator->();
+    const LpSolverInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

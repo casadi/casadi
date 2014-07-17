@@ -751,7 +751,7 @@
 <tr><td>HessOpt</td><td>OT_INTEGER</td><td>1</td><td>Hessian calculation method</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>HonorBnds</td><td>OT_BOOLEAN</td><td>0</td><td>Enforce bounds</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>InitPt</td><td>OT_BOOLEAN</td><td>0</td><td>Use initial point strategy</td><td>casadi::KnitroInternal</td></tr>
-<tr><td>LPSolver</td><td>OT_BOOLEAN</td><td>0</td><td>Use LPSolver</td><td>casadi::KnitroInternal</td></tr>
+<tr><td>LpSolver</td><td>OT_BOOLEAN</td><td>0</td><td>Use LpSolver</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>LmSize</td><td>OT_INTEGER</td><td>10</td><td>Memory pairsize limit</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>MaxCgIt</td><td>OT_INTEGER</td><td>0</td><td>Maximum conjugate gradient iterations</td><td>casadi::KnitroInternal</td></tr>
 <tr><td>MaxIt</td><td>OT_INTEGER</td><td>10000</td><td>Iteration limit</td><td>casadi::KnitroInternal</td></tr>
@@ -2352,7 +2352,7 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::LPSolverInternal
+/** \class casadi::LpSolverInternal
 \n
 \par
 <a name='options'></a><table>
@@ -2370,7 +2370,7 @@
 </table>
 */
 /// \endcond
-/** \class casadi::LPSolver
+/** \class casadi::LpSolver
 \n
 \par
 <a name='options'></a><table>

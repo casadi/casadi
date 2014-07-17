@@ -84,7 +84,7 @@ namespace casadi {
     addOption("HessOpt", OT_INTEGER, 1, "Hessian calculation method");
     addOption("Feasible", OT_BOOLEAN, 0, "Allow infeasible iterations");
     addOption("HonorBnds", OT_BOOLEAN, 0, "Enforce bounds");
-    addOption("LPSolver", OT_BOOLEAN, 0, "Use LPSolver");
+    addOption("LpSolver", OT_BOOLEAN, 0, "Use LpSolver");
     addOption("Multistart", OT_BOOLEAN, 0, "Use multistart");
     //addOption("MsMaxSolves", OT_INTEGER, 1, "Maximum multistart points");
     addOption("MaxCgIt", OT_INTEGER, 0, "Maximum conjugate gradient iterations");
@@ -137,7 +137,7 @@ namespace casadi {
     if (hasSetOption("HessOpt")) int_param_["hessopt"] = getOption("HessOpt");
     if (hasSetOption("Feasible")) int_param_["feasible"] = getOption("Feasible");
     if (hasSetOption("HonorBnds")) int_param_["honorbnds"] = getOption("HonorBnds");
-    if (hasSetOption("LPSolver")) int_param_["lpsolver"] = getOption("LPSolver");
+    if (hasSetOption("LpSolver")) int_param_["lpsolver"] = getOption("LpSolver");
     if (hasSetOption("Multistart")) int_param_["multistart"] = getOption("Multistart");
     //if (hasSetOption("MsMaxSolves")) int_param_["msmaxsolves"] = getOption("MsMaxSolves");
     if (hasSetOption("MaxCgIt")) int_param_["maxcgit"] = getOption("MaxCgIt");

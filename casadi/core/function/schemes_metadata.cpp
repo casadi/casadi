@@ -39,8 +39,8 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_IntegratorOutput: return "IntegratorOutput";
     case SCHEME_LinsolInput: return "LinsolInput";
     case SCHEME_LinsolOutput: return "LinsolOutput";
-    case SCHEME_LPSolverInput: return "LPSolverInput";
-    case SCHEME_LPSolverOutput: return "LPSolverOutput";
+    case SCHEME_LpSolverInput: return "LpSolverInput";
+    case SCHEME_LpSolverOutput: return "LpSolverOutput";
     case SCHEME_LPStruct: return "LPStruct";
     case SCHEME_NLPInput: return "NLPInput";
     case SCHEME_NLPOutput: return "NLPOutput";
@@ -102,9 +102,9 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
       return "A, B";
     case SCHEME_LinsolOutput:
       return "X";
-    case SCHEME_LPSolverInput:
+    case SCHEME_LpSolverInput:
       return "c, a, lba, uba, lbx, ubx";
-    case SCHEME_LPSolverOutput:
+    case SCHEME_LpSolverOutput:
       return "x, cost, lam_a, lam_x";
     case SCHEME_LPStruct:
       return "a";
@@ -247,7 +247,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
     case SCHEME_LinsolOutput:
       if (i==0) return "X";
       break;
-    case SCHEME_LPSolverInput:
+    case SCHEME_LpSolverInput:
       if (i==0) return "c";
       if (i==1) return "a";
       if (i==2) return "lba";
@@ -255,7 +255,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==4) return "lbx";
       if (i==5) return "ubx";
       break;
-    case SCHEME_LPSolverOutput:
+    case SCHEME_LpSolverOutput:
       if (i==0) return "x";
       if (i==1) return "cost";
       if (i==2) return "lam_a";
@@ -561,7 +561,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_LinsolOutput:
       if (i==0) return "Solution to the linear system of equations";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_LPSolverInput:
+    case SCHEME_LpSolverInput:
       if (i==0) return "The vector c: dense (n x 1)";  // NOLINT(whitespace/line_length)
       if (i==1) return "The matrix A: sparse, (nc x n) - product with x must be dense.";  // NOLINT(whitespace/line_length)
       if (i==2) return "dense, (nc x 1)";  // NOLINT(whitespace/line_length)
@@ -569,7 +569,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==4) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
       if (i==5) return "dense, (n x 1)";  // NOLINT(whitespace/line_length)
       break;
-    case SCHEME_LPSolverOutput:
+    case SCHEME_LpSolverOutput:
       if (i==0) return "The primal solution";  // NOLINT(whitespace/line_length)
       if (i==1) return "The optimal cost";  // NOLINT(whitespace/line_length)
       if (i==2) return "The dual solution corresponding to linear bounds";  // NOLINT(whitespace/line_length)
@@ -875,7 +875,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
     case SCHEME_LinsolOutput:
       if (i==0) return "LINSOL_X";
       break;
-    case SCHEME_LPSolverInput:
+    case SCHEME_LpSolverInput:
       if (i==0) return "LP_SOLVER_C";
       if (i==1) return "LP_SOLVER_A";
       if (i==2) return "LP_SOLVER_LBA";
@@ -883,7 +883,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==4) return "LP_SOLVER_LBX";
       if (i==5) return "LP_SOLVER_UBX";
       break;
-    case SCHEME_LPSolverOutput:
+    case SCHEME_LpSolverOutput:
       if (i==0) return "LP_SOLVER_X";
       if (i==1) return "LP_SOLVER_COST";
       if (i==2) return "LP_SOLVER_LAM_A";
@@ -1153,10 +1153,10 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_LinsolOutput:
       return 1;
       break;
-    case SCHEME_LPSolverInput:
+    case SCHEME_LpSolverInput:
       return 6;
       break;
-    case SCHEME_LPSolverOutput:
+    case SCHEME_LpSolverOutput:
       return 4;
       break;
     case SCHEME_LPStruct:
@@ -1330,7 +1330,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
     case SCHEME_LinsolOutput:
       if (name=="X") return 0;
       break;
-    case SCHEME_LPSolverInput:
+    case SCHEME_LpSolverInput:
       if (name=="c") return 0;
       if (name=="a") return 1;
       if (name=="lba") return 2;
@@ -1338,7 +1338,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="lbx") return 4;
       if (name=="ubx") return 5;
       break;
-    case SCHEME_LPSolverOutput:
+    case SCHEME_LpSolverOutput:
       if (name=="x") return 0;
       if (name=="cost") return 1;
       if (name=="lam_a") return 2;

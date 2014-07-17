@@ -24,14 +24,14 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
-INPUTSCHEME(LPSolverInput)
-OUTPUTSCHEME(LPSolverOutput)
+INPUTSCHEME(LpSolverInput)
+OUTPUTSCHEME(LpSolverOutput)
 
 using namespace std;
 namespace casadi {
 
   // Constructor
-  LPSolverInternal::LPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  LpSolverInternal::LpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
     casadi_assert_message(st_.size()==LP_STRUCT_NUM, "Problem structure mismatch");
 
     const Sparsity& A = st_[LP_STRUCT_A];
@@ -56,27 +56,27 @@ namespace casadi {
     output(LP_SOLVER_LAM_X) = DMatrix::zeros(n_);
     output(LP_SOLVER_LAM_A) = DMatrix::zeros(nc_);
 
-    input_.scheme = SCHEME_LPSolverInput;
-    output_.scheme = SCHEME_LPSolverOutput;
+    input_.scheme = SCHEME_LpSolverInput;
+    output_.scheme = SCHEME_LpSolverOutput;
   }
 
-  void LPSolverInternal::init() {
+  void LpSolverInternal::init() {
     // Call the init method of the base class
     FunctionInternal::init();
   }
 
-  LPSolverInternal::~LPSolverInternal() {
+  LpSolverInternal::~LpSolverInternal() {
   }
 
-  void LPSolverInternal::evaluate() {
-    throw CasadiException("LPSolverInternal::evaluate: Not implemented");
+  void LpSolverInternal::evaluate() {
+    throw CasadiException("LpSolverInternal::evaluate: Not implemented");
   }
 
-  void LPSolverInternal::solve() {
-    throw CasadiException("LPSolverInternal::solve: Not implemented");
+  void LpSolverInternal::solve() {
+    throw CasadiException("LpSolverInternal::solve: Not implemented");
   }
 
-  void LPSolverInternal::checkInputs() const {
+  void LpSolverInternal::checkInputs() const {
     for (int i=0;i<input(LP_SOLVER_LBX).size();++i) {
       casadi_assert_message(input(LP_SOLVER_LBX).at(i)<=input(LP_SOLVER_UBX).at(i),
                             "LBX[i] <= UBX[i] was violated for i=" << i
@@ -91,9 +91,9 @@ namespace casadi {
     }
   }
 
-  std::map<std::string, LPSolverInternal::Plugin> LPSolverInternal::solvers_;
+  std::map<std::string, LpSolverInternal::Plugin> LpSolverInternal::solvers_;
 
-  const std::string LPSolverInternal::infix_ = "lpsolver";
+  const std::string LpSolverInternal::infix_ = "lpsolver";
 
 
 } // namespace casadi

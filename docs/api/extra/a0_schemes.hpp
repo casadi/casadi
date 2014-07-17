@@ -83,9 +83,9 @@
 <tr><td>SDP_SOLVER_UBX</td><td>ubx</td><td>Upper bounds on x ( n x 1 ) .</td></tr>
 </table>
 */
-/** \defgroup scheme_LPSolverInput
+/** \defgroup scheme_LpSolverInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::LPSolverInput  (LP_SOLVER_NUM_IN = 7) [lpIn]</caption>
+<caption>Input scheme: casadi::LpSolverInput  (LP_SOLVER_NUM_IN = 7) [lpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>LP_SOLVER_C</td><td>c</td><td>The vector c: dense (n x 1) .</td></tr>
 <tr><td>LP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
@@ -208,9 +208,9 @@
 <tr><td>GRADF_P</td><td>p</td><td>Fixed parameter .</td></tr>
 </table>
 */
-/** \defgroup scheme_LPSolverOutput
+/** \defgroup scheme_LpSolverOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::LPSolverOutput  (LP_SOLVER_NUM_OUT = 5) [lpOut]</caption>
+<caption>Output scheme: casadi::LpSolverOutput  (LP_SOLVER_NUM_OUT = 5) [lpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>LP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
 <tr><td>LP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
@@ -495,9 +495,9 @@
 /** \class casadi::QPLPInternal
 \n
 \par
-@copydoc scheme_LPSolverInput
+@copydoc scheme_LpSolverInput
 <br/>
-@copydoc scheme_LPSolverOutput
+@copydoc scheme_LpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -947,20 +947,20 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::LPSolverInternal
+/** \class casadi::LpSolverInternal
 \n
 \par
-@copydoc scheme_LPSolverInput
+@copydoc scheme_LpSolverInput
 <br/>
-@copydoc scheme_LPSolverOutput
+@copydoc scheme_LpSolverOutput
 */
 /// \endcond
-/** \class casadi::LPSolver
+/** \class casadi::LpSolver
 \n
 \par
-@copydoc scheme_LPSolverInput
+@copydoc scheme_LpSolverInput
 <br/>
-@copydoc scheme_LPSolverOutput
+@copydoc scheme_LpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::NlpSolverInternal

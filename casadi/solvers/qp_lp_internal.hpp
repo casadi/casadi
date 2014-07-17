@@ -33,13 +33,13 @@ namespace casadi {
 
   /** \brief Solve LPs using a QP Solver
 
-   @copydoc LPSolver_doc
+   @copydoc LpSolver_doc
 
    \author Joris Gillis
    \date 2013
   */
-class CASADI_LPSOLVER_QP_EXPORT QPLPInternal : public LPSolverInternal {
-  friend class QPLPSolver;
+class CASADI_LPSOLVER_QP_EXPORT QPLPInternal : public LpSolverInternal {
+  friend class QPLpSolver;
 public:
 
   /** \brief  Create a new Solver */
@@ -52,7 +52,7 @@ public:
   virtual QPLPInternal* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static LPSolverInternal* creator(const LPStructure& st)
+  static LpSolverInternal* creator(const LPStructure& st)
   { return new QPLPInternal(st);}
 
   /** \brief  Initialize */
