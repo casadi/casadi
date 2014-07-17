@@ -88,7 +88,7 @@ namespace casadi {
     virtual void evaluate();
 
   protected:
-    SOCPSolver socpsolver_;
+    SocpSolver socpsolver_;
     std::vector<LinearSolver> cholesky_;
   };
   /// \endcond

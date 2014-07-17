@@ -62880,7 +62880,7 @@ C++ includes: schemes_helpers.hpp ";
 %feature("docstring") casadi::SOCPOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 
-// File: classcasadi_1_1SOCPSolver.xml
+// File: classcasadi_1_1SocpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -62888,7 +62888,7 @@ C++ includes: schemes_helpers.hpp ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::SOCPSolver::checkNode() const  "
+casadi::SocpSolver::checkNode() const  "
 
 Check if the node is pointing to the right type of object.
 
@@ -63580,13 +63580,13 @@ check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::SOCPSolver::SOCPSolver() "
+%feature("docstring") casadi::SocpSolver::SocpSolver() "
 
 Default constructor.
 
 ";
 
-%feature("docstring") casadi::SOCPSolver::SOCPSolver(const std::string
+%feature("docstring") casadi::SocpSolver::SocpSolver(const std::string
 &name, const SOCPStructure &st) "
 
 Constructor.
@@ -63752,9 +63752,9 @@ Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::SOCPSolver "
+%feature("docstring") casadi::SocpSolver "
 
-SOCPSolver.
+SocpSolver.
 
 Solves an Second Order Cone Programming (SOCP) problem in standard form.
 
@@ -77342,7 +77342,7 @@ derived class, cf. dynamic_cast (const)
 ";
 
 %feature("docstring")
-casadi::casadi_register_socpsolver_sdp(SOCPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_socpsolver_sdp(SocpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::transpose(const Sparsity &a) "
@@ -80850,7 +80850,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__SdqpSolver__doc.xml
 
 
-// File: group__SOCPSolver__doc.xml
+// File: group__SocpSolver__doc.xml
 
 
 // File: group__StabilizedQPSolver__doc.xml

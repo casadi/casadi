@@ -53,7 +53,7 @@ namespace casadi {
 
   SOCPQCQPInternal::SOCPQCQPInternal(const std::vector<Sparsity> &st) : QcqpSolverInternal(st) {
     addOption("socp_solver",       OT_STRING, GenericType(),
-              "The SOCPSolver used to solve the QCQPs.");
+              "The SocpSolver used to solve the QCQPs.");
     addOption("socp_solver_options",       OT_DICTIONARY, GenericType(),
               "Options to be passed to the SOCPSOlver");
 
@@ -192,7 +192,7 @@ namespace casadi {
 
     // Create an socpsolver instance
     std::string socpsolver_name = getOption("socp_solver");
-    socpsolver_ = SOCPSolver(socpsolver_name,
+    socpsolver_ = SocpSolver(socpsolver_name,
                              socpStruct("g", horzcat(socp_g),
                                         "a", horzcat(input(QCQP_SOLVER_A).sparsity(), Sparsity::sparse(nc_, 1))));
 

@@ -591,7 +591,7 @@
 @copydoc scheme_IntegratorInput
 */
 /// \cond INTERNAL
-/** \class casadi::SOCPSolverInternal
+/** \class casadi::SocpSolverInternal
 \n
 \par
 @copydoc scheme_SOCPInput
@@ -599,7 +599,7 @@
 @copydoc scheme_SOCPOutput
 */
 /// \endcond
-/** \class casadi::SOCPSolver
+/** \class casadi::SocpSolver
 \n
 \par
 @copydoc scheme_SOCPInput

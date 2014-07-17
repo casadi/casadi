@@ -25,31 +25,31 @@
 using namespace std;
 namespace casadi {
 
-  SOCPSolver::SOCPSolver() {
+  SocpSolver::SocpSolver() {
   }
 
-  SOCPSolverInternal* SOCPSolver::operator->() {
-    return static_cast<SOCPSolverInternal*>(Function::operator->());
+  SocpSolverInternal* SocpSolver::operator->() {
+    return static_cast<SocpSolverInternal*>(Function::operator->());
   }
 
-  const SOCPSolverInternal* SOCPSolver::operator->() const {
-    return static_cast<const SOCPSolverInternal*>(Function::operator->());
+  const SocpSolverInternal* SocpSolver::operator->() const {
+    return static_cast<const SocpSolverInternal*>(Function::operator->());
   }
 
-  bool SOCPSolver::checkNode() const {
-    return dynamic_cast<const SOCPSolverInternal*>(get())!=0;
+  bool SocpSolver::checkNode() const {
+    return dynamic_cast<const SocpSolverInternal*>(get())!=0;
   }
 
-  SOCPSolver::SOCPSolver(const std::string& name, const SOCPStructure& st) {
-    assignNode(SOCPSolverInternal::getPlugin(name).creator(st));
+  SocpSolver::SocpSolver(const std::string& name, const SOCPStructure& st) {
+    assignNode(SocpSolverInternal::getPlugin(name).creator(st));
   }
 
-  void SOCPSolver::loadPlugin(const std::string& name) {
-    SOCPSolverInternal::loadPlugin(name);
+  void SocpSolver::loadPlugin(const std::string& name) {
+    SocpSolverInternal::loadPlugin(name);
   }
 
-  std::string SOCPSolver::doc(const std::string& name) {
-    return SOCPSolverInternal::getPlugin(name).doc;
+  std::string SocpSolver::doc(const std::string& name) {
+    return SocpSolverInternal::getPlugin(name).doc;
   }
 
 } // namespace casadi

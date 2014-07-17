@@ -26,7 +26,7 @@
 #include "function.hpp"
 
 
-/** \defgroup SOCPSolver_doc
+/** \defgroup SocpSolver_doc
 
     Solves an Second Order Cone Programming (SOCP) problem in standard form.
 
@@ -103,31 +103,31 @@ namespace casadi {
     SOCP_STRUCT_NUM};
 
   // Forward declaration of internal class
-  class SOCPSolverInternal;
+  class SocpSolverInternal;
 
-  /** \brief SOCPSolver
+  /** \brief SocpSolver
 
 
-      @copydoc SOCPSolver_doc
+      @copydoc SocpSolver_doc
 
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_CORE_EXPORT SOCPSolver : public Function {
+  class CASADI_CORE_EXPORT SocpSolver : public Function {
   public:
 
     /// Default constructor
-    SOCPSolver();
+    SocpSolver();
 
     /** \brief Constructor
      *  \param st Problem structure
      *  \copydoc scheme_SOCPStruct
      */
-    SOCPSolver(const std::string& name, const SOCPStructure& st);
+    SocpSolver(const std::string& name, const SOCPStructure& st);
 
     /// Access functions of the node
-    SOCPSolverInternal* operator->();
-    const SOCPSolverInternal* operator->() const;
+    SocpSolverInternal* operator->();
+    const SocpSolverInternal* operator->() const;
 
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;

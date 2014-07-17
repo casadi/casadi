@@ -33,13 +33,13 @@ namespace casadi {
 
   /** \brief SOCP Solver for quadratic programming
 
-      @copydoc SOCPSolver_doc
+      @copydoc SocpSolver_doc
 
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SOCPSolverInternal {
-    friend class SDPSOCPSolver;
+  class CASADI_SOCPSOLVER_SDP_EXPORT SDPSOCPInternal : public SocpSolverInternal {
+    friend class SDPSocpSolver;
   public:
 
     /** \brief  Create a new Solver */
@@ -52,7 +52,7 @@ namespace casadi {
     virtual SDPSOCPInternal* clone() const;
   
     /** \brief  Create a new SOCP Solver */
-    static SOCPSolverInternal* creator(const SOCPStructure& st)
+    static SocpSolverInternal* creator(const SOCPStructure& st)
     { return new SDPSOCPInternal(st);}
 
     /** \brief  Initialize */

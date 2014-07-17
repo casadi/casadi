@@ -34,7 +34,7 @@ using namespace std;
 namespace casadi {
 
   // Constructor
-  SOCPSolverInternal::SOCPSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
+  SocpSolverInternal::SocpSolverInternal(const std::vector<Sparsity> &st) : st_(st) {
     addOption("ni", OT_INTEGERVECTOR, GenericType(),
               "Provide the size of each SOC constraint. Must sum up to N.");
     addOption("print_problem", OT_BOOLEAN, false, "Print out problem statement for debugging.");
@@ -44,7 +44,7 @@ namespace casadi {
 
   }
 
-  void SOCPSolverInternal::init() {
+  void SocpSolverInternal::init() {
     // Call the init method of the base class
     FunctionInternal::init();
 
@@ -58,7 +58,7 @@ namespace casadi {
 
     N_ = std::accumulate(ni_.begin(), ni_.end(), 0);
     casadi_assert_message(N_==G.size2(),
-                          "SOCPSolverInternal: Supplied G sparsity: number of cols ("
+                          "SocpSolverInternal: Supplied G sparsity: number of cols ("
                           << G.size2()
                           <<  ")  must match sum of vector provided with option 'ni' ("
                           << N_ << ").");
@@ -67,7 +67,7 @@ namespace casadi {
     n_ = A.size2();
 
     casadi_assert_message(n_==G.size1(),
-       "SOCPSolverInternal: Supplied G sparsity: number of rows ("
+       "SocpSolverInternal: Supplied G sparsity: number of rows ("
         << G.size1()
         <<  ") must match number of decision variables (cols of A): " << n_ << ".");
 
@@ -94,18 +94,18 @@ namespace casadi {
 
   }
 
-  SOCPSolverInternal::~SOCPSolverInternal() {
+  SocpSolverInternal::~SocpSolverInternal() {
   }
 
-  void SOCPSolverInternal::evaluate() {
-    throw CasadiException("SOCPSolverInternal::evaluate: Not implemented");
+  void SocpSolverInternal::evaluate() {
+    throw CasadiException("SocpSolverInternal::evaluate: Not implemented");
   }
 
-  void SOCPSolverInternal::solve() {
-    throw CasadiException("SOCPSolverInternal::solve: Not implemented");
+  void SocpSolverInternal::solve() {
+    throw CasadiException("SocpSolverInternal::solve: Not implemented");
   }
 
-  void SOCPSolverInternal::printProblem(std::ostream &stream) const {
+  void SocpSolverInternal::printProblem(std::ostream &stream) const {
     stream << "SOCP Problem statement -- start" << std::endl;
     stream << "ni: "<< ni_ << std::endl;
     stream << "g: "<< std::endl;  input(SOCP_SOLVER_G).printDense(stream);
@@ -123,7 +123,7 @@ namespace casadi {
   }
 
 
-  void SOCPSolverInternal::checkInputs() const {
+  void SocpSolverInternal::checkInputs() const {
     for (int i=0;i<input(SOCP_SOLVER_LBX).size();++i) {
       casadi_assert_message(input(SOCP_SOLVER_LBX).at(i)<=input(SOCP_SOLVER_UBX).at(i),
                             "LBX[i] <= UBX[i] was violated for i=" << i
@@ -138,9 +138,9 @@ namespace casadi {
     }
   }
 
-  std::map<std::string, SOCPSolverInternal::Plugin> SOCPSolverInternal::solvers_;
+  std::map<std::string, SocpSolverInternal::Plugin> SocpSolverInternal::solvers_;
 
-  const std::string SOCPSolverInternal::infix_ = "socpsolver";
+  const std::string SocpSolverInternal::infix_ = "socpsolver";
 
 } // namespace casadi
 
