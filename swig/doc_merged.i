@@ -44771,7 +44771,7 @@ Print a representation of the object.
 casadi::SDPOutputIOSchemeVector::SDPOutputIOSchemeVector "[INTERNAL] ";
 
 
-// File: classcasadi_1_1SDPSolver.xml
+// File: classcasadi_1_1SdpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -44779,19 +44779,19 @@ casadi::SDPOutputIOSchemeVector::SDPOutputIOSchemeVector "[INTERNAL] ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::SDPSolver::setSOCPOptions "
+casadi::SdpSolver::setSOCPOptions "
 
 Set options that make the SDP solver more suitable for solving SOCPs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getNumOutputNonzeros "
+%feature("docstring") casadi::SdpSolver::getNumOutputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setJacobian "
+%feature("docstring") casadi::SdpSolver::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
@@ -44799,7 +44799,7 @@ internally
 
 ";
 
-%feature("docstring") casadi::SDPSolver::tangent "
+%feature("docstring") casadi::SdpSolver::tangent "
 
 Generate a tangent function of output oind with respect to input iind.
 
@@ -44815,9 +44815,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::SDPSolver "
+%feature("docstring") casadi::SdpSolver "
 
-SDPSolver.
+SdpSolver.
 
 Solves an SDP problem in standard form.
 Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -44853,7 +44853,7 @@ symmetric ( m x m)
 You can cast this into the standard form with: G = blkdiag(Gj for all j) Fi
 = blkdiag(F_ij for all j)
 
-Implementations of SDPSolver are encouraged to exploit this block structure.
+Implementations of SdpSolver are encouraged to exploit this block structure.
 
 Joel Andersson
 
@@ -45051,7 +45051,7 @@ Diagrams
 
 C++ includes: sdp_solver.hpp ";
 
-%feature("docstring") casadi::SDPSolver::output "
+%feature("docstring") casadi::SdpSolver::output "
 
 [UNSAFE] Obtain reference to outputs  getOutput, getOutput
 
@@ -45059,25 +45059,25 @@ Access output argument
 
 ";
 
-%feature("docstring") casadi::SDPSolver::dictionary "
+%feature("docstring") casadi::SdpSolver::dictionary "
 
 Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::isNull "
+%feature("docstring") casadi::SdpSolver::isNull "
 
 Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getStat "
+%feature("docstring") casadi::SdpSolver::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::callDerivative "[INTERNAL]
+%feature("docstring") casadi::SdpSolver::callDerivative "[INTERNAL]
 Evaluate the function symbolically or numerically with directional
 derivatives The first two arguments are the nondifferentiated inputs and
 results of the evaluation, the next two arguments are a set of forward
@@ -45089,11 +45089,11 @@ adjoint directions.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::clone "[INTERNAL]  Deep copy.
+%feature("docstring") casadi::SdpSolver::clone "[INTERNAL]  Deep copy.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::makeUnique "
+%feature("docstring") casadi::SdpSolver::makeUnique "
 
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
@@ -45110,13 +45110,13 @@ SWIGINTERNAL
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getNumInputs "
+%feature("docstring") casadi::SdpSolver::getNumInputs "
 
 Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOutput "
+%feature("docstring") casadi::SdpSolver::getOutput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getOutput(int oind=0) const
 ------------------------------------------------------------------------
@@ -45164,56 +45164,56 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::assertInit "[INTERNAL]  Assert
+%feature("docstring") casadi::SdpSolver::assertInit "[INTERNAL]  Assert
 that it is initialized
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getDescription "
+%feature("docstring") casadi::SdpSolver::getDescription "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOptionEnumValue "[INTERNAL]
+%feature("docstring") casadi::SdpSolver::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::checkInputs "[INTERNAL]  Check if
+%feature("docstring") casadi::SdpSolver::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getNumOutputElements "
+%feature("docstring") casadi::SdpSolver::getNumOutputElements "
 
 Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::assignNode "[INTERNAL]  Assign the
+%feature("docstring") casadi::SdpSolver::assignNode "[INTERNAL]  Assign the
 node to a node class pointer (or null)
 
 ";
 
-%feature("docstring") casadi::SDPSolver::spCanEvaluate "[INTERNAL]  Is the
+%feature("docstring") casadi::SdpSolver::spCanEvaluate "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::SDPSolver::output_struct "[INTERNAL]
+%feature("docstring") casadi::SdpSolver::output_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::SDPSolver::repr "[INTERNAL]  Print a
+%feature("docstring") casadi::SdpSolver::repr "[INTERNAL]  Print a
 representation of the object.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::gradient "
+%feature("docstring") casadi::SdpSolver::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
 
@@ -45229,19 +45229,19 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::printOptions "
+%feature("docstring") casadi::SdpSolver::printOptions "
 
 Print options to a stream.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::evaluate "
+%feature("docstring") casadi::SdpSolver::evaluate "
 
 Evaluate.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOptionDefault "
+%feature("docstring") casadi::SdpSolver::getOptionDefault "
 
 INTERNAL.
 
@@ -45249,30 +45249,30 @@ Get the default of a certain option
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setInputScheme "
+%feature("docstring") casadi::SdpSolver::setInputScheme "
 
 Set input scheme.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setOutputScheme "
+%feature("docstring") casadi::SdpSolver::setOutputScheme "
 
 Set output scheme.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getRepresentation "
+%feature("docstring") casadi::SdpSolver::getRepresentation "
 
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::SDPSolver::print "[INTERNAL]  Print a
+%feature("docstring") casadi::SdpSolver::print "[INTERNAL]  Print a
 description of the object.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::derivative "
+%feature("docstring") casadi::SdpSolver::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -45294,7 +45294,7 @@ returned.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::get "
+%feature("docstring") casadi::SdpSolver::get "
 
 >  const SharedObjectNode * casadi::SharedObject::get() const 
 ------------------------------------------------------------------------
@@ -45308,20 +45308,20 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOptionDescription "
+%feature("docstring") casadi::SdpSolver::getOptionDescription "
 
 Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::assignNodeNoCount "[INTERNAL]
+%feature("docstring") casadi::SdpSolver::assignNodeNoCount "[INTERNAL]
 Assign the node to a node class pointer without reference counting.
 
 improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::SDPSolver::inputSchemeEntry "[INTERNAL]  Find
+%feature("docstring") casadi::SdpSolver::inputSchemeEntry "[INTERNAL]  Find
 the index for a string describing a particular entry of an input scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -45329,19 +45329,19 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOptionType "
+%feature("docstring") casadi::SdpSolver::getOptionType "
 
 Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::hasOption "
+%feature("docstring") casadi::SdpSolver::hasOption "
 
 check if there is an option str
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOptionNames "
+%feature("docstring") casadi::SdpSolver::getOptionNames "
 
 INTERNAL.
 
@@ -45349,25 +45349,25 @@ Get a list of all option names
 
 ";
 
-%feature("docstring") casadi::SDPSolver::input_struct "[INTERNAL]
+%feature("docstring") casadi::SdpSolver::input_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOutputScheme "
+%feature("docstring") casadi::SdpSolver::getOutputScheme "
 
 Get output scheme.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::SDPSolver "
+%feature("docstring") casadi::SdpSolver::SdpSolver "
 
->  casadi::SDPSolver::SDPSolver()
+>  casadi::SdpSolver::SdpSolver()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  casadi::SDPSolver::SDPSolver(const std::string &name, const SDPStructure &st)
+>  casadi::SdpSolver::SdpSolver(const std::string &name, const SDPStructure &st)
 ------------------------------------------------------------------------
 
 Constructor.
@@ -45379,7 +45379,7 @@ st:  Problem structure
 
 ";
 
-%feature("docstring") casadi::SDPSolver::outputS "
+%feature("docstring") casadi::SdpSolver::outputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::outputS(int i)
 ------------------------------------------------------------------------
@@ -45393,24 +45393,24 @@ Const access an output.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setNumInputs "
+%feature("docstring") casadi::SdpSolver::setNumInputs "
 
 Set the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::inputScheme "[INTERNAL]  Access
+%feature("docstring") casadi::SdpSolver::inputScheme "[INTERNAL]  Access
 input/output scheme.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOptionAllowed "
+%feature("docstring") casadi::SdpSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::init "
+%feature("docstring") casadi::SdpSolver::init "
 
 Initialize or re-initialize the object:
 
@@ -45418,18 +45418,18 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setOptionByEnumValue "[INTERNAL]
+%feature("docstring") casadi::SdpSolver::setOptionByEnumValue "[INTERNAL]
 Set a certain option by giving an enum value.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::removeMonitor "
+%feature("docstring") casadi::SdpSolver::removeMonitor "
 
 Remove modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setInput "
+%feature("docstring") casadi::SdpSolver::setInput "
 
 >  void casadi::IOInterface< Function  >::setInput(T val, int iind=0)
 ------------------------------------------------------------------------
@@ -45459,7 +45459,7 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::jacobian "
+%feature("docstring") casadi::SdpSolver::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
 
@@ -45481,7 +45481,7 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getInput "
+%feature("docstring") casadi::SdpSolver::getInput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getInput(int iind=0) const
 ------------------------------------------------------------------------
@@ -45529,13 +45529,13 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::copyOptions "
+%feature("docstring") casadi::SdpSolver::copyOptions "
 
 Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::symbolicInput "
+%feature("docstring") casadi::SdpSolver::symbolicInput "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -45543,14 +45543,14 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::SDPSolver::spInit "[INTERNAL]  Reset the
+%feature("docstring") casadi::SdpSolver::spInit "[INTERNAL]  Reset the
 sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setDerivative "
+%feature("docstring") casadi::SdpSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -45560,19 +45560,19 @@ kept internally
 
 ";
 
-%feature("docstring") casadi::SDPSolver::addMonitor "
+%feature("docstring") casadi::SdpSolver::addMonitor "
 
 Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getInputScheme "
+%feature("docstring") casadi::SdpSolver::getInputScheme "
 
 Get input scheme.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::generateCode "
+%feature("docstring") casadi::SdpSolver::generateCode "
 
 >  void casadi::Function::generateCode(const std::string &filename)
 ------------------------------------------------------------------------
@@ -45588,18 +45588,18 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setNumOutputs "
+%feature("docstring") casadi::SdpSolver::setNumOutputs "
 
 Set the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::printPtr "[INTERNAL]  Print the
+%feature("docstring") casadi::SdpSolver::printPtr "[INTERNAL]  Print the
 pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setOutput "
+%feature("docstring") casadi::SdpSolver::setOutput "
 
 >  void casadi::IOInterface< Function  >::setOutput(T val, int oind=0)
 ------------------------------------------------------------------------
@@ -45629,31 +45629,31 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getStats "
+%feature("docstring") casadi::SdpSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setJacSparsity "
+%feature("docstring") casadi::SdpSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::SDPSolver::isInit "
+%feature("docstring") casadi::SdpSolver::isInit "
 
 Is initialized?
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOptionTypeName "
+%feature("docstring") casadi::SdpSolver::getOptionTypeName "
 
 Get the type name of a certain option.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::input "
+%feature("docstring") casadi::SdpSolver::input "
 
 [UNSAFE] Obtain reference to inputs  getInput, setInput
 
@@ -45661,25 +45661,25 @@ Access input argument
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getNumOutputs "
+%feature("docstring") casadi::SdpSolver::getNumOutputs "
 
 Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOption "
+%feature("docstring") casadi::SdpSolver::getOption "
 
 get an option value
 
 ";
 
-%feature("docstring") casadi::SDPSolver::checkNode "
+%feature("docstring") casadi::SdpSolver::checkNode "
 
 Check if the node is pointing to the right type of object.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::outputSchemeEntry "[INTERNAL]
+%feature("docstring") casadi::SdpSolver::outputSchemeEntry "[INTERNAL]
 Find the index for a string describing a particular entry of an output
 scheme.
 
@@ -45688,13 +45688,13 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getSanitizedName "
+%feature("docstring") casadi::SdpSolver::getSanitizedName "
 
 get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring") casadi::SDPSolver::schemeEntry "[INTERNAL]  Find the
+%feature("docstring") casadi::SdpSolver::schemeEntry "[INTERNAL]  Find the
 index for a string describing a particular entry of a scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -45702,7 +45702,7 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::SDPSolver::hessian "
+%feature("docstring") casadi::SdpSolver::hessian "
 
 Generate a Hessian function of output oind with respect to input iind.
 
@@ -45718,18 +45718,18 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::jacSparsity "
+%feature("docstring") casadi::SdpSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::SDPSolver::outputScheme "[INTERNAL]  Access
+%feature("docstring") casadi::SdpSolver::outputScheme "[INTERNAL]  Access
 input/output scheme.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::callParallel "
+%feature("docstring") casadi::SdpSolver::callParallel "
 
 Evaluate symbolically in parallel (matrix graph)
 
@@ -45740,13 +45740,13 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring") casadi::SDPSolver::call "
+%feature("docstring") casadi::SdpSolver::call "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::spEvaluate "[INTERNAL]  Propagate
+%feature("docstring") casadi::SdpSolver::spEvaluate "[INTERNAL]  Propagate
 the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
@@ -45754,12 +45754,12 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::SDPSolver::swap "[INTERNAL]  Swap content
+%feature("docstring") casadi::SdpSolver::swap "[INTERNAL]  Swap content
 with another instance.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setOption "
+%feature("docstring") casadi::SdpSolver::setOption "
 
 >  void casadi::OptionsFunctionality::setOption(const std::string &str, const GenericType &val)
 ------------------------------------------------------------------------
@@ -45781,22 +45781,22 @@ changes, the init function should be called again.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+%feature("docstring") casadi::SdpSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::weak "[INTERNAL]  Get a weak
+%feature("docstring") casadi::SdpSolver::weak "[INTERNAL]  Get a weak
 reference to the object.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getOptionAllowedIndex "[INTERNAL]
+%feature("docstring") casadi::SdpSolver::getOptionAllowedIndex "[INTERNAL]
 Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::inputS "
+%feature("docstring") casadi::SdpSolver::inputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::inputS(int i)
 ------------------------------------------------------------------------
@@ -45810,24 +45810,24 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getNumInputElements "
+%feature("docstring") casadi::SdpSolver::getNumInputElements "
 
 Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getCount "[INTERNAL]  Get the
+%feature("docstring") casadi::SdpSolver::getCount "[INTERNAL]  Get the
 reference count.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::hasSetOption "
+%feature("docstring") casadi::SdpSolver::hasSetOption "
 
 check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::SDPSolver::setFullJacobian "
+%feature("docstring") casadi::SdpSolver::setFullJacobian "
 
 Set the Jacobian of all the input nonzeros with respect to all output
 nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
@@ -45835,13 +45835,13 @@ are kept internally
 
 ";
 
-%feature("docstring") casadi::SDPSolver::getNumInputNonzeros "
+%feature("docstring") casadi::SdpSolver::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::symbolicInputSX "
+%feature("docstring") casadi::SdpSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
@@ -45850,7 +45850,7 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::SDPSolver::fullJacobian "
+%feature("docstring") casadi::SdpSolver::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
@@ -46177,7 +46177,7 @@ with another instance.
 
 SDQPSolver.
 
-Same as an SDPSolver, but with a quadratic objective 1/2 x' H x
+Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
 Joel Andersson
 
@@ -66501,7 +66501,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__QPSolver__doc.xml
 
 
-// File: group__SDPSolver__doc.xml
+// File: group__SdpSolver__doc.xml
 
 
 // File: group__SDQPSolver__doc.xml

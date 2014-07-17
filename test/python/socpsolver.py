@@ -28,7 +28,7 @@ from helpers import *
 
 socpsolvers = []
 try:
-  SDPSolver.loadPlugin("dsdp")
+  SdpSolver.loadPlugin("dsdp")
   socpsolvers.append((SDPSOCPSolver,{"sdp_solver": "dsdp" ,"verbose": True, "sdp_solver_options": {"verbose":True}},False))
 except:
   pass

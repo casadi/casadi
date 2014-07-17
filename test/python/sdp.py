@@ -29,7 +29,7 @@ from helpers import *
 
 sdpsolvers = []
 try:
-  SDPSolver.loadPlugin("dsdp")
+  SdpSolver.loadPlugin("dsdp")
   sdpsolvers.append(("dsdp",{}))
 except:
   pass
@@ -37,7 +37,7 @@ except:
 
 sdqpsolvers = []
 try:
-  SDPSolver.loadPlugin("dsdp")
+  SdpSolver.loadPlugin("dsdp")
   sdqpsolvers.append(("sdp",{"sdp_solver": "dsdp"}))
 except:
   pass
@@ -64,7 +64,7 @@ class SDPtests(casadiTestCase):
     G = sparse(G)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
 
   def test_memleak2(self):
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -82,7 +82,7 @@ class SDPtests(casadiTestCase):
     G = sparse(G)
 
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
 
@@ -93,7 +93,7 @@ class SDPtests(casadiTestCase):
     n1 = 3.1
     c = DMatrix(n1)
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=Sparsity.dense(0,1),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=Sparsity.dense(0,1),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(c,"c")
@@ -128,7 +128,7 @@ class SDPtests(casadiTestCase):
     F = horzcat(Fi)
     G = DMatrix([[2,0],[0,2]])
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(G,"g")
@@ -169,7 +169,7 @@ class SDPtests(casadiTestCase):
     F = horzcat(Fi)
     G = DMatrix([[0,-2],[-2,0]])
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(G,"g")
@@ -205,7 +205,7 @@ class SDPtests(casadiTestCase):
     F = sparse(F)
     G = -DMatrix(n2)
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(G,"g")
@@ -242,7 +242,7 @@ class SDPtests(casadiTestCase):
     G = -blkdiag([n2,-n2])
     F = -horzcat(Fi)
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(G,"g")
@@ -277,7 +277,7 @@ class SDPtests(casadiTestCase):
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(G,"g")
@@ -312,7 +312,7 @@ class SDPtests(casadiTestCase):
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(G,"g")
@@ -337,7 +337,7 @@ class SDPtests(casadiTestCase):
     c = DMatrix([2,3])
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(c,"c")
@@ -373,7 +373,7 @@ class SDPtests(casadiTestCase):
     c = DMatrix([2,3])
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=Sparsity.dense(0,0),f=Sparsity.dense(0,0)))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(c,"c")
@@ -408,7 +408,7 @@ class SDPtests(casadiTestCase):
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(G,"g")
@@ -449,7 +449,7 @@ class SDPtests(casadiTestCase):
     F = -horzcat(Fi)
     
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
       sdp.setInput(G,"g")
@@ -483,7 +483,7 @@ class SDPtests(casadiTestCase):
     G = sparse(G)
 
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
 
@@ -556,7 +556,7 @@ class SDPtests(casadiTestCase):
 
 
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
 
@@ -598,7 +598,7 @@ class SDPtests(casadiTestCase):
     
     G = G[perm,perm]
     for sdpsolver, sdp_options in sdpsolvers:
-      sdp = SDPSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
+      sdp = SdpSolver(sdpsolver,sdpStruct(a=A.sparsity(),g=G.sparsity(),f=F.sparsity()))
       sdp.setOption(sdp_options)
       sdp.init()
 

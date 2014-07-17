@@ -59,7 +59,7 @@ namespace casadi {
   class StabilizedQPSolver;
   class QcqpSolver;
   class LPSolver;
-  class SDPSolver;
+  class SdpSolver;
   class SOCPSolver;
   class SDQPSolver;
   class ImplicitFunction;

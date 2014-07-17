@@ -61,7 +61,7 @@ namespace casadi {
     virtual void evaluate();
 
   protected:
-    SDPSolver sdpsolver_;
+    SdpSolver sdpsolver_;
 
     /// Mapping from G, H, E, F to P, G
     Function mapping_;

@@ -36,7 +36,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_SDPSOLVER_DSDP_EXPORT
-  casadi_register_sdpsolver_dsdp(SDPSolverInternal::Plugin* plugin) {
+  casadi_register_sdpsolver_dsdp(SdpSolverInternal::Plugin* plugin) {
     plugin->creator = DSDPInternal::creator;
     plugin->name = "dsdp";
     plugin->doc = "DSDP docs not available";
@@ -46,7 +46,7 @@ namespace casadi {
 
   extern "C"
   void CASADI_SDPSOLVER_DSDP_EXPORT casadi_load_sdpsolver_dsdp() {
-    SDPSolverInternal::registerPlugin(casadi_register_sdpsolver_dsdp);
+    SdpSolverInternal::registerPlugin(casadi_register_sdpsolver_dsdp);
   }
 
   DSDPInternal* DSDPInternal::clone() const {
@@ -57,7 +57,7 @@ namespace casadi {
     return node;
   }
 
-  DSDPInternal::DSDPInternal(const std::vector<Sparsity> &st) : SDPSolverInternal(st) {
+  DSDPInternal::DSDPInternal(const std::vector<Sparsity> &st) : SdpSolverInternal(st) {
     casadi_assert_message(
       static_cast<double>(m_)*(static_cast<double>(m_)+1)/2 < std::numeric_limits<int>::max(),
       "Your problem size m is too large to be handled by DSDP.");
@@ -130,7 +130,7 @@ namespace casadi {
 
   void DSDPInternal::init() {
     // Initialize the base classes
-    SDPSolverInternal::init();
+    SdpSolverInternal::init();
     log("DSDPInternal::init", "Enter");
 
     // Fill the data structures that hold DSDP-style sparse symmetric matrix

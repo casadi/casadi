@@ -888,7 +888,7 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::SDPSolverInternal
+/** \class casadi::SdpSolverInternal
 \n
 \par
 @copydoc scheme_SDPInput
@@ -896,7 +896,7 @@
 @copydoc scheme_SDPOutput
 */
 /// \endcond
-/** \class casadi::SDPSolver
+/** \class casadi::SdpSolver
 \n
 \par
 @copydoc scheme_SDPInput

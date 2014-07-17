@@ -28,7 +28,7 @@
 
 /** \defgroup SDQPSolver_doc
 
-    Same as an SDPSolver, but with a quadratic objective 1/2 x' H x
+    Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
 */
 

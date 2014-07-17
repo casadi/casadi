@@ -55471,7 +55471,7 @@ C++ includes: schemes_helpers.hpp ";
 >::SDPOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
 
-// File: classcasadi_1_1SDPSolver.xml
+// File: classcasadi_1_1SdpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -55479,7 +55479,7 @@ C++ includes: schemes_helpers.hpp ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::SDPSolver::setSOCPOptions() "
+casadi::SdpSolver::setSOCPOptions() "
 
 Set options that make the SDP solver more suitable for solving SOCPs.
 
@@ -55567,9 +55567,9 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::SDPSolver "
+%feature("docstring") casadi::SdpSolver "
 
-SDPSolver.
+SdpSolver.
 
 Solves an SDP problem in standard form.
 Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
@@ -55605,7 +55605,7 @@ symmetric ( m x m)
 You can cast this into the standard form with: G = blkdiag(Gj for all j) Fi
 = blkdiag(F_ij for all j)
 
-Implementations of SDPSolver are encouraged to exploit this block structure.
+Implementations of SdpSolver are encouraged to exploit this block structure.
 
 Joel Andersson
 
@@ -56243,13 +56243,13 @@ Get output scheme.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::SDPSolver() "
+%feature("docstring") casadi::SdpSolver::SdpSolver() "
 
 Default constructor.
 
 ";
 
-%feature("docstring") casadi::SDPSolver::SDPSolver(const std::string &name,
+%feature("docstring") casadi::SdpSolver::SdpSolver(const std::string &name,
 const SDPStructure &st) "
 
 Constructor.
@@ -56691,7 +56691,7 @@ get an option value
 
 ";
 
-%feature("docstring")  casadi::SDPSolver::checkNode() const  "
+%feature("docstring")  casadi::SdpSolver::checkNode() const  "
 
 Check if the node is pointing to the right type of object.
 
@@ -57453,7 +57453,7 @@ Copy all options from another object.
 
 SDQPSolver.
 
-Same as an SDPSolver, but with a quadratic objective 1/2 x' H x
+Same as an SdpSolver, but with a quadratic objective 1/2 x' H x
 
 Joel Andersson
 
@@ -79466,7 +79466,7 @@ elementary functions from the 'math.h' ('cmath') header.
 %feature("docstring")  casadi::ProfilingType() "[INTERNAL] ";
 
 %feature("docstring")
-casadi::casadi_register_sdpsolver_dsdp(SDPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_sdpsolver_dsdp(SdpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::dense(const MX &x) "
@@ -80844,7 +80844,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__QPSolver__doc.xml
 
 
-// File: group__SDPSolver__doc.xml
+// File: group__SdpSolver__doc.xml
 
 
 // File: group__SDQPSolver__doc.xml

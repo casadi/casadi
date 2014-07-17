@@ -75,7 +75,7 @@ namespace casadi {
     virtual void evaluate();
 
     /// Underlying SDP solver
-    SDPSolver sdpsolver_;
+    SdpSolver sdpsolver_;
 
     /// Cholesky Decomposition
     LinearSolver cholesky_;

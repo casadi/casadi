@@ -43,7 +43,7 @@ except:
 # try:  
 #   QPSolver.loadPlugin("dsdp")
 #   def SDPLPSolver(st):
-#     return DSDPSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
+#     return DSdpSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
 #   lpsolvers.append((SDPLPSolver,{},False))
 # except:
 #  pass

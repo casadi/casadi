@@ -39,9 +39,9 @@ namespace casadi {
    \author Joris Gillis
    \date 2013
    *
-   @copydoc SDPSolver_doc
+   @copydoc SdpSolver_doc
    * */
-  class CASADI_SDPSOLVER_DSDP_EXPORT DSDPInternal : public SDPSolverInternal {
+  class CASADI_SDPSOLVER_DSDP_EXPORT DSDPInternal : public SdpSolverInternal {
   public:
 
     /** \brief Constructor */
@@ -51,7 +51,7 @@ namespace casadi {
     virtual DSDPInternal* clone() const;
 
     /** \brief  Create a new SDP Solver */
-    static SDPSolverInternal* creator(const SDPStructure& st)
+    static SdpSolverInternal* creator(const SDPStructure& st)
     { return new DSDPInternal(st);}
 
     /** \brief Destructor */
