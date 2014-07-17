@@ -129,15 +129,15 @@ This document aims to give an introduction to \CasADi, an open-source software f
 After reading this document, the reader should be able to formulate and manipulate expressions in \CasADi's symbolic framework, generate derivative information efficiently using \emph{algorithmic differentiation}, to set up, solve and perform forward and adjoint sensitivity analysis for systems of ordinary differential equations (ODE) or differential-algebraic equations (DAE) as well as to formulate and solve nonlinear programs (NLP) problems and optimal control problems (OCP).
 
 \section{What \CasADi is and what it is \emph{not}}
-\CasADi started out as a tool for algorithmic differentiation (AD) using a syntax borrowed from computer algebra systems (CAS), which explains its name. While this still forms one of the core functionalities of the tool, the scope of the tool has since been considerably broadened, with the addition of support for ODE/DAE integration and sensitivity analysis, nonlinear programming and interfaces to other numerical tools. In its current form, it is more of a general-purpose tool for gradient-based numerical optimization -- with a strong focus on optimal control -- and ``\CasADi'' is just a name without any particular meaning.
+\CasADi started out as a tool for algorithmic differentiation (AD) using a syntax borrowed from computer algebra systems (CAS), which explains its name. While AD still forms one of the core functionalities of the tool, the scope of the tool has since been considerably broadened, with the addition of support for ODE/DAE integration and sensitivity analysis, nonlinear programming and interfaces to other numerical tools. In its current form, it is a general-purpose tool for gradient-based numerical optimization -- with a strong focus on optimal control -- and ``\CasADi'' is just a name without any particular meaning.
 
-CasADi is written in C++ but also has front-ends to Python and (experimentally) Octave.
+CasADi is written in C++ but also has a full-featured front-end to Python\footnote{In addition, a MATLAB front-end is in development}.
 
 It is important to point out that \CasADi is \emph{not} a conventional AD tool, that can be used to calculate derivative information from existing user code with little to no modification. If you have an existing model written in say C++ or Python, you need to be prepared to reimplement the model using \CasADi syntax.
 
 Secondly, \CasADi is \emph{not} a computer algebra system. While the symbolic core does include an increasing set of tools for manipulate symbolic expressions, these capabilities are very limited compared to a proper CAS tool.
 
-Finally, \CasADi is not an ``optimal control problem solver'', that allows the user to enter an OCP and gives the solution back. Instead, it tries to provide the user with a set of ``building blocks'' that can be used to implement general-purpose or specific-purpose OCP solvers efficiently with a modest programming effort.
+Finally, \CasADi is not an ``optimal control problem solver'', that allows the user to enter an OCP and then gives the solution back. Instead, it tries to provide the user with a set of ``building blocks'' that can be used to implement general-purpose or specific-purpose OCP solvers efficiently with a modest programming effort.
 
 \section{Help and support} \label{sec:support}
 If you find simple bugs or lack some feature that you think would be relatively easy for us to add, the simplest thing is simply to write to the forum, located at \htmladdnormallink{forum.casadi.org}{http://forum.casadi.org/}. We read the forum post regularly and try to respond as soon as possible. The only thing we expect for this kind of support is that you cite us, cf. Section~\ref{sec:citing}, whenever you use \CasADi in scientific work.
@@ -164,10 +164,10 @@ If you use \CasADi in published scientific work, please cite the following:
 \section{Reading this document}
 The goal of this document is to make the reader familiar with the syntax of \CasADi and provide easily available building blocks to build numerical optimization and dynamic optimization software. Our explanation is mostly program code driven and provides little mathematical background knowledge. We assume that the reader already has a fair knowledge of either Python or C++, theory of differential equations and optimization theory. 
 
-We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, even if the intention is to use another language later. We try to point out the instances where the C++ or Octave syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
+We will mainly use Python syntax in the discussion, which is the language we recommend using for getting familiar with \CasADi, even if the intention is to use another language later. We try to point out the instances where the C++ syntax diverges from the Python syntax. To facilitate switching between the programming languages, we also list the major differences in Chapter~\ref{ch:syntax_differences}.
 
 \chapter{Obtaining and installing \CasADi}
-\CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its alternative front-ends, to Python and Octave, are full-featured and auto-generated via the SWIG tool and can be used with little to no loss of efficiency. \CasADi has been compiled and used successfully on Linux, OS X and Windows.
+\CasADi is an open-source tool, available under LGPL license, which is a permissive license that allows the tool to be used royalty-free also in commercial closed-source applications. The source code is hosted on Github and has a core written in self-contained C++ code, relying on nothing but the C++ Standard Library. Its front-end to Python is full-featured and auto-generated using \htmladdnormallink{SWIG}{http://www.swig.org/} and can be used with little to no loss of efficiency. \CasADi has been compiled and used successfully on Linux, OS X and Windows.
 
 For up-to-date installation instructions, we refer to the \CasADi's website, \htmladdnormallink{casadi.org}{http://casadi.org/}.
 
@@ -175,7 +175,7 @@ For up-to-date installation instructions, we refer to the \CasADi's website, \ht
 At the core of \CasADi, is a self-contained symbolic framework that allows the user to construct symbolic expressions using a MATLAB inspired everything-is-a-matrix data type, i.e. vectors are treated as n-by-1 matrices and scalars as 1-by-1 matrices. All matrices are \emph{sparse} and use a general sparse format -- \emph{compressed column storage} (CCS) -- to store matrices\footnote{Before v1.9.0, \emph{compressed row storage} (CRS) was used.}. In the following, we introduce the most fundamental classes of this framework.
 
 \section{The \texttt{SX} symbolics}
-The \texttt{SX} data type is used to represent matrices whose elements consist of symbolic expressions made up by a sequence of unary and binary operations. To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import \CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "symbolic/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the \CasADi module is imported by the command ``\texttt{casadi;}''}
+The \texttt{SX} data type is used to represent matrices whose elements consist of symbolic expressions made up by a sequence of unary and binary operations. To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import \CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "casadi/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{casadi}.}
 
 \pytexStart{empty}
 
@@ -433,11 +433,11 @@ print SX.sym("x",Sparsity.tril(3))
 \CasADi offers a variety of different ways to get or set specific elements or blocks of elements in matrix types. There are two different categories for this:
 
 \begin{description}
-\item[Element access and assignment] Access or set elements of a matrix -- which may well be structural zeros --  by their (row, col) pairs. This is done with the syntax \verb|A = B[i,j]|, \verb|A[i,j] = B| in Python, and \verb|A = B(i,j)|, \verb|A(i,j) = B| in C++ and Octave.
-\item[Nonzero access and assignment] Access or set a particular nonzero of the (sparse) matrices. Entries are ordered by columns using the compressed column storage format, cf. Section~\ref{sec:sparsity_class}. The syntax for this is \verb|A = B.el[k]|, \verb|A.el[k] = B| in Python, \verb|A = B[k]|, \verb|A[k] = B| in C++ and \verb|A = B{k}|, \verb|A{k} = B| in Octave.
+\item[Element access and assignment] Access or set elements of a matrix -- which may well be structural zeros --  by their (row, col) pairs. This is done with the syntax \verb|A = B[i,j]|, \verb|A[i,j] = B| in Python, and \verb|A = B(i,j)|, \verb|A(i,j) = B| in C++ and MATLAB.
+\item[Nonzero access and assignment] Access or set a particular nonzero of the (sparse) matrices. Entries are ordered by columns using the compressed column storage format, cf. Section~\ref{sec:sparsity_class}. The syntax for this is \verb|A = B.el[k]|, \verb|A.el[k] = B| in Python, \verb|A = B[k]|, \verb|A[k] = B| in C++ and \verb|A = B{k}|, \verb|A{k} = B| in MATLAB.
 \end{description}
 
-In Python and C++, indexing starts from zero, while in Octave indexing starts from one. In Python, negative indices to specify an index counted from the end of a list.
+In Python and C++, indexing starts from zero, while in MATLAB indexing starts from one. In Python, negative indices to specify an index counted from the end of a list.
 
 The discussion in the following applies to all matrix types: \texttt{SX}, \texttt{MX}, \texttt{DMatrix}.
 
@@ -505,12 +505,12 @@ print M.nz[-2]
 \begin{pytex}
 print M[:,1]
 \end{pytex}
-which is equivalent to \verb|M(:,2)| in Octave and \verb|M(Slice(),1)| in C++.
+which is equivalent to \verb|M(:,2)| in MATLAB and \verb|M(Slice(),1)| in C++.
 
 \begin{pytex}
 print M[1:,1:4:2]
 \end{pytex}
-which is equivalent to \verb|M(1:end,2:2:5)| in Octave and \verb|M(Slice(1,-1),Slice(1,4,2))| in C++.
+which is equivalent to \verb|M(1:end,2:2:5)| in MATLAB and \verb|M(Slice(1,-1),Slice(1,4,2))| in C++.
 
 \paragraph{List access} are similar to (but not as efficient as) slice access:
 \begin{pytex}
@@ -851,7 +851,7 @@ The last line is essentially equivalent to \verb|nlp = SXFunction([x,p],[f,g])|,
 \end{itemize}
 
 \section{Calling function objects}
-\texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. To embed a call to function (e.g. \texttt{SXFunction} or \texttt{CVodesIntegrator}, see Chapter~\ref{ch:integrators}), you use the syntax:
+\texttt{MX} expressions may contain calls to \texttt{Function}-derived functions. To embed a call to function (e.g. \texttt{SXFunction} or \texttt{Integrator}, see Chapter~\ref{ch:integrators}), you use the syntax:
 \begin{verbatim}
 [y1,y2,...,yn] = f([x1,x2,...,xn])
 \end{verbatim}
@@ -997,7 +997,12 @@ print dae
 %This particular problem is actually troublesome. During integration, the rootfinding problem $C(z) = 0$ will be solved, and the initial guess is $z=0$. Since $\frac{dC}{dz}(z=0)=0$, the rootfinding will fail. You cannot force a different initial guess directly, but you can transform the $z$ variable:
 %$z \rightarrow z + 1$ -- $C=z^2+2z-1$, which will work fine.
 
-An integrator in \CasADi is a function that take the state at the initial time, a set of parameters, the state vector at the initial time and a guess for the algebraic variables (only for DAEs) and returns the state vector and algebraic variables at the final time. The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
+An integrator in \CasADi is a function that take the state at the initial time, a set of parameters, the state vector at the initial time and a guess for the algebraic variables (only for DAEs) and returns the state vector and algebraic variables at the final time. 
+\begin{verbatim}
+integrator = Integrator("solver_name",dae)
+\end{verbatim}
+
+The time horizon is assumed to be fixed\footnote{for problems with free end time, you can always scale time by introducing an extra parameter and substitute $t$ for a dimensionless time variable that goes from 0 to 1} and can be set with the option:
 \begin{verbatim}
  integrator.setOption("tf",integration_end_time)
 \end{verbatim}
@@ -1005,13 +1010,14 @@ An integrator in \CasADi is a function that take the state at the initial time, 
 \section{Sundials integrators}
 The Sundials suite contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These two integrators supports forward and adjoint sensitivities and when used via \CasADi's Sundials interface, \CasADi will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations. This means that the only information that the user needs to provide is the DAE residual function:
 \begin{verbatim}
- integrator = CVodesIntegrator(f)   or  integrator = IdasIntegrator(f)
+ integrator = Integrator("cvodes",dae)  # For ODEs
+ integrator = Integrator("idas",dae)    # For DAEs
 \end{verbatim}
 for CVodes and IDAS respectively.
 
 For a list of options for the integrators, as well as the input and output schemes of this \emph{function}, check the documentation directly from Python:
 \begin{verbatim}
- CVodesIntegrator?
+print Integrator.doc("cvodes")
 \end{verbatim}
 or by consulting the online C++ API docs on the website.
 
@@ -1063,7 +1069,7 @@ g_{\min} \le g(x,p) \le g_{\max}
 
 With a function \texttt{nlp}, which given $x$ and $p$, gives $f$ and $g$, an NLP solver instance can be allocated by:
 \begin{verbatim}
- nlp_solver = IpoptSolver(nlp)
+ nlp_solver = NlpSolver("solver_name",nlp)
 \end{verbatim}
 
 The interface will then automatically generate the information that it might need to solve the NLP, which may be solver and option dependent. Typically an NLP solver will need a function that gives the Jacobian of the constraint function and a Hessian of the Lagrangian function ($L(x,\lambda) = f(x) + \lambda^{\text{T}} \, g(x))$ with respect to $x$. The interface will generate this kind of information automatically and provide to the solver.
@@ -1071,10 +1077,10 @@ The interface will then automatically generate the information that it might nee
 NLP solvers, like ODE/DAE integrators are functions in \CasADi (though taking derivatives of them is currently not supported). You will find the input and output schemes in the \CasADi API documentation on the website or by using the question mark in Python.
 
 \chapter{Optimal control with \CasADi}
-\CasADi can be used to solve \emph{optimal control problems} (OCP) using a variety of methods, including direct (a.k.a. \emph{discretize-then-optimize}) and indirect (a.k.a. \emph{optimize-then-discretize}) methods, all-at-once (e.g. collocation) methods and shooting-methods requiring embedded solvers of initial value problems in ODE or DAE. As a user, you are in general expected to \emph{write your own OCP solver} and \CasADi aims as making this as easy as possible by providing powerful high-level building blocks. Since you are writing the solver yourself (rather than calling an existing ``black-box'' solver), a basic understanding of how to solve OCPs is indispensable. Good, self-contained introductions to numerical optimal can be found in the recent textbooks by Biegler\footnote{Lorenz T. Biegler, \emph{\htmladdnormallink{Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes}{http://books.google.es/books/about/Nonlinear_Programming.html?id=VdB1wJQu0sgC&redir_esc=y}}, SIAM 2010} or Betts\footnote{John T. Betts, \emph{\htmladdnormallink{Practical Methods for Optimal Control Using Nonlinear Programming}{http://books.google.es/books/about/Practical_Methods_for_Optimal_Control_Us.html?id=Yn53JcYAeaoC&redir_esc=y}}, SIAM 2001} or Moritz Diehl's lecture notes on \htmladdnormallink{numerical optimal control}{http://homes.esat.kuleuven.be/~mdiehl/NUMOPT/numopt.pdf}.
+\CasADi can be used to solve \emph{optimal control problems} (OCP) using a variety of methods, including direct (a.k.a. \emph{discretize-then-optimize}) and indirect (a.k.a. \emph{optimize-then-discretize}) methods, all-at-once (e.g. collocation) methods and shooting-methods requiring embedded solvers of initial value problems in ODE or DAE. As a user, you are in general expected to \emph{write your own OCP solver} and \CasADi aims as making this as easy as possible by providing powerful high-level building blocks. Since you are writing the solver yourself (rather than calling an existing ``black-box'' solver), a basic understanding of how to solve OCPs is indispensable. Good, self-contained introductions to numerical optimal control can be found in the recent textbooks by Biegler\footnote{Lorenz T. Biegler, \emph{\htmladdnormallink{Nonlinear Programming: Concepts, Algorithms, and Applications to Chemical Processes}{http://books.google.es/books/about/Nonlinear_Programming.html?id=VdB1wJQu0sgC&redir_esc=y}}, SIAM 2010} or Betts\footnote{John T. Betts, \emph{\htmladdnormallink{Practical Methods for Optimal Control Using Nonlinear Programming}{http://books.google.es/books/about/Practical_Methods_for_Optimal_Control_Us.html?id=Yn53JcYAeaoC&redir_esc=y}}, SIAM 2001} or Moritz Diehl's lecture notes on \htmladdnormallink{numerical optimal control}{http://homes.esat.kuleuven.be/~mdiehl/NUMOPT/numopt.pdf}.
 
 \section{Optimization of a Van der Pol oscillator}
-In \CasADi's examples collection\footnote{You can obtain this collection as an archive named \texttt{examples\_pack.zip} in \CasADi's \htmladdnormallink{download area}{http://files.casadi.org}}, you find codes for solving simple optimal control problem\footnote{The OCP was taken from \texttt{JModelica.org}} using a variety of different methods. The problem is driving a \emph{Van der Pol} oscillator to the origin, while trying to minimize a quadratic cost:
+In \CasADi's examples collection\footnote{You can obtain this collection as an archive named \texttt{examples\_pack.zip} in \CasADi's \htmladdnormallink{download area}{http://files.casadi.org}}, you find codes for solving simple optimal control problem using a variety of different methods. The problem is driving a \emph{Van der Pol} oscillator to the origin, while trying to minimize a quadratic cost:
 \begin{equation}
 \begin{array}{lc}
 \begin{array}{l}
@@ -1248,17 +1254,16 @@ Other useful commands available for an instance \texttt{ocp} of \texttt{Symbolic
 
 For a more detailed description of this class and its functionalities, we refer to the API documentation. We also recommend potential users to have a look at the {\texttt{modelica\_ms.py}} tutorial example.
 
-\chapter{Syntax differences between \CasADi in Python, C++ and Octave} \label{ch:syntax_differences}
+\chapter{Syntax differences between \CasADi in Python, C++ and MATLAB (in development)} \label{ch:syntax_differences}
 \scriptsize
 \begin{center}
   \begin{tabular}{| p{3.5cm} | p{3.5cm} | p{3.5cm} | p{3.5cm} | }
     \hline
-      & Python & C++ & Octave \\ \hline
-    Starting \CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace casadi;| & \verb|casadi| \\ \hline
+      & Python & C++ & MATLAB (in development) \\ \hline
+    Starting \CasADi & \verb|from casadi import *| & \verb|#include \| \verb|"casadi/casadi.hpp"| \verb|using namespace casadi;| & \verb|import casadi.*| \\ \hline
     Printing the \emph{representation} (string representation intended to be \emph{unambiguous}) & \verb|A <ENTER>| (interactive), \verb|print repr(A)| (in scripts) & \verb|std::cout << A;|& \verb|A <ENTER>| or \verb|disp A|\\ \hline
     Printing the \emph{description} (string representation intended to be \emph{readable}) & \verb|print A| & \verb|A.print();| or \verb|A.print(stream);|& \verb|A.print()| \\ \hline
     Calling a class function & \verb|SX.zeros(3,4)| & \verb|SX::zeros(3,4)| & \verb|SX.zeros(3,4)|\\ \hline
-    Reference to a class (e.g. passed to a function as an option) & \verb|ClassName| or \verb|ClassName.creator| & \verb|ClassName::creator| & \verb|ClassName.creator|\\ \hline
     Element access & \verb|A[i,j]|, \emph{0-based} & \verb|A(i,j)| and \verb|A(i)|, \emph{0-based} & \verb|A(i,j)|, \emph{1-based} \\ \hline
     Element assignment & \verb|A[i,j] = b|, \emph{0-based} & \verb|A(i,j) = b| and \verb|A(i) = b|, \linebreak \emph{0-based} & \verb|A(i,j) = b|, \emph{1-based} \\ \hline
     Nonzero access & \verb|A.el[k]|, \emph{0-based} & \verb|A[k]|, \emph{0-based} & \verb|A{k}|, \emph{1-based} \\ \hline
