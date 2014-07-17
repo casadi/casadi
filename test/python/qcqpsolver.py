@@ -29,7 +29,7 @@ from helpers import *
 qcqpsolvers = []
 try:
   SDPSolver.loadPlugin("dsdp")
-  qcqpsolvers.append((SOCPQcqpSolver,{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
+  qcqpsolvers.append(("socp",{"socp_solver": "sdp", "socp_solver_options": {"sdp_solver": "dsdp"} },False))
 except:
   pass
 
@@ -47,7 +47,7 @@ class QcqpSolverTests(casadiTestCase):
     UBX = DMatrix([ inf, -inf ])
     
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
-      solver = qcqpsolver(qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
       solver.setOption(qcqp_options)
       solver.init()
 
@@ -80,7 +80,7 @@ class QcqpSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = qcqpsolver(qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
       solver.setOption(qcqp_options)
       solver.init()
 
@@ -95,7 +95,7 @@ class QcqpSolverTests(casadiTestCase):
 
       solver.evaluate()
       
-      socp = solver.getSolver()
+      #socp = solver.getSolver()
         
       self.checkarray(solver.getOutput(),DMatrix([-(sqrt(73)+3)/3,-(sqrt(73)+9)/12]),str(qcqpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=5)
@@ -120,7 +120,7 @@ class QcqpSolverTests(casadiTestCase):
     for qcqpsolver, qcqp_options, re_init in qcqpsolvers:
       self.message("qcqpsolver: " + str(qcqpsolver))
 
-      solver = qcqpsolver(qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
+      solver = QcqpSolver(qcqpsolver,qcqpStruct(a=A.sparsity(),p=P.sparsity(),h=H.sparsity()))
       solver.setOption(qcqp_options)
       solver.init()
 
@@ -135,7 +135,7 @@ class QcqpSolverTests(casadiTestCase):
 
       solver.evaluate()
       
-      socp = solver.getSolver()
+      #socp = solver.getSolver()
         
       self.checkarray(solver.getOutput(),DMatrix([-2,-1]),str(qcqpsolver),digits=5)
       self.checkarray(solver.getOutput("lam_x"),DMatrix([0,0]),str(qcqpsolver),digits=5)
