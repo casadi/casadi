@@ -126,3 +126,5 @@ foreach(name ${CASADI_MODULES})
     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig
   )
 endforeach()
+
+install(FILES casadi.hpp DESTINATION include/casadi)
