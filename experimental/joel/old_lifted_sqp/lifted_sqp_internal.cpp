@@ -337,7 +337,7 @@ void LiftedSQPInternal::init(){
   DMatrix &lam_g_k = output(NLP_SOLVER_LAM_G);
 
   // Allocate a QP solver
-  QPSolverCreator qp_solver_creator = getOption("qp_solver");
+  QpSolverCreator qp_solver_creator = getOption("qp_solver");
   qp_solver_ = qp_solver_creator(B1.sparsity(),B2.sparsity());
   
   // Set options if provided

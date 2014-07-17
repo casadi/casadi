@@ -30,7 +30,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_QPSOLVER_QCQP_EXPORT
-  casadi_register_qpsolver_qcqp(QPSolverInternal::Plugin* plugin) {
+  casadi_register_qpsolver_qcqp(QpSolverInternal::Plugin* plugin) {
     plugin->creator = QCQPQPInternal::creator;
     plugin->name = "qcqp";
     plugin->doc = "QCQP docs not available";
@@ -40,7 +40,7 @@ namespace casadi {
 
   extern "C"
   void CASADI_QPSOLVER_QCQP_EXPORT casadi_load_qpsolver_qcqp() {
-    QPSolverInternal::registerPlugin(casadi_register_qpsolver_qcqp);
+    QpSolverInternal::registerPlugin(casadi_register_qpsolver_qcqp);
   }
 
   QCQPQPInternal* QCQPQPInternal::clone() const {
@@ -51,7 +51,7 @@ namespace casadi {
     return node;
   }
 
-  QCQPQPInternal::QCQPQPInternal(const std::vector<Sparsity> &st) : QPSolverInternal(st) {
+  QCQPQPInternal::QCQPQPInternal(const std::vector<Sparsity> &st) : QpSolverInternal(st) {
 
     addOption("qcqp_solver",       OT_STRING, GenericType(),
               "The QcqpSolver used to solve the QPs.");
@@ -91,7 +91,7 @@ namespace casadi {
 
   void QCQPQPInternal::init() {
 
-    QPSolverInternal::init();
+    QpSolverInternal::init();
 
     // Create an qcqpsolver instance
     std::string qcqpsolver_name = getOption("qcqp_solver");

@@ -34,10 +34,10 @@ gauss_newton = False
 
 # QP-solver
 if False:
-  QPSolverClass = OOQPSolver
+  QpSolverClass = OOQpSolver
   qp_solver_options = {}
 else:
-  QPSolverClass = QPOasesSolver
+  QpSolverClass = QPOasesSolver
   qp_solver_options = {"printLevel" : "none"}
 
 # Initial condition
@@ -294,7 +294,7 @@ for (i,x0) in enumerate([0.08]):
 
     if k==0:
       # Allocate a QP solver
-      qp_solver = QPSolverClass(H.sparsity(),A.sparsity())
+      qp_solver = QpSolverClass(H.sparsity(),A.sparsity())
       qp_solver.setOption(qp_solver_options)
       qp_solver.init()
 

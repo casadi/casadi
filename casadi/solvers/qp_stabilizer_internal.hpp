@@ -37,7 +37,7 @@ namespace casadi {
       \date 2013
   */
   class CASADI_STABILIZEDQPSOLVER_QP_EXPORT QPStabilizerInternal
-    : public StabilizedQPSolverInternal {
+    : public StabilizedQpSolverInternal {
     friend class QPStabilizer;
   public:
 
@@ -51,7 +51,7 @@ namespace casadi {
     virtual QPStabilizerInternal* clone() const { return new QPStabilizerInternal(*this);}
 
     /** \brief  Create a new Stabilized QP Solver */
-    static StabilizedQPSolverInternal* creator(const QPStructure& st)
+    static StabilizedQpSolverInternal* creator(const QPStructure& st)
     { return new QPStabilizerInternal(st);}
 
     /** \brief  Deep copy data members */
@@ -67,7 +67,7 @@ namespace casadi {
     virtual void generateNativeCode(std::ostream &file) const;
 
     /// Data members
-    QPSolver qp_solver_;
+    QpSolver qp_solver_;
   };
 
 } // namespace casadi

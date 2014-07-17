@@ -28,7 +28,7 @@ from helpers import *
 
 lpsolvers = []
 try:
-  QPSolver.loadPlugin("ooqp")
+  QpSolver.loadPlugin("ooqp")
   lpsolvers.append(("qp",{"qp_solver": "ooqp" },False))
 except:
   pass
@@ -41,7 +41,7 @@ except:
 
 
 # try:  
-#   QPSolver.loadPlugin("dsdp")
+#   QpSolver.loadPlugin("dsdp")
 #   def SDPLpSolver(st):
 #     return DSdpSolver(sdpStruct(a=st["a"],f=Sparsity.sparse(0,0),g=Sparsity.sparse(0,0)))
 #   lpsolvers.append((SDPLpSolver,{},False))

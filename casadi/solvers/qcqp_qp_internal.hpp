@@ -32,12 +32,12 @@ namespace casadi {
 
   /** \brief Use a QCQP solver to solve q QP
 
-      @copydoc QPSolver_doc
+      @copydoc QpSolver_doc
 
       \author Joris Gillis
       \date 2013
   */
-  class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QPSolverInternal {
+  class CASADI_QPSOLVER_QCQP_EXPORT QCQPQPInternal : public QpSolverInternal {
   public:
 
     /** \brief  Create a new Solver */
@@ -50,7 +50,7 @@ namespace casadi {
     virtual QCQPQPInternal* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static QPSolverInternal* creator(const QPStructure& st)
+    static QpSolverInternal* creator(const QPStructure& st)
     { return new QCQPQPInternal(st);}
 
     /** \brief  Initialize */

@@ -25,41 +25,41 @@
 using namespace std;
 namespace casadi {
 
-  StabilizedQPSolver::StabilizedQPSolver() {
+  StabilizedQpSolver::StabilizedQpSolver() {
   }
 
-  StabilizedQPSolverInternal* StabilizedQPSolver::operator->() {
-    return static_cast<StabilizedQPSolverInternal*>(Function::operator->());
+  StabilizedQpSolverInternal* StabilizedQpSolver::operator->() {
+    return static_cast<StabilizedQpSolverInternal*>(Function::operator->());
   }
 
-  const StabilizedQPSolverInternal* StabilizedQPSolver::operator->() const {
-    return static_cast<const StabilizedQPSolverInternal*>(Function::operator->());
+  const StabilizedQpSolverInternal* StabilizedQpSolver::operator->() const {
+    return static_cast<const StabilizedQpSolverInternal*>(Function::operator->());
   }
 
-  bool StabilizedQPSolver::checkNode() const {
-    return dynamic_cast<const StabilizedQPSolverInternal*>(get())!=0;
+  bool StabilizedQpSolver::checkNode() const {
+    return dynamic_cast<const StabilizedQpSolverInternal*>(get())!=0;
   }
 
-  void StabilizedQPSolver::setLPOptions() {
+  void StabilizedQpSolver::setLPOptions() {
     (*this)->setLPOptions();
   }
 
-  void StabilizedQPSolver::generateNativeCode(const std::string &filename) const {
+  void StabilizedQpSolver::generateNativeCode(const std::string &filename) const {
     std::ofstream file;
     file.open(filename.c_str());
     (*this)->generateNativeCode(file);
   }
 
-  StabilizedQPSolver::StabilizedQPSolver(const std::string& name, const QPStructure& st) {
-    assignNode(StabilizedQPSolverInternal::getPlugin(name).creator(st));
+  StabilizedQpSolver::StabilizedQpSolver(const std::string& name, const QPStructure& st) {
+    assignNode(StabilizedQpSolverInternal::getPlugin(name).creator(st));
   }
 
-  void StabilizedQPSolver::loadPlugin(const std::string& name) {
-    StabilizedQPSolverInternal::loadPlugin(name);
+  void StabilizedQpSolver::loadPlugin(const std::string& name) {
+    StabilizedQpSolverInternal::loadPlugin(name);
   }
 
-  std::string StabilizedQPSolver::doc(const std::string& name) {
-    return StabilizedQPSolverInternal::getPlugin(name).doc;
+  std::string StabilizedQpSolver::doc(const std::string& name) {
+    return StabilizedQpSolverInternal::getPlugin(name).doc;
   }
 
 } // namespace casadi

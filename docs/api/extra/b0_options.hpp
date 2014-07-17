@@ -331,7 +331,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::StabilizedQPSolverInternal
+/** \class casadi::StabilizedQpSolverInternal
 \n
 \par
 <a name='options'></a><table>
@@ -349,7 +349,7 @@
 </table>
 */
 /// \endcond
-/** \class casadi::StabilizedQPSolver
+/** \class casadi::StabilizedQpSolver
 \n
 \par
 <a name='options'></a><table>
@@ -1195,7 +1195,7 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::QPSolverInternal
+/** \class casadi::QpSolverInternal
 \n
 \par
 <a name='options'></a><table>
@@ -1213,7 +1213,7 @@
 </table>
 */
 /// \endcond
-/** \class casadi::QPSolver
+/** \class casadi::QpSolver
 \n
 \par
 <a name='options'></a><table>

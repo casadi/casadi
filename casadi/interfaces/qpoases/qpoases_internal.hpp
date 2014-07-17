@@ -36,7 +36,7 @@ namespace casadi {
    * \date 2011
    *
    * */
-class CASADI_QPSOLVER_QPOASES_EXPORT QPOasesInternal : public QPSolverInternal {
+class CASADI_QPSOLVER_QPOASES_EXPORT QPOasesInternal : public QpSolverInternal {
   friend class QPOasesSolver;
 public:
   /** \brief  Constructor */
@@ -46,7 +46,7 @@ public:
   virtual QPOasesInternal* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static QPSolverInternal* creator(const QPStructure& st)
+  static QpSolverInternal* creator(const QPStructure& st)
   { return new QPOasesInternal(st);}
 
   /** \brief  Create a new Solver */

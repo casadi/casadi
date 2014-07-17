@@ -31,12 +31,12 @@ namespace casadi {
 
   /**  \brief Interface to the SQIC solver for quadratic programming
 
-       @copydoc QPSolver_doc
+       @copydoc QpSolver_doc
        \author Joris Gillis
        \date 2013
 
   */
-  class CASADI_QPSOLVER_SQIC_EXPORT SQICInternal : public QPSolverInternal {
+  class CASADI_QPSOLVER_SQIC_EXPORT SQICInternal : public QpSolverInternal {
   public:
     /** \brief  Constructor */
     explicit SQICInternal();
@@ -45,7 +45,7 @@ namespace casadi {
     virtual SQICInternal* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static QPSolverInternal* creator(const QPStructure& st)
+    static QpSolverInternal* creator(const QPStructure& st)
     { return new SQICInternal(st);}
 
     /** \brief  Create a new Solver */

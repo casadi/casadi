@@ -52,7 +52,7 @@ namespace casadi {
     virtual void evaluate();
 
     /// Stabilized QP solver for the subproblems
-    StabilizedQPSolver stabilized_qp_solver_;
+    StabilizedQpSolver stabilized_qp_solver_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -106,8 +106,8 @@ namespace casadi {
     double rhoap_, rhoap_mu_;
     int TRsuccess_;
 
-    /// Access StabilizedQPSolver
-    const StabilizedQPSolver getStabilizedQPSolver() const { return stabilized_qp_solver_;}
+    /// Access StabilizedQpSolver
+    const StabilizedQpSolver getStabilizedQpSolver() const { return stabilized_qp_solver_;}
 
     /// Lagrange multipliers of the NLP
     std::vector<double> mu_, mu_x_, mu_e_, pi_, pi2_;

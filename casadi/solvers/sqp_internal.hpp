@@ -46,7 +46,7 @@ namespace casadi {
     virtual void evaluate();
 
     /// QP solver for the subproblems
-    QPSolver qp_solver_;
+    QpSolver qp_solver_;
 
     /// Exact Hessian?
     bool exact_hessian_;
@@ -76,8 +76,8 @@ namespace casadi {
     /// Hessian regularization
     double reg_;
 
-    /// Access QPSolver
-    const QPSolver getQPSolver() const { return qp_solver_;}
+    /// Access QpSolver
+    const QpSolver getQpSolver() const { return qp_solver_;}
 
     /// Lagrange multipliers of the NLP
     std::vector<double> mu_, mu_x_;

@@ -51557,7 +51557,7 @@ C++ includes: casadi_types.hpp ";
 ";
 
 
-// File: classcasadi_1_1QPSolver.xml
+// File: classcasadi_1_1QpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -51682,7 +51682,7 @@ get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring")  casadi::QPSolver::checkNode() const  "
+%feature("docstring")  casadi::QpSolver::checkNode() const  "
 
 Check if the node is pointing to the right type of object.
 
@@ -51940,9 +51940,9 @@ Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::QPSolver "
+%feature("docstring") casadi::QpSolver "
 
-QPSolver.
+QpSolver.
 
 Solves the following strictly convex problem:
 
@@ -51955,7 +51955,7 @@ If H is not positive-definite, the solver should throw an error.
 
 Joel Andersson
 
->Input scheme: casadi::QPSolverInput (QP_SOLVER_NUM_IN = 10) [qpIn]
+>Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 10) [qpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -51987,7 +51987,7 @@ Joel Andersson
 | QP_SOLVER_LAM_X0       | lam_x0                 | dense                  |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QPSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
+>Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -52153,7 +52153,7 @@ Get input scheme.
 
 ";
 
-%feature("docstring")  casadi::QPSolver::setLPOptions() "
+%feature("docstring")  casadi::QpSolver::setLPOptions() "
 
 Set options that make the QP solver more suitable for solving LPs.
 
@@ -52885,13 +52885,13 @@ input/output scheme.
 
 ";
 
-%feature("docstring") casadi::QPSolver::QPSolver() "
+%feature("docstring") casadi::QpSolver::QpSolver() "
 
 Default constructor.
 
 ";
 
-%feature("docstring") casadi::QPSolver::QPSolver(const std::string &name,
+%feature("docstring") casadi::QpSolver::QpSolver(const std::string &name,
 const QPStructure &st) "
 
 Constructor.
@@ -52975,14 +52975,14 @@ pointer to the node.
 
 ";
 
-%feature("docstring")  casadi::QPSolver::generateNativeCode(const
+%feature("docstring")  casadi::QpSolver::generateNativeCode(const
 std::string &filename) const  "
 
 Generate native code in the interfaced language for debugging
 
 ";
 
-%feature("docstring")  casadi::QPSolver::generateNativeCode(std::ostream
+%feature("docstring")  casadi::QpSolver::generateNativeCode(std::ostream
 &file) const  "
 
 Generate native code in the interfaced language for debugging
@@ -52990,9 +52990,9 @@ Generate native code in the interfaced language for debugging
 ";
 
 
-// File: classcasadi_1_1QPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::QPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'QPSolverInput'
+// File: classcasadi_1_1QpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::QpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'QpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -53004,19 +53004,19 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring") casadi::QPSolverInputIOSchemeVector< M
->::QPSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::QpSolverInputIOSchemeVector< M
+>::QpSolverInputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
 [INTERNAL]  Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::QPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::PrintableObject::getDescription() const  "
 [INTERNAL]  Return a string with a description (for SWIG)
@@ -53029,12 +53029,12 @@ C++ includes: schemes_helpers.hpp ";
 ";
 
 
-// File: classcasadi_1_1QPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+// File: classcasadi_1_1QpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::print(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a description of the object.
@@ -53056,11 +53056,11 @@ C++ includes: schemes_helpers.hpp ";
 
 ";
 
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector< M
->::QPSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector< M
+>::QpSolverOutputIOSchemeVector(const std::vector< M > &t) " [INTERNAL] ";
 
-%feature("docstring") casadi::QPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'QPSolverOutput'
+%feature("docstring") casadi::QpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'QpSolverOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
@@ -66490,7 +66490,7 @@ Get function reference.
 ";
 
 
-// File: classcasadi_1_1StabilizedQPSolver.xml
+// File: classcasadi_1_1StabilizedQpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -66498,9 +66498,9 @@ Get function reference.
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::StabilizedQPSolver "
+casadi::StabilizedQpSolver "
 
-StabilizedQPSolver.
+StabilizedQpSolver.
 
 Solves the following strictly convex problem:
 
@@ -66512,7 +66512,7 @@ If H is not positive-definite, the solver should throw an error.
 
 Joel Andersson
 
->Input scheme: casadi::StabilizedQPSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]
+>Input scheme: casadi::StabilizedQpSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -66559,7 +66559,7 @@ Joel Andersson
 | U                      |                        |                        |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::QPSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
+>Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -66673,7 +66673,7 @@ Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring")  casadi::StabilizedQPSolver::checkNode() const  "
+%feature("docstring")  casadi::StabilizedQpSolver::checkNode() const  "
 
 Check if the node is pointing to the right type of object.
 
@@ -67515,7 +67515,7 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring")  casadi::StabilizedQPSolver::generateNativeCode(const
+%feature("docstring")  casadi::StabilizedQpSolver::generateNativeCode(const
 std::string &filename) const  "
 
 Generate native code in the interfaced language for debugging
@@ -67609,13 +67609,13 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::StabilizedQPSolver::StabilizedQPSolver() "
+%feature("docstring") casadi::StabilizedQpSolver::StabilizedQpSolver() "
 
 Default constructor.
 
 ";
 
-%feature("docstring") casadi::StabilizedQPSolver::StabilizedQPSolver(const
+%feature("docstring") casadi::StabilizedQpSolver::StabilizedQpSolver(const
 std::string &name, const QPStructure &st) "
 
 Constructor.
@@ -67821,7 +67821,7 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring")  casadi::StabilizedQPSolver::setLPOptions() "
+%feature("docstring")  casadi::StabilizedQpSolver::setLPOptions() "
 
 Set options that make the QP solver more suitable for solving LPs.
 
@@ -67931,7 +67931,7 @@ class
 ";
 
 
-// File: classcasadi_1_1StabilizedQPSolverInputIOSchemeVector.xml
+// File: classcasadi_1_1StabilizedQpSolverInputIOSchemeVector.xml
 %feature("docstring")  casadi::PrintableObject::getRepresentation() const  "
 [INTERNAL]  Return a string with a representation (for SWIG)
 
@@ -67945,26 +67945,26 @@ class
 %feature("docstring")  casadi::IOSchemeVector< M  >::vector() const "
 [INTERNAL] ";
 
-%feature("docstring") casadi::StabilizedQPSolverInputIOSchemeVector "[INTERNAL]  Helper function for 'StabilizedQPSolverInput'
+%feature("docstring") casadi::StabilizedQpSolverInputIOSchemeVector "[INTERNAL]  Helper function for 'StabilizedQpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")
-casadi::StabilizedQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+casadi::StabilizedQpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")
-casadi::StabilizedQPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+casadi::StabilizedQpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
 %feature("docstring")  casadi::IOSchemeVector< M  >::repr(std::ostream
 &stream=std::cout) const " [INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::StabilizedQPSolverInputIOSchemeVector< M
->::StabilizedQPSolverInputIOSchemeVector(const std::vector< M > &t) "
+%feature("docstring") casadi::StabilizedQpSolverInputIOSchemeVector< M
+>::StabilizedQpSolverInputIOSchemeVector(const std::vector< M > &t) "
 [INTERNAL] ";
 
-%feature("docstring") casadi::StabilizedQPSolverInputIOSchemeVector::__len__
+%feature("docstring") casadi::StabilizedQpSolverInputIOSchemeVector::__len__
 "[INTERNAL] ";
 
 %feature("docstring")  casadi::PrintableObject::getDescription() const  "
@@ -75896,7 +75896,7 @@ const M &arg_m3=M()) "
 
 Output arguments of an QP Solver
 
->Output scheme: casadi::QPSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
+>Output scheme: casadi::QpSolverOutput (QP_SOLVER_NUM_OUT = 5) [qpOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -76266,7 +76266,7 @@ Example usage:>>   x
 ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_sqic(QPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_qpsolver_sqic(QpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::str(const PrintableObject &obj) " ";
 
@@ -76312,7 +76312,7 @@ std::string &arg_s0="", const std::string &arg_s1="", const std::string
 &arg_s2="", const std::string &arg_s3="") " ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_cplex(QPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_qpsolver_cplex(QpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::isIncreasing(const std::vector< T > &v) "
@@ -76631,7 +76631,7 @@ CasADi additions.
 ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_nlp(QPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_qpsolver_nlp(QpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::profileWriteEntry(std::ofstream &f, T *a) "
 [INTERNAL] ";
@@ -76759,7 +76759,7 @@ Get the sparsity pattern of a matrix.
 ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_ooqp(QPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_qpsolver_ooqp(QpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")  casadi::acos(const T &x) " [INTERNAL]  Pre-C99
 elementary functions from the 'math.h' ('cmath') header.
@@ -76969,7 +76969,7 @@ std::string &arg_s2="", const std::string &arg_s3="", const std::string
 [INTERNAL] ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_qpoases(QPSolverInternal::Plugin *plugin) "
+casadi::casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin *plugin) "
 ";
 
 %feature("docstring")  casadi::toVector(const T &v0) " [INTERNAL] ";
@@ -77385,7 +77385,7 @@ const std::string &arg_s5="", const M &arg_m5=M(), const std::string
 
 Input arguments of a QP problem
 
->Input scheme: casadi::QPSolverInput (QP_SOLVER_NUM_IN = 10) [qpIn]
+>Input scheme: casadi::QpSolverInput (QP_SOLVER_NUM_IN = 10) [qpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -77466,7 +77466,7 @@ const std::string &arg_s9="", const M &arg_m9=M(), const std::string
 
 Input arguments of a QP problem
 
->Input scheme: casadi::StabilizedQPSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]
+>Input scheme: casadi::StabilizedQpSolverInput (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -77594,7 +77594,7 @@ roots are real.
 ";
 
 %feature("docstring")
-casadi::casadi_register_qpsolver_qcqp(QPSolverInternal::Plugin *plugin) " ";
+casadi::casadi_register_qpsolver_qcqp(QpSolverInternal::Plugin *plugin) " ";
 
 %feature("docstring")
 casadi::casadi_register_integrator_cvodes(IntegratorInternal::Plugin
@@ -78449,7 +78449,7 @@ std::string &arg_s0="", const std::string &arg_s1="") " ";
 %feature("docstring")  casadi::casadi_load_integrator_collocation() "";
 
 %feature("docstring")
-casadi::casadi_register_stabilizedqpsolver_qp(StabilizedQPSolverInternal::Plugin
+casadi::casadi_register_stabilizedqpsolver_qp(StabilizedQpSolverInternal::Plugin
 *plugin) " ";
 
 %feature("docstring")  casadi::sqrt(const T &x) " [INTERNAL]  Pre-C99
@@ -79251,7 +79251,7 @@ Get typename.
 %feature("docstring")  casadi::casadi_load_nlpsolver_worhp() "";
 
 %feature("docstring")
-casadi::casadi_register_stabilizedqpsolver_sqic(StabilizedQPSolverInternal::Plugin
+casadi::casadi_register_stabilizedqpsolver_sqic(StabilizedQpSolverInternal::Plugin
 *plugin) " ";
 
 %feature("docstring")  casadi::casadi_load_linearsolver_symbolicqr() "";
@@ -80841,7 +80841,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__QcqpSolver__doc.xml
 
 
-// File: group__QPSolver__doc.xml
+// File: group__QpSolver__doc.xml
 
 
 // File: group__SdpSolver__doc.xml
@@ -80853,7 +80853,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__SocpSolver__doc.xml
 
 
-// File: group__StabilizedQPSolver__doc.xml
+// File: group__StabilizedQpSolver__doc.xml
 
 
 // File: group__expression__tools.xml
@@ -80907,7 +80907,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__InputOutputScheme.xml
 
 
-// File: group__scheme__StabilizedQPSolverInput.xml
+// File: group__scheme__StabilizedQpSolverInput.xml
 
 
 // File: group__scheme__GradFInput.xml
@@ -80940,7 +80940,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__IntegratorInput.xml
 
 
-// File: group__scheme__QPSolverInput.xml
+// File: group__scheme__QpSolverInput.xml
 
 
 // File: group__scheme__OCPOutput.xml
@@ -80973,7 +80973,7 @@ double *rc, const int *nnzH, const int *indH, const int *locH, double *valH)
 // File: group__scheme__HessLagInput.xml
 
 
-// File: group__scheme__QPSolverOutput.xml
+// File: group__scheme__QpSolverOutput.xml
 
 
 // File: group__scheme__HNLPInput.xml

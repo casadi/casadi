@@ -33,12 +33,12 @@ namespace casadi {
 
   /** \brief Solve QPs using an NLP solver
 
-   @copydoc QPSolver_doc
+   @copydoc QpSolver_doc
 
    \author Joris Gillis
    \date 2011
   */
-class CASADI_QPSOLVER_NLP_EXPORT NLPQPInternal : public QPSolverInternal {
+class CASADI_QPSOLVER_NLP_EXPORT NLPQPInternal : public QpSolverInternal {
 public:
   /** \brief  Constructor */
   explicit NLPQPInternal();
@@ -47,7 +47,7 @@ public:
   virtual NLPQPInternal* clone() const;
 
   /** \brief  Create a new QP Solver */
-  static QPSolverInternal* creator(const QPStructure& st)
+  static QpSolverInternal* creator(const QPStructure& st)
   { return new NLPQPInternal(st);}
 
   /** \brief  Create a new Solver */

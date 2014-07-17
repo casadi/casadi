@@ -31,13 +31,13 @@ namespace casadi {
 
   /** \brief Interface to the OOQP Solver for quadratic programming:
 
-      @copydoc QPSolver_doc
+      @copydoc QpSolver_doc
 
       The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.
 
       NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
   */
-  class CASADI_QPSOLVER_OOQP_EXPORT OOQPInternal : public QPSolverInternal {
+  class CASADI_QPSOLVER_OOQP_EXPORT OOQPInternal : public QpSolverInternal {
   public:
 
     /** \brief  Constructor */
@@ -50,7 +50,7 @@ namespace casadi {
     explicit OOQPInternal(const std::vector<Sparsity>& st);
 
     /** \brief  Create a new QP Solver */
-    static QPSolverInternal* creator(const QPStructure& st)
+    static QpSolverInternal* creator(const QPStructure& st)
     { return new OOQPInternal(st);}
 
     /** \brief  Destructor */

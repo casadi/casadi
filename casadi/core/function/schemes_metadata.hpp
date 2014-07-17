@@ -64,8 +64,8 @@ enum InputOutputScheme {
   SCHEME_QcqpSolverInput,
   SCHEME_QcqpSolverOutput,
   SCHEME_QCQPStruct,
-  SCHEME_QPSolverInput,
-  SCHEME_QPSolverOutput,
+  SCHEME_QpSolverInput,
+  SCHEME_QpSolverOutput,
   SCHEME_QPStruct,
   SCHEME_SDPInput,
   SCHEME_SDPOutput,
@@ -76,7 +76,7 @@ enum InputOutputScheme {
   SCHEME_SOCPInput,
   SCHEME_SOCPOutput,
   SCHEME_SOCPStruct,
-  SCHEME_StabilizedQPSolverInput };
+  SCHEME_StabilizedQpSolverInput };
 
 CASADI_CORE_EXPORT std::string getSchemeEntryName(InputOutputScheme scheme, int i);
 CASADI_CORE_EXPORT std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);

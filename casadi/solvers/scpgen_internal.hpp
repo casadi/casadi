@@ -93,7 +93,7 @@ namespace casadi {
     double t_eval_mat_, t_eval_res_, t_eval_vec_, t_eval_exp_, t_solve_qp_, t_mainloop_;
 
     /// QP solver for the subproblems
-    QPSolver qp_solver_;
+    QpSolver qp_solver_;
 
     /// use Gauss-Newton Hessian
     bool gauss_newton_;
@@ -133,8 +133,8 @@ namespace casadi {
     /// Enable Code generation
     bool codegen_;
 
-    /// Access QPSolver
-    const QPSolver getQPSolver() const { return qp_solver_;}
+    /// Access QpSolver
+    const QpSolver getQpSolver() const { return qp_solver_;}
 
     /// Regularization
     bool regularize_;

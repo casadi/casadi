@@ -124,7 +124,7 @@ namespace casadi {
         : jacG().output().sparsity();
 
     std::string qp_solver_name = getOption("qp_solver");
-    qp_solver_ = QPSolver(qp_solver_name,
+    qp_solver_ = QpSolver(qp_solver_name,
                           qpStruct("h", H_sparsity, "a", A_sparsity));
 
     // Set options if provided

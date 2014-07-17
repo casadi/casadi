@@ -61,7 +61,7 @@ public:
   virtual void evaluate();
 
   protected:
-    QPSolver qpsolver_;
+    QpSolver qpsolver_;
 
 };
 

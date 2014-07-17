@@ -121,7 +121,7 @@ int main(){
 
   Dictionary qp_solver_options;
   if(false){
-    solver.setOption("qp_solver",NLPQPSolver::creator);
+    solver.setOption("qp_solver",NLPQpSolver::creator);
     qp_solver_options["nlp_solver"] = IpoptSolver::creator;
     Dictionary nlp_solver_options;
     nlp_solver_options["tol"] = 1e-12;

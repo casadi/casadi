@@ -3343,10 +3343,10 @@
 %exception casadi::QCQPStructIOSchemeVector< T >::QCQPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::QPSolverInputIOSchemeVector< M >::QPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QpSolverInputIOSchemeVector< M >::QpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::QPSolverOutputIOSchemeVector< M >::QPSolverOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::QpSolverOutputIOSchemeVector< M >::QpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::QPStructIOSchemeVector< T >::QPStructIOSchemeVector(const std::vector< M > &t) {
@@ -3457,7 +3457,7 @@
 %exception casadi::Split::Split(const MX &x, const std::vector< int > &offset) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::StabilizedQPSolverInputIOSchemeVector< M >::StabilizedQPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::StabilizedQpSolverInputIOSchemeVector< M >::StabilizedQpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::SubAssign::SubAssign(const MX &x, const MX &y, const Slice &i, const Slice &j) {

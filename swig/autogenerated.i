@@ -1803,7 +1803,7 @@ namespace casadi {
 %pythoncode %{
 def qpIn(*dummy,**kwargs):
   """
-  Helper function for 'QPSolverInput'
+  Helper function for 'QpSolverInput'
 
   Two use cases:
      a) arg = qpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0)
@@ -1824,7 +1824,7 @@ def qpIn(*dummy,**kwargs):
     lam_x0 -- dense [QP_SOLVER_LAM_X0]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPSolverInput,n)] for n in dummy[1:]]
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QpSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
     h = kwargs['h']
@@ -1855,7 +1855,7 @@ def qpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0']):
       raise Exception("Keyword error in qpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0" % k )
-  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0], IOScheme(SCHEME_QPSolverInput))
+  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0], IOScheme(SCHEME_QpSolverInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1863,12 +1863,12 @@ namespace casadi {
 %template(qpIn) qpIn<casadi::SX>;
 %template(qpIn) qpIn<casadi::MX>;
 %template(qpIn) qpIn<casadi::Sparsity>;
-%template(IOSchemeVectorQPSolverInputSX) QPSolverInputIOSchemeVector<SX>;
-%template(IOSchemeVectorQPSolverInputMX) QPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorQPSolverInputSparsity) QPSolverInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputSX;
-%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputMX;
-%rename(IOSchemeVectorQPSolverInput) IOSchemeVectorQPSolverInputSparsity;
+%template(IOSchemeVectorQpSolverInputSX) QpSolverInputIOSchemeVector<SX>;
+%template(IOSchemeVectorQpSolverInputMX) QpSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorQpSolverInputSparsity) QpSolverInputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorQpSolverInput) IOSchemeVectorQpSolverInputSX;
+%rename(IOSchemeVectorQpSolverInput) IOSchemeVectorQpSolverInputMX;
+%rename(IOSchemeVectorQpSolverInput) IOSchemeVectorQpSolverInputSparsity;
 }
 #endif //SWIGPYTHON
 namespace casadi {
@@ -1877,7 +1877,7 @@ namespace casadi {
 %pythoncode %{
 def qpOut(*dummy,**kwargs):
   """
-  Helper function for 'QPSolverOutput'
+  Helper function for 'QpSolverOutput'
 
   Two use cases:
      a) arg = qpOut(x=my_x, cost=my_cost, lam_a=my_lam_a, lam_x=my_lam_x)
@@ -1893,7 +1893,7 @@ def qpOut(*dummy,**kwargs):
     lam_x -- The dual solution corresponding to simple bounds [QP_SOLVER_LAM_X]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of qpOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QPSolverOutput,n)] for n in dummy[1:]]
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_QpSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1909,7 +1909,7 @@ def qpOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','cost','lam_a','lam_x']):
       raise Exception("Keyword error in qpOut: '%s' is not recognized. Available keywords are: x, cost, lam_a, lam_x" % k )
-  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_QPSolverOutput))
+  return IOSchemeVector([x,cost,lam_a,lam_x], IOScheme(SCHEME_QpSolverOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1917,12 +1917,12 @@ namespace casadi {
 %template(qpOut) qpOut<casadi::SX>;
 %template(qpOut) qpOut<casadi::MX>;
 %template(qpOut) qpOut<casadi::Sparsity>;
-%template(IOSchemeVectorQPSolverOutputSX) QPSolverOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorQPSolverOutputMX) QPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorQPSolverOutputSparsity) QPSolverOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputSX;
-%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputMX;
-%rename(IOSchemeVectorQPSolverOutput) IOSchemeVectorQPSolverOutputSparsity;
+%template(IOSchemeVectorQpSolverOutputSX) QpSolverOutputIOSchemeVector<SX>;
+%template(IOSchemeVectorQpSolverOutputMX) QpSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorQpSolverOutputSparsity) QpSolverOutputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorQpSolverOutput) IOSchemeVectorQpSolverOutputSX;
+%rename(IOSchemeVectorQpSolverOutput) IOSchemeVectorQpSolverOutputMX;
+%rename(IOSchemeVectorQpSolverOutput) IOSchemeVectorQpSolverOutputSparsity;
 }
 #endif //SWIGPYTHON
 namespace casadi {
@@ -2507,7 +2507,7 @@ namespace casadi {
 %pythoncode %{
 def stabilizedQpIn(*dummy,**kwargs):
   """
-  Helper function for 'StabilizedQPSolverInput'
+  Helper function for 'StabilizedQpSolverInput'
 
   Two use cases:
      a) arg = stabilizedQpIn(h=my_h, g=my_g, a=my_a, lba=my_lba, uba=my_uba, lbx=my_lbx, ubx=my_ubx, x0=my_x0, lam_x0=my_lam_x0, muR=my_muR, muE=my_muE, mu=my_mu)
@@ -2531,7 +2531,7 @@ def stabilizedQpIn(*dummy,**kwargs):
     mu     -- dense (nc x 1) [STABILIZED_QP_SOLVER_MU]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of stabilizedQpIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_StabilizedQPSolverInput,n)] for n in dummy[1:]]
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_StabilizedQpSolverInput,n)] for n in dummy[1:]]
   h = []
   if 'h' in kwargs:
     h = kwargs['h']
@@ -2571,7 +2571,7 @@ def stabilizedQpIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['h','g','a','lba','uba','lbx','ubx','x0','lam_x0','muR','muE','mu']):
       raise Exception("Keyword error in stabilizedQpIn: '%s' is not recognized. Available keywords are: h, g, a, lba, uba, lbx, ubx, x0, lam_x0, muR, muE, mu" % k )
-  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0,muR,muE,mu], IOScheme(SCHEME_StabilizedQPSolverInput))
+  return IOSchemeVector([h,g,a,lba,uba,lbx,ubx,x0,lam_x0,muR,muE,mu], IOScheme(SCHEME_StabilizedQpSolverInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -2579,12 +2579,12 @@ namespace casadi {
 %template(stabilizedQpIn) stabilizedQpIn<casadi::SX>;
 %template(stabilizedQpIn) stabilizedQpIn<casadi::MX>;
 %template(stabilizedQpIn) stabilizedQpIn<casadi::Sparsity>;
-%template(IOSchemeVectorStabilizedQPSolverInputSX) StabilizedQPSolverInputIOSchemeVector<SX>;
-%template(IOSchemeVectorStabilizedQPSolverInputMX) StabilizedQPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorStabilizedQPSolverInputSparsity) StabilizedQPSolverInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputSX;
-%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputMX;
-%rename(IOSchemeVectorStabilizedQPSolverInput) IOSchemeVectorStabilizedQPSolverInputSparsity;
+%template(IOSchemeVectorStabilizedQpSolverInputSX) StabilizedQpSolverInputIOSchemeVector<SX>;
+%template(IOSchemeVectorStabilizedQpSolverInputMX) StabilizedQpSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorStabilizedQpSolverInputSparsity) StabilizedQpSolverInputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorStabilizedQpSolverInput) IOSchemeVectorStabilizedQpSolverInputSX;
+%rename(IOSchemeVectorStabilizedQpSolverInput) IOSchemeVectorStabilizedQpSolverInputMX;
+%rename(IOSchemeVectorStabilizedQpSolverInput) IOSchemeVectorStabilizedQpSolverInputSparsity;
 }
 #endif //SWIGPYTHON
 namespace casadi {

@@ -33,7 +33,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_QPSOLVER_QPOASES_EXPORT
-  casadi_register_qpsolver_qpoases(QPSolverInternal::Plugin* plugin) {
+  casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin* plugin) {
     plugin->creator = QPOasesInternal::creator;
     plugin->name = "qpoases";
     plugin->doc = "QPOASES docs not available";
@@ -43,7 +43,7 @@ namespace casadi {
 
   extern "C"
   void CASADI_QPSOLVER_QPOASES_EXPORT casadi_load_qpsolver_qpoases() {
-    QPSolverInternal::registerPlugin(casadi_register_qpsolver_qpoases);
+    QpSolverInternal::registerPlugin(casadi_register_qpsolver_qpoases);
   }
 
   QPOasesInternal* QPOasesInternal::clone() const {
@@ -54,7 +54,7 @@ namespace casadi {
     return node;
   }
 
-  QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QPSolverInternal(st) {
+  QPOasesInternal::QPOasesInternal(const std::vector<Sparsity>& st) : QpSolverInternal(st) {
     addOption("nWSR",                   OT_INTEGER,     GenericType(),
               "The maximum number of working set recalculations to be performed during "
               "the initial homotopy. Default is 5(nx + nc)");
@@ -141,7 +141,7 @@ namespace casadi {
   }
 
   void QPOasesInternal::init() {
-    QPSolverInternal::init();
+    QpSolverInternal::init();
 
     // Read options
     if (hasSetOption("nWSR")) {

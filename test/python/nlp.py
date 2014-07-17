@@ -70,7 +70,7 @@ except:
   
 try:
   qp_solver_options = {}
-  QPSolver.loadPlugin("sqic")
+  QpSolver.loadPlugin("sqic")
   solvers.append(("stabilizedsqp",{"tol_pr": 1e-9, "tol_du": 1e-9,"stabilized_qp_solver": "qp", "stabilized_qp_solver_options": {"qp_solver": "sqic"}}))
   print "Will test stabilizedsqp"
 except:

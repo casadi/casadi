@@ -182,9 +182,9 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
-/** \defgroup scheme_StabilizedQPSolverInput
+/** \defgroup scheme_StabilizedQpSolverInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::StabilizedQPSolverInput  (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]</caption>
+<caption>Input scheme: casadi::StabilizedQpSolverInput  (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>STABILIZED_QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
 <tr><td>STABILIZED_QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
@@ -314,9 +314,9 @@
 <tr><td>INTEGRATOR_RZ0</td><td>rz0</td><td>Initial guess for the backwards algebraic variable .</td></tr>
 </table>
 */
-/** \defgroup scheme_QPSolverInput
+/** \defgroup scheme_QpSolverInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::QPSolverInput  (QP_SOLVER_NUM_IN = 10) [qpIn]</caption>
+<caption>Input scheme: casadi::QpSolverInput  (QP_SOLVER_NUM_IN = 10) [qpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
 <tr><td>QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
@@ -427,9 +427,9 @@
 <tr><td>HESSLAG_LAM_G</td><td>lam_g</td><td>Multiplier for g .</td></tr>
 </table>
 */
-/** \defgroup scheme_QPSolverOutput
+/** \defgroup scheme_QpSolverOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::QPSolverOutput  (QP_SOLVER_NUM_OUT = 5) [qpOut]</caption>
+<caption>Output scheme: casadi::QpSolverOutput  (QP_SOLVER_NUM_OUT = 5) [qpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>QP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
 <tr><td>QP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
@@ -486,9 +486,9 @@
 /** \class casadi::OOQPInternal
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_QpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -542,20 +542,20 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::StabilizedQPSolverInternal
+/** \class casadi::StabilizedQpSolverInternal
 \n
 \par
-@copydoc scheme_StabilizedQPSolverInput
+@copydoc scheme_StabilizedQpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
-/** \class casadi::StabilizedQPSolver
+/** \class casadi::StabilizedQpSolver
 \n
 \par
-@copydoc scheme_StabilizedQPSolverInput
+@copydoc scheme_StabilizedQpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::ControlSimulatorInternal
@@ -644,9 +644,9 @@
 /** \class casadi::QPStabilizerInternal
 \n
 \par
-@copydoc scheme_StabilizedQPSolverInput
+@copydoc scheme_StabilizedQpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -761,20 +761,20 @@
 @copydoc scheme_QcqpSolverOutput
 */
 /// \cond INTERNAL
-/** \class casadi::QPSolverInternal
+/** \class casadi::QpSolverInternal
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_QpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
-/** \class casadi::QPSolver
+/** \class casadi::QpSolver
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_QpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::OCPSolverInternal
@@ -812,9 +812,9 @@
 /** \class casadi::StabilizedSQICInternal
 \n
 \par
-@copydoc scheme_StabilizedQPSolverInput
+@copydoc scheme_StabilizedQpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -839,9 +839,9 @@
 /** \class casadi::SQICInternal
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_QpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -882,9 +882,9 @@
 /** \class casadi::NLPQPInternal
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_QpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -982,9 +982,9 @@
 /** \class casadi::CplexInternal
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_QpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -1043,17 +1043,17 @@
 /** \class casadi::QPOasesInternal
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_QpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
 /** \class casadi::QCQPQPInternal
 \n
 \par
-@copydoc scheme_QPSolverInput
+@copydoc scheme_QpSolverInput
 <br/>
-@copydoc scheme_QPSolverOutput
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond

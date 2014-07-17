@@ -93,7 +93,7 @@ namespace casadi {
 
     // Create an qpsolver instance
     std::string qpsolver_name = getOption("qp_solver");
-    qpsolver_ = QPSolver(qpsolver_name,
+    qpsolver_ = QpSolver(qpsolver_name,
                          qpStruct("h", Sparsity::sparse(n_, n_),
                                   "a", input(LP_SOLVER_A).sparsity()));
 

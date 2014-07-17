@@ -30,7 +30,7 @@
 namespace casadi {
 
   class CASADI_STABILIZEDQPSOLVER_SQIC_EXPORT StabilizedSQICInternal
-    : public StabilizedQPSolverInternal {
+    : public StabilizedQpSolverInternal {
   public:
     /** \brief  Constructor */
     explicit StabilizedSQICInternal();
@@ -39,7 +39,7 @@ namespace casadi {
     virtual StabilizedSQICInternal* clone() const;
 
     /** \brief  Create a new QP Solver */
-    static StabilizedQPSolverInternal* creator(const QPStructure& st)
+    static StabilizedQpSolverInternal* creator(const QPStructure& st)
     { return new StabilizedSQICInternal(st);}
 
     /** \brief  Create a new Solver */
