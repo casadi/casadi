@@ -23,36 +23,6 @@
 #ifndef CASADI_CASADI_HPP
 #define CASADI_CASADI_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx/sx_element.hpp"
-
-// Generic tools
-#include "polynomial.hpp"
-#include "matrix/generic_matrix_tools.hpp"
-#include "matrix/generic_expression_tools.hpp"
-
-// Matrices
-#include "matrix/matrix.hpp"
-#include "matrix/matrix_tools.hpp"
-#include "matrix/sparsity_tools.hpp"
-
-// Scalar expressions
-#include "sx/sx_tools.hpp"
-
-// Matrix expressions
-#include "mx/mx.hpp"
-#include "mx/mx_tools.hpp"
-
-// Misc functions
-#include "function/sx_function.hpp"
-#include "function/mx_function.hpp"
-#include "function/external_function.hpp"
-
-// Misc solvers
-#include "function/linear_solver.hpp"
-#include "function/nlp_solver.hpp"
-#include "function/integrator.hpp"
-#include "function/implicit_function.hpp"
-
+#include "core/core.hpp"
 
 #endif // CASADI_CASADI_HPP

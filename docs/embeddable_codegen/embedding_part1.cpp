@@ -20,9 +20,7 @@
  *
  */
 
-#include <core/casadi.hpp>
-#include <core/std_vector_tools.hpp>
-#include <core/function/nlp_solver.hpp>
+#include <casadi/casadi.hpp>
 #include <fstream>
 
 using namespace casadi;

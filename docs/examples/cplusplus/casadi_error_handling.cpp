@@ -31,7 +31,7 @@
  * \date 2012
  */
 
-#include "casadi/core/casadi.hpp"
+#include "casadi/casadi.hpp"
 
 // Uncomment this line to compile without error handling
 //#define CASADI_NDEBUG

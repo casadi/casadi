@@ -38,7 +38,7 @@
 */
 
 // CasADi core
-#include <casadi/core/casadi.hpp>
+#include <casadi/casadi.hpp>
 
 // Declare solvers to be loaded manually
 extern "C" void casadi_load_integrator_cvodes();

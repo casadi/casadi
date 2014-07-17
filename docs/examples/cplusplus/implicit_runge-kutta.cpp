@@ -25,7 +25,7 @@
    @author: Joel Andersson, K.U. Leuven 2013
 */
 
-#include <casadi/core/casadi.hpp>
+#include <casadi/casadi.hpp>
 #include <casadi/core/misc/integration_tools.hpp>
 #include <iomanip>
 

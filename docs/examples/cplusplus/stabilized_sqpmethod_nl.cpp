@@ -19,7 +19,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 *
 */
-#include <casadi/core/casadi.hpp>
+#include <casadi/casadi.hpp>
 #include <casadi/core/misc/symbolic_nlp.hpp> 
 /**
  * This example demonstrates how NL-files, which can be generated

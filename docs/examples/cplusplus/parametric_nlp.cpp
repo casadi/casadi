@@ -24,8 +24,7 @@
 #include <fstream>
 #include <ctime>
 #include <iomanip>
-#include <casadi/core/casadi.hpp>
-#include <casadi/core/std_vector_tools.hpp>
+#include <casadi/casadi.hpp>
 
 extern "C" void casadi_load_nlpsolver_ipopt();
 

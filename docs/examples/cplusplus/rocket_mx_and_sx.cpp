@@ -21,8 +21,7 @@
  */
 
 #include <iostream>
-#include <casadi/core/casadi.hpp>
-#include <casadi/core/function/external_function.hpp>
+#include <casadi/casadi.hpp>
 
 extern "C" void casadi_load_nlpsolver_ipopt();
 

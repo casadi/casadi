@@ -20,8 +20,7 @@
  *
  */
 
-#include <core/casadi.hpp>
-#include <core/std_vector_tools.hpp>
+#include <casadi/casadi.hpp>
 
 using namespace casadi;
 using namespace std;

@@ -25,7 +25,7 @@ File superlu.c from the CSparse example collection
 Joel Andersson, K.U. Leuven, 2010
 */
 
-#include "casadi/core/casadi.hpp"
+#include "casadi/casadi.hpp"
 
 using namespace casadi;
 using namespace std;

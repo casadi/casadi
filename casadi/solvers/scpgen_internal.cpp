@@ -21,7 +21,7 @@
  */
 
 #include "scpgen_internal.hpp"
-#include "casadi/core/casadi.hpp"
+#include "casadi/core/core.hpp"
 #include <ctime>
 #include <iomanip>
 #include <fstream>

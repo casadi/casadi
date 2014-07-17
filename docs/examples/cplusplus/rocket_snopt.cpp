@@ -23,8 +23,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
-#include <casadi/core/casadi.hpp>
-#include <casadi/core/std_vector_tools.hpp>
+#include <casadi/casadi.hpp>
 
 using namespace casadi;
 using namespace std;

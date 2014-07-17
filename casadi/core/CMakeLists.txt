@@ -117,7 +117,7 @@ set(CASADI_SRCS
   misc/symbolic_nlp.hpp            misc/symbolic_nlp.cpp
 
   # User include class with the most essential includes
-  casadi.hpp
+  core.hpp
 
   function/schemes_metadata.hpp function/schemes_metadata.cpp function/schemes_helpers.hpp
 

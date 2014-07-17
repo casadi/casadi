@@ -20,7 +20,7 @@
  *
  */
 
-#include <casadi/core/casadi.hpp>
+#include <casadi/casadi.hpp>
 
 #include <casadi/optimal_control/symbolic_ocp.hpp>
 #include <casadi/optimal_control/direct_multiple_shooting.hpp>

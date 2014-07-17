@@ -21,6 +21,7 @@
  */
 
 #include "symbolic_nlp.hpp"
+#include "../core.hpp"
 #include <fstream>
 
 using namespace std;

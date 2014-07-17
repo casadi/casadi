@@ -21,7 +21,7 @@
  */
 
 #include <iostream>
-#include <casadi/core/casadi.hpp>
+#include <casadi/casadi.hpp>
 
 using namespace casadi;
 using namespace std;

@@ -23,7 +23,7 @@
 #ifndef CASADI_SYMBOLIC_NLP_HPP
 #define CASADI_SYMBOLIC_NLP_HPP
 
-#include "../casadi.hpp"
+#include "../sx/sx_element.hpp"
 
 namespace casadi {
 

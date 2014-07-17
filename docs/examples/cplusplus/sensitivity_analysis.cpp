@@ -20,7 +20,7 @@
  *
  */
 
-#include <casadi/core/casadi.hpp>
+#include <casadi/casadi.hpp>
 
 #include <iostream>
 #include <iomanip>
