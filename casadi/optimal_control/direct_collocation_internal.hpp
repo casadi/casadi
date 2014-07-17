@@ -71,7 +71,7 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectCollocationInternal : public OCPSolver
     MXFunction nlp_;
 
     // NLP solver
-    NLPSolver nlp_solver_;
+    NlpSolver nlp_solver_;
 
     // Interpolation order
     int deg_;

@@ -1290,7 +1290,7 @@ namespace casadi {
 %pythoncode %{
 def nlpSolverIn(*dummy,**kwargs):
   """
-  Helper function for 'NLPSolverInput'
+  Helper function for 'NlpSolverInput'
 
   Two use cases:
      a) arg = nlpSolverIn(x0=my_x0, p=my_p, lbx=my_lbx, ubx=my_ubx, lbg=my_lbg, ubg=my_ubg, lam_x0=my_lam_x0, lam_g0=my_lam_g0)
@@ -1310,7 +1310,7 @@ def nlpSolverIn(*dummy,**kwargs):
     lam_g0 -- Lagrange multipliers for bounds on G, initial guess (ng x 1) [NLP_SOLVER_LAM_G0]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverIn. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPSolverInput,n)] for n in dummy[1:]]
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NlpSolverInput,n)] for n in dummy[1:]]
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -1338,7 +1338,7 @@ def nlpSolverIn(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x0','p','lbx','ubx','lbg','ubg','lam_x0','lam_g0']):
       raise Exception("Keyword error in nlpSolverIn: '%s' is not recognized. Available keywords are: x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0" % k )
-  return IOSchemeVector([x0,p,lbx,ubx,lbg,ubg,lam_x0,lam_g0], IOScheme(SCHEME_NLPSolverInput))
+  return IOSchemeVector([x0,p,lbx,ubx,lbg,ubg,lam_x0,lam_g0], IOScheme(SCHEME_NlpSolverInput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1346,12 +1346,12 @@ namespace casadi {
 %template(nlpSolverIn) nlpSolverIn<casadi::SX>;
 %template(nlpSolverIn) nlpSolverIn<casadi::MX>;
 %template(nlpSolverIn) nlpSolverIn<casadi::Sparsity>;
-%template(IOSchemeVectorNLPSolverInputSX) NLPSolverInputIOSchemeVector<SX>;
-%template(IOSchemeVectorNLPSolverInputMX) NLPSolverInputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPSolverInputSparsity) NLPSolverInputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputSX;
-%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputMX;
-%rename(IOSchemeVectorNLPSolverInput) IOSchemeVectorNLPSolverInputSparsity;
+%template(IOSchemeVectorNlpSolverInputSX) NlpSolverInputIOSchemeVector<SX>;
+%template(IOSchemeVectorNlpSolverInputMX) NlpSolverInputIOSchemeVector<MX>;
+%template(IOSchemeVectorNlpSolverInputSparsity) NlpSolverInputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorNlpSolverInput) IOSchemeVectorNlpSolverInputSX;
+%rename(IOSchemeVectorNlpSolverInput) IOSchemeVectorNlpSolverInputMX;
+%rename(IOSchemeVectorNlpSolverInput) IOSchemeVectorNlpSolverInputSparsity;
 }
 #endif //SWIGPYTHON
 namespace casadi {
@@ -1360,7 +1360,7 @@ namespace casadi {
 %pythoncode %{
 def nlpSolverOut(*dummy,**kwargs):
   """
-  Helper function for 'NLPSolverOutput'
+  Helper function for 'NlpSolverOutput'
 
   Two use cases:
      a) arg = nlpSolverOut(x=my_x, f=my_f, g=my_g, lam_x=my_lam_x, lam_g=my_lam_g, lam_p=my_lam_p)
@@ -1378,7 +1378,7 @@ def nlpSolverOut(*dummy,**kwargs):
     lam_p -- Lagrange multipliers for bounds on P at the solution (np x 1) [NLP_SOLVER_LAM_P]
   """
   if (len(dummy)>0 and len(kwargs)>0): raise Exception("Cannot mix two use cases of nlpSolverOut. Either use keywords or non-keywords ")
-  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NLPSolverOutput,n)] for n in dummy[1:]]
+  if len(dummy)>0: return [ dummy[0][getSchemeEntryEnum(SCHEME_NlpSolverOutput,n)] for n in dummy[1:]]
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -1400,7 +1400,7 @@ def nlpSolverOut(*dummy,**kwargs):
   for k in kwargs.keys():
     if not(k in ['x','f','g','lam_x','lam_g','lam_p']):
       raise Exception("Keyword error in nlpSolverOut: '%s' is not recognized. Available keywords are: x, f, g, lam_x, lam_g, lam_p" % k )
-  return IOSchemeVector([x,f,g,lam_x,lam_g,lam_p], IOScheme(SCHEME_NLPSolverOutput))
+  return IOSchemeVector([x,f,g,lam_x,lam_g,lam_p], IOScheme(SCHEME_NlpSolverOutput))
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -1408,12 +1408,12 @@ namespace casadi {
 %template(nlpSolverOut) nlpSolverOut<casadi::SX>;
 %template(nlpSolverOut) nlpSolverOut<casadi::MX>;
 %template(nlpSolverOut) nlpSolverOut<casadi::Sparsity>;
-%template(IOSchemeVectorNLPSolverOutputSX) NLPSolverOutputIOSchemeVector<SX>;
-%template(IOSchemeVectorNLPSolverOutputMX) NLPSolverOutputIOSchemeVector<MX>;
-%template(IOSchemeVectorNLPSolverOutputSparsity) NLPSolverOutputIOSchemeVector<Sparsity>;
-%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputSX;
-%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputMX;
-%rename(IOSchemeVectorNLPSolverOutput) IOSchemeVectorNLPSolverOutputSparsity;
+%template(IOSchemeVectorNlpSolverOutputSX) NlpSolverOutputIOSchemeVector<SX>;
+%template(IOSchemeVectorNlpSolverOutputMX) NlpSolverOutputIOSchemeVector<MX>;
+%template(IOSchemeVectorNlpSolverOutputSparsity) NlpSolverOutputIOSchemeVector<Sparsity>;
+%rename(IOSchemeVectorNlpSolverOutput) IOSchemeVectorNlpSolverOutputSX;
+%rename(IOSchemeVectorNlpSolverOutput) IOSchemeVectorNlpSolverOutputMX;
+%rename(IOSchemeVectorNlpSolverOutput) IOSchemeVectorNlpSolverOutputSparsity;
 }
 #endif //SWIGPYTHON
 namespace casadi {

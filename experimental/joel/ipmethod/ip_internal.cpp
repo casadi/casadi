@@ -33,7 +33,7 @@
 using namespace std;
 namespace casadi{
 
-IPInternal::IPInternal(const Function& F, const Function& G) : NLPSolverInternal(Function(),F,G){
+IPInternal::IPInternal(const Function& F, const Function& G) : NlpSolverInternal(Function(),F,G){
   casadi_warning("The IP method is experimental and incomplete. Can be used as the basis of an IP solver in CasADi.");
   addOption("linear_solver",         OT_LINEARSOLVER,   GenericType(), "The linear solver to be used by the IP method");
   addOption("linear_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver");
@@ -44,7 +44,7 @@ IPInternal::~IPInternal(){
 
 void IPInternal::init(){
   // Call the init method of the base class
-  NLPSolverInternal::init();
+  NlpSolverInternal::init();
     
   // Assume SXFunction
   SXFunction FF = shared_cast<SXFunction>(F_);

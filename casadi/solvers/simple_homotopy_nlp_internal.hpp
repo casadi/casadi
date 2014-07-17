@@ -52,7 +52,7 @@ namespace casadi {
     virtual void init();
     virtual void evaluate();
 
-    NLPSolver nlpsolver_;
+    NlpSolver nlpsolver_;
 
     /// Take this many steps to go from tau=0 to tau=1
     int num_steps_;

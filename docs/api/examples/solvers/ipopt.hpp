@@ -1,12 +1,12 @@
 /** 
-* This example looks at a use for the NLPSolver class
+* This example looks at a use for the NlpSolver class
 *
 *
 * \pythonexample{solvers/ipopt}
 *
 * \sa
 * \code
-* casadi::NLPSolver();
+* casadi::NlpSolver();
 * \endcode
 *
 */

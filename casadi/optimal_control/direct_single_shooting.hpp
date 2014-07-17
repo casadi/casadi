@@ -90,8 +90,8 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectSingleShooting : public OCPSolver {
     /// Set the optimal solution
     void setOptimalSolution(const std::vector<double> &V_opt);
 
-    // Access the underlying NLPSolver object
-    NLPSolver getNLPSolver() const;
+    // Access the underlying NlpSolver object
+    NlpSolver getNlpSolver() const;
 
     // Prints out a human readable report about possible constraint violations, after solving
     void reportConstraints(std::ostream &stream=std::cout);

@@ -74,7 +74,7 @@ public:
   vector<double> p_scale_;
 
   /// NLP solver
-  NLPSolver nlp_solver_;
+  NlpSolver nlp_solver_;
 };
 
 void Tester::model(){

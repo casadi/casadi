@@ -65,8 +65,8 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_JacGOutput: return "JacGOutput";
     case SCHEME_HessLagInput: return "HessLagInput";
     case SCHEME_HessLagOutput: return "HessLagOutput";
-    case SCHEME_NLPSolverInput: return "NLPSolverInput";
-    case SCHEME_NLPSolverOutput: return "NLPSolverOutput";
+    case SCHEME_NlpSolverInput: return "NlpSolverInput";
+    case SCHEME_NlpSolverOutput: return "NlpSolverOutput";
     case SCHEME_MayerInput: return "MayerInput";
     case SCHEME_OCPInput: return "OCPInput";
     case SCHEME_OCPOutput: return "OCPOutput";
@@ -105,8 +105,8 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_JacGOutput: return "jac, f, g";
     case SCHEME_HessLagInput: return "x, p, lam_f, lam_g";
     case SCHEME_HessLagOutput: return "hess, f, g, grad_x, grad_p";
-    case SCHEME_NLPSolverInput: return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
-    case SCHEME_NLPSolverOutput: return "x, f, g, lam_x, lam_g, lam_p";
+    case SCHEME_NlpSolverInput: return "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0";
+    case SCHEME_NlpSolverOutput: return "x, f, g, lam_x, lam_g, lam_p";
     case SCHEME_MayerInput: return "x, p";
     case SCHEME_OCPInput: return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
     case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt, cost";
@@ -257,7 +257,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==3) return "grad_x";
       if (i==4) return "grad_p";
       break;
-    case SCHEME_NLPSolverInput:
+    case SCHEME_NlpSolverInput:
       if (i==0) return "x0";
       if (i==1) return "p";
       if (i==2) return "lbx";
@@ -267,7 +267,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if (i==6) return "lam_x0";
       if (i==7) return "lam_g0";
       break;
-    case SCHEME_NLPSolverOutput:
+    case SCHEME_NlpSolverOutput:
       if (i==0) return "x";
       if (i==1) return "f";
       if (i==2) return "g";
@@ -506,7 +506,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==3) return "Gradient of the Lagrangian with respect to x";
       if (i==4) return "Gradient of the Lagrangian with respect to p";
       break;
-    case SCHEME_NLPSolverInput:
+    case SCHEME_NlpSolverInput:
       if (i==0) return "Decision variables, initial guess (nx x 1) ";
       if (i==1) return "Value of fixed parameters (np x 1)";
       if (i==2) return "Decision variables lower bound (nx x 1), default -inf";
@@ -516,7 +516,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if (i==6) return "Lagrange multipliers for bounds on X, initial guess (nx x 1)";
       if (i==7) return "Lagrange multipliers for bounds on G, initial guess (ng x 1)";
       break;
-    case SCHEME_NLPSolverOutput:
+    case SCHEME_NlpSolverOutput:
       if (i==0) return "Decision variables at the optimal solution (nx x 1)";
       if (i==1) return "Cost function value at the optimal solution (1 x 1)";
       if (i==2) return "Constraints function at the optimal solution (ng x 1)";
@@ -755,7 +755,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==3) return "HESSLAG_GRAD_X";
       if (i==4) return "HESSLAG_GRAD_P";
       break;
-    case SCHEME_NLPSolverInput:
+    case SCHEME_NlpSolverInput:
       if (i==0) return "NLP_SOLVER_X0";
       if (i==1) return "NLP_SOLVER_P";
       if (i==2) return "NLP_SOLVER_LBX";
@@ -765,7 +765,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if (i==6) return "NLP_SOLVER_LAM_X0";
       if (i==7) return "NLP_SOLVER_LAM_G0";
       break;
-    case SCHEME_NLPSolverOutput:
+    case SCHEME_NlpSolverOutput:
       if (i==0) return "NLP_SOLVER_X";
       if (i==1) return "NLP_SOLVER_F";
       if (i==2) return "NLP_SOLVER_G";
@@ -934,10 +934,10 @@ int getSchemeSize(InputOutputScheme scheme) {
     case SCHEME_HessLagOutput:
       return 5;
       break;
-    case SCHEME_NLPSolverInput:
+    case SCHEME_NlpSolverInput:
       return 8;
       break;
-    case SCHEME_NLPSolverOutput:
+    case SCHEME_NlpSolverOutput:
       return 6;
       break;
     case SCHEME_MayerInput:
@@ -1114,7 +1114,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="grad_x") return 3;
       if (name=="grad_p") return 4;
       break;
-    case SCHEME_NLPSolverInput:
+    case SCHEME_NlpSolverInput:
       if (name=="x0") return 0;
       if (name=="p") return 1;
       if (name=="lbx") return 2;
@@ -1124,7 +1124,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if (name=="lam_x0") return 6;
       if (name=="lam_g0") return 7;
       break;
-    case SCHEME_NLPSolverOutput:
+    case SCHEME_NlpSolverOutput:
       if (name=="x") return 0;
       if (name=="f") return 1;
       if (name=="g") return 2;

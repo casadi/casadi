@@ -49,7 +49,7 @@ nlp_solver = "ipopt"
 #qp_solver_options = {}
 
 # Create solver
-solv = NLPSolver(nlp_solver, nlp)
+solv = NlpSolver(nlp_solver, nlp)
 
 # NLP solver options
 if nlp_solver in ("sqpmethod", "scpgen"):

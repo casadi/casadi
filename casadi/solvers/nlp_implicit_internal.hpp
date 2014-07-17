@@ -32,7 +32,7 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Use an NLPSolver as ImplicitFunction solver
+  /** \brief Use an NlpSolver as ImplicitFunction solver
 
    @copydoc ImplicitFunction_doc
 
@@ -72,7 +72,7 @@ namespace casadi {
     virtual void solveNonLinear();
 
     // NLP solver instance
-    NLPSolver nlp_solver_;
+    NlpSolver nlp_solver_;
 
   };
 

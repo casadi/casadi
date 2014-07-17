@@ -43,9 +43,9 @@
 namespace casadi {
 
   /**
-     @copydoc NLPSolver_doc
+     @copydoc NlpSolver_doc
   */
-  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInternal : public NlpSolverInternal {
 
   public:
     // Constructor
@@ -58,7 +58,7 @@ namespace casadi {
     virtual WorhpInternal* clone() const;
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new WorhpInternal(nlp);}
 
     // Reset solver

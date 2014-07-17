@@ -36,7 +36,7 @@ DirectSingleShootingInternal::DirectSingleShootingInternal(const Function& ffcn,
     : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn) {
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to casadi::Parallelizer");
   addOption("nlp_solver",               OT_STRING,  GenericType(),
-            "An NLPSolver creator function");
+            "An NlpSolver creator function");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(),
             "Options to be passed to the NLP Solver");
   addOption("integrator",               OT_STRING, GenericType(),
@@ -146,7 +146,7 @@ void DirectSingleShootingInternal::init() {
   std::string nlp_solver_name = getOption("nlp_solver");
 
   // Allocate an NLP solver
-  nlp_solver_ = NLPSolver(nlp_solver_name, nlp_);
+  nlp_solver_ = NlpSolver(nlp_solver_name, nlp_);
 
   // Pass options
   if (hasSetOption("nlp_solver_options")) {

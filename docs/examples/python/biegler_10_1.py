@@ -130,7 +130,7 @@ for N in range(1,11):
   ## ----
   
   # Allocate an NLP solver
-  solver = NLPSolver("ipopt", nlp)
+  solver = NlpSolver("ipopt", nlp)
 
   # Set options
   solver.setOption("tol",1e-10)

@@ -501,7 +501,7 @@ class SDPtests(casadiTestCase):
       self.checkarray(sdp.getOutput("p"),DMatrix.zeros(2,2),digits=5)
       
       try:
-        NLPSolver.loadPlugin("ipopt")
+        NlpSolver.loadPlugin("ipopt")
       except:
         return
         
@@ -520,7 +520,7 @@ class SDPtests(casadiTestCase):
 
       nlp = SXFunction(nlpIn(x=V),nlpOut(f=mul(c.T,x),g=veccat(g)))
 
-      sol = NLPSolver("ipopt", nlp)
+      sol = NlpSolver("ipopt", nlp)
       sol.init()
       sol.setInput(0,"lbg")
       sol.setInput(0,"ubg")

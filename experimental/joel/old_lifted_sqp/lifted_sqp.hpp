@@ -34,7 +34,7 @@ class LiftedSQPInternal;
   \author Joel Andersson
   \date 2012
 */
-class LiftedSQP : public NLPSolver {
+class LiftedSQP : public NlpSolver {
   public:
     /// Default constructor
     LiftedSQP();
@@ -55,7 +55,7 @@ class LiftedSQP : public NLPSolver {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static NLPSolver creator(const Function& F, const Function& G, int dummy){ return LiftedSQP(F,G);}
+    static NlpSolver creator(const Function& F, const Function& G, int dummy){ return LiftedSQP(F,G);}
     #ifdef SWIG
     %nocallback;
     #endif

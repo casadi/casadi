@@ -31,9 +31,9 @@
 namespace casadi {
 
   /**
-     @copydoc NLPSolver_doc
+     @copydoc NlpSolver_doc
   */
-  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_KNITRO_EXPORT KnitroInternal : public NlpSolverInternal {
 
   public:
     explicit KnitroInternal(const Function& nlp);
@@ -41,7 +41,7 @@ namespace casadi {
     virtual KnitroInternal* clone() const { return new KnitroInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new KnitroInternal(nlp);}
 
     virtual void init();

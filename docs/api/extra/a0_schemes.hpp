@@ -57,9 +57,9 @@
 <tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_NLPSolverOutput
+/** \defgroup scheme_NlpSolverOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::NLPSolverOutput  (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]</caption>
+<caption>Output scheme: casadi::NlpSolverOutput  (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>NLP_SOLVER_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1) .</td></tr>
 <tr><td>NLP_SOLVER_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1) .</td></tr>
@@ -137,9 +137,9 @@
 <tr><td>SDP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_NLPSolverInput
+/** \defgroup scheme_NlpSolverInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::NLPSolverInput  (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]</caption>
+<caption>Input scheme: casadi::NlpSolverInput  (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>NLP_SOLVER_X0</td><td>x0</td><td>Decision variables, initial guess (nx x 1) .</td></tr>
 <tr><td>NLP_SOLVER_P</td><td>p</td><td>Value of fixed parameters (np x 1) .</td></tr>
@@ -610,9 +610,9 @@
 /** \class casadi::SimpleHomotopyNLPInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -635,9 +635,9 @@
 /** \class casadi::StabilizedSQPInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -653,18 +653,18 @@
 /** \class casadi::KnitroInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
 /** \class casadi::SnoptInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -796,17 +796,17 @@
 /** \class casadi::HomotopyNLPInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
-/** \class casadi::HomotopyNLPSolver
+/** \class casadi::HomotopyNlpSolver
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::StabilizedSQICInternal
@@ -907,18 +907,18 @@
 /** \class casadi::WorhpInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
 /** \class casadi::SCPgenInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -941,9 +941,9 @@
 /** \class casadi::IpoptInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -963,20 +963,20 @@
 @copydoc scheme_LPSolverOutput
 */
 /// \cond INTERNAL
-/** \class casadi::NLPSolverInternal
+/** \class casadi::NlpSolverInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
-/** \class casadi::NLPSolver
+/** \class casadi::NlpSolver
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::CplexInternal
@@ -1034,9 +1034,9 @@
 /** \class casadi::SQPInternal
 \n
 \par
-@copydoc scheme_NLPSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_NLPSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL

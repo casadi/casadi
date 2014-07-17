@@ -32,14 +32,14 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  class CASADI_NLPSOLVER_SQPMETHOD_EXPORT SQPInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_SQPMETHOD_EXPORT SQPInternal : public NlpSolverInternal {
   public:
     explicit SQPInternal(const Function& nlp);
     virtual ~SQPInternal();
     virtual SQPInternal* clone() const { return new SQPInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new SQPInternal(nlp);}
 
     virtual void init();

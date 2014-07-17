@@ -42,14 +42,14 @@ namespace casadi {
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */
-  class CASADI_NLPSOLVER_SCPGEN_EXPORT SCPgenInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_SCPGEN_EXPORT SCPgenInternal : public NlpSolverInternal {
   public:
     explicit SCPgenInternal(const Function& nlp);
     virtual ~SCPgenInternal();
     virtual SCPgenInternal* clone() const { return new SCPgenInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new SCPgenInternal(nlp);}
 
     virtual void init();

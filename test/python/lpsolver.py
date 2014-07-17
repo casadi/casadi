@@ -34,7 +34,7 @@ except:
   pass
 
 try:
-  NLPSolver.loadPlugin("ipopt")
+  NlpSolver.loadPlugin("ipopt")
   lpsolvers.append(("qp",{"qp_solver": "nlp", "qp_solver_options":{"nlp_solver":"ipopt"}},False))
 except:
   pass

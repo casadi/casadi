@@ -1374,7 +1374,7 @@ Callback.
 
 In C++, supply a CallbackCPtr function pointer When the callback function
 returns a non-zero integer, the host is signalled of a problem. E.g. an
-NLPSolver may halt iterations if the Callback is something else than 0
+NlpSolver may halt iterations if the Callback is something else than 0
 
 In python, supply a callable, annotated with pycallback decorator
 
@@ -8472,7 +8472,7 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_STRING    | GenericType( | An NLPSolver | casadi::Dire |
+| nlp_solver   | OT_STRING    | GenericType( | An NlpSolver | casadi::Dire |
 |              |              | )            | creator      | ctCollocatio |
 |              |              |              | function     | nInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -8832,9 +8832,9 @@ Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::DirectCollocation::getNLPSolver "
+%feature("docstring") casadi::DirectCollocation::getNlpSolver "
 
-Access the underlying NLPSolver object.
+Access the underlying NlpSolver object.
 
 ";
 
@@ -9742,7 +9742,7 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_STRING    | GenericType( | An NLPSolver | casadi::Dire |
+| nlp_solver   | OT_STRING    | GenericType( | An NlpSolver | casadi::Dire |
 |              |              | )            | creator      | ctMultipleSh |
 |              |              |              | function     | ootingIntern |
 |              |              |              |              | al           |
@@ -10154,7 +10154,7 @@ internally
 
 %feature("docstring") casadi::DirectMultipleShooting::getCfcn "";
 
-%feature("docstring") casadi::DirectMultipleShooting::getNLPSolver "";
+%feature("docstring") casadi::DirectMultipleShooting::getNlpSolver "";
 
 %feature("docstring") casadi::DirectMultipleShooting::spInit "[INTERNAL]
 Reset the sparsity propagation.
@@ -10545,7 +10545,7 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::DirectSingleShooting::getNLPSolver "";
+%feature("docstring") casadi::DirectSingleShooting::getNlpSolver "";
 
 %feature("docstring") casadi::DirectSingleShooting::dictionary "
 
@@ -10862,7 +10862,7 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_STRING    | GenericType( | An NLPSolver | casadi::Dire |
+| nlp_solver   | OT_STRING    | GenericType( | An NlpSolver | casadi::Dire |
 |              |              | )            | creator      | ctSingleShoo |
 |              |              |              | function     | tingInternal |
 +--------------+--------------+--------------+--------------+--------------+
@@ -18047,7 +18047,7 @@ C++ includes: schemes_helpers.hpp ";
 casadi::HNLPInputIOSchemeVector::HNLPInputIOSchemeVector "[INTERNAL] ";
 
 
-// File: classcasadi_1_1HomotopyNLPSolver.xml
+// File: classcasadi_1_1HomotopyNlpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -18055,30 +18055,30 @@ casadi::HNLPInputIOSchemeVector::HNLPInputIOSchemeVector "[INTERNAL] ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::HomotopyNLPSolver::setOptionByEnumValue " [INTERNAL]  Set a certain
+casadi::HomotopyNlpSolver::setOptionByEnumValue " [INTERNAL]  Set a certain
 option by giving an enum value.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::isInit "
+%feature("docstring") casadi::HomotopyNlpSolver::isInit "
 
 Is initialized?
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getStats "
+%feature("docstring") casadi::HomotopyNlpSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getNumOutputs "
+%feature("docstring") casadi::HomotopyNlpSolver::getNumOutputs "
 
 Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::tangent "
+%feature("docstring") casadi::HomotopyNlpSolver::tangent "
 
 Generate a tangent function of output oind with respect to input iind.
 
@@ -18094,12 +18094,12 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::outputScheme "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::outputScheme "[INTERNAL]
 Access input/output scheme.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::symbolicInputSX "
+%feature("docstring") casadi::HomotopyNlpSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
@@ -18108,7 +18108,7 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::symbolicInput "
+%feature("docstring") casadi::HomotopyNlpSolver::symbolicInput "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -18116,13 +18116,13 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::hasOption "
+%feature("docstring") casadi::HomotopyNlpSolver::hasOption "
 
 check if there is an option str
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::jacobian "
+%feature("docstring") casadi::HomotopyNlpSolver::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
 
@@ -18144,7 +18144,7 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOutput "
+%feature("docstring") casadi::HomotopyNlpSolver::getOutput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getOutput(int oind=0) const
 ------------------------------------------------------------------------
@@ -18192,24 +18192,24 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::repr "[INTERNAL]  Print a
+%feature("docstring") casadi::HomotopyNlpSolver::repr "[INTERNAL]  Print a
 representation of the object.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::evaluate "
+%feature("docstring") casadi::HomotopyNlpSolver::evaluate "
 
 Evaluate.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getNumOutputElements "
+%feature("docstring") casadi::HomotopyNlpSolver::getNumOutputElements "
 
 Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getInput "
+%feature("docstring") casadi::HomotopyNlpSolver::getInput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getInput(int iind=0) const
 ------------------------------------------------------------------------
@@ -18257,7 +18257,7 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setInput "
+%feature("docstring") casadi::HomotopyNlpSolver::setInput "
 
 >  void casadi::IOInterface< Function  >::setInput(T val, int iind=0)
 ------------------------------------------------------------------------
@@ -18287,7 +18287,7 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::inputS "
+%feature("docstring") casadi::HomotopyNlpSolver::inputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::inputS(int i)
 ------------------------------------------------------------------------
@@ -18301,19 +18301,19 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getInputScheme "
+%feature("docstring") casadi::HomotopyNlpSolver::getInputScheme "
 
 Get input scheme.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::jacSparsity "
+%feature("docstring") casadi::HomotopyNlpSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::derivative "
+%feature("docstring") casadi::HomotopyNlpSolver::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -18335,42 +18335,42 @@ returned.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::call "
+%feature("docstring") casadi::HomotopyNlpSolver::call "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::printPtr "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::printPtr "[INTERNAL]
 Print the pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::spCanEvaluate "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::spCanEvaluate "[INTERNAL]
 Is the class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::printOptions "
+%feature("docstring") casadi::HomotopyNlpSolver::printOptions "
 
 Print options to a stream.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::inputScheme "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::inputScheme "[INTERNAL]
 Access input/output scheme.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getNumInputs "
+%feature("docstring") casadi::HomotopyNlpSolver::getNumInputs "
 
 Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setJacobian "
+%feature("docstring") casadi::HomotopyNlpSolver::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
@@ -18378,7 +18378,7 @@ internally
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::generateCode "
+%feature("docstring") casadi::HomotopyNlpSolver::generateCode "
 
 >  void casadi::Function::generateCode(const std::string &filename)
 ------------------------------------------------------------------------
@@ -18394,7 +18394,7 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::gradient "
+%feature("docstring") casadi::HomotopyNlpSolver::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
 
@@ -18410,7 +18410,7 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::callDerivative "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::callDerivative "[INTERNAL]
 Evaluate the function symbolically or numerically with directional
 derivatives The first two arguments are the nondifferentiated inputs and
 results of the evaluation, the next two arguments are a set of forward
@@ -18422,19 +18422,19 @@ adjoint directions.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
+%feature("docstring") casadi::HomotopyNlpSolver::assignNodeNoCount "[INTERNAL]  Assign the node to a node class pointer without reference
 counting.
 
 improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getCount "[INTERNAL]  Get
+%feature("docstring") casadi::HomotopyNlpSolver::getCount "[INTERNAL]  Get
 the reference count.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setOption "
+%feature("docstring") casadi::HomotopyNlpSolver::setOption "
 
 >  void casadi::OptionsFunctionality::setOption(const std::string &str, const GenericType &val)
 ------------------------------------------------------------------------
@@ -18456,35 +18456,35 @@ changes, the init function should be called again.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::dictionary "
+%feature("docstring") casadi::HomotopyNlpSolver::dictionary "
 
 Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::output_struct "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::output_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::isNull "
+%feature("docstring") casadi::HomotopyNlpSolver::isNull "
 
 Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::HomotopyNLPSolver "
+%feature("docstring") casadi::HomotopyNlpSolver::HomotopyNlpSolver "
 
 Default constructor.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::assertInit "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::assertInit "[INTERNAL]
 Assert that it is initialized
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::hessian "
+%feature("docstring") casadi::HomotopyNlpSolver::hessian "
 
 Generate a Hessian function of output oind with respect to input iind.
 
@@ -18500,7 +18500,7 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::schemeEntry "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::schemeEntry "[INTERNAL]
 Find the index for a string describing a particular entry of a scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -18508,42 +18508,42 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOutputScheme "
+%feature("docstring") casadi::HomotopyNlpSolver::getOutputScheme "
 
 Get output scheme.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getNumInputNonzeros "
+%feature("docstring") casadi::HomotopyNlpSolver::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getStat "
+%feature("docstring") casadi::HomotopyNlpSolver::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOptionTypeName "
+%feature("docstring") casadi::HomotopyNlpSolver::getOptionTypeName "
 
 Get the type name of a certain option.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getNumOutputNonzeros "
+%feature("docstring") casadi::HomotopyNlpSolver::getNumOutputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::assignNode "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::assignNode "[INTERNAL]
 Assign the node to a node class pointer (or null)
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::makeUnique "
+%feature("docstring") casadi::HomotopyNlpSolver::makeUnique "
 
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
@@ -18560,18 +18560,18 @@ SWIGINTERNAL
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::checkInputs "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::checkInputs "[INTERNAL]
 Check if the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setJacSparsity "
+%feature("docstring") casadi::HomotopyNlpSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver "
+%feature("docstring") casadi::HomotopyNlpSolver "
 
 Base class for Homotopy NLP Solvers.
 
@@ -18584,7 +18584,7 @@ In a homotopy from tau = 0 to tau = 1.
 
 Joris Gillis
 
->Input scheme: casadi::NLPSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -18622,7 +18622,7 @@ Joris Gillis
 |                        |                        | .                      |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::NLPSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
+>Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -18748,7 +18748,7 @@ Diagrams
 
 C++ includes: homotopy_nlp_solver.hpp ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setOutput "
+%feature("docstring") casadi::HomotopyNlpSolver::setOutput "
 
 >  void casadi::IOInterface< Function  >::setOutput(T val, int oind=0)
 ------------------------------------------------------------------------
@@ -18778,13 +18778,13 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getNumInputElements "
+%feature("docstring") casadi::HomotopyNlpSolver::getNumInputElements "
 
 Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::spEvaluate "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::spEvaluate "[INTERNAL]
 Propagate the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
@@ -18792,7 +18792,7 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::outputSchemeEntry "[INTERNAL]  Find the index for a string describing a particular entry of an
+%feature("docstring") casadi::HomotopyNlpSolver::outputSchemeEntry "[INTERNAL]  Find the index for a string describing a particular entry of an
 output scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -18800,13 +18800,13 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setOutputScheme "
+%feature("docstring") casadi::HomotopyNlpSolver::setOutputScheme "
 
 Set output scheme.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOptionDefault "
+%feature("docstring") casadi::HomotopyNlpSolver::getOptionDefault "
 
 INTERNAL.
 
@@ -18814,7 +18814,7 @@ Get the default of a certain option
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOptionNames "
+%feature("docstring") casadi::HomotopyNlpSolver::getOptionNames "
 
 INTERNAL.
 
@@ -18822,7 +18822,7 @@ Get a list of all option names
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::inputSchemeEntry "[INTERNAL]  Find the index for a string describing a particular entry of an
+%feature("docstring") casadi::HomotopyNlpSolver::inputSchemeEntry "[INTERNAL]  Find the index for a string describing a particular entry of an
 input scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -18830,13 +18830,13 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::addMonitor "
+%feature("docstring") casadi::HomotopyNlpSolver::addMonitor "
 
 Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::init "
+%feature("docstring") casadi::HomotopyNlpSolver::init "
 
 Initialize or re-initialize the object:
 
@@ -18844,31 +18844,31 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOptionDescription "
+%feature("docstring") casadi::HomotopyNlpSolver::getOptionDescription "
 
 Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::fullJacobian "
+%feature("docstring") casadi::HomotopyNlpSolver::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::input_struct "[INTERNAL]
+%feature("docstring") casadi::HomotopyNlpSolver::input_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getRepresentation "
+%feature("docstring") casadi::HomotopyNlpSolver::getRepresentation "
 
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::get "
+%feature("docstring") casadi::HomotopyNlpSolver::get "
 
 >  const SharedObjectNode * casadi::SharedObject::get() const 
 ------------------------------------------------------------------------
@@ -18882,16 +18882,16 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
+%feature("docstring") casadi::HomotopyNlpSolver::getOptionAllowedIndex "[INTERNAL]  Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::print "[INTERNAL]  Print a
+%feature("docstring") casadi::HomotopyNlpSolver::print "[INTERNAL]  Print a
 description of the object.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::output "
+%feature("docstring") casadi::HomotopyNlpSolver::output "
 
 [UNSAFE] Obtain reference to outputs  getOutput, getOutput
 
@@ -18899,19 +18899,19 @@ Access output argument
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOption "
+%feature("docstring") casadi::HomotopyNlpSolver::getOption "
 
 get an option value
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setNumInputs "
+%feature("docstring") casadi::HomotopyNlpSolver::setNumInputs "
 
 Set the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::callParallel "
+%feature("docstring") casadi::HomotopyNlpSolver::callParallel "
 
 Evaluate symbolically in parallel (matrix graph)
 
@@ -18922,13 +18922,13 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOptionAllowed "
+%feature("docstring") casadi::HomotopyNlpSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::outputS "
+%feature("docstring") casadi::HomotopyNlpSolver::outputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::outputS(int i)
 ------------------------------------------------------------------------
@@ -18942,52 +18942,52 @@ Const access an output.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOptionType "
+%feature("docstring") casadi::HomotopyNlpSolver::getOptionType "
 
 Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::removeMonitor "
+%feature("docstring") casadi::HomotopyNlpSolver::removeMonitor "
 
 Remove modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::clone "[INTERNAL]  Deep
+%feature("docstring") casadi::HomotopyNlpSolver::clone "[INTERNAL]  Deep
 copy.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::weak "[INTERNAL]  Get a
+%feature("docstring") casadi::HomotopyNlpSolver::weak "[INTERNAL]  Get a
 weak reference to the object.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getDescription "
+%feature("docstring") casadi::HomotopyNlpSolver::getDescription "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setNumOutputs "
+%feature("docstring") casadi::HomotopyNlpSolver::setNumOutputs "
 
 Set the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::swap "[INTERNAL]  Swap
+%feature("docstring") casadi::HomotopyNlpSolver::swap "[INTERNAL]  Swap
 content with another instance.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getSanitizedName "
+%feature("docstring") casadi::HomotopyNlpSolver::getSanitizedName "
 
 get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setFullJacobian "
+%feature("docstring") casadi::HomotopyNlpSolver::setFullJacobian "
 
 Set the Jacobian of all the input nonzeros with respect to all output
 nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
@@ -18995,19 +18995,19 @@ are kept internally
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::hasSetOption "
+%feature("docstring") casadi::HomotopyNlpSolver::hasSetOption "
 
 check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::copyOptions "
+%feature("docstring") casadi::HomotopyNlpSolver::copyOptions "
 
 Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::input "
+%feature("docstring") casadi::HomotopyNlpSolver::input "
 
 [UNSAFE] Obtain reference to inputs  getInput, setInput
 
@@ -19015,7 +19015,7 @@ Access input argument
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setDerivative "
+%feature("docstring") casadi::HomotopyNlpSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -19025,31 +19025,31 @@ kept internally
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+%feature("docstring") casadi::HomotopyNlpSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::spInit "[INTERNAL]  Reset
+%feature("docstring") casadi::HomotopyNlpSolver::spInit "[INTERNAL]  Reset
 the sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::checkNode "
+%feature("docstring") casadi::HomotopyNlpSolver::checkNode "
 
 Check if the node is pointing to the right type of object.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::setInputScheme "
+%feature("docstring") casadi::HomotopyNlpSolver::setInputScheme "
 
 Set input scheme.
 
 ";
 
-%feature("docstring") casadi::HomotopyNLPSolver::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
+%feature("docstring") casadi::HomotopyNlpSolver::getOptionEnumValue "[INTERNAL]  Get the enum value corresponding to th certain option.
 
 ";
 
@@ -31389,7 +31389,7 @@ casadi::NLPOutputIOSchemeVector::NLPOutputIOSchemeVector "[INTERNAL] ";
 ";
 
 
-// File: classcasadi_1_1NLPSolver.xml
+// File: classcasadi_1_1NlpSolver.xml
 
 
 /*  Simple Getters & Setters  */
@@ -31397,19 +31397,19 @@ casadi::NLPOutputIOSchemeVector::NLPOutputIOSchemeVector "[INTERNAL] ";
 /*  Advanced Getters  */
 
 /*  Option Functionality  */ %feature("docstring")
-casadi::NLPSolver::getNumOutputNonzeros "
+casadi::NlpSolver::getNumOutputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::checkNode "
+%feature("docstring") casadi::NlpSolver::checkNode "
 
 Check if the node is pointing to the right type of object.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setOption "
+%feature("docstring") casadi::NlpSolver::setOption "
 
 >  void casadi::OptionsFunctionality::setOption(const std::string &str, const GenericType &val)
 ------------------------------------------------------------------------
@@ -31431,15 +31431,15 @@ changes, the init function should be called again.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setQPOptions "
+%feature("docstring") casadi::NlpSolver::setQPOptions "
 
 Set options that make the NLP solver more suitable for solving QPs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getReportConstraints "";
+%feature("docstring") casadi::NlpSolver::getReportConstraints "";
 
-%feature("docstring") casadi::NLPSolver::symbolicInput "
+%feature("docstring") casadi::NlpSolver::symbolicInput "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 
@@ -31447,7 +31447,7 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::NLPSolver::init "
+%feature("docstring") casadi::NlpSolver::init "
 
 Initialize or re-initialize the object:
 
@@ -31455,13 +31455,13 @@ more documentation in the node class ( SharedObjectNode and derived classes)
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getNumInputElements "
+%feature("docstring") casadi::NlpSolver::getNumInputElements "
 
 Get total number of elements in all of the matrix-valued inputs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::derivative "
+%feature("docstring") casadi::NlpSolver::derivative "
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -31483,13 +31483,13 @@ returned.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::isInit "
+%feature("docstring") casadi::NlpSolver::isInit "
 
 Is initialized?
 
 ";
 
-%feature("docstring") casadi::NLPSolver::gradient "
+%feature("docstring") casadi::NlpSolver::gradient "
 
 Generate a gradient function of output oind with respect to input iind.
 
@@ -31505,24 +31505,24 @@ that the output must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::outputScheme "[INTERNAL]  Access
+%feature("docstring") casadi::NlpSolver::outputScheme "[INTERNAL]  Access
 input/output scheme.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getNumInputs "
+%feature("docstring") casadi::NlpSolver::getNumInputs "
 
 Get the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOptionType "
+%feature("docstring") casadi::NlpSolver::getOptionType "
 
 Get the type of a certain option.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::jacobian "
+%feature("docstring") casadi::NlpSolver::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
 
@@ -31544,18 +31544,18 @@ corresponding to the Jacobian and the same number of inputs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::inputScheme "[INTERNAL]  Access
+%feature("docstring") casadi::NlpSolver::inputScheme "[INTERNAL]  Access
 input/output scheme.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getStat "
+%feature("docstring") casadi::NlpSolver::getStat "
 
 Get a single statistic obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOptionDefault "
+%feature("docstring") casadi::NlpSolver::getOptionDefault "
 
 INTERNAL.
 
@@ -31563,7 +31563,7 @@ Get the default of a certain option
 
 ";
 
-%feature("docstring") casadi::NLPSolver::symbolicInputSX "
+%feature("docstring") casadi::NlpSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph.
@@ -31572,13 +31572,13 @@ There is no guarantee that consecutive calls return identical objects
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getNumOutputElements "
+%feature("docstring") casadi::NlpSolver::getNumOutputElements "
 
 Get total number of elements in all of the matrix-valued outputs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOptionNames "
+%feature("docstring") casadi::NlpSolver::getOptionNames "
 
 INTERNAL.
 
@@ -31586,20 +31586,20 @@ Get a list of all option names
 
 ";
 
-%feature("docstring") casadi::NLPSolver::fullJacobian "
+%feature("docstring") casadi::NlpSolver::fullJacobian "
 
 Generate a Jacobian function of all the inputs elements with respect to all
 the output elements).
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getStats "
+%feature("docstring") casadi::NlpSolver::getStats "
 
 Get all statistics obtained at the end of the last evaluate call.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::outputSchemeEntry "[INTERNAL]
+%feature("docstring") casadi::NlpSolver::outputSchemeEntry "[INTERNAL]
 Find the index for a string describing a particular entry of an output
 scheme.
 
@@ -31608,7 +31608,7 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::NLPSolver::hessLag "
+%feature("docstring") casadi::NlpSolver::hessLag "
 
 Access the Hessian of the Lagrangian function.
 
@@ -31634,36 +31634,36 @@ Access the Hessian of the Lagrangian function.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::clone "[INTERNAL]  Deep copy.
+%feature("docstring") casadi::NlpSolver::clone "[INTERNAL]  Deep copy.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::input_struct "[INTERNAL]
+%feature("docstring") casadi::NlpSolver::input_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getInputScheme "
+%feature("docstring") casadi::NlpSolver::getInputScheme "
 
 Get input scheme.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::copyOptions "
+%feature("docstring") casadi::NlpSolver::copyOptions "
 
 Copy all options from another object.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::hasSetOption "
+%feature("docstring") casadi::NlpSolver::hasSetOption "
 
 check if the user has there is an option str
 
 ";
 
-%feature("docstring") casadi::NLPSolver "
+%feature("docstring") casadi::NlpSolver "
 
-NLPSolver.
+NlpSolver.
 
 Solves the following parametric nonlinear program (NLP):min          F(x, p)
 x  subject to             LBX <=   x    <= UBX LBG <= G(x, p) <= UBG
@@ -31672,7 +31672,7 @@ np: number of parameters
 
 Joel Andersson
 
->Input scheme: casadi::NLPSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -31710,7 +31710,7 @@ Joel Andersson
 |                        |                        | .                      |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::NLPSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
+>Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -31928,12 +31928,12 @@ Diagrams
 
 C++ includes: nlp_solver.hpp ";
 
-%feature("docstring") casadi::NLPSolver::repr "[INTERNAL]  Print a
+%feature("docstring") casadi::NlpSolver::repr "[INTERNAL]  Print a
 representation of the object.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::spEvaluate "[INTERNAL]  Propagate
+%feature("docstring") casadi::NlpSolver::spEvaluate "[INTERNAL]  Propagate
 the sparsity pattern through a set of directional.
 
 derivatives forward or backward (for usage, see the example
@@ -31941,7 +31941,7 @@ propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::NLPSolver::inputS "
+%feature("docstring") casadi::NlpSolver::inputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::inputS(int i)
 ------------------------------------------------------------------------
@@ -31955,7 +31955,7 @@ Const access an input.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOutput "
+%feature("docstring") casadi::NlpSolver::getOutput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getOutput(int oind=0) const
 ------------------------------------------------------------------------
@@ -32003,13 +32003,13 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::isNull "
+%feature("docstring") casadi::NlpSolver::isNull "
 
 Is a null pointer?
 
 ";
 
-%feature("docstring") casadi::NLPSolver::tangent "
+%feature("docstring") casadi::NlpSolver::tangent "
 
 Generate a tangent function of output oind with respect to input iind.
 
@@ -32025,19 +32025,19 @@ that the input must be scalar. In other cases, use the Jacobian instead.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setOptionsFromFile "
+%feature("docstring") casadi::NlpSolver::setOptionsFromFile "
 
 Read options from parameter xml.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOptionAllowed "
+%feature("docstring") casadi::NlpSolver::getOptionAllowed "
 
 Get the allowed values of a certain option.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setDerivative "
+%feature("docstring") casadi::NlpSolver::setDerivative "
 
 Set a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives.
@@ -32047,7 +32047,7 @@ kept internally
 
 ";
 
-%feature("docstring") casadi::NLPSolver::output "
+%feature("docstring") casadi::NlpSolver::output "
 
 [UNSAFE] Obtain reference to outputs  getOutput, getOutput
 
@@ -32055,24 +32055,24 @@ Access output argument
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setNumOutputs "
+%feature("docstring") casadi::NlpSolver::setNumOutputs "
 
 Set the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::output_struct "[INTERNAL]
+%feature("docstring") casadi::NlpSolver::output_struct "[INTERNAL]
 Input/output structures of the function
 
 ";
 
-%feature("docstring") casadi::NLPSolver::removeMonitor "
+%feature("docstring") casadi::NlpSolver::removeMonitor "
 
 Remove modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setOutput "
+%feature("docstring") casadi::NlpSolver::setOutput "
 
 >  void casadi::IOInterface< Function  >::setOutput(T val, int oind=0)
 ------------------------------------------------------------------------
@@ -32102,34 +32102,34 @@ oname:  output name. Only allowed when an output scheme is set.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::assertInit "[INTERNAL]  Assert
+%feature("docstring") casadi::NlpSolver::assertInit "[INTERNAL]  Assert
 that it is initialized
 
 ";
 
-%feature("docstring") casadi::NLPSolver::dictionary "
+%feature("docstring") casadi::NlpSolver::dictionary "
 
 Get the dictionary.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOptionTypeName "
+%feature("docstring") casadi::NlpSolver::getOptionTypeName "
 
 Get the type name of a certain option.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::call "
+%feature("docstring") casadi::NlpSolver::call "
 
 Evaluate the function symbolically or numerically.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::nlp "
+%feature("docstring") casadi::NlpSolver::nlp "
 
 Access the NLP.
 
->Input scheme: casadi::NLPSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -32167,7 +32167,7 @@ Access the NLP.
 |                        |                        | .                      |
 +------------------------+------------------------+------------------------+
 
->Output scheme: casadi::NLPSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
+>Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -32198,23 +32198,23 @@ Access the NLP.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::checkInputs "[INTERNAL]  Check if
+%feature("docstring") casadi::NlpSolver::checkInputs "[INTERNAL]  Check if
 the numerical values of the supplied bounds make sense.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::printPtr "[INTERNAL]  Print the
+%feature("docstring") casadi::NlpSolver::printPtr "[INTERNAL]  Print the
 pointer to the internal class
 
 ";
 
-%feature("docstring") casadi::NLPSolver::evaluate "
+%feature("docstring") casadi::NlpSolver::evaluate "
 
 Evaluate.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::hessian "
+%feature("docstring") casadi::NlpSolver::hessian "
 
 Generate a Hessian function of output oind with respect to input iind.
 
@@ -32230,25 +32230,25 @@ corresponding to the Hessian and the gradients.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOptionDescription "
+%feature("docstring") casadi::NlpSolver::getOptionDescription "
 
 Get the description of a certain option.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getDescription "
+%feature("docstring") casadi::NlpSolver::getDescription "
 
 Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::NLPSolver::printOptions "
+%feature("docstring") casadi::NlpSolver::printOptions "
 
 Print options to a stream.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::get "
+%feature("docstring") casadi::NlpSolver::get "
 
 >  const SharedObjectNode * casadi::SharedObject::get() const 
 ------------------------------------------------------------------------
@@ -32262,25 +32262,25 @@ Get a pointer to the node.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setNumInputs "
+%feature("docstring") casadi::NlpSolver::setNumInputs "
 
 Set the number of function inputs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOptionEnumValue "[INTERNAL]
+%feature("docstring") casadi::NlpSolver::getOptionEnumValue "[INTERNAL]
 Get the enum value corresponding to th certain option.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::spCanEvaluate "[INTERNAL]  Is the
+%feature("docstring") casadi::NlpSolver::spCanEvaluate "[INTERNAL]  Is the
 class able to propagate seeds through the algorithm?
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setJacobian "
+%feature("docstring") casadi::NlpSolver::setJacobian "
 
 Set the Jacobian function of output oind with respect to input iind NOTE:
 Does not take ownership, only weak references to the Jacobians are kept
@@ -32288,7 +32288,7 @@ internally
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setFullJacobian "
+%feature("docstring") casadi::NlpSolver::setFullJacobian "
 
 Set the Jacobian of all the input nonzeros with respect to all output
 nonzeros NOTE: Does not take ownership, only weak references to the Jacobian
@@ -32296,48 +32296,48 @@ are kept internally
 
 ";
 
-%feature("docstring") casadi::NLPSolver::NLPSolver "
+%feature("docstring") casadi::NlpSolver::NlpSolver "
 
->  casadi::NLPSolver::NLPSolver()
+>  casadi::NlpSolver::NlpSolver()
 ------------------------------------------------------------------------
 
 Default constructor.
 
->  casadi::NLPSolver::NLPSolver(const std::string &name, const Function &nlp)
+>  casadi::NlpSolver::NlpSolver(const std::string &name, const Function &nlp)
 ------------------------------------------------------------------------
 
 NLP solver factory.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getCount "[INTERNAL]  Get the
+%feature("docstring") casadi::NlpSolver::getCount "[INTERNAL]  Get the
 reference count.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOptionAllowedIndex "[INTERNAL]
+%feature("docstring") casadi::NlpSolver::getOptionAllowedIndex "[INTERNAL]
 Get the index into allowed options of a certain option.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
+%feature("docstring") casadi::NlpSolver::setOptionByAllowedIndex "[INTERNAL]  Set a certain option by giving its index into the allowed
 values.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::reportConstraints "
+%feature("docstring") casadi::NlpSolver::reportConstraints "
 
 Prints out a human readable report about possible constraint violations,
 after solving.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setOptionByEnumValue "[INTERNAL]
+%feature("docstring") casadi::NlpSolver::setOptionByEnumValue "[INTERNAL]
 Set a certain option by giving an enum value.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::generateCode "
+%feature("docstring") casadi::NlpSolver::generateCode "
 
 >  void casadi::Function::generateCode(const std::string &filename)
 ------------------------------------------------------------------------
@@ -32353,20 +32353,20 @@ Generate C code for the function.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::jacSparsity "
+%feature("docstring") casadi::NlpSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::NLPSolver::spInit "[INTERNAL]  Reset the
+%feature("docstring") casadi::NlpSolver::spInit "[INTERNAL]  Reset the
 sparsity propagation.
 
 (for usage, see the example propagating_sparsity.cpp)
 
 ";
 
-%feature("docstring") casadi::NLPSolver::outputS "
+%feature("docstring") casadi::NlpSolver::outputS "
 
 >  DMatrix& casadi::IOInterface< Function  >::outputS(int i)
 ------------------------------------------------------------------------
@@ -32380,36 +32380,36 @@ Const access an output.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setJacSparsity "
+%feature("docstring") casadi::NlpSolver::setJacSparsity "
 
 Generate the sparsity of a Jacobian block
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getReducedHessian "
+%feature("docstring") casadi::NlpSolver::getReducedHessian "
 
 Get the reduced Hessian. Requires a patched sIPOPT installation, see CasADi
 documentation.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::swap "[INTERNAL]  Swap content
+%feature("docstring") casadi::NlpSolver::swap "[INTERNAL]  Swap content
 with another instance.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::assignNode "[INTERNAL]  Assign the
+%feature("docstring") casadi::NlpSolver::assignNode "[INTERNAL]  Assign the
 node to a node class pointer (or null)
 
 ";
 
-%feature("docstring") casadi::NLPSolver::hasOption "
+%feature("docstring") casadi::NlpSolver::hasOption "
 
 check if there is an option str
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getInput "
+%feature("docstring") casadi::NlpSolver::getInput "
 
 >  Matrix<double> casadi::IOInterface< Function  >::getInput(int iind=0) const
 ------------------------------------------------------------------------
@@ -32457,12 +32457,12 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::print "[INTERNAL]  Print a
+%feature("docstring") casadi::NlpSolver::print "[INTERNAL]  Print a
 description of the object.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::callParallel "
+%feature("docstring") casadi::NlpSolver::callParallel "
 
 Evaluate symbolically in parallel (matrix graph)
 
@@ -32473,13 +32473,13 @@ paropt:  Set of options to be passed to the Parallelizer
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getRepresentation "
+%feature("docstring") casadi::NlpSolver::getRepresentation "
 
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::NLPSolver::input "
+%feature("docstring") casadi::NlpSolver::input "
 
 [UNSAFE] Obtain reference to inputs  getInput, setInput
 
@@ -32487,7 +32487,7 @@ Access input argument
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setInput "
+%feature("docstring") casadi::NlpSolver::setInput "
 
 >  void casadi::IOInterface< Function  >::setInput(T val, int iind=0)
 ------------------------------------------------------------------------
@@ -32517,19 +32517,19 @@ iname:  input name. Only allowed when an input scheme is set.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOutputScheme "
+%feature("docstring") casadi::NlpSolver::getOutputScheme "
 
 Get output scheme.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setOutputScheme "
+%feature("docstring") casadi::NlpSolver::setOutputScheme "
 
 Set output scheme.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::inputSchemeEntry "[INTERNAL]  Find
+%feature("docstring") casadi::NlpSolver::inputSchemeEntry "[INTERNAL]  Find
 the index for a string describing a particular entry of an input scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -32537,7 +32537,7 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::NLPSolver::schemeEntry "[INTERNAL]  Find the
+%feature("docstring") casadi::NlpSolver::schemeEntry "[INTERNAL]  Find the
 index for a string describing a particular entry of a scheme.
 
 example: schemeEntry(\"x_opt\") -> returns NLP_SOLVER_X if FunctionInternal
@@ -32545,7 +32545,7 @@ adheres to SCHEME_NLPINput
 
 ";
 
-%feature("docstring") casadi::NLPSolver::callDerivative "[INTERNAL]
+%feature("docstring") casadi::NlpSolver::callDerivative "[INTERNAL]
 Evaluate the function symbolically or numerically with directional
 derivatives The first two arguments are the nondifferentiated inputs and
 results of the evaluation, the next two arguments are a set of forward
@@ -32557,7 +32557,7 @@ adjoint directions.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::jacG "
+%feature("docstring") casadi::NlpSolver::jacG "
 
 Access the Jacobian of the constraint function.
 
@@ -32596,19 +32596,19 @@ Access the Jacobian of the constraint function.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getOption "
+%feature("docstring") casadi::NlpSolver::getOption "
 
 get an option value
 
 ";
 
-%feature("docstring") casadi::NLPSolver::setInputScheme "
+%feature("docstring") casadi::NlpSolver::setInputScheme "
 
 Set input scheme.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::makeUnique "
+%feature("docstring") casadi::NlpSolver::makeUnique "
 
 >  void casadi::SharedObject::makeUnique(bool clone_members=true)
 ------------------------------------------------------------------------
@@ -32625,7 +32625,7 @@ SWIGINTERNAL
 
 ";
 
-%feature("docstring") casadi::NLPSolver::gradF "
+%feature("docstring") casadi::NlpSolver::gradF "
 
 Access the objective gradient function>Input scheme: casadi::GradFInput
 (GRADF_NUM_IN = 3) [gradFIn] +-----------+-------+---------------------+ |
@@ -32636,110 +32636,110 @@ variable . | +-----------+-------+---------------------+ | GRADF_P   | p
 
 ";
 
-%feature("docstring") casadi::NLPSolver::weak "[INTERNAL]  Get a weak
+%feature("docstring") casadi::NlpSolver::weak "[INTERNAL]  Get a weak
 reference to the object.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::addMonitor "
+%feature("docstring") casadi::NlpSolver::addMonitor "
 
 Add modules to be monitored.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getNumOutputs "
+%feature("docstring") casadi::NlpSolver::getNumOutputs "
 
 Get the number of function outputs.
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getSanitizedName "
+%feature("docstring") casadi::NlpSolver::getSanitizedName "
 
 get function name with all non alphanumeric characters converted to '_'
 
 ";
 
-%feature("docstring") casadi::NLPSolver::assignNodeNoCount "[INTERNAL]
+%feature("docstring") casadi::NlpSolver::assignNodeNoCount "[INTERNAL]
 Assign the node to a node class pointer without reference counting.
 
 improper use will cause memory leaks!
 
 ";
 
-%feature("docstring") casadi::NLPSolver::getNumInputNonzeros "
+%feature("docstring") casadi::NlpSolver::getNumInputNonzeros "
 
 Get total number of nonzeros in all of the matrix-valued inputs.
 
 ";
 
 
-// File: classcasadi_1_1NLPSolverInputIOSchemeVector.xml
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
+// File: classcasadi_1_1NlpSolverInputIOSchemeVector.xml
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::__len__ "[INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
-
-";
-
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::getDescription "[INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::vector "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
+
+";
+
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::vector "[INTERNAL] ";
 
 %feature("docstring")
-casadi::NLPSolverInputIOSchemeVector::NLPSolverInputIOSchemeVector "[INTERNAL] ";
+casadi::NlpSolverInputIOSchemeVector::NlpSolverInputIOSchemeVector "[INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::NLPSolverInputIOSchemeVector "[INTERNAL]
-Helper function for 'NLPSolverInput'
+%feature("docstring") casadi::NlpSolverInputIOSchemeVector "[INTERNAL]
+Helper function for 'NlpSolverInput'
 
 C++ includes: schemes_helpers.hpp ";
 
 %feature("docstring")
-casadi::NLPSolverInputIOSchemeVector::getRepresentation "[INTERNAL]  Return
+casadi::NlpSolverInputIOSchemeVector::getRepresentation "[INTERNAL]  Return
 a string with a representation (for SWIG)
 
 ";
 
 
-// File: classcasadi_1_1NLPSolverOutputIOSchemeVector.xml
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
+// File: classcasadi_1_1NlpSolverOutputIOSchemeVector.xml
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::repr "[INTERNAL]  Print a representation of the object.
 
 ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector "[INTERNAL]
-Helper function for 'NLPSolverOutput'
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector "[INTERNAL]
+Helper function for 'NlpSolverOutput'
 
 C++ includes: schemes_helpers.hpp ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::vector "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::vector "[INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::getDescription
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::getDescription
 "[INTERNAL]  Return a string with a description (for SWIG)
 
 ";
 
 %feature("docstring")
-casadi::NLPSolverOutputIOSchemeVector::getRepresentation "[INTERNAL]
+casadi::NlpSolverOutputIOSchemeVector::getRepresentation "[INTERNAL]
 Return a string with a representation (for SWIG)
 
 ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::__getitem__ "[INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::print "[INTERNAL]  Print a description of the object.
 
 ";
 
 %feature("docstring")
-casadi::NLPSolverOutputIOSchemeVector::NLPSolverOutputIOSchemeVector "[INTERNAL] ";
+casadi::NlpSolverOutputIOSchemeVector::NlpSolverOutputIOSchemeVector "[INTERNAL] ";
 
-%feature("docstring") casadi::NLPSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
+%feature("docstring") casadi::NlpSolverOutputIOSchemeVector::__len__ "[INTERNAL] ";
 
 
 // File: structcasadi_1_1NonnegativeChecker.xml
@@ -64233,12 +64233,12 @@ from the 'math.h' ('cmath') header.
 
 %feature("docstring") casadi::nlpSolverOut "
 
->  NLPSolverOutputIOSchemeVector<M> casadi::nlpSolverOut(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M())
+>  NlpSolverOutputIOSchemeVector<M> casadi::nlpSolverOut(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M())
 ------------------------------------------------------------------------
 
 Output arguments of an NLP Solver
 
->Output scheme: casadi::NLPSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
+>Output scheme: casadi::NlpSolverOutput (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -64993,12 +64993,12 @@ return.
 
 %feature("docstring") casadi::nlpSolverIn "
 
->  NLPSolverInputIOSchemeVector<M> casadi::nlpSolverIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M(), const std::string &arg_s6=\"\", const M &arg_m6=M(), const std::string &arg_s7=\"\", const M &arg_m7=M())
+>  NlpSolverInputIOSchemeVector<M> casadi::nlpSolverIn(const std::string &arg_s0=\"\", const M &arg_m0=M(), const std::string &arg_s1=\"\", const M &arg_m1=M(), const std::string &arg_s2=\"\", const M &arg_m2=M(), const std::string &arg_s3=\"\", const M &arg_m3=M(), const std::string &arg_s4=\"\", const M &arg_m4=M(), const std::string &arg_s5=\"\", const M &arg_m5=M(), const std::string &arg_s6=\"\", const M &arg_m6=M(), const std::string &arg_s7=\"\", const M &arg_m7=M())
 ------------------------------------------------------------------------
 
 Input arguments of an NLP Solver
 
->Input scheme: casadi::NLPSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
+>Input scheme: casadi::NlpSolverInput (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]
 +------------------------+------------------------+------------------------+
 |       Full name        |         Short          |      Description       |
 +========================+========================+========================+
@@ -66456,7 +66456,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__DPLE__doc.xml
 
 
-// File: group__HomotopyNLPSolver__doc.xml
+// File: group__HomotopyNlpSolver__doc.xml
 
 
 // File: group__ImplicitFunction__doc.xml
@@ -66489,7 +66489,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__LPSolver__doc.xml
 
 
-// File: group__NLPSolver__doc.xml
+// File: group__NlpSolver__doc.xml
 
 
 // File: group__Nullspace__doc.xml
@@ -66531,7 +66531,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__SOCPOutput.xml
 
 
-// File: group__scheme__NLPSolverOutput.xml
+// File: group__scheme__NlpSolverOutput.xml
 
 
 // File: group__scheme__SDPInput.xml
@@ -66552,7 +66552,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__SDPOutput.xml
 
 
-// File: group__scheme__NLPSolverInput.xml
+// File: group__scheme__NlpSolverInput.xml
 
 
 // File: group__scheme__DAEInput.xml

@@ -34,7 +34,7 @@ namespace casadi {
 
   extern "C"
   int CASADI_NLPSOLVER_WORHP_EXPORT
-  casadi_register_nlpsolver_worhp(NLPSolverInternal::Plugin* plugin) {
+  casadi_register_nlpsolver_worhp(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = WorhpInternal::creator;
     plugin->name = "worhp";
     plugin->doc = "WORHP docs not available";
@@ -44,10 +44,10 @@ namespace casadi {
 
   extern "C"
   void CASADI_NLPSOLVER_WORHP_EXPORT casadi_load_nlpsolver_worhp() {
-    NLPSolverInternal::registerPlugin(casadi_register_nlpsolver_worhp);
+    NlpSolverInternal::registerPlugin(casadi_register_nlpsolver_worhp);
   }
 
-  WorhpInternal::WorhpInternal(const Function& nlp) : NLPSolverInternal(nlp) {
+  WorhpInternal::WorhpInternal(const Function& nlp) : NlpSolverInternal(nlp) {
 
     // Monitors
     addOption("monitor",            OT_STRINGVECTOR,  GenericType(),  "Monitor functions",
@@ -200,7 +200,7 @@ namespace casadi {
   void WorhpInternal::init() {
 
     // Call the init method of the base class
-    NLPSolverInternal::init();
+    NlpSolverInternal::init();
 
     if (hasSetOption("Ares")) {
       std::vector<int> ares = getOption("Ares");

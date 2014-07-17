@@ -72,7 +72,7 @@ nlp.evaluate()
 #! Test the objective for some value of x:
 print nlp.output("f").toArray()
 
-solver = NLPSolver("ipopt", nlp)
+solver = NlpSolver("ipopt", nlp)
 solver.printOptions()
 
 solver.init()

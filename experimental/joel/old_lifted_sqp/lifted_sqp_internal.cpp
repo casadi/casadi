@@ -33,7 +33,7 @@
 using namespace std;
 namespace casadi{
 
-LiftedSQPInternal::LiftedSQPInternal(const Function& F, const Function& G) : NLPSolverInternal(Function(),F,G){
+LiftedSQPInternal::LiftedSQPInternal(const Function& F, const Function& G) : NlpSolverInternal(Function(),F,G){
   casadi_warning("casadi::LiftedSQP has been replaced by casadi::SCPgen. This class will be deleted.");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(), "Options to be passed to the QP solver");
@@ -62,7 +62,7 @@ LiftedSQPInternal::~LiftedSQPInternal(){
 
 void LiftedSQPInternal::init(){
   // Call the init method of the base class
-  NLPSolverInternal::init();
+  NlpSolverInternal::init();
 
   // Number of lifted variables
   nv = getOption("num_lifted");

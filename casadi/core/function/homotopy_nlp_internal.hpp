@@ -34,7 +34,7 @@ namespace casadi {
 
 /** \brief Homotopy NLP solver storage class
   \internal
-  @copydoc HomotopyNLPSolver_doc
+  @copydoc HomotopyNlpSolver_doc
   \author Joris Gillis
   \date 2013-2014
 */

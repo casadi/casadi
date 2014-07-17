@@ -3292,10 +3292,10 @@
 %exception casadi::NLPOutputIOSchemeVector< M >::NLPOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::NLPSolverInputIOSchemeVector< M >::NLPSolverInputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::NlpSolverInputIOSchemeVector< M >::NlpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::NLPSolverOutputIOSchemeVector< M >::NLPSolverOutputIOSchemeVector(const std::vector< M > &t) {
+%exception casadi::NlpSolverOutputIOSchemeVector< M >::NlpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::NanSX::NanSX() {

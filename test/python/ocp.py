@@ -27,7 +27,7 @@ from types import *
 from helpers import *
 
 class OCPtests(casadiTestCase):
-  @requiresPlugin(NLPSolver,"ipopt")
+  @requiresPlugin(NlpSolver,"ipopt")
   def testdiscrete(self):
     self.message("Linear-quadratic problem, discrete, using IPOPT")
     # inspired by www.cs.umsl.edu/~janikow/publications/1992/GAforOpt/text.pdf
@@ -52,7 +52,7 @@ class OCPtests(casadiTestCase):
     
     nlp = SXFunction(nlpIn(x=V),nlpOut(f=cost,g=vertcat([X[0]-x0,X[1:,0]-(a*X[:N,0]+b*U)])))
     
-    solver = NLPSolver("ipopt", nlp)
+    solver = NlpSolver("ipopt", nlp)
     solver.setOption("tol",1e-5)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",100)
@@ -71,7 +71,7 @@ class OCPtests(casadiTestCase):
     exact_sol=K * x0**2
     self.assertAlmostEqual(ocp_sol,exact_sol,10,"Linear-quadratic problem solution using IPOPT")
 
-  @requiresPlugin(NLPSolver,"ipopt")
+  @requiresPlugin(NlpSolver,"ipopt")
   def test_singleshooting(self):
     self.message("Single shooting")
     p0 = 0.2
@@ -111,7 +111,7 @@ class OCPtests(casadiTestCase):
     f.init()
     nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0]))
     nlp.init()
-    solver = NLPSolver("ipopt", nlp)
+    solver = NlpSolver("ipopt", nlp)
     solver.setOption("tol",1e-12)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",10)
@@ -130,7 +130,7 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[0],0,8,"Constraint is supposed to be unactive")
     self.assertAlmostEqual(fmax(-solver.getOutput("lam_x"),0)[1],0,8,"Constraint is supposed to be unactive")
 
-  @requiresPlugin(NLPSolver,"ipopt")
+  @requiresPlugin(NlpSolver,"ipopt")
   def test_singleshooting2(self):
     self.message("Single shooting 2")
     p0 = 0.2
@@ -170,7 +170,7 @@ class OCPtests(casadiTestCase):
     nlp = MXFunction(nlpIn(x=var),nlpOut(f=-f.call([var,parc])[0],g=var[0]-var[1]))
     nlp.init()
     
-    solver = NLPSolver("ipopt", nlp)
+    solver = NlpSolver("ipopt", nlp)
     solver.setOption("tol",1e-12)
     solver.setOption("hessian_approximation", "limited-memory")
     solver.setOption("max_iter",10)
@@ -251,7 +251,7 @@ class OCPtests(casadiTestCase):
     
     mystates = []
 
-  @requiresPlugin(NLPSolver,"ipopt")
+  @requiresPlugin(NlpSolver,"ipopt")
   def testMSclass_prim(self):
     self.message("CasADi multiple shooting class")
     
@@ -325,7 +325,7 @@ class OCPtests(casadiTestCase):
     for i in [OCP_LBH,OCP_UBH]:
       self.checkarray(ms.input(i).shape,(nh,ns+1),"shape")
 
-  @requiresPlugin(NLPSolver,"ipopt")
+  @requiresPlugin(NlpSolver,"ipopt")
   def testMSclassSimple(self):
     self.message("CasADi multiple shooting class: simple example")
     """

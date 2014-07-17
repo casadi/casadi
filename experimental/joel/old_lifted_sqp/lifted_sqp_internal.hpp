@@ -29,7 +29,7 @@
 
 namespace casadi{
     
-class LiftedSQPInternal : public NLPSolverInternal{
+class LiftedSQPInternal : public NlpSolverInternal{
 
 public:
   explicit LiftedSQPInternal(const Function& F, const Function& G);

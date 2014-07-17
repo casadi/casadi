@@ -114,7 +114,7 @@ g = vertcat(g)
 
 # Create NLP solver instance
 nlp = MXFunction(nlpIn(x=V),nlpOut(f=f,g=g))
-solver = NLPSolver("ipopt", nlp)
+solver = NlpSolver("ipopt", nlp)
 
 #solver.setOption("verbose",True)
 solver.init()

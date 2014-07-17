@@ -1183,20 +1183,20 @@ std::vector<M> hessLagOut(const std::vector<M>& args,
 
 }
 /// \cond INTERNAL
-/// Helper function for 'NLPSolverInput'
+/// Helper function for 'NlpSolverInput'
 
 template<class M>
-class CASADI_CORE_EXPORT NLPSolverInputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT NlpSolverInputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit NLPSolverInputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_NLPSolverInput) {}
+    explicit NlpSolverInputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_NlpSolverInput) {}
 };
 /// \endcond
 /// Input arguments of an NLP Solver
 ///
-/// \copydoc scheme_NLPSolverInput
+/// \copydoc scheme_NlpSolverInput
 template<class M>
-NLPSolverInputIOSchemeVector<M> nlpSolverIn(
+NlpSolverInputIOSchemeVector<M> nlpSolverIn(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -1217,14 +1217,14 @@ NLPSolverInputIOSchemeVector<M> nlpSolverIn(
   if (arg_s7 != "") arg.insert(make_pair(arg_s7, arg_m7));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NLPSolverInput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_NlpSolverInput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPSolverInput: '" << it->first
+      casadi_error("Keyword error in NlpSolverInput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "x0, p, lbx, ubx, lbg, ubg, lam_x0, lam_g0");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return NLPSolverInputIOSchemeVector<M>(ret);
+  return NlpSolverInputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> nlpSolverIn(const std::vector<M>& args,
@@ -1237,32 +1237,32 @@ std::vector<M> nlpSolverIn(const std::vector<M>& args,
     const std::string &arg_s6="",
     const std::string &arg_s7="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
-  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
-  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s6 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s6))); // NOLINT(whitespace/line_length)
+  if (arg_s7 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverInput, arg_s7))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
 /// \cond INTERNAL
-/// Helper function for 'NLPSolverOutput'
+/// Helper function for 'NlpSolverOutput'
 
 template<class M>
-class CASADI_CORE_EXPORT NLPSolverOutputIOSchemeVector : public IOSchemeVector<M> {
+class CASADI_CORE_EXPORT NlpSolverOutputIOSchemeVector : public IOSchemeVector<M> {
   public:
-    explicit NLPSolverOutputIOSchemeVector(const std::vector<M>& t)
-      : IOSchemeVector<M>(t, SCHEME_NLPSolverOutput) {}
+    explicit NlpSolverOutputIOSchemeVector(const std::vector<M>& t)
+      : IOSchemeVector<M>(t, SCHEME_NlpSolverOutput) {}
 };
 /// \endcond
 /// Output arguments of an NLP Solver
 ///
-/// \copydoc scheme_NLPSolverOutput
+/// \copydoc scheme_NlpSolverOutput
 template<class M>
-NLPSolverOutputIOSchemeVector<M> nlpSolverOut(
+NlpSolverOutputIOSchemeVector<M> nlpSolverOut(
     const std::string &arg_s0 ="", const M &arg_m0 =M(),
     const std::string &arg_s1 ="", const M &arg_m1 =M(),
     const std::string &arg_s2 ="", const M &arg_m2 =M(),
@@ -1279,14 +1279,14 @@ NLPSolverOutputIOSchemeVector<M> nlpSolverOut(
   if (arg_s5 != "") arg.insert(make_pair(arg_s5, arg_m5));
   typedef typename std::map<std::string, M>::const_iterator it_type;
   for (it_type it = arg.begin(); it != arg.end(); it++) {
-    int n = getSchemeEntryEnum(SCHEME_NLPSolverOutput, it->first);
+    int n = getSchemeEntryEnum(SCHEME_NlpSolverOutput, it->first);
     if (n==-1)
-      casadi_error("Keyword error in NLPSolverOutput: '" << it->first
+      casadi_error("Keyword error in NlpSolverOutput: '" << it->first
         << "' is not recognized. Available keywords are: "
         "x, f, g, lam_x, lam_g, lam_p");  // NOLINT(whitespace/line_length)
     ret[n] = it->second;
   }
-  return NLPSolverOutputIOSchemeVector<M>(ret);
+  return NlpSolverOutputIOSchemeVector<M>(ret);
 }
 template<class M>
 std::vector<M> nlpSolverOut(const std::vector<M>& args,
@@ -1297,12 +1297,12 @@ std::vector<M> nlpSolverOut(const std::vector<M>& args,
     const std::string &arg_s4="",
     const std::string &arg_s5="") {
   std::vector<M> ret;
-  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
-  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
-  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
-  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
-  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s4))); // NOLINT(whitespace/line_length)
-  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NLPSolverOutput, arg_s5))); // NOLINT(whitespace/line_length)
+  if (arg_s0 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s0))); // NOLINT(whitespace/line_length)
+  if (arg_s1 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s1))); // NOLINT(whitespace/line_length)
+  if (arg_s2 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s2))); // NOLINT(whitespace/line_length)
+  if (arg_s3 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s3))); // NOLINT(whitespace/line_length)
+  if (arg_s4 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s4))); // NOLINT(whitespace/line_length)
+  if (arg_s5 != "") ret.push_back(args.at(getSchemeEntryEnum(SCHEME_NlpSolverOutput, arg_s5))); // NOLINT(whitespace/line_length)
   return ret;
 
 }
@@ -2461,8 +2461,8 @@ template class JacGInputIOSchemeVector<T>;\
 template class JacGOutputIOSchemeVector<T>;\
 template class HessLagInputIOSchemeVector<T>;\
 template class HessLagOutputIOSchemeVector<T>;\
-template class NLPSolverInputIOSchemeVector<T>;\
-template class NLPSolverOutputIOSchemeVector<T>;\
+template class NlpSolverInputIOSchemeVector<T>;\
+template class NlpSolverOutputIOSchemeVector<T>;\
 template class MayerInputIOSchemeVector<T>;\
 template class OCPInputIOSchemeVector<T>;\
 template class OCPOutputIOSchemeVector<T>;\

@@ -130,7 +130,7 @@ int main(){
   enum Tests{IPOPT, LIFTED_SQP, FULLSPACE_SQP, OLD_SQP_METHOD, NUM_TESTS};
   for(int test=0; test<NUM_TESTS; ++test){
     // Get the nlp solver and NLP solver options
-    NLPSolver nlp_solver;
+    NlpSolver nlp_solver;
     switch(test){
       case IPOPT:
 	cout << "Testing IPOPT" << endl;

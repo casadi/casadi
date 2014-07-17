@@ -52,7 +52,7 @@ namespace casadi {
   typedef SDPStructIOSchemeVector<Sparsity> SDPStructure;
   typedef SOCPStructIOSchemeVector<Sparsity> SOCPStructure;
   typedef SDQPStructIOSchemeVector<Sparsity> SDQPStructure;
-  class NLPSolver;
+  class NlpSolver;
   class LinearSolver;
   class Integrator;
   class QPSolver;

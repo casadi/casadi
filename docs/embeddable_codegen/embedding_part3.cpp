@@ -39,7 +39,7 @@ int main(){
   ExternalFunction hess_lag("./hess_lag.casadi");
 
   // Create an NLP solver passing derivative information
-  NLPSolver solver("ipopt", nlp);
+  NlpSolver solver("ipopt", nlp);
   solver.setOption("grad_f",grad_f);
   solver.setOption("jac_g",jac_g);
   solver.setOption("hess_lag",hess_lag);

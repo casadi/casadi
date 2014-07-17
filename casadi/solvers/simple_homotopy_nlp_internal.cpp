@@ -70,7 +70,7 @@ namespace casadi {
   }
 
   void SimpleHomotopyNLPInternal::init() {
-    casadi_warning("SimpleHomotopyNLPSolver is experimental");
+    casadi_warning("SimpleHomotopyNlpSolver is experimental");
     // Call the init method of the base class
     HomotopyNLPInternal::init();
 
@@ -90,7 +90,7 @@ namespace casadi {
 
     // Create an nlpsolver instance
     std::string nlpsolver_name = getOption("nlp_solver");
-    nlpsolver_ = NLPSolver(nlpsolver_name, nlp);
+    nlpsolver_ = NlpSolver(nlpsolver_name, nlp);
 
     if (hasSetOption("nlp_solver_options")) {
       nlpsolver_.setOption(getOption("nlp_solver_options"));

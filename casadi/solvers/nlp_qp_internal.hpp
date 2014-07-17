@@ -62,7 +62,7 @@ public:
   virtual void evaluate();
 
   protected:
-    NLPSolver nlpsolver_;
+    NlpSolver nlpsolver_;
 
 };
 

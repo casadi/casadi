@@ -30,9 +30,9 @@
 namespace casadi {
 
 /**
-@copydoc NLPSolver_doc
+@copydoc NlpSolver_doc
 */
-class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInternal : public NLPSolverInternal {
+class CASADI_NLPSOLVER_IPOPT_EXPORT IpoptInternal : public NlpSolverInternal {
 friend class IpoptUserClass;
 
 public:
@@ -41,7 +41,7 @@ public:
   virtual IpoptInternal* clone() const { return new IpoptInternal(*this);}
 
   /** \brief  Create a new NLP Solver */
-  static NLPSolverInternal* creator(const Function& nlp)
+  static NlpSolverInternal* creator(const Function& nlp)
   { return new IpoptInternal(nlp);}
 
   // Free Ipopt related memory

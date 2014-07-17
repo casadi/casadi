@@ -76,7 +76,7 @@ class CASADI_OPTIMAL_CONTROL_EXPORT DirectMultipleShootingInternal : public OCPS
     MXFunction nlp_;
 
     // NLP solver
-    NLPSolver nlp_solver_;
+    NlpSolver nlp_solver_;
 };
 
 } // namespace casadi

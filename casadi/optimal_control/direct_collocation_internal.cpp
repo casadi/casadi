@@ -34,7 +34,7 @@ DirectCollocationInternal::DirectCollocationInternal(const Function& ffcn, const
                                                      const Function& cfcn, const Function& rfcn) :
     OCPSolverInternal(ffcn, mfcn, cfcn, rfcn) {
   addOption("nlp_solver",                       OT_STRING,  GenericType(),
-            "An NLPSolver creator function");
+            "An NlpSolver creator function");
   addOption("nlp_solver_options",               OT_DICTIONARY, GenericType(),
             "Options to be passed to the NLP Solver");
   addOption("interpolation_order",          OT_INTEGER,  3,
@@ -208,7 +208,7 @@ void DirectCollocationInternal::init() {
   std::string nlp_solver_name = getOption("nlp_solver");
 
   // Allocate an NLP solver
-  nlp_solver_ = NLPSolver(nlp_solver_name, nlp_);
+  nlp_solver_ = NlpSolver(nlp_solver_name, nlp_);
 
   // Pass options
   if (hasSetOption("nlp_solver_options")) {

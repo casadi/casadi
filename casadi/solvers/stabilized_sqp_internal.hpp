@@ -38,14 +38,14 @@ namespace casadi {
      \author Slava Kung
      \date 2013
   */
-  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSQPInternal : public NLPSolverInternal {
+  class CASADI_NLPSOLVER_STABILIZEDSQP_EXPORT StabilizedSQPInternal : public NlpSolverInternal {
   public:
     explicit StabilizedSQPInternal(const Function& nlp);
     virtual ~StabilizedSQPInternal();
     virtual StabilizedSQPInternal* clone() const { return new StabilizedSQPInternal(*this);}
 
     /** \brief  Create a new NLP Solver */
-    static NLPSolverInternal* creator(const Function& nlp)
+    static NlpSolverInternal* creator(const Function& nlp)
     { return new StabilizedSQPInternal(nlp);}
 
     virtual void init();
