@@ -84,7 +84,7 @@ namespace casadi {
 
 namespace std {
   #ifndef _MSC_VER
-  template struct std::numeric_limits<casadi::SXElement>;
+  template class std::numeric_limits<casadi::SXElement>;
   #endif
 
 } // namespace std
