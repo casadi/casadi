@@ -3217,12 +3217,6 @@
 %exception casadi::JacGOutputIOSchemeVector< M >::JacGOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::LpSolverInputIOSchemeVector< M >::LpSolverInputIOSchemeVector(const std::vector< M > &t) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception casadi::LpSolverOutputIOSchemeVector< M >::LpSolverOutputIOSchemeVector(const std::vector< M > &t) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
 %exception casadi::LPStructIOSchemeVector< T >::LPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
@@ -3233,6 +3227,12 @@
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::LinsolOutputIOSchemeVector< M >::LinsolOutputIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::LpSolverInputIOSchemeVector< M >::LpSolverInputIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::LpSolverOutputIOSchemeVector< M >::LpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::MXFunction::MXFunction(const MX &input, const MX &output) {
@@ -3292,13 +3292,13 @@
 %exception casadi::NLPOutputIOSchemeVector< M >::NLPOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::NanSX::NanSX() {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::NlpSolverInputIOSchemeVector< M >::NlpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::NlpSolverOutputIOSchemeVector< M >::NlpSolverOutputIOSchemeVector(const std::vector< M > &t) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception casadi::NanSX::NanSX() {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::NonZeroIterator< DataType >::NonZeroIterator(const Matrix< DataType > &m) {
@@ -3334,22 +3334,22 @@
 %exception casadi::OutputNode::OutputNode(const MX &parent, int oind) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
+%exception casadi::QCQPStructIOSchemeVector< T >::QCQPStructIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
+%exception casadi::QPStructIOSchemeVector< T >::QPStructIOSchemeVector(const std::vector< M > &t) {
+  START INTERNAL_MSG() $action STOP { $action } 
+}
 %exception casadi::QcqpSolverInputIOSchemeVector< M >::QcqpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::QcqpSolverOutputIOSchemeVector< M >::QcqpSolverOutputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
-%exception casadi::QCQPStructIOSchemeVector< T >::QCQPStructIOSchemeVector(const std::vector< M > &t) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
 %exception casadi::QpSolverInputIOSchemeVector< M >::QpSolverInputIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::QpSolverOutputIOSchemeVector< M >::QpSolverOutputIOSchemeVector(const std::vector< M > &t) {
-  START INTERNAL_MSG() $action STOP { $action } 
-}
-%exception casadi::QPStructIOSchemeVector< T >::QPStructIOSchemeVector(const std::vector< M > &t) {
   START INTERNAL_MSG() $action STOP { $action } 
 }
 %exception casadi::RDAEInputIOSchemeVector< M >::RDAEInputIOSchemeVector(const std::vector< M > &t) {

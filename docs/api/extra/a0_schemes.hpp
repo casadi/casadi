@@ -10,22 +10,17 @@
 <tr><td>INTEGRATOR_RZF</td><td>rzf</td><td>Backward algebraic variable at the initial time .</td></tr>
 </table>
 */
-/** \defgroup scheme_QcqpSolverInput
+/** \defgroup scheme_SDPOutput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::QcqpSolverInput  (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]</caption>
+<caption>Output scheme: casadi::SDPOutput  (SDP_SOLVER_NUM_OUT = 8) [sdpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QCQP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
-<tr><td>QCQP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
-<tr><td>QCQP_SOLVER_P</td><td>p</td><td>The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
-<tr><td>QCQP_SOLVER_Q</td><td>q</td><td>The vertical stack of all qi: dense, (nq n x 1) .</td></tr>
-<tr><td>QCQP_SOLVER_R</td><td>r</td><td>The vertical stack of all scalars ri (nq x 1) .</td></tr>
-<tr><td>QCQP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
-<tr><td>QCQP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>QCQP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>QCQP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
-<tr><td>QCQP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
-<tr><td>QCQP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
-<tr><td>QCQP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
+<tr><td>SDP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) - may be used as initial guess .</td></tr>
+<tr><td>SDP_SOLVER_P</td><td>p</td><td>The solution P (m x m) - may be used as initial guess .</td></tr>
+<tr><td>SDP_SOLVER_DUAL</td><td>dual</td><td>The dual solution (m x m) - may be used as initial guess .</td></tr>
+<tr><td>SDP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
+<tr><td>SDP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
+<tr><td>SDP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
+<tr><td>SDP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_HessLagOutput
@@ -57,16 +52,19 @@
 <tr><td>SOCP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
 </table>
 */
-/** \defgroup scheme_NlpSolverOutput
+/** \defgroup scheme_QpSolverInput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::NlpSolverOutput  (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]</caption>
+<caption>Input scheme: casadi::QpSolverInput  (QP_SOLVER_NUM_IN = 10) [qpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NLP_SOLVER_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1) .</td></tr>
-<tr><td>NLP_SOLVER_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1) .</td></tr>
-<tr><td>NLP_SOLVER_G</td><td>g</td><td>Constraints function at the optimal solution (ng x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1) .</td></tr>
+<tr><td>QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
+<tr><td>QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
+<tr><td>QP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
+<tr><td>QP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>QP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>QP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
+<tr><td>QP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
+<tr><td>QP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
+<tr><td>QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
 </table>
 */
 /** \defgroup scheme_SDPInput
@@ -81,18 +79,6 @@
 <tr><td>SDP_SOLVER_UBA</td><td>uba</td><td>Upper bounds on Ax ( nc x 1) .</td></tr>
 <tr><td>SDP_SOLVER_LBX</td><td>lbx</td><td>Lower bounds on x ( n x 1 ) .</td></tr>
 <tr><td>SDP_SOLVER_UBX</td><td>ubx</td><td>Upper bounds on x ( n x 1 ) .</td></tr>
-</table>
-*/
-/** \defgroup scheme_LpSolverInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::LpSolverInput  (LP_SOLVER_NUM_IN = 7) [lpIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LP_SOLVER_C</td><td>c</td><td>The vector c: dense (n x 1) .</td></tr>
-<tr><td>LP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
-<tr><td>LP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>LP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>LP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
-<tr><td>LP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
 </table>
 */
 /** \defgroup scheme_RDAEInput
@@ -124,33 +110,6 @@
 <tr><td>DPLE_V</td><td>v</td><td>V matrices (horzcat when const_dim, blkdiag otherwise) .</td></tr>
 </table>
 */
-/** \defgroup scheme_SDPOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::SDPOutput  (SDP_SOLVER_NUM_OUT = 8) [sdpOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SDP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) - may be used as initial guess .</td></tr>
-<tr><td>SDP_SOLVER_P</td><td>p</td><td>The solution P (m x m) - may be used as initial guess .</td></tr>
-<tr><td>SDP_SOLVER_DUAL</td><td>dual</td><td>The dual solution (m x m) - may be used as initial guess .</td></tr>
-<tr><td>SDP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
-<tr><td>SDP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
-<tr><td>SDP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
-<tr><td>SDP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
-</table>
-*/
-/** \defgroup scheme_NlpSolverInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::NlpSolverInput  (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>NLP_SOLVER_X0</td><td>x0</td><td>Decision variables, initial guess (nx x 1) .</td></tr>
-<tr><td>NLP_SOLVER_P</td><td>p</td><td>Value of fixed parameters (np x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LBX</td><td>lbx</td><td>Decision variables lower bound (nx x 1), default -inf .</td></tr>
-<tr><td>NLP_SOLVER_UBX</td><td>ubx</td><td>Decision variables upper bound (nx x 1), default +inf .</td></tr>
-<tr><td>NLP_SOLVER_LBG</td><td>lbg</td><td>Constraints lower bound (ng x 1), default -inf .</td></tr>
-<tr><td>NLP_SOLVER_UBG</td><td>ubg</td><td>Constraints upper bound (ng x 1), default +inf .</td></tr>
-<tr><td>NLP_SOLVER_LAM_X0</td><td>lam_x0</td><td>Lagrange multipliers for bounds on X, initial guess (nx x 1) .</td></tr>
-<tr><td>NLP_SOLVER_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1) .</td></tr>
-</table>
-*/
 /** \defgroup scheme_DAEInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::DAEInput  (DAE_NUM_IN = 5) [daeIn]</caption>
@@ -170,6 +129,16 @@
 <tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations .</td></tr>
 </table>
 */
+/** \defgroup scheme_QpSolverOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::QpSolverOutput  (QP_SOLVER_NUM_OUT = 5) [qpOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>QP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
+<tr><td>QP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
+<tr><td>QP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
+<tr><td>QP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
+</table>
+*/
 /** \defgroup scheme_InputOutputScheme
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::InputOutputScheme  ( = 45) []</caption>
@@ -182,40 +151,12 @@
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 </table>
 */
-/** \defgroup scheme_StabilizedQpSolverInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::StabilizedQpSolverInput  (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>STABILIZED_QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
-<tr><td>STABILIZED_QP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
-<tr><td>STABILIZED_QP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_MUR</td><td>muR</td><td>dense (1 x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_MUE</td><td>muE</td><td>dense (nc x 1) </td></tr>
-<tr><td>STABILIZED_QP_SOLVER_MU</td><td>mu</td><td>dense (nc x 1) </td></tr>
-</table>
-*/
 /** \defgroup scheme_GradFInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::GradFInput  (GRADF_NUM_IN = 3) [gradFIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>GRADF_X</td><td>x</td><td>Decision variable .</td></tr>
 <tr><td>GRADF_P</td><td>p</td><td>Fixed parameter .</td></tr>
-</table>
-*/
-/** \defgroup scheme_LpSolverOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::LpSolverOutput  (LP_SOLVER_NUM_OUT = 5) [lpOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>LP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
-<tr><td>LP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
-<tr><td>LP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
-<tr><td>LP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
 </table>
 */
 /** \defgroup scheme_GradFOutput
@@ -261,14 +202,17 @@
 <tr><td>OCP_UBG</td><td>ubg</td><td>Upper bound for the coupling constraints .</td></tr>
 </table>
 */
-/** \defgroup scheme_QcqpSolverOutput
+/** \defgroup scheme_SDQPOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::QcqpSolverOutput  (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]</caption>
+<caption>Output scheme: casadi::SDQPOutput  (SDQP_SOLVER_NUM_OUT = 8) [sdqpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QCQP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
-<tr><td>QCQP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
-<tr><td>QCQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
-<tr><td>QCQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
+<tr><td>SDQP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) - may be used as initial guess .</td></tr>
+<tr><td>SDQP_SOLVER_P</td><td>p</td><td>The solution P (m x m) - may be used as initial guess .</td></tr>
+<tr><td>SDQP_SOLVER_DUAL</td><td>dual</td><td>The dual solution (m x m) - may be used as initial guess .</td></tr>
+<tr><td>SDQP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
+<tr><td>SDQP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
+<tr><td>SDQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
+<tr><td>SDQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_MayerInput
@@ -302,6 +246,24 @@
 <tr><td>NL_P</td><td>p</td><td>Fixed parameter .</td></tr>
 </table>
 */
+/** \defgroup scheme_StabilizedQpSolverInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::StabilizedQpSolverInput  (STABILIZED_QP_SOLVER_NUM_IN = 13) [stabilizedQpIn]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>STABILIZED_QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
+<tr><td>STABILIZED_QP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
+<tr><td>STABILIZED_QP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_MUR</td><td>muR</td><td>dense (1 x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_MUE</td><td>muE</td><td>dense (nc x 1) </td></tr>
+<tr><td>STABILIZED_QP_SOLVER_MU</td><td>mu</td><td>dense (nc x 1) </td></tr>
+</table>
+*/
 /** \defgroup scheme_IntegratorInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::IntegratorInput  (INTEGRATOR_NUM_IN = 7) [integratorIn]</caption>
@@ -314,19 +276,14 @@
 <tr><td>INTEGRATOR_RZ0</td><td>rz0</td><td>Initial guess for the backwards algebraic variable .</td></tr>
 </table>
 */
-/** \defgroup scheme_QpSolverInput
+/** \defgroup scheme_QcqpSolverOutput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::QpSolverInput  (QP_SOLVER_NUM_IN = 10) [qpIn]</caption>
+<caption>Output scheme: casadi::QcqpSolverOutput  (QCQP_SOLVER_NUM_OUT = 5) [qcqpOut]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
-<tr><td>QP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
-<tr><td>QP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
-<tr><td>QP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>QP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
-<tr><td>QP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
-<tr><td>QP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
-<tr><td>QP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
-<tr><td>QP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
+<tr><td>QCQP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
+<tr><td>QCQP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
+<tr><td>QCQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
+<tr><td>QCQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
 </table>
 */
 /** \defgroup scheme_OCPOutput
@@ -348,6 +305,18 @@
 <tr><td>RDAE_QUAD</td><td>quad</td><td>Right hand side of quadratures. .</td></tr>
 </table>
 */
+/** \defgroup scheme_NlpSolverOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::NlpSolverOutput  (NLP_SOLVER_NUM_OUT = 7) [nlpSolverOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>NLP_SOLVER_X</td><td>x</td><td>Decision variables at the optimal solution (nx x 1) .</td></tr>
+<tr><td>NLP_SOLVER_F</td><td>f</td><td>Cost function value at the optimal solution (1 x 1) .</td></tr>
+<tr><td>NLP_SOLVER_G</td><td>g</td><td>Constraints function at the optimal solution (ng x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_X</td><td>lam_x</td><td>Lagrange multipliers for bounds on X at the solution (nx x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_G</td><td>lam_g</td><td>Lagrange multipliers for bounds on G at the solution (ng x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_P</td><td>lam_p</td><td>Lagrange multipliers for bounds on P at the solution (np x 1) .</td></tr>
+</table>
+*/
 /** \defgroup scheme_JacGOutput
 <a name='schemes'></a><table>
 <caption>Output scheme: casadi::JacGOutput  (JACG_NUM_OUT = 4) [jacGOut]</caption>
@@ -364,17 +333,36 @@
 <tr><td>LINSOL_X</td><td>X</td><td>Solution to the linear system of equations .</td></tr>
 </table>
 */
-/** \defgroup scheme_SDQPOutput
+/** \defgroup scheme_QcqpSolverInput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::SDQPOutput  (SDQP_SOLVER_NUM_OUT = 8) [sdqpOut]</caption>
+<caption>Input scheme: casadi::QcqpSolverInput  (QCQP_SOLVER_NUM_IN = 13) [qcqpIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SDQP_SOLVER_X</td><td>x</td><td>The primal solution (n x 1) - may be used as initial guess .</td></tr>
-<tr><td>SDQP_SOLVER_P</td><td>p</td><td>The solution P (m x m) - may be used as initial guess .</td></tr>
-<tr><td>SDQP_SOLVER_DUAL</td><td>dual</td><td>The dual solution (m x m) - may be used as initial guess .</td></tr>
-<tr><td>SDQP_SOLVER_COST</td><td>cost</td><td>The primal optimal cost (1 x 1) .</td></tr>
-<tr><td>SDQP_SOLVER_DUAL_COST</td><td>dual_cost</td><td>The dual optimal cost (1 x 1) .</td></tr>
-<tr><td>SDQP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to the linear constraints (nc x 1) .</td></tr>
-<tr><td>SDQP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds (n x 1) .</td></tr>
+<tr><td>QCQP_SOLVER_H</td><td>h</td><td>The square matrix H: sparse, (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
+<tr><td>QCQP_SOLVER_G</td><td>g</td><td>The vector g: dense, (n x 1) .</td></tr>
+<tr><td>QCQP_SOLVER_P</td><td>p</td><td>The horizontal stack of all Pi. Each Pi is sparse (n x n). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. </td></tr>
+<tr><td>QCQP_SOLVER_Q</td><td>q</td><td>The vertical stack of all qi: dense, (nq n x 1) .</td></tr>
+<tr><td>QCQP_SOLVER_R</td><td>r</td><td>The vertical stack of all scalars ri (nq x 1) .</td></tr>
+<tr><td>QCQP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
+<tr><td>QCQP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>QCQP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>QCQP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
+<tr><td>QCQP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
+<tr><td>QCQP_SOLVER_X0</td><td>x0</td><td>dense, (n x 1) </td></tr>
+<tr><td>QCQP_SOLVER_LAM_X0</td><td>lam_x0</td><td>dense </td></tr>
+</table>
+*/
+/** \defgroup scheme_NlpSolverInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::NlpSolverInput  (NLP_SOLVER_NUM_IN = 9) [nlpSolverIn]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>NLP_SOLVER_X0</td><td>x0</td><td>Decision variables, initial guess (nx x 1) .</td></tr>
+<tr><td>NLP_SOLVER_P</td><td>p</td><td>Value of fixed parameters (np x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LBX</td><td>lbx</td><td>Decision variables lower bound (nx x 1), default -inf .</td></tr>
+<tr><td>NLP_SOLVER_UBX</td><td>ubx</td><td>Decision variables upper bound (nx x 1), default +inf .</td></tr>
+<tr><td>NLP_SOLVER_LBG</td><td>lbg</td><td>Constraints lower bound (ng x 1), default -inf .</td></tr>
+<tr><td>NLP_SOLVER_UBG</td><td>ubg</td><td>Constraints upper bound (ng x 1), default +inf .</td></tr>
+<tr><td>NLP_SOLVER_LAM_X0</td><td>lam_x0</td><td>Lagrange multipliers for bounds on X, initial guess (nx x 1) .</td></tr>
+<tr><td>NLP_SOLVER_LAM_G0</td><td>lam_g0</td><td>Lagrange multipliers for bounds on G, initial guess (ng x 1) .</td></tr>
 </table>
 */
 /** \defgroup scheme_ControlSimulatorInput
@@ -402,12 +390,34 @@
 <tr><td>SOCP_SOLVER_UBX</td><td>ubx</td><td>Upper bounds on x ( n x 1 ) .</td></tr>
 </table>
 */
+/** \defgroup scheme_LpSolverOutput
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::LpSolverOutput  (LP_SOLVER_NUM_OUT = 5) [lpOut]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>LP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
+<tr><td>LP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
+<tr><td>LP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
+<tr><td>LP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
+</table>
+*/
 /** \defgroup scheme_JacGInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::JacGInput  (JACG_NUM_IN = 3) [jacGIn]</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>JACG_X</td><td>x</td><td>Decision variable .</td></tr>
 <tr><td>JACG_P</td><td>p</td><td>Fixed parameter .</td></tr>
+</table>
+*/
+/** \defgroup scheme_LpSolverInput
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::LpSolverInput  (LP_SOLVER_NUM_IN = 7) [lpIn]</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+<tr><td>LP_SOLVER_C</td><td>c</td><td>The vector c: dense (n x 1) .</td></tr>
+<tr><td>LP_SOLVER_A</td><td>a</td><td>The matrix A: sparse, (nc x n) - product with x must be dense. .</td></tr>
+<tr><td>LP_SOLVER_LBA</td><td>lba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>LP_SOLVER_UBA</td><td>uba</td><td>dense, (nc x 1) </td></tr>
+<tr><td>LP_SOLVER_LBX</td><td>lbx</td><td>dense, (n x 1) </td></tr>
+<tr><td>LP_SOLVER_UBX</td><td>ubx</td><td>dense, (n x 1) </td></tr>
 </table>
 */
 /** \defgroup scheme_DPLEOutput
@@ -425,16 +435,6 @@
 <tr><td>HESSLAG_P</td><td>p</td><td>Fixed parameter .</td></tr>
 <tr><td>HESSLAG_LAM_F</td><td>lam_f</td><td>Multiplier for f. Just a scalar factor for the objective that the NLP solver might use to scale the objective. </td></tr>
 <tr><td>HESSLAG_LAM_G</td><td>lam_g</td><td>Multiplier for g .</td></tr>
-</table>
-*/
-/** \defgroup scheme_QpSolverOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::QpSolverOutput  (QP_SOLVER_NUM_OUT = 5) [qpOut]</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>QP_SOLVER_X</td><td>x</td><td>The primal solution .</td></tr>
-<tr><td>QP_SOLVER_COST</td><td>cost</td><td>The optimal cost .</td></tr>
-<tr><td>QP_SOLVER_LAM_A</td><td>lam_a</td><td>The dual solution corresponding to linear bounds .</td></tr>
-<tr><td>QP_SOLVER_LAM_X</td><td>lam_x</td><td>The dual solution corresponding to simple bounds .</td></tr>
 </table>
 */
 /** \defgroup scheme_HNLPInput
@@ -480,15 +480,6 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
-*/
-/// \endcond
-/// \cond INTERNAL
-/** \class casadi::OOQPInternal
-\n
-\par
-@copydoc scheme_QpSolverInput
-<br/>
-@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -542,20 +533,20 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::StabilizedQpSolverInternal
+/** \class casadi::NlpSolverInternal
 \n
 \par
-@copydoc scheme_StabilizedQpSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_QpSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \endcond
-/** \class casadi::StabilizedQpSolver
+/** \class casadi::NlpSolver
 \n
 \par
-@copydoc scheme_StabilizedQpSolverInput
+@copydoc scheme_NlpSolverInput
 <br/>
-@copydoc scheme_QpSolverOutput
+@copydoc scheme_NlpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::ControlSimulatorInternal
@@ -591,20 +582,52 @@
 @copydoc scheme_IntegratorInput
 */
 /// \cond INTERNAL
-/** \class casadi::SocpSolverInternal
+/** \class casadi::LpSolverInternal
 \n
 \par
-@copydoc scheme_SOCPInput
+@copydoc scheme_LpSolverInput
 <br/>
-@copydoc scheme_SOCPOutput
+@copydoc scheme_LpSolverOutput
 */
 /// \endcond
-/** \class casadi::SocpSolver
+/** \class casadi::LpSolver
 \n
 \par
-@copydoc scheme_SOCPInput
+@copydoc scheme_LpSolverInput
 <br/>
-@copydoc scheme_SOCPOutput
+@copydoc scheme_LpSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::StabilizedQpSolverInternal
+\n
+\par
+@copydoc scheme_StabilizedQpSolverInput
+<br/>
+@copydoc scheme_QpSolverOutput
+*/
+/// \endcond
+/** \class casadi::StabilizedQpSolver
+\n
+\par
+@copydoc scheme_StabilizedQpSolverInput
+<br/>
+@copydoc scheme_QpSolverOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::QpSolverInternal
+\n
+\par
+@copydoc scheme_QpSolverInput
+<br/>
+@copydoc scheme_QpSolverOutput
+*/
+/// \endcond
+/** \class casadi::QpSolver
+\n
+\par
+@copydoc scheme_QpSolverInput
+<br/>
+@copydoc scheme_QpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::SimpleHomotopyNLPInternal
@@ -615,22 +638,6 @@
 @copydoc scheme_NlpSolverOutput
 */
 /// \endcond
-/// \cond INTERNAL
-/** \class casadi::SdqpSolverInternal
-\n
-\par
-@copydoc scheme_SDQPInput
-<br/>
-@copydoc scheme_SDQPOutput
-*/
-/// \endcond
-/** \class casadi::SdqpSolver
-\n
-\par
-@copydoc scheme_SDQPInput
-<br/>
-@copydoc scheme_SDQPOutput
-*/
 /// \cond INTERNAL
 /** \class casadi::StabilizedSQPInternal
 \n
@@ -745,38 +752,6 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::QcqpSolverInternal
-\n
-\par
-@copydoc scheme_QcqpSolverInput
-<br/>
-@copydoc scheme_QcqpSolverOutput
-*/
-/// \endcond
-/** \class casadi::QcqpSolver
-\n
-\par
-@copydoc scheme_QcqpSolverInput
-<br/>
-@copydoc scheme_QcqpSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::QpSolverInternal
-\n
-\par
-@copydoc scheme_QpSolverInput
-<br/>
-@copydoc scheme_QpSolverOutput
-*/
-/// \endcond
-/** \class casadi::QpSolver
-\n
-\par
-@copydoc scheme_QpSolverInput
-<br/>
-@copydoc scheme_QpSolverOutput
-*/
-/// \cond INTERNAL
 /** \class casadi::OCPSolverInternal
 \n
 \par
@@ -817,6 +792,22 @@
 @copydoc scheme_QpSolverOutput
 */
 /// \endcond
+/// \cond INTERNAL
+/** \class casadi::SocpSolverInternal
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
+*/
+/// \endcond
+/** \class casadi::SocpSolver
+\n
+\par
+@copydoc scheme_SOCPInput
+<br/>
+@copydoc scheme_SOCPOutput
+*/
 /// \cond INTERNAL
 /** \class casadi::SimpleIndefDpleInternal
 \n
@@ -888,22 +879,6 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::SdpSolverInternal
-\n
-\par
-@copydoc scheme_SDPInput
-<br/>
-@copydoc scheme_SDPOutput
-*/
-/// \endcond
-/** \class casadi::SdpSolver
-\n
-\par
-@copydoc scheme_SDPInput
-<br/>
-@copydoc scheme_SDPOutput
-*/
-/// \cond INTERNAL
 /** \class casadi::WorhpInternal
 \n
 \par
@@ -947,36 +922,20 @@
 */
 /// \endcond
 /// \cond INTERNAL
-/** \class casadi::LpSolverInternal
+/** \class casadi::QcqpSolverInternal
 \n
 \par
-@copydoc scheme_LpSolverInput
+@copydoc scheme_QcqpSolverInput
 <br/>
-@copydoc scheme_LpSolverOutput
+@copydoc scheme_QcqpSolverOutput
 */
 /// \endcond
-/** \class casadi::LpSolver
+/** \class casadi::QcqpSolver
 \n
 \par
-@copydoc scheme_LpSolverInput
+@copydoc scheme_QcqpSolverInput
 <br/>
-@copydoc scheme_LpSolverOutput
-*/
-/// \cond INTERNAL
-/** \class casadi::NlpSolverInternal
-\n
-\par
-@copydoc scheme_NlpSolverInput
-<br/>
-@copydoc scheme_NlpSolverOutput
-*/
-/// \endcond
-/** \class casadi::NlpSolver
-\n
-\par
-@copydoc scheme_NlpSolverInput
-<br/>
-@copydoc scheme_NlpSolverOutput
+@copydoc scheme_QcqpSolverOutput
 */
 /// \cond INTERNAL
 /** \class casadi::CplexInternal
@@ -1004,6 +963,38 @@
 @copydoc scheme_OCPOutput
 */
 /// \cond INTERNAL
+/** \class casadi::SdqpSolverInternal
+\n
+\par
+@copydoc scheme_SDQPInput
+<br/>
+@copydoc scheme_SDQPOutput
+*/
+/// \endcond
+/** \class casadi::SdqpSolver
+\n
+\par
+@copydoc scheme_SDQPInput
+<br/>
+@copydoc scheme_SDQPOutput
+*/
+/// \cond INTERNAL
+/** \class casadi::SdpSolverInternal
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/// \endcond
+/** \class casadi::SdpSolver
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/// \cond INTERNAL
 /** \class casadi::SDPSOCPInternal
 \n
 \par
@@ -1028,6 +1019,15 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::OOQPInternal
+\n
+\par
+@copydoc scheme_QpSolverInput
+<br/>
+@copydoc scheme_QpSolverOutput
 */
 /// \endcond
 /// \cond INTERNAL

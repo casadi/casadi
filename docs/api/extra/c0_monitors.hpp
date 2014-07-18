@@ -43,18 +43,6 @@
 </table>
 */
 /// \cond INTERNAL
-/** \class casadi::XFunctionInternal
-\n
-\par
-<a name='monitors'></a><table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
-</table>
-*/
-/// \endcond
-/// \cond INTERNAL
 /** \class casadi::StabilizedSQPInternal
 \n
 \par
@@ -152,6 +140,18 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>eval_djac</td><td>casadi::KinsolInternal</td></tr>
 <tr><td>eval_f</td><td>casadi::KinsolInternal</td></tr>
+<tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
+</table>
+*/
+/// \endcond
+/// \cond INTERNAL
+/** \class casadi::XFunctionInternal
+\n
+\par
+<a name='monitors'></a><table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
 <tr><td>inputs</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>outputs</td><td>casadi::FunctionInternal</td></tr>
 </table>
