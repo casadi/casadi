@@ -20,7 +20,7 @@ set(CASADI_SRCS
   casadi_calculus.hpp
   casadi_math.hpp
   casadi_options.hpp          casadi_options.cpp
-  casadi_meta.hpp             casadi_meta.cpp
+  casadi_meta.hpp             ${PROJECT_BINARY_DIR}/casadi_meta.cpp
   printable_object.hpp        printable_object.cpp      # Base class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           shared_object.cpp         # This base class implements the reference counting (garbage collection) framework used in CasADi
   weak_ref.hpp                weak_ref.cpp              # Provides weak reference functionality (non-owning smart pointers)

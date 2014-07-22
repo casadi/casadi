@@ -30,3 +30,8 @@ def print_subclasses(myclass, depth=0):
   print ("  " * depth) + " - " + myclass.__name__
   for s in myclass.__subclasses__():
     print_subclasses(s,depth=depth+1)
+    
+def loadAllCompiledPlugins():
+  for k in CasadiMeta.getPlugins().split(";"):
+    cls, name = k.split("::")
+    getattr(casadi,cls).loadPlugin(name)

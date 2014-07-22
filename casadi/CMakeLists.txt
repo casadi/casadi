@@ -1,10 +1,16 @@
 
+#define_property(TARGET PROPERTY PKG_CONFIG_REQUIRES
+#  BRIEF_DOCS "add requires info for target"
+#  FULL_DOCS "add requires info for target"
+#)
+
 set(LINT_TARGETS)
 set(SPELL_TARGETS)
 
 macro(casadi_plugin Type name)
   string(TOLOWER ${Type} type)
   casadi_library(casadi_${type}_${name} ${ARGN})
+  set_property(GLOBAL APPEND PROPERTY CASADI_PLUGINS "${Type}::${name}")
 endmacro()
 
 macro(casadi_plugin_link_libraries Type name)
@@ -71,8 +77,10 @@ add_custom_target(spell
 
 get_property(CASADI_MODULES GLOBAL PROPERTY CASADI_MODULES)
 get_property(CASADI_SWIG_MODULES GLOBAL PROPERTY CASADI_SWIG_MODULES)
+get_property(CASADI_PLUGINS GLOBAL PROPERTY CASADI_PLUGINS)
 
 set(CASADI_MODULES ${CASADI_MODULES} PARENT_SCOPE)
+set(CASADI_PLUGINS ${CASADI_PLUGINS} PARENT_SCOPE)
 set(CASADI_SWIG_MODULES ${CASADI_SWIG_MODULES} PARENT_SCOPE)
 
 foreach(name ${CASADI_MODULES})
@@ -127,6 +135,7 @@ foreach(name ${CASADI_MODULES})
     endif()
   endforeach()
   get_target_property(PC_LINK_LIBRARIES ${name} "LINK_LIBRARIES")
+  get_target_property(PC_PKG_CONFIG_REQUIRES ${name} "PKG_CONFIG_REQUIRES")
   configure_file(
     ${CMAKE_SOURCE_DIR}/cmake/pkgconfig.pc.in
     ${CMAKE_BINARY_DIR}/lib/pkgconfig/${name}.pc
