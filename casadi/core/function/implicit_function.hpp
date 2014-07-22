@@ -58,6 +58,9 @@ namespace casadi {
 
      @copydoc ImplicitFunction_doc
 
+      \generalsection{ImplicitFunction}
+      \pluginssection{ImplicitFunction}
+
      \author Joel Andersson
      \date 2011
   */
