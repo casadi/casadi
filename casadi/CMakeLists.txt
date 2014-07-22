@@ -2,6 +2,16 @@
 set(LINT_TARGETS)
 set(SPELL_TARGETS)
 
+macro(casadi_plugin Type name)
+  string(TOLOWER ${Type} type)
+  casadi_library(casadi_${type}_${name} ${ARGN})
+endmacro()
+
+macro(casadi_plugin_link_libraries Type name)
+  string(TOLOWER ${Type} type)
+  target_link_libraries(casadi_${type}_${name} ${ARGN})
+endmacro()
+
 macro(casadi_library name)
   if(ENABLE_STATIC)
     add_library(${name} STATIC ${ARGN})
