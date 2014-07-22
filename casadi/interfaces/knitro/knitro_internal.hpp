@@ -72,7 +72,7 @@ namespace casadi {
 
     // KNITRO string parameter
     std::map<std::string, std::string> string_param_;
-    
+
     /// A documentation string
     static const std::string meta_doc;
 

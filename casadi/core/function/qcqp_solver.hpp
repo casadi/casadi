@@ -118,6 +118,9 @@ namespace casadi {
 
       @copydoc QcqpSolver_doc
 
+      \generalsection{QcqpSolver}
+      \pluginssection{QcqpSolver}
+      
       \author Joris Gillis
       \date 2013
   */

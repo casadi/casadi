@@ -67,6 +67,9 @@ namespace casadi {
 
       @copydoc HomotopyNlpSolver_doc
 
+      \generalsection{HomotopyNlpSolver}
+      \pluginssection{HomotopyNlpSolver}
+      
       \author Joris Gillis
       \date 2014
   */
