@@ -114,8 +114,8 @@ namespace casadi {
     void get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag);
     int get_number_of_nonlinear_variables();
     bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars);
-    bool intermediate_callback(
-                               const double* x, const double* z_L, const double* z_U, const double* g,
+    bool intermediate_callback(const double* x, const double* z_L, const double* z_U,
+                               const double* g,
                                const double* lambda, double obj_value, int iter,
                                double inf_pr, double inf_du, double mu, double d_norm,
                                double regularization_size, double alpha_du, double alpha_pr,
