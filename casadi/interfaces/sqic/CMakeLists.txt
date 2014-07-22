@@ -16,7 +16,8 @@ casadi_plugin(QpSolver sqic
 casadi_plugin(StabilizedQpSolver sqic
   stabilized_sqic_internal.hpp
   stabilized_sqic_internal.cpp
-  stabilized_sqic_internal_meta.cpp)
+  stabilized_sqic_internal_meta.cpp
+  ${resource_file})
 casadi_plugin_link_libraries(StabilizedQpSolver sqic casadi_qpsolver_sqic)
 
 if(ENABLE_STATIC)
