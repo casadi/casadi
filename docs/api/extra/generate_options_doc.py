@@ -308,7 +308,7 @@ f = file(out+'b0_options.hpp','w')
 fdiagram = file(out+'e0_diagram.hpp','w')
 
 filemap = {}
-for name,meta in metadata.items():
+for name,meta in sorted(metadata.items()):
   if "casadi::PluginInterface" in meta["hierarchy"] and 'casadi::FunctionInternal' not in meta["parents"]: 
     m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
     if m:
@@ -318,7 +318,7 @@ import pickle
 pickle.dump(filemap,file(out+"filemap.pkl","w"))
 
 # Print out doxygen information - options
-for name,meta in metadata.items():
+for name,meta in sorted(metadata.items()):
   if not('options' in meta):
     meta['options'] = {}
 
@@ -367,14 +367,18 @@ for name,meta in metadata.items():
       f.write("<caption>List of available options</caption>\n")
       f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>\n")
       for k in myoptionskeys :
-        if alloptions[k]["used"] == name:
+        #if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[alloptions[k]["used"]]["parents"]:
+        if alloptions[k]["used"] in metadata and "casadi::PluginInterface" in metadata[metadata[alloptions[k]["used"]]["parents"][0]]["hierarchy"]:
           f.write(optionsashtml(alloptions[k],used=False)+"\n")
       f.write( "</table>\n")
       f.write( "*/\n")
     
   if 'InternalFor' in meta:
     for t in meta['InternalFor']:
-      f.write("/** \class %s\n\\n\n\\par\n" % t)
+      if "casadi::PluginInterface" in meta["parents"]:
+        f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
+      else:
+        f.write("/** \class %s\n\\n\n\\par\n" % t)
       f.write("<a name='options'></a><table>\n")
       f.write("<caption>List of available options</caption>\n")
       f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>\n")
@@ -392,7 +396,7 @@ f.close()
 f = file(out+'d0_stats.hpp','w')
 
 # Print out doxygen information - stats
-for name,meta in metadata.items():
+for name,meta in sorted(metadata.items()):
   if not('stats' in meta):
     continue
 
@@ -437,7 +441,10 @@ for name,meta in metadata.items():
       
   if 'InternalFor' in meta:
     for t in meta['InternalFor']:
-      f.write("/** \class %s\n\\n\n\\par\n" % t)
+      if "casadi::PluginInterface" in meta["parents"]:
+        f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
+      else:
+        f.write("/** \class %s\n\\n\n\\par\n" % t)
       f.write("<a name='stats'></a><table>\n")
       f.write("<caption>List of available stats</caption>\n")
       f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
@@ -451,7 +458,7 @@ f.close()
 f = file(out+'c0_monitors.hpp','w')
 
 # Print out doxygen information - monitors
-for name,meta in metadata.items():
+for name,meta in sorted(metadata.items()):
   if not('monitors' in meta):
     continue
 
@@ -497,7 +504,10 @@ for name,meta in metadata.items():
       
   if 'InternalFor' in meta: 
     for t in meta['InternalFor']:
-      f.write("/** \class %s\n\\n\n\\par\n" % t)
+      if "casadi::PluginInterface" in meta["parents"]:
+        f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
+      else:
+        f.write("/** \class %s\n\\n\n\\par\n" % t)
       f.write("<a name='monitors'></a><table>\n")
       f.write("<caption>List of available monitors</caption>\n")
       f.write("<tr><th>Id</th><th>Used in</th></tr>\n")
@@ -555,7 +565,7 @@ for scheme in enums:
       f.write( "*/\n")
 
 # Print out doxygen information - schemes
-for name,meta in metadata.items():
+for name,meta in sorted(metadata.items()):
 
   inputscheme = None
   outputscheme = None
@@ -595,7 +605,10 @@ for name,meta in metadata.items():
   if 'InternalFor' in meta:
     for t in meta['InternalFor']:
       if not(inputscheme is None) or not(outputscheme is None):
-        f.write("/** \class %s\n\\n\n\\par\n" % t)
+        if "casadi::PluginInterface" in meta["parents"]:
+          f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
+        else:
+          f.write("/** \class %s\n\\n\n\\par\n" % t)
         if not(inputscheme is None) and not(outputscheme is None):
           f.write("@copydoc scheme_%s\n" % inputscheme)
           f.write("<br/>\n")
