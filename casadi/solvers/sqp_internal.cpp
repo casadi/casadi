@@ -40,7 +40,7 @@ namespace casadi {
   int CASADI_NLPSOLVER_SQPMETHOD_EXPORT casadi_register_nlpsolver_sqpmethod(NlpSolverInternal::Plugin* plugin){
     plugin->creator = SQPInternal::creator;
     plugin->name = "sqpmethod";
-    plugin->doc = "SQPMethod docs not available";
+    plugin->doc = SQPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

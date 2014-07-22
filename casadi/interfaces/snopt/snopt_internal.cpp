@@ -45,7 +45,7 @@ namespace casadi {
   casadi_register_nlpsolver_snopt(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = SnoptInternal::creator;
     plugin->name = "snopt";
-    plugin->doc = "SNOPT docs not available";
+    plugin->doc = SnoptInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

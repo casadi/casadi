@@ -28,10 +28,14 @@
 
 #include <casadi/solvers/casadi_lpsolver_qp_export.h>
 
+/** \pluginsection{LpSolver,qp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Solve LPs using a QP Solver
+  /** \brief \pluginbrief{LpSolver,qp}
+  
+   Solve LPs using a QP Solver
 
    @copydoc LpSolver_doc
 
@@ -60,6 +64,9 @@ public:
 
   virtual void evaluate();
 
+  /// A documentation string
+  static const std::string meta_doc;
+    
   protected:
     QpSolver qpsolver_;
 

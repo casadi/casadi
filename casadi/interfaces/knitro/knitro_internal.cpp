@@ -35,7 +35,7 @@ namespace casadi {
   casadi_register_nlpsolver_knitro(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = KnitroInternal::creator;
     plugin->name = "knitro";
-    plugin->doc = "KNITRO docs not available";
+    plugin->doc = KnitroInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

@@ -26,10 +26,14 @@
 #include "dple_internal.hpp"
 #include <casadi/control/casadi_dplesolver_simple_export.h>
 
+/** \pluginsection{DpleSolver,simple} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Solving the Discrete Periodic Lyapunov Equations with regular Linear Solvers
+  /** \brief \pluginbrief{DpleSolver,simple}
+  
+       Solving the Discrete Periodic Lyapunov Equations with regular Linear Solvers
 
        @copydoc DPLE_doc
 
@@ -81,6 +85,9 @@ namespace casadi {
      and \a nadj adjoint derivatives
     */
     virtual Function getDerivative(int nfwd, int nadj);
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   private:
     /// Main implementation as MXFunction

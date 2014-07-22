@@ -26,10 +26,14 @@
 #include "../../control/dple_internal.hpp"
 #include <casadi/interfaces/slicot/casadi_dplesolver_slicot_export.h>
 
+/** \pluginsection{DpleSolver,slicot} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
+  /** \brief \pluginbrief{DpleSolver,slicot}
+   * 
+   * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
    *
    * @copydoc DPLE_doc
    
@@ -82,6 +86,9 @@ namespace casadi {
     and \a nadj adjoint derivatives
     */
     virtual Function getDerivative(int nfwd, int nadj);
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   private:
     /// Dimension of state-space

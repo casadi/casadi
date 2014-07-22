@@ -71,6 +71,10 @@ namespace casadi {
   /**  \brief Base class for Discrete Periodic Lyapunov Equation Solvers
 
      @copydoc DPLE_doc
+     
+      \generalsection{DpleSolver}
+      \pluginssection{DpleSolver}
+      
        \author Joris Gillis
       \date 2014
 

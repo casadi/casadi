@@ -108,6 +108,9 @@ namespace casadi {
 
       @copydoc QpSolver_doc
 
+      \generalsection{QpSolver}
+      \pluginssection{QpSolver}
+      
       \author Joel Andersson
       \date 2010
   */

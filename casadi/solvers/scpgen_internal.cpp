@@ -39,7 +39,7 @@ namespace casadi {
   int CASADI_NLPSOLVER_SCPGEN_EXPORT casadi_register_nlpsolver_scpgen(NlpSolverInternal::Plugin* plugin){
     plugin->creator = SCPgenInternal::creator;
     plugin->name = "scpgen";
-    plugin->doc = "SCPgen docs not available";
+    plugin->doc = SCPgenInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

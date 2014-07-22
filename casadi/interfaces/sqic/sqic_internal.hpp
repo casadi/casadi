@@ -26,10 +26,14 @@
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include <casadi/interfaces/sqic/casadi_qpsolver_sqic_export.h>
 
+/** \pluginsection{QpSolver,sqic} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /**  \brief Interface to the SQIC solver for quadratic programming
+  /**  \brief \pluginbrief{QpSolver,sqic}
+  
+       Interface to the SQIC solver for quadratic programming
 
        @copydoc QpSolver_doc
        \author Joris Gillis
@@ -70,6 +74,10 @@ namespace casadi {
 
     /// Error message map
     static std::map<int, std::string> flagmap;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   protected:
 
     /// Flag: is already initialized

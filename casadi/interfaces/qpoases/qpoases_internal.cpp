@@ -36,7 +36,7 @@ namespace casadi {
   casadi_register_qpsolver_qpoases(QpSolverInternal::Plugin* plugin) {
     plugin->creator = QPOasesInternal::creator;
     plugin->name = "qpoases";
-    plugin->doc = "QPOASES docs not available";
+    plugin->doc = QPOasesInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

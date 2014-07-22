@@ -27,10 +27,14 @@
 #include <casadi/interfaces/qpoases/casadi_qpsolver_qpoases_export.h>
 #include <qpOASES.hpp>
 
+/** \pluginsection{QpSolver,qpoases} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Interface to QPOases Solver for quadratic programming
+  /** \brief \pluginbrief{QpSolver,qpoases}
+   * 
+   * Interface to QPOases Solver for quadratic programming
    * 
    * \author Joris Gillis, Joel Andersson
    * \date 2011
@@ -59,6 +63,9 @@ public:
   virtual void init();
 
   virtual void evaluate();
+
+  /// A documentation string
+  static const std::string meta_doc;
 
   protected:
 
@@ -98,6 +105,7 @@ public:
 
     /// Get qpOASES error message
     static std::string getErrorMessage(int flag);
+
 };
 
 } // namespace casadi

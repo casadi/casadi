@@ -99,6 +99,7 @@ namespace casadi {
 
     // Tape
     std::vector<std::vector<double> > x_tape_, Z_tape_;
+
   };
 
 } // namespace casadi

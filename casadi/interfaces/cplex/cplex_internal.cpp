@@ -39,7 +39,7 @@ namespace casadi {
   casadi_register_qpsolver_cplex(QpSolverInternal::Plugin* plugin) {
     plugin->creator = CplexInternal::creator;
     plugin->name = "cplex";
-    plugin->doc = "CPLEX docs not available";
+    plugin->doc = CplexInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

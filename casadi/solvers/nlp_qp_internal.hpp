@@ -28,10 +28,14 @@
 
 #include <casadi/solvers/casadi_qpsolver_nlp_export.h>
 
+/** \pluginsection{QpSolver,nlp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Solve QPs using an NLP solver
+  /** \brief \pluginbrief{QpSolver,nlp}
+  
+   Solve QPs using an NLP solver
 
    @copydoc QpSolver_doc
 
@@ -60,6 +64,9 @@ public:
   virtual void init();
 
   virtual void evaluate();
+
+  /// A documentation string
+  static const std::string meta_doc;
 
   protected:
     NlpSolver nlpsolver_;

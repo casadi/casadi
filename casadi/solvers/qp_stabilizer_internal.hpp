@@ -28,10 +28,14 @@
 
 #include <casadi/solvers/casadi_stabilizedqpsolver_qp_export.h>
 
+/** \pluginsection{StabilizedQpSolver,qp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Solved a stabilized QP using a standard QP solver
+  /** \brief \pluginbrief{StabilizedQpSolver,qp}
+  
+      Solved a stabilized QP using a standard QP solver
 
       \author Joris Gillis
       \date 2013
@@ -68,6 +72,10 @@ namespace casadi {
 
     /// Data members
     QpSolver qp_solver_;
+    
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

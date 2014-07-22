@@ -37,7 +37,7 @@ namespace casadi {
   casadi_register_implicitfunction_newton(ImplicitFunctionInternal::Plugin* plugin) {
     plugin->creator = NewtonImplicitInternal::creator;
     plugin->name = "newton";
-    plugin->doc = "NEWTON docs not available";
+    plugin->doc = NewtonImplicitInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

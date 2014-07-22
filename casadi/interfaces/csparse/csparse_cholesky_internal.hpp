@@ -23,6 +23,8 @@
 #ifndef CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
 #define CASADI_CSPARSE_CHOLESKY_INTERNAL_HPP
 
+/** \pluginsection{LinearSolver,csparsecholesky} */
+
 /// \cond INTERNAL
 extern "C" {
 #include "external_packages/CSparse/Include/cs.h"
@@ -32,7 +34,9 @@ extern "C" {
 
 namespace casadi {
 
-  /** \brief  LinearSolver with CSparseCholesky Interface
+  /** \brief \pluginbrief{LinearSolver,csparsecholesky}
+   * 
+   * LinearSolver with CSparseCholesky Interface
    *
    @copydoc LinearSolver_doc
    *
@@ -106,6 +110,10 @@ namespace casadi {
 
     // Temporary
     std::vector<double> temp_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

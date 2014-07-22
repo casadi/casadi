@@ -36,7 +36,7 @@ namespace casadi {
   casadi_register_linearsolver_symbolicqr(LinearSolverInternal::Plugin* plugin) {
     plugin->creator = SymbolicQRInternal::creator;
     plugin->name = "symbolicqr";
-    plugin->doc = "SymbolicQR docs not available";
+    plugin->doc = SymbolicQRInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

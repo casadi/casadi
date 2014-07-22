@@ -33,7 +33,7 @@ namespace casadi {
   casadi_register_qpsolver_nlp(QpSolverInternal::Plugin* plugin) {
     plugin->creator = NLPQPInternal::creator;
     plugin->name = "nlp";
-    plugin->doc = "NLPQPInternal docs not available";
+    plugin->doc = NLPQPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

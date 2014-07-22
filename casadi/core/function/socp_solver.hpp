@@ -110,6 +110,9 @@ namespace casadi {
 
       @copydoc SocpSolver_doc
 
+      \generalsection{SocpSolver}
+      \pluginssection{SocpSolver}
+      
       \author Joris Gillis
       \date 2013
   */

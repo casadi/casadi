@@ -46,7 +46,7 @@ namespace casadi {
   casadi_register_nlpsolver_ipopt(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = IpoptInternal::creator;
     plugin->name = "ipopt";
-    plugin->doc = "IPOPT docs not available";
+    plugin->doc = IpoptInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

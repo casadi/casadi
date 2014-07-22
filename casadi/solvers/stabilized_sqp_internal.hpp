@@ -29,11 +29,15 @@
 
 #include <casadi/solvers/casadi_nlpsolver_stabilizedsqp_export.h>
 
+/** \pluginsection{NlpSolver,stabilizedsqp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
   /**
-     \brief Stabilized Sequential Quadratic Programming method.
+     \brief \pluginbrief{NlpSolver,stabilizedsqp}
+     
+     Stabilized Sequential Quadratic Programming method.
 
      \author Slava Kung
      \date 2013
@@ -218,6 +222,9 @@ namespace casadi {
 
     /// Calculate 1-norm of a matrix
     double norm1matrix(const DMatrix& A);
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   };
   /// \endcond

@@ -29,10 +29,14 @@
 
 #include <casadi/solvers/casadi_implicitfunction_nlp_export.h>
 
+/** \pluginsection{ImplicitFunction,nlp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Use an NlpSolver as ImplicitFunction solver
+  /** \brief  \pluginbrief{ImplicitFunction,nlp}
+  
+  Use an NlpSolver as ImplicitFunction solver
 
    @copydoc ImplicitFunction_doc
 
@@ -73,6 +77,9 @@ namespace casadi {
 
     // NLP solver instance
     NlpSolver nlp_solver_;
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   };
 

@@ -26,11 +26,15 @@
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include <casadi/solvers/casadi_linearsolver_symbolicqr_export.h>
 
+/** \pluginsection{LinearSolver,symbolicqr} */
+
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief  LinearSolver based on QR factorization with sparsity pattern based reordering
+  /** \brief \pluginbrief{LinearSolver,symbolicqr}
+      
+       LinearSolver based on QR factorization with sparsity pattern based reordering
       _without_ partial pivoting
       @copydoc LinearSolver_doc
       \author Joel Andersson
@@ -83,6 +87,10 @@ namespace casadi {
 
     // Storage for QR factorization
     DMatrix Q_, R_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

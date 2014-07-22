@@ -185,6 +185,9 @@ namespace casadi {
   /** \brief NlpSolver
 
       @copydoc NlpSolver_doc
+      
+      \generalsection{NlpSolver}
+      \pluginssection{NlpSolver}
 
       \author Joel Andersson
       \date 2010

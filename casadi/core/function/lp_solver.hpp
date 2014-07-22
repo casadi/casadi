@@ -95,7 +95,10 @@ namespace casadi {
 
 
       @copydoc LpSolver_doc
-
+      
+      \generalsection{LpSolver}
+      \pluginssection{LpSolver}
+      
       \author Joris Gillis
       \date 2013
   */

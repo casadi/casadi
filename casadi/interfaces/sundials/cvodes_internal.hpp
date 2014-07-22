@@ -35,10 +35,14 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/** \pluginsection{Integrator,cvodes} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Interface to CVodes from the Sundials suite.
+  /** \brief \pluginbrief{Integrator,cvodes}
+  
+      Interface to CVodes from the Sundials suite.
 
       @copydoc DAE_doc
 
@@ -110,6 +114,9 @@ namespace casadi {
 
     /** \brief  Get the integrator Jacobian for the backward problem */
     virtual Function getJacB();
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
 
@@ -284,7 +291,7 @@ namespace casadi {
     bool monitor_rhsQB_;
 
     bool disable_internal_warnings_;
-
+    
   };
 
 } // namespace casadi

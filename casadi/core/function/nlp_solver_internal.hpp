@@ -155,6 +155,7 @@ namespace casadi {
 
     /// Read options from parameter xml
     virtual void setOptionsFromFile(const std::string & file);
+
   };
 
 } // namespace casadi

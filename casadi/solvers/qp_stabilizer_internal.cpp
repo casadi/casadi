@@ -33,7 +33,7 @@ namespace casadi {
   casadi_register_stabilizedqpsolver_qp(StabilizedQpSolverInternal::Plugin* plugin) {
     plugin->creator = QPStabilizerInternal::creator;
     plugin->name = "qp";
-    plugin->doc = "QPStabilizer docs not available";
+    plugin->doc = QPStabilizerInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

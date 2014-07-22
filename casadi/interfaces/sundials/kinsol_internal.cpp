@@ -34,7 +34,7 @@ namespace casadi {
   casadi_register_implicitfunction_kinsol(ImplicitFunctionInternal::Plugin* plugin) {
     plugin->creator = KinsolInternal::creator;
     plugin->name = "kinsol";
-    plugin->doc = "KINSOL docs not available";
+    plugin->doc = KinsolInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

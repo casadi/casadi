@@ -36,7 +36,7 @@ namespace casadi {
   casadi_register_sdqpsolver_sdp(SdqpSolverInternal::Plugin* plugin) {
     plugin->creator = SDPSDQPInternal::creator;
     plugin->name = "sdp";
-    plugin->doc = "sdp docs not available";
+    plugin->doc = SDPSDQPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

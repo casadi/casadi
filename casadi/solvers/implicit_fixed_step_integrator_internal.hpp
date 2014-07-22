@@ -61,6 +61,7 @@ namespace casadi {
 
     // Implicit function solver
     ImplicitFunction implicit_solver_, backward_implicit_solver_;
+
   };
 
 } // namespace casadi

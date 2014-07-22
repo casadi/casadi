@@ -27,10 +27,14 @@
 #include "casadi/core/function/qcqp_solver.hpp"
 #include <casadi/solvers/casadi_qpsolver_qcqp_export.h>
 
+/** \pluginsection{QpSolver,qcqp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Use a QCQP solver to solve q QP
+  /** \brief \pluginbrief{QpSolver,qcqp}
+  
+     Use a QCQP solver to solve q QP
 
       @copydoc QpSolver_doc
 
@@ -57,6 +61,9 @@ namespace casadi {
     virtual void init();
 
     virtual void evaluate();
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
     QcqpSolver qcqpsolver_;

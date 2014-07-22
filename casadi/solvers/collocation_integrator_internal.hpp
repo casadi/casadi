@@ -28,11 +28,15 @@
 #include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
 
+/** \pluginsection{Integrator,collocation} */
+
 /// \cond INTERNAL
 namespace casadi {
 
   /**
-     \brief Fixed-step implicit Runge-Kutta integrator
+     \brief \pluginbrief{Integrator,collocation}
+     
+     Fixed-step implicit Runge-Kutta integrator
      ODE/DAE integrator based on collocation schemes
 
      The method is still under development
@@ -84,6 +88,10 @@ namespace casadi {
 
     // Interpolation order
     int deg_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

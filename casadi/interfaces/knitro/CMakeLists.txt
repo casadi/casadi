@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 include_directories(${KNITRO_INCLUDE_DIR})
 
-casadi_library(casadi_nlpsolver_knitro
+casadi_plugin(NlpSolver knitro
   knitro_internal.hpp
-  knitro_internal.cpp)
+  knitro_internal.cpp
+  knitro_internal_meta.cpp)
 
-target_link_libraries(casadi_nlpsolver_knitro ${KNITRO_LIBRARIES})
+casadi_plugin_link_libraries(NlpSolver knitro ${KNITRO_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/knitro

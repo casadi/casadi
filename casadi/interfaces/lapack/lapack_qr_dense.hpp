@@ -26,6 +26,9 @@
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linearsolver_lapackqr_export.h>
 
+/** \pluginsection{LinearSolver,lapackqr} */
+
+/// \cond INTERNAL
 namespace casadi {
 
   /// QR-factorize dense matrix (lapack)
@@ -41,7 +44,9 @@ namespace casadi {
   extern "C" void dtrsm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
                          double *alpha, double *a, int *lda, double *b, int *ldb);
 
-  /** \brief  QR LinearSolver with Lapack Interface
+  /** \brief  \pluginbrief{LinearSolver,lapackqr}
+   *
+   * QR LinearSolver with Lapack Interface
    *
    @copydoc LinearSolver_doc
    *
@@ -87,6 +92,9 @@ namespace casadi {
     // Solve the system of equations
     virtual void solve(double* x, int nrhs, bool transpose);
 
+    /// A documentation string
+    static const std::string meta_doc;
+
   protected:
 
     // Matrix
@@ -105,4 +113,5 @@ namespace casadi {
 
 } // namespace casadi
 
+/// \endcond
 #endif // CASADI_LAPACK_QR_DENSE_HPP

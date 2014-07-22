@@ -65,6 +65,8 @@ class Doxy2SWIG_X(Doxy2SWIG):
     del kwargs["deprecated"]
     self.merge = kwargs["merge"]
     del kwargs["merge"]
+    self.groupdoc = kwargs["groupdoc"]
+    del kwargs["groupdoc"]
     Doxy2SWIG.__init__(self,*args, **kwargs)
     self.docstringmap = {}
     self.active_docstring = None
@@ -160,7 +162,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
               fname = os.path.join(self.my_dir,  fname)
           if not self.quiet:
               print "parsing file: %s"%fname
-          p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated,merge=self.merge)
+          p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated,merge=self.merge,groupdoc=self.groupdoc)
           p.generate()
           self.pieces.extend(self.clean_pieces(p.pieces))
             
@@ -201,6 +203,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
 
   def do_compounddef(self, node):
       kind = node.attributes['kind'].value
+
       if kind in ('class', 'struct'):
           prot = node.attributes['prot'].value
           if prot <> 'public':
@@ -219,6 +222,15 @@ class Doxy2SWIG_X(Doxy2SWIG):
           nodes = node.getElementsByTagName('sectiondef')
           for n in nodes:
               self.parse(n)
+      elif kind in ('group',):
+          if node.getElementsByTagName('compoundname')[0].firstChild.data.startswith("plugin_"):
+            names = ('compoundname', 'briefdescription',
+                     'detaileddescription', 'includes')
+            first = self.get_specific_nodes(node, names)
+            for n in names:
+                if first.has_key(n):
+                    self.parse(first[n])
+            self.end_docstring()
       
   def do_memberdef(self, node):
       prot = node.attributes['prot'].value
@@ -294,6 +306,9 @@ class Doxy2SWIG_X(Doxy2SWIG):
         publicapi = None
       Doxy2SWIG.generate(self)
       for k, v in self.docstringmap.iteritems():
+        if k.startswith("plugin_"):
+          groupdoc[k] = v[0][1]
+          break
         # Group together
         grouped_list = []
         grouped_dict = {}
@@ -373,13 +388,15 @@ class Doxy2SWIG_X(Doxy2SWIG):
               if len(u"".join(pieces).rstrip())>0:
                 self.add_text_original(["\n"]+["\n>  " + o.replace('"',r'\"') + '\n'  for o in origin] + ["-"*(80-8) + "\n"] + pieces + ["\n"])
             self.add_text_original(["\";\n","\n"])
-            
-def convert(input, output,  include_function_definition=True, quiet=False,internal=None,deprecated=None,merge=False):
-    p = Doxy2SWIG_X(input, include_function_definition, quiet,internal=internal,deprecated=deprecated,merge=merge)
+  
+
+def convert(input, output,  include_function_definition=True, quiet=False,internal=None,deprecated=None,merge=False,groupdoc=None):
+    p = Doxy2SWIG_X(input, include_function_definition, quiet,internal=internal,deprecated=deprecated,merge=merge,groupdoc=groupdoc)
     p.generate()
     p.write(output)
 
-def main():
+    
+if __name__ == '__main__':
     usage = __doc__
     parser = optparse.OptionParser(usage)
     parser.add_option("-n", '--no-function-definition',
@@ -405,9 +422,27 @@ def main():
     
     internal = dict()
     deprecated = dict()
-    convert(args[0], args[1], False, options.quiet,internal=internal,deprecated=deprecated,merge=options.merge)
+    groupdoc = dict()
+    convert(args[0], args[1], False, options.quiet,internal=internal,deprecated=deprecated,merge=options.merge,groupdoc=groupdoc)
     file(args[2],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, internal.values()))))
     file(args[3],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, deprecated.values()))))
+    import pickle
+    filemap = pickle.load(file('filemap.pkl','r'))
+    
+    for k,v in groupdoc.iteritems():
+      fn,n = filemap[k]
+      f = file(fn.replace(".hpp","_meta.cpp"),"w")
+      f.write(file('../../../misc/license_header.txt','r').read())
+      f.write("""
+      #include "%s"
+      #include <string>
 
-if __name__ == '__main__':
-    main()
+      const std::string %s::meta_doc=
+      """ % (fn.split("/")[-1],n,))
+      
+      for p in "".join(v).split("\n"):
+        f.write('"')
+        f.write(p+"\\n")
+        f.write('"\n')
+      f.write(';\n')
+      f.close()

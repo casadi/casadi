@@ -166,6 +166,9 @@ namespace casadi {
 
       @copydoc SdpSolver_doc
 
+      \generalsection{SdpSolver}
+      \pluginssection{SdpSolver}
+      
       \author Joel Andersson
       \date 2010
   */

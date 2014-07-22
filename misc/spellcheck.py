@@ -88,6 +88,7 @@ def checkfile(f,lock):
     
     t = re.sub(r'\b\w+[A-Z]\w+\b','',t) # camelcase
     t = re.sub(r'\b\w+_\w*\b','',t) # camelcase
+    t = re.sub('[\\\\@][a-zA-Z]+\{.*?\}','',t)
     t = re.sub('[\\\\@][a-zA-Z{}]+','',t)
     
     t = re.sub('<tt>.*?</tt>','',t)

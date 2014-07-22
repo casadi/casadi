@@ -74,6 +74,11 @@ for c in classes:
   metadata[name]=meta
   meta['parents']=[]
   meta['xmlsource']=refid
+  
+  if f.getroot().find("compounddef/briefdescription/para") is not None:
+    meta["brief"] = "".join(list(f.getroot().find("compounddef/briefdescription/para").itertext())).strip()
+  else:
+    meta["brief"] = ""
  
   # find parents
   for e in f.getroot().findall("compounddef/basecompoundref"):
@@ -261,15 +266,23 @@ def htmlescape(h):
 def newline2br(a):
   return a.replace("\n","<br />")
   
-def optionsashtml(option):
-  return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(htmlescape(option['description'])),newline2br(option['used']))
+def optionsashtml(option,used=True):
+  if used:
+    return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(htmlescape(option['description'])),newline2br(option['used']))
+  else:
+    return "<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" %(option['name'],option['type'],option['default'],newline2br(htmlescape(option['description'])))
 
-def statsashtml(stat):
-  return "<tr><td>%s</td><td>%s</td></tr>" %(stat['name'],stat['used'])
+def statsashtml(stat,used=True):
+  if used:
+    return "<tr><td>%s</td><td>%s</td></tr>" %(stat['name'],stat['used'])
+  else:
+    return "<tr><td>%s</td></tr>" % stat['name']
 
-def monitorsashtml(monitor):
-  return "<tr><td>%s</td><td>%s</td></tr>" %(monitor['name'],monitor['used'])
-
+def monitorsashtml(monitor,used=True):
+  if used:
+    return "<tr><td>%s</td><td>%s</td></tr>" %(monitor['name'],monitor['used'])
+  else:
+    return "<tr><td>%s</td></tr>" % monitor['name']
 
 
 def update_no_overwrite(orig,new):
@@ -290,8 +303,19 @@ def update_overwrite(orig,new):
         orig[k] = copy.copy(v)
         
 f = file(out+'b0_options.hpp','w')
+
+#raise Exception("")
 fdiagram = file(out+'e0_diagram.hpp','w')
 
+filemap = {}
+for name,meta in metadata.items():
+  if "casadi::PluginInterface" in meta["hierarchy"] and 'casadi::FunctionInternal' not in meta["parents"]: 
+    m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
+    if m:
+      filemap["plugin_%s_%s" % ( m.group(2),m.group(1))] = (meta["file"],name)
+
+import pickle
+pickle.dump(filemap,file(out+"filemap.pkl","w"))
 
 # Print out doxygen information - options
 for name,meta in metadata.items():
@@ -330,6 +354,22 @@ for name,meta in metadata.items():
     fdiagram.write("""<a name="diagram" id="diagram"></a><h2>Diagrams</h2>""")
     fdiagram.write( "*/\n")
     fdiagram.write("/// \endcond\n")
+    
+  if "casadi::PluginInterface" in meta["hierarchy"] and 'casadi::FunctionInternal' not in meta["parents"]:
+        
+    m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
+    if not m:
+      print "This plugin is undocumented. add \\pluginbrief{class,name} to it: " + meta["file"]
+      #print meta["file"]
+    else:
+      f.write("/** \\addtogroup plugin_%s_%s\n\\n\n\\par\n" % (m.group(2),m.group(1)))
+      f.write("<a name='options'></a><table>\n")
+      f.write("<caption>List of available options</caption>\n")
+      f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>\n")
+      for k in myoptionskeys :
+        f.write(optionsashtml(alloptions[k],used=False)+"\n")
+      f.write( "</table>\n")
+      f.write( "*/\n")
     
   if 'InternalFor' in meta:
     for t in meta['InternalFor']:
@@ -377,6 +417,22 @@ for name,meta in metadata.items():
     f.write( "*/\n")
     f.write("/// \endcond\n")
 
+  if "casadi::PluginInterface" in meta["hierarchy"] and 'casadi::FunctionInternal' not in meta["parents"]:
+        
+    m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
+    if not m:
+      print "This plugin is undocumented. add \\pluginbrief{class,name} to it: " + meta["file"]
+      #print meta["file"]
+    else:
+      f.write("/** \\addtogroup plugin_%s_%s\n\\n\n\\par\n" % (m.group(2),m.group(1)))
+      f.write("<a name='stats'></a><table>\n")
+      f.write("<caption>List of available stats</caption>\n")
+      f.write("<tr><th>Id</th></tr>\n")
+      for k in mystatskeys :
+        f.write(statsashtml(allstats[k],used=False)+"\n")
+      f.write( "</table>\n")
+      f.write( "*/\n")
+      
   if 'InternalFor' in meta:
     for t in meta['InternalFor']:
       f.write("/** \class %s\n\\n\n\\par\n" % t)
@@ -419,7 +475,23 @@ for name,meta in metadata.items():
     f.write( "</table>\n")
     f.write( "*/\n")
     f.write("/// \endcond\n")
-  
+
+  if "casadi::PluginInterface" in meta["hierarchy"] and 'casadi::FunctionInternal' not in meta["parents"]:
+        
+    m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
+    if not m:
+      print "This plugin is undocumented. add \\pluginbrief{class,name} to it: " + meta["file"]
+      #print meta["file"]
+    else:
+      f.write("/** \\addtogroup plugin_%s_%s\n\\n\n\\par\n" % (m.group(2),m.group(1)))
+      f.write("<a name='monitors'></a><table>\n")
+      f.write("<caption>List of available monitors</caption>\n")
+      f.write("<tr><th>Id</th></tr>\n")
+      for k in mymonitorskeys :
+        f.write(monitorsashtml(allmonitors[k],used=False)+"\n")
+      f.write( "</table>\n")
+      f.write( "*/\n")
+      
   if 'InternalFor' in meta: 
     for t in meta['InternalFor']:
       f.write("/** \class %s\n\\n\n\\par\n" % t)

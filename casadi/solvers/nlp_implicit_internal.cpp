@@ -33,7 +33,7 @@ namespace casadi {
   casadi_register_implicitfunction_nlp(ImplicitFunctionInternal::Plugin* plugin) {
     plugin->creator = NLPImplicitInternal::creator;
     plugin->name = "nlp";
-    plugin->doc = "NLP docs not available";
+    plugin->doc = NLPImplicitInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

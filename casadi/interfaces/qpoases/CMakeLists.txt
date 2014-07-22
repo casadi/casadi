@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 2.6)
 include_directories(${QPOASES_INCLUDE_DIR})
 
-casadi_library(casadi_qpsolver_qpoases
+casadi_plugin(QpSolver qpoases
   qpoases_internal.hpp
-  qpoases_internal.cpp)
+  qpoases_internal.cpp
+  qpoases_internal_meta.cpp)
 
-target_link_libraries(casadi_qpsolver_qpoases ${QPOASES_LIBRARIES})
+casadi_plugin_link_libraries(QpSolver qpoases ${QPOASES_LIBRARIES})
 
 install(DIRECTORY ./
   DESTINATION include/casadi/interfaces/qpoases

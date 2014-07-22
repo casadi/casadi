@@ -44,7 +44,7 @@ namespace casadi {
   casadi_register_qpsolver_ooqp(QpSolverInternal::Plugin* plugin) {
     plugin->creator = OOQPInternal::creator;
     plugin->name = "ooqp";
-    plugin->doc = "OOQP docs not available";
+    plugin->doc = OOQPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

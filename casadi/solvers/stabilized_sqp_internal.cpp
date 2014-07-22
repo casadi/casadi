@@ -41,7 +41,7 @@ namespace casadi {
   casadi_register_nlpsolver_stabilizedsqp(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedSQPInternal::creator;
     plugin->name = "stabilizedsqp";
-    plugin->doc = "StabilizedSQP docs not available";
+    plugin->doc = StabilizedSQPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

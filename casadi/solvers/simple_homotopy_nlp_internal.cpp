@@ -41,7 +41,7 @@ namespace casadi {
   casadi_register_homotopynlpsolver_simple(HomotopyNLPInternal::Plugin* plugin) {
     plugin->creator = SimpleHomotopyNLPInternal::creator;
     plugin->name = "simple";
-    plugin->doc = "SimpleHomotopyNLP docs not available";
+    plugin->doc = SimpleHomotopyNLPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

@@ -33,7 +33,7 @@ namespace casadi {
   casadi_register_qpsolver_qcqp(QpSolverInternal::Plugin* plugin) {
     plugin->creator = QCQPQPInternal::creator;
     plugin->name = "qcqp";
-    plugin->doc = "QCQP docs not available";
+    plugin->doc = QCQPQPInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

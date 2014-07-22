@@ -36,7 +36,7 @@ namespace casadi {
   int CASADI_INTEGRATOR_COLLOCATION_EXPORT casadi_register_integrator_collocation(IntegratorInternal::Plugin* plugin){
     plugin->creator = CollocationIntegratorInternal::creator;
     plugin->name = "collocation";
-    plugin->doc = "collocation docs not available";
+    plugin->doc = CollocationIntegratorInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

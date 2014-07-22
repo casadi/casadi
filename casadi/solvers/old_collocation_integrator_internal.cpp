@@ -40,7 +40,7 @@ namespace casadi {
   casadi_register_integrator_oldcollocation(IntegratorInternal::Plugin* plugin) {
     plugin->creator = OldCollocationIntegratorInternal::creator;
     plugin->name = "oldcollocation";
-    plugin->doc = "old collocation docs not available";
+    plugin->doc = OldCollocationIntegratorInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

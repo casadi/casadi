@@ -28,10 +28,14 @@
 
 #include <casadi/solvers/casadi_socpsolver_sdp_export.h>
 
+/** \pluginsection{SocpSolver,sdp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief SOCP Solver for quadratic programming
+  /** \brief \pluginbrief{SocpSolver,sdp}
+  
+      SDP Solver for second order cone programming
 
       @copydoc SocpSolver_doc
 
@@ -59,6 +63,9 @@ namespace casadi {
     virtual void init();
 
     virtual void evaluate();
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
     SdpSolver sdpsolver_;

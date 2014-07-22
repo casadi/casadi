@@ -28,10 +28,14 @@
 #include "casadi/core/function/linear_solver.hpp"
 #include <casadi/solvers/casadi_qcqpsolver_socp_export.h>
 
+/** \pluginsection{QcqpSolver,socp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief SOCP QCQP Solver for quadratic programming
+  /** \brief \pluginbrief{QcqpSolver,socp}
+   * 
+   * SOCP QCQP Solver for quadratic programming
    *
    *  Note: this implementation relies on Cholesky decomposition:
    *        <tt>Chol(H) = L ->  H = LL'</tt> with L lower triangular
@@ -86,6 +90,9 @@ namespace casadi {
     virtual void init();
 
     virtual void evaluate();
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
     SocpSolver socpsolver_;

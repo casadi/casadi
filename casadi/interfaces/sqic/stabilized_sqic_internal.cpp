@@ -40,7 +40,7 @@ namespace casadi {
   casadi_register_stabilizedqpsolver_sqic(StabilizedQpSolverInternal::Plugin* plugin) {
     plugin->creator = StabilizedSQICInternal::creator;
     plugin->name = "sqic";
-    plugin->doc = "SQIC docs not available";
+    plugin->doc = StabilizedSQICInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }

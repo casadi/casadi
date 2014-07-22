@@ -29,11 +29,15 @@
 #include "casadi/core/misc/integration_tools.hpp"
 #include <casadi/solvers/casadi_integrator_oldcollocation_export.h>
 
+/** \pluginsection{Integrator,oldcollocation} */
+
 /// \cond INTERNAL
 namespace casadi {
 
   /**
-     \brief Collocation integrator
+     \brief \pluginbrief{Integrator,oldcollocation}
+     
+     Collocation integrator
      ODE/DAE integrator based on collocation
 
      The method is still under development
@@ -98,6 +102,9 @@ namespace casadi {
 
     // Collocated times
     std::vector<std::vector<double> > coll_time_;
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   };
 

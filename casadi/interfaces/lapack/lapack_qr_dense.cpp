@@ -31,7 +31,7 @@ namespace casadi {
   casadi_register_linearsolver_lapackqr(LinearSolverInternal::Plugin* plugin) {
     plugin->creator = LapackQRDenseInternal::creator;
     plugin->name = "lapackqr";
-    plugin->doc = "LapackQR docs not available";
+    plugin->doc = LapackQRDenseInternal::meta_doc.c_str();;
     plugin->version = 20;
     return 0;
   }

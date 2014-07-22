@@ -35,11 +35,15 @@
 #include <idas/idas_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/** \pluginsection{Integrator,idas} */
+
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief Interface to IDAS from the Sundials suite.
+  /** \brief \pluginbrief{Integrator,idas}
+      
+      Interface to IDAS from the Sundials suite.
 
       @copydoc IdasIntegrator_doc
 
@@ -126,6 +130,9 @@ namespace casadi {
 
     /// Correct the initial conditions, i.e. calculate
     void correctInitialConditions();
+
+    /// A documentation string
+    static const std::string meta_doc;
 
   protected:
 

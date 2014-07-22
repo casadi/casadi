@@ -26,10 +26,14 @@
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include <casadi/interfaces/ooqp/casadi_qpsolver_ooqp_export.h>
 
+/** \pluginsection{QpSolver,ooqp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Interface to the OOQP Solver for quadratic programming:
+  /** \brief \pluginbrief{QpSolver,ooqp}
+  
+     Interface to the OOQP Solver for quadratic programming:
 
       @copydoc QpSolver_doc
 
@@ -96,6 +100,10 @@ namespace casadi {
 
     // Tolerances
     double mutol_, artol_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

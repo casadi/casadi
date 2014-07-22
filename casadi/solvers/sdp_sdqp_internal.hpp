@@ -29,10 +29,12 @@
 
 #include <casadi/solvers/casadi_sdqpsolver_sdp_export.h>
 
+/** \pluginsection{SdqpSolver,sdp} */
+
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief SDP SDQP Solver for quadratic programming
+  /** \brief \pluginbrief{SdqpSolver,sdp}
    *
    *  Note: this implementation relies on Cholesky decomposition:
    *        <tt>Chol(H) = L ->  H = LL'</tt> with L lower triangular
@@ -82,6 +84,10 @@ namespace casadi {
 
     /// Mapping
     Function mapping_;
+
+    /// A documentation string
+    static const std::string meta_doc;
+
   };
 
 } // namespace casadi

@@ -37,7 +37,7 @@ namespace casadi {
   casadi_register_nlpsolver_worhp(NlpSolverInternal::Plugin* plugin) {
     plugin->creator = WorhpInternal::creator;
     plugin->name = "worhp";
-    plugin->doc = "WORHP docs not available";
+    plugin->doc = WorhpInternal::meta_doc.c_str();
     plugin->version = 20;
     return 0;
   }
