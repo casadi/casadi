@@ -30,18 +30,22 @@
 
 #include <deque>
 
+/** \defgroup plugin_NlpSolver_scpgen
+   A structure-exploiting sequential quadratic programming
+     (to be come sequential convex programming) method for nonlinear programming.
+*/
+
 /** \pluginsection{NlpSolver,scpgen} */
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /**
-     \brief \pluginbrief{NlpSolver,scpgen}
+  /**  \brief \pluginbrief{NlpSolver,scpgen}
      
-     A structure-exploiting sequential quadratic programming
-     (to be come sequential convex programming) method for nonlinear programming.
-
+     @copy_doc NLPSolver_doc
+     @copy_doc plugin_NlpSolver_scpgen
+     
      \author Joel Andersson, Attila Kozma and Joris Gillis
      \date 2013
   */

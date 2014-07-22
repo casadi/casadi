@@ -37,6 +37,9 @@
 #include <kinsol/kinsol_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/** \defgroup plugin_ImplicitFunction_kinsol
+ KINSOL interface from the Sundials suite
+*/
 /** \pluginsection{ImplicitFunction,kinsol} */
 
 /// \cond INTERNAL
@@ -45,7 +48,9 @@ namespace casadi {
   typedef std::pair< std::string, std::string> Message;
 
   /** \brief \pluginbrief{ImplicitFunction,kinsol}
-  
+  *
+  * @copydoc ImplicitFunction_doc
+  * @copydoc plugin_ImplicitFunction_kinsol
   */
   class CASADI_IMPLICITFUNCTION_KINSOL_EXPORT KinsolInternal : public ImplicitFunctionInternal {
   public:

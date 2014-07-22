@@ -177,7 +177,20 @@ namespace casadi {
     /// Default constructor
     Integrator();
 
-    /// Integrator factory
+    /** \brief  Integrator factory
+    *
+    * \param name \pluginargument{Integrator}
+    * \param f dynamical system
+    * \parblock
+    * \copydoc scheme_DAEInput
+    * \copydoc scheme_DAEOutput
+    * \endparblock
+    * \param g backwards system
+    * \parblock
+    * \copydoc scheme_RDAEInput
+    * \copydoc scheme_RDAEOutput
+    * \endparblock
+    */
     Integrator(const std::string& name, const Function& f, const Function& g=Function());
 
     /// Clone

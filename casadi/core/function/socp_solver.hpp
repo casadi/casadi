@@ -123,6 +123,7 @@ namespace casadi {
     SocpSolver();
 
     /** \brief Constructor
+     *  \param name \pluginargument{SocpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_SOCPStruct
      */

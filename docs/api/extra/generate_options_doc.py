@@ -367,7 +367,8 @@ for name,meta in metadata.items():
       f.write("<caption>List of available options</caption>\n")
       f.write("<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th></tr>\n")
       for k in myoptionskeys :
-        f.write(optionsashtml(alloptions[k],used=False)+"\n")
+        if alloptions[k]["used"] == name:
+          f.write(optionsashtml(alloptions[k],used=False)+"\n")
       f.write( "</table>\n")
       f.write( "*/\n")
     
@@ -429,7 +430,8 @@ for name,meta in metadata.items():
       f.write("<caption>List of available stats</caption>\n")
       f.write("<tr><th>Id</th></tr>\n")
       for k in mystatskeys :
-        f.write(statsashtml(allstats[k],used=False)+"\n")
+        if allstats[k]["used"] == name:
+          f.write(statsashtml(allstats[k],used=False)+"\n")
       f.write( "</table>\n")
       f.write( "*/\n")
       
@@ -488,7 +490,8 @@ for name,meta in metadata.items():
       f.write("<caption>List of available monitors</caption>\n")
       f.write("<tr><th>Id</th></tr>\n")
       for k in mymonitorskeys :
-        f.write(monitorsashtml(allmonitors[k],used=False)+"\n")
+        if allmonitors[k]["used"] == name:
+          f.write(monitorsashtml(allmonitors[k],used=False)+"\n")
       f.write( "</table>\n")
       f.write( "*/\n")
       
@@ -528,7 +531,7 @@ def enumsashtml(n,title):
         num = m['name']
       if re.search(r'_NUM_OUT$',m['name']):
         num = m['name']
-    s+= "<caption>%s  (%s = %d) [%s]</caption>\n" % (title,num,len(enums[n])-1,extract_shorthand(enums[n][0])[0])
+    s+= "<caption>%s  (%s = %d) [%s]</caption>\n" % (title,num,len(enums[n])-2,extract_shorthand(enums[n][0])[0])
     s+= "<tr><th>Full name</th><th>Short</th><th>Description</th></tr>\n"
     for i in range(len(enums[n])-1):
       m = enums[n][1+i]

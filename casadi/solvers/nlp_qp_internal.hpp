@@ -28,6 +28,11 @@
 
 #include <casadi/solvers/casadi_qpsolver_nlp_export.h>
 
+
+/** \defgroup plugin_QpSolver_nlp
+   Solve QPs using an NlpSolver
+*/
+
 /** \pluginsection{QpSolver,nlp} */
 
 /// \cond INTERNAL
@@ -35,10 +40,9 @@ namespace casadi {
 
   /** \brief \pluginbrief{QpSolver,nlp}
   
-   Solve QPs using an NLP solver
-
    @copydoc QpSolver_doc
-
+   @copydoc plugin_QpSolver_nlp
+   
    \author Joris Gillis
    \date 2011
   */

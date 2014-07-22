@@ -71,7 +71,7 @@ namespace casadi {
     ImplicitFunction();
 
     /** \brief  Create an implicit function solver
-     *
+     * \param name \pluginargument{ImplicitFunction}
      * \param f Function mapping from (n+1) inputs to 1 output
      *
      */

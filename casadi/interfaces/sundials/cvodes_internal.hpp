@@ -35,21 +35,25 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/** \defgroup plugin_Integrator_cvodes
+  
+      Interface to CVodes from the Sundials suite.
+
+      A call to evaluate will integrate to the end.
+
+      You can retrieve the entire state trajectory as follows, after the evaluate call: 
+      Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
+*/
+
 /** \pluginsection{Integrator,cvodes} */
 
 /// \cond INTERNAL
 namespace casadi {
 
   /** \brief \pluginbrief{Integrator,cvodes}
-  
-      Interface to CVodes from the Sundials suite.
 
       @copydoc DAE_doc
-
-      A call to evaluate will integrate to the end.
-
-      You can retrieve the entire state trajectory as follows, after the evaluate call: 
-      Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
+      @copydoc plugin_Integrator_cvodes
 
   */
   class CASADI_INTEGRATOR_CVODES_EXPORT CVodesInternal : public SundialsInternal {

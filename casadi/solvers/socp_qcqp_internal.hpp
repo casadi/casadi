@@ -28,14 +28,9 @@
 #include "casadi/core/function/linear_solver.hpp"
 #include <casadi/solvers/casadi_qcqpsolver_socp_export.h>
 
-/** \pluginsection{QcqpSolver,socp} */
+/** \defgroup plugin_QcqpSolver_socp
 
-/// \cond INTERNAL
-namespace casadi {
-
-  /** \brief \pluginbrief{QcqpSolver,socp}
-   * 
-   * SOCP QCQP Solver for quadratic programming
+   * Solve a QCQP with an SocpSolver
    *
    *  Note: this implementation relies on Cholesky decomposition:
    *        <tt>Chol(H) = L ->  H = LL'</tt> with L lower triangular
@@ -65,8 +60,18 @@ namespace casadi {
    *    arising from the epigraph reformulation and e==0 for all other 
    *    quadratic constraints.
 
-   @copydoc QcqpSolver_doc
+*/
 
+/** \pluginsection{QcqpSolver,socp} */
+
+/// \cond INTERNAL
+namespace casadi {
+
+  /** \brief \pluginbrief{QcqpSolver,socp}
+  
+   @copydoc QcqpSolver_doc
+   @copydoc plugin_QcqpSolver_socp
+   
    \author Joris Gillis
    \date 2013
   */

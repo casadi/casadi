@@ -26,6 +26,12 @@
 #include "casadi/core/function/linear_solver_internal.hpp"
 #include <casadi/interfaces/lapack/casadi_linearsolver_lapackqr_export.h>
 
+/** \defgroup plugin_LinearSolver_lapackqr
+*
+* This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
+* <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
+*/ 
+
 /** \pluginsection{LinearSolver,lapackqr} */
 
 /// \cond INTERNAL
@@ -46,26 +52,8 @@ namespace casadi {
 
   /** \brief  \pluginbrief{LinearSolver,lapackqr}
    *
-   * QR LinearSolver with Lapack Interface
-   *
    @copydoc LinearSolver_doc
-   *
-   * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
-   * <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
-   *
-   * LapackQRDense is an casadi::Function mapping from 2 inputs
-   * [ A (matrix), b (vector)] to one output [x (vector)].
-   *
-   * The usual procedure to use LapackQRDense is: \n
-   *  -# init()
-   *  -# set the first input (A)
-   *  -# prepare()
-   *  -# set the second input (b)
-   *  -# solve()
-   *  -# Repeat steps 4 and 5 to work with other b vectors.
-   *
-   * The method evaluate() combines the prepare() and solve() step and is
-   * therefore more expensive if A is invariant.
+   @copydoc plugin_LinearSolver_lapackqr
    *
    */
   class CASADI_LINEARSOLVER_LAPACKQR_EXPORT LapackQRDenseInternal : public LinearSolverInternal {

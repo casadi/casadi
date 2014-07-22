@@ -28,16 +28,20 @@
 
 #include <casadi/solvers/casadi_lpsolver_qp_export.h>
 
+/** \defgroup plugin_LpSolver_qp
+
+    Solve LPs using a QpSolver
+*/
+
 /** \pluginsection{LpSolver,qp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
   /** \brief \pluginbrief{LpSolver,qp}
-  
-   Solve LPs using a QP Solver
 
    @copydoc LpSolver_doc
+   @copydoc plugin_LpSolver_qp
 
    \author Joris Gillis
    \date 2013

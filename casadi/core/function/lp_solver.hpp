@@ -109,6 +109,7 @@ namespace casadi {
     LpSolver();
 
     /** \brief Constructor
+     *  \param name \pluginargument{LpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_LPStruct
      */

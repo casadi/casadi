@@ -27,6 +27,10 @@
 #include "casadi/interfaces/snopt/casadi_nlpsolver_snopt_export.h"
 #include "wsnopt.hpp"
 
+/** \defgroup plugin_NlpSolver_snopt
+  SNOPT interface
+*/
+
 /** \pluginsection{NlpSolver,snopt} */
 
 /// \cond INTERNAL
@@ -34,6 +38,7 @@ namespace casadi {
 
   /** \brief \pluginbrief{NlpSolver,snopt}
      @copydoc NlpSolver_doc
+     @copydoc plugin_NlpSolver_snopt
   */
   class CASADI_NLPSOLVER_SNOPT_EXPORT SnoptInternal : public NlpSolverInternal {
 

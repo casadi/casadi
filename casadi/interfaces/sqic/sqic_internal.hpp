@@ -26,6 +26,10 @@
 #include "casadi/core/function/qp_solver_internal.hpp"
 #include <casadi/interfaces/sqic/casadi_qpsolver_sqic_export.h>
 
+/** \defgroup plugin_QpSolver_sqic
+       Interface to the SQIC solver for quadratic programming
+*/
+
 /** \pluginsection{QpSolver,sqic} */
 
 /// \cond INTERNAL
@@ -33,9 +37,8 @@ namespace casadi {
 
   /**  \brief \pluginbrief{QpSolver,sqic}
   
-       Interface to the SQIC solver for quadratic programming
-
        @copydoc QpSolver_doc
+       @copydoc plugin_QpSolver_sqic
        \author Joris Gillis
        \date 2013
 

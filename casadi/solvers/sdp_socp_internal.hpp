@@ -28,16 +28,20 @@
 
 #include <casadi/solvers/casadi_socpsolver_sdp_export.h>
 
+/** \defgroup plugin_SocpSolver_sdp
+   Solve SOCPs using an SdpSolver
+*/
+
+
 /** \pluginsection{SocpSolver,sdp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
   /** \brief \pluginbrief{SocpSolver,sdp}
-  
-      SDP Solver for second order cone programming
 
       @copydoc SocpSolver_doc
+      @copydoc plugin_SocpSolver_sdp
 
       \author Joris Gillis
       \date 2013

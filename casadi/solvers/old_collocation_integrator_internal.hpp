@@ -29,6 +29,14 @@
 #include "casadi/core/misc/integration_tools.hpp"
 #include <casadi/solvers/casadi_integrator_oldcollocation_export.h>
 
+/** \defgroup plugin_Integrator_oldcollocation
+     
+     Collocation integrator
+     ODE/DAE integrator based on collocation
+
+     The method is still under development
+
+*/
 /** \pluginsection{Integrator,oldcollocation} */
 
 /// \cond INTERNAL
@@ -36,13 +44,9 @@ namespace casadi {
 
   /**
      \brief \pluginbrief{Integrator,oldcollocation}
-     
-     Collocation integrator
-     ODE/DAE integrator based on collocation
-
-     The method is still under development
 
      @copydoc DAE_doc
+     @copydoc plugin_Integrator_oldcollocation
 
      \author Joel Andersson
      \date 2011

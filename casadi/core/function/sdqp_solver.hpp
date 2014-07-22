@@ -107,6 +107,7 @@ namespace casadi {
     SdqpSolver();
 
     /** \brief Constructor
+     *  \param name \pluginargument{SdqpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_SDQPStruct
      */

@@ -27,6 +27,11 @@
 #include <casadi/interfaces/qpoases/casadi_qpsolver_qpoases_export.h>
 #include <qpOASES.hpp>
 
+/** \defgroup plugin_QpSolver_qpoases
+Interface to QPOases Solver for quadratic programming
+
+*/ 
+
 /** \pluginsection{QpSolver,qpoases} */
 
 /// \cond INTERNAL
@@ -34,7 +39,8 @@ namespace casadi {
 
   /** \brief \pluginbrief{QpSolver,qpoases}
    * 
-   * Interface to QPOases Solver for quadratic programming
+   * @copydoc QPSolver_doc
+   * @copydoc plugin_QpSolver_qpoases
    * 
    * \author Joris Gillis, Joel Andersson
    * \date 2011

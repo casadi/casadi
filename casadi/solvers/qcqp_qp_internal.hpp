@@ -27,6 +27,10 @@
 #include "casadi/core/function/qcqp_solver.hpp"
 #include <casadi/solvers/casadi_qpsolver_qcqp_export.h>
 
+/** \defgroup plugin_QpSolver_qcqp
+   Solve QP using a QcqpSolver
+*/
+
 /** \pluginsection{QpSolver,qcqp} */
 
 /// \cond INTERNAL
@@ -34,9 +38,8 @@ namespace casadi {
 
   /** \brief \pluginbrief{QpSolver,qcqp}
   
-     Use a QCQP solver to solve q QP
-
       @copydoc QpSolver_doc
+      @copydoc plugin_QpSolver_qcqp
 
       \author Joris Gillis
       \date 2013

@@ -87,7 +87,11 @@ namespace casadi {
     /// Clone
     DpleSolver clone() const;
 
-    /// DpleSolver solver factory
+    /** \brief DpleSolver solver factory
+    * \param name \pluginargument{DpleSolver}
+    * \param[in] A List of sparsities of A_i
+    * \param[in] V List of sparsities of V_i
+    */
     DpleSolver(const std::string& name,
                const std::vector< Sparsity > & A,
                const std::vector< Sparsity > & V);

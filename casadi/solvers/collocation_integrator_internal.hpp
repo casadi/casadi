@@ -28,6 +28,15 @@
 #include "casadi/core/function/implicit_function.hpp"
 #include "casadi/core/misc/integration_tools.hpp"
 
+/** \defgroup plugin_Integrator_collocation
+     
+     Fixed-step implicit Runge-Kutta integrator
+     ODE/DAE integrator based on collocation schemes
+
+     The method is still under development
+
+*/
+
 /** \pluginsection{Integrator,collocation} */
 
 /// \cond INTERNAL
@@ -35,13 +44,9 @@ namespace casadi {
 
   /**
      \brief \pluginbrief{Integrator,collocation}
-     
-     Fixed-step implicit Runge-Kutta integrator
-     ODE/DAE integrator based on collocation schemes
-
-     The method is still under development
 
      @copydoc DAE_doc
+     @copydoc plugin_Integrator_collocation
 
      \author Joel Andersson
      \date 2014

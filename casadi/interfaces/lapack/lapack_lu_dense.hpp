@@ -28,6 +28,13 @@
 
 namespace casadi {
 
+/** \defgroup plugin_LinearSolver_lapacklu
+*
+   * This class solves the linear system <tt>A.x=b</tt> by making an LU factorization of A: \n
+   * <tt>A = L.U</tt>, with L lower and U upper triangular
+   *
+*/ 
+
 /** \pluginsection{LinearSolver,lapacklu} */
 
 /// \cond INTERNAL
@@ -49,25 +56,8 @@ namespace casadi {
 
   /** \brief \pluginbrief{LinearSolver,lapacklu}
    *
-   * LU LinearSolver with Lapack Interface
    * @copydoc LinearSolver_doc
-   *
-   * This class solves the linear system <tt>A.x=b</tt> by making an LU factorization of A: \n
-   * <tt>A = L.U</tt>, with L lower and U upper triangular
-   *
-   * LapackLUDense is an casadi::Function mapping from 2 inputs 
-   * [ A (matrix), b (vector)] to one output [x (vector)].
-   *
-   * The usual procedure to use LapackLUDense is: \n
-   *  -# init()
-   *  -# set the first input (A)
-   *  -# prepare()
-   *  -# set the second input (b)
-   *  -# solve()
-   *  -# Repeat steps 4 and 5 to work with other b vectors.
-   *
-   * The method evaluate() combines the prepare() and solve() step and is
-   * therefore more expensive if A is invariant.
+   * @copydoc plugin_LinearSolver_lapacklu
    *
    */
   class CASADI_LINEARSOLVER_LAPACKLU_EXPORT LapackLUDenseInternal : public LinearSolverInternal {

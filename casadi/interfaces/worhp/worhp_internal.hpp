@@ -38,7 +38,9 @@
 
 // MACROs that pollute our code
 #undef Q
-
+/**\defgroup plugin_NlpSolver_worhp
+ WORHP interface
+*/
 /** \pluginsection{NlpSolver,worhp} **/
 
 /// \cond INTERNAL
@@ -46,6 +48,7 @@ namespace casadi {
 
   /** \brief \pluginbrief{NlpSolver,worhp}
      @copydoc NlpSolver_doc
+     @copydoc plugin_NlpSolver_worhp
   */
   class CASADI_NLPSOLVER_WORHP_EXPORT WorhpInternal : public NlpSolverInternal {
 

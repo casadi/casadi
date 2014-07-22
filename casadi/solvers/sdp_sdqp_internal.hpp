@@ -29,13 +29,9 @@
 
 #include <casadi/solvers/casadi_sdqpsolver_sdp_export.h>
 
-/** \pluginsection{SdqpSolver,sdp} */
+/** \defgroup plugin_SdqpSolver_sdp
 
-/// \cond INTERNAL
-namespace casadi {
-
-  /** \brief \pluginbrief{SdqpSolver,sdp}
-   *
+    Solve an SQDP using an SdpSolver
    *  Note: this implementation relies on Cholesky decomposition:
    *        <tt>Chol(H) = L ->  H = LL'</tt> with L lower triangular
    *   This requires Pi, H to be positive definite. Positive semi-definite is not sufficient.
@@ -44,9 +40,19 @@ namespace casadi {
    *  A better implementation would rely on matrix square root,
    *  but we need singular value decomposition to implement that.
    *
+*/
+
+/** \pluginsection{SdqpSolver,sdp} */
+
+/// \cond INTERNAL
+namespace casadi {
+
+  /** \brief \pluginbrief{SdqpSolver,sdp}
+   *
    *
    @copydoc SdqpSolver_doc
-
+   @copydoc plugin_SdqpSolver_sdp
+   
    \author Joris Gillis
    \date 2013
   */

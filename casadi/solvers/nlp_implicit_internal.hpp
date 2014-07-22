@@ -29,17 +29,19 @@
 
 #include <casadi/solvers/casadi_implicitfunction_nlp_export.h>
 
+/** \defgroup plugin_ImplicitFunction_nlp
+  Use an NlpSolver as ImplicitFunction solver
+*/
 /** \pluginsection{ImplicitFunction,nlp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
   /** \brief  \pluginbrief{ImplicitFunction,nlp}
-  
-  Use an NlpSolver as ImplicitFunction solver
 
    @copydoc ImplicitFunction_doc
-
+   @copydoc plugin_ImplicitFunction_nlp
+  
    \author Joris Gillis
    \date 2012
   */

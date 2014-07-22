@@ -35,6 +35,10 @@
 #include <idas/idas_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+/** \defgroup plugin_Integrator_idas
+      Interface to IDAS from the Sundials suite.
+*/
+
 /** \pluginsection{Integrator,idas} */
 
 /// \cond INTERNAL
@@ -42,10 +46,9 @@
 namespace casadi {
 
   /** \brief \pluginbrief{Integrator,idas}
-      
-      Interface to IDAS from the Sundials suite.
 
       @copydoc IdasIntegrator_doc
+      @copydoc plugin_Integrator_idas
 
       \author Joel Andersson
       \date 2010

@@ -103,6 +103,7 @@ namespace casadi {
     StabilizedQpSolver();
 
     /** \brief Constructor
+     *  \param name \pluginargument{StabilizedQpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_QPStruct
      */

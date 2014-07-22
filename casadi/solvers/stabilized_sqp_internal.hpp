@@ -29,6 +29,10 @@
 
 #include <casadi/solvers/casadi_nlpsolver_stabilizedsqp_export.h>
 
+/** \defgroup plugin_NlpSolver_stabilizedsqp
+      Stabilized Sequential Quadratic Programming method.
+*/
+
 /** \pluginsection{NlpSolver,stabilizedsqp} */
 
 /// \cond INTERNAL
@@ -37,7 +41,8 @@ namespace casadi {
   /**
      \brief \pluginbrief{NlpSolver,stabilizedsqp}
      
-     Stabilized Sequential Quadratic Programming method.
+     @copydoc NlpSolver_doc
+     @copydoc plugin_NlpSolver_stabilizedsqp
 
      \author Slava Kung
      \date 2013

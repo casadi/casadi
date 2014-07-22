@@ -179,6 +179,7 @@ namespace casadi {
     SdpSolver();
 
     /** \brief Constructor
+     *  \param name \pluginargument{SdpSolver}
      *  \param st Problem structure
      *  \copydoc scheme_SDPStruct
      */

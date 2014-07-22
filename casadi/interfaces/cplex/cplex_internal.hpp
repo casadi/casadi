@@ -28,6 +28,11 @@
 
 #include <string>
 
+/** \defgroup plugin_QpSolver_cplex
+     
+      Interface to Cplex solver for sparse Quadratic Programs
+*/
+
 /** \pluginsection{QpSolver,cplex} */
 
 /// \cond INTERNAL
@@ -35,9 +40,10 @@
 namespace casadi {
 
   /** \brief \pluginbrief{QpSolver,cplex}
-     
-      Interface to Cplex solver for sparse Quadratic Programs
+
       @copydoc QpSolver_doc
+      @copydoc plugin_QpSolver_cplex
+      
       \author Attila Kozma, Joel Andersson
       \date 2012
   */

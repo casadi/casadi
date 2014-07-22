@@ -28,14 +28,19 @@
 
 #include <casadi/solvers/casadi_stabilizedqpsolver_qp_export.h>
 
+/** \defgroup plugin_StabilizedQpSolver_qp
+      Solved a stabilized QP using a standard QP solver
+*/
+
 /** \pluginsection{StabilizedQpSolver,qp} */
 
 /// \cond INTERNAL
 namespace casadi {
 
   /** \brief \pluginbrief{StabilizedQpSolver,qp}
-  
-      Solved a stabilized QP using a standard QP solver
+     
+      @copydoc StabilizedQpSolver_doc
+      @copydoc plugin_StabilizedQpSolver_qp
 
       \author Joris Gillis
       \date 2013
